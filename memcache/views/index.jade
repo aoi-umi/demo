@@ -1,0 +1,19 @@
+extends layout
+
+block content
+  span host
+  input#memcacheHost(value="localhost:11211")
+  input#memcacheLink(type="button",value="连接")
+  span#message
+  div
+    input#query(type="button",value="查询")
+    input#delNullKey(type="button",value="删除空键")
+    table(style="border-collapse:collapse;border:none;border:solid #000 1px;")
+      thead
+        tr
+          th success
+          th key
+          th operation
+      tbody#dataList
+  script(type="text/javascript", src="/javascripts/index.js")
+
