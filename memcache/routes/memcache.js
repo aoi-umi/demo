@@ -17,7 +17,7 @@ exports.delete = function(key, cb){
     memcached.del(key, cb);
 }
 
-exports.getItems = function(cb) {
+exports.getItems = function(args, cb) {
     memcached.items(function (err, result) {
         if (err) return cb(err);
         //console.log(JSON.stringify((result)))
@@ -32,6 +32,7 @@ exports.getItems = function(cb) {
             var keys = Object.keys(itemSet);
             keys.pop(); // we don't need the "server" key, but the other indicate the slab id's
 
+            if(!keys.length) return cb(null, list);
             keys.forEach(function (stats) {
 
                 // get a cachedump for each slabid and slab.number
@@ -42,14 +43,14 @@ exports.getItems = function(cb) {
                     } else if(response){
                         if(isArray(response)){
                             response.forEach(function(eachRes){
-                                if(eachRes.key)
+                                if(eachRes.key && (!args || !args.key || eachRes.key.indexOf(args.key) >= 0))
                                     list.push({success: 1, data: {
                                         slabid: stats,
                                         number: itemSet[stats].number,
                                         key: eachRes.key
                                     }});
                             });
-                        }else if(response.key) {
+                        }else if(response.key && (!args || !args.key || response.key.indexOf(args.key) >= 0)) {
                             //console.log(response)
                             list.push({
                                 success: 1, data: {

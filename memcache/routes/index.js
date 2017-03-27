@@ -19,14 +19,19 @@ router.post('/link', function(req, res, next) {
 });
 
 router.post('/query', function(req, res, next) {
-  try {
-    memcache.getItems(function(err, result){
-      if(err) throw err;
+    var reqData = req.body;
+    var key = reqData.key;
+    var args = {
+        key: key
+    };
+    try {
+    memcache.getItems(args, function(err, result){
+      if(err) return res.send({success: 0, data: err.toString()});
       res.send({success:1, data: result});
     });
-  }catch (err){
+    }catch (err){
     res.send({success:0, data:err.toString()});
-  }
+    }
 });
 
 router.post('/detailQuery', function(req, res, next) {
@@ -34,7 +39,7 @@ router.post('/detailQuery', function(req, res, next) {
     var reqData = req.body;
     var key = reqData.key;
     memcache.get(key, function (err, result) {
-      if (err) throw err;
+      if (err) return res.send({success: 0, data: err.toString()});
       res.send({success: 1, data: result});
     });
   } catch (err) {
@@ -47,7 +52,7 @@ router.post('/delKey', function(req, res, next) {
     var reqData = req.body;
     var key = reqData.key;
     memcache.delete(key, function (err) {
-      if (err) throw err;
+      if (err) return res.send({success: 0, data: err.toString()});
       res.send({success: 1});
     });
   } catch (err) {
@@ -57,7 +62,7 @@ router.post('/delKey', function(req, res, next) {
 
 router.post('/delNullKey', function(req, res, next) {
   try {
-    memcache.getItems(function(err, result){
+    memcache.getItems(null,function(err, result){
       if(err) throw err;
       var delCount = 0;
       var finishedCount = 0;

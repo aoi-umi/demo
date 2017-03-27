@@ -1,10 +1,13 @@
 extends layout
 
 block content
-  span host
+  span(style="width:40px;display:inline-block;") host
   input#memcacheHost(value="localhost:11211")
   input#memcacheLink(type="button",value="连接")
   span#message
+  br
+  span(style="width:40px;display:inline-block;") key
+  input#key
   div
     input#query(type="button",value="查询")
     input#delNullKey(type="button",value="删除空键")

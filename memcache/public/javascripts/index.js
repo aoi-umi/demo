@@ -11,6 +11,7 @@ $(function(){
             url:'/detailQuery',
             contentType: 'application/json',
             dataType: 'json',
+            timeout :30000,
             data:JSON.stringify(data),
             success:function(data) {
                 if(!data.success){
@@ -51,6 +52,7 @@ $(function(){
             url:'/delKey',
             contentType: 'application/json',
             dataType: 'json',
+            timeout :30000,
             data:JSON.stringify(data),
             success:function(data) {
                 var date = new Date();
@@ -78,6 +80,7 @@ $(function(){
             url:'/link',
             contentType: 'application/json',
             dataType: 'json',
+            timeout :30000,
             data:JSON.stringify(data),
             success:function(data) {
                 var date = new Date();
@@ -90,11 +93,17 @@ $(function(){
         });
     });
     $('#query').on('click', function(){
+        var data = {
+            key: $.trim($('#key').val())
+        };
+
         $.ajax({
             type:'post',
             url:'/query',
             contentType: 'application/json',
             dataType: 'json',
+            timeout :30000,
+            data:JSON.stringify(data),
             success:function(data) {
                 if(!data.success){
                     var date = new Date();
@@ -128,6 +137,7 @@ $(function(){
             url:'/delNullKey',
             contentType: 'application/json',
             dataType: 'json',
+            timeout :30000,
             success:function(data) {
                 if(!data.success){
                     var date = new Date();

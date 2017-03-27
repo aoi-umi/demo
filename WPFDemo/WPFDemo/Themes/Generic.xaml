@@ -1,0 +1,28 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:WPFDemo">
+    <DataTemplate x:Key="DataTemplate1">
+        <StackPanel>
+            <StackPanel.Background>
+                <SolidColorBrush Color="BlueViolet" Opacity=".6"/>
+            </StackPanel.Background>
+            <TextBlock Text="样式一"/>
+            <UniformGrid HorizontalAlignment="Stretch">
+                <ContentPresenter Content="{Binding str1}"/>
+                <ContentPresenter Content="{Binding str2}"/>
+                <Button Content="测试" Command="{Binding DataContext.TestCommand, RelativeSource={RelativeSource AncestorType=Window}}"  
+                        CommandParameter="{Binding Path=Content, RelativeSource={RelativeSource TemplatedParent}}"/>
+            </UniformGrid>
+        </StackPanel>
+    </DataTemplate>
+    <DataTemplate x:Key="DataTemplate2">
+        <StackPanel>
+            <StackPanel.Background>
+                <SolidColorBrush Color="Tomato" Opacity=".6"/>
+            </StackPanel.Background>
+            <TextBlock Text="样式二"/>
+            <ContentPresenter Content="{Binding str1}"/>
+            <ContentPresenter Content="{Binding str2}"/>
+        </StackPanel>
+    </DataTemplate>
+</ResourceDictionary>
