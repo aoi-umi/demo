@@ -1,0 +1,58 @@
+<% include ./header.ejs %>
+<link rel="stylesheet" type="text/css" href="/css/diffview.css">
+<div class="container theme-showcase navbar-fixed-top" role="main">
+    <div align="center">
+        <table id="table1" border="0" width="900">
+            <tbody>
+            <tr>
+                <td>
+                    <h3>Base Text（基础文本）</h3>
+                    <textarea class="form-control" id="baseText"></textarea>
+
+                    <h3>New Text（对比文本）</h3>
+                    <textarea class="form-control" id="newText"></textarea><br>
+
+                    <input id="contextSize" value="" type="hidden">
+                    <strong>结果查看方式:</strong>
+                    <label><input name="_viewtype" id="sidebyside" type="radio"> 左右并排</label>
+                    &nbsp;&nbsp;
+                    <label><input name="_viewtype" checked="checked" id="inline" type="radio"> 上下对比</label>
+
+                    <input class="btn btn-primary" value="Submit" onclick="diffUsingJS();" type="button"><br><br>
+                    <a name="diff"> </a>
+
+                    <div id="diffoutput" style="width:100%">
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div> <!-- /container -->
+<% include ./footer.ejs %>
+
+<script type="text/javascript" src="/js/memcache.js"></script>
+<script type="text/javascript" src="/js/diffview.js"></script>
+<script type="text/javascript" src="/js/difflib.js"></script>
+<script type="text/javascript">
+    function diffUsingJS() {
+        var base = difflib.stringAsLines($("#baseText").val());
+        var newtxt = difflib.stringAsLines($("#newText").val());
+        var sm = new difflib.SequenceMatcher(base, newtxt);
+        var opcodes = sm.get_opcodes();
+        var diffoutputdiv = $("#diffoutput");
+        diffoutputdiv.html('');
+        var contextSize = $("#contextSize").val();
+        contextSize = contextSize ? contextSize : null;
+        diffoutputdiv.append(diffview.buildView({
+            baseTextLines: base,
+            newTextLines: newtxt,
+            opcodes: opcodes,
+            baseTextName: "Base Text",
+            newTextName: "New Text",
+            contextSize: contextSize,
+            viewType: $("#inline").prop('checked') ? 1 : 0,
+            tableClass: 'table table-bordered'
+        }));
+    }
+</script>
