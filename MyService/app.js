@@ -23,6 +23,7 @@ app.use('/', function (req, res, next) {
     //req.query  /?params1=1&params2=2
     //req.body  post的参数
     //req.params /:params1/:params2
+    console.log(require('./routes/_system/common').getClientIp(req));
     req.myData = {};
     for(var i = 0; i < restConfig.length; i++) {
         var rest = restConfig[i];

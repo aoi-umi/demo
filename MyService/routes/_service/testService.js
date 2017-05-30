@@ -22,5 +22,5 @@ exports.test1 = function (data, cb) {
     opt.serviceName += 'test1';
     opt.method = 'test1';
     opt.data = data;
-    common.requestServiceFromConfig(opt, cb);
+    common.requestServiceByConfig(opt, cb);
 };
