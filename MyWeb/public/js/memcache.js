@@ -19,7 +19,8 @@ $(function(){
                     msg.html(date + ' ' + JSON.stringify(data.data));
                 }else{
                     var data = data.data;
-                    div.html(data ? data : 'undefined');
+                    data = data ? JSON.stringify(data): 'undefined';
+                    div.html(data);
                 }
 
             },
