@@ -32,4 +32,10 @@ module.exports = [
         path:'',
         auth:[],
     },
+    {
+        url:'/test2',
+        method:['get'],
+        path:'',
+        auth:[],
+    },
 ];

@@ -13,24 +13,30 @@ exports.requestServiceByConfig = function (option, cb) {
         var host = service.host;
         var methodArgs = service[option.methodName];
         var method = methodArgs.method;
-        if(methodArgs.isUsedHost) {
+        var url = methodArgs.url;
+        if(methodArgs.isUseHost !== false) {
             if (!host) throw new Error(errStr + ' host is empty!');
         }else {
             host = '';
         }
-        if(!method) throw new Error(errStr + ' method "' + option.methodName + '" is empty!');
-        var url = host + method;
-        console.log('request url:', url);
+        if(!url) throw new Error(errStr + ' method "' + option.methodName + '" url is empty!');
+        url = host + url;
         var opt = {
             url: url,
             data: option.data,
+            method: method
         };
         //console.log(opt);
-        common.requestService(opt, cb);
+        common.requestService(opt, function (err, data) {
+            if(err) {
+                console.log('request', '[' + option.serviceName + ']', '[' + option.methodName + ']', 'error');
+                console.log('url:', url);
+            }
+            cb(err, data);
+        });
     }
     catch (e) {
-        cb(e.message);
-        common.writeError(e);
+        cb(e);
     }
 };
 
@@ -39,7 +45,7 @@ exports.requestService = function (option, cb) {
     var options = {
         headers: {},
         url: opt.url,
-        method: 'POST',
+        method: opt.method || 'POST',
         json: true,
         body: opt.data
     };
@@ -48,13 +54,15 @@ exports.requestService = function (option, cb) {
     });
 };
 
-exports.formatReq = function (err, data, result) {
+exports.formatRes = function (err, data, result) {
     var res = {
         code: null,
         detail: null,
         desc: null,
     };
     if(err) {
+        common.writeError(err);
+        if(err.message) err = err.message;
         res.code = '400';
         res.desc = err;
     }else{
@@ -69,8 +77,10 @@ exports.writeError = function (err){
     console.error(err)
     //用于查找上一级调用
     var stack = new Error().stack;
-    var stackList = common.getStack(stack, 2, 3).concat(common.getStack(err.stack, 1, 3))
-    for(var i = 0;i < stackList.length; i++){
+    var stackList = common.getStack(err.stack, 1,3)
+        .concat(['help stack:'])
+        .concat(common.getStack(stack, 2, 4));
+    for(var i = 0;i < stackList.length; i++) {
         console.error(stackList[i]);
     }
 };

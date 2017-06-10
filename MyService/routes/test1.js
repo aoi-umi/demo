@@ -5,6 +5,6 @@ var testService = require('./_service/testService');
 var common = require('./_system/common');
 exports.get = function (req, res) {
     testService.test1({}, function (err, data) {
-        res.send(common.formatReq(err, data));
+        res.send(common.formatRes(err, data));
     });
 }
