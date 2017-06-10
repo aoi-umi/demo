@@ -12,15 +12,14 @@ var getOption = function () {
 
 exports.test = function (data, cb) {
     var opt = getOption();
-    opt.method = 'test';
+    opt.methodName = 'test';
     opt.data = data;
-    common.requestServiceFromConfig(opt, cb);
+    common.requestServiceByConfig(opt, cb);
 };
 
 exports.test1 = function (data, cb) {
     var opt = getOption();
-    opt.serviceName += 'test1';
-    opt.method = 'test1';
+    opt.methodName = 'test1';
     opt.data = data;
     common.requestServiceByConfig(opt, cb);
 };

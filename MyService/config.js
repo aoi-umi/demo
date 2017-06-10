@@ -10,7 +10,14 @@ module.exports = {
     api:{
         testService:{
             host:'http://localhost:3010',
-            test:'/'
+            test:{
+                method:'/',
+                isUsedHost:true,
+            },
+            test1:{
+                method:'http://localhost:3009',
+                isUsedHost:false,
+            },
         }
     }
 };

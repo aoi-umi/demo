@@ -11,10 +11,16 @@ exports.requestServiceByConfig = function (option, cb) {
         var service = config.api[option.serviceName];
         if(!service) throw new Error(errStr + ' is not exist!');
         var host = service.host;
-        var method = service[option.method];
-        if(!host) throw new Error(errStr + ' host is empty!');
-        if(!method) throw new Error(errStr + ' method "' + option.method + '" is empty!');
+        var methodArgs = service[option.methodName];
+        var method = methodArgs.method;
+        if(methodArgs.isUsedHost) {
+            if (!host) throw new Error(errStr + ' host is empty!');
+        }else {
+            host = '';
+        }
+        if(!method) throw new Error(errStr + ' method "' + option.methodName + '" is empty!');
         var url = host + method;
+        console.log('request url:', url);
         var opt = {
             url: url,
             data: option.data,
