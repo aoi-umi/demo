@@ -23,3 +23,9 @@ exports.test1 = function (data, cb) {
     opt.data = data;
     common.requestServiceByConfig(opt, cb);
 };
+exports.test2 = function (data, cb) {
+    var opt = getOption();
+    opt.methodName = 'test2';
+    opt.data = data;
+    common.requestServiceByConfig(opt, cb);
+};
