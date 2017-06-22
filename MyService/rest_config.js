@@ -3,38 +3,68 @@
  */
 module.exports = [
     {
-        url:'/',
-        method:['get', 'post'],
-        path:'index',
-        auth:[],
+        url: '/',
+        method: [{
+            name: 'get',
+            functionName: ''
+        }, {
+            name: 'post',
+            functionName: ''
+        }],
+        path: 'index',
+        auth: [],
+    },
+    {
+        url:'/index',
+        method:[{
+            name: 'get',
+            functionName: 'index'
+        }],
+        path:'',
+        auth:[]
     },
     {
         url:'/users',
-        method:['get'],
+        method:[{
+            name: 'get',
+            functionName: 'testGet'
+        }],
         path:'',
         auth:['login']
     },
     {
         url:'/admin',
-        method:['get'],
+        method:[{
+            name: 'get',
+            functionName: ''
+        }],
         path:'',
         auth:['login', 'admin']
     },
     {
         url:'/test',
-        method:['get'],
+        method:[{
+            name: 'get',
+            functionName: ''
+        }],
         path:'',
         auth:[],
     },
     {
         url:'/test1',
-        method:['get'],
+        method:[{
+            name: 'get',
+            functionName: 'testGet'
+        }],
         path:'',
         auth:[],
     },
     {
         url:'/test2',
-        method:['get'],
+        method:[{
+            name: 'get',
+            functionName: ''
+        }],
         path:'',
         auth:[],
     },
