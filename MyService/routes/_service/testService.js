@@ -7,8 +7,6 @@ var getOption = function () {
     var opt = {
         serviceName: 'testService',
         beforeSend: function (option, args) {
-            console.log(option)
-            console.log(args)
         }
     };
     return opt;

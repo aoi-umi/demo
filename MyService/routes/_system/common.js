@@ -30,7 +30,7 @@ exports.requestServiceByConfig = function (option, cb) {
         url = host + url;
         var opt = {
             url: url,
-            data: option.data,
+            body: option.data,
             method: method
         };
         if(option.beforeSend){
@@ -51,36 +51,39 @@ exports.requestServiceByConfig = function (option, cb) {
     }
 };
 
-exports.requestService = function (option, cb) {
-    var opt = option;
-    var options = {
-        headers: opt.header || {},
-        url: opt.url,
-        method: opt.method || 'POST',
-        json: true,
-        body: opt.data
-    };
-    request(options, function(err, res, data) {
+exports.requestService = function (opt, cb) {
+    if(!opt.method)
+        opt.method = 'POST';
+    if(opt.json == undefined)
+        opt.json = true;
+    request(opt, function(err, res, data) {
         cb(err, data);
+        if(err)
+            console.error(opt);
     });
 };
 
-exports.formatRes = function (err, data, result) {
+exports.formatRes = function (err, data) {
+    //result    是否成功
+    //desc      描述
+    //detail    成功 返回的内容
+    //          失败 错误代码
     var res = {
-        code: null,
+        result: null,
         detail: null,
         desc: null,
     };
     if(err) {
         common.writeError(err);
         if(err.message) err = err.message;
-        res.code = '400';
+        res.result = false;
         res.desc = err;
     }else{
-        res.code = '20000';
-        res.detail = data;
+        res.result = true;
+        res.desc = 'success';
     }
-    if(result) res.code = result;
+    if(data)
+        res.detail = data;
     return res;
 };
 
@@ -147,3 +150,31 @@ exports.IPv4ToIPv6 = function (ip, convert) {
 };
 // console.log(exports.IPv4ToIPv6('192.168.1.1'))
 // console.log(exports.IPv4ToIPv6('192.168.1.1', true))
+
+exports.dateFormat = function (date, format) {
+    try {
+        if (!format)format = 'yyyy-MM-dd';
+        if(!date)
+            date = new Date();
+        if(typeof date == 'string')
+            date = Date.parse(date);
+
+
+        var o = {
+            y: date.getFullYear(),
+            M: date.getMonth() + 1,
+            d: date.getDate(),
+            h: date.getHours() % 12,
+            H: date.getHours(),
+            m: date.getMinutes(),
+            s: date.getSeconds()
+        };
+        return format.replace(/(y+|M+|d+|h+|H+|m+|s+)/g, function (e) {
+            return ((e.length > 1 ? '0' : '') + eval('o.' + e.slice(-1))).slice(-(e.length > 2 ? e.length : 2))
+        });
+    } catch (ex) {
+        return '';
+    }
+};
+//console.log(exports.dateFormat(null,'yyyy-MM-dd hh:mm:ss'))
+//console.log(exports.dateFormat(null,'yyyy-MM-dd HH:mm:ss'))
