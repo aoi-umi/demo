@@ -10,15 +10,22 @@ exports.requestServiceByConfig = function (option, cb) {
         var errStr = 'service "' + option.serviceName + '"';
         var service = config.api[option.serviceName];
         if(!service) throw new Error(errStr + ' is not exist!');
-        var host = service.host;
+        var serviceArgs = null;
+
         var methodArgs = service[option.methodName];
+        if(methodArgs.isUseDefault !== false) {
+            serviceArgs = service.defaultArgs;
+        }
+        else{
+            serviceArgs = methodArgs.args;
+        }
+        if (!serviceArgs) throw new Error(errStr + ' args is empty!');
+
+        var host = serviceArgs.host;
+        if (!host) throw new Error(errStr + ' host is empty!');
+
         var method = methodArgs.method;
         var url = methodArgs.url;
-        if(methodArgs.isUseHost !== false) {
-            if (!host) throw new Error(errStr + ' host is empty!');
-        }else {
-            host = '';
-        }
         if(!url) throw new Error(errStr + ' method "' + option.methodName + '" url is empty!');
         url = host + url;
         var opt = {
@@ -26,6 +33,10 @@ exports.requestServiceByConfig = function (option, cb) {
             data: option.data,
             method: method
         };
+        if(option.beforeSend){
+            //发送的参数 当前所用参数
+            option.beforeSend(opt, serviceArgs);
+        }
         //console.log(opt);
         common.requestService(opt, function (err, data) {
             if(err) {
@@ -43,7 +54,7 @@ exports.requestServiceByConfig = function (option, cb) {
 exports.requestService = function (option, cb) {
     var opt = option;
     var options = {
-        headers: {},
+        headers: opt.header || {},
         url: opt.url,
         method: opt.method || 'POST',
         json: true,
