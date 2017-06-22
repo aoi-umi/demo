@@ -47,12 +47,13 @@ for(var i = 0; i < restConfig.length; i++){
         path = './routes' + path;
         var reqfile = require(path);
         var isRouter = true;
-        switch (method.toLowerCase()) {
+        var functionName = method.functionName || method.name;
+        switch (method.name.toLowerCase()) {
             case 'get':
-                app.get(rest.url, auth.auth, reqfile.get);
+                app.get(rest.url, auth.auth, reqfile[functionName]);
                 break;
             case 'post':
-                app.post(rest.url, auth.auth, reqfile.post);
+                app.post(rest.url, auth.auth, reqfile[functionName]);
                 break;
             default:
                 isRouter = false;
