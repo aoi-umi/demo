@@ -30,7 +30,7 @@ module.exports = {
                 }
             },
             test2: {
-                url: '3010',
+                url: '1',
                 method: 'get'
             },
         }
