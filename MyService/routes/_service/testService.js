@@ -5,7 +5,11 @@ var common = require('../_system/common');
 var config = require('../../config');
 var getOption = function () {
     var opt = {
-        serviceName: 'testService'
+        serviceName: 'testService',
+        beforeSend: function (option, args) {
+            console.log(option)
+            console.log(args)
+        }
     };
     return opt;
 };

@@ -9,20 +9,28 @@ module.exports = {
     env: '_dev',
     api: {
         testService: {
+            //默认参数
+            defaultArgs: {
+                host: 'http://localhost:3010',
+                username: '',
+            },
             host: 'http://localhost:3010',
             test: {
                 url: '/',
-                isUseHost: true,//default true
+                isUseDefault: true,//default true
                 method: 'post',//default post
             },
             test1: {
-                url: 'http://localhost:3010',
-                isUseHost: false,
-                method: 'get'
+                url: '/',
+                isUseDefault: false,
+                method: 'get',
+                args: {
+                    host: 'http://localhost:3010',
+                    username: 'user1',
+                }
             },
             test2: {
-                url: 'http://localhost:3010',
-                isUseHost: true,
+                url: '3010',
                 method: 'get'
             },
         }
