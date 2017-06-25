@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var config = require('./config');
+var common = require('./routes/_system/common');
 var app = express();
 console.log(config.name,'run at port ', config.port, ',version:', config.version);
 // view engine setup
@@ -23,7 +24,7 @@ app.use('/', function (req, res, next) {
     //req.query  /?params1=1&params2=2
     //req.body  post的参数
     //req.params /:params1/:params2
-    console.log(require('./routes/_system/common').getClientIp(req));
+    //console.log(require('./routes/_system/common').getClientIp(req));
     req.myData = {};
     for(var i = 0; i < restConfig.length; i++) {
         var rest = restConfig[i];
@@ -37,12 +38,12 @@ app.use('/', function (req, res, next) {
 var auth = require('./routes/_system/auth');
 var restConfig = require('./rest_config');
 var restList = [];
-for(var i = 0; i < restConfig.length; i++){
-    var rest  = restConfig[i];
-    for(var imethod = 0;imethod < rest.method.length; imethod++){
+for(var i = 0; i < restConfig.length; i++) {
+    var rest = restConfig[i];
+    for (var imethod = 0; imethod < rest.method.length; imethod++) {
         var method = rest.method[imethod];
         var path = rest.path || rest.url;
-        if(path && path.substr(0, 1) !== '/')
+        if (path && path.substr(0, 1) !== '/')
             path = '/' + path;
         path = './routes' + path;
         var reqfile = require(path);
@@ -59,7 +60,7 @@ for(var i = 0; i < restConfig.length; i++){
                 isRouter = false;
                 break;
         }
-        if(isRouter){
+        if (isRouter) {
             restList.push({url: rest.url, method: method, path: path});
         }
     }
@@ -81,10 +82,14 @@ if (config.env === '_dev') {
     app.use(function(err, req, res, next) {
         err.status = err.status || 500;
         res.status(err.status);
-        res.render('error', {
-            message: err.message,
-            error: err
-        });
+        if (req.headers['x-requested-with'] && req.headers['x-requested-with'].toLowerCase() == 'xmlhttprequest') {
+            res.send(common.formatRes(err));
+        }else{
+            res.render('error', {
+                message: err.message,
+                error: err
+            });
+        }
     });
 }
 

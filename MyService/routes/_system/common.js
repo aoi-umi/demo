@@ -177,4 +177,4 @@ exports.dateFormat = function (date, format) {
     }
 };
 //console.log(exports.dateFormat(null,'yyyy-MM-dd hh:mm:ss'))
-//console.log(exports.dateFormat(null,'yyyy-MM-dd HH:mm:ss'))
+//console.log(exports.dateFormat(null,'yyyy-MM-dd H:mm:ss'))

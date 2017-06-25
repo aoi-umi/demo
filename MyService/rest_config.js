@@ -6,10 +6,12 @@ module.exports = [
         url: '/',
         method: [{
             name: 'get',
-            functionName: ''
+            functionName: '',
+            exampleRequest:''
         }, {
             name: 'post',
-            functionName: ''
+            functionName: '',
+            exampleRequest:''
         }],
         path: 'index',
         auth: [],
@@ -61,6 +63,15 @@ module.exports = [
     },
     {
         url:'/test2',
+        method:[{
+            name: 'get',
+            functionName: ''
+        }],
+        path:'',
+        auth:[],
+    },
+    {
+        url:'/help',
         method:[{
             name: 'get',
             functionName: ''
