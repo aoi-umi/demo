@@ -14,7 +14,6 @@ module.exports = {
                 host: 'http://localhost:3010',
                 username: '',
             },
-            host: 'http://localhost:3010',
             test: {
                 url: '/',
                 isUseDefault: true,//default true

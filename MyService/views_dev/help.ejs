@@ -1,0 +1,46 @@
+<% include _public/header %>
+<table>
+    <thead>
+    <tr>
+        <td>url</td>
+        <td>method</td>
+        <td>data</td>
+    </tr>
+    </thead>
+    <tbody>
+    <% restList.forEach(function (t) { %>
+    <tr>
+        <td><a name="url" href="<%= t.method == 'post' ? 'javascript:;' : t.url %>" target=_blank
+               data-url="<%= t.url %>"
+               data-method="<%= t.method %>"
+               data-req="<%= t.exampleRequest ? t.exampleRequest:'' %>">
+                <%= t.url %></a>
+        </td>
+        <td>[<%= t.method %>]</td>
+    </tr>
+    <% }) %>
+    </tbody>
+</table>
+<% include _public/footer %>
+<script type="text/javascript">
+    $(function () {
+        $(document).on('click', '[name=url][data-method=post]', function () {
+            var dom = $(this);
+            var req = dom.attr('data-req');
+            req = {
+                a: null,
+            }
+            $.ajax({
+                type: 'POST',
+                url: dom.attr('data-url'),
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(req),
+                dataType: 'json',
+            }).then(function (t) {
+                console.log(t)
+            }).fail(function (e) {
+                console.log(e)
+            });
+        })
+    });
+</script>
