@@ -20,26 +20,31 @@ app.use(bodyParser.urlencoded());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public' + config.env)));
 
+var auth = require('./routes/_system/auth');
+var restConfig = require('./rest_config');
 app.use('/', function (req, res, next) {
     //req.query  /?params1=1&params2=2
     //req.body  post的参数
     //req.params /:params1/:params2
     //console.log(require('./routes/_system/common').getClientIp(req));
     req.myData = {};
-    for(var i = 0; i < restConfig.length; i++) {
-        var rest = restConfig[i];
-        if(req.originalUrl == rest.url){
-            req.myData.auth = rest.auth;
-            break;
-        }
-    }
+    //for (var i = 0; i < restConfig.length; i++) {
+    //    var rest = restConfig[i];
+    //    console.log(req.originalUrl, rest.url)
+    //    if (req.originalUrl == rest.url) {
+    //        req.myData.auth = rest.auth;
+    //        break;
+    //    }
+    //}
+    var user = req.myData.user = {auth:[]};
+    if (req.query.login)
+        user.auth.push('login');
+    if (req.query.admin)
+        user.auth.push('admin');
     next();
 });
-var auth = require('./routes/_system/auth');
-var restConfig = require('./rest_config');
 var restList = [];
-for(var i = 0; i < restConfig.length; i++) {
-    var rest = restConfig[i];
+restConfig.forEach(function(rest){
     for (var imethod = 0; imethod < rest.method.length; imethod++) {
         var method = rest.method[imethod];
         var path = rest.path || rest.url;
@@ -51,10 +56,16 @@ for(var i = 0; i < restConfig.length; i++) {
         var functionName = method.functionName || method.name;
         switch (method.name.toLowerCase()) {
             case 'get':
-                app.get(rest.url, auth.auth, reqfile[functionName]);
+                app.get(rest.url, function(req, res, next){
+                    req.myData.auth = rest.auth;
+                    auth.auth(req, res, next);
+                }, reqfile[functionName]);
                 break;
             case 'post':
-                app.post(rest.url, auth.auth, reqfile[functionName]);
+                app.post(rest.url, function(req, res, next){
+                    req.myData.auth = rest.auth;
+                    auth.auth(req, res, next);
+                },  reqfile[functionName]);
                 break;
             default:
                 isRouter = false;
@@ -64,7 +75,7 @@ for(var i = 0; i < restConfig.length; i++) {
             restList.push({url: rest.url, method: method, path: path});
         }
     }
-}
+});
 //console.log(restList);
 
 /// catch 404 and forwarding to error handler

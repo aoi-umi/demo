@@ -19,7 +19,6 @@ exports.auth = function(req, res, next) {
 };
 
 var authenticationCheck = function (user, authList) {
-    console.log(authList, user)
     var noPermission = true;
     var desc = '';
     if(!authList || !authList.length){
@@ -27,7 +26,7 @@ var authenticationCheck = function (user, authList) {
     }else {
         if (user && user.auth && user.auth.length) {
             noPermission = false;
-            for (var i = 0; i < authList; i++) {
+            for (var i = 0; i < authList.length; i++) {
                 var hasAuth = _.find(user.auth, function (auth) {
                     return auth == authList[i].key;
                 });
