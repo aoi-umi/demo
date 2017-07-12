@@ -1,6 +1,16 @@
 /**
  * Created by umi on 2017-5-29.
  */
+var auth = {
+    'login':{
+        key:'login',
+        desc:'请先登录'
+    },
+    'admin': {
+        key: 'admin',
+        desc: '',
+    }
+};
 module.exports = [
     {
         url: '/',
@@ -26,13 +36,22 @@ module.exports = [
         auth:[]
     },
     {
+        url:'/:p1/:p2',
+        method:[{
+            name: 'get',
+            functionName: 'params'
+        }],
+        path:'index',
+        auth:[]
+    },
+    {
         url:'/users',
         method:[{
             name: 'get',
             functionName: 'testGet'
         }],
         path:'',
-        auth:['login']
+        auth:[auth['login']]
     },
     {
         url:'/admin',
@@ -41,7 +60,7 @@ module.exports = [
             functionName: ''
         }],
         path:'',
-        auth:['login', 'admin']
+        auth:[auth['login'],auth['admin']]
     },
     {
         url:'/test',

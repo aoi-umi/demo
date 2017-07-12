@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var common = require('./_system/common');
 
 var exports = module.exports;
 var restConfig = require('../rest_config');
@@ -23,5 +24,5 @@ exports.get = function(req, res) {
       }
     }
   }
-  res.render('help', {title: 'help', restList: restList});
+  res.render('help', common.formatViewtRes({title: 'help', restList: restList}));
 };
