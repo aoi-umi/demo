@@ -87,6 +87,13 @@ exports.formatRes = function (err, data) {
     return res;
 };
 
+exports.formatViewtRes = function(opt){
+    if(!opt)
+        opt = {};
+    opt.version = config.version;
+    return opt;
+};
+
 exports.writeError = function (err){
     console.error(err)
     //用于查找上一级调用

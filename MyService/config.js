@@ -5,7 +5,7 @@ module.exports = {
     name: 'MyService',
     port: 3010,
     deploy: '20170529',
-    version: '0.0.1',
+    version: '0.0.2',
     env: '_dev',
     api: {
         testService: {

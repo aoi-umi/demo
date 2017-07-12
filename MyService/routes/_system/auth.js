@@ -5,16 +5,12 @@ var express = require('express');
 var _ = require('underscore');
 var exports = module.exports;
 exports.auth = function(req, res, next) {
-    //res.send('respond with a resource');
-    //console.log(req.myData)
     //url权限认证
-    var noPermission = true;
     var auth = req.myData.auth;
     var user = req.myData.user;
-    noPermission = authenticationCheck(user, auth);
-
-    if(noPermission){
-        var err = new Error('No Permissions');
+    var permissionRes = authenticationCheck(user, auth);
+    if(permissionRes.noPermission){
+        var err = new Error(permissionRes.desc || 'No Permissions');
         err.status = 403;
         next(err);
     }else{
@@ -23,25 +19,28 @@ exports.auth = function(req, res, next) {
 };
 
 var authenticationCheck = function (user, authList) {
+    console.log(authList, user)
     var noPermission = true;
+    var desc = '';
     if(!authList || !authList.length){
         noPermission = false;
     }else {
         if (user && user.auth && user.auth.length) {
-            var authCount = 0;
-            for (var i = 0; i < user.auth.length; i++) {
-                var hasAuth = _.find(authList, function (auth) {
-                    return auth == user.auth[i];
+            noPermission = false;
+            for (var i = 0; i < authList; i++) {
+                var hasAuth = _.find(user.auth, function (auth) {
+                    return auth == authList[i].key;
                 });
-                if (hasAuth) {
-                    authCount++;
-                }
-                if (authCount == authList.length) {
-                    noPermission = false;
+                if (!hasAuth) {
+                    desc = authList[i].desc;
+                    noPermission = true;
                     break;
                 }
             }
+        }else{
+            desc = authList[0].desc;
+            noPermission = true;
         }
     }
-    return noPermission;
+    return {noPermission: noPermission, desc:desc};
 }
