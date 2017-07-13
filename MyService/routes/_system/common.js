@@ -5,6 +5,25 @@ var request = require('request');
 var net = require('net');
 var config = require('../../config');
 var common = exports;
+
+exports.extend = function() {
+    var args = arguments;
+    var res;
+    for (var i in args) {
+        var arg = args[i];
+        if (typeof(arg) == 'object') {
+            if (!res) res = arg;
+            else {
+                for (var key in  arg) {
+                    if (arg[key] != undefined)
+                        res[key] = arg[key];
+                }
+            }
+        }
+    }
+    return res;
+}
+
 exports.requestServiceByConfig = function (option, cb) {
     try {
         var errStr = 'service "' + option.serviceName + '"';
