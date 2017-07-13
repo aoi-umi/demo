@@ -2,8 +2,8 @@
  * Created by umi on 2017-5-29.
  */
 var request = require('request');
-var config = require('../../config');
 var net = require('net');
+var config = require('../../config');
 var common = exports;
 exports.requestServiceByConfig = function (option, cb) {
     try {
