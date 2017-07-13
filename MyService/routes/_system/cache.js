@@ -21,15 +21,15 @@ exports.get = function(key, cb){
     });
 }
 //timeout seconds
-exports.set = function(key, value, timeout, cb){
-    if(typeof timeout == 'function') {
-        cb = timeout;
-        timeout = 0;
+exports.set = function(key, value, expire, cb){
+    if(typeof expire == 'function') {
+        cb = expire;
+        expire = 0;
     }
     if(typeof value == 'object') value = JSON.stringify(value);
     client.set(cachePrefix + key, value, cb);
-    if(timeout)
-        client.expire(cachePrefix + key, timeout)
+    if(expire)
+        client.expire(cachePrefix + key, expire)
 }
 
 exports.del = function(key, cb){
