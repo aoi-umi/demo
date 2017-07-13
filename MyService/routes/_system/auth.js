@@ -1,7 +1,6 @@
 /**
  * Created by umi on 2017-5-29.
  */
-var express = require('express');
 var _ = require('underscore');
 var exports = module.exports;
 exports.auth = function(req, res, next) {
