@@ -1,6 +1,46 @@
 <% include _public/header %>
+<style>
+    .hover-source{
+        position: relative;
+        left: 100px;
+    }
+    .hover-target {
+        display: none;
+        position: absolute;
+        z-index: 999;
+        padding-top: 50px;
+    }
+    .content{
+        background-color: #ffffff;
+        border: 1px solid #47a8ef;
+        width: 100px;
+        height: 100px;
+    }
+</style>
     <h1><%= title %></h1>
     <p>Welcome to <%= title %></p>
+    <a class="hover hover-source" href="javascript:;">hover</a>
+    <div class="hover hover-target">
+        <div class="content" class="fill_main"></div>
+    </div>
+    <a class="hover hover-source" href="javascript:;">hover</a>
     <p>Method <%= method %></p>
-
 <% include _public/footer %>
+<script type="text/javascript">
+    $(function(){
+        $('.hover').on('mouseover mouseleave', function(e){
+            var dom = $(this);
+            if(dom.hasClass('hover-source')){
+                $('.hover-target').css('left', dom.position().left);
+            }
+            switch (e.type) {
+                case 'mouseover':
+                    $('.hover-target').show();
+                    break;
+                case 'mouseleave':
+                    $('.hover-target').hide();
+                    break;
+            }
+        });
+    })
+</script>
