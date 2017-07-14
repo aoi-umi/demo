@@ -31,8 +31,13 @@ exports.requestServiceByConfig = function (option, cb) {
         if(!service) throw new Error(errStr + ' is not exist!');
         var serviceArgs = null;
 
+        var defaultMethodArgs = {
+            isUseDefault: true,
+        }
         var methodArgs = service[option.methodName];
-        if(methodArgs.isUseDefault !== false) {
+        methodArgs = common.extend(defaultMethodArgs, methodArgs);
+        //console.log(methodArgs);
+        if(methodArgs.isUseDefault) {
             serviceArgs = service.defaultArgs;
         }
         else{
@@ -70,11 +75,13 @@ exports.requestServiceByConfig = function (option, cb) {
     }
 };
 
-exports.requestService = function (opt, cb) {
-    if(!opt.method)
-        opt.method = 'POST';
-    if(opt.json == undefined)
-        opt.json = true;
+exports.requestService = function (option, cb) {
+    var opt = {
+        method: 'POST',
+        json: true,
+    };
+    opt = common.extend(opt, option);
+    //console.log(opt)
     request(opt, function(err, res, data) {
         cb(err, data);
         if(err)

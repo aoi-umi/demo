@@ -16,8 +16,8 @@ module.exports = {
             },
             test: {
                 url: '/',
-                isUseDefault: true,//default true
-                method: 'post',//default post
+                //isUseDefault: true,//default true
+                //method: 'post',//default post
             },
             test1: {
                 url: '/',
