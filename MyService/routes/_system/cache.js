@@ -5,7 +5,7 @@ var client  = redis.createClient(config.redis.port, config.redis.host);
 var cachePrefix = config.cachePrefix ? config.cachePrefix + '_' : '';
 
 client.on('error', function (err) {
-    console.log('Cache Error ' + err);
+    console.error('Cache Error [' + err + ']');
 });
 
 exports.get = function(key, cb){
