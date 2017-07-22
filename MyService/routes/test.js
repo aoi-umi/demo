@@ -8,3 +8,11 @@ exports.get = function (req, res) {
         res.send(common.formatRes(err, data));
     });
 }
+
+exports.getPromise = function (req, res) {
+    testService.testPromise({}).then(function (t) {
+        res.send(common.formatRes(null, t));
+    }).catch(function (e) {
+        res.send(common.formatRes(e));
+    })
+}

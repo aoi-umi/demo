@@ -24,11 +24,51 @@ exports.extend = function() {
     return res;
 }
 
+exports.promisify = function(fun) {
+    return function() {
+        var args = arguments;
+        var evalStr = 'fun(';
+        var funArgs = [];
+        for (var key in args) {
+            funArgs.push('args[' + key + ']');
+        }
+        var cbStrList = [];
+        cbStrList.push('function(){');
+        cbStrList.push('	var cbArgs = arguments;');
+        cbStrList.push('	if(cbArgs && cbArgs[0])');
+        cbStrList.push('		reject(cbArgs[0]);');
+        cbStrList.push('	else{');
+        cbStrList.push('		var resovleEval = \'resolve(\';');
+        cbStrList.push('		var resolveArgs = [];');
+        cbStrList.push('		if(cbArgs){');
+        cbStrList.push('			for(var cbArgKey in cbArgs){');
+        cbStrList.push('				if(cbArgKey != 0){');
+        cbStrList.push('					resolveArgs.push(\'cbArgs[\' + cbArgKey + \']\');');
+        cbStrList.push('				}');
+        cbStrList.push('			}');
+        cbStrList.push('			if(resolveArgs.length)');
+        cbStrList.push('				resovleEval += resolveArgs.join(\',\');');
+        cbStrList.push('		}');
+        cbStrList.push('		resovleEval	+= \')\';');
+        cbStrList.push('		eval(resovleEval);');
+        cbStrList.push('	}');
+        cbStrList.push('}');
+        funArgs.push(cbStrList.join('\n'));
+
+        if (funArgs.length) evalStr += funArgs.join(',');
+        evalStr += ');';
+        return new Promise(function(resolve, reject) {
+            //console.log(evalStr);
+            eval(evalStr);
+        });
+    };
+};
+
 exports.requestServiceByConfig = function (option, cb) {
     try {
         var errStr = 'service "' + option.serviceName + '"';
         var service = config.api[option.serviceName];
-        if(!service) throw new Error(errStr + ' is not exist!');
+        if (!service) throw new Error(errStr + ' is not exist!');
         var serviceArgs = null;
 
         var defaultMethodArgs = {
@@ -37,10 +77,10 @@ exports.requestServiceByConfig = function (option, cb) {
         var methodArgs = service[option.methodName];
         methodArgs = common.extend(defaultMethodArgs, methodArgs);
         //console.log(methodArgs);
-        if(methodArgs.isUseDefault) {
+        if (methodArgs.isUseDefault) {
             serviceArgs = service.defaultArgs;
         }
-        else{
+        else {
             serviceArgs = methodArgs.args;
         }
         if (!serviceArgs) throw new Error(errStr + ' args is empty!');
@@ -50,24 +90,31 @@ exports.requestServiceByConfig = function (option, cb) {
 
         var method = methodArgs.method;
         var url = methodArgs.url;
-        if(!url) throw new Error(errStr + ' method "' + option.methodName + '" url is empty!');
+        if (!url) throw new Error(errStr + ' method "' + option.methodName + '" url is empty!');
         url = host + url;
         var opt = {
             url: url,
             body: option.data,
             method: method
         };
-        if(option.beforeSend){
+        if (option.beforeSend) {
             //发送的参数 当前所用参数
             option.beforeSend(opt, serviceArgs);
         }
         //console.log(opt);
-        common.requestService(opt, function (err, data) {
-            if(err) {
-                console.log('request', '[' + option.serviceName + ']', '[' + option.methodName + ']', 'error');
-                console.log('url:', url);
-            }
-            cb(err, data);
+        // common.requestService(opt, function (err, data) {
+        //     if(err) {
+        //         console.log('request', '[' + option.serviceName + ']', '[' + option.methodName + ']', 'error');
+        //         console.log('url:', url);
+        //     }
+        //     cb(err, data);
+        // });
+        common.requestServicePromise(opt).then(function (t) {
+            cb(null, t);
+        }).catch(function (e) {
+            console.log('request', '[' + option.serviceName + ']', '[' + option.methodName + ']', 'error');
+            console.log('url:', url);
+            cb(e);
         });
     }
     catch (e) {
@@ -88,6 +135,9 @@ exports.requestService = function (option, cb) {
             console.error(opt);
     });
 };
+
+exports.requestServiceByConfigPromise = common.promisify(exports.requestServiceByConfig);
+exports.requestServicePromise = common.promisify(exports.requestService);
 
 exports.formatRes = function (err, data) {
     //result    是否成功

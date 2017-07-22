@@ -72,6 +72,15 @@ module.exports = [
         auth:[],
     },
     {
+        url:'/testPromise',
+        method:[{
+            name: 'get',
+            functionName: 'getPromise'
+        }],
+        path:'/test',
+        auth:[],
+    },
+    {
         url:'/test1',
         method:[{
             name: 'get',
