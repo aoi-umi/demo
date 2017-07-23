@@ -1,11 +1,24 @@
 var redis = require('redis');
 var config = require('../../config');
+var common = require('./common');
 
 var client  = redis.createClient(config.redis.port, config.redis.host);
 var cachePrefix = config.cachePrefix ? config.cachePrefix + '_' : '';
 
+function writeCacheErr(err) {
+    console.error(common.dateFormat(null, 'yyyy-MM-dd HH:mm:ss'), 'Cache Error [' + err + ']');
+}
+var connectErrorTimes = 0;
 client.on('error', function (err) {
-    console.error('Cache Error [' + err + ']');
+    if(err.code == 'ECONNREFUSED') {
+        if(connectErrorTimes % 10 == 0){
+            writeCacheErr(err);
+            connectErrorTimes = 0;
+        }
+        connectErrorTimes++;
+    }else{
+        writeCacheErr(err);
+    }
 });
 
 exports.get = function(key, cb){

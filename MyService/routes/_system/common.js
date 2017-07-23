@@ -22,7 +22,7 @@ exports.extend = function() {
         }
     }
     return res;
-}
+};
 
 exports.promisify = function(fun) {
     return function() {
@@ -64,11 +64,18 @@ exports.promisify = function(fun) {
     };
 };
 
+exports.promisifyAll = function (obj) {
+    for(var key in obj){
+        if(typeof obj[key] == 'function')
+            obj[key + 'Promise'] = common.promisify(obj[key]);
+    }
+};
+
 exports.requestServiceByConfig = function (option, cb) {
     try {
         var errStr = 'service "' + option.serviceName + '"';
         var service = config.api[option.serviceName];
-        if (!service) throw new Error(errStr + ' is not exist!');
+        if (!service) throw common.error(errStr + ' is not exist!');
         var serviceArgs = null;
 
         var defaultMethodArgs = {
@@ -83,14 +90,14 @@ exports.requestServiceByConfig = function (option, cb) {
         else {
             serviceArgs = methodArgs.args;
         }
-        if (!serviceArgs) throw new Error(errStr + ' args is empty!');
+        if (!serviceArgs) throw common.error(errStr + ' args is empty!');
 
         var host = serviceArgs.host;
-        if (!host) throw new Error(errStr + ' host is empty!');
+        if (!host) throw common.error(errStr + ' host is empty!');
 
         var method = methodArgs.method;
         var url = methodArgs.url;
-        if (!url) throw new Error(errStr + ' method "' + option.methodName + '" url is empty!');
+        if (!url) throw common.error(errStr + ' method "' + option.methodName + '" url is empty!');
         url = host + url;
         var opt = {
             url: url,
@@ -139,7 +146,7 @@ exports.requestService = function (option, cb) {
 exports.requestServiceByConfigPromise = common.promisify(exports.requestServiceByConfig);
 exports.requestServicePromise = common.promisify(exports.requestService);
 
-exports.formatRes = function (err, data) {
+exports.formatRes = function (err, data, desc) {
     //result    是否成功
     //desc      描述
     //detail    成功 返回的内容
@@ -156,7 +163,7 @@ exports.formatRes = function (err, data) {
         res.desc = err;
     }else{
         res.result = true;
-        res.desc = 'success';
+        res.desc = desc || 'success';
     }
     if(data)
         res.detail = data;
@@ -170,11 +177,19 @@ exports.formatViewtRes = function(opt){
     return opt;
 };
 
+exports.error = function (msg, code, opt) {
+    var err = new Error(msg);
+    err.code = code || '';
+    if(opt)
+        err = common.extend(err, opt);
+    return err;
+};
+
 exports.writeError = function (err){
-    console.error(err)
+    console.error(err);
     //用于查找上一级调用
     var stack = new Error().stack;
-    var stackList = common.getStack(err.stack, 1,3)
+    var stackList = common.getStack(err.stack, 1, 4)
         .concat(['help stack:'])
         .concat(common.getStack(stack, 2, 4));
     for(var i = 0;i < stackList.length; i++) {
@@ -234,6 +249,22 @@ exports.IPv4ToIPv6 = function (ip, convert) {
 // console.log(exports.IPv4ToIPv6('192.168.1.1'))
 // console.log(exports.IPv4ToIPv6('192.168.1.1', true))
 
+exports.format = function () {
+    var res = '';
+    var args = arguments;
+    if(args) {
+        res = args[0] || '';
+        for (var key in args) {
+            if (key != 0) {
+                var reg = new RegExp('\\{' + (key - 1) + '\\}', 'g');
+                res = res.replace(reg, args[key]);
+            }
+        }
+        res = res.replace(/\{\d\}/g, '');
+    }
+    return res;
+};
+
 exports.dateFormat = function (date, format) {
     try {
         if (!format)format = 'yyyy-MM-dd';
@@ -241,7 +272,6 @@ exports.dateFormat = function (date, format) {
             date = new Date();
         if(typeof date == 'string')
             date = Date.parse(date);
-
 
         var o = {
             y: date.getFullYear(),
