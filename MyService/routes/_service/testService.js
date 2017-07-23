@@ -19,7 +19,7 @@ exports.test = function (data, cb) {
     common.requestServiceByConfig(opt, cb);
 };
 
-exports.testPromise = function (data, cb) {
+exports.testPromise = function (data) {
     var opt = getOption();
     opt.methodName = 'test';
     opt.data = data;
