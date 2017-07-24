@@ -10,7 +10,8 @@
     <tbody>
     <% restList.forEach(function (t) { %>
     <tr>
-        <td><a name="url" href="<%= t.method == 'post' ? 'javascript:;' : t.url %>" target=_blank
+        <td><a name="url" href="<%= t.method == 'post' ? 'javascript:;' : t.url %>"
+                <%= t.method == 'post' ? '' : 'target=_blank' %>
                data-url="<%= t.url %>"
                data-method="<%= t.method %>"
                data-req="<%= t.exampleRequest ? t.exampleRequest:'' %>">
@@ -27,14 +28,14 @@
         $(document).on('click', '[name=url][data-method=post]', function () {
             var dom = $(this);
             var req = dom.attr('data-req');
-            req = {
-                a: null,
-            }
+            if(!req) req = {};
+            if(typeof req != 'string')
+                req = JSON.stringify(req);
             $.ajax({
                 type: 'POST',
                 url: dom.attr('data-url'),
                 contentType: 'application/json; charset=utf-8',
-                data: JSON.stringify(req),
+                data: req,
                 dataType: 'json',
             }).then(function (t) {
                 console.log(t)
