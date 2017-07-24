@@ -7,7 +7,7 @@ exports.get = function (req, res) {
     testService.test({}, function (err, data) {
         res.send(common.formatRes(err, data));
     });
-}
+};
 
 exports.getPromise = function (req, res) {
     var query = req.query;
@@ -18,4 +18,20 @@ exports.getPromise = function (req, res) {
     }).catch(function (e) {
         res.send(common.formatRes(e, {err_code: '400'}));
     });
+};
+
+exports.testGet = function (req, res) {
+    testService.test1({}, function (err, data) {
+        res.send(common.formatRes(err, data));
+    });
+};
+
+exports.get2 = function (req, res) {
+    testService.test2({}, function (err, data) {
+        res.send(common.formatRes(err, data));
+    });
+};
+
+exports.getReg = function (req, res) {
+    res.send(common.formatRes(null, req.url));
 };

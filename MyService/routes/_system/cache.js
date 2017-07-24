@@ -32,8 +32,8 @@ exports.get = function(key, cb){
         }
         cb(err, result);
     });
-}
-//timeout seconds
+};
+//expire seconds
 exports.set = function(key, value, expire, cb){
     if(typeof expire == 'function') {
         cb = expire;
@@ -43,18 +43,26 @@ exports.set = function(key, value, expire, cb){
     client.set(cachePrefix + key, value, cb);
     if(expire)
         client.expire(cachePrefix + key, expire)
-}
+};
 
 exports.del = function(key, cb){
     client.del(cachePrefix + key, cb);
-}
+};
 
 exports.keys = function(key, cb){
     client.keys(key, cb);
-}
+};
 
-//exports.set('foo', {bar:'bar'}, 1, function(err, result) {
-//    console.log(err, result)
+exports.select = function(db, cb){
+    client.select(db, cb);
+};
+//exports.select(2, function() {
+//    exports.set('foo', {bar: 'bar'}, 60, function (err, result) {
+//        console.log(err, result);
+//        exports.get('foo', function (err, result) {
+//            console.log(err, result)
+//        });
+//    });
 //});
 //
 //exports.keys('*', function(err, result) {
