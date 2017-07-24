@@ -86,16 +86,25 @@ module.exports = [
             name: 'get',
             functionName: 'testGet'
         }],
-        path:'',
+        path:'/test',
         auth:[],
     },
     {
         url:'/test2',
         method:[{
             name: 'get',
-            functionName: ''
+            functionName: 'get2'
         }],
-        path:'',
+        path:'/test',
+        auth:[],
+    },
+    {
+        url:/\/test.+/,
+        method:[{
+            name: 'get',
+            functionName: 'getReg'
+        }],
+        path:'/test',
         auth:[],
     },
     {
