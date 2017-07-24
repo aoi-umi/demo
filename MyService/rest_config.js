@@ -11,6 +11,7 @@ var auth = {
         desc: '',
     }
 };
+
 module.exports = [
     {
         url: '/',
@@ -21,7 +22,7 @@ module.exports = [
         }, {
             name: 'post',
             functionName: '',
-            exampleRequest:''
+            exampleRequest:'{"arg":"login"}'
         }],
         path: 'index',
         auth: [],

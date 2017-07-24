@@ -20,7 +20,7 @@ exports.get = function(req, res) {
           break;
       }
       if (isRouter) {
-        restList.push({url: rest.url, method: method.name});
+        restList.push({url: rest.url, method: method.name, exampleRequest: method.exampleRequest});
       }
     }
   }
