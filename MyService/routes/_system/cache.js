@@ -56,6 +56,11 @@ exports.keys = function(key, cb){
 exports.select = function(db, cb){
     client.select(db, cb);
 };
+
+var promiseList = ['get', 'set', 'del', 'keys', 'select'];
+promiseList.forEach(function(funName){
+    exports[funName + 'Promise'] = common.promisify(exports[funName]);
+});
 //exports.select(2, function() {
 //    exports.set('foo', {bar: 'bar'}, 60, function (err, result) {
 //        console.log(err, result);

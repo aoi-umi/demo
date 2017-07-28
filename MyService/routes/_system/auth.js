@@ -2,17 +2,19 @@
  * Created by umi on 2017-5-29.
  */
 var _ = require('underscore');
+var common = require('./common');
+var errorConfig = require('./errorConfig');
 var exports = module.exports;
 exports.auth = function(req, res, next) {
     //url权限认证
     var auth = req.myData.auth;
     var user = req.myData.user;
     var permissionRes = authenticationCheck(user, auth);
-    if(permissionRes.noPermission){
-        var err = new Error(permissionRes.desc || 'No Permissions');
+    if (permissionRes.noPermission) {
+        var err = common.error('', permissionRes.errCode || errorConfig.NO_PERMISSIONS.code);
         err.status = 403;
         next(err);
-    }else{
+    } else {
         next();
     }
 };
@@ -20,25 +22,29 @@ exports.auth = function(req, res, next) {
 var authenticationCheck = function (user, authList) {
     var noPermission = true;
     var desc = '';
+    var errCode = '';
+    var notPassAuth = null;
     if(!authList || !authList.length){
         noPermission = false;
     }else {
         if (user && user.auth && user.auth.length) {
             noPermission = false;
-            for (var i = 0; i < authList.length; i++) {
+            authList.forEach(function(checkAuth){
                 var hasAuth = _.find(user.auth, function (auth) {
-                    return auth == authList[i].key;
+                    return auth == checkAuth.key;
                 });
                 if (!hasAuth) {
-                    desc = authList[i].desc;
-                    noPermission = true;
-                    break;
+                    notPassAuth = checkAuth;
+                    return false;
                 }
-            }
+            });
         }else{
-            desc = authList[0].desc;
+            notPassAuth = authList[0];
+        }
+        if(notPassAuth){
+            errCode = notPassAuth.errCode;
             noPermission = true;
         }
     }
-    return {noPermission: noPermission, desc:desc};
+    return {noPermission: noPermission,errCode:errCode};
 }

@@ -7,7 +7,6 @@ var bodyParser = require('body-parser');
 
 var config = require('./config');
 var common = require('./routes/_system/common');
-var cache = require('./routes/_system/cache');
 var app = express();
 console.log(config.name,'run at port ', config.port, ',version:', config.version);
 // view engine setup
@@ -23,27 +22,6 @@ app.use(express.static(path.join(__dirname, 'public' + config.env)));
 
 var auth = require('./routes/_system/auth');
 var restConfig = require('./rest_config');
-app.use('/', function (req, res, next) {
-    //req.query  /?params1=1&params2=2
-    //req.body  post的参数
-    //req.params /:params1/:params2
-    //console.log(require('./routes/_system/common').getClientIp(req));
-    req.myData = {};
-    //for (var i = 0; i < restConfig.length; i++) {
-    //    var rest = restConfig[i];
-    //    console.log(req.originalUrl, rest.url)
-    //    if (req.originalUrl == rest.url) {
-    //        req.myData.auth = rest.auth;
-    //        break;
-    //    }
-    //}
-    var user = req.myData.user = {auth:[]};
-    if (req.query.login)
-        user.auth.push('login');
-    if (req.query.admin)
-        user.auth.push('admin');
-    next();
-});
 var restList = [];
 restConfig.forEach(function(rest){
     for (var imethod = 0; imethod < rest.method.length; imethod++) {
@@ -55,7 +33,11 @@ restConfig.forEach(function(rest){
         var reqfile = require(path);
         var isRouter = true;
         var functionName = method.functionName || method.name;
+        if(!reqfile[functionName])
+            throw new Error('[' + path + '] is not exist function [' + functionName + ']')
         switch (method.name.toLowerCase()) {
+            case 'use':
+                app.use(rest.url, reqfile[functionName]);
             case 'get':
                 app.get(rest.url, function(req, res, next){
                     req.myData.auth = rest.auth;
@@ -90,17 +72,24 @@ app.use(function(req, res, next) {
 
 // development error handler
 // will print stacktrace
+var errorConfig = require('./routes/_system/errorConfig');
 if (config.env === '_dev') {
     app.use(function(err, req, res, next) {
         err.status = err.status || 500;
-        res.status(err.status);
         if (req.headers['x-requested-with'] && req.headers['x-requested-with'].toLowerCase() == 'xmlhttprequest') {
-            res.send(common.formatRes(err));
-        }else{
-            res.render('error', {
-                message: err.message,
-                error: err
-            });
+            res.send(common.formatRes(err, err.code || err.status));
+        } else {
+            if(errorConfig.NO_LOGIN.code == err.code)
+                res.redirect('/login');
+            else {
+                res.status(err.status);
+                res.render('error',
+                    common.formatViewtRes({
+                        title: '出错了',
+                        message: err.message,
+                        error: err
+                    }));
+            }
         }
     });
 }
@@ -109,10 +98,12 @@ if (config.env === '_dev') {
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
     res.status(err.status || 500);
-    res.render('error', {
-        message: err.message,
-        error: {}
-    });
+    res.render('error',
+        common.formatViewtRes({
+            title: '出错了',
+            message: err.message,
+            error: {}
+        }));
 });
 
 
