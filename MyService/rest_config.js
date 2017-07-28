@@ -2,13 +2,13 @@
  * Created by umi on 2017-5-29.
  */
 var auth = {
-    'login':{
-        key:'login',
-        desc:'请先登录'
+    'login': {
+        key: 'login',
+        errCode: 'NO_LOGIN',
     },
     'admin': {
         key: 'admin',
-        desc: '',
+        errCode: 'NO_PERMISSIONS',
     }
 };
 
@@ -16,31 +16,38 @@ module.exports = [
     {
         url: '/',
         method: [{
+            name: 'use',
+        }, {
             name: 'get',
             functionName: '',
             exampleRequest:''
         }, {
             name: 'post',
             functionName: '',
-            exampleRequest:'{"arg":"login"}'
+            exampleRequest:'{"arg":"123"}'
         }],
         path: 'index',
         auth: [],
     },
     {
-        url:'/index',
+        url:'/login',
         method:[{
+            name: 'post',
+            functionName: 'loginPost',
+            exampleRequest:'{"userName":"user", "pwd":"123456"}'
+        },{
             name: 'get',
-            functionName: 'index'
+            functionName: 'loginGet'
         }],
-        path:'',
+        path:'index',
         auth:[]
     },
     {
         url:'/:p1/:p2',
         method:[{
             name: 'get',
-            functionName: 'params'
+            functionName: 'params',
+            exampleRequest: '/test/test'
         }],
         path:'index',
         auth:[]
@@ -50,6 +57,9 @@ module.exports = [
         method:[{
             name: 'get',
             functionName: 'testGet'
+        },{
+            name: 'post',
+            functionName: 'testPost'
         }],
         path:'',
         auth:[auth['login']]
@@ -103,7 +113,8 @@ module.exports = [
         url:/\/test.+/,
         method:[{
             name: 'get',
-            functionName: 'getReg'
+            functionName: 'getReg',
+            exampleRequest: '/test99'
         }],
         path:'/test',
         auth:[],

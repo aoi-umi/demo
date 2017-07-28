@@ -3,10 +3,12 @@
  */
 var request = require('request');
 var net = require('net');
+var crypto = require('crypto');
 var config = require('../../config');
+var errorConfig = require('./errorConfig');
 var common = exports;
 
-exports.extend = function() {
+exports.extend = function () {
     var args = arguments;
     var res;
     for (var i in args) {
@@ -24,8 +26,8 @@ exports.extend = function() {
     return res;
 };
 
-exports.promisify = function(fun) {
-    return function() {
+exports.promisify = function (fun) {
+    return function () {
         var args = arguments;
         var evalStr = 'fun(';
         var funArgs = [];
@@ -57,7 +59,7 @@ exports.promisify = function(fun) {
 
         if (funArgs.length) evalStr += funArgs.join(',');
         evalStr += ');';
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
             //console.log(evalStr);
             eval(evalStr);
         });
@@ -65,8 +67,8 @@ exports.promisify = function(fun) {
 };
 
 exports.promisifyAll = function (obj) {
-    for(var key in obj){
-        if(typeof obj[key] == 'function')
+    for (var key in obj) {
+        if (typeof obj[key] == 'function')
             obj[key + 'Promise'] = common.promisify(obj[key]);
     }
 };
@@ -136,9 +138,9 @@ exports.requestService = function (option, cb) {
     };
     opt = common.extend(opt, option);
     //console.log(opt)
-    request(opt, function(err, res, data) {
+    request(opt, function (err, res, data) {
         cb(err, data);
-        if(err)
+        if (err)
             console.error(opt);
     });
 };
@@ -156,50 +158,63 @@ exports.formatRes = function (err, data, desc) {
         detail: null,
         desc: null,
     };
-    if(err) {
+    if (err) {
         common.writeError(err);
-        if(err.message) err = err.message;
+        if (err.message) err = err.message;
         res.result = false;
         res.desc = err;
-    }else{
+    } else {
         res.result = true;
         res.desc = desc || 'success';
     }
-    if(data)
+    if (data)
         res.detail = data;
     return res;
 };
 
-exports.formatViewtRes = function(opt){
-    if(!opt)
+exports.formatViewtRes = function (opt) {
+    if (!opt)
         opt = {};
     opt.version = config.version;
     return opt;
 };
 
-exports.error = function (msg, code, opt) {
+exports.error = function (msg, code, option) {
+    var opt = {
+        lang: 'zh'
+    };
+    if (option)
+        opt = common.extend(opt, option);
+    if (!code)
+        code = '';
+
+    if (code && errorConfig[code]) {
+        var error = errorConfig[code];
+        code = error.code;
+        if (!msg)
+            msg = error.desc[opt.lang];
+    }
+    if(!msg) msg = '';
     var err = new Error(msg);
-    err.code = code || '';
-    if(opt)
-        err = common.extend(err, opt);
+    err.code = code;
     return err;
 };
 
-exports.writeError = function (err){
+exports.writeError = function (err) {
     console.error(err);
     //用于查找上一级调用
     var stack = new Error().stack;
     var stackList = common.getStack(err.stack, 1, 4)
         .concat(['help stack:'])
         .concat(common.getStack(stack, 2, 4));
-    for(var i = 0;i < stackList.length; i++) {
+    for (var i = 0; i < stackList.length; i++) {
         console.error(stackList[i]);
     }
 };
 
 exports.getStack = function (stack, start, end) {
     var stackList = [];
-    if(stack) stackList = stack.split('\n');
+    if (stack) stackList = stack.split('\n');
     return stackList.slice(start, end);
 };
 
@@ -214,14 +229,14 @@ exports.getClientIp = function (req) {
 
 exports.IPv4ToIPv6 = function (ip, convert) {
     if (net.isIPv4(ip)) {
-        if(!convert) {
+        if (!convert) {
             ip = '::ffff:' + ip;
-        }else{
+        } else {
             //转为2进制的数，每4位为一组，转换成16进制的
             //192.168.1.1  11000000 10101000 00000001 00000001  C0 A8 01 01 0:0:0:0:0:0:C0A8:0101  ::C0A8:0101
             var ipv6 = [];
             var list = ip.split('.');
-            for(var i = 0; i <list.length;i++) {
+            for (var i = 0; i < list.length; i++) {
                 var t = parseInt(list[i]).toString(2);
                 if (t.length % 8 != 0) {
                     var fixNum = 8 - t.length;
@@ -234,7 +249,7 @@ exports.IPv4ToIPv6 = function (ip, convert) {
             }
             var ipv6List = [];
             var ipv6Str = '';
-            for(var i = 0; i < ipv6.length;i++ ) {
+            for (var i = 0; i < ipv6.length; i++) {
                 ipv6Str += ipv6[i];
                 if ((i + 1) % 4 == 0 && ipv6Str) {
                     ipv6List.push(ipv6Str);
@@ -252,7 +267,7 @@ exports.IPv4ToIPv6 = function (ip, convert) {
 exports.format = function () {
     var res = '';
     var args = arguments;
-    if(args) {
+    if (args) {
         res = args[0] || '';
         for (var key in args) {
             if (key != 0) {
@@ -268,9 +283,9 @@ exports.format = function () {
 exports.dateFormat = function (date, format) {
     try {
         if (!format)format = 'yyyy-MM-dd';
-        if(!date)
+        if (!date)
             date = new Date();
-        if(typeof date == 'string')
+        if (typeof date == 'string')
             date = Date.parse(date);
 
         var o = {
@@ -291,3 +306,39 @@ exports.dateFormat = function (date, format) {
 };
 //console.log(exports.dateFormat(null,'yyyy-MM-dd hh:mm:ss'))
 //console.log(exports.dateFormat(null,'yyyy-MM-dd H:mm:ss'))
+
+exports.isInList = function (list, obj) {
+    var result = false;
+    if (list) {
+        list.forEach(function () {
+            if (this === obj) {
+                result = true;
+                return false;
+            }
+        });
+    }
+    return result;
+};
+
+exports.createToken = function (str) {
+    console.log(str);
+    var code = common.md5(str);
+    return code;
+};
+
+exports.md5 = function (str, method) {
+    var buff = new Buffer(str, 'utf8');
+    var md5 = crypto.createHash('md5');
+    if (!method)
+        method = 'hex';
+    var code = md5.update(buff).digest(method);
+    return code;
+};
+
+function s4() {
+    return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+};
+
+exports.guid = function () {
+    return (s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4());
+};

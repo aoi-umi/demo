@@ -10,14 +10,17 @@
     <tbody>
     <% restList.forEach(function (t) { %>
     <tr>
-        <td><a name="url" href="<%= t.method == 'post' ? 'javascript:;' : t.url %>"
+        <td><a name="url" href="<%= t.method == 'post' ? 'javascript:;' : t.exampleRequest || t.url %>"
                 <%= t.method == 'post' ? '' : 'target=_blank' %>
                data-url="<%= t.url %>"
                data-method="<%= t.method %>"
-               data-req="<%= t.exampleRequest ? t.exampleRequest:'' %>">
+               data-req="<%= t.method == 'post' && t.exampleRequest ? t.exampleRequest:'' %>">
                 <%= t.url %></a>
         </td>
         <td>[<%= t.method %>]</td>
+        <td>
+            <textarea name="exampleRequest"><%= t.method == 'post' && t.exampleRequest ? t.exampleRequest:'' %></textarea>
+        </td>
     </tr>
     <% }) %>
     </tbody>
@@ -27,21 +30,33 @@
     $(function () {
         $(document).on('click', '[name=url][data-method=post]', function () {
             var dom = $(this);
-            var req = dom.attr('data-req');
-            if(!req) req = {};
-            if(typeof req != 'string')
-                req = JSON.stringify(req);
-            $.ajax({
-                type: 'POST',
-                url: dom.attr('data-url'),
-                contentType: 'application/json; charset=utf-8',
-                data: req,
-                dataType: 'json',
+            var row = dom.closest('tr');
+            var req = $.trim(row.find('[name=exampleRequest]').val());
+            var url = dom.attr('data-url');
+            if (!req) req = {};
+            var reqStr = req;
+            if (typeof req != 'string')
+                reqStr = JSON.stringify(req);
+            else {
+                req = JSON.parse(req);
+            }
+            var headers = {};
+            if (url == '/login') {
+                var token = extend.createToken(req.userName + $.md5(req.pwd) + JSON.stringify(req));
+                headers = {
+                    'User-Name': 'user',
+                    'Token': token,
+                };
+            }
+            extend.ajax({
+                url: url,
+                data: reqStr,
+                headers: headers,
             }).then(function (t) {
                 console.log(t)
             }).fail(function (e) {
                 console.log(e)
             });
-        })
+        });
     });
 </script>

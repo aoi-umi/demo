@@ -1,0 +1,16 @@
+<% include _public/header %>
+<h1><%= title %></h1>
+<p>Welcome to <%= title %></p>
+<form class="navbar-form">
+    <input class="form-control" id="userName" type="text"/>
+    <input class="form-control" id="pwd" type="password"/>
+    <input class="btn btn-primary" id="login" type="button" value="Login"/>
+</form>
+<% include _public/footer %>
+<script type="text/javascript">
+    $(function(){
+        $('#login').on('click', function(){
+
+        });
+    });
+</script>
