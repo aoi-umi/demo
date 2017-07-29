@@ -187,7 +187,7 @@ exports.error = function (msg, code, option) {
     var opt = {
         sourceName: '',
         lang: 'zh',
-        notFormat: false,
+        format: null,
     };
     if (option)
         opt = common.extend(opt, option);
@@ -199,8 +199,8 @@ exports.error = function (msg, code, option) {
         code = error.code;
         if (!msg) {
             msg = error.desc[opt.lang];
-            if(!opt.notFormat)
-                msg = common.format(msg, opt.sourceName);
+            if(typeof opt.format == 'function')
+                msg = opt.format(msg);
         }
     }
     if(!msg) msg = '';
@@ -378,11 +378,14 @@ exports.enumCheck = function(srcEnum, destEnum, enumType) {
         throw new Error('no match dest enum!');
 
     if (!list[indexSrcEnum][indexDestEnum]) {
-        var err = common.error(null, errorConfig.ENUM_CHANGED_INVALID.code, {notFormat: true});
-        err.message = common.format(err.message,
-            enumType + ':[' + srcEnum + '](' + myEnum.getValue(enumType, srcEnum) + ')',
-            '[' + destEnum + '](' + myEnum.getValue(enumType, destEnum) + ')');
-        throw err;
+        throw common.error(null, errorConfig.ENUM_CHANGED_INVALID.code, {
+            //lang:'en',
+            format: function (msg) {
+                return common.format(msg,
+                    enumType + ':[' + srcEnum + '](' + myEnum.getValue(enumType, srcEnum) + ')',
+                    '[' + destEnum + '](' + myEnum.getValue(enumType, destEnum) + ')');
+            }
+        });
     }
 };
 

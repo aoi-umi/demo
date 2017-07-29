@@ -71,7 +71,11 @@ exports.params = function (req, res, next) {
 function login(userName, token, req) {
   return new Promise(function (resolve, reject) {
     if(!userName)
-      throw common.error(null, errorConfig.CAN_NOT_BE_EMPTY.code, {sourceName:'userName'});
+      throw common.error(null, errorConfig.CAN_NOT_BE_EMPTY.code, {
+        format: function (msg) {
+          return common.format(msg, 'userName');
+        }
+      });
     if (!req)
       req = '';
     if (typeof req != 'string')
