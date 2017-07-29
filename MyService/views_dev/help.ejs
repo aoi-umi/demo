@@ -42,6 +42,11 @@
             }
             var headers = {};
             if (url == '/login') {
+                var userInfo = $.cookie(config.cacheKey.userInfo);
+                if(!userInfo){
+                    userInfo = extend.guid();
+                    $.cookie(config.cacheKey.userInfo, userInfo, { expires: 1 });
+                }
                 var token = extend.createToken(req.userName + $.md5(req.pwd) + JSON.stringify(req));
                 headers = {
                     'User-Name': 'user',

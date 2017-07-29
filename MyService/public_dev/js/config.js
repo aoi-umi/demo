@@ -3,6 +3,6 @@
  */
 var config = {
     cacheKey: {
-        userInfo: 'userInfo'
+        userInfo: 'userInfoCacheKey'
     }
 };

@@ -7,7 +7,7 @@ module.exports= {
         code: 'TOKEN_WRONG',
         desc: {
             'zh':'token错误',
-            'en':'Token Is Wrong',
+            'en':'token is wrong',
         }
     },
     NO_LOGIN:{
@@ -17,11 +17,25 @@ module.exports= {
             'en':'No Login',
         }
     },
+    CAN_NOT_BE_EMPTY:{
+        code: 'CAN_NOT_BE_EMPTY',
+        desc: {
+            'zh':'{0}不能为空',
+            'en':'{0} can not be empty',
+        }
+    },
     NO_PERMISSIONS:{
         code: 'NO_PERMISSIONS',
         desc: {
             'zh':'无权限',
             'en':'No Permissions',
+        }
+    },
+    ENUM_CHANGED_INVALID:{
+        code: 'ENUM_CHANGED_INVALID',
+        desc: {
+            'zh':'{0}无法变更为{1}',
+            'en':'{0} can not change to {1}',
         }
     },
 };

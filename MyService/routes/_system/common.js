@@ -6,6 +6,7 @@ var net = require('net');
 var crypto = require('crypto');
 var config = require('../../config');
 var errorConfig = require('./errorConfig');
+var myEnum = require('./enum');
 var common = exports;
 
 exports.extend = function () {
@@ -172,16 +173,21 @@ exports.formatRes = function (err, data, desc) {
     return res;
 };
 
-exports.formatViewtRes = function (opt) {
-    if (!opt)
-        opt = {};
-    opt.version = config.version;
+exports.formatViewtRes = function (option) {
+    var  opt = {
+        title: 'TestService',
+        version: config.version,
+        user: null
+    };
+    opt = common.extend(opt, option);
     return opt;
 };
 
 exports.error = function (msg, code, option) {
     var opt = {
-        lang: 'zh'
+        sourceName: '',
+        lang: 'zh',
+        notFormat: false,
     };
     if (option)
         opt = common.extend(opt, option);
@@ -191,8 +197,11 @@ exports.error = function (msg, code, option) {
     if (code && errorConfig[code]) {
         var error = errorConfig[code];
         code = error.code;
-        if (!msg)
+        if (!msg) {
             msg = error.desc[opt.lang];
+            if(!opt.notFormat)
+                msg = common.format(msg, opt.sourceName);
+        }
     }
     if(!msg) msg = '';
     var err = new Error(msg);
@@ -310,8 +319,8 @@ exports.dateFormat = function (date, format) {
 exports.isInList = function (list, obj) {
     var result = false;
     if (list) {
-        list.forEach(function () {
-            if (this === obj) {
+        list.forEach(function (t) {
+            if (t === obj) {
                 result = true;
                 return false;
             }
@@ -342,3 +351,39 @@ function s4() {
 exports.guid = function () {
     return (s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4());
 };
+
+//状态变更
+exports.enumCheck = function(srcEnum, destEnum, enumType) {
+    if (enumType == undefined)
+        throw new Error('enumType can not be empty!');
+    var srcEnumList = [];
+    var destEnumList = [];
+    //  目标
+    //源
+    var list = null;
+
+    var matchEnum = myEnum.getEnum(enumType);
+    for(var key in matchEnum){
+        srcEnumList.push(key);
+        destEnumList.push(key);
+    }
+    list = myEnum.enumCheck[enumType];
+    srcEnum = srcEnum.toString();
+    destEnum = destEnum.toString();
+    var indexSrcEnum = srcEnumList.indexOf(srcEnum);
+    if (indexSrcEnum < 0)
+        throw new Error('no match src enum!');
+    var indexDestEnum = destEnumList.indexOf(destEnum);
+    if (indexDestEnum < 0)
+        throw new Error('no match dest enum!');
+
+    if (!list[indexSrcEnum][indexDestEnum]) {
+        var err = common.error(null, errorConfig.ENUM_CHANGED_INVALID.code, {notFormat: true});
+        err.message = common.format(err.message,
+            enumType + ':[' + srcEnum + '](' + myEnum.getValue(enumType, srcEnum) + ')',
+            '[' + destEnum + '](' + myEnum.getValue(enumType, destEnum) + ')');
+        throw err;
+    }
+};
+
+//common.enumCheck(1,0,'statusEnum');

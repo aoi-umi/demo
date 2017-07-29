@@ -7,3 +7,35 @@
     <link rel='stylesheet' href='/css/style.css' />
 </head>
 <body>
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <!-- 定义个内部框架表现的基调,位置大小背景等 -->
+    <div class="navbar-inner">
+        <!-- 定义实现块的css,具体内容都包含在container中 -->
+        <div class="container">
+            <!-- 定义响应时用的按钮元素,界面大小改变时会用到 -->
+            <button data-target=".nav-collapse" data-toggle="collapse" class="btn btn-navbar" type="button">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <!-- 定义品牌链接导航 -->
+            <!-- 不知道为什么这么定义 -->
+            <a href="/" class="brand">Bootstrap</a>
+            <!-- 定义了个响应触发点 -->
+            <div class="nav-collapse collapse">
+                <!-- 定义导航列表 -->
+                <ul class="nav">
+                    <!-- 首页链接高亮 -->
+                    <li class="">
+                        <a href="/">首页</a>
+                    </li>
+                </ul>
+                <%if(user){%>
+                <p class="navbar-text pull-right">
+                    您好， <a class="navbar-link" href="#"><%=user.NickName%></a>
+                </p>
+                <%}%>
+            </div>
+        </div>
+    </div>
+</div>
