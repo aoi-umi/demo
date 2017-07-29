@@ -40,6 +40,6 @@ module.exports = {
     },
     cachePrefix:'testService',
     cacheKey: {
-        userInfo: 'userInfo'
+        userInfo: 'userInfoCacheKey'
     }
 };

@@ -76,6 +76,7 @@ var errorConfig = require('./routes/_system/errorConfig');
 if (config.env === '_dev') {
     app.use(function(err, req, res, next) {
         err.status = err.status || 500;
+        err.code = err.code || err.status;
         if (req.headers['x-requested-with'] && req.headers['x-requested-with'].toLowerCase() == 'xmlhttprequest') {
             res.send(common.formatRes(err, err.code || err.status));
         } else {
@@ -97,7 +98,9 @@ if (config.env === '_dev') {
 // production error handler
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
+    err.status = err.status || 500;
+    err.code = err.code || err.status;
+    res.status(err.status);
     res.render('error',
         common.formatViewtRes({
             title: '出错了',
