@@ -73,41 +73,33 @@ app.use(function(req, res, next) {
 // development error handler
 // will print stacktrace
 var errorConfig = require('./routes/_system/errorConfig');
-if (config.env === '_dev') {
-    app.use(function(err, req, res, next) {
-        err.status = err.status || 500;
-        err.code = err.code || err.status;
-        if (req.headers['x-requested-with'] && req.headers['x-requested-with'].toLowerCase() == 'xmlhttprequest') {
-            res.send(common.formatRes(err, err.code || err.status));
-        } else {
-            if(errorConfig.NO_LOGIN.code == err.code)
-                res.redirect('/login');
-            else {
-                res.status(err.status);
-                res.render('error',
-                    common.formatViewtRes({
-                        title: '出错了',
-                        message: err.message,
-                        error: err
-                    }));
-            }
+
+app.use(function(err, req, res, next) {
+    if(config.env !== '_dev'){
+        err.stack = '';
+    }
+    err.status = err.status || 500;
+    err.code = err.code || err.status;
+    if (req.headers['x-requested-with'] && req.headers['x-requested-with'].toLowerCase() == 'xmlhttprequest') {
+        res.send(common.formatRes(err, err.code || err.status));
+    } else {
+        if (errorConfig.NO_LOGIN.code == err.code)
+            res.redirect('/login');
+        else {
+            res.status(err.status);
+            res.render('error',
+                common.formatViewtRes({
+                    title: '出错了',
+                    message: err.message,
+                    error: err
+                }));
         }
-    });
-}
+    }
+});
+
 
 // production error handler
 // no stacktraces leaked to user
-app.use(function(err, req, res, next) {
-    err.status = err.status || 500;
-    err.code = err.code || err.status;
-    res.status(err.status);
-    res.render('error',
-        common.formatViewtRes({
-            title: '出错了',
-            message: err.message,
-            error: {}
-        }));
-});
 
 
 module.exports = app;

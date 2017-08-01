@@ -4,6 +4,7 @@
 var request = require('request');
 var net = require('net');
 var crypto = require('crypto');
+var q = require('q');
 var config = require('../../config');
 var errorConfig = require('./errorConfig');
 var myEnum = require('./enum');
@@ -39,9 +40,9 @@ exports.promisify = function (fun) {
         cbStrList.push('function(){');
         cbStrList.push('	var cbArgs = arguments;');
         cbStrList.push('	if(cbArgs && cbArgs[0])');
-        cbStrList.push('		reject(cbArgs[0]);');
+        cbStrList.push('		reject (cbArgs[0]);');
         cbStrList.push('	else{');
-        cbStrList.push('		var resovleEval = \'resolve(\';');
+        cbStrList.push('		var resovleEval = \'resolve (\';');
         cbStrList.push('		var resolveArgs = [];');
         cbStrList.push('		if(cbArgs){');
         cbStrList.push('			for(var cbArgKey in cbArgs){');
@@ -60,7 +61,7 @@ exports.promisify = function (fun) {
 
         if (funArgs.length) evalStr += funArgs.join(',');
         evalStr += ');';
-        return new Promise(function (resolve, reject) {
+        return common.promise().then(function (resolve, reject) {
             //console.log(evalStr);
             eval(evalStr);
         });
@@ -390,3 +391,13 @@ exports.enumCheck = function(srcEnum, destEnum, enumType) {
 };
 
 //common.enumCheck(1,0,'statusEnum');
+
+exports.promise = function(){
+    var res = q.defer();
+    var defer = q.defer();
+    defer.promise.then(function(){
+       return res.promise;
+    });
+    defer.resolve(res.resolve, res.reject);
+    return defer.promise;
+};
