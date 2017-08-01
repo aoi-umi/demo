@@ -17,6 +17,8 @@ exports.getPromise = function (req, res) {
         res.send(common.formatRes(null, t, 'promise success'));
     }).catch(function (e) {
         res.send(common.formatRes(e, {err_code: '400'}));
+    }).finally(function(){
+        console.log('finally')
     });
 };
 
