@@ -188,20 +188,20 @@ private static List<string> CreateMySqlSaveProcedure(DatabaseModel databaseModel
     procStrList.Add(tabStr + "IF " + nullListName + " IS NULL THEN");  
     procStrList.Add(tabStr + "\tSET " + nullListName + " = '';"); 
     procStrList.Add(tabStr + "END IF;");       
-    procStrList.Add(tabStr + "SET " + nullListName + " = ',' + " + nullListName + " + ',';" + Environment.NewLine); 
+    procStrList.Add(tabStr + "SET " + nullListName + " = CONCAT(',', " + nullListName + ", ',');" + Environment.NewLine); 
     
-    procStrList.Add(tabStr + "SET @Sql ='UPDATE	" + databaseModel.TableName + " SET ';");    
+    procStrList.Add(tabStr + "SET @Sql ='UPDATE " + databaseModel.TableName + " SET ';");    
     
     for(var i = 0;i < cols.Count;i++){
         var x = cols[i];
         procStrList.Add(string.Format(tabStr + "IF " + paraPerfix + "{0} IS NOT NULL THEN", x.Name));
         procStrList.Add(string.Format(tabStr + "\tSET @Sql = CONCAT(@Sql,' {0} = ''', " + paraPerfix + "{0}, ''',');", x.Name));
-        procStrList.Add(string.Format(tabStr + "ELSE IF LOCATE('," + x.Name +",', " + nullListName + ")>0 THEN"));
-        procStrList.Add(string.Format(tabStr + "\tSET @Sql = CONCAT(@Sql,' {0} =　null,');", x.Name));
-        procStrList.Add(string.Format(tabStr + "END IF;"));
+        procStrList.Add(string.Format(tabStr + "ELSEIF LOCATE('," + x.Name +",', " + nullListName + ")>0 THEN"));
+        procStrList.Add(string.Format(tabStr + "\tSET @Sql = CONCAT(@Sql,' {0} = null,');", x.Name));
         procStrList.Add(string.Format(tabStr + "END IF;" + Environment.NewLine));
     };    
 
+    procStrList.Add(tabStr + "-- SELECT @Sql;");
     procStrList.Add(tabStr + "IF LOCATE(',',@Sql)>0 THEN");
     procStrList.Add(tabStr + "\tSET @Sql = LEFT(@Sql,CHAR_LENGTH(@Sql)-1);");
     procStrList.Add(string.Format(tabStr + "\tSET @Sql = CONCAT(@Sql,' WHERE {0} = ''', " + paraPerfix + "{0}, ''';	');", databaseModel.IdCol.Name));
