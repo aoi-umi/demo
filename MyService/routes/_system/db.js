@@ -11,6 +11,17 @@ var pool = require('mysql').createPool({
     port: config.datebase.port
 });
 
-module.exports.Exec = function(){
+//事务处理
+module.exports.TransExec = function (sql, params, conn, callback) {
+    if (typeof  params === 'function') {
+        callback = params;
+        params = [];
+    }
 
+    conn.query(sql, params, function (err, results) {
+        if (err) {
+            callback(err);
+        }
+        callback(null, results);
+    });
 }

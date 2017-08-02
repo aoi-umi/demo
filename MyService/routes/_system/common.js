@@ -28,6 +28,16 @@ exports.extend = function () {
     return res;
 };
 
+exports.promise = function(){
+    var res = q.defer();
+    var defer = q.defer();
+    defer.promise.then(function(){
+        return res.promise;
+    });
+    defer.resolve(res.resolve, res.reject);
+    return defer.promise;
+};
+
 exports.promisify = function (fun) {
     return function () {
         var args = arguments;
@@ -391,13 +401,3 @@ exports.enumCheck = function(srcEnum, destEnum, enumType) {
 };
 
 //common.enumCheck(1,0,'statusEnum');
-
-exports.promise = function(){
-    var res = q.defer();
-    var defer = q.defer();
-    defer.promise.then(function(){
-       return res.promise;
-    });
-    defer.resolve(res.resolve, res.reject);
-    return defer.promise;
-};
