@@ -23,8 +23,35 @@ public class DatabaseModel
 {
     public bool IsIdInt;
     public string TableName;
+    public string RemoveTablePrefix;
     public DatabaseColModel IdCol;
     public List<DatabaseColModel> Cols;
+}
+
+public static DatabaseModel CreateDatabaseModel(TableSchema table, DatabaseTypeEnum databaseType){
+    var id = "";
+    var dbModel = new DatabaseModel(){
+        TableName = table.Columns[0].Table.Name,
+    };
+    var cols = new List<Tools.DatabaseColModel>();
+    foreach(ColumnSchema col in table.Columns){ 
+    var colModel = new Tools.DatabaseColModel();
+        colModel.Name = col.Name;
+        colModel.NativeType = GetTypeWithSize(col, databaseType); 
+        //第一个主键为id
+        if(string.IsNullOrEmpty(id) && col.IsPrimaryKeyMember){
+            dbModel.IdCol = colModel;
+            var intTypeList = new List<DbType>(){DbType.Int16, DbType.Int32, DbType.Int64};
+            if(intTypeList.Contains(col.DataType))
+                dbModel.IsIdInt = true;
+        }else{
+            cols.Add(colModel);
+        }
+    }
+    if(dbModel.IdCol == null)
+        throw new Exception("不包含主键");
+    dbModel.Cols = cols;
+    return dbModel;
 }
 
 public static string GetTypeWithSize(ColumnSchema col, DatabaseTypeEnum databaseType)
@@ -115,8 +142,8 @@ private static string GetRepeatStr(string str, int count)
 private static List<string> CreateMySqlProcedure(DatabaseModel databaseModel)
 {
     var procList = new List<string>();
-    //var procTypeList = new List<ProcTypeEnum>(){ProcTypeEnum.Save, ProcTypeEnum.Del, ProcTypeEnum.DetailQuery, ProcTypeEnum.Query};
-    var procTypeList = new List<ProcTypeEnum>(){ProcTypeEnum.Query};
+    var procTypeList = new List<ProcTypeEnum>(){ProcTypeEnum.Save, ProcTypeEnum.Del, ProcTypeEnum.DetailQuery, ProcTypeEnum.Query};
+    //var procTypeList = new List<ProcTypeEnum>(){ProcTypeEnum.Query};
     procTypeList.ForEach(procType=>{
         switch(procType){
             case ProcTypeEnum.Save:
@@ -141,7 +168,15 @@ private static List<string> CreateMySqlSaveProcedure(DatabaseModel databaseModel
     var level = 0;
     var tabStr = "";
     var procList = new List<string>();
-    var procName = "p_auto_" + databaseModel.TableName + "_save";
+    var tableName = databaseModel.TableName;
+    var procTableName = tableName;
+    if(!string.IsNullOrEmpty(databaseModel.RemoveTablePrefix)){
+        if(procTableName.StartsWith(databaseModel.RemoveTablePrefix))
+            procTableName = procTableName.Substring(databaseModel.RemoveTablePrefix.Length);
+    }
+    var procName = "p_auto_" 
+        + procTableName
+        + "_save";
     var procStrList = new List<string>();
     var cols = databaseModel.Cols;
     var paraPerfix = "pr_";
@@ -171,7 +206,7 @@ private static List<string> CreateMySqlSaveProcedure(DatabaseModel databaseModel
     #region insert
     level = 1;
     tabStr = GetRepeatStr("\t", level);
-    procStrList.Add(string.Format(tabStr + "INSERT INTO {0} (", databaseModel.TableName));
+    procStrList.Add(string.Format(tabStr + "INSERT INTO {0} (", tableName));
     
     level = 2;
     tabStr = GetRepeatStr("\t", level);
@@ -207,7 +242,7 @@ private static List<string> CreateMySqlSaveProcedure(DatabaseModel databaseModel
     procStrList.Add(tabStr + "END IF;");       
     procStrList.Add(tabStr + "SET " + nullListName + " = CONCAT(',', " + nullListName + ", ',');" + Environment.NewLine); 
     
-    procStrList.Add(tabStr + "SET @Sql ='UPDATE " + databaseModel.TableName + " SET ';");    
+    procStrList.Add(tabStr + "SET @Sql ='UPDATE " + tableName + " SET ';");    
     
     for(var i = 0;i < cols.Count;i++){
         var x = cols[i];
@@ -242,7 +277,15 @@ private static List<string> CreateMySqlDelProcedure(DatabaseModel databaseModel)
     var level = 0;
     var tabStr = "";
     var procList = new List<string>();
-    var procName = "p_auto_" + databaseModel.TableName + "_del";
+    var tableName = databaseModel.TableName;
+    var procTableName = tableName;
+    if(!string.IsNullOrEmpty(databaseModel.RemoveTablePrefix)){
+        if(procTableName.StartsWith(databaseModel.RemoveTablePrefix))
+            procTableName = procTableName.Substring(databaseModel.RemoveTablePrefix.Length);
+    }
+    var procName = "p_auto_" 
+        + procTableName
+        + "_del";
     var procStrList = new List<string>();
     var cols = databaseModel.Cols;
     var paraPerfix = "pr_";
@@ -255,7 +298,7 @@ private static List<string> CreateMySqlDelProcedure(DatabaseModel databaseModel)
     procStrList.Add(")");
     procStrList.Add("SQL SECURITY INVOKER");
     procStrList.Add("BEGIN");
-    procStrList.Add(string.Format(tabStr + "DELETE FROM {0} WHERE `{1}` = " + paraPerfix + "{1};", databaseModel.TableName , databaseModel.IdCol.Name));
+    procStrList.Add(string.Format(tabStr + "DELETE FROM {0} WHERE `{1}` = " + paraPerfix + "{1};", tableName , databaseModel.IdCol.Name));
     procStrList.Add("END;");
     
     procList.Add(string.Join(Environment.NewLine, procStrList.ToArray())); 
@@ -267,7 +310,15 @@ private static List<string> CreateMySqlDetailQueryProcedure(DatabaseModel databa
     var level = 0;
     var tabStr = "";
     var procList = new List<string>();
-    var procName = "p_auto_" + databaseModel.TableName + "_detail_query";
+    var tableName = databaseModel.TableName;
+    var procTableName = tableName;
+    if(!string.IsNullOrEmpty(databaseModel.RemoveTablePrefix)){
+        if(procTableName.StartsWith(databaseModel.RemoveTablePrefix))
+            procTableName = procTableName.Substring(databaseModel.RemoveTablePrefix.Length);
+    }
+    var procName = "p_auto_" 
+        + procTableName
+        + "_detail_query";
     var procStrList = new List<string>();
     var cols = databaseModel.Cols;
     var paraPerfix = "pr_";
@@ -276,7 +327,7 @@ private static List<string> CreateMySqlDetailQueryProcedure(DatabaseModel databa
     procStrList.Add( "create procedure " + procName + "(");
     level = 1;
     tabStr = GetRepeatStr("\t", level);
-        procStrList.Add(string.Format(tabStr + paraPerfix + "{0} {1},", databaseModel.IdCol.Name , databaseModel.IdCol.NativeType));    
+    procStrList.Add(string.Format(tabStr + paraPerfix + "{0} {1}", databaseModel.IdCol.Name , databaseModel.IdCol.NativeType));    
     
     procStrList.Add(")");
     procStrList.Add("SQL SECURITY INVOKER");
@@ -285,7 +336,7 @@ private static List<string> CreateMySqlDetailQueryProcedure(DatabaseModel databa
     level = 1;
     tabStr = GetRepeatStr("\t", level);
     
-    procStrList.Add(string.Format(tabStr + "SELECT * FROM {0} WHERE `{1}` = " + paraPerfix + "{1};", databaseModel.TableName , databaseModel.IdCol.Name));
+    procStrList.Add(string.Format(tabStr + "SELECT * FROM {0} WHERE `{1}` = " + paraPerfix + "{1};", tableName , databaseModel.IdCol.Name));
     procStrList.Add("END;");
     
     procList.Add(string.Join(Environment.NewLine, procStrList.ToArray())); 
@@ -297,14 +348,22 @@ private static List<string> CreateMySqlQueryProcedure(DatabaseModel databaseMode
     var level = 0;
     var tabStr = "";
     var procList = new List<string>();
-    var procName = "p_auto_" + databaseModel.TableName + "_query";
+    var tableName = databaseModel.TableName;
+    var procTableName = tableName;
+    if(!string.IsNullOrEmpty(databaseModel.RemoveTablePrefix)){
+        if(procTableName.StartsWith(databaseModel.RemoveTablePrefix))
+            procTableName = procTableName.Substring(databaseModel.RemoveTablePrefix.Length);
+    }
+    var procName = "p_auto_" 
+        + procTableName
+        + "_query";
     var procStrList = new List<string>();
     var cols = databaseModel.Cols;
     var paraPerfix = "pr_";
     var nullListName = paraPerfix + "null_list";
     var pageIndexName = paraPerfix + "page_index";
     var pageSizeName = paraPerfix + "page_size";
-    procStrList.Add( "/*drop procedure if exists `" + procName + "`;");
+    procStrList.Add( "drop procedure if exists `" + procName + "`;");
     
     procStrList.Add( "create procedure " + procName + "(");
     level = 1;
@@ -329,7 +388,7 @@ private static List<string> CreateMySqlQueryProcedure(DatabaseModel databaseMode
     procStrList.Add(tabStr + "\tSET " + nullListName + " = '';"); 
     procStrList.Add(tabStr + "END IF;");       
     procStrList.Add(tabStr + "SET " + nullListName + " = CONCAT(',', " + nullListName + ", ',');" + Environment.NewLine); 
-    procStrList.Add(string.Format(tabStr + "SET @Sql ='SELECT SQL_CALC_FOUND_ROWS * FROM {0} WHERE 1 = 1 ';", databaseModel.TableName));  
+    procStrList.Add(string.Format(tabStr + "SET @Sql ='SELECT SQL_CALC_FOUND_ROWS * FROM {0} WHERE 1 = 1 ';", tableName));  
     
     procStrList.Add(string.Format(tabStr + "IF {0} IS NOT NULL OR LOCATE(',{0},', {1}) > 0 THEN", paraPerfix + databaseModel.IdCol.Name, nullListName));
         procStrList.Add(string.Format(tabStr + "\tSET @Sql = CONCAT(@Sql, ' AND `{0}` = '''," + paraPerfix +"{0}, '''');", databaseModel.IdCol.Name));  
@@ -351,7 +410,7 @@ private static List<string> CreateMySqlQueryProcedure(DatabaseModel databaseMode
     procStrList.Add(tabStr + "EXECUTE stmt1;");
     procStrList.Add(tabStr + "SELECT FOUND_ROWS() AS 'count';");
     
-    procStrList.Add("END;*/");
+    procStrList.Add("END;");
     
     procList.Add(string.Join(Environment.NewLine, procStrList.ToArray())); 
     return procList;   
