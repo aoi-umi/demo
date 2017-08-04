@@ -28,13 +28,52 @@ exports.extend = function () {
     return res;
 };
 
+//带参数：args0:带nodeCallback的 function
+//       args1:function的参数1
+//       args2:function的参数2
+//       ...
 exports.promise = function(){
-    var res = q.defer();
+    var args = arguments;
     var defer = q.defer();
-    defer.promise.then(function(){
-        return res.promise;
-    });
-    defer.resolve(res.resolve, res.reject);
+    //if(!args.length) {
+        var res = q.defer();
+        defer.promise.then(function () {
+            return res.promise;
+        });
+        defer.resolve(res.resolve, res.reject);
+    //}else{
+    //    var funArgs = [];
+    //    var evalStr = 'args[0](';
+    //    for (var key in args) {
+    //        if(key != 0)
+    //            funArgs.push('args[' + key + ']');
+    //    }
+    //    var cbStrList = [];
+    //    cbStrList.push('function(){');
+    //    cbStrList.push('	var cbArgs = arguments;');
+    //    cbStrList.push('	if(cbArgs && cbArgs[0])');
+    //    cbStrList.push('		defer.reject (cbArgs[0]);');
+    //    cbStrList.push('	else{');
+    //    cbStrList.push('		var resovleEval = \'defer.resolve (\';');
+    //    cbStrList.push('		var resolveArgs = [];');
+    //    cbStrList.push('		if(cbArgs){');
+    //    cbStrList.push('			for(var cbArgKey in cbArgs){');
+    //    cbStrList.push('				if(cbArgKey != 0){');
+    //    cbStrList.push('					resolveArgs.push(\'cbArgs[\' + cbArgKey + \']\');');
+    //    cbStrList.push('				}');
+    //    cbStrList.push('			}');
+    //    cbStrList.push('			if(resolveArgs.length)');
+    //    cbStrList.push('				resovleEval += resolveArgs.join(\',\');');
+    //    cbStrList.push('		}');
+    //    cbStrList.push('		resovleEval	+= \')\';');
+    //    cbStrList.push('		eval(resovleEval);');
+    //    cbStrList.push('	}');
+    //    cbStrList.push('}');
+    //    funArgs.push(cbStrList.join('\n'));
+    //    if (funArgs.length) evalStr += funArgs.join(',');
+    //    evalStr += ');';
+    //    eval(evalStr);
+    //}
     return defer.promise;
 };
 
