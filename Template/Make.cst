@@ -1,0 +1,41 @@
+﻿<%-- 
+Name:
+Author: 
+Description: 
+--%>
+<%@ CodeTemplate Inherits="CodeTemplate" Language="C#" TargetLanguage="Text" Description="NetTiers main template." Debug="True" 
+ResponseEncoding="UTF-8"%>
+
+<%@ Assembly Name="SchemaExplorer"%>
+<%@ Import Namespace="SchemaExplorer"%>
+<%@ Import Namespace="System.Collections.Generic" %>
+<%@ Import Namespace="System.Linq" %>
+<%@ Register Name="Tools" Template="Tools.cst"MergeProperties="Flase" ExcludeProperties=""%>
+<%@ Property Name="Table" Type="TableSchema" DeepLoad="True" Optional="False" Category="01. Getting Started - Required" 
+Description="数据表"%>
+<%@ Property Name="RemoveTablePrefix" Type="String" Default="t_" DeepLoad="True" Optional="True" Category="移除数据表前缀" 
+Description="移除数据表前缀"%>
+<%@ Property Name="MakeType" Type="MakeTypeEnum" Default="" DeepLoad="True" Optional="True" Category="生成类型" 
+Description="生成类型"%>
+<script runat="template">
+public enum MakeTypeEnum{
+    Procedure,
+    Js
+}
+</script>
+
+<%
+var databaseType = Tools.DatabaseTypeEnum.MySql;
+var dbModel = Tools.CreateDatabaseModel(Table, databaseType);
+    dbModel.RemoveTablePrefix = RemoveTablePrefix;
+switch(MakeType){
+    case MakeTypeEnum.Procedure:
+        var procList = Tools.CreateProcedure(dbModel, databaseType);
+        procList.ForEach(x=>{
+            %>
+        <%=x%>
+            <%
+        });
+        break;
+}
+%>

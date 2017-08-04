@@ -1,0 +1,38 @@
+﻿<%@ Template Language="C#"%>
+<%@ Import Namespace="System.Collections.Generic" %>
+
+<%@ Register Name="Make" Template="Make.cst"MergeProperties="Flase" ExcludeProperties=""%>
+<%@ Property Name="SourceDatabase" Type="SchemaExplorer.TableSchemaCollection" Category="数据源"   Description="需要生成的表" %>
+<%@ Property Name="MakeTypeList" Type="List<Make.MakeTypeEnum>" Category="生成类型"   Description="生成类型" %>
+<%
+var temp = new Make();
+SourceDatabase.ForEach(x=>{    
+    try{
+        temp.Table = x;
+        MakeTypeList.ForEach(makeType=>{
+            try{
+                var outputFormat = "./Output/{0}/{1}";
+                switch(makeType){
+                    case Make.MakeTypeEnum.Procedure:
+                        outputFormat = "./Output/{0}/sql/{1}.sql";
+                        break;
+                    case Make.MakeTypeEnum.Js:
+                        outputFormat = "./Output/{0}/js/{1}.js";
+                        break;
+                }
+                temp.MakeType = makeType;
+                temp.RenderToFile(string.Format(outputFormat, x.Database.Name, x.Name), true);
+        %>
+<%=string.Format("{0}:{1} {2}", x.Name, makeType, "success")%>
+        <%
+            }catch(Exception ex){%>
+<%=string.Format("{0}:{1}", x.Name, ex.Message)%>
+    <%
+            }
+        });        
+    }catch(Exception ex){%>
+<%=string.Format("{0}:{1}", x.Name, ex.Message)%>
+    <%
+    }
+});
+%>
