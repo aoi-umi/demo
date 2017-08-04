@@ -1,0 +1,8 @@
+﻿<%@ Template Language="C#"%>
+
+<%@ Property Name="SourceDatabase" Type="SchemaExplorer.TableSchemaCollection" Category="数据源"   Description="需要生成的表" %>
+<%@ Register Name="Make" Template="Make.cst"MergeProperties="Flase" ExcludeProperties=""%>
+<%var temp = new Make();
+temp.Table = SourceDatabase["t_user_info"];
+temp.RenderToFile("./Output", true);
+%>
