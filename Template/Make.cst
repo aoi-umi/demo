@@ -23,19 +23,22 @@ public enum MakeTypeEnum{
     Js
 }
 </script>
-
 <%
 var databaseType = Tools.DatabaseTypeEnum.MySql;
 var dbModel = Tools.CreateDatabaseModel(Table, databaseType);
     dbModel.RemoveTablePrefix = RemoveTablePrefix;
+var list = new List<string>();
 switch(MakeType){
     case MakeTypeEnum.Procedure:
-        var procList = Tools.CreateProcedure(dbModel, databaseType);
-        procList.ForEach(x=>{
-            %>
-        <%=x%>
-            <%
-        });
+        list = Tools.CreateProcedure(dbModel, databaseType);        
+        break;
+    case MakeTypeEnum.Js:
+        list = Tools.CreateJs(dbModel, databaseType);
         break;
 }
+list.ForEach(x=>{
+            %>
+<%=x%>
+            <%
+        });
 %>

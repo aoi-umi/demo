@@ -24,7 +24,7 @@ module.exports = [
         }, {
             name: 'post',
             functionName: '',
-            exampleRequest:'{"arg":"123"}'
+            exampleRequest:{"arg":"123"}
         }],
         path: 'index',
         auth: [],
@@ -34,7 +34,7 @@ module.exports = [
         method:[{
             name: 'post',
             functionName: 'loginPost',
-            exampleRequest:'{"userName":"user", "pwd":"123456"}'
+            exampleRequest:{"userName":"user", "pwd":"123456"}
         },{
             name: 'get',
             functionName: 'loginGet'
@@ -53,16 +53,13 @@ module.exports = [
         auth:[]
     },
     {
-        url:'/users',
+        url:'/signUp',
         method:[{
-            name: 'get',
-            functionName: 'testGet'
-        },{
             name: 'post',
-            functionName: 'testPost'
+            functionName: 'signUp',
+            exampleRequest:{"userName":"user", "pwd":"123456"}
         }],
-        path:'',
-        auth:[auth['login']]
+        path:'users',
     },
     {
         url:'/admin',
