@@ -17,8 +17,6 @@ var pool = require('mysql').createPool({
 
 var exports = module.exports;
 
-//resolve result
-//reject  err
 exports.query = function (sql, params) {
     if(!params)
         params = [];
@@ -39,9 +37,6 @@ exports.query = function (sql, params) {
     });
 };
 
-
-//resolve conn, result
-//reject  conn, err
 //事务处理
 exports.tranConnect = function (queryFunction) {
     var connection = null;
@@ -121,14 +116,15 @@ function queryFormat(query, values) {
 }
 
 function getConnection(){
-    var res = q.defer();
-    pool.getConnection(function(e, t){
-        if(e)
-            res.reject(e);
-        else
-            res.resolve(t);
-    });
-    return res.promise;
+    return common.promise(pool, 'getConnection');
+    // var res = q.defer();
+    // pool.getConnection(function(e, t){
+    //     if(e)
+    //         res.reject(e);
+    //     else
+    //         res.resolve(t);
+    // });
+    // return res.promise;
 }
 
 function release(conn){

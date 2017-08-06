@@ -34,12 +34,8 @@
             var req = $.trim(row.find('[name=exampleRequest]').val());
             var url = dom.attr('data-url');
             if (!req) req = {};
-            var reqStr = req;
-            if (typeof req != 'string')
-                reqStr = JSON.stringify(req);
-            else {
+            if (typeof req == 'string')
                 req = JSON.parse(req);
-            }
             var headers = {};
             if (url == '/login') {
                 var userInfo = $.cookie(config.cacheKey.userInfo);
@@ -52,7 +48,12 @@
                     'User-Name': 'user',
                     'Token': token,
                 };
+            }else if(url == '/signUp'){
+                req.pwd = $.md5(req.pwd);
             }
+            var reqStr = req;
+            if(typeof reqStr != 'string');
+                reqStr = JSON.stringify(reqStr);
             extend.ajax({
                 url: url,
                 data: reqStr,

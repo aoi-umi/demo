@@ -33,9 +33,9 @@ public static DatabaseModel CreateDatabaseModel(TableSchema table, DatabaseTypeE
     var dbModel = new DatabaseModel(){
         TableName = table.Columns[0].Table.Name,
     };
-    var cols = new List<Tools.DatabaseColModel>();
+    var cols = new List<DatabaseColModel>();
     foreach(ColumnSchema col in table.Columns){ 
-    var colModel = new Tools.DatabaseColModel();
+    var colModel = new DatabaseColModel();
         colModel.Name = col.Name;
         colModel.NativeType = GetTypeWithSize(col, databaseType); 
         //第一个主键为id
@@ -108,20 +108,7 @@ public static string GetCSharpDataTypeByDBColumn(ColumnSchema column)
     }
 }
 
-public static List<string> CreateProcedure(DatabaseModel databaseModel, DatabaseTypeEnum databaseType)
-{
-    var procList = new List<string>();
-    switch(databaseType)
-    {
-        case DatabaseTypeEnum.MySql:
-            procList = CreateMySqlProcedure(databaseModel);
-            break;
-        
-    }
-    return procList;
-}
-
-public enum ProcTypeEnum
+public enum OperateTypeEnum
 {
     Save,
     Del,
@@ -139,23 +126,38 @@ private static string GetRepeatStr(string str, int count)
     return returnStr;
 }
 
+#region 存储过程
+public static List<string> CreateProcedure(DatabaseModel databaseModel, DatabaseTypeEnum databaseType)
+{
+    var procList = new List<string>();
+    switch(databaseType)
+    {
+        case DatabaseTypeEnum.MySql:
+            procList = CreateMySqlProcedure(databaseModel);
+            break;
+        
+    }
+    return procList;
+}
+
+#region mysql 存储过程
 private static List<string> CreateMySqlProcedure(DatabaseModel databaseModel)
 {
     var procList = new List<string>();
-    var procTypeList = new List<ProcTypeEnum>(){ProcTypeEnum.Save, ProcTypeEnum.Del, ProcTypeEnum.DetailQuery, ProcTypeEnum.Query};
-    //var procTypeList = new List<ProcTypeEnum>(){ProcTypeEnum.Query};
-    procTypeList.ForEach(procType=>{
-        switch(procType){
-            case ProcTypeEnum.Save:
+    var operateTypeList = new List<OperateTypeEnum>(){OperateTypeEnum.Save, OperateTypeEnum.Del, OperateTypeEnum.DetailQuery, OperateTypeEnum.Query};
+    //var operateTypeList = new List<OperateTypeEnum>(){OperateTypeEnum.Query};
+    operateTypeList.ForEach(operateType=>{
+        switch(operateType){
+            case OperateTypeEnum.Save:
                 procList.AddRange(CreateMySqlSaveProcedure(databaseModel));
                 break;
-            case ProcTypeEnum.Del:
+            case OperateTypeEnum.Del:
                 procList.AddRange(CreateMySqlDelProcedure(databaseModel));
                 break;
-            case ProcTypeEnum.DetailQuery:
+            case OperateTypeEnum.DetailQuery:
                 procList.AddRange(CreateMySqlDetailQueryProcedure(databaseModel));
                 break;
-            case ProcTypeEnum.Query:
+            case OperateTypeEnum.Query:
                 procList.AddRange(CreateMySqlQueryProcedure(databaseModel));
                 break;
         }      
@@ -174,9 +176,9 @@ private static List<string> CreateMySqlSaveProcedure(DatabaseModel databaseModel
         if(procTableName.StartsWith(databaseModel.RemoveTablePrefix))
             procTableName = procTableName.Substring(databaseModel.RemoveTablePrefix.Length);
     }
-    var procName = "p_auto_" 
+    var procName = "p_" 
         + procTableName
-        + "_save";
+        + "_save_auto";
     var procStrList = new List<string>();
     var cols = databaseModel.Cols;
     var paraPerfix = "pr_";
@@ -229,7 +231,7 @@ private static List<string> CreateMySqlSaveProcedure(DatabaseModel databaseModel
     level = 1;
     tabStr = GetRepeatStr("\t", level);    
     procStrList.Add(tabStr + ");");
-    procStrList.Add(tabStr + "SELECT LAST_INSERT_ID() as '" + databaseModel.IdCol.Name + "';");    
+    procStrList.Add(tabStr + "SELECT LAST_INSERT_ID() as 'id';");    
     #endregion
     
     #region update
@@ -260,7 +262,7 @@ private static List<string> CreateMySqlSaveProcedure(DatabaseModel databaseModel
     procStrList.Add(tabStr + "\tPREPARE stmt1 FROM @Sql;");
     procStrList.Add(tabStr + "\tEXECUTE stmt1;");		
     procStrList.Add(tabStr + "END IF;");	
-    procStrList.Add(string.Format(tabStr + "SELECT " + paraPerfix + "{0} AS '{0}';", databaseModel.IdCol.Name));
+    procStrList.Add(string.Format(tabStr + "SELECT " + paraPerfix + "{0} AS 'id';", databaseModel.IdCol.Name));
             
     procStrList.Add("END IF;");
     
@@ -283,9 +285,9 @@ private static List<string> CreateMySqlDelProcedure(DatabaseModel databaseModel)
         if(procTableName.StartsWith(databaseModel.RemoveTablePrefix))
             procTableName = procTableName.Substring(databaseModel.RemoveTablePrefix.Length);
     }
-    var procName = "p_auto_" 
+    var procName = "p_" 
         + procTableName
-        + "_del";
+        + "_del_auto";
     var procStrList = new List<string>();
     var cols = databaseModel.Cols;
     var paraPerfix = "pr_";
@@ -316,9 +318,9 @@ private static List<string> CreateMySqlDetailQueryProcedure(DatabaseModel databa
         if(procTableName.StartsWith(databaseModel.RemoveTablePrefix))
             procTableName = procTableName.Substring(databaseModel.RemoveTablePrefix.Length);
     }
-    var procName = "p_auto_" 
+    var procName = "p_" 
         + procTableName
-        + "_detail_query";
+        + "_detail_query_auto";
     var procStrList = new List<string>();
     var cols = databaseModel.Cols;
     var paraPerfix = "pr_";
@@ -354,9 +356,9 @@ private static List<string> CreateMySqlQueryProcedure(DatabaseModel databaseMode
         if(procTableName.StartsWith(databaseModel.RemoveTablePrefix))
             procTableName = procTableName.Substring(databaseModel.RemoveTablePrefix.Length);
     }
-    var procName = "p_auto_" 
+    var procName = "p_" 
         + procTableName
-        + "_query";
+        + "_query_auto";
     var procStrList = new List<string>();
     var cols = databaseModel.Cols;
     var paraPerfix = "pr_";
@@ -368,7 +370,7 @@ private static List<string> CreateMySqlQueryProcedure(DatabaseModel databaseMode
     procStrList.Add( "create procedure " + procName + "(");
     level = 1;
     tabStr = GetRepeatStr("\t", level);
-        procStrList.Add(string.Format(tabStr + paraPerfix + "{0} {1},", databaseModel.IdCol.Name , databaseModel.IdCol.NativeType));
+    procStrList.Add(string.Format(tabStr + paraPerfix + "{0} {1},", databaseModel.IdCol.Name , databaseModel.IdCol.NativeType));
     var i = 0;
     cols.ForEach(x=>{        
         procStrList.Add(string.Format(tabStr + paraPerfix + "{0} {1},", x.Name , x.NativeType));
@@ -415,6 +417,92 @@ private static List<string> CreateMySqlQueryProcedure(DatabaseModel databaseMode
     procList.Add(string.Join(Environment.NewLine, procStrList.ToArray())); 
     return procList;   
 }
+#endregion
+#endregion
+
+#region js
+
+public static List<string> CreateJs(DatabaseModel databaseModel, DatabaseTypeEnum databaseType)
+{
+    var list = new List<string>();
+    switch(databaseType)
+    {
+        case DatabaseTypeEnum.MySql:
+            list = CreateMySqlJs(databaseModel);
+            break;
+        
+    }
+    return list;
+}
+
+#region mysql js
+public static List<string> CreateMySqlJs(DatabaseModel databaseModel)
+{
+    var list = new List<string>();
+    var operateTypeList = new List<OperateTypeEnum>(){OperateTypeEnum.Save, OperateTypeEnum.Del, OperateTypeEnum.DetailQuery, OperateTypeEnum.Query};
+    
+    var procTableName = databaseModel.TableName;
+    if(!string.IsNullOrEmpty(databaseModel.RemoveTablePrefix)){
+        if(procTableName.StartsWith(databaseModel.RemoveTablePrefix))
+            procTableName = procTableName.Substring(databaseModel.RemoveTablePrefix.Length);
+    }
+    
+    var jsStrList = new List<string>();
+    jsStrList.Add("var db = require('../_system/db');");
+    jsStrList.Add("var exports = module.exports;");
+    
+    operateTypeList.ForEach(operateType=>{
+        var level = 1;
+        var tabStr = GetRepeatStr("\t", level);
+        var functionName = "";
+        var procName = "";
+        var sqlStr = "var sql = 'call p_" + procTableName + "_{0}_auto({1})';";
+        var paramsList = new List<string>();
+        switch(operateType){
+            case OperateTypeEnum.Save:
+                procName = functionName = "save";
+                paramsList.Add(databaseModel.IdCol.Name);
+                paramsList.AddRange(databaseModel.Cols.Select(x=>x.Name));
+                paramsList.Add("null_list");
+                
+                break;
+            case OperateTypeEnum.Del:
+                procName = functionName = "del";
+                paramsList.Add(databaseModel.IdCol.Name);
+                
+                break;
+            case OperateTypeEnum.DetailQuery:
+                procName = "detail_query";
+                functionName = "detailQuery";
+                paramsList.Add(databaseModel.IdCol.Name);               
+                break;
+            case OperateTypeEnum.Query:
+                procName = functionName = "query";
+                paramsList.Add(databaseModel.IdCol.Name);
+                paramsList.AddRange(databaseModel.Cols.Select(x=>x.Name));
+                paramsList.Add("null_list");
+                paramsList.Add("page_index");
+                paramsList.Add("page_size");
+                break;
+        }      
+        if(!string.IsNullOrEmpty(functionName))
+        {
+            sqlStr = string.Format(sqlStr, procName, string.Join(", ", paramsList.Select(x=> ":" + x)));                        
+            jsStrList.Add("exports." + functionName + " = function (params, conn) {");
+            jsStrList.Add(tabStr + sqlStr);
+            jsStrList.Add(tabStr + "if(!conn)");
+            jsStrList.Add(tabStr + "\t" + "return db.query(sql, params);");
+            jsStrList.Add(tabStr + "else");
+            jsStrList.Add(tabStr + "\t" + "return db.tranQuery(sql, params, conn);");
+            jsStrList.Add("};" + Environment.NewLine);
+        }
+    });
+    list.Add(string.Join(Environment.NewLine, jsStrList.ToArray()));
+    return list;
+}
+#endregion
+
+#endregion
 </script>
 
 

@@ -28,52 +28,53 @@ exports.extend = function () {
     return res;
 };
 
-//带参数：args0:带nodeCallback的 function
-//       args1:function的参数1
-//       args2:function的参数2
-//       ...
-exports.promise = function(){
+//带参数：args0:对象
+//        args1:带nodeCallback的 function名
+//        args2:function的参数1
+//        args3:function的参数2
+//        ...
+exports.promise = function(obj, methodName){
     var args = arguments;
     var defer = q.defer();
-    //if(!args.length) {
+    if(!args.length) {
         var res = q.defer();
         defer.promise.then(function () {
             return res.promise;
         });
         defer.resolve(res.resolve, res.reject);
-    //}else{
-    //    var funArgs = [];
-    //    var evalStr = 'args[0](';
-    //    for (var key in args) {
-    //        if(key != 0)
-    //            funArgs.push('args[' + key + ']');
-    //    }
-    //    var cbStrList = [];
-    //    cbStrList.push('function(){');
-    //    cbStrList.push('	var cbArgs = arguments;');
-    //    cbStrList.push('	if(cbArgs && cbArgs[0])');
-    //    cbStrList.push('		defer.reject (cbArgs[0]);');
-    //    cbStrList.push('	else{');
-    //    cbStrList.push('		var resovleEval = \'defer.resolve (\';');
-    //    cbStrList.push('		var resolveArgs = [];');
-    //    cbStrList.push('		if(cbArgs){');
-    //    cbStrList.push('			for(var cbArgKey in cbArgs){');
-    //    cbStrList.push('				if(cbArgKey != 0){');
-    //    cbStrList.push('					resolveArgs.push(\'cbArgs[\' + cbArgKey + \']\');');
-    //    cbStrList.push('				}');
-    //    cbStrList.push('			}');
-    //    cbStrList.push('			if(resolveArgs.length)');
-    //    cbStrList.push('				resovleEval += resolveArgs.join(\',\');');
-    //    cbStrList.push('		}');
-    //    cbStrList.push('		resovleEval	+= \')\';');
-    //    cbStrList.push('		eval(resovleEval);');
-    //    cbStrList.push('	}');
-    //    cbStrList.push('}');
-    //    funArgs.push(cbStrList.join('\n'));
-    //    if (funArgs.length) evalStr += funArgs.join(',');
-    //    evalStr += ');';
-    //    eval(evalStr);
-    //}
+    }else{
+       var funArgs = [];
+       var evalStr = 'obj[methodName](';
+       for (var key in args) {
+           if(key != 0 && key != 1)
+               funArgs.push('args[' + key + ']');
+       }
+       var cbStrList = [];
+       cbStrList.push('function(){');
+       cbStrList.push('	var cbArgs = arguments;');
+       cbStrList.push('	if(cbArgs && cbArgs[0])');
+       cbStrList.push('		defer.reject (cbArgs[0]);');
+       cbStrList.push('	else{');
+       cbStrList.push('		var resovleEval = \'defer.resolve (\';');
+       cbStrList.push('		var resolveArgs = [];');
+       cbStrList.push('		if(cbArgs){');
+       cbStrList.push('			for(var cbArgKey in cbArgs){');
+       cbStrList.push('				if(cbArgKey != 0){');
+       cbStrList.push('					resolveArgs.push(\'cbArgs[\' + cbArgKey + \']\');');
+       cbStrList.push('				}');
+       cbStrList.push('			}');
+       cbStrList.push('			if(resolveArgs.length)');
+       cbStrList.push('				resovleEval += resolveArgs.join(\',\');');
+       cbStrList.push('		}');
+       cbStrList.push('		resovleEval	+= \')\';');
+       cbStrList.push('		eval(resovleEval);');
+       cbStrList.push('	}');
+       cbStrList.push('}');
+       funArgs.push(cbStrList.join('\n'));
+       if (funArgs.length) evalStr += funArgs.join(',');
+       evalStr += ');';
+       eval(evalStr);
+    }
     return defer.promise;
 };
 
@@ -199,7 +200,7 @@ exports.requestService = function (option, cb) {
 exports.requestServiceByConfigPromise = common.promisify(exports.requestServiceByConfig);
 exports.requestServicePromise = common.promisify(exports.requestService);
 
-exports.formatRes = function (err, data, desc) {
+exports.formatRes = function (err, detail, desc) {
     //result    是否成功
     //desc      描述
     //detail    成功 返回的内容
@@ -218,8 +219,8 @@ exports.formatRes = function (err, data, desc) {
         res.result = true;
         res.desc = desc || 'success';
     }
-    if (data)
-        res.detail = data;
+    if (detail)
+        res.detail = detail;
     return res;
 };
 
