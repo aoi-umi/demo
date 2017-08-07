@@ -37,11 +37,12 @@ exports.promise = function(obj, methodName){
     var args = arguments;
     var defer = q.defer();
     if(!args.length) {
-        var res = q.defer();
-        defer.promise.then(function () {
-            return res.promise;
-        });
-        defer.resolve(res.resolve, res.reject);
+        // var res = q.defer();
+        // defer.promise.then(function () {
+        //     return res.promise;
+        // });
+        // defer.resolve(res.resolve, res.reject);
+        defer.resolve();
     }else{
        var funArgs = [];
        var evalStr = 'obj[methodName](';
@@ -89,31 +90,20 @@ exports.promisify = function (fun) {
         var cbStrList = [];
         cbStrList.push('function(){');
         cbStrList.push('	var cbArgs = arguments;');
+        //cbStrList.push('	console.log(cbArgs)');
         cbStrList.push('	if(cbArgs && cbArgs[0])');
-        cbStrList.push('		reject (cbArgs[0]);');
-        cbStrList.push('	else{');
-        cbStrList.push('		var resovleEval = \'resolve (\';');
-        cbStrList.push('		var resolveArgs = [];');
-        cbStrList.push('		if(cbArgs){');
-        cbStrList.push('			for(var cbArgKey in cbArgs){');
-        cbStrList.push('				if(cbArgKey != 0){');
-        cbStrList.push('					resolveArgs.push(\'cbArgs[\' + cbArgKey + \']\');');
-        cbStrList.push('				}');
-        cbStrList.push('			}');
-        cbStrList.push('			if(resolveArgs.length)');
-        cbStrList.push('				resovleEval += resolveArgs.join(\',\');');
-        cbStrList.push('		}');
-        cbStrList.push('		resovleEval	+= \')\';');
-        cbStrList.push('		eval(resovleEval);');
-        cbStrList.push('	}');
+        cbStrList.push('		return res.reject(cbArgs[0]);');
+        cbStrList.push('	return res.resolve(cbArgs[1]);');
         cbStrList.push('}');
         funArgs.push(cbStrList.join('\n'));
 
         if (funArgs.length) evalStr += funArgs.join(',');
         evalStr += ');';
-        return common.promise().then(function (resolve, reject) {
+        return common.promise().then(function () {
             //console.log(evalStr);
+            var res = q.defer();
             eval(evalStr);
+            return res.promise;
         });
     };
 };
@@ -162,17 +152,9 @@ exports.requestServiceByConfig = function (option, cb) {
             //发送的参数 当前所用参数
             option.beforeSend(opt, serviceArgs);
         }
-        //console.log(opt);
-        // common.requestService(opt, function (err, data) {
-        //     if(err) {
-        //         console.log('request', '[' + option.serviceName + ']', '[' + option.methodName + ']', 'error');
-        //         console.log('url:', url);
-        //     }
-        //     cb(err, data);
-        // });
         common.requestServicePromise(opt).then(function (t) {
             cb(null, t);
-        }).catch(function (e) {
+        }).fail(function (e) {
             console.log('request', '[' + option.serviceName + ']', '[' + option.methodName + ']', 'error');
             console.log('url:', url);
             cb(e);
@@ -381,7 +363,6 @@ exports.isInList = function (list, obj) {
 };
 
 exports.createToken = function (str) {
-    console.log(str);
     var code = common.md5(str);
     return code;
 };

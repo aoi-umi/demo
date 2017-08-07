@@ -3,16 +3,9 @@ var common = require('./_system/common');
 var cache = require('./_system/cache');
 var errorConfig = require('./_system/errorConfig');
 var config = require('../config');
+var autoBll = require('./_bll/auto');
 
 exports.use = function (req, res, next) {
-    //req.query  /?params1=1&params2=2
-    //req.body  post的参数
-    //req.params /:params1/:params2
-    //console.log(require('./routes/_system/common').getClientIp(req));
-    req.myData = {};
-    var user = req.myData.user = {
-        auth: []
-    };
     var userInfoKey = req.cookies[config.cacheKey.userInfo];
     if (userInfoKey) {
         userInfoKey = config.cacheKey.userInfo + userInfoKey;
@@ -30,8 +23,9 @@ exports.use = function (req, res, next) {
 };
 
 exports.get = function (req, res, next) {
-    res.render('index', common.formatViewtRes({title: 'Express', method: 'get'}));
+    res.myRender('index', common.formatViewtRes({title: 'Express', method: 'get'}));
 };
+
 exports.post = function (req, res, next) {
     res.send(common.formatRes(null, 'post'));
 };
@@ -47,18 +41,38 @@ exports.loginPost = function (req, res, next) {
     var userName = req.header('user-name');
     var token = req.header('token');
     var reqBody = req.body;
-    login(userName, token, reqBody).then(function () {
+    login(userName, token, reqBody).then(function (t) {
         var userInfoKey = req.cookies[config.cacheKey.userInfo];
         if (userInfoKey) {
             userInfoKey = config.cacheKey.userInfo + userInfoKey;
-            var user = req.myData.user = {
-                auth: ['login']
-            };
+            var user = req.myData.user;
+            user.nickname = t.nickname;
+            user.authority['login'] = true;
+            if(t.auth){
+                var authList = t.auth.split(',');
+                authList.forEach(function (auth) {
+                    user.authority[auth] = true;
+                });
+            }
             var hours = new Date().getHours();
             var seconds = parseInt((24 - hours) * 60 * 60);
             cache.setPromise(userInfoKey, user, seconds);
         }
         res.send(common.formatRes(null, 'post'));
+    }).catch(function (e) {
+        res.send(common.formatRes(e, e.code));
+    });
+};
+
+exports.loginOut = function (req, res, next) {
+    var userInfoKey = req.cookies[config.cacheKey.userInfo];
+    common.promise().then(function () {
+        if(userInfoKey) {
+            userInfoKey = config.cacheKey.userInfo + userInfoKey;
+            return cache.delPromise(userInfoKey);
+        }
+    }).then(function () {
+        res.send(common.formatRes(null, 'success'));
     }).catch(function (e) {
         res.send(common.formatRes(e, e.code));
     });
@@ -80,12 +94,18 @@ function login(userName, token, req) {
             req = '';
         if (typeof req != 'string')
             req = JSON.stringify(req);
-        var pwd = common.md5('123456');//todo 按用户名查询密码
-        var str = userName + pwd + req;
-        var checkToken = common.createToken(userName + pwd + req);
-        if (token != checkToken)
-            throw common.error(null, errorConfig.TOKEN_WRONG.code);
-    }).finally(function () {
-        console.log('finally')
+        return autoBll.query('user_info', {account: userName}).then(function (t) {
+            if (!t.count)
+                throw common.error('no account or password wrong!');
+            if (t.count > 1)
+                throw common.error('system error: data wrong');
+            var userInfo = t.list[0];
+            var pwd = userInfo.password;
+            var str = userName + pwd + req;
+            var checkToken = common.createToken(userName + pwd + req);
+            if (token != checkToken)
+                throw common.error(null, errorConfig.TOKEN_WRONG.code);
+            return userInfo;
+        });
     });
 }

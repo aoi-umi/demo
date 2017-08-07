@@ -3,6 +3,13 @@
  */
 //lang ISO 639-1
 module.exports= {
+    DEV: {
+        code: 'DEV',
+        desc: {
+            'zh':'dev',
+            'en':'dev',
+        }
+    },
     TOKEN_WRONG: {
         code: 'TOKEN_WRONG',
         desc: {
