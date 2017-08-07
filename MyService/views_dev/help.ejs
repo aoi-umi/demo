@@ -19,7 +19,8 @@
         </td>
         <td>[<%= t.method %>]</td>
         <td>
-            <textarea name="exampleRequest"><%= t.method == 'post' && t.exampleRequest ? t.exampleRequest:'' %></textarea>
+            <textarea name="exampleRequest"><%= t.method == 'post' ? t.exampleRequest|| '': t.exampleRequest || t.url %>
+            </textarea>
         </td>
     </tr>
     <% }) %>
@@ -28,41 +29,47 @@
 <% include _public/footer %>
 <script type="text/javascript">
     $(function () {
-        $(document).on('click', '[name=url][data-method=post]', function () {
+        $(document).on('click', '[name=url]', function () {
             var dom = $(this);
             var row = dom.closest('tr');
             var req = $.trim(row.find('[name=exampleRequest]').val());
+            var method = dom.attr('data-method');
             var url = dom.attr('data-url');
-            if (!req) req = {};
-            if (typeof req == 'string')
-                req = JSON.parse(req);
-            var headers = {};
-            if (url == '/login') {
-                var userInfo = $.cookie(config.cacheKey.userInfo);
-                if(!userInfo){
-                    userInfo = extend.guid();
-                    $.cookie(config.cacheKey.userInfo, userInfo, { expires: 1 });
+            if(method == 'post') {
+                if (!req) req = {};
+                if (typeof req == 'string')
+                    req = JSON.parse(req);
+                var headers = {};
+                if (url == '/login') {
+                    var userInfo = $.cookie(config.cacheKey.userInfo);
+                    if (!userInfo) {
+                        userInfo = extend.guid();
+                        $.cookie(config.cacheKey.userInfo, userInfo, {expires: 1});
+                    }
+                    var token = extend.createToken(req.userName + $.md5(req.pwd) + JSON.stringify(req));
+                    headers = {
+                        'User-Name': req.userName,
+                        'Token': token,
+                    };
+                } else if (url == '/signUp') {
+                    req.pwd = $.md5(req.pwd);
                 }
-                var token = extend.createToken(req.userName + $.md5(req.pwd) + JSON.stringify(req));
-                headers = {
-                    'User-Name': 'user',
-                    'Token': token,
-                };
-            }else if(url == '/signUp'){
-                req.pwd = $.md5(req.pwd);
-            }
-            var reqStr = req;
-            if(typeof reqStr != 'string');
+                var reqStr = req;
+                if (typeof reqStr != 'string');
                 reqStr = JSON.stringify(reqStr);
-            extend.ajax({
-                url: url,
-                data: reqStr,
-                headers: headers,
-            }).then(function (t) {
-                console.log(t)
-            }).fail(function (e) {
-                console.log(e)
-            });
+                extend.ajax({
+                    url: url,
+                    data: reqStr,
+                    headers: headers,
+                }).then(function (t) {
+                    console.log(t)
+                }).fail(function (e) {
+                    console.log(e)
+                });
+            }else if(method == 'get') {
+                url = req || url;
+                dom.attr('href', url);
+            }
         });
     });
 </script>

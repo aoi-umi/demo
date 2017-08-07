@@ -9,6 +9,10 @@ var auth = {
     'admin': {
         key: 'admin',
         errCode: 'NO_PERMISSIONS',
+    },
+    'dev': {
+        key: 'dev',
+        errCode: 'DEV',
     }
 };
 
@@ -38,6 +42,15 @@ module.exports = [
         },{
             name: 'get',
             functionName: 'loginGet'
+        }],
+        path:'index',
+        auth:[]
+    },
+    {
+        url:'/loginOut',
+        method:[{
+            name: 'post',
+            functionName: 'loginOut',
         }],
         path:'index',
         auth:[]
@@ -123,6 +136,6 @@ module.exports = [
             functionName: ''
         }],
         path:'',
-        auth:[],
+        auth:[auth['dev']],
     },
 ];

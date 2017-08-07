@@ -20,6 +20,33 @@ app.use(bodyParser.urlencoded());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public' + config.env)));
 
+app.use(function (req, res, next) {
+    //req.query  /?params1=1&params2=2
+    //req.body  post的参数
+    //req.params /:params1/:params2
+    //console.log(require('./routes/_system/common').getClientIp(req));
+    res.myRender = function (view, options, fn) {
+        var opt = {
+            user: req.myData.user
+        };
+        opt = common.extend(opt, options);
+        res.render(view, common.formatViewtRes(opt));
+    };
+
+    res.mySend = function (err, detail, desc) {
+        res.send(common.formatRes(err, detail, desc));
+    };
+
+    req.myData = {};
+    var user = req.myData.user = {
+        nickname: 'guest',
+        authority: {}
+    };
+    if(config.env == '_dev')
+        user.authority['dev'] = true;
+    next();
+});
+
 var auth = require('./routes/_system/auth');
 var restConfig = require('./rest_config');
 var restList = [];
