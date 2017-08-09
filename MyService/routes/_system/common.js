@@ -1,6 +1,8 @@
 /**
  * Created by umi on 2017-5-29.
  */
+var fs = require("fs");
+var path = require('path');
 var request = require('request');
 var net = require('net');
 var crypto = require('crypto');
@@ -244,6 +246,12 @@ exports.error = function (msg, code, option) {
 
 exports.writeError = function (err) {
     console.error(err);
+
+    var list = [];
+    var createDate = common.dateFormat(new Date(), 'yyyy-MM-dd');
+    var createDateTime = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
+    list.push(createDateTime);
+    list.push(err);
     //用于查找上一级调用
     var stack = new Error().stack;
     var stackList = common.getStack(err.stack, 1, 4)
@@ -251,7 +259,13 @@ exports.writeError = function (err) {
         .concat(common.getStack(stack, 2, 4));
     for (var i = 0; i < stackList.length; i++) {
         console.error(stackList[i]);
+        list.push(stackList[i]);
     }
+
+    //write file
+    common.mkdirsSync(config.errorDir);
+    var fileName = config.errorDir + '/' + createDate + '.txt';
+    fs.appendFile(fileName, list.join('\r\n') + '\r\n\r\n', function(){});
 };
 
 exports.getStack = function (stack, start, end) {
@@ -259,6 +273,19 @@ exports.getStack = function (stack, start, end) {
     if (stack) stackList = stack.split('\n');
     return stackList.slice(start, end);
 };
+
+exports.mkdirsSync = function(dirname, mode) {
+    if (fs.existsSync(dirname)) {
+        return true;
+    } else {
+        if (common.mkdirsSync(path.dirname(dirname), mode)) {
+            fs.mkdirSync(dirname, mode);
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
 
 exports.getClientIp = function (req) {
     // var ip = req.headers['x-forwarded-for']
