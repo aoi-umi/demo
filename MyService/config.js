@@ -33,6 +33,14 @@ module.exports = {
                 url: '1',
                 method: 'get'
             },
+        },
+        logService:{
+            defaultArgs: {
+                host: 'http://localhost:3010',
+            },
+            save: {
+                url: '/log/save',
+            },
         }
     },
     redis: {

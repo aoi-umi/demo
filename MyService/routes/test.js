@@ -23,13 +23,13 @@ exports.getPromise = function (req, res) {
 };
 
 exports.testGet = function (req, res) {
-    testService.test1({}, function (err, data) {
+    testService.test1({arg:1}, function (err, data) {
         res.send(common.formatRes(err, data));
     });
 };
 
 exports.get2 = function (req, res) {
-    testService.test2({}, function (err, data) {
+    testService.test2({arg:2}, function (err, data) {
         res.send(common.formatRes(err, data));
     });
 };

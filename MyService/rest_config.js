@@ -138,4 +138,12 @@ module.exports = [
         path:'',
         auth:[auth['dev']],
     },
+    {
+        url:'/log/save',
+        method:[{
+            name: 'post',
+            functionName: 'save'
+        }],
+        path:'/log',
+    },
 ];
