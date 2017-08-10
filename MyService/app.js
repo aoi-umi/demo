@@ -33,8 +33,11 @@ app.use(function (req, res, next) {
         res.render(view, common.formatViewtRes(opt));
     };
 
-    res.mySend = function (err, detail, desc) {
+    res.mySend = function (err, detail, desc, log) {
         res.send(common.formatRes(err, detail, desc));
+        if(log) {
+            logService.save(log);
+        }
     };
 
     req.myData = {};
@@ -125,6 +128,13 @@ app.use(function(err, req, res, next) {
 });
 
 
+process.on('unhandledRejection', function(e){
+    var stack = e;
+    if(e && e.stack)
+        stack = e.stack;
+    console.error('unhandledRejection');
+    console.error(stack);
+});
 // production error handler
 // no stacktraces leaked to user
 

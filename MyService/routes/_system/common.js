@@ -10,6 +10,7 @@ var q = require('q');
 var config = require('../../config');
 var errorConfig = require('./errorConfig');
 var myEnum = require('./enum');
+var logService = require('../_service/logService');
 var common = exports;
 
 exports.extend = function () {
@@ -126,6 +127,7 @@ exports.requestServiceByConfig = function (option, cb) {
 
         var defaultMethodArgs = {
             isUseDefault: true,
+            method: 'POST',
         }
         var methodArgs = service[option.methodName];
         methodArgs = common.extend(defaultMethodArgs, methodArgs);
@@ -154,12 +156,33 @@ exports.requestServiceByConfig = function (option, cb) {
             //发送的参数 当前所用参数
             option.beforeSend(opt, serviceArgs);
         }
+        var result = null;
+        var logRes = null;
+        var logMethod = '[' + option.serviceName + '][' + option.methodName + ']';
         common.requestServicePromise(opt).then(function (t) {
+            result = true;
+            logRes = t;
             cb(null, t);
         }).fail(function (e) {
-            console.log('request', '[' + option.serviceName + ']', '[' + option.methodName + ']', 'error');
+            result = false;
+            logRes = e;
+            console.log('request', logMethod, 'error');
             console.log('url:', url);
             cb(e);
+        }).finally(function(){
+            if(!option.noLog) {
+                var log = common.logModle();
+                log.url = url;
+                log.result = result;
+                log.method = logMethod
+                log.req = opt.body;
+                log.res = logRes;
+                if (typeof log.req != 'string')
+                    log.req = JSON.stringify(log.req);
+                if (typeof log.res != 'string')
+                    log.res = JSON.stringify(log.res);
+                logService.save(log);
+            }
         });
     }
     catch (e) {
@@ -449,3 +472,16 @@ exports.enumCheck = function(srcEnum, destEnum, enumType) {
 };
 
 //common.enumCheck(1,0,'statusEnum');
+
+exports.logModle = function() {
+    return {
+        url: null,
+        method: null,
+        result: null,
+        code: null,
+        req: null,
+        res: null,
+        create_date: common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss'),
+        remark: null,
+    };
+};
