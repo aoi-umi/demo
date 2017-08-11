@@ -33,11 +33,22 @@ app.use(function (req, res, next) {
         res.render(view, common.formatViewtRes(opt));
     };
 
-    res.mySend = function (err, detail, desc, log) {
+    res.mySend = function (err, detail, desc) {
         res.send(common.formatRes(err, detail, desc));
-        if(log) {
-            logService.save(log);
-        }
+        var url = req.originalUrl;
+        var result = err ? false : true;
+        var logReq = req.method == 'POST' ? req.body : '';
+        var logRes = detail;
+        var logMethod = '[' + (config.name + '][' + (req.myData.method.methodName || url)) + ']';
+
+        url = req.header('host') + url;
+        var log = common.logModle();
+        log.url = url;
+        log.result = result;
+        log.method = logMethod
+        log.req = logReq;
+        log.res = logRes;
+        common.logSave(log);
     };
 
     req.myData = {};
@@ -54,7 +65,7 @@ var auth = require('./routes/_system/auth');
 var restConfig = require('./rest_config');
 var restList = [];
 restConfig.forEach(function(rest){
-    for (var imethod = 0; imethod < rest.method.length; imethod++) {
+    rest.method.forEach(function(method, imethod){
         var method = rest.method[imethod];
         var path = rest.path || rest.url;
         if (path && path.substr(0, 1) !== '/')
@@ -71,12 +82,14 @@ restConfig.forEach(function(rest){
             case 'get':
                 app.get(rest.url, function(req, res, next){
                     req.myData.auth = rest.auth;
+                    req.myData.method = method;
                     auth.auth(req, res, next);
                 }, reqfile[functionName]);
                 break;
             case 'post':
                 app.post(rest.url, function(req, res, next){
                     req.myData.auth = rest.auth;
+                    req.myData.method = method;
                     auth.auth(req, res, next);
                 },  reqfile[functionName]);
                 break;
@@ -87,7 +100,7 @@ restConfig.forEach(function(rest){
         if (isRouter) {
             restList.push({url: rest.url, method: method, path: path});
         }
-    }
+    });
 });
 //console.log(restList);
 
