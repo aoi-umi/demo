@@ -27,7 +27,7 @@ exports.get = function (req, res, next) {
 };
 
 exports.post = function (req, res, next) {
-    res.send(common.formatRes(null, 'post'));
+    res.mySend(null, 'post');
 };
 
 exports.loginGet = function (req, res, next) {
@@ -72,9 +72,9 @@ exports.loginOut = function (req, res, next) {
             return cache.delPromise(userInfoKey);
         }
     }).then(function () {
-        res.send(common.formatRes(null, 'success'));
+        res.mySend(null, 'success');
     }).catch(function (e) {
-        res.send(common.formatRes(e, e.code));
+        res.mySend(e, e.code);
     });
 };
 

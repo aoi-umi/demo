@@ -157,6 +157,7 @@ exports.requestServiceByConfig = function (option, cb) {
             option.beforeSend(opt, serviceArgs);
         }
         var result = null;
+        var logReq = opt.body;
         var logRes = null;
         var logMethod = '[' + option.serviceName + '][' + option.methodName + ']';
         common.requestServicePromise(opt).then(function (t) {
@@ -175,13 +176,9 @@ exports.requestServiceByConfig = function (option, cb) {
                 log.url = url;
                 log.result = result;
                 log.method = logMethod
-                log.req = opt.body;
+                log.req = logReq;
                 log.res = logRes;
-                if (typeof log.req != 'string')
-                    log.req = JSON.stringify(log.req);
-                if (typeof log.res != 'string')
-                    log.res = JSON.stringify(log.res);
-                logService.save(log);
+                common.logSave(log);
             }
         });
     }
@@ -484,4 +481,12 @@ exports.logModle = function() {
         create_date: common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss'),
         remark: null,
     };
+};
+
+exports.logSave = function(log) {
+    if (log.req && typeof log.req != 'string')
+        log.req = JSON.stringify(log.req);
+    if (log.res && typeof log.res != 'string')
+        log.res = JSON.stringify(log.res);
+    return logService.save(log);
 };

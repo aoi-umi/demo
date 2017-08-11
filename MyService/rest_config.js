@@ -28,7 +28,8 @@ module.exports = [
         }, {
             name: 'post',
             functionName: '',
-            exampleRequest:{"arg":"123"}
+            exampleRequest:{"arg":"123"},
+            methodName:'index-post',//用于记录日志
         }],
         path: 'index',
         auth: [],
