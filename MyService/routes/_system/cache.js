@@ -22,6 +22,7 @@ client.on('error', function (err) {
 });
 
 exports.get = function(key, cb){
+    var isCallback = false;
     client.get(cachePrefix + key, function(err, result){
         if(result && typeof result == 'string') {
             try {
@@ -30,8 +31,17 @@ exports.get = function(key, cb){
             catch (e) {
             }
         }
-        cb(err, result);
+        if(!isCallback) {
+            cb(err, result);
+            isCallback = true;
+        }
     });
+    setTimeout(function () {
+        if(!isCallback) {
+            cb(common.error('Cache Get Timeout', 'CACHE_TIMEOUT'));
+            isCallback = true;
+        }
+    }, 10 * 1000);
 };
 //expire seconds
 exports.set = function(key, value, expire, cb){

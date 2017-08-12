@@ -34,11 +34,12 @@ app.use(function (req, res, next) {
     };
 
     res.mySend = function (err, detail, desc) {
-        res.send(common.formatRes(err, detail, desc));
+        var formatRes = common.formatRes(err, detail, desc);
+        res.send(formatRes);
         var url = req.originalUrl;
-        var result = err ? false : true;
+        var result = formatRes.result;
         var logReq = req.method == 'POST' ? req.body : '';
-        var logRes = detail;
+        var logRes = formatRes.detail;
         var logMethod = '[' + (config.name + '][' + (req.myData.method.methodName || url)) + ']';
 
         url = req.header('host') + url;
@@ -48,14 +49,18 @@ app.use(function (req, res, next) {
         log.method = logMethod
         log.req = logReq;
         log.res = logRes;
+        log.remark = formatRes.desc;
         common.logSave(log);
     };
 
-    req.myData = {};
-    var user = req.myData.user = {
-        nickname: 'guest',
-        authority: {}
+    req.myData = {
+        method: {},
+        user: {
+            nickname: 'guest',
+            authority: {}
+        }
     };
+    var user = req.myData.user;
     if(config.env == '_dev')
         user.authority['dev'] = true;
     next();
@@ -75,23 +80,20 @@ restConfig.forEach(function(rest){
         var isRouter = true;
         var functionName = method.functionName || method.name;
         if(!reqfile[functionName])
-            throw new Error('[' + path + '] is not exist function [' + functionName + ']')
+            throw new Error('[' + path + '] is not exist function [' + functionName + ']');
+        function init(req, res, next) {
+            req.myData.auth = rest.auth;
+            req.myData.method = method;
+            auth.auth(req, res, next);
+        }
         switch (method.name.toLowerCase()) {
             case 'use':
                 app.use(rest.url, reqfile[functionName]);
             case 'get':
-                app.get(rest.url, function(req, res, next){
-                    req.myData.auth = rest.auth;
-                    req.myData.method = method;
-                    auth.auth(req, res, next);
-                }, reqfile[functionName]);
+                app.get(rest.url, init, reqfile[functionName]);
                 break;
             case 'post':
-                app.post(rest.url, function(req, res, next){
-                    req.myData.auth = rest.auth;
-                    req.myData.method = method;
-                    auth.auth(req, res, next);
-                },  reqfile[functionName]);
+                app.post(rest.url, init,  reqfile[functionName]);
                 break;
             default:
                 isRouter = false;
@@ -124,7 +126,7 @@ app.use(function(err, req, res, next) {
     err.status = err.status || 500;
     err.code = err.code || err.status;
     if (req.headers['x-requested-with'] && req.headers['x-requested-with'].toLowerCase() == 'xmlhttprequest') {
-        res.send(common.formatRes(err, err.code || err.status));
+        res.mySend(err, err.code);
     } else {
         if (errorConfig.NO_LOGIN.code == err.code)
             res.redirect('/login');
