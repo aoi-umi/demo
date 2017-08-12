@@ -21,10 +21,11 @@ module.exports = [
         url: '/',
         method: [{
             name: 'use',
+            methodName:'index-use',//用于记录日志
         }, {
             name: 'get',
             functionName: '',
-            exampleRequest:''
+            exampleRequest:'',
         }, {
             name: 'post',
             functionName: '',

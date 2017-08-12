@@ -45,4 +45,19 @@ module.exports= {
             'en':'{0} can not change to {1}',
         }
     },
+    //缓存
+    CACHE_TIMEOUT:{
+        code: 'CACHE_TIMEOUT',
+        desc: {
+            'zh':'缓存超时',
+            'en':'Cache Timeout',
+        }
+    },
+    CACHE_EXPIRE:{
+        code: 'CACHE_EXPIRE',
+        desc: {
+            'zh':'缓存失效',
+            'en':'Cache Expire',
+        }
+    }
 };
