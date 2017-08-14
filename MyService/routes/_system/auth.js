@@ -9,8 +9,8 @@ exports.auth = function(req, res, next) {
     //url权限认证
     var auth = req.myData.auth;
     var user = req.myData.user;
-    console.log(user.authority);
-    console.log(auth);
+    // console.log(user.authority);
+    // console.log(auth);
     var permissionRes = authenticationCheck(user, auth);
     if (permissionRes.noPermission) {
         var err = common.error('', permissionRes.errCode || errorConfig.NO_PERMISSIONS.code);
