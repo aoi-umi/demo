@@ -74,51 +74,29 @@ module.exports = [
             functionName: 'signUp',
             exampleRequest:{"userName":"user", "pwd":"123456"}
         }],
-        path:'users',
+        path:'index',
     },
     {
         url:'/admin',
         method:[{
             name: 'get',
-            functionName: ''
+            functionName: 'admin'
         }],
-        path:'',
+        path:'index',
         auth:[auth['login'],auth['admin']]
     },
     {
         url:'/test',
         method:[{
             name: 'get',
-            functionName: ''
+            functionName: 'testGet',
+            exampleRequest: '/test?code=success&test=0'
+        },{
+            name: 'post',
+            functionName: 'testPost',
+            exampleRequest: {code:'success'}
         }],
-        path:'',
-        auth:[],
-    },
-    {
-        url:'/testPromise',
-        method:[{
-            name: 'get',
-            functionName: 'getPromise'
-        }],
-        path:'/test',
-        auth:[],
-    },
-    {
-        url:'/test1',
-        method:[{
-            name: 'get',
-            functionName: 'testGet'
-        }],
-        path:'/test',
-        auth:[],
-    },
-    {
-        url:'/test2',
-        method:[{
-            name: 'get',
-            functionName: 'get2'
-        }],
-        path:'/test',
+        path:'/index',
         auth:[],
     },
     {
@@ -144,8 +122,8 @@ module.exports = [
         url:'/log/save',
         method:[{
             name: 'post',
-            functionName: 'save'
+            functionName: 'logSave'
         }],
-        path:'/log',
+        path:'index',
     },
 ];

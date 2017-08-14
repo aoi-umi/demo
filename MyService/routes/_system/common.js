@@ -152,9 +152,9 @@ exports.requestServiceByConfig = function (option, cb) {
             body: option.data,
             method: method
         };
-        if (option.beforeSend) {
+        if (option.beforeRequest) {
             //发送的参数 当前所用参数
-            option.beforeSend(opt, serviceArgs);
+            option.beforeRequest(opt, serviceArgs);
         }
         var result = null;
         var logReq = opt.body;
@@ -163,7 +163,15 @@ exports.requestServiceByConfig = function (option, cb) {
         common.requestServicePromise(opt).then(function (t) {
             result = true;
             logRes = t;
-            cb(null, t);
+            var err = null;
+            if(option.afterResponse) {
+                try {
+                    t = option.afterResponse(t);
+                }catch (e){
+                    err = e;
+                }
+            }
+            cb(err, t);
         }).fail(function (e) {
             result = false;
             logRes = e;

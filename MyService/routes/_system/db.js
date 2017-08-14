@@ -117,14 +117,6 @@ function queryFormat(query, values) {
 
 function getConnection(){
     return common.promise(pool, 'getConnection');
-    // var res = q.defer();
-    // pool.getConnection(function(e, t){
-    //     if(e)
-    //         res.reject(e);
-    //     else
-    //         res.resolve(t);
-    // });
-    // return res.promise;
 }
 
 function release(conn){
@@ -135,47 +127,20 @@ function release(conn){
 
 function query(conn, sql, params){
     conn.config.queryFormat = queryFormat;
-    var res = q.defer();
-    conn.query(sql, params, function(e, t){
-        if(e)
-            res.reject(e);
-        else
-            res.resolve(t);
-    });
-    return res.promise;
+    return common.promise(conn, 'query', sql, params);
 }
 
 function beginTransaction(conn){
     var res = q.defer();
-    conn.beginTransaction(function(e, t){
-        if(e)
-            res.reject(e);
-        else
-            res.resolve(t);
-    });
-    return res.promise;
+    return common.promise(conn, 'beginTransaction');
 }
 
 function commit(conn){
     console.log('commit');
-    var res = q.defer();
-    conn.commit(function(e, t){
-        if(e)
-            res.reject(e);
-        else
-            res.resolve(t);
-    });
-    return res.promise;
+    return common.promise(conn, 'commit');
 }
 
 function rollback(conn){
     console.log('rollback');
-    var res = q.defer();
-    conn.rollback(function(e, t){
-        if(e)
-            res.reject(e);
-        else
-            res.resolve(t);
-    });
-    return res.promise;
+    return common.promise(conn, 'rollback');
 }
