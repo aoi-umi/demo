@@ -49,6 +49,7 @@ app.use(function (req, res, next) {
         log.method = logMethod
         log.req = logReq;
         log.res = logRes;
+        log.ip = common.getClientIp(req);
         log.remark = formatRes.desc;
         common.logSave(log);
     };
