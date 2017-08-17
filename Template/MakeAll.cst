@@ -1,12 +1,15 @@
 ﻿<%@ Template Language="C#"%>
 <%@ Import Namespace="System.Collections.Generic" %>
 
+<%@ Register Name="Tools" Template="Tools.cst"MergeProperties="Flase" ExcludeProperties=""%>
 <%@ Register Name="Make" Template="Make.cst"MergeProperties="Flase" ExcludeProperties=""%>
 <%@ Property Name="SourceDatabase" Type="SchemaExplorer.TableSchemaCollection" Category="数据源"   Description="需要生成的表" %>
 <%@ Property Name="MakeTypeList" Type="List<Make.MakeTypeEnum>" Category="生成类型"   Description="生成类型" %>
 <%@ Property Name="RemoveTablePrefix" Type="String" Default="t_" DeepLoad="True" Optional="True" Category="移除数据表前缀" 
 Description="移除数据表前缀"%>
 <%
+
+Tools.DeleteFilesAndFolders("./Output");
 var temp = new Make();
 SourceDatabase.ForEach(x=>{    
     try{
@@ -43,3 +46,27 @@ SourceDatabase.ForEach(x=>{
     }
 });
 %>
+<script runat="template">
+
+//sql替换特殊字符
+/**
+DROP FUNCTION IF EXISTS `replace_special_char`;
+
+CREATE DEFINER = `root`@`localhost` FUNCTION `replace_special_char`(pr_str text)
+ RETURNS text
+    READS SQL DATA
+BEGIN
+  SET pr_str = REPLACE(pr_str, '\\', '\\\\');
+  SET pr_str = REPLACE(pr_str, '''', '''''');
+  RETURN pr_str;
+END ;
+**/
+
+</script>
+
+
+
+
+
+
+
