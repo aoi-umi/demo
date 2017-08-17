@@ -4,6 +4,7 @@
 <%@ Import Namespace="SchemaExplorer"%>
 <%@ Import Namespace="System.Collections.Generic" %>
 <%@ Import Namespace="System.Linq" %>
+<%@ Import Namespace="System.IO" %>
 <script runat="template">
 
 public enum DatabaseTypeEnum
@@ -27,6 +28,24 @@ public class DatabaseModel
     public DatabaseColModel IdCol;
     public List<DatabaseColModel> Cols;
 }
+
+public static void DeleteFilesAndFolders(string path)  
+{  
+    // Delete files.  
+    string[] files = Directory.GetFiles(path);  
+    foreach (var file in files)  
+    {  
+        File.Delete(file);  
+    }  
+
+    // Delete folders.  
+    string[] folders = Directory.GetDirectories(path);  
+    foreach (var folder in folders)  
+    {  
+        DeleteFilesAndFolders(folder);  
+        Directory.Delete(folder);  
+    }  
+}  
 
 public static DatabaseModel CreateDatabaseModel(TableSchema table, DatabaseTypeEnum databaseType){
     var id = "";
@@ -254,7 +273,7 @@ private static List<string> CreateMySqlSaveProcedure(DatabaseModel databaseModel
         if(x.Name == databaseModel.IdCol.Name)
             continue;
         procStrList.Add(string.Format(tabStr + "IF " + paraPerfix + "{0} IS NOT NULL THEN", x.Name));
-        procStrList.Add(string.Format(tabStr + "\tSET @Sql = CONCAT(@Sql,' {0} = ''', " + paraPerfix + "{0}, ''',');", x.Name));
+        procStrList.Add(string.Format(tabStr + "\tSET @Sql = CONCAT(@Sql,' {0} = ''', replace_special_char(" + paraPerfix + "{0}), ''',');", x.Name));
         procStrList.Add(string.Format(tabStr + "ELSEIF LOCATE('," + x.Name +",', " + nullListName + ")>0 THEN"));
         procStrList.Add(string.Format(tabStr + "\tSET @Sql = CONCAT(@Sql,' {0} = null,');", x.Name));
         procStrList.Add(string.Format(tabStr + "END IF;" + Environment.NewLine));
@@ -398,7 +417,7 @@ private static List<string> CreateMySqlQueryProcedure(DatabaseModel databaseMode
     
     cols.ForEach(x=>{
         procStrList.Add(string.Format(tabStr + "IF {0} IS NOT NULL THEN", paraPerfix + x.Name));
-        procStrList.Add(string.Format(tabStr + "\tSET @Sql = CONCAT(@Sql, ' AND `{0}` = '''," + paraPerfix +"{0}, '''');", x.Name)); 
+        procStrList.Add(string.Format(tabStr + "\tSET @Sql = CONCAT(@Sql, ' AND `{0}` = ''',replace_special_char(" + paraPerfix +"{0}), '''');", x.Name)); 
         procStrList.Add(string.Format(tabStr + "ELSEIF LOCATE(',{0},', {1}) > 0 THEN", x.Name, nullListName));  
         procStrList.Add(string.Format(tabStr + "\tSET @Sql = CONCAT(@Sql, ' AND `{0}` IS NULL');", x.Name)); 
         procStrList.Add(tabStr + "END IF;" + Environment.NewLine);  
