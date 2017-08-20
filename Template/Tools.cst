@@ -293,6 +293,7 @@ private static List<string> CreateMySqlSaveProcedure(DatabaseModel databaseModel
     #endregion
     
     procStrList.Add("END;");
+    procStrList.Add("DELIMITER ;");    
     
     procList.Add(string.Join(Environment.NewLine, procStrList.ToArray())); 
     return procList;    
@@ -326,6 +327,7 @@ private static List<string> CreateMySqlDelProcedure(DatabaseModel databaseModel)
     procStrList.Add("BEGIN");
     procStrList.Add(string.Format(tabStr + "DELETE FROM {0} WHERE `{1}` = " + paraPerfix + "{1};", tableName , databaseModel.IdCol.Name));
     procStrList.Add("END;");
+    procStrList.Add("DELIMITER ;");   
     
     procList.Add(string.Join(Environment.NewLine, procStrList.ToArray())); 
     return procList;   
@@ -364,6 +366,7 @@ private static List<string> CreateMySqlDetailQueryProcedure(DatabaseModel databa
     
     procStrList.Add(string.Format(tabStr + "SELECT * FROM {0} WHERE `{1}` = " + paraPerfix + "{1};", tableName , databaseModel.IdCol.Name));
     procStrList.Add("END;");
+    procStrList.Add("DELIMITER ;");   
     
     procList.Add(string.Join(Environment.NewLine, procStrList.ToArray())); 
     return procList;   
@@ -434,6 +437,7 @@ private static List<string> CreateMySqlQueryProcedure(DatabaseModel databaseMode
     procStrList.Add(tabStr + "SELECT FOUND_ROWS() AS 'count';");
     
     procStrList.Add("END;");
+    procStrList.Add("DELIMITER ;");   
     
     procList.Add(string.Join(Environment.NewLine, procStrList.ToArray())); 
     return procList;   

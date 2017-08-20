@@ -14,6 +14,7 @@ var temp = new Make();
 SourceDatabase.ForEach(x=>{    
     try{
         var fileName = x.Name;
+        var dbName = x.Database.Name;
         if(!string.IsNullOrEmpty(RemoveTablePrefix)){
             if(fileName.StartsWith(RemoveTablePrefix))
                 fileName = fileName.Substring(RemoveTablePrefix.Length);
@@ -31,7 +32,9 @@ SourceDatabase.ForEach(x=>{
                         break;
                 }
                 temp.MakeType = makeType;
-                temp.RenderToFile(string.Format(outputFormat, x.Database.Name, fileName), true);
+                temp.RenderToFile(string.Format(outputFormat, dbName, fileName), true);
+                if(makeType == Make.MakeTypeEnum.Procedure)
+                    File.AppendAllText(string.Format("./Output/{0}/sql/_all.sql", dbName), temp.RenderToString());
         %>
 <%=string.Format("{0}:{1} {2}", x.Name, makeType, "success")%>
         <%
@@ -51,15 +54,15 @@ SourceDatabase.ForEach(x=>{
 //sql替换特殊字符
 /**
 DROP FUNCTION IF EXISTS `replace_special_char`;
-
-CREATE DEFINER = `root`@`localhost` FUNCTION `replace_special_char`(pr_str text)
- RETURNS text
-    READS SQL DATA
+DELIMITER ;;
+CREATE FUNCTION `replace_special_char`(`fun_str` text) RETURNS text CHARSET utf8
 BEGIN
-  SET pr_str = REPLACE(pr_str, '\\', '\\\\');
-  SET pr_str = REPLACE(pr_str, '''', '''''');
-  RETURN pr_str;
-END ;
+    SET fun_str = REPLACE(fun_str, '\\', '\\\\');
+    SET fun_str = REPLACE(fun_str, '''', '''''');
+    RETURN fun_str;
+END
+;;
+DELIMITER ;
 **/
 
 </script>
