@@ -7,6 +7,7 @@ var request = require('request');
 var net = require('net');
 var crypto = require('crypto');
 var q = require('q');
+var zlib = require('zlib');
 var config = require('../../config');
 var errorConfig = require('./errorConfig');
 var myEnum = require('./enum');
@@ -195,22 +196,53 @@ exports.requestServiceByConfig = function (option, cb) {
     }
 };
 
-exports.requestService = function (option, cb) {
+exports.requestServicePromise = function (option) {
     var opt = {
         method: 'POST',
         json: true,
+        encoding: null,
     };
     opt = common.extend(opt, option);
     //console.log(opt)
-    request(opt, function (err, res, data) {
-        cb(err, data);
-        if (err)
-            console.error(opt);
+    return common.promise().then(function(){
+        var res = q.defer();
+        request(opt, function (err, response, data) {
+            try{
+                if(err)
+                    throw err;
+                var encoding = response.headers['content-encoding'];
+                if(encoding){
+                    switch(encoding){
+                        case 'gzip':
+                            return zlib.unzipPromise(data).then(function(buffer){
+                                data = buffer.toString();
+                                if(data && typeof data == 'string')
+                                    data = JSON.parse(data);
+                                return res.resolve(data);
+                            }).fail(function(e){
+                                return res.reject(e);
+                            });
+                            break;
+                        default:
+                            throw common.error('Not Accept Encoding');
+                            break;
+                    }
+                }
+                return res.resolve(data);
+            }catch(e){
+                return res.reject(e);
+                console.error(opt);
+            }
+        });
+        return res.promise;
+    }).fail(function(e){
+        throw e;
     });
 };
 
 exports.requestServiceByConfigPromise = common.promisify(exports.requestServiceByConfig);
-exports.requestServicePromise = common.promisify(exports.requestService);
+//exports.requestServicePromise = common.promisify(exports.requestService);
+zlib.unzipPromise = common.promisify(zlib.unzip);
 
 exports.formatRes = function (err, detail, desc) {
     //result    是否成功
