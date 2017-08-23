@@ -167,7 +167,7 @@ exports.testGet = function (req, res) {
             throw common.error('promise error', query.code, {message: 'opt_promise error', code: 'opt_' + query.code});
         res.mySend(null, t, 'promise success');
     }).fail(function (e) {
-        res.mySend(e, {err_code: '400'});
+        res.mySend(e, null, {code: '400'});
     }).finally(function(){
         //console.log('finally');
     });
@@ -181,7 +181,7 @@ exports.testPost = function (req, res) {
             throw common.error('promise error', reqData.code, {message: 'opt_promise error', code: 'opt_' + reqData.code});
         res.mySend(null, t, 'promise success');
     }).fail(function (e) {
-        res.mySend(e, {err_code: '400'});
+        res.mySend(e, null,{code: '400'});
     }).finally(function(){
         //console.log('finally');
     });
