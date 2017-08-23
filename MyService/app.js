@@ -127,7 +127,7 @@ app.use(function(err, req, res, next) {
     err.status = err.status || 500;
     err.code = err.code || err.status;
     if (req.headers['x-requested-with'] && req.headers['x-requested-with'].toLowerCase() == 'xmlhttprequest') {
-        res.mySend(err, err.code);
+        res.mySend(err, err, {code: err.code});
     } else {
         if (errorConfig.NO_LOGIN.code == err.code)
             res.redirect('/login');

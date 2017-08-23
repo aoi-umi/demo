@@ -14,10 +14,10 @@ exports.getPromise = function (req, res) {
     testService.testPromise().then(function (t) {
         if (query.code != 'success')
             throw common.error('promise error', query.code, {message: 'opt_promise error', code: 'opt_' + query.code});
-        res.send(common.formatRes(null, t, 'promise success'));
+        res.send(common.formatRes(null, t, {desc: 'promise success'}));
     }).catch(function (e) {
         res.send(common.formatRes(e, {err_code: '400'}));
-    }).finally(function(){
+    }).finally(function () {
         //console.log('finally');
     });
 };

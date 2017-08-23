@@ -247,24 +247,30 @@ exports.requestServiceByConfigPromise = common.promisify(exports.requestServiceB
 //exports.requestServicePromise = common.promisify(exports.requestService);
 zlib.unzipPromise = common.promisify(zlib.unzip);
 
-exports.formatRes = function (err, detail, desc) {
+exports.formatRes = function (err, detail, opt) {
     //result    是否成功
-    //desc      描述
     //detail    成功 返回的内容
-    //          失败 错误代码
+    //          失败 错误详细
+    //code      成功/失败代码
+    //desc      描述
     var res = {
         result: null,
         detail: null,
+        code: null,
         desc: null,
     };
+    if(opt)
+        res = common.extend(res, opt);
     if (err) {
         common.writeError(err);
-        if (err.message) err = err.message;
+        var errMsg = err;
+        if (err.message) errMsg = err.message;
         res.result = false;
-        res.desc = err;
+        res.desc = errMsg;
     } else {
         res.result = true;
-        res.desc = desc || 'success';
+        if(!res.desc)
+        res.desc = 'success';
     }
     if (detail)
         res.detail = detail;
@@ -407,7 +413,7 @@ exports.format = function () {
                 res = res.replace(reg, args[key]);
             }
         }
-        res = res.replace(/\{\d\}/g, '');
+        //res = res.replace(/\{\d\}/g, '');
     }
     return res;
 };
@@ -478,28 +484,18 @@ exports.guid = function () {
 exports.enumCheck = function(srcEnum, destEnum, enumType) {
     if (enumType == undefined)
         throw new Error('enumType can not be empty!');
-    var srcEnumList = [];
-    var destEnumList = [];
-    //  目标
-    //源
-    var list = null;
 
     var matchEnum = myEnum.getEnum(enumType);
-    for(var key in matchEnum){
-        srcEnumList.push(key);
-        destEnumList.push(key);
-    }
-    list = myEnum.enumCheck[enumType];
+    var enumCheck = myEnum.enumCheck[enumType];
     srcEnum = srcEnum.toString();
     destEnum = destEnum.toString();
-    var indexSrcEnum = srcEnumList.indexOf(srcEnum);
-    if (indexSrcEnum < 0)
-        throw new Error('no match src enum!');
-    var indexDestEnum = destEnumList.indexOf(destEnum);
-    if (indexDestEnum < 0)
-        throw new Error('no match dest enum!');
+    if(typeof matchEnum[srcEnum] == 'undefined')
+        throw common.error(common.format('no match src enum [{0}] in [{1}]!', srcEnum, enumType));
 
-    if (!list[indexSrcEnum][indexDestEnum]) {
+    if(typeof matchEnum[destEnum] == 'undefined')
+        throw common.error(common.format('no match dest enum [{0}] in [{1}]!', destEnum, enumType));
+
+    if (!enumCheck[srcEnum] || !enumCheck[srcEnum][destEnum]) {
         throw common.error(null, errorConfig.ENUM_CHANGED_INVALID.code, {
             //lang:'en',
             format: function (msg) {
@@ -511,7 +507,7 @@ exports.enumCheck = function(srcEnum, destEnum, enumType) {
     }
 };
 
-//common.enumCheck(1,0,'statusEnum');
+//common.enumCheck(0,9,'statusEnum');
 
 exports.logModle = function() {
     return {
