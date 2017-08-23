@@ -33,6 +33,8 @@ var extend = {
         var res = $.Deferred();
         $.ajax(opt).then(function (t) {
             if(!t.result) {
+                if(typeof t.desc == 'object')
+                    t.desc = JSON.stringify(t.desc);
                 var err = new Error(t.desc);
                 err.code = t.detail;
                 return $.Deferred().reject(err);
