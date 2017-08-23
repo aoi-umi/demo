@@ -228,6 +228,9 @@ exports.requestServicePromise = function (option) {
                             break;
                     }
                 }
+                if(Buffer.isBuffer(data)){
+                    data = data.toString();
+                }
                 return res.resolve(data);
             }catch(e){
                 return res.reject(e);
