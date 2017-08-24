@@ -542,3 +542,6 @@ exports.logSave = function(log) {
 //         }
 //     });
 // });
+
+//删除require
+//delete require.cache[require.resolve('./configData')];

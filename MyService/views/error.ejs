@@ -1,3 +1,5 @@
-<h1><%= message %></h1>
+<% include _public/header %>
+<h1><%= message %>(Code:<%= error.code %>)</h1>
 <h2><%= error.status %></h2>
 <pre><%= error.stack %></pre>
+<% include _public/footer %>
