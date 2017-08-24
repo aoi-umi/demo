@@ -1,0 +1,12 @@
+<% include _public/header %>
+<% include _public/footer %>
+<script type="text/template" id="statusTemp">
+    <%include _template/status%>
+</script>
+<script type="text/javascript">
+    $(function () {
+        var data = <%-JSON.stringify({enumDict: enumDict,enumCheck: enumCheck})%>;
+        var temp = $('#statusTemp').html();
+        $('body').append(ejs.render(temp, data));
+    });
+</script>

@@ -270,7 +270,7 @@ exports.formatRes = function (err, detail, opt) {
     } else {
         res.result = true;
         if(!res.desc)
-        res.desc = 'success';
+            res.desc = 'success';
     }
     if (detail)
         res.detail = detail;

@@ -3,6 +3,7 @@ var common = require('./_system/common');
 var cache = require('./_system/cache');
 var errorConfig = require('./_system/errorConfig');
 var config = require('../config');
+var myEnum = require('./_system/enum');
 
 var autoBll = require('./_bll/auto');
 var userInfoBll = require('./_bll/user_info');
@@ -189,4 +190,12 @@ exports.testPost = function (req, res) {
 
 exports.getReg = function (req, res) {
     res.mySend(null, req.url);
+};
+
+exports.status = function (req, res) {
+    var opt = {
+        enumDict: myEnum.enumDict,
+        enumCheck: myEnum.enumCheck
+    };
+    res.myRender('status', opt);
 };

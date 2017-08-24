@@ -19,7 +19,8 @@ module.exports = {
         return enumType[key];
     },
     enumDict: {
-        statusEnum: {'0': '状态0', '1': '状态1', '2': '状态2',}
+        statusEnum: {'0': '状态0', '1': '状态1', '2': '状态2',},
+        statusEnum2: {'0': '状态0', '1': '状态1', '2': '状态2',}
     },
     enumCheck:{
         statusEnum:{
@@ -33,6 +34,9 @@ module.exports = {
                 '2':'操作2'
             },
             '2':{},
+        },
+        statusEnum2:{
+            '0':{'1':'superis operation'}
         }
     }
 };
