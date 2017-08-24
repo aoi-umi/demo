@@ -6,7 +6,7 @@ module.exports = {
     port: 3010,
     deploy: '20170529',
     version: '0.0.2',
-    env: '_dev',
+    env: 'dev',
     errorDir: __dirname + '/error',
     api: {
         testService: {

@@ -10,7 +10,7 @@ var common = require('./routes/_system/common');
 var app = express();
 console.log(config.name,'run at port ', config.port, ',version:', config.version);
 // view engine setup
-app.set('views', path.join(__dirname, 'views' + config.env));
+app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 app.use(favicon());
@@ -18,7 +18,7 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public' + config.env)));
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(function (req, res, next) {
     //req.query  /?params1=1&params2=2
@@ -62,7 +62,7 @@ app.use(function (req, res, next) {
         }
     };
     var user = req.myData.user;
-    if(config.env == '_dev')
+    if(config.env == 'dev')
         user.authority['dev'] = true;
     next();
 });
@@ -121,7 +121,7 @@ app.use(function(req, res, next) {
 var errorConfig = require('./routes/_system/errorConfig');
 
 app.use(function(err, req, res, next) {
-    if(config.env !== '_dev'){
+    if(config.env !== 'dev'){
         err.stack = '';
     }
     err.status = err.status || 500;
