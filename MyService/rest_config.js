@@ -36,6 +36,16 @@ module.exports = [
         auth: [],
     },
     {
+        url: '/status',
+        method: [{
+            name: 'get',
+            functionName: 'status',
+            exampleRequest:'',
+        }],
+        path: 'index',
+        auth: [],
+    },
+    {
         url:'/login',
         method:[{
             name: 'post',

@@ -4,15 +4,15 @@ var gulp = require('gulp'),
 
 gulp.task('clear-all',function(cb){
 	del([
-		'views_dev/_template_dev/*',
+		'views/_template/*',
 	], cb);
 })
 
 gulp.task('template', function() {
-  gulp.src('views_dev/_template_dev/*')
+  gulp.src('views/_template_dev/*')
 		.pipe(replace('<%','{%'))
 		.pipe(replace('%>','%}'))
-		.pipe(gulp.dest('views_dev/_template'));
+		.pipe(gulp.dest('views/_template'));
 });
 
 
