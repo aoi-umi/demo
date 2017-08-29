@@ -9,10 +9,10 @@ gulp.task('clear-all',function(cb){
 })
 
 gulp.task('template', function() {
-  gulp.src('views/_template_dev/*')
+  gulp.src('views/_template/*')
 		.pipe(replace('<%','{%'))
 		.pipe(replace('%>','%}'))
-		.pipe(gulp.dest('views/_template'));
+		.pipe(gulp.dest('views/_template_web'));
 });
 
 

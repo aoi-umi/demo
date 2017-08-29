@@ -1,7 +1,7 @@
 <table class="table table-bordered">
     <thead>
     <tr>
-        <th>{%=key%}</th>
+        <th><%=key%></th>
     </tr>
     </thead>
     <tbody>
@@ -9,24 +9,24 @@
         <td><span style="margin-left:43px">目状态</span><br>
             <span>源状态</span>
         </td>
-        {%for(var enumKey in value){%}
-        <td>{%=enumKey%}({%=value[enumKey]%})</td>
-        {%}%}
+        <%for(var enumKey in value){%>
+        <td><%=enumKey%>(<%=value[enumKey]%>)</td>
+        <%}%>
     </tr>
 
-    {%for(var enumKeySrc in value){%}
+    <%for(var enumKeySrc in value){%>
     <tr>
-        <td>{%=enumKeySrc%}({%=value[enumKeySrc]%})</td>
-        {%for(var enumKeyDest in value){%}
+        <td><%=enumKeySrc%>(<%=value[enumKeySrc]%>)</td>
+        <%for(var enumKeyDest in value){%>
         <td>
-            {%if(enumCheck[key] && enumCheck[key][enumKeySrc] && enumCheck[key][enumKeySrc][enumKeyDest]){%}
-            {%=enumCheck[key][enumKeySrc][enumKeyDest]%}
-            {%}else{%}
+            <%if(enumCheck[key] && enumCheck[key][enumKeySrc] && enumCheck[key][enumKeySrc][enumKeyDest]){%>
+            <%=enumCheck[key][enumKeySrc][enumKeyDest]%>
+            <%}else{%>
             -
-            {%}%}
+            <%}%>
         </td>
-        {%}%}
+        <%}%>
     </tr>
-    {%}%}
+    <%}%>
     </tbody>
 </table>

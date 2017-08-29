@@ -65,6 +65,21 @@ END
 DELIMITER ;
 **/
 
+//sql server
+/**
+if exists(SELECT * FROM SYSOBJECTS WHERE NAME='replace_special_char')
+    drop function replace_special_char;
+GO
+
+CREATE FUNCTION  replace_special_char(@fun_str nvarchar(max))
+RETURNS nvarchar(max)
+AS
+BEGIN
+    SET @fun_str = REPLACE(@fun_str, '''', '''''');
+    RETURN @fun_str;
+END 
+**/
+
 </script>
 
 
