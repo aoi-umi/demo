@@ -1,14 +1,27 @@
 <% include _public/header %>
-<% include _public/footer %>
-<script type="text/template" id="statusTemp">
+<div>
+    <span>ejs</span>
+    <%for(var key in enumDict){
+        var value = enumDict[key];
+    %>
     <%include _template/status%>
+    <%}%>
+    <span>ejs-js</span>
+    <div id="webTempBox">
+
+    </div>
+</div>
+<% include _public/footer %>
+
+<script type="text/template" id="statusTemp">
+    <%include _template_web/status%>
 </script>
 <script type="text/javascript">
     $(function () {
         var data = <%-JSON.stringify({enumDict: enumDict,enumCheck: enumCheck})%>;
         var temp = $('#statusTemp').html();
         for(key in data.enumDict) {
-            $('body').append(ejs.render(temp, {key:key, value:data.enumDict[key], enumCheck: data.enumCheck}));
+            $('#webTempBox').append(ejs.render(temp, {key:key, value:data.enumDict[key], enumCheck: data.enumCheck}));
         }
     });
 </script>

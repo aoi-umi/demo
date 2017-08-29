@@ -77,9 +77,13 @@ public static string GetTypeWithSize(ColumnSchema col, DatabaseTypeEnum database
 {
     var returnType  = col.NativeType;
     var size = col.Size;
+    var sizeStr = "";
     if(databaseType == DatabaseTypeEnum.MySql){
         size /= 3;
     }
+    sizeStr = size.ToString();
+    if(size == -1)
+        sizeStr = "max";
     switch(col.DataType)
     {
         //string
@@ -88,7 +92,7 @@ public static string GetTypeWithSize(ColumnSchema col, DatabaseTypeEnum database
         case DbType.String: 
         case DbType.StringFixedLength: 
             if(col.NativeType != "text" && col.NativeType != "longtext")
-                returnType += "(" + size + ")";
+                returnType += "(" + sizeStr + ")";
             break;
     }
     return returnType;
@@ -154,12 +158,16 @@ public static List<string> CreateProcedure(DatabaseModel databaseModel, Database
         case DatabaseTypeEnum.MySql:
             procList = CreateMySqlProcedure(databaseModel);
             break;
+        case DatabaseTypeEnum.SqlServer:
+            procList = CreateSqlServerProcedure(databaseModel);
+            break;
         
     }
     return procList;
 }
 
 #region mysql 存储过程
+
 private static List<string> CreateMySqlProcedure(DatabaseModel databaseModel)
 {
     var procList = new List<string>();
@@ -443,6 +451,157 @@ private static List<string> CreateMySqlQueryProcedure(DatabaseModel databaseMode
     return procList;   
 }
 #endregion
+
+#region sql server 存储过程
+
+private static List<string> CreateSqlServerProcedure(DatabaseModel databaseModel)
+{
+    var procList = new List<string>();
+    var operateTypeList = new List<OperateTypeEnum>(){OperateTypeEnum.Save, OperateTypeEnum.Del, OperateTypeEnum.DetailQuery, OperateTypeEnum.Query};
+    //var operateTypeList = new List<OperateTypeEnum>(){OperateTypeEnum.Query};
+    operateTypeList.ForEach(operateType=>{
+        switch(operateType){
+            case OperateTypeEnum.Save:
+                procList.AddRange(CreateSqlServerSaveProcedure(databaseModel));
+                break;
+            case OperateTypeEnum.Del:
+                //procList.AddRange(CreateSqlServerDelProcedure(databaseModel));
+                break;
+            case OperateTypeEnum.DetailQuery:
+                //procList.AddRange(CreateSqlServerDetailQueryProcedure(databaseModel));
+                break;
+            case OperateTypeEnum.Query:
+                //procList.AddRange(CreateSqlServerQueryProcedure(databaseModel));
+                break;
+        }      
+    });
+    return procList;
+}
+
+private static List<string> CreateSqlServerSaveProcedure(DatabaseModel databaseModel)
+{
+    var level = 0;
+    var tabStr = "";
+    var procList = new List<string>();
+    var tableName = databaseModel.TableName;
+    var procTableName = tableName;
+    if(!string.IsNullOrEmpty(databaseModel.RemoveTablePrefix)){
+        if(procTableName.StartsWith(databaseModel.RemoveTablePrefix))
+            procTableName = procTableName.Substring(databaseModel.RemoveTablePrefix.Length);
+    }
+    var procName = "p_" 
+        + procTableName
+        + "_save_auto";
+    var procStrList = new List<string>();
+    var cols = databaseModel.Cols;
+    var paraPerfix = "@";
+    var nullListName = paraPerfix + "null_list";
+    
+    procStrList.Add( "if exists(SELECT * FROM SYSOBJECTS WHERE NAME='" + procName + "')");
+    procStrList.Add( "drop PROCEDURE " + procName + ";");
+    procStrList.Add( "GO");
+    
+    procStrList.Add( "create procedure " + procName + "(");
+    level = 1;
+    tabStr = GetRepeatStr("\t", level);
+    cols.ForEach(x=>{        
+        procStrList.Add(string.Format(tabStr + paraPerfix + "{0} {1},", x.Name , x.NativeType));
+    });
+    procStrList.Add(tabStr + nullListName + " varchar(1000)");
+    procStrList.Add(")");
+    procStrList.Add("AS");
+    procStrList.Add("BEGIN");
+    procStrList.Add("SET NOCOUNT ON;");
+    
+    procStrList.Add("");
+    if(databaseModel.IsIdInt){
+        procStrList.Add(string.Format("IF {0} IS NULL OR {0} = 0 ",  paraPerfix + databaseModel.IdCol.Name));        
+    }else{        
+        procStrList.Add(string.Format("IF {0} IS NULL OR Len({0}) = 0 ",  paraPerfix + databaseModel.IdCol.Name));   
+    }
+    procStrList.Add("BEGIN");
+    
+    #region insert
+    level = 1;
+    tabStr = GetRepeatStr("\t", level);
+    procStrList.Add(string.Format(tabStr + "INSERT INTO {0} (", tableName));
+    
+    level = 2;
+    tabStr = GetRepeatStr("\t", level);
+    for(var i = 0;i < cols.Count;i++){
+        var x = cols[i];
+        if(x.Name == databaseModel.IdCol.Name)
+            continue;
+        procStrList.Add(string.Format(tabStr + "[{0}]{1}", x.Name, i == cols.Count - 1 ? "" : ","));
+    };
+    
+    level = 1;
+    tabStr = GetRepeatStr("\t", level);    
+    procStrList.Add(tabStr + ") VALUES( ");
+    
+    level = 2;
+    tabStr = GetRepeatStr("\t", level);
+    for(var i = 0;i < cols.Count;i++){
+        var x = cols[i];
+        if(x.Name == databaseModel.IdCol.Name)
+            continue;
+        procStrList.Add(string.Format(tabStr +  paraPerfix + "{0}{1}", x.Name, i == cols.Count - 1 ? "" : ","));
+    };
+    
+    level = 1;
+    tabStr = GetRepeatStr("\t", level);    
+    procStrList.Add(tabStr + ");");
+    procStrList.Add(tabStr + "SELECT SCOPE_IDENTITY() as 'id';");   
+    procStrList.Add(tabStr + "END");    
+    #endregion
+    
+    #region update
+    procStrList.Add("ELSE");
+    procStrList.Add("BEGIN");
+    
+    level = 1;
+    tabStr = GetRepeatStr("\t", level);
+                    
+    procStrList.Add(tabStr + "DECLARE @Sql NVARCHAR(Max);");  
+    procStrList.Add(tabStr + "IF " + nullListName + " IS NULL BEGIN");  
+    procStrList.Add(tabStr + "\tSET " + nullListName + " = '';"); 
+    procStrList.Add(tabStr + "END");       
+    procStrList.Add(tabStr + "SET " + nullListName + " = ',' + " + nullListName + " + ',';" + Environment.NewLine); 
+    
+    procStrList.Add(tabStr + "SET @Sql ='UPDATE " + tableName + " SET ';");    
+    
+    for(var i = 0;i < cols.Count;i++){
+        var x = cols[i];
+        if(x.Name == databaseModel.IdCol.Name)
+            continue;
+        procStrList.Add(string.Format(tabStr + "IF " + paraPerfix + "{0} IS NOT NULL BEGIN", x.Name));
+        procStrList.Add(string.Format(tabStr + "\tSET @Sql = @Sql + ' {0} = ''' + dbo.replace_special_char(select cast(" + paraPerfix + "{0} as varchar)) + ''',';", x.Name));
+        procStrList.Add(string.Format(tabStr + "END"));
+        procStrList.Add(string.Format(tabStr + "ELSE IF CHARINDEX('," + x.Name +",', " + nullListName + ")>0 BEGIN"));
+        procStrList.Add(string.Format(tabStr + "\tSET @Sql = @Sql + ' {0} = null,';", x.Name));
+        procStrList.Add(string.Format(tabStr + "END" + Environment.NewLine));
+    };    
+
+    procStrList.Add(tabStr + "-- SELECT @Sql;");
+    procStrList.Add(tabStr + "IF CHARINDEX(',',@Sql)>0 BEGIN");
+    procStrList.Add(tabStr + "\tSET @Sql = substring(@Sql, 1, len(@Sql)-1);");
+    procStrList.Add(string.Format(tabStr + "\tSET @Sql = @Sql + ' WHERE {0} = ' + (select cast(" + paraPerfix + "{0} as varchar));", databaseModel.IdCol.Name));
+    procStrList.Add(tabStr + "\texec (@Sql);");	
+    procStrList.Add(tabStr + "END");	
+    procStrList.Add(string.Format(tabStr + "SELECT " + paraPerfix + "{0} AS 'id';", databaseModel.IdCol.Name));
+            
+    procStrList.Add("END");
+    
+    #endregion
+    
+    procStrList.Add("END;");
+    procStrList.Add("GO");    
+    
+    procList.Add(string.Join(Environment.NewLine, procStrList.ToArray())); 
+    return procList;    
+}
+#endregion
+
 #endregion
 
 #region js

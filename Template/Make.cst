@@ -24,7 +24,7 @@ public enum MakeTypeEnum{
 }
 </script>
 <%
-var databaseType = Tools.DatabaseTypeEnum.MySql;
+var databaseType = Tools.DatabaseTypeEnum.SqlServer;
 var dbModel = Tools.CreateDatabaseModel(Table, databaseType);
     dbModel.RemoveTablePrefix = RemoveTablePrefix;
 var list = new List<string>();
