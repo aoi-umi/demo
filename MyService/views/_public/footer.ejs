@@ -1,17 +1,28 @@
+<div id="footer" class="">
+    <nav class="navbar navbar-inverse navbar-fixed-bottom">
+        <div class="navbar-inner navbar-content-center">
+            <p class="navbar-text">
+                <span>在线人数:<span id="onlineCount"></span></span>
+            </p>
+        </div>
+    </nav>
+</div>
 <script type="text/javascript" src="/js/plugin/jquery-2.1.1.min.js"></script>
 <script type="text/javascript" src="/js/plugin/jquery.cookie.js"></script>
 <script type="text/javascript" src="/js/plugin/bootstrap.min.js"></script>
 <script type="text/javascript" src="/js/plugin/ejs.min.js"></script>
 <script type="text/javascript" src="/js/plugin/md5.js"></script>
-<script type="text/javascript">
-    (function(){
-        //
-        ejs.open = '{%';
-        ejs.close = '%}';
-    })();
-</script>
+<script type="text/javascript" src="/socket.io/socket.io.js"></script>
 
 <script type="text/javascript" src="/js/config.js?v=<%=version%>"></script>
 <script type="text/javascript" src="/js/extend.js?v=<%=version%>"></script>
+<script type="text/javascript" src="/js/socket.js?v=<%=version%>"></script>
+<script type="text/javascript">
+    $(function () {
+        ejs.open = '{%';
+        ejs.close = '%}';
+        socket.init();
+    });
+</script>
 </body>
 </html>

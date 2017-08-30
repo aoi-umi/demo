@@ -7,6 +7,7 @@ var bodyParser = require('body-parser');
 
 var config = require('./config');
 var common = require('./routes/_system/common');
+var cache = require('./routes/_system/cache');
 var app = express();
 console.log(config.name,'run at port ', config.port, ',version:', config.version);
 // view engine setup
