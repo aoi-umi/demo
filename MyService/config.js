@@ -56,6 +56,7 @@ module.exports = {
     },
     cachePrefix: 'testService',
     cacheKey: {
+        onlineCount: 'onlineCount',
         userInfo: 'userInfoCacheKey'
     }
 };
