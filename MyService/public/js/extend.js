@@ -53,5 +53,22 @@ var extend = {
             res.reject(e);
         });
         return res;
+    },
+    parseJSON : function(str) {
+        try {
+            JSON.parse(str)
+        } catch (e) {
+            var reg = /JSON.parse:[\s\S]* at line ([\d]) column ([\d]) of the JSON data/;
+            var match = e.message.match(reg)
+            if (match) {
+                var row = parseInt(match[1]);
+                var col = parseInt(match[2]);
+                var list = str.split(/\r\n|\r|\n/);
+                if (list[row - 1]) {
+                    e.message += ' "' + list[row - 1].substr(col - 1) + '"';
+                    throw new Error(e.message);
+                }
+            }
+        }
     }
 }

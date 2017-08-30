@@ -545,3 +545,8 @@ exports.logSave = function(log) {
 
 //删除require
 //delete require.cache[require.resolve('./configData')];
+
+//.prototype
+//.prototype.constructor
+//[] instanceof Array
+//[].constructor == Array
