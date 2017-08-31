@@ -9,20 +9,5 @@ var server = app.listen(app.get('port'), function () {
 });
 
 var io = require('socket.io')(server);
-var onlineCount = 0;
-io.on('connection', function (socket) {
-    onlineCount++;
-    io.sockets.emit('onlineCount', onlineCount);
-
-    socket.on('postMsg', function(msg) {
-        //将消息发送到除自己外的所有用户
-        socket.broadcast.emit('newMsg', msg);
-    });
-
-    socket.on('disconnect', function () {
-        if (onlineCount > 0) {
-            onlineCount--;
-            io.sockets.emit('onlineCount', onlineCount);
-        }
-    });
-});
+var socket = require('../routes/socket');
+socket.init(io);

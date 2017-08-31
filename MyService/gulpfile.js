@@ -4,7 +4,7 @@ var gulp = require('gulp'),
 
 gulp.task('clear-all',function(cb){
 	del([
-		'views/_template/*',
+		'views/_template_web/*',
 	], cb);
 })
 
