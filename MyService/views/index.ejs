@@ -17,6 +17,7 @@
         height: 100px;
     }
 </style>
+<div class="container">
     <h1><%= title %></h1>
     <p>Welcome to <%= title %></p>
     <a href="/help">help</a>
@@ -29,9 +30,18 @@
     <p>Method <%= method %></p>
     <div>
         <div id="msgBox"></div>
-        <input type="text" id="msg"/><input id="postMsg" type="button" class="btn" value="发送"/>
+        <div class="form-inline">
+            <div class="form-group">
+                <input type="text" id="msg" class="form-control"/>
+            </div>
+            <input id="postMsg" type="button" class="btn btn-default" value="发送"/>
+        </div>
     </div>
+</div>
 <% include _public/footer %>
+<script type="text/template" id="msgItem">
+    <% include _template_web/msgItem %>
+</script>
 <script type="text/javascript">
     $(function(){
         $('.hover').on('mouseover mouseleave', function(e){

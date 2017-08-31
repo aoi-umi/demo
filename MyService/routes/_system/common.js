@@ -279,7 +279,7 @@ exports.formatRes = function (err, detail, opt) {
 
 exports.formatViewtRes = function (option) {
     var  opt = {
-        title: 'TestService',
+        title: config.name,
         version: config.version,
         user: null
     };

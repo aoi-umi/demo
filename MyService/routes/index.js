@@ -28,7 +28,7 @@ exports.use = function (req, res, next) {
 };
 
 exports.get = function (req, res, next) {
-    res.myRender('index', common.formatViewtRes({title: 'Express', method: 'get'}));
+    res.myRender('index', common.formatViewtRes({method: 'get'}));
 };
 
 exports.post = function (req, res, next) {

@@ -70,5 +70,29 @@ var extend = {
                 }
             }
         }
+    },
+    dateFormat: function (date, format) {
+        try {
+            if (!format)format = 'yyyy-MM-dd';
+            if (!date)
+                date = new Date();
+            if (typeof date == 'string')
+                date = Date.parse(date);
+
+            var o = {
+                y: date.getFullYear(),
+                M: date.getMonth() + 1,
+                d: date.getDate(),
+                h: date.getHours() % 12,
+                H: date.getHours(),
+                m: date.getMinutes(),
+                s: date.getSeconds()
+            };
+            return format.replace(/(y+|M+|d+|h+|H+|m+|s+)/g, function (e) {
+                return ((e.length > 1 ? '0' : '') + eval('o.' + e.slice(-1))).slice(-(e.length > 2 ? e.length : 2))
+            });
+        } catch (ex) {
+            return '';
+        }
     }
 }

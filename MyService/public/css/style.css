@@ -1,8 +1,28 @@
 body {
-  padding: 50px;
+  padding-top: 50px;
+  padding-bottom: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 a {
   color: #00B7FF;
+}
+
+.navbar-fixed-bottom, .navbar-fixed-top {
+  position: fixed;
+  right: 0;
+  left: 0;
+  z-index: 1030;
+}
+
+.container {
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.item {
+  border: 1px solid #47a8ef;
+  margin: 2px;
 }
