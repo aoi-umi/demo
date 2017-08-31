@@ -16,24 +16,24 @@ var extend = {
         var s4 = self.s4;
         return (s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4());
     },
-    createToken:function(str){
+    createToken: function (str) {
         return $.md5(str);
     },
-    ajax: function(option){
+    ajax: function (option) {
         var opt = {
             type: 'POST',
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
         };
         opt = $.extend(opt, option);
-        if(!opt.data)
+        if (!opt.data)
             opt.data = {};
-        if(typeof opt.data != 'string')
+        if (typeof opt.data != 'string')
             opt.data = JSON.stringify(opt.data);
         var res = $.Deferred();
         $.ajax(opt).then(function (t) {
-            if(!t.result) {
-                if(typeof t.desc == 'object')
+            if (!t.result) {
+                if (typeof t.desc == 'object')
                     t.desc = JSON.stringify(t.desc);
                 var err = new Error(t.desc);
                 err.code = t.detail;
@@ -44,9 +44,9 @@ var extend = {
         }).then(function (t) {
             res.resolve(t);
         }).fail(function (e) {
-            if(!e)
+            if (!e)
                 e = new Error();
-            if(e.statusText){
+            if (e.statusText) {
                 e = new Error(e.statusText);
                 e.code = status;
             }
@@ -54,7 +54,7 @@ var extend = {
         });
         return res;
     },
-    parseJSON : function(str) {
+    parseJSON: function (str) {
         try {
             JSON.parse(str)
         } catch (e) {

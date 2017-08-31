@@ -308,6 +308,7 @@ exports.error = function (msg, code, option) {
         }
     }
     if(!msg) msg = '';
+    if(typeof msg == 'object') msg = JSON.stringify(msg);
     var err = new Error(msg);
     err.code = code;
     return err;
