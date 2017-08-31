@@ -465,10 +465,10 @@ private static List<string> CreateSqlServerProcedure(DatabaseModel databaseModel
                 procList.AddRange(CreateSqlServerSaveProcedure(databaseModel));
                 break;
             case OperateTypeEnum.Del:
-                //procList.AddRange(CreateSqlServerDelProcedure(databaseModel));
+                procList.AddRange(CreateSqlServerDelProcedure(databaseModel));
                 break;
             case OperateTypeEnum.DetailQuery:
-                //procList.AddRange(CreateSqlServerDetailQueryProcedure(databaseModel));
+                procList.AddRange(CreateSqlServerDetailQueryProcedure(databaseModel));
                 break;
             case OperateTypeEnum.Query:
                 //procList.AddRange(CreateSqlServerQueryProcedure(databaseModel));
@@ -595,10 +595,167 @@ private static List<string> CreateSqlServerSaveProcedure(DatabaseModel databaseM
     #endregion
     
     procStrList.Add("END;");
-    procStrList.Add("GO");    
+    procStrList.Add("GO");
+    procStrList.Add( Environment.NewLine);    
     
     procList.Add(string.Join(Environment.NewLine, procStrList.ToArray())); 
     return procList;    
+}
+
+
+private static List<string> CreateSqlServerDelProcedure(DatabaseModel databaseModel)
+{
+    var level = 0;
+    var tabStr = "";
+    var procList = new List<string>();
+    var tableName = databaseModel.TableName;
+    var procTableName = tableName;
+    if(!string.IsNullOrEmpty(databaseModel.RemoveTablePrefix)){
+        if(procTableName.StartsWith(databaseModel.RemoveTablePrefix))
+            procTableName = procTableName.Substring(databaseModel.RemoveTablePrefix.Length);
+    }
+    var procName = "p_" 
+        + procTableName
+        + "_del_auto";
+    var procStrList = new List<string>();
+    var cols = databaseModel.Cols;
+    var paraPerfix = "@";
+    
+    procStrList.Add("if exists(SELECT * FROM SYSOBJECTS WHERE NAME='" + procName + "')");
+    procStrList.Add("drop PROCEDURE " + procName + ";");
+    procStrList.Add("GO");
+    
+    procStrList.Add("create procedure " + procName + "(");
+    level = 1;
+    tabStr = GetRepeatStr("\t", level);
+        procStrList.Add(string.Format(tabStr + paraPerfix + "{0} {1}", databaseModel.IdCol.Name , databaseModel.IdCol.NativeType));
+    procStrList.Add(")");
+    procStrList.Add("AS");
+    procStrList.Add("BEGIN");
+    procStrList.Add("SET NOCOUNT ON;");
+    procStrList.Add(string.Format(tabStr + "DELETE FROM {0} WHERE [{1}] = " + paraPerfix + "{1};", tableName , databaseModel.IdCol.Name));
+    
+    procStrList.Add("END;");
+    procStrList.Add("GO");    
+    procStrList.Add(Environment.NewLine);
+    
+    procList.Add(string.Join(Environment.NewLine, procStrList.ToArray())); 
+    return procList;   
+}
+
+
+private static List<string> CreateSqlServerDetailQueryProcedure(DatabaseModel databaseModel)
+{
+    var level = 0;
+    var tabStr = "";
+    var procList = new List<string>();
+    var tableName = databaseModel.TableName;
+    var procTableName = tableName;
+    if(!string.IsNullOrEmpty(databaseModel.RemoveTablePrefix)){
+        if(procTableName.StartsWith(databaseModel.RemoveTablePrefix))
+            procTableName = procTableName.Substring(databaseModel.RemoveTablePrefix.Length);
+    }
+    var procName = "p_" 
+        + procTableName
+        + "_query_auto";
+    var procStrList = new List<string>();
+    var cols = databaseModel.Cols;
+    var paraPerfix = "@";
+    var nullListName = paraPerfix + "null_list";
+    var pageIndexName = paraPerfix + "page_index";
+    var pageSizeName = paraPerfix + "page_size";
+    
+    procStrList.Add("if exists(SELECT * FROM SYSOBJECTS WHERE NAME='" + procName + "')");
+    procStrList.Add("drop PROCEDURE " + procName + ";");
+    procStrList.Add("GO");
+    
+    procStrList.Add("create procedure " + procName + "(");
+    level = 1;
+    var i = 0;
+    cols.ForEach(x=>{        
+        procStrList.Add(string.Format(tabStr + paraPerfix + "{0} {1},", x.Name , x.NativeType));
+        i++;
+    });
+    procStrList.Add(string.Format(tabStr + "{0} {1},", nullListName, "varchar(1000)"));
+    procStrList.Add(string.Format(tabStr + "{0} {1},", pageIndexName , "int"));
+    procStrList.Add(string.Format(tabStr + "{0} {1}", pageSizeName , "int"));
+    procStrList.Add(")");
+    procStrList.Add("AS");
+    procStrList.Add("BEGIN");
+    procStrList.Add("SET NOCOUNT ON;");
+    
+    level = 1;
+    tabStr = GetRepeatStr("\t", level);    
+    procStrList.Add(tabStr + "IF " + nullListName + " IS NULL BEGIN");  
+    procStrList.Add(tabStr + "\tSET " + nullListName + " = '';"); 
+    procStrList.Add(tabStr + "END;");       
+    procStrList.Add(tabStr + "SET " + nullListName + " = ',' + " + nullListName + " + ',';" + Environment.NewLine); 
+    procStrList.Add(string.Format(tabStr + "SET @Sql ='SELECT {0}, ROW_NUMBER() OVER ( ORDER BY {0} DESC ) AS ROWNUMBER into #{1}_00 FROM {1} WHERE 1 = 1 ';",databaseModel.IdCol.Name, tableName));    
+    
+    cols.ForEach(x=>{
+        procStrList.Add(string.Format(tabStr + "IF {0} IS NOT NULL BEGIN", paraPerfix + x.Name));
+        procStrList.Add(string.Format(tabStr + "\tSET @Sql = @Sql + ' AND [{0}] = ''' + dbo.replace_special_char(select cast(" + paraPerfix + "{0} as varchar)) + ''',';", x.Name));
+        procStrList.Add(string.Format(tabStr + "END"));
+        procStrList.Add(string.Format(tabStr + "ELSE IF CHARINDEX(',{0},', {1}) > 0 BEGIN", x.Name, nullListName));  
+        procStrList.Add(string.Format(tabStr + "\tSET @Sql = @Sql + ' AND [{0}] IS NULL';", x.Name)); 
+        procStrList.Add(tabStr + "END;" + Environment.NewLine);  
+    });
+    
+    //procStrList.Add(string.Format(tabStr + "IF {0} IS NOT NULL AND {1} IS NOT NULL THEN", pageIndexName, pageSizeName));
+    //procStrList.Add(string.Format(tabStr + "\tSET @Sql = @Sql + ' limit ', ({0} - 1) * {1} + ',' +  {1}", pageIndexName, pageSizeName));
+    procStrList.Add(tabStr + "END;");
+    procStrList.Add(tabStr + "SET @Sql = @Sql + ';'");
+    
+    procStrList.Add(tabStr + "-- SELECT @Sql;");
+    procStrList.Add(tabStr + "exec (@Sql);");	
+    
+    procStrList.Add("END;");
+    procStrList.Add("GO");    
+    procStrList.Add(Environment.NewLine);
+    
+    procList.Add(string.Join(Environment.NewLine, procStrList.ToArray())); 
+    return procList;   
+}
+
+
+private static List<string> CreateSqlServerQueryProcedure(DatabaseModel databaseModel)
+{
+    var level = 0;
+    var tabStr = "";
+    var procList = new List<string>();
+    var tableName = databaseModel.TableName;
+    var procTableName = tableName;
+    if(!string.IsNullOrEmpty(databaseModel.RemoveTablePrefix)){
+        if(procTableName.StartsWith(databaseModel.RemoveTablePrefix))
+            procTableName = procTableName.Substring(databaseModel.RemoveTablePrefix.Length);
+    }
+    var procName = "p_" 
+        + procTableName
+        + "_detail_query_auto";
+    var procStrList = new List<string>();
+    var cols = databaseModel.Cols;
+    var paraPerfix = "@";
+    
+    procStrList.Add("if exists(SELECT * FROM SYSOBJECTS WHERE NAME='" + procName + "')");
+    procStrList.Add("drop PROCEDURE " + procName + ";");
+    procStrList.Add("GO");
+    
+    procStrList.Add("create procedure " + procName + "(");
+    level = 1;
+    tabStr = GetRepeatStr("\t", level);
+        procStrList.Add(string.Format(tabStr + paraPerfix + "{0} {1}", databaseModel.IdCol.Name , databaseModel.IdCol.NativeType));
+    procStrList.Add(")");
+    procStrList.Add("AS");
+    procStrList.Add("BEGIN");
+    procStrList.Add("SET NOCOUNT ON;");
+    procStrList.Add(string.Format(tabStr + "SELECT * FROM {0} WHERE [{1}] = " + paraPerfix + "{1};", tableName , databaseModel.IdCol.Name));
+    
+    procStrList.Add("END;");
+    procStrList.Add("GO");    
+    procStrList.Add(Environment.NewLine);
+    
+    procList.Add(string.Join(Environment.NewLine, procStrList.ToArray())); 
+    return procList;   
 }
 #endregion
 
