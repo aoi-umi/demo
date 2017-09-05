@@ -54,10 +54,12 @@ exports.tranConnect = function (queryFunction) {
     }).then(function(t){
         return commit(connection);
     }).fail(function(e) {
-        rollback(connection);
+        if(connection)
+            rollback(connection);
         throw e;
     }).finally(function(){
-        release(connection);
+        if(connection)
+            release(connection);
     });
 };
 

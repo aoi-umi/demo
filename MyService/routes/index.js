@@ -7,6 +7,7 @@ var myEnum = require('./_system/enum');
 
 var autoBll = require('./_bll/auto');
 var userInfoBll = require('./_bll/user_info');
+var logBll = require('./_bll/log');
 
 var testService = require('./_service/testService');
 
@@ -198,4 +199,13 @@ exports.status = function (req, res) {
         enumCheck: myEnum.enumCheck
     };
     res.myRender('status', opt);
+};
+
+exports.tranTest = function(req, res){
+    var reqData = req.body;
+    logBll.tranTest(reqData).then(function(t){
+        res.mySend(null, t);
+    }).fail(function(e){
+        res.mySend(e, null,{code: '400'});
+    })
 };

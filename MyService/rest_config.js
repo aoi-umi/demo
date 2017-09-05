@@ -136,4 +136,13 @@ module.exports = [
         }],
         path:'index',
     },
+    {
+        url: '/tranTest',
+        method: [{
+            name: 'post',
+            functionName: 'tranTest',
+            exampleRequest: {error: false}
+        }],
+        path: 'index',
+    },
 ];
