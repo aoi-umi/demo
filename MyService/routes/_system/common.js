@@ -32,6 +32,9 @@ exports.extend = function () {
     return res;
 };
 
+exports.defer = function(){
+    return q.defer();
+}
 //带参数：args0:对象
 //        args1:带nodeCallback的 function名
 //        args2:function的参数1

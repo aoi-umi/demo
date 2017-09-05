@@ -9,8 +9,8 @@
 
 public enum DatabaseTypeEnum
 {
-    SqlServer,
     MySql,
+    SqlServer,
 }
 
 public class DatabaseColModel

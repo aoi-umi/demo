@@ -8,13 +8,23 @@ var extend = {
     base64ToString: function (base64Str) {
         return decodeURIComponent(atob(base64Str));
     },
-    s4: function () {
-        return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+    s4: function (count) {
+        var str = '';
+        if(typeof count == 'undefined')
+            count = 1;
+        if(count <= 0){
+
+        }else{
+            for(i = 0; i < count;i++){
+                str += (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+            }
+        }
+        return str;
     },
     guid: function () {
         var self = this;
         var s4 = self.s4;
-        return (s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4());
+        return (s4(2) + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4(3));
     },
     createToken: function (str) {
         return $.md5(str);
@@ -26,11 +36,15 @@ var extend = {
             dataType: 'json',
         };
         opt = $.extend(opt, option);
+        var originReq = opt.data;
         if (!opt.data)
             opt.data = {};
         if (typeof opt.data != 'string')
             opt.data = JSON.stringify(opt.data);
         var res = $.Deferred();
+        var resOpt = {
+            req : originReq
+        };
         $.ajax(opt).then(function (t) {
             if (!t.result) {
                 if (typeof t.desc == 'object')
@@ -42,15 +56,15 @@ var extend = {
             else
                 return $.Deferred().resolve(t.detail);
         }).then(function (t) {
-            res.resolve(t);
+            res.resolve(t, resOpt);
         }).fail(function (e) {
             if (!e)
                 e = new Error();
             if (e.statusText) {
                 e = new Error(e.statusText);
-                e.code = status;
+                e.code = e.status;
             }
-            res.reject(e);
+            res.reject(e, resOpt);
         });
         return res;
     },

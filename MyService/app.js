@@ -34,8 +34,8 @@ app.use(function (req, res, next) {
         res.render(view, common.formatViewtRes(opt));
     };
 
-    res.mySend = function (err, detail, desc) {
-        var formatRes = common.formatRes(err, detail, desc);
+    res.mySend = function (err, detail, opt) {
+        var formatRes = common.formatRes(err, detail, opt);
         res.send(formatRes);
         var url = req.originalUrl;
         var result = formatRes.result;
