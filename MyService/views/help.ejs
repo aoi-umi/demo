@@ -1,29 +1,40 @@
 <% include _public/header %>
-<table>
+<table class="table table-bordered">
     <thead>
-    <tr>
-        <td>url</td>
-        <td>method</td>
-        <td>data</td>
-    </tr>
+        <tr>
+            <%var count = 2;
+            for(var i = 0;i < count;i++){
+            %>
+            <td>url</td>
+            <td>method</td>
+            <td>data</td>
+            <%}%>
+        </tr>
     </thead>
     <tbody>
-    <% restList.forEach(function (t) { %>
-    <tr>
-        <td><a name="url" href="<%= t.method == 'post' ? 'javascript:;' : t.exampleRequest || t.url %>"
-                <%= t.method == 'post' ? '' : 'target=_blank' %>
-               data-url="<%= t.url %>"
-               data-method="<%= t.method %>"
-               data-req="<%= t.method == 'post' && t.exampleRequest ? t.exampleRequest:'' %>">
-                <%= t.url %></a>
-        </td>
-        <td>[<%= t.method %>]</td>
-        <td>
-            <textarea name="exampleRequest"><%= t.method == 'post' ? t.exampleRequest|| '': t.exampleRequest || t.url %>
-            </textarea>
-        </td>
-    </tr>
-    <% }) %>
+    <%
+    for(var restIndex = 0; restIndex < restList.length;){
+    %>
+        <tr>
+    <%
+        for(var i = 0;i < count && restIndex < restList.length;i++,restIndex++){
+            var t = restList[restIndex];
+            %>
+            <td><a data-index="<%=restIndex%>" name="url" href="<%= t.method == 'post' ? 'javascript:;' : t.exampleRequest || t.url %>"
+                        <%= t.method == 'post' ? '' : 'target=_blank' %>
+                   data-url="<%= t.url %>"
+                   data-method="<%= t.method %>"
+                   data-req="<%= t.method == 'post' && t.exampleRequest ? t.exampleRequest:'' %>">
+                    <%= t.url %></a>
+            </td>
+            <td>[<%= t.method %>]</td>
+            <td data-index="<%=restIndex%>">
+                <textarea name="exampleRequest"><%= t.method == 'post' ? t.exampleRequest|| '': t.exampleRequest || t.url %>
+                </textarea>
+            </td>
+        <%}%>
+        </tr>
+    <%}%>
     </tbody>
 </table>
 <% include _public/footer %>
@@ -32,7 +43,8 @@
         $(document).on('click', '[name=url]', function () {
             var dom = $(this);
             var row = dom.closest('tr');
-            var req = $.trim(row.find('[name=exampleRequest]').val());
+            var index = dom.data('index');
+            var req = $.trim(row.find('[data-index=' + index + '] [name=exampleRequest]').val());
             var method = dom.attr('data-method');
             var url = dom.attr('data-url');
             if(method == 'post') {
