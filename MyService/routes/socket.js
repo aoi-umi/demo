@@ -15,12 +15,17 @@ var mySocket = module.exports = {
             mySocket.onlineCount++;
             io.sockets.emit('onlineCount', mySocket.onlineCount);
 
-            socket.on('postMsg', function(msg) {
+            socket.on('postMsg', function(opt) {
                 //将消息发送到除自己外的所有用户
                 socket.broadcast.emit('newMsg', {
                     datetime: common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss'),
-                    user: '',
-                    content: msg,
+                    user: opt.user,
+                    content: opt.content,
+                    msgId: opt.msgId,
+                });
+                socket.emit('postSuccess', {
+                    user: opt.user,
+                    msgId: opt.msgId,
                 });
             });
 

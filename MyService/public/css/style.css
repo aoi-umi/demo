@@ -26,3 +26,19 @@ a {
   border: 1px solid #47a8ef;
   margin: 2px;
 }
+
+.item.self .item-content{
+  text-align:right;
+ }
+
+.success{
+  border: solid #3e8f3e !important;
+}
+
+.loading{
+  border: solid #eb9316 !important;
+}
+
+.fail{
+  border: solid #c12e2a !important;
+}
