@@ -10,12 +10,12 @@ var extend = {
     },
     s4: function (count) {
         var str = '';
-        if(typeof count == 'undefined')
+        if (typeof count == 'undefined')
             count = 1;
-        if(count <= 0){
+        if (count <= 0) {
 
-        }else{
-            for(i = 0; i < count;i++){
+        } else {
+            for (i = 0; i < count; i++) {
                 str += (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
             }
         }
@@ -43,7 +43,7 @@ var extend = {
             opt.data = JSON.stringify(opt.data);
         var res = $.Deferred();
         var resOpt = {
-            req : originReq
+            req: originReq
         };
         $.ajax(opt).then(function (t) {
             if (!t.result) {
@@ -108,5 +108,99 @@ var extend = {
         } catch (ex) {
             return '';
         }
+    },
+    dataCheck: function (option) {
+        var self = this;
+        var data = {
+            success: false,
+            model: {},
+            desc: '',
+            err: null,
+            dom: null
+        };
+        if (!option) return data;
+        //示例
+        //var dict = {
+        //    name: 'Password',
+        //    desc: '密码',
+        //    dom: $('#password'),
+        //    focusDom: $('#password'),
+        //    canNotNull: true,
+        //    canNotNullDesc: '请输入{0}',
+        //    isTrim: false,
+        //    getValue: function () {
+        //        return this.dom.find("option:selected").text();
+        //    },
+        //    checkValue: function (value, model) {
+        //        if (!value) {
+        //            return ('密码只能由8~20位字母和数字组成');
+        //        }
+        //    }
+        //}
+        for (var i = 0; i < option.list.length; i++) {
+            var noName = false;
+            var t = option.list[i];
+            var name = (t.desc || t.name);
+            data.dom = t.focusDom || t.dom;
+            if (typeof t.isTrim == 'undefined') t.isTrim = true;
+            if (!t.canNotNullDesc) t.canNotNullDesc = '{0}不能为空';
+            try {
+                var value = '';
+                var typeOfGetValue = typeof t.getValue;
+                switch (typeOfGetValue) {
+                    case 'function':
+                        value = t.getValue(data.model);
+                        break;
+                    case 'string':
+                        if (typeof t.dom[t.getValue] == 'function') value = t.dom[t.getValue]();
+                        else value = t.dom[t.getValue];
+                        break;
+                    default:
+                        value = t.dom.val();
+                        break;
+                }
+                if (typeof value == 'string') {
+                    //if (t.dom && value == t.dom.attr('placeholder'))
+                    //    value = '';
+                    if (t.isTrim)
+                        value = $.trim(value);
+                }
+                data.model[t.name] = value;
+                if (t.canNotNull && (value === '' || value == null || typeof value == 'undefined')) {
+                    noName = true;
+                    throw self.stringFormat(t.canNotNullDesc, name);
+                }
+                if (t.checkValue) {
+                    var err = t.checkValue(value, data.model);
+                    if (err) {
+                        noName = true;
+                        throw self.stringFormat(err, name);
+                    }
+                }
+            } catch (e) {
+                if (e && e.message) e = e.message;
+                var errStr = (typeof e == 'object') ? JSON.stringify(e) : e;
+                data.desc = (noName ? '' : name) + errStr;
+                data.err = e;
+                return data;
+            }
+        }
+        data.success = true;
+        return data;
+    },
+    stringFormat: function () {
+        var args = arguments;
+        var reg = /(\{\d\})/g
+        var res = args[0] || '';
+        var split = res.split(reg);
+        for(var i = 0;i < split.length; i++){
+            var m = split[i].length >= 3 && split[i].match(/\{(\d)\}/);
+            if(m){
+                var index = parseInt(m[1]);
+                split[i] = split[i].replace('{' + index + '}', args[index + 1] || '');
+            }
+        }
+        res = split.join('');
+        return res;
     }
 }

@@ -406,19 +406,19 @@ exports.IPv4ToIPv6 = function (ip, convert) {
 // console.log(exports.IPv4ToIPv6('192.168.1.1'))
 // console.log(exports.IPv4ToIPv6('192.168.1.1', true))
 
-exports.format = function () {
-    var res = '';
+exports.stringFormat = function () {
     var args = arguments;
-    if (args) {
-        res = args[0] || '';
-        for (var key in args) {
-            if (key != 0) {
-                var reg = new RegExp('\\{' + (key - 1) + '\\}', 'g');
-                res = res.replace(reg, args[key]);
-            }
+    var reg = /(\{\d\})/g
+    var res = args[0] || '';
+    var split = res.split(reg);
+    for(var i = 0;i < split.length; i++){
+        var m = split[i].length >= 3 && split[i].match(/\{(\d)\}/);
+        if(m){
+            var index = parseInt(m[1]);
+            split[i] = split[i].replace('{' + index + '}', args[index + 1] || '');
         }
-        //res = res.replace(/\{\d\}/g, '');
     }
+    res = split.join('');
     return res;
 };
 
@@ -494,16 +494,16 @@ exports.enumCheck = function(srcEnum, destEnum, enumType) {
     srcEnum = srcEnum.toString();
     destEnum = destEnum.toString();
     if(typeof matchEnum[srcEnum] == 'undefined')
-        throw common.error(common.format('no match src enum [{0}] in [{1}]!', srcEnum, enumType));
+        throw common.error(common.stringFormat('no match src enum [{0}] in [{1}]!', srcEnum, enumType));
 
     if(typeof matchEnum[destEnum] == 'undefined')
-        throw common.error(common.format('no match dest enum [{0}] in [{1}]!', destEnum, enumType));
+        throw common.error(common.stringFormat('no match dest enum [{0}] in [{1}]!', destEnum, enumType));
 
     if (!enumCheck[srcEnum] || !enumCheck[srcEnum][destEnum]) {
         throw common.error(null, errorConfig.ENUM_CHANGED_INVALID.code, {
             //lang:'en',
             format: function (msg) {
-                return common.format(msg,
+                return common.stringFormat(msg,
                     enumType + ':[' + srcEnum + '](' + myEnum.getValue(enumType, srcEnum) + ')',
                     '[' + destEnum + '](' + myEnum.getValue(enumType, destEnum) + ')');
             }

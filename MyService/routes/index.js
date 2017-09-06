@@ -111,7 +111,7 @@ function login(userName, token, req) {
         if (!userName)
             throw common.error(null, errorConfig.CAN_NOT_BE_EMPTY.code, {
                 format: function (msg) {
-                    return common.format(msg, 'userName');
+                    return common.stringFormat(msg, 'userName');
                 }
             });
         if (!req)
