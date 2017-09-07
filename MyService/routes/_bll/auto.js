@@ -1,6 +1,9 @@
 ﻿var exports = module.exports;
-function getRequire(name) {
-	return require('../_dal/' + name + '_auto');
+function getRequire(name, custom) {
+    if(!custom)
+	    return require('../_dal/' + name + '_auto');
+    else
+        return require('./' + name);
 }
 exports.save = function (name, params, conn) {
 	return getRequire(name).save(params, conn).then(function (t) {
@@ -25,5 +28,9 @@ exports.query = function (name, params, conn) {
 			count: t[1][0].count,
 		};
 	});
+};
+
+exports.custom = function (name, method, opt) {
+	return getRequire(name, true)[method](opt);
 };
 

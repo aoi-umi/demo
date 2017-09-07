@@ -4,6 +4,7 @@
 var autoBll = require('./auto');
 var db = require('../_system/db');
 var common = require('../_system/common');
+var logDal = require('../_dal/log');
 var exports = module.exports;
 
 //事务测试
@@ -31,4 +32,13 @@ exports.tranTest = function (opt) {
         });
     });
     return res.promise;
+};
+
+exports.query = function(opt){
+    return logDal.query(opt).then(function(t){
+        var resData = {};
+        resData.list = t[0];
+        resData.count = t[1].count;
+        return resData;
+    });
 };
