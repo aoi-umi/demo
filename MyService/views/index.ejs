@@ -19,8 +19,15 @@
 </style>
     <h1><%= title %></h1>
     <p>Welcome to <%= title %></p>
-    <a href="/help">help</a>
-    <a href="/status">status</a>
+    <table class="table table-bordered">
+        <tr>
+            <td><a href="/help">help</a></td>
+            <td><a href="/status">status</a></td>
+        </tr>
+        <tr>
+            <td><a href="/log">log</a></td>
+        </tr>
+    </table>
     <a class="hover hover-source" href="javascript:;">hover</a>
     <div class="hover hover-target">
         <div class="content" class="fill_main"></div>

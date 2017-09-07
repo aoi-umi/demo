@@ -129,12 +129,28 @@ module.exports = [
         auth:[auth['dev']],
     },
     {
+        url:'/log',
+        method:[{
+            name: 'get',
+            functionName: 'view'
+        }],
+        path:'log',
+    },
+    {
+        url:'/log/query',
+        method:[{
+            name: 'post',
+            functionName: 'query'
+        }],
+        path:'log',
+    },
+    {
         url:'/log/save',
         method:[{
             name: 'post',
-            functionName: 'logSave'
+            functionName: 'save'
         }],
-        path:'index',
+        path:'log',
     },
     {
         url: '/tranTest',

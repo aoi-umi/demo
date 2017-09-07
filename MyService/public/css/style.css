@@ -1,5 +1,5 @@
 body {
-  padding-top: 50px;
+  padding-top: 55px;
   padding-bottom: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
@@ -41,4 +41,9 @@ a {
 
 .fail{
   border: solid #c12e2a !important;
+}
+
+tbody{
+  word-break:break-all;
+  word-wrap:break-word;
 }

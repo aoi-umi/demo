@@ -1,0 +1,53 @@
+<% include _public/header %>
+<div>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>url</th>
+                <th>method</th>
+                <th>result</th>
+                <th>code</th>
+                <th>req</th>
+                <th>res</th>
+                <th>ip</th>
+                <th>create_date</th>
+                <th>remark</th>
+                <th>guid</th>
+            </tr>
+        </thead>
+        <tbody id="logList"></tbody>
+        <tbody>
+            <tr><td colspan="100" id="logMsg"></td></tr>
+        </tbody>
+    </table>
+</div>
+<% include _public/footer %>
+
+<script type="text/template" id="logItem">
+    <%include _template_web/logItem%>
+</script>
+<script type="text/javascript">
+    $(function () {
+        var opt = {
+            url: '/log/query',
+            data: {
+                page_index: 1,
+                page_size: 10
+            }
+        };
+        extend.ajax(opt).then(function(t){
+            $('#logList').empty();
+            var temp = $('#logItem').html();
+            $(t.list).each(function(){
+                var item = this;
+                $('#logList').append(ejs.render(temp, item));
+            });
+        }).fail(function(e){
+            $('#logList').empty();
+            if(typeof e == 'object')
+                e = JSON.stringify(e);
+            $('#logMsg').html(e)
+        });
+    });
+</script>

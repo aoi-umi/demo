@@ -122,8 +122,11 @@ exports.promisifyAll = function (obj) {
     }
 };
 
-exports.requestServiceByConfig = function (option, cb) {
-    try {
+exports.requestServiceByConfigPromise = function (option) {
+    var method = '';
+    var url = '';
+    var log = common.logModle();
+    return common.promise().then(function () {
         var errStr = 'service "' + option.serviceName + '"';
         var service = config.api[option.serviceName];
         if (!service) throw common.error(errStr + ' is not exist!');
@@ -147,8 +150,8 @@ exports.requestServiceByConfig = function (option, cb) {
         var host = serviceArgs.host;
         if (!host) throw common.error(errStr + ' host is empty!');
 
-        var method = methodArgs.method;
-        var url = methodArgs.url;
+        method = methodArgs.method;
+        url = methodArgs.url;
         if (!url) throw common.error(errStr + ' method "' + option.methodName + '" url is empty!');
         url = host + url;
         var opt = {
@@ -160,43 +163,29 @@ exports.requestServiceByConfig = function (option, cb) {
             //发送的参数 当前所用参数
             option.beforeRequest(opt, serviceArgs);
         }
-        var result = null;
-        var logReq = opt.body;
-        var logRes = null;
-        var logMethod = '[' + option.serviceName + '][' + option.methodName + ']';
-        common.requestServicePromise(opt).then(function (t) {
-            result = true;
-            logRes = t;
-            var err = null;
-            if(option.afterResponse) {
-                try {
-                    t = option.afterResponse(t);
-                }catch (e){
-                    err = e;
-                }
-            }
-            cb(err, t);
-        }).fail(function (e) {
-            result = false;
-            logRes = e;
-            console.log('request', logMethod, 'error');
-            console.log('url:', url);
-            cb(e);
-        }).finally(function(){
-            if(!option.noLog) {
-                var log = common.logModle();
-                log.url = url;
-                log.result = result;
-                log.method = logMethod
-                log.req = logReq;
-                log.res = logRes;
-                common.logSave(log);
-            }
-        });
-    }
-    catch (e) {
-        cb(e);
-    }
+        log.guid = common.guid();
+        log.url = url;
+        log.req = opt.body;
+        log.method = '[' + option.serviceName + '][' + option.methodName + ']';
+        return common.requestServicePromise(opt);
+    }).then(function (t) {
+        log.result = true;
+        log.res = t;
+        if (option.afterResponse) {
+            t = option.afterResponse(t);
+        }
+        return t;
+    }).fail(function (e) {
+        log.result = false;
+        log.res = e;
+        console.log('request', log.method, 'error');
+        console.log('url:', url);
+        throw e;
+    }).finally(function () {
+        if (!option.noLog) {
+            common.logSave(log);
+        }
+    });
 };
 
 exports.requestServicePromise = function (option) {
@@ -246,7 +235,7 @@ exports.requestServicePromise = function (option) {
     });
 };
 
-exports.requestServiceByConfigPromise = common.promisify(exports.requestServiceByConfig);
+//exports.requestServiceByConfigPromise = common.promisify(exports.requestServiceByConfig);
 //exports.requestServicePromise = common.promisify(exports.requestService);
 zlib.unzipPromise = common.promisify(zlib.unzip);
 
@@ -261,6 +250,7 @@ exports.formatRes = function (err, detail, opt) {
         detail: null,
         code: null,
         desc: null,
+        guid: common.guid()
     };
     if(opt)
         res = common.extend(res, opt);
@@ -527,10 +517,12 @@ exports.logModle = function() {
 };
 
 exports.logSave = function(log) {
-    if (log.req && typeof log.req != 'string')
-        log.req = JSON.stringify(log.req);
-    if (log.res && typeof log.res != 'string')
-        log.res = JSON.stringify(log.res);
+    for(var key in log){
+        var value = log[key];
+        var type = typeof(value);
+        if(value !== null && type == 'object')
+            log[key] = JSON.stringify(value);
+    }
     return logService.save(log);
 };
 
