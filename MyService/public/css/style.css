@@ -47,3 +47,15 @@ tbody{
   word-break:break-all;
   word-wrap:break-word;
 }
+
+.my-row>div {
+  margin-top: 10px;
+}
+
+table >.table-error{
+    display: none;
+}
+
+table.error >.table-error{
+    display: table-row-group;
+}

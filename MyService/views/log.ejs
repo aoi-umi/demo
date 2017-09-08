@@ -1,5 +1,45 @@
 <% include _public/header %>
 <div>
+    <div class="form-group">
+        <% var rowItemClass = 'col-lg-3 col-md-4 col-sm-6 col-xs-12';%>
+        <div class="row my-row">
+            <%
+            var prefix = 'log_';
+            var searchItemList = [{
+                text: 'id',
+                id:'id',
+            },{
+                text: 'url',
+                id:'url',
+            },{
+                text: 'create_date_s',
+                id:'create_date_start',
+            },{
+                text: 'create_date_e',
+                id:'create_date_end',
+            },{
+                text: 'guid',
+                id:'guid',
+            },];
+            for(var i = 0;i< searchItemList.length;i++){
+                var item = searchItemList[i];
+            %>
+                <div class="<%=rowItemClass%>">
+                    <div class="input-group">
+                        <span class="input-group-addon"><%=item.text%></span>
+                        <input id="<%=prefix + item.id%>" type="text" class="form-control" />
+                    </div>
+                </div>
+            <%}%>
+        </div>
+        <div class="row my-row">
+            <div class="<%=rowItemClass%> col-lg-offset-9 col-md-offset-8 col-sm-offset-6">
+                <button id="search" class="btn btn-default btn-block">
+                    search
+                </button>
+            </div>
+        </div>
+    </div>
     <table class="table table-bordered">
         <thead>
             <tr>
@@ -17,8 +57,8 @@
             </tr>
         </thead>
         <tbody id="logList"></tbody>
-        <tbody>
-            <tr><td colspan="100" id="logMsg"></td></tr>
+        <tbody class="table-error">
+            <tr><td class="text-center" colspan="100" id="logMsg"></td></tr>
         </tbody>
     </table>
 </div>
@@ -28,26 +68,69 @@
     <%include _template_web/logItem%>
 </script>
 <script type="text/javascript">
-    $(function () {
-        var opt = {
-            url: '/log/query',
-            data: {
-                page_index: 1,
-                page_size: 10
-            }
-        };
-        extend.ajax(opt).then(function(t){
-            $('#logList').empty();
-            var temp = $('#logItem').html();
-            $(t.list).each(function(){
-                var item = this;
-                $('#logList').append(ejs.render(temp, item));
+    var logModel = {
+        init: function () {
+            var self = this;
+            self.bindEvent();
+            $('#search').click();
+        },
+        bindEvent: function () {
+            var self = this;
+            $('#log_create_date_start').on('click', function() {
+                var datePickerArgs = {
+                    el: this,
+                    //startDate: '#{%y-30}-01-01',
+                    doubleCalendar: true,
+                    dateFmt: 'yyyy-MM-dd',
+                    minDate: '1900-01-01',
+                    maxDate: '#F{$dp.$D(\'log_create_date_end\')}',
+                };
+                WdatePicker(datePickerArgs);
             });
-        }).fail(function(e){
-            $('#logList').empty();
-            if(typeof e == 'object')
-                e = JSON.stringify(e);
-            $('#logMsg').html(e)
-        });
+            $('#log_create_date_end').on('click', function() {
+                var datePickerArgs = {
+                    el: this,
+                    //startDate: minDate || '#{%y-30}-01-01',
+                    doubleCalendar: true,
+                    dateFmt: 'yyyy-MM-dd',
+                    minDate: '#F{$dp.$D(\'log_create_date_start\')||\'1900-01-01\'}',
+                    maxDate: '',
+                };
+                WdatePicker(datePickerArgs);
+            });
+
+            $('#search').on('click', function(){
+                self.query();
+            });
+        },
+        query: function(){
+            var opt = {
+                url: '/log/query',
+                data: {
+                    page_index: 1,
+                    page_size: 10
+                },
+                myDataCheck:function(){
+                    //throw new Error(123)
+                }
+            };
+            extend.ajax(opt).then(function(t){
+                $('#logList').empty();
+                var temp = $('#logItem').html();
+                $(t.list).each(function(){
+                    var item = this;
+                    $('#logList').append(ejs.render(temp, item));
+                });
+            }).fail(function(e) {
+                $('#logList').empty();
+                if (e instanceof Error) e = e.message;
+                if (typeof e == 'object') e = JSON.stringify(e);
+                $('#logMsg').html(e);
+            });
+        },
+    }
+
+    $(function () {
+        logModel.init();
     });
 </script>
