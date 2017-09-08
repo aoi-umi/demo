@@ -34,6 +34,9 @@ var extend = {
             type: 'POST',
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
+
+            //自定义参数
+            myDataCheck: null,
         };
         opt = $.extend(opt, option);
         var originReq = opt.data;
@@ -45,7 +48,17 @@ var extend = {
         var resOpt = {
             req: originReq
         };
-        $.ajax(opt).then(function (t) {
+        var def = $.Deferred();
+        def.then(function(){
+            if(typeof opt.myDataCheck == 'function'){
+                try {
+                    opt.myDataCheck();
+                }catch (e){
+                    return $.Deferred().reject(e);
+                }
+            }
+            return $.ajax(opt);
+        }).then(function (t) {
             if (!t.result) {
                 if (typeof t.desc == 'object')
                     t.desc = JSON.stringify(t.desc);
@@ -66,6 +79,8 @@ var extend = {
             }
             res.reject(e, resOpt);
         });
+
+        def.resolve();
         return res;
     },
     parseJSON: function (str) {
