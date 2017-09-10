@@ -218,4 +218,4 @@ var extend = {
         res = split.join('');
         return res;
     }
-}
+};

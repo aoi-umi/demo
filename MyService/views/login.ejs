@@ -1,4 +1,6 @@
-<% include _public/header %>
+<% include _public/header_with_nav %>
+
+<div class="container">
 <h1><%= title %></h1>
 <p>Welcome to <%= title %></p>
 <form class="navbar-form">
@@ -6,7 +8,8 @@
     <input class="form-control" id="pwd" type="password"/>
     <input class="btn btn-primary" id="login" type="button" value="Login"/>
 </form>
-<% include _public/footer %>
+</div>
+<% include _public/footer_with_nav %>
 <script type="text/javascript">
     $(function(){
         $('#login').on('click', function(){

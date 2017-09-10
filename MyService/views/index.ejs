@@ -1,4 +1,4 @@
-<% include _public/header %>
+<% include _public/header_with_nav %>
 <style>
     .hover-source{
         position: relative;
@@ -17,6 +17,8 @@
         height: 100px;
     }
 </style>
+
+<div class="container">
     <h1><%= title %></h1>
     <p>Welcome to <%= title %></p>
     <table class="table table-bordered">
@@ -43,7 +45,8 @@
             <input id="postMsg" type="button" class="btn btn-default" value="发送"/>
         </div>
     </div>
-<% include _public/footer %>
+</div>
+<% include _public/footer_with_nav %>
 <script type="text/template" id="msgItem">
     <% include _template_web/msgItem %>
 </script>
