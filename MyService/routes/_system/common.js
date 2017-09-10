@@ -235,8 +235,6 @@ exports.requestServicePromise = function (option) {
     });
 };
 
-//exports.requestServiceByConfigPromise = common.promisify(exports.requestServiceByConfig);
-//exports.requestServicePromise = common.promisify(exports.requestService);
 zlib.unzipPromise = common.promisify(zlib.unzip);
 
 exports.formatRes = function (err, detail, opt) {
@@ -272,9 +270,10 @@ exports.formatRes = function (err, detail, opt) {
 
 exports.formatViewtRes = function (option) {
     var  opt = {
+        env: config.env,
         title: config.name,
         version: config.version,
-        user: null
+        user: null,
     };
     opt = common.extend(opt, option);
     return opt;

@@ -6,7 +6,7 @@ module.exports = {
     port: 3010,
     deploy: '20170529',
     version: '0.0.2',
-    env: 'dev',
+    env: 'dev',//ides 演示练习、dev 开发、qas 质量保证、prd 生产系统
     errorDir: __dirname + '/error',
     api: {
         testService: {
@@ -60,3 +60,5 @@ module.exports = {
         userInfo: 'userInfoCacheKey'
     }
 };
+
+//npm install --production

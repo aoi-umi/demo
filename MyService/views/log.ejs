@@ -1,5 +1,5 @@
-<% include _public/header %>
-<div>
+<% include _public/header_with_nav %>
+<div class="container">
     <div class="form-group">
         <% var rowItemClass = 'col-lg-3 col-md-4 col-sm-6 col-xs-12';%>
         <div class="row my-row">
@@ -40,7 +40,7 @@
             </div>
         </div>
     </div>
-    <table class="table table-bordered">
+    <table id="logTable" class="table table-bordered">
         <thead>
             <tr>
                 <th>id</th>
@@ -61,17 +61,29 @@
             <tr><td class="text-center" colspan="100" id="logMsg"></td></tr>
         </tbody>
     </table>
+    <div id="pager"></div>
 </div>
-<% include _public/footer %>
+<% include _public/footer_with_nav %>
 
 <script type="text/template" id="logItem">
     <%include _template_web/logItem%>
 </script>
+<script type="text/javascript" src="/js/<%=env%>/my.pager.js"></script>
 <script type="text/javascript">
     var logModel = {
+        pager: null,
         init: function () {
             var self = this;
             self.bindEvent();
+            self.pager = new my.pager({
+                changeHandle: function (cb) {
+                    self.query().then(function (t) {
+                        cb({count: t.count});
+                    }).fail(function () {
+                        cb();
+                    });
+                }
+            });
             $('#search').click();
         },
         bindEvent: function () {
@@ -100,32 +112,62 @@
             });
 
             $('#search').on('click', function(){
-                self.query();
+                self.pager.gotoPage(1);
             });
         },
         query: function(){
+            var self = this;
+            var list=[{
+                name: 'id',
+                dom: $('#log_id'),
+            }, {
+                name: 'create_date_start',
+                dom: $('#log_create_date_start'),
+                canNotNull: true,
+            },{
+                name: 'create_date_end',
+                dom: $('#log_create_date_end'),
+            },{
+                name: 'url',
+                dom: $('#log_url'),
+            },{
+                name: 'guid',
+                dom: $('#log_guid'),
+            }];
+            var checkRes = extend.dataCheck({list:list});
+            if(!checkRes.success){
+                alert(checkRes.desc);
+                if(checkRes.dom)
+                    checkRes.dom.focus();
+                return $.Deferred().reject();
+            }
+            var data = checkRes.model;
+            $('#logTable').removeClass('error');
+            if (!data.id) data.id = null;
+            data.page_index = self.pager.pageIndex;
+            data.page_size = self.pager.pageSize;
             var opt = {
                 url: '/log/query',
-                data: {
-                    page_index: 1,
-                    page_size: 10
-                },
-                myDataCheck:function(){
-                    //throw new Error(123)
+                data: data,
+                myDataCheck:function() {
                 }
             };
-            extend.ajax(opt).then(function(t){
+            return extend.ajax(opt).then(function(t){
+                if(!t.list.length)
+                        return $.Deferred().reject('No Data');
                 $('#logList').empty();
                 var temp = $('#logItem').html();
                 $(t.list).each(function(){
                     var item = this;
                     $('#logList').append(ejs.render(temp, item));
                 });
+                return t;
             }).fail(function(e) {
                 $('#logList').empty();
                 if (e instanceof Error) e = e.message;
                 if (typeof e == 'object') e = JSON.stringify(e);
                 $('#logMsg').html(e);
+                $('#logTable').addClass('error');
             });
         },
     }
