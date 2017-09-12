@@ -12,6 +12,7 @@ $(function () {
     $.cookie(config.cacheKey.userInfo, userInfo, { expires: 30 });
 
     socket.init();
+    my.interface.init();
 
     $('.nav.navbar-nav').on('click','li', function(){
         $(this).addClass('active').siblings().removeClass('active');

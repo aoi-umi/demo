@@ -87,11 +87,11 @@ var socket = {
                 className.push('fail');
                 break;
         }
-        if(opt.self){
+        var userInfo = $.cookie(config.cacheKey.userInfo);
+        if(opt.self || userInfo == opt.user){
             className.push('self');
         }
         opt.className = className.join(' ');
-        var userInfo = $.cookie(config.cacheKey.userInfo);
         var msgItemTemp = $('#msgItem').html();
 
         $('#msgBox').append(ejs.render(msgItemTemp, opt));

@@ -31,4 +31,3 @@ my.interface = {
         }
     }
 };
-my.interface.init();
