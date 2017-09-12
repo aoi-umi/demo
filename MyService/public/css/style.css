@@ -22,9 +22,12 @@ a {
   margin-left: auto;
 }
 
+
+
 .item {
   border: 1px solid #47a8ef;
   margin: 2px;
+  border-radius:8px;
 }
 
 .item.self .item-content{
@@ -32,15 +35,15 @@ a {
  }
 
 .success{
-  border: solid #3e8f3e !important;
+  border: solid #d6e9c6;
 }
 
 .loading{
-  border: solid #eb9316 !important;
+  border: solid #faebcc;
 }
 
 .fail{
-  border: solid #c12e2a !important;
+  border: solid #ebccd1;
 }
 
 tbody{
