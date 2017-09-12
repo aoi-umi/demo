@@ -13,7 +13,6 @@
 <script type="text/javascript">
     $(function(){
         $('#login').on('click', function(){
-            var url = '/login'
             var req = {
                 userName: $('#userName').val(),
                 pwd: $('#pwd').val(),
@@ -28,9 +27,7 @@
                 'User-Name': req.userName,
                 'Token': token,
             };
-            extend.ajax({
-                url: url,
-                data: {},
+            interface.login({},{
                 headers: headers,
             }).then(function (t) {
                 console.log(t)

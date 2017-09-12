@@ -32,7 +32,7 @@ exports.extend = function () {
     return res;
 };
 
-exports.defer = function(){
+exports.defer = function () {
     return q.defer();
 }
 //带参数：args0:对象
@@ -40,48 +40,45 @@ exports.defer = function(){
 //        args2:function的参数1
 //        args3:function的参数2
 //        ...
-exports.promise = function(obj, methodName){
+exports.promise = function (obj, methodName) {
     var args = arguments;
     var defer = q.defer();
-    if(!args.length) {
+    if (!args.length) {
         // var res = q.defer();
         // defer.promise.then(function () {
         //     return res.promise;
         // });
         // defer.resolve(res.resolve, res.reject);
         defer.resolve();
-    }else{
-       var funArgs = [];
-       var evalStr = 'obj[methodName](';
-       for (var key in args) {
-           if(key != 0 && key != 1)
-               funArgs.push('args[' + key + ']');
-       }
-       var cbStrList = [];
-       cbStrList.push('function(){');
-       cbStrList.push('	var cbArgs = arguments;');
-       cbStrList.push('	if(cbArgs && cbArgs[0])');
-       cbStrList.push('		defer.reject (cbArgs[0]);');
-       cbStrList.push('	else{');
-       cbStrList.push('		var resovleEval = \'defer.resolve (\';');
-       cbStrList.push('		var resolveArgs = [];');
-       cbStrList.push('		if(cbArgs){');
-       cbStrList.push('			for(var cbArgKey in cbArgs){');
-       cbStrList.push('				if(cbArgKey != 0){');
-       cbStrList.push('					resolveArgs.push(\'cbArgs[\' + cbArgKey + \']\');');
-       cbStrList.push('				}');
-       cbStrList.push('			}');
-       cbStrList.push('			if(resolveArgs.length)');
-       cbStrList.push('				resovleEval += resolveArgs.join(\',\');');
-       cbStrList.push('		}');
-       cbStrList.push('		resovleEval	+= \')\';');
-       cbStrList.push('		eval(resovleEval);');
-       cbStrList.push('	}');
-       cbStrList.push('}');
-       funArgs.push(cbStrList.join('\n'));
-       if (funArgs.length) evalStr += funArgs.join(',');
-       evalStr += ');';
-       eval(evalStr);
+    } else {
+        var funArgs = [];
+        for (var key in args) {
+            if (key != 0 && key != 1)
+                funArgs.push('args[' + key + ']');
+        }
+        var cbStr =
+        `function(){
+            var cbArgs = arguments;
+            if(cbArgs && cbArgs[0])
+                defer.reject (cbArgs[0]);
+            else{
+                var resolveArgs = [];
+                if(cbArgs){
+                    for(var cbArgKey in cbArgs){
+                        if(cbArgKey != 0){
+                            resolveArgs.push('cbArgs[' + cbArgKey + ']');
+                        }
+                    }
+                }
+                var resovleEval = \`defer.resolve(\${resolveArgs.length ? resolveArgs.join(','):''});\`;
+                eval(resovleEval);
+            }
+        }`;
+        funArgs.push(cbStr);
+        var evalStr = 'obj[methodName](';
+        if (funArgs.length) evalStr += funArgs.join(',');
+        evalStr += ');';
+        eval(evalStr);
     }
     return defer.promise;
 };
@@ -89,23 +86,21 @@ exports.promise = function(obj, methodName){
 exports.promisify = function (fun) {
     return function () {
         var args = arguments;
-        var evalStr = 'fun(';
         var funArgs = [];
         for (var key in args) {
             funArgs.push('args[' + key + ']');
         }
-        var cbStrList = [];
-        cbStrList.push('function(){');
-        cbStrList.push('	var cbArgs = arguments;');
-        //cbStrList.push('	console.log(cbArgs)');
-        cbStrList.push('	if(cbArgs && cbArgs[0])');
-        cbStrList.push('		return res.reject(cbArgs[0]);');
-        cbStrList.push('	return res.resolve(cbArgs[1]);');
-        cbStrList.push('}');
-        funArgs.push(cbStrList.join('\n'));
+        var cbStr =
+            `function(){
+                var cbArgs = arguments;
+                //console.log(cbArgs);
+                if(cbArgs && cbArgs[0])
+                    return res.reject(cbArgs[0]);
+                return res.resolve(cbArgs[1]);
+            }`;
+        funArgs.push(cbStr);
 
-        if (funArgs.length) evalStr += funArgs.join(',');
-        evalStr += ');';
+        var evalStr = `fun(${funArgs.length ? funArgs.join(','):''});`;
         return common.promise().then(function () {
             //console.log(evalStr);
             var res = q.defer();
@@ -196,22 +191,22 @@ exports.requestServicePromise = function (option) {
     };
     opt = common.extend(opt, option);
     //console.log(opt)
-    return common.promise().then(function(){
+    return common.promise().then(function () {
         var res = q.defer();
         request(opt, function (err, response, data) {
-            try{
-                if(err)
+            try {
+                if (err)
                     throw err;
                 var encoding = response.headers['content-encoding'];
-                if(encoding){
-                    switch(encoding){
+                if (encoding) {
+                    switch (encoding) {
                         case 'gzip':
-                            return zlib.unzipPromise(data).then(function(buffer){
+                            return zlib.unzipPromise(data).then(function (buffer) {
                                 data = buffer.toString();
-                                if(data && typeof data == 'string')
+                                if (data && typeof data == 'string')
                                     data = JSON.parse(data);
                                 return res.resolve(data);
-                            }).fail(function(e){
+                            }).fail(function (e) {
                                 return res.reject(e);
                             });
                             break;
@@ -220,17 +215,17 @@ exports.requestServicePromise = function (option) {
                             break;
                     }
                 }
-                if(Buffer.isBuffer(data)){
+                if (Buffer.isBuffer(data)) {
                     data = data.toString();
                 }
                 return res.resolve(data);
-            }catch(e){
+            } catch (e) {
                 return res.reject(e);
                 console.error(opt);
             }
         });
         return res.promise;
-    }).fail(function(e){
+    }).fail(function (e) {
         throw e;
     });
 };
@@ -250,7 +245,7 @@ exports.formatRes = function (err, detail, opt) {
         desc: null,
         guid: common.guid()
     };
-    if(opt)
+    if (opt)
         res = common.extend(res, opt);
     if (err) {
         common.writeError(err);
@@ -260,7 +255,7 @@ exports.formatRes = function (err, detail, opt) {
         res.desc = errMsg;
     } else {
         res.result = true;
-        if(!res.desc)
+        if (!res.desc)
             res.desc = 'success';
     }
     if (detail)
@@ -269,9 +264,10 @@ exports.formatRes = function (err, detail, opt) {
 };
 
 exports.formatViewtRes = function (option) {
-    var  opt = {
+    var opt = {
         env: config.env,
         title: config.name,
+        siteName: config.name,
         version: config.version,
         user: null,
     };
@@ -295,12 +291,12 @@ exports.error = function (msg, code, option) {
         code = error.code;
         if (!msg) {
             msg = error.desc[opt.lang];
-            if(typeof opt.format == 'function')
+            if (typeof opt.format == 'function')
                 msg = opt.format(msg);
         }
     }
-    if(!msg) msg = '';
-    if(typeof msg == 'object') msg = JSON.stringify(msg);
+    if (!msg) msg = '';
+    if (typeof msg == 'object') msg = JSON.stringify(msg);
     var err = new Error(msg);
     err.code = code;
     return err;
@@ -327,7 +323,8 @@ exports.writeError = function (err) {
     //write file
     common.mkdirsSync(config.errorDir);
     var fileName = config.errorDir + '/' + createDate + '.txt';
-    fs.appendFile(fileName, list.join('\r\n') + '\r\n\r\n', function(){});
+    fs.appendFile(fileName, list.join('\r\n') + '\r\n\r\n', function () {
+    });
 };
 
 exports.getStack = function (stack, start, end) {
@@ -336,7 +333,7 @@ exports.getStack = function (stack, start, end) {
     return stackList.slice(start, end);
 };
 
-exports.mkdirsSync = function(dirname, mode) {
+exports.mkdirsSync = function (dirname, mode) {
     if (fs.existsSync(dirname)) {
         return true;
     } else {
@@ -400,9 +397,9 @@ exports.stringFormat = function () {
     var reg = /(\{\d\})/g
     var res = args[0] || '';
     var split = res.split(reg);
-    for(var i = 0;i < split.length; i++){
+    for (var i = 0; i < split.length; i++) {
         var m = split[i].length >= 3 && split[i].match(/\{(\d)\}/);
-        if(m){
+        if (m) {
             var index = parseInt(m[1]);
             split[i] = split[i].replace('{' + index + '}', args[index + 1] || '');
         }
@@ -474,7 +471,7 @@ exports.guid = function () {
 };
 
 //状态变更
-exports.enumCheck = function(srcEnum, destEnum, enumType) {
+exports.enumCheck = function (srcEnum, destEnum, enumType) {
     if (enumType == undefined)
         throw new Error('enumType can not be empty!');
 
@@ -482,10 +479,10 @@ exports.enumCheck = function(srcEnum, destEnum, enumType) {
     var enumCheck = myEnum.enumCheck[enumType];
     srcEnum = srcEnum.toString();
     destEnum = destEnum.toString();
-    if(typeof matchEnum[srcEnum] == 'undefined')
+    if (typeof matchEnum[srcEnum] == 'undefined')
         throw common.error(common.stringFormat('no match src enum [{0}] in [{1}]!', srcEnum, enumType));
 
-    if(typeof matchEnum[destEnum] == 'undefined')
+    if (typeof matchEnum[destEnum] == 'undefined')
         throw common.error(common.stringFormat('no match dest enum [{0}] in [{1}]!', destEnum, enumType));
 
     if (!enumCheck[srcEnum] || !enumCheck[srcEnum][destEnum]) {
@@ -502,7 +499,7 @@ exports.enumCheck = function(srcEnum, destEnum, enumType) {
 
 //common.enumCheck(0,9,'statusEnum');
 
-exports.logModle = function() {
+exports.logModle = function () {
     return {
         url: null,
         method: null,
@@ -515,11 +512,11 @@ exports.logModle = function() {
     };
 };
 
-exports.logSave = function(log) {
-    for(var key in log){
+exports.logSave = function (log) {
+    for (var key in log) {
         var value = log[key];
         var type = typeof(value);
-        if(value !== null && type == 'object')
+        if (value !== null && type == 'object')
             log[key] = JSON.stringify(value);
     }
     return logService.save(log);
