@@ -1,13 +1,29 @@
+<tbody class="item">
 <tr>
-    <td>{%=id%}</td>
-    <td>{%=url%}</td>
-    <td>{%=method%}</td>
-    <td>{%=result%}</td>
-    <td>{%=code%}</td>
-    <td>{%=req%}</td>
-    <td>{%=res%}</td>
-    <td>{%=ip%}</td>
-    <td>{%=create_date%}</td>
-    <td>{%=remark%}</td>
-    <td>{%=guid%}</td>
+    <th colspan="100">
+        <div class="btn-group dropup itemToggle">
+            <button class="btn btn-default"><span class="caret"></span></button>
+        </div>
+        <span>{%=colNum%}</span>
+    </th>
 </tr>
+<tr>
+    <td>
+        <div class="itemConetnt">
+            <table class="table table-bordered">
+                <tr><th>id</th><td>{%=id%}</td></tr>
+                <tr><th>url</th><td>{%=url%}</td></tr>
+                <tr><th>method</th><td>{%=method%}</td></tr>
+                <tr><th>result</th><td>{%=result%}</td></tr>
+                <tr><th>code</th><td>{%=code%}</td></tr>
+                <tr><th>req</th><td>{%=req%}</td></tr>
+                <tr><th>res</th><td>{%=res%}</td></tr>
+                <tr><th>ip</th><td>{%=ip%}</td></tr>
+                <tr><th>create_date</th><td>{%=create_date%}</td></tr>
+                <tr><th>remark</th><td>{%=remark%}</td></tr>
+                <tr><th>guid</th><td>{%=guid%}</td></tr>
+            </table>
+        </div>
+    </td>
+</tr>
+</tbody>

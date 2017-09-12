@@ -40,9 +40,9 @@ my.pager.prototype = {
         }).on('click', '[name=myPagerPage]', function () {
             var page = $(this).data('page');
             self.gotoPage(page);
-        }).on('click', '[name=myPagerPrev]:not(.disabled)', function () {
+        }).on('click', 'li:not(.disabled) [name=myPagerPrev]', function () {
             self.gotoPage(self.pageIndex - 1);
-        }).on('click', '[name=myPagerNext]:not(.disabled)', function () {
+        }).on('click', 'li:not(.disabled) [name=myPagerNext]', function () {
             self.gotoPage(self.pageIndex + 1);
         });
     },
@@ -50,10 +50,10 @@ my.pager.prototype = {
         var self = this;
         var opt = self.opt;
         var pagerDom = $('#' + opt.pagerId);
-        pagerDom.empty();
         page = parseInt(page);
         if(isNaN(page) || page <= 0)
             throw  new Error('page must be a int and large than 0');
+        pagerDom.empty();
         if(opt.changeHandle){
             self.pageIndex = page;
             opt.changeHandle(function (t) {
@@ -61,12 +61,21 @@ my.pager.prototype = {
                     var dom = $(opt.template);
                     var totalPage = Math.ceil(t.count / opt.pageSize);
                     var pageHtml = [];
-                    for(var i = 1;i <= totalPage;i++){
-                        pageHtml.push(`<li><a href="javascript:;" name="myPagerPage" data-page="${i}">${i}</a></li>`);
+                    var pageStart = 1;
+                    var pageEnd = totalPage;
+                    if(totalPage + 1 - page > opt.maxPageCount){
+                        pageStart = page;
+                        pageEnd = page + opt.maxPageCount - 1;
+                    }
+                    if(page > opt.maxPageCount && pageEnd - pageStart > opt.maxPageCount){
+                        pageStart = pageEnd - opt.maxPageCount + 1;
+                    }
+                    for(var i = pageStart;i <= pageEnd;i++){
+                        pageHtml.push(`<li class="${page==i?'active':''}"><a href="javascript:;" name="myPagerPage" data-page="${i}">${i}</a></li>`);
                     }
                     if(page == 1)
                         dom.find('[name=myPagerPrev]').closest('li').addClass('disabled');
-                    if(page == totalPage)
+                    if(page >= totalPage)
                         dom.find('[name=myPagerNext]').closest('li').addClass('disabled');
                     dom.find('[name=myPagerPrev]').closest('li').after(pageHtml);
                     dom.find('[name=count]').html(t.count);
