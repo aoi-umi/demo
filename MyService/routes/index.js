@@ -198,3 +198,7 @@ exports.tranTest = function(req, res){
         res.mySend(e, null,{code: '400'});
     })
 };
+
+exports.color = function (req, res, next) {
+    res.myRender('color');
+};

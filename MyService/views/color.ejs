@@ -1,0 +1,96 @@
+<% include _public/header_with_nav %>
+<link href="/css/bootstrap-slider.css" rel="stylesheet">
+<style>
+    #RGB {
+        height: 20px;
+        background: rgb(128, 128, 128);
+    }
+    #RC .slider-selection {
+        background: #FF8282;
+    }
+    #RC .slider-handle {
+        background: red;
+    }
+    #GC .slider-selection {
+        background: #428041;
+    }
+    #GC .slider-handle {
+        background: green;
+    }
+    #BC .slider-selection {
+        background: #8283FF;
+    }
+    #BC .slider-handle {
+        border-bottom-color: blue;
+    }
+    #R, #G, #B {
+        width: 300px;
+    }
+</style>
+<div class="container">
+    <div class="row" style="display:none">
+        <div class="col-md-12">
+            <table>
+            <thead><tr><th colspan="100">color</th></tr></thead>
+            <tbody>
+            <%
+            var r = 256, g = 256, b = 256;
+            for(var i = 0; i < r;i += 32){%>
+            <tr>
+            <%
+            for(var j = 0;j < g;j += 32){
+                for(var k = 0;k < b ;k += 32){
+                        var color = (i * 0x10000 + j * 0x100 + k).toString(16);
+                        if(color.length < 6){
+                            var fixLen = 6 - color.length;
+                            for(var x = 0;x < fixLen;x++) {
+                                color = '0' + color;
+                            }
+                        }
+                    color = '#' + color;
+            %>
+                    <td style="background:<%=color%>; width: 40px;height: 20px;"></td>
+                    <%}
+                    }%>
+            </tr>
+            <%}%>
+            </tbody>
+        </table>
+        </div>
+    </div>
+    <p>
+        <b>R</b> <input type="text" class="span2" value=""  data-slider-id="RC" id="R"/>
+    </p>
+    <p>
+        <b>G</b> <input type="text" class="span2" value="" data-slider-id="GC" id="G"/>
+    </p>
+    <p>
+        <b>B</b> <input type="text" class="span2" value="" data-slider-id="BC" id="B"/>
+    </p>
+    <div id="RGB"></div>
+</div>
+<% include _public/footer_with_nav %>
+<script src="/js/plugin/bootstrap-slider.min.js"></script>
+<script type="text/javascript">
+    $(function(){
+        var RGBChange = function() {
+            $('#RGB').css('background', 'rgb('+r.getValue()+','+g.getValue()+','+b.getValue()+')')
+        };
+        var opt = {
+            min:0,
+            max:255,
+            step:1,
+            value:128,
+            tooltip:'hide'
+        };
+        var r = $('#R').slider(opt)
+                .on('slide', RGBChange)
+                .data('slider');
+        var g = $('#G').slider(opt)
+                .on('slide', RGBChange)
+                .data('slider');
+        var b = $('#B').slider(opt)
+                .on('slide', RGBChange)
+                .data('slider');
+    });
+</script>

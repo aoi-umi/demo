@@ -59,6 +59,15 @@ module.exports = [
         auth:[]
     },
     {
+        url:'/color',
+        method:[{
+            name: 'get',
+            functionName: 'color'
+        }],
+        path:'index',
+        auth:[]
+    },
+    {
         url:'/loginOut',
         method:[{
             name: 'post',
