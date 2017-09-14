@@ -89,7 +89,7 @@ var modelLog = {
             return $.Deferred().reject();
         }
         var data = checkRes.model;
-        $('#logTable').removeClass('error');
+        $('#logList').removeClass('error');
         if (!data.id) data.id = null;
         if (!data.create_date_start) data.create_date_start = null;
         if (!data.create_date_end) data.create_date_end = null;

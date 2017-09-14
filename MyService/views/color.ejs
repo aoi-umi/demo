@@ -26,9 +26,15 @@
     #R, #G, #B {
         width: 300px;
     }
+
+    .color {
+        cursor: pointer;
+        width: 40px;
+        height: 20px;
+    }
 </style>
 <div class="container">
-    <div class="row" style="display:none">
+    <div class="row">
         <div class="col-md-12">
             <table>
             <thead><tr><th colspan="100">color</th></tr></thead>
@@ -49,7 +55,7 @@
                         }
                     color = '#' + color;
             %>
-                    <td style="background:<%=color%>; width: 40px;height: 20px;"></td>
+                    <td class="color" style="background:<%=color%>;"></td>
                     <%}
                     }%>
             </tr>
@@ -74,8 +80,9 @@
 <script type="text/javascript">
     $(function(){
         var RGBChange = function() {
-            $('#RGB').css('background', 'rgb('+r.getValue()+','+g.getValue()+','+b.getValue()+')')
+            $('#RGB').css('background', 'rgb('+r.getValue()+','+g.getValue()+','+b.getValue()+')');
         };
+
         var opt = {
             min:0,
             max:255,
@@ -92,5 +99,16 @@
         var b = $('#B').slider(opt)
                 .on('slide', RGBChange)
                 .data('slider');
+
+        $(document).on('click', '.color', function () {
+            var color = $(this).css('background-color');
+            var rgb = color.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+            if(rgb){
+                r.setValue(rgb[1]);
+                g.setValue(rgb[2]);
+                b.setValue(rgb[3]);
+                RGBChange();
+            }
+        });
     });
 </script>
