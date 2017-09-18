@@ -49,11 +49,11 @@ var extend = {
             req: originReq
         };
         var def = $.Deferred();
-        def.then(function(){
-            if(typeof opt.myDataCheck == 'function'){
+        def.then(function () {
+            if (typeof opt.myDataCheck == 'function') {
                 try {
                     opt.myDataCheck();
-                }catch (e){
+                } catch (e) {
                     return $.Deferred().reject(e);
                 }
             }
@@ -85,19 +85,30 @@ var extend = {
     },
     parseJSON: function (str) {
         try {
-            JSON.parse(str)
+            return JSON.parse(str)
         } catch (e) {
-            var reg = /JSON.parse:[\s\S]* at line ([\d]) column ([\d]) of the JSON data/;
-            var match = e.message.match(reg)
-            if (match) {
-                var row = parseInt(match[1]);
-                var col = parseInt(match[2]);
-                var list = str.split(/\r\n|\r|\n/);
-                if (list[row - 1]) {
-                    e.message += ' "' + list[row - 1].substr(col - 1) + '"';
-                    throw new Error(e.message);
-                }
+            var browserType = getBrowserType();
+            var reg = null;
+            switch (browserType) {
+                case 'Firefox':
+                    reg = /JSON.parse:[\s\S]* at line ([\d]) column ([\d]) of the JSON data/;
+                    var match = e.message.match(reg)
+                    if (match) {
+                        var row = parseInt(match[1]);
+                        var col = parseInt(match[2]);
+                        var list = str.split(/\r\n|\r|\n/);
+                        if (list[row - 1]) {
+                            e.message += ' "' + list[row - 1].substr(col - 1) + '"';
+                            throw new Error(e.message);
+                        }
+                    }
+                    break;
+                case 'Chrome':
+                //reg = /Uncaught SyntaxError: Unexpected token } in JSON at position ([\d])/
+                case 'IE':
+                    break;
             }
+            throw e;
         }
     },
     dateFormat: function (date, format) {
@@ -208,14 +219,67 @@ var extend = {
         var reg = /(\{\d\})/g
         var res = args[0] || '';
         var split = res.split(reg);
-        for(var i = 0;i < split.length; i++){
+        for (var i = 0; i < split.length; i++) {
             var m = split[i].length >= 3 && split[i].match(/\{(\d)\}/);
-            if(m){
+            if (m) {
                 var index = parseInt(m[1]);
                 split[i] = split[i].replace('{' + index + '}', args[index + 1] || '');
             }
         }
         res = split.join('');
         return res;
+    },
+    msgNotice: function (option) {
+        var opt = {
+            //在target四周显示
+            type: 0,
+            position: 'right'
+        };
+        var dom = null;
+        opt = $.extend(opt, option);
+        switch (opt.type){
+            case 0:
+                if(!opt.target)
+                    throw new Error('target can not be null');
+                if(!opt.msg)
+                    throw new Error('msg can not be null');
+                if(!opt.template){
+                    opt.template = '<div class="popover right" role="tooltip"><div class="arrow"></div><div class="popover-content"></div></div>';
+                }
+                dom = $('[data-target="' + opt.target + '"]');
+                if(!dom.length){
+                    dom = $(opt.template);
+                    $('body').append(dom);
+                }
+                dom.attr('data-target', opt.target).find('.popover-content').html(opt.msg);
+                dom.removeClass('top bottom left right').addClass(opt.position);
+                var x = 0, y = 0;
+                var targetDom = $(opt.target);
+                switch(opt.position){
+                    case 'top':
+                        x = targetDom.offset().left;
+                        y = targetDom.offset().top - dom.outerHeight() - 3;
+                        break;
+                    case 'bottom':
+                        x = targetDom.offset().left;
+                        y = targetDom.offset().top + targetDom.outerHeight() + 3;
+                        break;
+                    case 'left':
+                        x = targetDom.offset().left - dom.outerWidth() - 3;
+                        y = targetDom.offset().top + (targetDom.outerHeight() - dom.outerHeight()) / 2;
+                        break;
+                    default:
+                    case 'right':
+                        opt.position = 'right';
+                        x = targetDom.offset().left + targetDom.outerWidth() + 3;
+                        y = targetDom.offset().top + (targetDom.outerHeight() - dom.outerHeight()) / 2;
+                        break;
+                }
+                dom.css('left', x)
+                    .css('top', y)
+                    .show();
+                break;
+        }
+        return dom;
     }
 };
