@@ -18,9 +18,29 @@ var modelLog = {
         });
         $('#search').click();
     },
+    queryArgs: [{
+        name: 'id',
+        dom: $('#log_id'),
+        checkValue: function (val) {
+            if (val && !val.match(/^[\d]+$/))
+                return '请输入正确的正整数';
+        }
+    }, {
+        name: 'create_date_start',
+        dom: $('#log_create_date_start'),
+    }, {
+        name: 'create_date_end',
+        dom: $('#log_create_date_end'),
+    }, {
+        name: 'url',
+        dom: $('#log_url'),
+    }, {
+        name: 'guid',
+        dom: $('#log_guid'),
+    }],
     bindEvent: function () {
         var self = this;
-        $('#log_create_date_start').on('click', function() {
+        $('#log_create_date_start').on('click', function () {
             var datePickerArgs = {
                 el: this,
                 //startDate: '#{%y-30}-01-01',
@@ -31,7 +51,7 @@ var modelLog = {
             };
             WdatePicker(datePickerArgs);
         });
-        $('#log_create_date_end').on('click', function() {
+        $('#log_create_date_end').on('click', function () {
             var datePickerArgs = {
                 el: this,
                 //startDate: minDate || '#{%y-30}-01-01',
@@ -43,49 +63,46 @@ var modelLog = {
             WdatePicker(datePickerArgs);
         });
 
-        $('#search').on('click', function(){
+        $('#search').on('click', function () {
             self.pager.gotoPage(1);
         });
 
-        $('#logList').on('click', '.itemToggle', function(){
+        $('#logList').on('click', '.itemToggle', function () {
             var dom = $(this);
             var content = dom.closest('.item').find('.itemConetnt');
-            if(dom.hasClass('dropup')){
+            if (dom.hasClass('dropup')) {
                 dom.removeClass('dropup');
                 content.slideUp();
-            }else {
+            } else {
                 dom.addClass('dropup');
                 content.slideDown();
             }
         });
-    },
-    query: function(){
-        var self = this;
-        var list=[{
-            name: 'id',
-            dom: $('#log_id'),
-            checkValue:function(val) {
-                if(val && !val.match(/^[\d]+$/))
-                    return '请输入正确的正整数';
+        $(self.queryArgs).each(function(){
+            var item = this;
+            if(item.dom){
+                item.dom.on('blur', function(){
+                    var checkRes = extend.dataCheck({list: [item]});
+                    if(checkRes.success){
+                        $('[data-target="' + checkRes.dom.selector + '"]').hide();
+                    }else{
+                        extend.msgNotice({target: checkRes.dom.selector, msg: checkRes.desc});
+                    }
+                });
             }
-        }, {
-            name: 'create_date_start',
-            dom: $('#log_create_date_start'),
-        },{
-            name: 'create_date_end',
-            dom: $('#log_create_date_end'),
-        },{
-            name: 'url',
-            dom: $('#log_url'),
-        },{
-            name: 'guid',
-            dom: $('#log_guid'),
-        }];
-        var checkRes = extend.dataCheck({list:list});
-        if(!checkRes.success){
-            alert(checkRes.desc);
-            if(checkRes.dom)
+        });
+    },
+    query: function () {
+        var self = this;
+        var list = self.queryArgs;
+        var checkRes = extend.dataCheck({list: list});
+        if (!checkRes.success) {
+            if (checkRes.dom) {
+                extend.msgNotice({target: checkRes.dom.selector, msg: checkRes.desc});
                 checkRes.dom.focus();
+            } else {
+                alert(checkRes.desc);
+            }
             return $.Deferred().reject();
         }
         var data = checkRes.model;
@@ -96,16 +113,16 @@ var modelLog = {
         data.page_index = self.pager.pageIndex;
         data.page_size = self.pager.pageSize;
 
-        return my.interface.logQuery(data).then(function(t){
+        return my.interface.logQuery(data).then(function (t) {
             $('#logList .item').remove();
             var temp = $('#logItem').html();
-            $(t.list).each(function(i){
+            $(t.list).each(function (i) {
                 var item = this;
                 item.colNum = i + 1;
                 $('#logList').append(ejs.render(temp, item));
             });
             return t;
-        }).fail(function(e) {
+        }).fail(function (e) {
             $('#logList .item').remove();
             if (e instanceof Error) e = e.message;
             if (typeof e == 'object') e = JSON.stringify(e);
