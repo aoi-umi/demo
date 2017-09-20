@@ -231,53 +231,138 @@ var extend = {
     },
     msgNotice: function (option) {
         var opt = {
-            //在target四周显示
             type: 0,
-            position: 'right'
+            msg: '',
+            template: '',
+
+            //type 0 参数
+            target: '',
+            position: 'right',
+
+            //type 1 参数
+            noClose: false,
+            btnTemplate: `<button class="btn" type="button" name="btnContent" style="margin: 0 5px"></button>`,
+            btnOptList: null
         };
+        //btnOpt = {
+        // class:'btn-default'
+        // content:123,
+        // cb:function(){}
+        // }
+
+        //type 0
+        //在target四周显示
+
+        //type 1
+        //弹出提示
         var dom = null;
         opt = $.extend(opt, option);
         switch (opt.type){
             case 0:
-                if(!opt.target)
-                    throw new Error('target can not be null');
-                if(!opt.msg)
-                    throw new Error('msg can not be null');
-                if(!opt.template){
-                    opt.template = '<div class="popover right" role="tooltip"><div class="arrow"></div><div class="popover-content"></div></div>';
+                if(true){
+                    if(!opt.target)
+                        throw new Error('target can not be null');
+                    if(!opt.msg)
+                        throw new Error('msg can not be null');
+                    if(!opt.template){
+                        opt.template = '<div class="popover right" role="tooltip"><div class="arrow"></div><div class="popover-content"></div></div>';
+                    }
+                    dom = $('[data-target="' + opt.target + '"]');
+                    if(!dom.length){
+                        dom = $(opt.template);
+                        $('body').append(dom);
+                    }
+                    dom.attr('data-target', opt.target).find('.popover-content').html(opt.msg);
+                    dom.removeClass('top bottom left right').addClass(opt.position);
+                    var x = 0, y = 0;
+                    var targetDom = $(opt.target);
+                    switch(opt.position){
+                        case 'top':
+                            x = targetDom.offset().left;
+                            y = targetDom.offset().top - dom.outerHeight() - 3;
+                            break;
+                        case 'bottom':
+                            x = targetDom.offset().left;
+                            y = targetDom.offset().top + targetDom.outerHeight() + 3;
+                            break;
+                        case 'left':
+                            x = targetDom.offset().left - dom.outerWidth() - 3;
+                            y = targetDom.offset().top + (targetDom.outerHeight() - dom.outerHeight()) / 2;
+                            break;
+                        default:
+                        case 'right':
+                            opt.position = 'right';
+                            x = targetDom.offset().left + targetDom.outerWidth() + 3;
+                            y = targetDom.offset().top + (targetDom.outerHeight() - dom.outerHeight()) / 2;
+                            break;
+                    }
+                    dom.css('left', x)
+                        .css('top', y)
+                        .show();
+                    dom.close = function(){
+                        dom.remove();
+                    };
                 }
-                dom = $('[data-target="' + opt.target + '"]');
-                if(!dom.length){
-                    dom = $(opt.template);
-                    $('body').append(dom);
+                break;
+            case 1:
+                if(true){
+                    opt.template =
+                        `<div id="msgNoticeBox" data-backdrop="static" role="dialog" tabindex="-1" class="modal fade">
+                            <div class="modal-dialog" style="top:100px">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                        <button name="closeBtn" class="close" type="button">
+                                            ×
+                                        </button>
+                                        <h4 name="title" class="modal-title">
+                                            提示
+                                        </h4>
+                                    </div>
+                                    <div name="content" class="modal-body">
+                                    </div>
+                                    <div name="footer" class="modal-body">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+                    dom = $('#msgNoticeBox');
+                    if(!dom.length) {
+                        dom = $(opt.template);
+                        dom.find('[name=closeBtn]').on('click', function(){
+                            dom.modal('hide');
+                        });
+                    }
+                    if(opt.noClose)
+                        dom.find('[name=closeBtn]').addClass('hidden');
+                    else
+                        dom.find('[name=closeBtn]').removeClass('hidden');
+                    dom.find('[name=content]').html(opt.msg);
+                    dom.find('[name=footer]').empty();
+                    if(opt.btnOptList){
+                        var btnList = [];
+                        $(opt.btnOptList).each(function(){
+                            var item = this;
+                            var btn = $(opt.btnTemplate);
+                            var btnClass = item.class || 'btn-default';
+                            btn.addClass(btnClass);
+                            if(btn.attr('name') == 'btnContent')
+                                btn.html(item.content);
+                            else
+                                btn.find('[name=btnContent]').html(item.content);
+                            btn.on('click', function(){
+                                dom.modal('hide');
+                                if(item.cb)
+                                    item.cb();
+                            });
+                            btnList.push(btn);
+                        });
+                        dom.find('[name=footer]').append(btnList);
+                    }
+                    dom.modal('show');
+                    dom.close = function() {
+                        dom.modal('hide');
+                    }
                 }
-                dom.attr('data-target', opt.target).find('.popover-content').html(opt.msg);
-                dom.removeClass('top bottom left right').addClass(opt.position);
-                var x = 0, y = 0;
-                var targetDom = $(opt.target);
-                switch(opt.position){
-                    case 'top':
-                        x = targetDom.offset().left;
-                        y = targetDom.offset().top - dom.outerHeight() - 3;
-                        break;
-                    case 'bottom':
-                        x = targetDom.offset().left;
-                        y = targetDom.offset().top + targetDom.outerHeight() + 3;
-                        break;
-                    case 'left':
-                        x = targetDom.offset().left - dom.outerWidth() - 3;
-                        y = targetDom.offset().top + (targetDom.outerHeight() - dom.outerHeight()) / 2;
-                        break;
-                    default:
-                    case 'right':
-                        opt.position = 'right';
-                        x = targetDom.offset().left + targetDom.outerWidth() + 3;
-                        y = targetDom.offset().top + (targetDom.outerHeight() - dom.outerHeight()) / 2;
-                        break;
-                }
-                dom.css('left', x)
-                    .css('top', y)
-                    .show();
                 break;
         }
         return dom;
