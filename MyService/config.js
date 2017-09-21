@@ -15,32 +15,36 @@ module.exports = {
                 host: 'http://localhost:3010',
                 username: '',
             },
-            test: {
-                url: '/',
-                //isUseDefault: true,//default true
-                //method: 'post',//default post
-            },
-            test1: {
-                url: '/',
-                isUseDefault: false,
-                method: 'get',
-                args: {
-                    host: 'http://localhost:3010',
-                    username: 'user1',
-                }
-            },
-            test2: {
-                url: '1',
-                method: 'get'
-            },
+            method:{
+                test: {
+                    url: '/',
+                    //isUseDefault: true,//default true
+                    //method: 'post',//default post
+                },
+                test1: {
+                    url: '/',
+                    isUseDefault: false,
+                    method: 'get',
+                    args: {
+                        host: 'http://localhost:3010',
+                        username: 'user1',
+                    }
+                },
+                test2: {
+                    url: '1',
+                    method: 'get'
+                },
+            }
         },
         logService:{
             defaultArgs: {
                 host: 'http://localhost:3010',
             },
-            save: {
-                url: '/log/save',
-            },
+            method:{
+                save: {
+                    url: '/log/save',
+                },
+            }
         }
     },
     redis: {

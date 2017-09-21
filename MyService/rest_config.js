@@ -68,6 +68,15 @@ module.exports = [
         auth:[]
     },
     {
+        url:'/tab',
+        method:[{
+            name: 'get',
+            functionName: 'tab'
+        }],
+        path:'index',
+        auth:[]
+    },
+    {
         url:'/loginOut',
         method:[{
             name: 'post',

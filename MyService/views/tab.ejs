@@ -1,0 +1,17 @@
+<% include _public/header_with_nav %>
+<link href="/css/bootstrap-slider.css" rel="stylesheet">
+<div class="container">
+    <a data-tab-target="concat" class="tab" href="javascript:;">Contact</a>
+    <a data-tab-target="about" class="tab" href="javascript:;">About</a>
+    <a data-tab-target="home" class="tab" href="javascript:;">Home</a>
+    <ul class="nav nav-tabs" id="myTab">
+    </ul>
+    <div class="tab-content" id="myPanel"></div>
+</div>
+<% include _public/footer_with_nav %>
+<script src="/js/<%=env%>/my.tab.js?v=<%=version%>"></script>
+<script type="text/javascript">
+    $(function(){
+        my.tab.init();
+    });
+</script>
