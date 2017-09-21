@@ -131,7 +131,7 @@ exports.requestServiceByConfigPromise = function (option) {
             isUseDefault: true,
             method: 'POST',
         }
-        var methodArgs = service[option.methodName];
+        var methodArgs = service.method[option.methodName];
         methodArgs = common.extend(defaultMethodArgs, methodArgs);
         //console.log(methodArgs);
         if (methodArgs.isUseDefault) {

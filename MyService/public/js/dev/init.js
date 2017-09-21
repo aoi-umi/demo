@@ -19,7 +19,27 @@ $(function () {
     });
 
     $(`.nav.navbar-nav a[href="${location.pathname}"]`).closest('li').addClass('active');
+
+    bindEvent();
 });
+
+function bindEvent(){
+    $(document).on('click', '.close', function () {
+        var closeTarget = $(this).attr('data-close-target');
+        if (closeTarget) {
+            var closeType = $(this).attr('data-close-type');
+            switch (closeType){
+                case '0':
+                default:
+                    $(closeTarget).remove();
+                    break;
+                case '1':
+                    $(closeTarget).hide();
+                    break;
+            }
+        }
+    });
+}
 
 //
 function namespace(namespace) {

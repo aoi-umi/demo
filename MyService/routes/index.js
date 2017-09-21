@@ -202,3 +202,7 @@ exports.tranTest = function(req, res){
 exports.color = function (req, res, next) {
     res.myRender('color');
 };
+
+exports.tab = function (req, res, next) {
+    res.myRender('tab');
+};
