@@ -247,7 +247,8 @@ var extend = {
         //btnOpt = {
         // class:'btn-default'
         // content:123,
-        // cb:function(){}
+        // cbOpt:123,
+        // cb:function(opt){}
         // }
 
         //type 0
@@ -352,7 +353,7 @@ var extend = {
                             btn.on('click', function(){
                                 dom.modal('hide');
                                 if(item.cb)
-                                    item.cb();
+                                    item.cb(item.cbOpt);
                             });
                             btnList.push(btn);
                         });
