@@ -26,15 +26,14 @@ my.tab = {
                 var closeTarget = '#' + tabParent + ',' + '#' + panel;
                 var tabDom = $('#' + tab);
                 if (tabDom.length == 0) {
-                    var tabData = [
-                        {
-                            id: tab,
-                            parentId: tabParent,
-                            targetId: panel,
-                            name: tabName,
-                            closeTarget: closeTarget
-                        }
-                    ];
+                    var tabData =
+                    {
+                        id: tab,
+                        parentId: tabParent,
+                        targetId: panel,
+                        name: tabName,
+                        closeTarget: closeTarget
+                    };
                     var tabParentDom = self.tab(tabData);
                     tabDom = tabParentDom.find('#' + tab);
                     //console.log(html)
@@ -43,9 +42,10 @@ my.tab = {
                 }
                 var panelDom = $('#' + panel);
                 if (panelDom.length == 0) {
-                    var panelData = [{
-                        id: panel
-                    }];
+                    var panelData = {
+                        id: panel,
+                        url: clickTab.data('url')
+                    };
                     panelDom = self.panel(panelData);
                     $('#' + self.opt.panelContainer).append(panelDom);
                 }
@@ -58,45 +58,59 @@ my.tab = {
             }
         });
     },
-    //tabData [{type:'', id:'', name:'', targetId:'', closeTarget:''}]
+    //tabData {type:'', id:'', name:'', targetId:'', closeTarget:''}
     tab: function (data) {
         var self = this;
-        var dom;
-        for (var i = 0; i < data.length; i++) {
-            var t = data[i];
-            switch (t.type) {
-                case 0:
-                default:
-                    dom =
-                        $(`<li id="${t.parentId || ''}">
+        var dom = null;
+        var t = data;
+        switch (t.type) {
+            case 0:
+            default:
+                var dom =
+                    $(`<li id="${t.parentId || ''}">
                             <a id="${t.id || ''}" data-toggle="tab" href="#${t.targetId}">${t.name}
                             ${t.closeTarget ? self.opt.closeBtnTemplate : ''}</a>
                         </li>`);
 
 
-                    if (t.closeTarget) {
-                        dom.find('[name=tab-close-btn]').removeClass('hidden').attr('data-close-target', t.closeTarget);
-                    }
-                    break;
-            }
+                if (t.closeTarget) {
+                    dom.find('[name=tab-close-btn]').removeClass('hidden').attr('data-close-target', t.closeTarget);
+                }
+                break;
         }
         return dom;
     },
-    //panelData [{type:'', id:''}]
+    tabs:function(data){
+        var self = this;
+        var list = [];
+        for(var i = 0;i < data.length;i++){
+            var dom = self.tab(data[i]);
+            if(dom)
+                list.push(dom);
+        }
+        return list;
+    },
+    //panelData {type:'', id:''}
     panel: function (data) {
         var self = this;
-        var dom;
-        for (var i = 0; i < data.length; i++) {
-            var t = data[i];
-            switch (t.type) {
-                case 0:
-                default:
-                    dom =
-                        $(`<div id="${t.id || ''}" class="tab-pane fade">${t.id ? t.id : ''}
-                        </div>`);
-                    break;
-            }
+        var dom = null;
+        var t = data;
+        switch (t.type) {
+            case 0:
+            default:
+                dom = $(`<div style="height: 512px" id="${t.id || ''}" class="tab-pane fade"><iframe src="${t.url || ''}" width="100%" height="100%" frameborder="no"></iframe></div>`);
+                break;
         }
         return dom;
+    },
+    panels:function(data){
+        var self = this;
+        var list = [];
+        for (var i = 0; i < data.length; i++) {
+            var dom = self.panel(data[i]);
+            if(dom)
+                list.push(dom);
+        }
+        return list;
     }
 }
