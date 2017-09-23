@@ -1,4 +1,4 @@
-<% include _public/header_with_nav %>
+<% include _public/header %>
 
 <div class="container-fluid">
     <div class="row">
@@ -9,9 +9,9 @@
                         菜单<%=i%>
                     </a>
                     <div class="collapse in" id="menuItemList<%=i%>">
-                        <a class="list-group-item tab" data-tab-target="home"  href="javascript:;">Home</a>
-                        <a class="list-group-item tab" data-tab-target="index" data-url="/" href="javascript:;">Index</a>
-                        <a class="list-group-item tab" data-tab-target="about"  href="javascript:;">About</a>
+                        <a class="list-group-item tab" href="javascript:;" data-tab-target="home">Home</a>
+                        <a class="list-group-item tab" href="javascript:;" data-tab-target="index" data-url="/">Index</a>
+                        <a class="list-group-item tab" href="javascript:;" data-tab-target="status"  data-url="/status?noNav=true">Status</a>
                     </div>
                 </div>
             <%}%>
@@ -41,7 +41,7 @@
         </div>
     </div>
 </div>
-<% include _public/footer_with_nav %>
+<% include _public/footer %>
 <script src="/js/<%=env%>/my.tab.js?v=<%=version%>"></script>
 <script type="text/javascript">
     $(function(){
