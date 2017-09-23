@@ -270,6 +270,7 @@ exports.formatViewtRes = function (option) {
         siteName: config.name,
         version: config.version,
         user: null,
+        noNav: false,
     };
     opt = common.extend(opt, option);
     return opt;

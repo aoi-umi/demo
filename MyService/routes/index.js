@@ -185,7 +185,8 @@ exports.getReg = function (req, res) {
 exports.status = function (req, res) {
     var opt = {
         enumDict: myEnum.enumDict,
-        enumCheck: myEnum.enumCheck
+        enumCheck: myEnum.enumCheck,
+        noNav: req.query.noNav
     };
     res.myRender('status', opt);
 };

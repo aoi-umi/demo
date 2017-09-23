@@ -359,6 +359,7 @@ var extend = {
                         });
                         dom.find('[name=footer]').append(btnList);
                     }
+                    $('.popover').hide();
                     dom.modal('show');
                     dom.close = function() {
                         dom.modal('hide');
