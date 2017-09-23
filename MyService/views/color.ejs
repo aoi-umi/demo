@@ -1,29 +1,30 @@
 <% include _public/header_with_nav %>
 <link href="/css/bootstrap-slider.css" rel="stylesheet">
 <style>
-    #RGB {
+    #rgba {
         height: 20px;
-        background: rgb(128, 128, 128);
+        background: rgba(128, 128, 128, 0.5);
     }
-    #RC .slider-selection {
+    #sliderR .slider-selection {
         background: #FF8282;
     }
-    #RC .slider-handle {
-        background: red;
+    #sliderR .slider-handle {
+        background: #FF6666;
     }
-    #GC .slider-selection {
+    #sliderG .slider-selection {
         background: #428041;
     }
-    #GC .slider-handle {
-        background: green;
+    #sliderG .slider-handle {
+        background: #66FF66;
     }
-    #BC .slider-selection {
+    #sliderB .slider-selection {
         background: #8283FF;
     }
-    #BC .slider-handle {
-        border-bottom-color: blue;
+    #sliderB .slider-handle {
+        background: #6666FF;
     }
-    #R, #G, #B {
+
+    #r, #g, #b, #a {
         width: 300px;
     }
 
@@ -65,48 +66,94 @@
         </div>
     </div>
     <p>
-        <b>R</b> <input type="text" class="span2" value=""  data-slider-id="RC" id="R"/>
+        <b>R</b> <input type="hidden" class="span2" value=""  data-slider-id="sliderR" id="r"/>
     </p>
     <p>
-        <b>G</b> <input type="text" class="span2" value="" data-slider-id="GC" id="G"/>
+        <b>G</b> <input type="hidden" class="span2" value="" data-slider-id="sliderG" id="g"/>
     </p>
     <p>
-        <b>B</b> <input type="text" class="span2" value="" data-slider-id="BC" id="B"/>
+        <b>B</b> <input type="hidden" class="span2" value="" data-slider-id="sliderB" id="b"/>
     </p>
-    <div id="RGB"></div>
+    <p>
+        <b>A</b> <input type="hidden" class="span2" value="" data-slider-id="sliderA" id="a"/>
+    </p>
+    <div id="rgba"></div>
+    <label id="colorText"></label><label>颜色</label>
 </div>
 <% include _public/footer_with_nav %>
 <script src="/js/plugin/bootstrap-slider.min.js"></script>
 <script type="text/javascript">
     $(function(){
+        var rgba = {
+            r:null,
+            g:null,
+            b:null,
+            a:null
+        }
         var RGBChange = function() {
-            $('#RGB').css('background', 'rgb('+r.getValue()+','+g.getValue()+','+b.getValue()+')');
+            $('#rgba').css('background', `rgba(${rgba.r.getValue()},${rgba.g.getValue()},${rgba.b.getValue()},${rgba.a.getValue()})`);
+            var colorText = getHexColor(true);
+            $('#colorText').html(getHexColor() + ';' + colorText)
+                    .next().css('color', colorText);
         };
 
-        var opt = {
-            min:0,
-            max:255,
-            step:1,
-            value:128,
-            tooltip:'hide'
-        };
-        var r = $('#R').slider(opt)
-                .on('slide', RGBChange)
-                .data('slider');
-        var g = $('#G').slider(opt)
-                .on('slide', RGBChange)
-                .data('slider');
-        var b = $('#B').slider(opt)
-                .on('slide', RGBChange)
-                .data('slider');
+        var getHexColor = function(noAlpha){
+            var color = $('#rgba').css('background-color');
+            var m = color.match(/^rgba\((\d+),\s*(\d+),\s*(\d+),\s*(\d+\.\d+)\)$/);
+            if(!m)
+                m = color.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+            var str = '';
+            if(m){
+                var alpha = 1;
+                var r = parseInt(m[1]);
+                var g = parseInt(m[2]);
+                var b = parseInt(m[3]);
+                if(m[4]){
+                    alpha = parseFloat(m[4]);
+                    if(!noAlpha)
+                        str += ('00' + parseInt((alpha * 255)).toString(16)).slice(-2);
+                    else {
+                        r = parseInt((1 - alpha) * 255 + r * alpha);
+                        g = parseInt((1 - alpha) * 255 + g * alpha);
+                        b = parseInt((1 - alpha) * 255 + b * alpha);
+                    }
+                }
+                str += ('00' + r.toString(16)).slice(-2);
+                str += ('00' + g.toString(16)).slice(-2);
+                str += ('00' + b.toString(16)).slice(-2);
+            }
+            if(str)
+                str = '#' + str.toUpperCase();
+            else
+                str = color;
+            return str;
+        }
+        for(var key in rgba){
+            var opt = {
+                min:0,
+                max:255,
+                step:1,
+                value:128,
+                tooltip:'hide'
+            };
+            if(key == 'a'){
+                opt.max = 1;
+                opt.step = 0.1;
+                opt.value = 0.5;
+            }
+            rgba[key] = $('#' + key).slider(opt)
+                    .on('slide change', RGBChange)
+                    .data('slider');
+        }
+        RGBChange();
 
         $(document).on('click', '.color', function () {
             var color = $(this).css('background-color');
             var rgb = color.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
             if(rgb){
-                r.setValue(rgb[1]);
-                g.setValue(rgb[2]);
-                b.setValue(rgb[3]);
+                rgba.r.setValue(rgb[1]);
+                rgba.g.setValue(rgb[2]);
+                rgba.b.setValue(rgb[3]);
                 RGBChange();
             }
         });
