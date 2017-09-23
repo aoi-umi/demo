@@ -1,4 +1,3 @@
-<% include _public/header %>
 <div class="container">
     <div class="form-group">
         <% var rowItemClass = 'col-lg-3 col-md-4 col-sm-6 col-xs-12';%>
@@ -52,10 +51,8 @@
     </table>
     <div id="pager"></div>
 </div>
-<% include _public/footer %>
-
 <script type="text/template" id="logItem">
-    <%include _template_web/logItem%>
+    <% include ../_template_web/logItem%>
 </script>
 <script type="text/javascript" src="/js/<%=env%>/my.pager.js?v=<%=version%>"></script>
 <script type="text/javascript" src="/js/<%=env%>/modelLog.js?v=<%=version%>"></script>

@@ -1,5 +1,3 @@
-<% include _public/header %>
-
 <div class="container-fluid">
     <div class="row">
         <div class="col-xs-2 col-sm-2 col-md-2 sidebar">
@@ -11,7 +9,8 @@
                     <div class="collapse in" id="menuItemList<%=i%>">
                         <a class="list-group-item tab" href="javascript:;" data-tab-target="home">Home</a>
                         <a class="list-group-item tab" href="javascript:;" data-tab-target="index" data-url="/">Index</a>
-                        <a class="list-group-item tab" href="javascript:;" data-tab-target="status"  data-url="/status?noNav=true">Status</a>
+                        <a class="list-group-item tab" href="javascript:;" data-tab-target="log"  data-url="/log?noNav=true">Log</a>
+                        <a class="list-group-item tab" href="javascript:;" data-tab-target="test">test</a>
                     </div>
                 </div>
             <%}%>
@@ -37,11 +36,14 @@
                         </div>
                     </div>
                 </div>
+
+                <div id="panel-test" class="tab-pane fade">
+                    test
+                </div>
             </div>
         </div>
     </div>
 </div>
-<% include _public/footer %>
 <script src="/js/<%=env%>/my.tab.js?v=<%=version%>"></script>
 <script type="text/javascript">
     $(function(){

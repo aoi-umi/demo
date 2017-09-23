@@ -25,5 +25,10 @@ exports.get = function (req, res) {
             }
         }
     }
-    res.render('help', common.formatViewtRes({title: 'help', restList: restList}));
+    var opt = {
+        view:'help',
+        title: 'help',
+        restList: restList
+    };
+    res.myRender('main', opt);
 };

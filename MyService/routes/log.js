@@ -6,7 +6,11 @@ var common = require('./_system/common');
 var autoBll = require('./_bll/auto');
 
 exports.view = function(req, res){
-    res.myRender('log');
+    var opt = {
+        view:'log',
+        noNav: req.query.noNav
+    };
+    res.myRender('main', opt);
 }
 
 exports.save = function (req, res) {

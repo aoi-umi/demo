@@ -135,12 +135,12 @@ app.use(function(err, req, res, next) {
             res.redirect('/login');
         else {
             res.status(err.status);
-            res.render('error',
-                common.formatViewtRes({
-                    title: '出错了',
-                    message: err.message,
-                    error: err
-                }));
+            res.myRender('main', {
+                view: 'error',
+                title: '出错了',
+                message: err.message,
+                error: err
+            });
         }
     }
 });
