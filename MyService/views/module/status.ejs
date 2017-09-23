@@ -1,12 +1,10 @@
-<% include _public/header %>
-
 <div class="container">
 <div>
     <span>ejs</span>
     <%for(var key in enumDict){
         var value = enumDict[key];
     %>
-    <%include _template/status%>
+    <% include ../_template/status%>
     <%}%>
     <span>ejs-js</span>
     <div id="webTempBox">
@@ -14,10 +12,9 @@
     </div>
 </div>
 </div>
-<% include _public/footer %>
 
 <script type="text/template" id="statusTemp">
-    <%include _template_web/status%>
+    <% include ../_template_web/status%>
 </script>
 <script type="text/javascript">
     $(function () {

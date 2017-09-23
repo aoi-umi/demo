@@ -1,0 +1,7 @@
+<% include _public/header %>
+<% switch(view){
+    default: %>
+        <%- include('module/' + view) %>
+        <% break;
+} %>
+<% include _public/footer %>

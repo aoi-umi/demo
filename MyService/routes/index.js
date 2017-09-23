@@ -29,7 +29,7 @@ exports.use = function (req, res, next) {
 };
 
 exports.get = function (req, res, next) {
-    res.myRender('index', common.formatViewtRes({method: 'get'}));
+    res.myRender('main', {view: 'index', method:'get'});
 };
 
 exports.post = function (req, res, next) {
@@ -62,7 +62,7 @@ exports.loginGet = function (req, res, next) {
     if (req.myData.user.authority['login'])
         res.redirect('/');
     else
-        res.render('login', common.formatViewtRes({title: 'Login'}));
+        res.myRender('main', {view: 'login', title: 'Login'});
 };
 
 exports.loginPost = function (req, res, next) {
@@ -135,7 +135,7 @@ function login(userName, token, req) {
 }
 
 exports.params = function (req, res, next) {
-    res.render('index', common.formatViewtRes({title: 'Express', method: 'params'}));
+    res.myRender('main', {view: 'index', title: 'Express', method: 'params'});
 };
 
 exports.admin = function(req, res) {
@@ -184,11 +184,11 @@ exports.getReg = function (req, res) {
 
 exports.status = function (req, res) {
     var opt = {
+        view: 'status',
         enumDict: myEnum.enumDict,
         enumCheck: myEnum.enumCheck,
-        noNav: req.query.noNav
     };
-    res.myRender('status', opt);
+    res.myRender('main', opt);
 };
 
 exports.tranTest = function(req, res){
@@ -201,9 +201,9 @@ exports.tranTest = function(req, res){
 };
 
 exports.color = function (req, res, next) {
-    res.myRender('color');
+    res.myRender('main', {view: 'color'});
 };
 
 exports.tab = function (req, res, next) {
-    res.myRender('tab');
+    res.myRender('main', {view: 'tab'});
 };
