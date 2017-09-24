@@ -16,31 +16,17 @@ var auth = {
     }
 };
 
-module.exports = [
+var restList = [
     {
         url: '/',
         method: [{
             name: 'use',
             methodName:'index-use',//用于记录日志
-        }, {
-            name: 'get',
-            functionName: '',
-            exampleRequest:'',
-        }, {
+        },{
             name: 'post',
             functionName: '',
             exampleRequest:{"arg":"123"},
             methodName:'index-post',//用于记录日志
-        }],
-        path: 'index',
-        auth: [],
-    },
-    {
-        url: '/status',
-        method: [{
-            name: 'get',
-            functionName: 'status',
-            exampleRequest:'',
         }],
         path: 'index',
         auth: [],
@@ -54,24 +40,6 @@ module.exports = [
         },{
             name: 'get',
             functionName: 'loginGet'
-        }],
-        path:'index',
-        auth:[]
-    },
-    {
-        url:'/color',
-        method:[{
-            name: 'get',
-            functionName: 'color'
-        }],
-        path:'index',
-        auth:[]
-    },
-    {
-        url:'/tab',
-        method:[{
-            name: 'get',
-            functionName: 'tab'
         }],
         path:'index',
         auth:[]
@@ -147,14 +115,6 @@ module.exports = [
         auth:[auth['dev']],
     },
     {
-        url:'/log',
-        method:[{
-            name: 'get',
-            functionName: 'view'
-        }],
-        path:'log',
-    },
-    {
         url:'/log/query',
         method:[{
             name: 'post',
@@ -180,3 +140,17 @@ module.exports = [
         path: 'index',
     },
 ];
+
+//module-get放在最后
+restList.push({
+    url: '*',
+    method: [{
+        name: 'get',
+        functionName: '',
+        exampleRequest:'',
+    }],
+    path: 'main',
+    auth: [],
+});
+
+module.exports = restList;

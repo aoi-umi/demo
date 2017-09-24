@@ -28,10 +28,6 @@ exports.use = function (req, res, next) {
     }
 };
 
-exports.get = function (req, res, next) {
-    res.myRender('main', {view: 'index', method:'get'});
-};
-
 exports.post = function (req, res, next) {
     res.mySend(null, 'post');
 };
@@ -198,12 +194,4 @@ exports.tranTest = function(req, res){
     }).fail(function(e){
         res.mySend(e, null,{code: '400'});
     })
-};
-
-exports.color = function (req, res, next) {
-    res.myRender('main', {view: 'color'});
-};
-
-exports.tab = function (req, res, next) {
-    res.myRender('main', {view: 'tab'});
 };
