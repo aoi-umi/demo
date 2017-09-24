@@ -61,7 +61,8 @@ app.use(function (req, res, next) {
         user: {
             nickname: 'guest',
             authority: {}
-        }
+        },
+        viewPath: app.get('views')
     };
     var user = req.myData.user;
     if(config.env == 'dev')

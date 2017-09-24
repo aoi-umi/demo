@@ -11,7 +11,7 @@ exports.view = function(req, res){
         noNav: req.query.noNav
     };
     res.myRender('main', opt);
-}
+};
 
 exports.save = function (req, res) {
     var args = req.body;
