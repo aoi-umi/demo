@@ -6,7 +6,8 @@ var path = require('path');
 var myEnum = require('./_system/enum');
 exports.get = function(req, res, next){
     var opt = {
-        view:'/index'
+        view:'/index',
+        noNav: req.query.noNav
     }
     switch (req.originalUrl){
         case '/':
