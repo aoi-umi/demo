@@ -8,9 +8,9 @@
                     </a>
                     <div class="collapse in" id="menuItemList<%=i%>">
                         <a class="list-group-item tab" href="javascript:;" data-tab-target="home">Home</a>
-                        <a class="list-group-item tab" href="javascript:;" data-tab-target="index" data-url="/">Index</a>
-                        <a class="list-group-item tab" href="javascript:;" data-tab-target="log"  data-url="/log?noNav=true">Log</a>
-                        <a class="list-group-item tab" href="javascript:;" data-tab-target="test">test</a>
+                        <a class="list-group-item tab" href="javascript:;" data-tab-target="index" data-tab-content="/">Index</a>
+                        <a class="list-group-item tab" href="javascript:;" data-tab-target="log"  data-tab-content="/log?noNav=true">Log</a>
+                        <a class="list-group-item tab" href="javascript:;" data-tab-target="test" data-tab-content="testTemplate" data-tab-type="template">test</a>
                     </div>
                 </div>
             <%}%>
@@ -36,24 +36,33 @@
                         </div>
                     </div>
                 </div>
-
-                <div id="panel-test" class="tab-pane fade">
-                    test
-                </div>
             </div>
         </div>
     </div>
 </div>
 <script src="/js/<%=env%>/my.tab.js?v=<%=version%>"></script>
+<script type="text/template" id="testTemplate">
+    <div>
+        test
+    </div>
+</script>
 <script type="text/javascript">
     $(function(){
         my.tab.init();
         var tabData = [{
             id:'tab-home',
             name:'Home',
-            targetId:'panel-home'
+            targetId:'panel-home',
         }];
         $('#myTab').append(my.tab.tabs(tabData));
+
+        var tabPanelData = [{
+            type: 'template',
+            id: 'panel-test',
+            content: 'testTemplate'
+        }];
+        $('#myPanel').append(my.tab.panels(tabPanelData));
+
         $('#tab-home').click();
         var notice0;
         $('.msgNotice').on('click', function(){

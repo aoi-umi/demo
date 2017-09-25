@@ -44,7 +44,8 @@ my.tab = {
                 if (panelDom.length == 0) {
                     var panelData = {
                         id: panel,
-                        url: clickTab.data('url')
+                        type: clickTab.data('tab-type'),
+                        content: clickTab.data('tab-content'),
                     };
                     panelDom = self.panel(panelData);
                     $('#' + self.opt.panelContainer).append(panelDom);
@@ -53,8 +54,9 @@ my.tab = {
             }
         });
         $(document).on('click', '#' + self.opt.tabContainer + ' .close', function () {
-            if($('#' + self.opt.tabContainer + '> .active').length == 0) {
-                $('#' + self.opt.tabContainer + ' a:eq(0)').click();
+            var tabContainer = $('#' + self.opt.tabContainer);
+            if(tabContainer.find('> .active').length == 0) {
+                tabContainer.find('a:eq(0)').click();
             }
         });
     },
@@ -90,17 +92,24 @@ my.tab = {
         }
         return list;
     },
-    //panelData {type:'', id:''}
+    //panelData {type:'', id:'', content:''}
     panel: function (data) {
         var self = this;
         var dom = null;
         var t = data;
+        var content = 'no content';
         switch (t.type) {
-            case 0:
+            case 'iframe':
             default:
-                dom = $(`<div style="height: 512px" id="${t.id || ''}" class="tab-pane fade"><iframe src="${t.url || ''}" width="100%" height="100%" frameborder="no"></iframe></div>`);
+                if(t.content)
+                    content = `<iframe src="${t.content}" width="100%" height="100%" frameborder="no"></iframe>`;
+                break;
+            case 'template':
+                content = $('#' + t.content).html();
                 break;
         }
+
+        dom = $(`<div style="height: 512px" id="${t.id || ''}" class="tab-pane fade">${content}</div>`);
         return dom;
     },
     panels:function(data){

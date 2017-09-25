@@ -25,15 +25,15 @@ $(function () {
 
 function bindEvent(){
     $(document).on('click', '.close', function () {
-        var closeTarget = $(this).attr('data-close-target');
+        var closeTarget = $(this).data('close-target');
         if (closeTarget) {
-            var closeType = $(this).attr('data-close-type');
+            var closeType = $(this).data('close-type');
             switch (closeType){
-                case '0':
+                case 'remove':
                 default:
                     $(closeTarget).remove();
                     break;
-                case '1':
+                case 'hide':
                     $(closeTarget).hide();
                     break;
             }
