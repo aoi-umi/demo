@@ -8,28 +8,48 @@ my.tab = {
         panelContainer: 'myPanel',
         closeBtnTemplate: '<button name="tab-close-btn" type="button" class="close hidden" data-close-target="" aria-hidden="true" style="margin-left: 5px;">&times;</button>'
     },
+    tabContainer: null,
+    panelContainer: null,
+    tabHeaderContextMenu: null,
     init: function (option) {
         var self = this;
         self.opt = $.extend(self.opt, option);
+        self.tabContainer = $('#' + self.opt.tabContainer);
+        self.panelContainer = $('#' + self.opt.panelContainer);
+        var tabHeaderContextMenu = self.tabHeaderContextMenu =
+            $(`<ul class="dropdown-menu" id="tab-header-context-menu">
+                <li><a href="javascript:;" class="menu-item" data-menu-type="refresh">刷新</a></li>
+                <li class="divider"></li>
+                <li><a href="javascript:;" class="menu-item" data-menu-type="close">关闭</a></li>
+                <li><a href="javascript:;" class="menu-item" data-menu-type="closeAll">关闭全部</a></li>
+                <li><a href="javascript:;" class="menu-item" data-menu-type="closeAllExceptThis">关闭除此之外全部</a></li>
+                <li><a href="javascript:;" class="menu-item" data-menu-type="closeLeftAll">关闭左侧全部</a></li>
+                <li><a href="javascript:;" class="menu-item" data-menu-type="closeRightAll">关闭右侧全部</a></li>
+            </ul>`);
+        $('body').append(tabHeaderContextMenu);
+
         self.bindEvent();
     },
     bindEvent: function () {
         var self = this;
+        var tabContainer = self.tabContainer;
+        var panelContainer = self.panelContainer;
+        var tabHeaderContextMenu = self.tabHeaderContextMenu;
         $(document).on('click', '.tab', function () {
             var clickTab = $(this);
             var targetId = clickTab.attr('data-tab-target');
             if (targetId) {
                 var tab = 'tab-' + targetId;
                 var tabName = clickTab.attr('data-tab-name') || targetId;
-                var tabParent = 'parent-' + tab;
+                var tabHeader = 'tab-header-' + targetId;
                 var panel = 'panel-' + targetId;
-                var closeTarget = '#' + tabParent + ',' + '#' + panel;
+                var closeTarget = '#' + tabHeader + ',' + '#' + panel;
                 var tabDom = $('#' + tab);
                 if (tabDom.length == 0) {
                     var tabData =
                     {
                         id: tab,
-                        parentId: tabParent,
+                        headerId: tabHeader,
                         targetId: panel,
                         name: tabName,
                         closeTarget: closeTarget
@@ -37,7 +57,7 @@ my.tab = {
                     var tabParentDom = self.tab(tabData);
                     tabDom = tabParentDom.find('#' + tab);
                     //console.log(html)
-                    $('#' + self.opt.tabContainer).append(tabParentDom);
+                    tabContainer.append(tabParentDom);
                     //tabDom.addClass('active').siblings('.active').removeClass('active');
                 }
                 var panelDom = $('#' + panel);
@@ -48,15 +68,59 @@ my.tab = {
                         content: clickTab.data('tab-content'),
                     };
                     panelDom = self.panel(panelData);
-                    $('#' + self.opt.panelContainer).append(panelDom);
+                    panelContainer.append(panelDom);
                 }
                 tabDom.click();
             }
         });
-        $(document).on('click', '#' + self.opt.tabContainer + ' .close', function () {
-            var tabContainer = $('#' + self.opt.tabContainer);
+        tabContainer.on('click','.close', function () {
+            $($(this).data('close-target')).remove();
             if(tabContainer.find('> .active').length == 0) {
                 tabContainer.find('a:eq(0)').click();
+            }
+        });
+        tabContainer.on('contextmenu', '.tab-header', function(e){
+            var x = e.clientX;
+            var y = e.clientY;
+            self.tabHeaderContextMenu.css({
+                left: x,
+                top: y,
+            }).show();
+            self.tabHeaderContextMenu.currTabHeader = $(this);
+            return false;
+        });
+
+        $(document).on('click', function(){
+            tabHeaderContextMenu.hide();
+            tabHeaderContextMenu.currTabHeader = null;
+        });
+        tabHeaderContextMenu.on('click','.menu-item', function(e){
+            var currTabHeader = tabHeaderContextMenu.currTabHeader;
+            if(currTabHeader) {
+                var type = $(this).data('menu-type');
+                switch (type) {
+                    case 'refresh':
+                        var iframe = $(currTabHeader.find('a').attr('href')).find('iframe');
+                        if(iframe.length){
+                            iframe.attr('src', iframe.attr('src'));
+                        }
+                        break;
+                    case 'close':
+                        currTabHeader.find('[name=tab-close-btn]').click();
+                        break;
+                    case 'closeAll':
+                        tabContainer.find('[name=tab-close-btn]').click();
+                        break;
+                    case 'closeAllExceptThis':
+                        currTabHeader.siblings().find('[name=tab-close-btn]').click();
+                        break;
+                    case 'closeLeftAll':
+                        currTabHeader.prevAll().find('[name=tab-close-btn]').click();
+                        break;
+                    case 'closeRightAll':
+                        currTabHeader.nextAll().find('[name=tab-close-btn]').click();
+                        break;
+                }
             }
         });
     },
@@ -66,10 +130,9 @@ my.tab = {
         var dom = null;
         var t = data;
         switch (t.type) {
-            case 0:
             default:
                 var dom =
-                    $(`<li id="${t.parentId || ''}">
+                    $(`<li class="tab-header" id="${t.headerId || ''}">
                             <a id="${t.id || ''}" data-toggle="tab" href="#${t.targetId}">${t.name}
                             ${t.closeTarget ? self.opt.closeBtnTemplate : ''}</a>
                         </li>`);

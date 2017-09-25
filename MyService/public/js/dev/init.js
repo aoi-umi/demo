@@ -14,16 +14,16 @@ $(function () {
     socket.init();
     my.interface.init();
 
-    $('.nav.navbar-nav').on('click','li', function(){
-        $(this).addClass('active').siblings().removeClass('active');
-    });
-
     $(`.nav.navbar-nav a[href="${location.pathname}"]`).closest('li').addClass('active');
 
     bindEvent();
 });
 
 function bindEvent(){
+    $('.nav.navbar-nav').on('click','li', function(){
+        $(this).addClass('active').siblings().removeClass('active');
+    });
+
     $(document).on('click', '.close', function () {
         var closeTarget = $(this).data('close-target');
         if (closeTarget) {
