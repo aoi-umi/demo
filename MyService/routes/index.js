@@ -114,19 +114,19 @@ function login(userName, token, req) {
             req = '';
         if (typeof req != 'string')
             req = JSON.stringify(req);
-        return autoBll.query('user_info', {account: userName}).then(function (t) {
-            if (!t.count)
-                throw common.error('no account or password wrong!');
-            if (t.count > 1)
-                throw common.error('system error: data wrong');
-            var userInfo = t.list[0];
-            var pwd = userInfo.password;
-            var str = userName + pwd + req;
-            var checkToken = common.createToken(userName + pwd + req);
-            if (token != checkToken)
-                throw common.error(null, errorConfig.TOKEN_WRONG.code);
-            return userInfo;
-        });
+        return autoBll.query('user_info', {account: userName});
+    }).then(function (t) {
+        if (!t.count)
+            throw common.error('no account or password wrong!');
+        if (t.count > 1)
+            throw common.error('system error: data wrong');
+        var userInfo = t.list[0];
+        var pwd = userInfo.password;
+        var str = userName + pwd + req;
+        var checkToken = common.createToken(userName + pwd + req);
+        if (token != checkToken)
+            throw common.error(null, errorConfig.TOKEN_WRONG.code);
+        return userInfo;
     });
 }
 

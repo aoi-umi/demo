@@ -44,12 +44,12 @@ exports.promise = function (obj, methodName) {
     var args = arguments;
     var defer = q.defer();
     if (!args.length) {
-        // var res = q.defer();
+        var res = q.defer();
         // defer.promise.then(function () {
         //     return res.promise;
         // });
         // defer.resolve(res.resolve, res.reject);
-        defer.resolve();
+        defer.resolve(res);
     } else {
         var funArgs = [];
         for (var key in args) {
@@ -191,8 +191,7 @@ exports.requestServicePromise = function (option) {
     };
     opt = common.extend(opt, option);
     //console.log(opt)
-    return common.promise().then(function () {
-        var res = q.defer();
+    return common.promise().then(function (res) {
         request(opt, function (err, response, data) {
             try {
                 if (err)
