@@ -69,7 +69,7 @@ var modelLog = {
 
         $('#logList').on('click', '.itemToggle', function () {
             var dom = $(this);
-            var content = dom.closest('.item').find('.itemConetnt');
+            var content = dom.closest('.itemRow').find('.itemConetnt');
             if (dom.hasClass('dropup')) {
                 dom.removeClass('dropup');
                 content.slideUp();
