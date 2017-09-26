@@ -15,13 +15,6 @@ a {
   z-index: 2000;
 }
 
-.container {
-  padding-right: 15px;
-  padding-left: 15px;
-  margin-right: auto;
-  margin-left: auto;
-}
-
 .container-fluid{
   margin: 0 10px;
 }
