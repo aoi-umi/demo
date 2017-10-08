@@ -35,6 +35,10 @@
     </div>
     <a class="hover hover-source" href="javascript:;">hover</a>
     <p>Method <%= method %></p>
+    <form method="post" action="/upload" enctype="multipart/form-data">
+        上传文件：<input name="upfile" id="upfile" type="file"/>
+        <input type="submit" value="提交"/>
+    </form>
     <div class="row">
         <div class="col-md-6 form-inline">
             <div class="form-group">

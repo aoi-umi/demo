@@ -1,7 +1,7 @@
 /**
  * Created by umi on 2017-5-29.
  */
-var fs = require("fs");
+var fs = require('fs');
 var path = require('path');
 var request = require('request');
 var net = require('net');
@@ -453,12 +453,15 @@ exports.createToken = function (str) {
     return code;
 };
 
-exports.md5 = function (str, method) {
-    var buff = new Buffer(str, 'utf8');
+exports.md5 = function (data, option) {
+    var opt = {
+        method: 'hex',
+    };
+    opt = common.extend(opt, option);
     var md5 = crypto.createHash('md5');
-    if (!method)
-        method = 'hex';
-    var code = md5.update(buff).digest(method);
+    if (typeof(data) == 'string')
+        data = new Buffer(data, 'utf8');
+    var code = md5.update(data).digest(opt.method);
     return code;
 };
 
@@ -542,3 +545,18 @@ exports.logSave = function (log) {
 //.prototype.constructor
 //[] instanceof Array
 //[].constructor == Array
+
+exports.streamToBuffer = function (stream) {
+    return common.promise().then(function (res) {
+        var buffers = [];
+        stream.on('data', function (buffer) {
+            buffers.push(buffer);
+        });
+        stream.on('end', function () {
+            var buffer = Buffer.concat(buffers);
+            res.resolve(buffer);
+        });
+        stream.on('error', res.reject);
+        return res.promise;
+    });
+};

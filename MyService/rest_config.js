@@ -139,6 +139,14 @@ var restList = [
         }],
         path: 'index',
     },
+    {
+        url: '/upload',
+        method: [{
+            name: 'post',
+            functionName: 'upload',
+        }],
+        path: 'index',
+    },
 ];
 
 //module-get放在最后
