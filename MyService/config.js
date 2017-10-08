@@ -8,6 +8,7 @@ module.exports = {
     version: '0.0.2',
     env: 'dev',//ides 演示练习、dev 开发、qas 质量保证、prd 生产系统
     errorDir: __dirname + '/error',
+    fileDir: __dirname + '/file',
     api: {
         testService: {
             //默认参数
