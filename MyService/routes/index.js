@@ -198,7 +198,7 @@ exports.tranTest = function(req, res){
 };
 
 exports.upload = [require('./_system/multer').any(), function (req, res) {
-    var success = req.files && req.files.length ? 'upload ' + req.files.length + ' file(s) success' : 0;
+    var success = req.files && req.files.length ? 'upload ' + req.files.length + ' file(s) success' : 'upload failed';
     if(req.files) {
         req.files.forEach(function (file) {
             var readStream = fs.createReadStream(file.path);
@@ -209,5 +209,9 @@ exports.upload = [require('./_system/multer').any(), function (req, res) {
             });
         });
     }
-    res.mySend(!success, success)
+    var opt = {
+        view: 'msg',
+        message: success,
+    };
+    res.myRender('main', opt);
 }];

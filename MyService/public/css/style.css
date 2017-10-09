@@ -8,12 +8,12 @@ a {
   color: #00B7FF;
 }
 
-.navbar-fixed-bottom, .navbar-fixed-top {
-  position: fixed;
-  right: 0;
-  left: 0;
-  z-index: 2000;
-}
+/*.navbar-fixed-bottom, .navbar-fixed-top {*/
+  /*position: fixed;*/
+  /*right: 0;*/
+  /*left: 0;*/
+  /*z-index: 2000;*/
+/*}*/
 
 .container-fluid{
   margin: 0 10px;
