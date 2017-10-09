@@ -1,3 +1,4 @@
+<link href="css/fileinput.min.css" rel="stylesheet" />
 <style>
     .hover-source{
         position: relative;
@@ -20,30 +21,26 @@
 <div class="container">
     <h1><%= title %></h1>
     <p>Welcome to <%= title %></p>
-    <table class="table table-bordered">
-        <tr>
-            <td><a href="/help">help</a></td>
-            <td><a href="/status">status</a></td>
-        </tr>
-        <tr>
-            <td><a href="/log">log</a></td>
-        </tr>
-    </table>
+    <p>Method <%= method %></p>
     <a class="hover hover-source" href="javascript:;">hover</a>
     <div class="hover hover-target">
         <div class="content" class="fill_main"></div>
     </div>
     <a class="hover hover-source" href="javascript:;">hover</a>
-    <p>Method <%= method %></p>
     <form method="post" action="/upload" enctype="multipart/form-data">
-        上传文件：<input name="upfile" id="upfile" type="file"/>
-        <input type="submit" value="提交"/>
+        <div class="row">
+            <div class="col-md-6">
+                <input name="upfile" id="upfile" type="file" class="file"/>
+            </div>
+
+            <!--<div class="col-md-6">-->
+                <!--<input type="submit" value="提交" class="btn btn-default"/>-->
+            <!--</div>-->
+        </div>
     </form>
     <div class="row">
         <div class="col-md-6 form-inline">
-            <div class="form-group">
-                <input type="text" id="msg" class="form-control"/>
-            </div>
+            <input type="text" id="msg" class="form-control"/>
             <input id="postMsg" type="button" class="btn btn-default" value="发送"/>
         </div>
         <div class="col-md-6">
@@ -60,6 +57,7 @@
 <script type="text/template" id="msgItem">
     <% include ../_template_web/msgItem %>
 </script>
+<script src="js/plugins/fileinput.min.js"></script>
 <script type="text/javascript">
     $(function(){
         $('.hover').on('mouseover mouseleave', function(e){
