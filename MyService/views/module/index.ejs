@@ -30,7 +30,7 @@
     <form method="post" action="/upload" enctype="multipart/form-data">
         <div class="row">
             <div class="col-md-6">
-                <input name="upfile" id="upfile" type="file" class="file"/>
+                <input name="upfile" id="upfile" type="file"/>
             </div>
 
             <!--<div class="col-md-6">-->
@@ -74,5 +74,24 @@
                     break;
             }
         });
+
+        var control = $('#upfile');
+        control.fileinput({
+            showUpload: true, //是否显示上传按钮
+            showRemove:true,
+            dropZoneEnabled: true,
+            showCaption: true,//是否显示标题
+            //showPreview:false,
+            allowedPreviewTypes: ['image'],
+            allowedFileTypes: ['image'],
+            //allowedFileExtensions:  ['jpg', 'png'],
+            maxFileSize : 2000,
+            maxFileCount: 1,
+            //initialPreview: [
+            //预览图片的设置
+            //      "<img src='' class='file-preview-image' alt='' title=''>",
+            //],
+
+        })
     })
 </script>
