@@ -139,6 +139,7 @@ app.use(function(err, req, res, next) {
             res.myRender('main', {
                 view: 'error',
                 title: '出错了',
+                noNav: req.query.noNav,
                 message: err.message,
                 error: err
             });

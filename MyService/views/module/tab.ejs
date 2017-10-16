@@ -1,19 +1,47 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-xs-2 col-sm-2 col-md-2 sidebar">
-            <%for(var i = 1; i < 4;i++){%>
-                <div class="list-group">
-                    <a class="list-group-item active" data-toggle="collapse" href="#menuItemList<%=i%>">
-                        菜单<%=i%>
-                    </a>
-                    <div class="collapse in" id="menuItemList<%=i%>">
-                        <a class="list-group-item tab" href="javascript:;" data-tab-target="home">Home</a>
-                        <a class="list-group-item tab" href="javascript:;" data-tab-target="index" data-tab-content="/">Index</a>
-                        <a class="list-group-item tab" href="javascript:;" data-tab-target="log"  data-tab-content="/log?noNav=true">Log</a>
-                        <a class="list-group-item tab" href="javascript:;" data-tab-target="test" data-tab-content="testTemplate" data-tab-type="template">test</a>
-                    </div>
+            <% var menuList = [{
+                        text: '菜单Test',
+                        listId: 'menuItemListTest',
+                        childs: [{
+                            text: 'Home',
+                            attr: 'data-tab-target="home"'
+                        }, {
+                            text: 'Index',
+                            attr: 'data-tab-target="index" data-tab-content="/"'
+                        }, {
+                            text: 'Log',
+                            attr: 'data-tab-target="log"  data-tab-content="/log?noNav=true"'
+                        }, {
+                            text: 'test',
+                            attr: 'data-tab-target="test" data-tab-content="testTemplate" data-tab-type="template"'
+                        },]
+                    }, {
+                        text: 'main content menu',
+                        listId: '',
+                        childs: [{
+                            text: 'main content type',
+                            attr: 'data-tab-target="mainContentType"  data-tab-content="/mainContentType?noNav=true"'
+                        },]
+                    }];
+            menuList.forEach(function(t){
+                if (!t.listId)
+                    t.listId = 'menuId' + new Date().getTime();
+            %>
+            <div class="list-group">
+                <a class="list-group-item active" data-toggle="collapse" href="#<%= t.listId %>">
+                    <%= t.text %>
+                </a>
+
+                <div class="collapse in" id="<%= t.listId %>">
+                    <% t.childs.forEach(function(child){ %>
+
+                    <a class="list-group-item tab" href="javascript:;" <%- child.attr %>><%= child.text %></a>
+                    <% }) %>
                 </div>
-            <%}%>
+            </div>
+            <% }); %>
         </div>
 
         <div class="col-xs-10 col-sm-10 col-md-10 main">
@@ -29,9 +57,9 @@
                             <button class="btn btn-default msgNotice" data-type="1">弹出提示</button>
                             <label>no close<input type="checkbox" id="msgNoticeNoClose"/></label>
                             <select id="msgNoticeBtnCount">
-                                <%for(var i = 1;i <= 10;i++){%>
-                                    <option value="<%=i%>"><%=i%></option>
-                                <%}%>
+                                <% for(var i = 1;i <= 10;i++){ %>
+                                <option value="<%= i %>"><%= i %></option>
+                                <% } %>
                             </select>
                         </div>
                     </div>
@@ -40,19 +68,19 @@
         </div>
     </div>
 </div>
-<script src="/js/<%=env%>/my.tab.js?v=<%=version%>"></script>
+<script src="/js/<%= env %>/my.tab.js?v=<%= version %>"></script>
 <script type="text/template" id="testTemplate">
     <div>
         test
     </div>
 </script>
 <script type="text/javascript">
-    $(function(){
+    $(function () {
         my.tab.init();
         var tabData = [{
-            id:'tab-home',
-            name:'Home',
-            targetId:'panel-home',
+            id: 'tab-home',
+            name: 'Home',
+            targetId: 'panel-home',
         }];
         $('#myTab').append(my.tab.tabs(tabData));
 
@@ -65,22 +93,22 @@
 
         $('#tab-home').click();
         var notice0;
-        $('.msgNotice').on('click', function(){
+        $('.msgNotice').on('click', function () {
             var dom = $(this);
             var type = dom.data('type');
-            if(type == 0){
-                if(notice0)
+            if (type == 0) {
+                if (notice0)
                     notice0.toggle();
                 else
-                    notice0 = extend.msgNotice({msg:'12333', target:'.msgNotice[data-type=0]'});
-            }else if(type == 1){
+                    notice0 = extend.msgNotice({msg: '12333', target: '.msgNotice[data-type=0]'});
+            } else if (type == 1) {
                 var msgNoticeBtnCount = parseInt($('#msgNoticeBtnCount').val());
                 var btnOptList = [];
-                for(var i = 1;i <= msgNoticeBtnCount;i++) {
+                for (var i = 1; i <= msgNoticeBtnCount; i++) {
                     btnOptList.push({
-                        content:'按钮' + i,
+                        content: '按钮' + i,
                         cbOpt: i,
-                        cb: function(opt){
+                        cb: function (opt) {
                             console.log(opt);
                         }
                     });

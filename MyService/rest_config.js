@@ -114,6 +114,7 @@ var restList = [
         path:'',
         auth:[auth['dev']],
     },
+
     {
         url:'/log/query',
         method:[{
@@ -130,6 +131,24 @@ var restList = [
         }],
         path:'log',
     },
+
+    {
+        url:'/mainContentType/query',
+        method:[{
+            name: 'post',
+            functionName: 'query'
+        }],
+        path:'mainContentType',
+    },
+    {
+        url:'/mainContentType/save',
+        method:[{
+            name: 'post',
+            functionName: 'save'
+        }],
+        path:'mainContentType',
+    },
+
     {
         url: '/tranTest',
         method: [{
