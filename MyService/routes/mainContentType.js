@@ -8,7 +8,7 @@ var autoBll = require('./_bll/auto');
 exports.save = function (req, res) {
     var args = req.body;
     common.promise().then(function (e) {
-        return autoBll.save('log', args);
+        return autoBll.save('main_content_type', args);
     }).then(function (t) {
         res.send(common.formatRes(null, t));
     }).fail(function (e) {
@@ -19,7 +19,7 @@ exports.save = function (req, res) {
 exports.query = function(req, res){
     var args = req.body;
     common.promise().then(function (e) {
-        return autoBll.custom('log', 'query', args);
+        return autoBll.query('main_content_type', args);
     }).then(function (t) {
         res.send(common.formatRes(null, t));
     }).fail(function (e) {

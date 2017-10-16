@@ -10,6 +10,12 @@ my.interface = {
             },
             logQuery: {
                 url: '/log/query'
+            },
+            mainContentTypeQuery: {
+                url: '/mainContentType/query'
+            },
+            mainContentTypeSave: {
+                url: '/mainContentType/save'
             }
         }
     },
