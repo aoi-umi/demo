@@ -4,7 +4,7 @@
 
 <Workspace>
 	<Local Expanded="Yes">
-		<Model Expanded="Yes" ID="{88086B01-C9E1-11D4-9552-0090277716A9}" Name="Physical Data Model 1" Type="{CDE44E21-9669-11D1-9914-006097355D9B}" URL="数据库模型.PDM"/>
+		<Model Expanded="Yes" ID="{AC9EC621-2B03-41F8-BDCF-8C3E42D99A47}" Loaded="No" Name="Physical Data Model 1" Selected="Yes" Type="{CDE44E21-9669-11D1-9914-006097355D9B}" URL="数据库模型.PDM"/>
 	</Local>
 	<BrowserModule Name="Repository"/>
 </Workspace>
