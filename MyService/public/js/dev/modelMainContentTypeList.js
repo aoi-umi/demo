@@ -1,8 +1,8 @@
 /**
  * Created by bang on 2017-9-11.
  */
-namespace('modelMainContentType');
-var modelMainContentType = {
+namespace('modelMainContentTypeList');
+var modelMainContentTypeList = {
     pager: null,
     init: function () {
         var self = this;
@@ -16,12 +16,26 @@ var modelMainContentType = {
                 });
             }
         });
+
         $('#search').click();
     },
     bindEvent: function () {
         var self = this;
         $('#search').on('click', function () {
             self.pager.gotoPage(1);
+        });
+
+        $('#add').on('click', function(){
+            self.edit();
+        });
+
+        $('#list').on('click','[name=edit]', function(){
+            var row = $(this).closest('.itemRow');
+            self.edit(row.data('item'));
+        });
+
+        $('#mainContentTypeSave [name=accept]').on('click', function(){
+            $('#mainContentTypeSave').modal('hide');
         });
     },
     query: function () {
@@ -37,7 +51,7 @@ var modelMainContentType = {
             $(t.list).each(function (i) {
                 var item = this;
                 item.colNum = i + 1;
-                $('#list').append(ejs.render(temp, item));
+                $('#list').append($(ejs.render(temp, item)).data('item', item));
             });
             return t;
         }).fail(function (e) {
@@ -48,4 +62,19 @@ var modelMainContentType = {
             $('#list').addClass('error');
         });
     },
-}
+    edit: function(item) {
+        if (!item) {
+            item = {
+                id: 0,
+                type: '',
+                type_name: '',
+                parent_type: '',
+                level: 10
+            };
+        }
+        $('#mainContentTypeSave [name=title]').html(item.id ? ('修改:' + item.id) : '新增');
+        var temp = $('#mainContentTypeSaveTemplate').html();
+        $('#mainContentTypeSave [name=content]').html(ejs.render(temp, item));
+        $('#mainContentTypeSave').modal('show');
+    }
+};
