@@ -10,7 +10,7 @@ module.exports = {
             if(t.isExist && t.detail.id != opt.id){
                 throw common.error('type [' + opt.type + '] is exist');
             }
-            //return autoBll.save('main_content_type');
+            return autoBll.save('main_content_type', opt);
         });
     },
     isExist: function(opt){

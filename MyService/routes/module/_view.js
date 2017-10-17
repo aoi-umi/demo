@@ -8,9 +8,9 @@ module.exports = {
     get: function (req, res, next) {
         var opt = {
             view: '/index',
-            noNav: req.query.noNav
         }
-        switch (req.originalUrl) {
+        //console.log(req.originalUrl, req._parsedUrl.pathname)
+        switch (req._parsedUrl.pathname) {
             case '/':
                 opt.method = 'get';
                 break;
