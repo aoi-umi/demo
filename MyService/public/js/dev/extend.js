@@ -242,7 +242,7 @@ var extend = {
             //type 1 参数
             noClose: false,
             btnTemplate: `<button class="btn" type="button" name="btnContent" style="margin: 0 5px"></button>`,
-            btnOptList: null
+            btnOptList: null,
         };
         //btnOpt = {
         // class:'btn-default'
@@ -339,6 +339,11 @@ var extend = {
                         dom.find('[name=closeBtn]').removeClass('hidden');
                     dom.find('[name=content]').html(opt.msg);
                     dom.find('[name=footer]').empty();
+                    if(!opt.btnOptList && !opt.noClose) {
+                        opt.btnOptList = [{
+                            content: '确认'
+                        }];
+                    }
                     if(opt.btnOptList){
                         var btnList = [];
                         $(opt.btnOptList).each(function(){

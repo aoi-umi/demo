@@ -6,28 +6,51 @@
                         listId: 'menuItemListTest',
                         childs: [{
                             text: 'Home',
-                            attr: 'data-tab-target="home"'
+                            tab:{
+                              target:'home'
+                            },
                         }, {
                             text: 'Index',
-                            attr: 'data-tab-target="index" data-tab-content="/"'
+                            tab:{
+                                target:'index',
+                                content:'/?noNav=true'
+                            },
+                        }, {
+                            text: 'Help',
+                            tab:{
+                                target:'help',
+                                content:'/help?noNav=true'
+                            },
                         }, {
                             text: 'Log',
-                            attr: 'data-tab-target="log"  data-tab-content="/log?noNav=true"'
+                            tab:{
+                                target:'log',
+                                content:'/log?noNav=true'
+                            },
                         }, {
                             text: 'test',
-                            attr: 'data-tab-target="test" data-tab-content="testTemplate" data-tab-type="template"'
+                            tab:{
+                                target:'test',
+                                content:'testTemplate',
+                                type:'template'
+                            },
                         },]
                     }, {
                         text: 'main content menu',
                         listId: '',
                         childs: [{
                             text: 'main content type',
-                            attr: 'data-tab-target="mainContentType"  data-tab-content="/mainContentType?noNav=true" data-tab-name="main content type list"'
+                            tab:{
+                                target:'mainContentType',
+                                content:'/mainContentType?noNav=true',
+                                name:'main content type list'
+                            },
                         },]
                     }];
             menuList.forEach(function(t){
                 if (!t.listId)
                     t.listId = 'menuId' + new Date().getTime();
+
             %>
             <div class="list-group">
                 <a class="list-group-item active" data-toggle="collapse" href="#<%= t.listId %>">
@@ -35,9 +58,16 @@
                 </a>
 
                 <div class="collapse in" id="<%= t.listId %>">
-                    <% t.childs.forEach(function(child){ %>
-
-                    <a class="list-group-item tab" href="javascript:;" <%- child.attr %>><%= child.text %></a>
+                    <% t.childs.forEach(function(child){
+                        if(!child.tab)
+                            child.tab = {};%>
+                    <a class="list-group-item tab" href="javascript:;"
+                            <%for(var key in child.tab){
+                                if(child.tab[key]){%>
+                            data-tab-<%=key%>="<%=child.tab[key]%>"
+                            <%}
+                            }%>
+                        <%- child.attr || '' %>><%= child.text %></a>
                     <% }) %>
                 </div>
             </div>

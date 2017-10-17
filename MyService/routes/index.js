@@ -10,25 +10,6 @@ var autoBll = require('./_bll/auto');
 var userInfoBll = require('./_bll/user_info');
 var logBll = require('./_bll/log');
 
-var testService = require('./_service/testService');
-
-exports.use = function (req, res, next) {
-    var userInfoKey = req.cookies[config.cacheKey.userInfo];
-    if (userInfoKey) {
-        userInfoKey = config.cacheKey.userInfo + userInfoKey;
-        cache.getPromise(userInfoKey).then(function (t) {
-            if (t) {
-                req.myData.user = t;
-            }
-            next();
-        }).catch(function (e) {
-            next(e);
-        });
-    } else {
-        next();
-    }
-};
-
 exports.post = function (req, res, next) {
     res.mySend(null, 'post');
 };
@@ -130,50 +111,6 @@ function login(userName, token, req) {
         return userInfo;
     });
 }
-
-exports.admin = function(req, res) {
-    res.send('admin respond with a resource');
-};
-
-//test
-exports.testGet = function (req, res) {
-    var query = req.query;
-    var test = query.test;
-    var p = null;
-    if(test == 1)
-        p = testService.test1(query);
-    else if(test == 2)
-        p = testService.test2(query);
-    else
-        p = testService.test(query);
-    p.then(function (t) {
-        if (query.code != 'success')
-            throw common.error('promise error', query.code, {message: 'opt_promise error', code: 'opt_' + query.code});
-        res.mySend(null, t, 'promise success');
-    }).fail(function (e) {
-        res.mySend(e, null, {code: '400'});
-    }).finally(function(){
-        //console.log('finally');
-    });
-};
-
-exports.testPost = function (req, res) {
-    var reqData = req.body;
-    var p = testService.test(reqData);
-    p.then(function (t) {
-        if (reqData.code != 'success')
-            throw common.error('promise error', reqData.code, {message: 'opt_promise error', code: 'opt_' + reqData.code});
-        res.mySend(null, t, 'promise success');
-    }).fail(function (e) {
-        res.mySend(e, null,{code: '400'});
-    }).finally(function(){
-        //console.log('finally');
-    });
-};
-
-exports.getReg = function (req, res) {
-    res.mySend(null, req.url);
-};
 
 exports.status = function (req, res) {
     var opt = {

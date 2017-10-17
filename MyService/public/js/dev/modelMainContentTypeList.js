@@ -69,7 +69,7 @@ var modelMainContentTypeList = {
                 type: '',
                 type_name: '',
                 parent_type: '',
-                level: 10
+                level: 0
             };
         }
         $('#mainContentTypeSave [name=title]').html(item.id ? ('修改:' + item.id) : '新增');
@@ -77,9 +77,52 @@ var modelMainContentTypeList = {
         $('#mainContentTypeSave [name=content]').html(ejs.render(temp, item));
         $('#mainContentTypeSave').modal('show');
     },
-    save: function(){
-        var data = {id:0, type: 1};
-        return my.interface.mainContentTypeSave(data);
-        //$('#mainContentTypeSave').modal('hide');
+    save: function() {
+        var self = this;
+        var list = [{
+            name: 'id',
+            dom: $('#mainContentTypeSave [name=id]'),
+        }, {
+            name: 'type',
+            dom: $('#mainContentTypeSave [name=type]'),
+            canNotNull: true,
+        }, {
+            name: 'type_name',
+            dom: $('#mainContentTypeSave [name=type_name]'),
+        }, {
+            name: 'parent_type',
+            dom: $('#mainContentTypeSave [name=parent_type]'),
+        }, {
+            name: 'level',
+            dom: $('#mainContentTypeSave [name=level]'),
+        }];
+        var checkRes = extend.dataCheck({list: list});
+        console.log(checkRes)
+        if (!checkRes.success) {
+            if (checkRes.dom) {
+                extend.msgNotice({target: checkRes.dom.selector, msg: checkRes.desc});
+                checkRes.dom.focus();
+            } else {
+                alert(checkRes.desc);
+            }
+            return $.Deferred().reject();
+        }
+        var data = checkRes.model;
+        return my.interface.mainContentTypeSave(data).then(function (t) {
+            extend.msgNotice({
+                type: 1, msg: '保存成功:' + t,
+                btnOptList: [{
+                    content: '继续'
+                }, {
+                    content: '关闭', cb: function () {
+                        $('#mainContentTypeSave').modal('hide');
+                    }
+                }]
+            });
+            self.pager.gotoPage(1);
+        }).fail(function (e) {
+            console.log(e)
+            extend.msgNotice({type: 1, msg: e.message});
+        });
     }
 };

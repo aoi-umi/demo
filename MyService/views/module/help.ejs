@@ -1,52 +1,47 @@
 <div class="container">
-    <table class="table table-bordered">
-    <thead>
-        <tr>
-            <%var count = 2;
-            for(var i = 0;i < count;i++){
-            %>
-            <td>url</td>
-            <td>method</td>
-            <td>data</td>
-            <%}%>
-        </tr>
-    </thead>
-    <tbody>
-    <%
-    for(var restIndex = 0; restIndex < restList.length;){
-    %>
-        <tr>
-    <%
-        for(var i = 0;i < count && restIndex < restList.length;i++,restIndex++){
-            var t = restList[restIndex];
-            %>
-            <td><a data-index="<%=restIndex%>" name="url" href="<%= t.method == 'post' ? 'javascript:;' : t.exampleRequest || t.url %>"
-                        <%= t.method == 'post' ? '' : 'target=_blank' %>
-                   data-url="<%= t.url %>"
-                   data-method="<%= t.method %>"
-                   data-req="<%= t.method == 'post' && t.exampleRequest ? t.exampleRequest:'' %>">
-                    <%= t.url %></a>
-            </td>
-            <td>[<%= t.method %>]</td>
-            <td data-index="<%=restIndex%>">
-                <textarea name="exampleRequest"><%= t.method == 'post' ? t.exampleRequest|| '': t.exampleRequest || t.url %>
-                </textarea>
-            </td>
-        <%}%>
-        </tr>
-    <%}%>
-    </tbody>
-</table>
+    <div class="row my-row">
+        <div class="col-xs-4">
+            <select id="config" class="form-control">
+                <%
+                for(var restIndex = 0;restIndex < restList.length;restIndex++){
+                    var t = restList[restIndex];
+                %>
+                <option data-item="<%= JSON.stringify(t)%>"><%=t.url%>(<%=t.method%>)</option>
+                <%}%>
+            </select>
+        </div>
+        <div class="col-xs-2">
+            <button class="btn btn-default" id="request">request</button>
+        </div>
+    </div>
+    <div class="row my-row">
+        <div class="col-xs-4"><input id="url" class="form-control"/></div>
+        <div class="col-xs-2"><input id="method" class="form-control"/></div>
+    </div>
+    <div class="row my-row">
+        <div class="col-xs-6"><textarea id="req" class="form-control" style="height: 200px"></textarea></div>
+        <div class="col-xs-6"><textarea id="res" class="form-control" style="height: 200px"></textarea></div>
+    </div>
 </div>
 <script type="text/javascript">
     $(function () {
-        $(document).on('click', '[name=url]', function () {
-            var dom = $(this);
-            var row = dom.closest('tr');
-            var index = dom.data('index');
-            var req = $.trim(row.find('[data-index=' + index + '] [name=exampleRequest]').val());
-            var method = dom.attr('data-method');
-            var url = dom.attr('data-url');
+        function setInterfaceOption(){
+            var dom = $('#config option:selected');
+            var item = dom.data('item');
+            if(item){
+                $('#req').val(item.exampleRequest);
+                $('#url').val(item.url);
+                $('#method').val(item.method);
+            }
+        }
+
+        $('#config').on('change blur', function(){
+            setInterfaceOption();
+        });
+        $('#request').on('click', function(){
+            var method = $('#method').val();
+            var req = $('#req').val();
+            var url = $('#url').val();
             if(method == 'post') {
                 if (!req) req = {};
                 if (typeof req == 'string')
@@ -74,14 +69,17 @@
                     data: reqStr,
                     headers: headers,
                 }).then(function (t) {
-                    console.log(t)
+                    $('#res').html(t);
+                    console.log(t);
                 }).fail(function (e) {
-                    console.log(e)
+                    $('#res').html(e);
+                    console.log(e);
                 });
             }else if(method == 'get') {
                 url = req || url;
-                dom.attr('href', url);
+                window.open(url);
             }
         });
+        setInterfaceOption();
     });
 </script>
