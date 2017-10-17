@@ -54,16 +54,6 @@ var restList = [
         auth:[]
     },
     {
-        url:'/:p1/:p2',
-        method:[{
-            name: 'get',
-            functionName: 'params',
-            exampleRequest: '/test/test'
-        }],
-        path:'index',
-        auth:[]
-    },
-    {
         url:'/signUp',
         method:[{
             name: 'post',
@@ -116,40 +106,6 @@ var restList = [
     },
 
     {
-        url:'/log/query',
-        method:[{
-            name: 'post',
-            functionName: 'query'
-        }],
-        path:'log',
-    },
-    {
-        url:'/log/save',
-        method:[{
-            name: 'post',
-            functionName: 'save'
-        }],
-        path:'log',
-    },
-
-    {
-        url:'/mainContentType/query',
-        method:[{
-            name: 'post',
-            functionName: 'query'
-        }],
-        path:'mainContentType',
-    },
-    {
-        url:'/mainContentType/save',
-        method:[{
-            name: 'post',
-            functionName: 'save'
-        }],
-        path:'mainContentType',
-    },
-
-    {
         url: '/tranTest',
         method: [{
             name: 'post',
@@ -168,6 +124,17 @@ var restList = [
     },
 ];
 
+//默认接口
+restList.push({
+    url: '/:module/:method',
+    method: [{
+        name: 'post',
+        functionName: '',
+        exampleRequest:'',
+    }],
+    path: '/module/_default',
+    auth: [],
+});
 //module-get放在最后
 restList.push({
     url: '*',
@@ -176,7 +143,7 @@ restList.push({
         functionName: '',
         exampleRequest:'',
     }],
-    path: 'main',
+    path: '/module/_view',
     auth: [],
 });
 

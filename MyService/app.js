@@ -26,6 +26,18 @@ app.use(function (req, res, next) {
     //req.body  post的参数
     //req.params /:params1/:params2
     //console.log(require('./routes/_system/common').getClientIp(req));
+    req.myData = {
+        method: {},
+        user: {
+            nickname: 'guest',
+            authority: {}
+        },
+        viewPath: app.get('views')
+    };
+    var user = req.myData.user;
+    if(config.env == 'dev')
+        user.authority['dev'] = true;
+
     res.myRender = function (view, options, fn) {
         var opt = {
             user: req.myData.user
@@ -44,29 +56,19 @@ app.use(function (req, res, next) {
         var logMethod = '[' + (config.name + '][' + (req.myData.method.methodName || url)) + ']';
 
         url = req.header('host') + url;
-        var log = common.logModle();
-        log.url = url;
-        log.result = result;
-        log.method = logMethod
-        log.req = logReq;
-        log.res = logRes;
-        log.ip = common.getClientIp(req);
-        log.remark = formatRes.desc;
-        log.guid = formatRes.guid;
-        common.logSave(log);
+        if(!req.myData.noLog) {
+            var log = common.logModle();
+            log.url = url;
+            log.result = result;
+            log.method = logMethod
+            log.req = logReq;
+            log.res = logRes;
+            log.ip = common.getClientIp(req);
+            log.remark = formatRes.desc;
+            log.guid = formatRes.guid;
+            common.logSave(log);
+        }
     };
-
-    req.myData = {
-        method: {},
-        user: {
-            nickname: 'guest',
-            authority: {}
-        },
-        viewPath: app.get('views')
-    };
-    var user = req.myData.user;
-    if(config.env == 'dev')
-        user.authority['dev'] = true;
     next();
 });
 

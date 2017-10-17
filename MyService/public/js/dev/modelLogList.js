@@ -123,7 +123,7 @@ var modelLogList = {
             });
             return t;
         }).fail(function (e) {
-            $('#logList .item').remove();
+            $('#logList .itemRow').remove();
             if (e instanceof Error) e = e.message;
             if (typeof e == 'object') e = JSON.stringify(e);
             $('#logMsg').html(e);
