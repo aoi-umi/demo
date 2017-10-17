@@ -35,7 +35,7 @@ var modelMainContentTypeList = {
         });
 
         $('#mainContentTypeSave [name=accept]').on('click', function(){
-            $('#mainContentTypeSave').modal('hide');
+            self.save();
         });
     },
     query: function () {
@@ -46,7 +46,7 @@ var modelMainContentTypeList = {
         data.page_size = self.pager.pageSize;
 
         return my.interface.mainContentTypeQuery(data).then(function (t) {
-            $('#list .item').remove();
+            $('#list .itemRow').remove();
             var temp = $('#mainContentTypeItem').html();
             $(t.list).each(function (i) {
                 var item = this;
@@ -55,7 +55,7 @@ var modelMainContentTypeList = {
             });
             return t;
         }).fail(function (e) {
-            $('#logList .item').remove();
+            $('#list .itemRow').remove();
             if (e instanceof Error) e = e.message;
             if (typeof e == 'object') e = JSON.stringify(e);
             $('#msg').html(e);
@@ -76,5 +76,10 @@ var modelMainContentTypeList = {
         var temp = $('#mainContentTypeSaveTemplate').html();
         $('#mainContentTypeSave [name=content]').html(ejs.render(temp, item));
         $('#mainContentTypeSave').modal('show');
+    },
+    save: function(){
+        var data = {id:0, type: 1};
+        return my.interface.mainContentTypeSave(data);
+        //$('#mainContentTypeSave').modal('hide');
     }
 };

@@ -9,14 +9,11 @@ var exports = module.exports;
 
 //事务测试
 exports.tranTest = function (opt) {
-    var res = common.defer();
-    db.tranConnect(function(conn){
+    return autoBll.tran(function(conn, res){
         var resData = [];
-        return common.promise().then(function(){
-            var log = common.logModle();
-            log.req = '事务请求测试1';
-            return autoBll.save('log', log, conn);
-        }).then(function(t){
+        var log = common.logModle();
+        log.req = '事务请求测试1';
+        return autoBll.save('log', log, conn).then(function(t){
             resData.push(t);
             if(opt && opt.error)
                 throw common.error('test error');
@@ -26,12 +23,8 @@ exports.tranTest = function (opt) {
         }).then(function(t){
             resData.push(t);
             return resData;
-        }).then(res.resolve).fail(function(e){
-            res.reject(e);
-            throw e;
         });
     });
-    return res.promise;
 };
 
 exports.query = function(opt){

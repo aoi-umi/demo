@@ -24,6 +24,13 @@ module.exports= {
             'en':'No Login',
         }
     },
+    ARGS_ERROR:{
+        code: 'ARGS_ERROR',
+        desc: {
+            'zh':'参数有误',
+            'en':'args error',
+        }
+    },
     CAN_NOT_BE_EMPTY:{
         code: 'CAN_NOT_BE_EMPTY',
         desc: {

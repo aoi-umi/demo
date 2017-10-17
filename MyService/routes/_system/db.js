@@ -14,73 +14,72 @@ var pool = require('mysql').createPool({
     port: config.datebase.port
 });
 
+module.exports = {
+    query: function (sql, params) {
+        if (!params)
+            params = [];
 
-var exports = module.exports;
-
-exports.query = function (sql, params) {
-    if(!params)
-        params = [];
-
-    var connection = null;
-    return common.promise().then(function(){
-        return getConnection();
-    }).then(function(t){
-        connection = t;
-        return query(connection, sql, params);
-    }).then(function(t){
-        return (t);
-    }).fail(function(e){
-        common.writeError(e);
-        throw e;
-    }).finally(function(){
-        release(connection);
-    });
-};
-
-//事务处理
-exports.tranConnect = function (queryFunction) {
-    var connection = null;
-    return common.promise().then(function(){
-        return getConnection();
-    }).then(function(t){
-        connection = t;
-        return beginTransaction(connection);
-    }).then(function(t){
-        var res = q.defer();
-        queryFunction(connection)
-            .then(res.resolve)
-            .fail(res.reject);
-        return res.promise;
-    }).then(function(t){
-        return commit(connection);
-    }).fail(function(e) {
-        if(connection)
-            rollback(connection);
-        throw e;
-    }).finally(function(){
-        if(connection)
+        var connection = null;
+        return common.promise().then(function () {
+            return getConnection();
+        }).then(function (t) {
+            connection = t;
+            return query(connection, sql, params);
+        }).then(function (t) {
+            return (t);
+        }).fail(function (e) {
+            common.writeError(e);
+            throw e;
+        }).finally(function () {
             release(connection);
-    });
-};
+        });
+    },
 
-exports.tranQuery = function (sql, params, conn) {
-    if(!conn) {
-        conn = params;
-        params = [];
+    //事务处理
+    tranConnect: function (queryFunction) {
+        var connection = null;
+        return common.promise().then(function () {
+            return getConnection();
+        }).then(function (t) {
+            connection = t;
+            return beginTransaction(connection);
+        }).then(function (t) {
+            var res = q.defer();
+            queryFunction(connection)
+                .then(res.resolve)
+                .fail(res.reject);
+            return res.promise;
+        }).then(function (t) {
+            return commit(connection);
+        }).fail(function (e) {
+            if (connection)
+                rollback(connection);
+            throw e;
+        }).finally(function () {
+            if (connection)
+                release(connection);
+        });
+    },
+    tranQuery: function (sql, params, conn) {
+        if (!conn) {
+            conn = params;
+            params = [];
+        }
+        if (!params)
+            params = [];
+
+        var connection = conn;
+        return common.promise().then(function (t) {
+            return query(connection, sql, params);
+        }).then(function (t) {
+            return (t);
+        }).fail(function (e) {
+            throw e;
+        });
     }
-    if(!params)
-        params = [];
-
-    var connection = conn;
-    return common.promise().then(function(t){
-        return query(connection, sql, params);
-    }).then(function(t){
-        return (t);
-    }).fail(function(e){
-        throw e;
-    });
 };
 
+//var exports = module.exports;
 //exports.query('call p_auto_t_user_info_query(:id, :account, :password,:nickname, :auth, :edit_date,:create_date, :remark,:null_list, :page_size, :page_index)').then(function(t){
 //    console.log(JSON.stringify(t))
 //}).fail(function(e){

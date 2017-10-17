@@ -59,7 +59,7 @@ exports.loginGet = function (req, res, next) {
     if (req.myData.user.authority['login'])
         res.redirect('/');
     else
-        res.myRender('main', {view: 'login', title: 'Login'});
+        res.myRender('view', {view: 'login', title: 'Login'});
 };
 
 exports.loginPost = function (req, res, next) {
@@ -131,10 +131,6 @@ function login(userName, token, req) {
     });
 }
 
-exports.params = function (req, res, next) {
-    res.myRender('main', {view: 'index', title: 'Express', method: 'params'});
-};
-
 exports.admin = function(req, res) {
     res.send('admin respond with a resource');
 };
@@ -185,7 +181,7 @@ exports.status = function (req, res) {
         enumDict: myEnum.enumDict,
         enumCheck: myEnum.enumCheck,
     };
-    res.myRender('main', opt);
+    res.myRender('view', opt);
 };
 
 exports.tranTest = function(req, res){
@@ -213,5 +209,5 @@ exports.upload = [require('./_system/multer').any(), function (req, res) {
         view: 'msg',
         message: success,
     };
-    res.myRender('main', opt);
+    res.myRender('view', opt);
 }];

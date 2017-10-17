@@ -30,5 +30,5 @@ exports.get = function (req, res) {
         title: 'help',
         restList: restList
     };
-    res.myRender('main', opt);
+    res.myRender('view', opt);
 };

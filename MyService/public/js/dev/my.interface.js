@@ -12,10 +12,10 @@ my.interface = {
                 url: '/log/query'
             },
             mainContentTypeQuery: {
-                url: '/mainContentType/query'
+                url: '/main_content_type/query'
             },
             mainContentTypeSave: {
-                url: '/mainContentType/save'
+                url: '/main_content_type/save'
             }
         }
     },
