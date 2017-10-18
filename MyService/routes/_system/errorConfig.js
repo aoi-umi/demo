@@ -10,6 +10,14 @@ module.exports= {
             'en':'dev',
         }
     },
+    CODE_ERROR: {
+        code: 'CODE_ERROR',
+        desc: {
+            'zh':'代码有误',
+            'en':'code error',
+        }
+    },
+
     TOKEN_WRONG: {
         code: 'TOKEN_WRONG',
         desc: {
