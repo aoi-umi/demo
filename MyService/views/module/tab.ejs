@@ -79,7 +79,7 @@
             <div class="tab-content" id="myPanel">
                 <div style="height: 512px" id="panel-home" class="tab-pane fade">
                     Home Page
-                    <div>
+                    <div class="my-row">
                         <div>
                             <button class="btn btn-default msgNotice" data-type="0">弹出提示</button>
                         </div>
@@ -91,6 +91,11 @@
                                 <option value="<%= i %>"><%= i %></option>
                                 <% } %>
                             </select>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-5">
+                                <input id="autocomplete" class="form-control"/>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -151,5 +156,72 @@
                 });
             }
         });
+
+        var availableTags = [
+            'ActionScript',
+            'AppleScript',
+            'Asp',
+            'BASIC',
+            'C',
+            'C++',
+            'Clojure',
+            'COBOL',
+            'ColdFusion',
+            'Erlang',
+            'Fortran',
+            'Groovy',
+            'Haskell',
+            'Java',
+            'JavaScript',
+            'Lisp',
+            'Perl',
+            'PHP',
+            'Python',
+            'Ruby',
+            'Scala',
+            'Scheme'
+        ];
+        var sourceList = [];
+        //sourceList = availableTags;
+        $(availableTags).each(function(){
+            sourceList.push({key: this});
+        });
+
+        function clearData(){
+            if(!$('#autocomplete').val()){
+                $('#autocomplete').data('item',null);
+            }
+        }
+        $('#autocomplete').on('keydown', function (event) {
+            if (event.keyCode === $.ui.keyCode.TAB &&
+                    $(this).data('ui-autocomplete').menu.active) {
+                event.preventDefault();
+            }
+            clearData();
+        }).on('blur', function(){
+            clearData();
+        }).on('focus', function () {
+            $(this).autocomplete('search');
+        }).autocomplete({
+            minLength: 0,
+            source: function (request, response) {
+                var match = _.filter(sourceList, function(t){
+                    var matcher = new RegExp($.ui.autocomplete.escapeRegex(request.term), 'i');
+                    return matcher.test(t.key);
+                });
+                response(match.slice(0, 10));
+            },
+            focus: function () {
+                return false;
+            },
+            select: function (event, ui) {
+                $(this).data('item', ui.item).val(ui.item.key);
+                return false;
+            }
+        }).data('ui-autocomplete')._renderItem = function (ul, item) {
+            return $('<li>')
+                    .append('<div>' + item.key + '</div>')
+                    .appendTo(ul);
+        };
     });
 </script>

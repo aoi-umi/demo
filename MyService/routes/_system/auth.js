@@ -26,6 +26,21 @@ module.exports = {
     }
 };
 
+var authConfig = {
+    'login': {
+        key: 'login',
+        errCode: 'NO_LOGIN',
+    },
+    'admin': {
+        key: 'admin',
+        errCode: 'NO_PERMISSIONS',
+    },
+    'dev': {
+        key: 'dev',
+        errCode: 'DEV',
+    }
+};
+
 var authenticationCheck = function (user, authList) {
     var noPermission = true;
     var desc = '';
@@ -37,7 +52,10 @@ var authenticationCheck = function (user, authList) {
         if (user && user.authority) {
             noPermission = false;
             for(var i in authList) {
-                var checkAuth = authList[i];
+                var key = authList[i];
+                var checkAuth = authConfig[key];
+                if(!checkAuth || !checkAuth.key)
+                    throw common.error('no auth [' + key + ']!','CODE_ERROR');
                 if(!user.authority[checkAuth.key]){
                     notPassAuth = checkAuth;
                     break;

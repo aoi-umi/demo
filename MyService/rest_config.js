@@ -1,20 +1,6 @@
 /**
  * Created by umi on 2017-5-29.
  */
-var auth = {
-    'login': {
-        key: 'login',
-        errCode: 'NO_LOGIN',
-    },
-    'admin': {
-        key: 'admin',
-        errCode: 'NO_PERMISSIONS',
-    },
-    'dev': {
-        key: 'dev',
-        errCode: 'DEV',
-    }
-};
 
 var restList = [
     {
@@ -63,7 +49,7 @@ var restList = [
             functionName: ''
         },
         path:'',
-        auth:[auth['dev']],
+        auth:['dev'],
     },
 
     {
@@ -88,7 +74,7 @@ var restList = [
         method: {
             checkAuthOnly: true,//仅检查权限，功能由后面路由实现
         },
-        auth:['admin']
+        auth:['login']
     },
 ];
 
