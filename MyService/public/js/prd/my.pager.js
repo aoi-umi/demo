@@ -5,7 +5,6 @@
  */
 namespace('my.pager');
 my.pager = function (option) {
-    //this.init(opt);
     this.init(option);
 };
 my.pager.prototype = {

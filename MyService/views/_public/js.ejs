@@ -9,8 +9,13 @@
 <script type="text/javascript" src="/js/plugins/underscore-min.js"></script>
 
 <script type="text/javascript" src="/js/config.js?v=<%=version%>"></script>
+<script type="text/javascript" src="/js/<%=env%>/init.js?v=<%=version%>"></script>
+
 <script type="text/javascript" src="/js/<%=env%>/extend.js?v=<%=version%>"></script>
 <script type="text/javascript" src="/js/socket.js?v=<%=version%>"></script>
-
-<script type="text/javascript" src="/js/<%=env%>/init.js?v=<%=version%>"></script>
 <script type="text/javascript" src="/js/<%=env%>/my.interface.js?v=<%=version%>"></script>
+<script type="text/javascript">
+    $(function(){
+       init.init();
+    });
+</script>

@@ -45,8 +45,8 @@
                 <th class="text-center" colspan="100">log</th>
             </tr>
         </thead>
-        <tbody class="table-error">
-            <tr><td class="text-center" colspan="100" id="logMsg"></td></tr>
+        <tbody class="error hidden">
+            <tr><td class="text-center" colspan="100" name="errorContent"></td></tr>
         </tbody>
     </table>
     <div id="pager"></div>
@@ -55,9 +55,100 @@
     <% include ../_template_web/logItem%>
 </script>
 <script type="text/javascript" src="/js/<%=env%>/my.pager.js?v=<%=version%>"></script>
-<script type="text/javascript" src="/js/<%=env%>/modelLogList.js?v=<%=version%>"></script>
+<script type="text/javascript" src="/js/<%=env%>/module.js?v=<%=version%>"></script>
 <script type="text/javascript">
     $(function () {
-        modelLogList.init();
+        var opt = {
+            operation: ['query'],
+            queryId: 'search',
+            queryItemTempId: 'logItem',
+            queryContainerId: 'logList',
+
+            rowClass: 'itemRow',
+            interfacePrefix: 'log',
+
+            queryArgs: [{
+                name: 'id',
+                dom: $('#log_id'),
+                checkValue: function (val) {
+                    if (val && !val.match(/^[\d]+$/))
+                        return '请输入正确的正整数';
+                }
+            }, {
+                name: 'create_date_start',
+                dom: $('#log_create_date_start'),
+            }, {
+                name: 'create_date_end',
+                dom: $('#log_create_date_end'),
+            }, {
+                name: 'url',
+                dom: $('#log_url'),
+            }, {
+                name: 'guid',
+                dom: $('#log_guid'),
+            }],
+            bindEvent: function (self) {
+                $('#log_create_date_start').on('click', function () {
+                    var datePickerArgs = {
+                        el: this,
+                        //startDate: '#{%y-30}-01-01',
+                        doubleCalendar: true,
+                        dateFmt: 'yyyy-MM-dd',
+                        minDate: '1900-01-01',
+                        maxDate: '#F{$dp.$D(\'log_create_date_end\')}',
+                    };
+                    WdatePicker(datePickerArgs);
+                });
+                $('#log_create_date_end').on('click', function () {
+                    var datePickerArgs = {
+                        el: this,
+                        //startDate: minDate || '#{%y-30}-01-01',
+                        doubleCalendar: true,
+                        dateFmt: 'yyyy-MM-dd',
+                        minDate: '#F{$dp.$D(\'log_create_date_start\')||\'1900-01-01\'}',
+                        maxDate: '',
+                    };
+                    WdatePicker(datePickerArgs);
+                });
+
+                $('#logList').on('click', '.itemToggle', function () {
+                    var dom = $(this);
+                    var content = dom.closest('.itemRow').find('.itemConetnt');
+                    if (dom.hasClass('dropup')) {
+                        dom.removeClass('dropup');
+                        content.slideUp();
+                    } else {
+                        dom.addClass('dropup');
+                        content.slideDown();
+                    }
+                });
+
+                $(this.queryArgs).each(function(){
+                    var item = this;
+                    if(item.dom){
+                        item.dom.on('blur', function(){
+                            var checkRes = extend.dataCheck({list: [item]});
+                            if(checkRes.success){
+                                $('[data-target="' + checkRes.dom.selector + '"]').hide();
+                            }else{
+                                extend.msgNotice({target: checkRes.dom.selector, msg: checkRes.desc});
+                            }
+                        });
+                    }
+                });
+            },
+            beforeQuery: function(){
+                var list = this.queryArgs;
+                var checkRes = extend.dataCheck({list: list});
+                if(checkRes.success) {
+                    var data = checkRes.model;
+                    if (!data.id) data.id = null;
+                    if (!data.create_date_start) data.create_date_start = null;
+                    if (!data.create_date_end) data.create_date_end = null;
+                }
+                return checkRes;
+            }
+        };
+        var moduleLogList = new module(opt);
     });
 </script>

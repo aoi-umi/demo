@@ -26,8 +26,8 @@
                 <th>parent_type</th><th>level</th><th>操作</th>
             </tr>
         </tbody>
-        <tbody class="table-error">
-            <tr><td class="text-center" colspan="100" id="msg"></td></tr>
+        <tbody class="error hidden">
+            <tr><td class="text-center" colspan="100" id="msg" name="errorContent"></td></tr>
         </tbody>
     </table>
     <div id="pager"></div>
@@ -42,10 +42,10 @@
                 <h4 name="title" class="modal-title">
                 </h4>
             </div>
-            <div name="content" class="modal-body">
+            <div id="detailContainer" class="modal-body">
             </div>
             <div name="footer" class="modal-body">
-                <button name="accept" style="margin: 0 5px" name="btnContent" type="button" class="btn btn-default">确认</button>
+                <button name="accept" style="margin: 0 5px" name="btnContent" type="button" class="btn btn-default" id="save">确认</button>
                 <button name="cancel" style="margin: 0 5px" name="btnContent" type="button" class="btn btn-default" data-dismiss="modal">取消</button>
             </div>
         </div>
@@ -58,9 +58,70 @@
     <% include ../_template_web/mainContentTypeItem%>
 </script>
 <script type="text/javascript" src="/js/<%=env%>/my.pager.js?v=<%=version%>"></script>
-<script type="text/javascript" src="/js/<%=env%>/modelMainContentTypeList.js?v=<%=version%>"></script>
+<script type="text/javascript" src="/js/<%=env%>/module.js?v=<%=version%>"></script>
 <script type="text/javascript">
     $(function () {
-        modelMainContentTypeList.init();
+        var opt = {
+            operation: ['query', 'detail', 'save'],
+            queryId: 'search',
+            queryItemTempId: 'mainContentTypeItem',
+            queryContainerId: 'list',
+
+            detailContainerId: 'detailContainer',
+            detailTempId: 'mainContentTypeSaveTemplate',
+
+            saveId: 'save',
+            saveDefaultModel: {
+                id: 0,
+                type: '',
+                type_name: '',
+                parent_type: '',
+                level: 0
+            },
+            addId: 'add',
+
+            rowClass: 'itemRow',
+            editClass: 'itemEdit',
+            interfacePrefix: 'mainContentType',
+            afterEdit: function (item) {
+                $('#mainContentTypeSave [name=title]').html(item.id ? ('修改:' + item.id) : '新增');
+                $('#mainContentTypeSave').modal('show');
+            },
+            beforeSave:function(){
+                var list = [{
+                    name: 'id',
+                    dom: $('#mainContentTypeSave [name=id]'),
+                }, {
+                    name: 'type',
+                    dom: $('#mainContentTypeSave [name=type]'),
+                    canNotNull: true,
+                }, {
+                    name: 'type_name',
+                    dom: $('#mainContentTypeSave [name=type_name]'),
+                }, {
+                    name: 'parent_type',
+                    dom: $('#mainContentTypeSave [name=parent_type]'),
+                }, {
+                    name: 'level',
+                    dom: $('#mainContentTypeSave [name=level]'),
+                }];
+                var checkRes = extend.dataCheck({list: list});
+                return checkRes;
+            },
+            onSaveSuccess: function(t){
+                extend.msgNotice({
+                    type: 1, msg: '保存成功:' + t,
+                    btnOptList: [{
+                        content: '继续'
+                    }, {
+                        content: '关闭', cb: function () {
+                            $('#mainContentTypeSave').modal('hide');
+                        }
+                    }]
+                });
+                moduleMainContentType.pager.refresh();
+            }
+        };
+        var moduleMainContentType = new module(opt);
     });
 </script>

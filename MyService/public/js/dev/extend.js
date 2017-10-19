@@ -1,7 +1,8 @@
 /**
  * Created by bang on 2017-7-26.
  */
-var extend = {
+namespace('extend');
+extend = {
     stringToBase64: function (str) {
         return btoa(encodeURIComponent(str));
     },
@@ -238,6 +239,8 @@ var extend = {
             //type 0 参数
             target: '',
             position: 'right',
+            autoHide: true,
+            focus: true,
 
             //type 1 参数
             noClose: false,
@@ -303,6 +306,13 @@ var extend = {
                     dom.close = function(){
                         dom.remove();
                     };
+                    if(opt.focus)
+                        targetDom.focus();
+                    if(opt.autoHide){
+                        targetDom.on('blur', function(){
+                            dom.remove();
+                        });
+                    }
                 }
                 break;
             case 1:
@@ -373,5 +383,8 @@ var extend = {
                 break;
         }
         return dom;
+    },
+    isInArray: function(obj, list, startIndex){
+        return $.inArray(obj, list, startIndex) >= 0;
     }
 };

@@ -1,47 +1,6 @@
 /**
  * Created by bang on 2017-9-11.
  */
-$(function () {
-    ejs.open = '{%';
-    ejs.close = '%}';
-
-    var userInfo = $.cookie(config.cacheKey.userInfo);
-    if(!userInfo){
-        userInfo = extend.guid();
-    }
-    $.cookie(config.cacheKey.userInfo, userInfo, { expires: 30 });
-
-    socket.init();
-    my.interface.init();
-
-    $(`.nav.navbar-nav a[href="${location.pathname}"]`).closest('li').addClass('active');
-
-    bindEvent();
-});
-
-function bindEvent(){
-    $('.nav.navbar-nav').on('click','li', function(){
-        $(this).addClass('active').siblings().removeClass('active');
-    });
-
-    $(document).on('click', '.close', function () {
-        var closeTarget = $(this).data('close-target');
-        if (closeTarget) {
-            var closeType = $(this).data('close-type');
-            switch (closeType){
-                case 'remove':
-                default:
-                    $(closeTarget).remove();
-                    break;
-                case 'hide':
-                    $(closeTarget).hide();
-                    break;
-            }
-        }
-    });
-}
-
-//
 function namespace(namespace) {
     var list = namespace.split('.');
     var ns = window[list[0]];
@@ -83,3 +42,46 @@ function getBrowserType() {
         return 'IE';
     }
 }
+
+namespace('init');
+init = {
+    init:function(){
+        var self = this;
+        ejs.open = '{%';
+        ejs.close = '%}';
+
+        var userInfo = $.cookie(config.cacheKey.userInfo);
+        if(!userInfo){
+            userInfo = extend.guid();
+        }
+        $.cookie(config.cacheKey.userInfo, userInfo, { expires: 30 });
+
+        socket.init();
+        my.interface.init();
+
+        $(`.nav.navbar-nav a[href="${location.pathname}"]`).closest('li').addClass('active');
+
+        self.bindEvent();
+    },
+    bindEvent: function () {
+        $('.nav.navbar-nav').on('click', 'li', function () {
+            $(this).addClass('active').siblings().removeClass('active');
+        });
+
+        $(document).on('click', '.close', function () {
+            var closeTarget = $(this).data('close-target');
+            if (closeTarget) {
+                var closeType = $(this).data('close-type');
+                switch (closeType) {
+                    case 'remove':
+                    default:
+                        $(closeTarget).remove();
+                        break;
+                    case 'hide':
+                        $(closeTarget).hide();
+                        break;
+                }
+            }
+        });
+    }
+};
