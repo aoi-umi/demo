@@ -1,7 +1,8 @@
 /**
  * Created by umi on 2017-8-30.
  */
-var socket = {
+namespace('socket');
+socket = {
     socket: null,
     socketData:{
         postSuccess:{}

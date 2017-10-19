@@ -3,7 +3,6 @@
  */
 namespace('my.pager');
 my.pager = function (option) {
-    //this.init(opt);
     this.init(option);
 };
 my.pager.prototype = {
@@ -84,5 +83,9 @@ my.pager.prototype = {
                 }
             });
         }
+    },
+    refresh:function(){
+        var self = this;
+        self.gotoPage(self.pageIndex);
     }
 };

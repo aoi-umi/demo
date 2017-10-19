@@ -1,8 +1,8 @@
 /**
  * Created by bang on 2017-9-11.
  */
-namespace('modelMainContentTypeList');
-var modelMainContentTypeList = {
+namespace('moduleMainContentTypeList');
+moduleMainContentTypeList = {
     pager: null,
     init: function () {
         var self = this;

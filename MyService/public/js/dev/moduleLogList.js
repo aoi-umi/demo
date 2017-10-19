@@ -1,8 +1,8 @@
 /**
  * Created by bang on 2017-9-11.
  */
-namespace('modelLogList');
-var modelLogList = {
+namespace('moduleLogList');
+moduleLogList = {
     pager: null,
     init: function () {
         var self = this;
