@@ -139,7 +139,11 @@ my.tab = {
 
 
                 if (t.closeTarget) {
-                    dom.find('[name=tab-close-btn]').removeClass('hidden').attr('data-close-target', t.closeTarget);
+                    var closeBtn = dom.find('[name=tab-close-btn]');
+                    closeBtn.removeClass('hidden').attr('data-close-target', t.closeTarget)
+                    dom.on('dblclick', function(){
+                        closeBtn.click();
+                    });
                 }
                 break;
         }
