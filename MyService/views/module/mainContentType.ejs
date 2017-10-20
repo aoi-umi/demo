@@ -62,7 +62,7 @@
 <script type="text/javascript">
     $(function () {
         var opt = {
-            operation: ['query', 'detail', 'save'],
+            operation: ['query', 'save'],
             queryId: 'search',
             queryItemTempId: 'mainContentTypeItem',
             queryContainerId: 'list',
@@ -108,7 +108,7 @@
                 var checkRes = extend.dataCheck({list: list});
                 return checkRes;
             },
-            onSaveSuccess: function(t){
+            onSaveSuccess: function(t, self){
                 extend.msgNotice({
                     type: 1, msg: '保存成功:' + t,
                     btnOptList: [{
@@ -119,7 +119,7 @@
                         }
                     }]
                 });
-                moduleMainContentType.pager.refresh();
+                self.pager.refresh();
             }
         };
         var moduleMainContentType = new module(opt);
