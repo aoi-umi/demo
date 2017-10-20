@@ -386,5 +386,11 @@ extend = {
     },
     isInArray: function(obj, list, startIndex){
         return $.inArray(obj, list, startIndex) >= 0;
-    }
+    },
+    promise: function(){
+        var def = $.Deferred();
+        var res = $.Deferred();
+        def.resolve(res);
+        return def;
+    },
 };

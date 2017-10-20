@@ -52,11 +52,11 @@ module.prototype = {
         beforeEdit: function(item){},
         afterEdit: function(item){},
         beforeSave: function(){},
-        onSaveSuccess: function(t){}
+        onSaveSuccess: function(t, self){}
     },
     init: function (option) {
         var self = this;
-        var opt = $.extend(self.opt, option);
+        self.opt = $.extend(self.opt, option);
 
         if (self.opt.operation && self.opt.operation.length) {
             $(self.opt.operation).each(function () {
@@ -132,44 +132,49 @@ module.prototype = {
     },
     query: function (pageIndex) {
         var self = this;
-        self.queryContainerDom.find('.error').addClass('hidden');
-        try {
+        return extend.promise().then(function () {
+            self.queryContainerDom.find('.error').addClass('hidden');
             var data = null;
             var checkRes = self.opt.beforeQuery();
             if (checkRes) {
                 console.log(checkRes)
+                var err = null;
                 if (!checkRes.success) {
                     if (checkRes.dom) {
                         extend.msgNotice({target: checkRes.dom.selector, msg: checkRes.desc});
                     } else {
-                        throw new Error(checkRes.desc);
+                        err = new Error(checkRes.desc);
                     }
-                    return $.Deferred().reject();
+                    return $.Deferred().reject(err);
                 }
                 data = checkRes.model;
-                data.page_index = pageIndex || self.pager.pageIndex;
-                data.page_size = self.pager.pageSize;
-                var method = self.opt.interfacePrefix + 'Query';
-                return my.interface[method](data).then(function (t) {
-                    self.queryContainerDom.find(self.rowClass).remove();
-                    var temp = self.queryItemTemp;
-                    $(t.list).each(function (i) {
-                        var item = this;
-                        item.colNum = i + 1;
-                        self.queryContainerDom.append($(ejs.render(temp, item)).data('item', item));
-                    });
-                    return t;
-                }).fail(function (e) {
-                    self.queryContainerDom.find(self.rowClass).remove();
-                    if (e instanceof Error) e = e.message;
-                    if (typeof e == 'object') e = JSON.stringify(e);
-                    self.queryContainerDom.find('[name=errorContent]').html(e);
-                    self.queryContainerDom.find('.error').removeClass('hidden');
-                });
             }
-        }catch(e){
-            extend.msgNotice({type: 1, msg: e.message});
-        }
+            if(!data) data={};
+            data.page_index = pageIndex || self.pager.pageIndex;
+            data.page_size = self.pager.pageSize;
+            var method = self.opt.interfacePrefix + 'Query';
+            return my.interface[method](data).then(function (t) {
+                self.queryContainerDom.find(self.rowClass).remove();
+                var temp = self.queryItemTemp;
+                $(t.list).each(function (i) {
+                    var item = this;
+                    item.colNum = i + 1;
+                    self.queryContainerDom.append($(ejs.render(temp, item)).data('item', item));
+                });
+                return t;
+            }).fail(function (e) {
+                self.queryContainerDom.find(self.rowClass).remove();
+                if (e instanceof Error) e = e.message;
+                if (typeof e == 'object') e = JSON.stringify(e);
+                self.queryContainerDom.find('[name=errorContent]').html(e);
+                self.queryContainerDom.find('.error').removeClass('hidden');
+            });
+        }).fail(function (e) {
+            console.log(e);
+            if(e)
+                extend.msgNotice({type: 1, msg: e.message});
+            return $.Deferred().reject(e);
+        });
     },
     edit: function (item) {
         var self = this;
@@ -199,7 +204,7 @@ module.prototype = {
                 data = checkRes.model;
                 var method = self.opt.interfacePrefix + 'Save';
                 my.interface[method](data).then(function (t) {
-                    self.opt.onSaveSuccess(t);
+                    self.opt.onSaveSuccess(t, self);
                 }).fail(function (e) {
                     console.log(e)
                     extend.msgNotice({type: 1, msg: e.message});
