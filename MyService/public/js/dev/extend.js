@@ -246,6 +246,7 @@ extend = {
             noClose: false,
             btnTemplate: `<button class="btn" type="button" name="btnContent" style="margin: 0 5px"></button>`,
             btnOptList: null,
+            dom: null
         };
         //btnOpt = {
         // class:'btn-default'
@@ -318,7 +319,7 @@ extend = {
             case 1:
                 if(true){
                     opt.template =
-                        `<div id="msgNoticeBox" data-backdrop="static" role="dialog" tabindex="-1" class="modal fade">
+                        `<div data-backdrop="static" role="dialog" tabindex="-1" class="modal fade">
                             <div class="modal-dialog" style="top:100px">
                                 <div class="modal-content">
                                     <div class="modal-body">
@@ -336,11 +337,12 @@ extend = {
                                 </div>
                             </div>
                         </div>`;
-                    dom = $('#msgNoticeBox');
-                    if(!dom.length) {
-                        dom = $(opt.template);
+                    //dom = $('#msgNoticeBox');
+                    dom = opt.dom;
+                    if(!dom || !dom.length) {
+                        dom = $(opt.template).attr('id', 'msgNoticeBox_' + new Date().getTime());
                         dom.find('[name=closeBtn]').on('click', function(){
-                            dom.modal('hide');
+                            dom.close();
                         });
                     }
                     if(opt.noClose)
@@ -366,7 +368,7 @@ extend = {
                             else
                                 btn.find('[name=btnContent]').html(item.content);
                             btn.on('click', function(){
-                                dom.modal('hide');
+                                dom.close();
                                 if(item.cb)
                                     item.cb(item.cbOpt);
                             });
@@ -375,7 +377,8 @@ extend = {
                         dom.find('[name=footer]').append(btnList);
                     }
                     $('.popover').hide();
-                    dom.modal('show');
+                    if(dom.is(':hidden'))
+                        dom.modal('show');
                     dom.close = function() {
                         dom.modal('hide');
                     }

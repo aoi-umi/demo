@@ -68,5 +68,9 @@ my.pager.prototype = {
                 }
             });
         }
+    },
+    refresh: function refresh() {
+        var self = this;
+        self.gotoPage(self.pageIndex);
     }
 };

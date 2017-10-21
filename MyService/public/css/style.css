@@ -57,3 +57,7 @@ tbody{
 .my-row>div {
   margin-top: 10px;
 }
+
+.error{
+  display: none;
+}
