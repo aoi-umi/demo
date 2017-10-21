@@ -19,8 +19,10 @@ module.prototype = {
     saveDom: null,
     addDom: null,
 
-    rowClass:'',
-    editClass:'',
+    rowClass: '',
+    editClass: '',
+    delClass: '',
+    detailQueryClass: '',
 
     operation: {
         query: false,
@@ -45,14 +47,40 @@ module.prototype = {
 
         rowClass: 'itemRow',
         editClass: 'itemEdit',
+        delClass: 'itemDel',
+        detailQueryClass: 'itemDetailQuery',
         interfacePrefix: '',
 
-        bindEvent: function(self){},
-        beforeQuery: function(){},
-        beforeEdit: function(item){},
-        afterEdit: function(item){},
-        beforeSave: function(){},
-        onSaveSuccess: function(t, self){}
+        bindEvent: function (self) {
+        },
+        beforeQuery: function () {
+        },
+        beforeEdit: function (item) {
+        },
+        afterEdit: function (item) {
+        },
+        beforeSave: function () {
+        },
+        onSaveSuccess: function (t, self) {
+            extend.msgNotice({type: 1, msg: '保存成功:' + t});
+        },
+        onSaveFail: function (e, self) {
+            extend.msgNotice({type: 1, msg: '保存失败:' + e.message});
+        },
+        onDelSuccess: function (t, self) {
+            extend.msgNotice({type: 1, msg: '删除成功'});
+            self.pager.refresh();
+        },
+        onDelFail: function (e, self) {
+            extend.msgNotice({type: 1, msg: '删除失败:' + e.message});
+        },
+        onDetailQuerySuccess: function (t, self) {
+            //todo
+            extend.msgNotice({type: 1, msg: '查询成功<br>' + JSON.stringify(t)});
+        },
+        onDetailQueryFail: function (e, self) {
+            extend.msgNotice({type: 1, msg: '查询失败:' + e.message});
+        }
     },
     init: function (option) {
         var self = this;
@@ -64,10 +92,14 @@ module.prototype = {
             });
         }
 
-        if(self.opt.rowClass)
+        if (self.opt.rowClass)
             self.rowClass = '.' + self.opt.rowClass;
-        if(self.opt.editClass)
+        if (self.opt.editClass)
             self.editClass = '.' + self.opt.editClass;
+        if (self.opt.delClass)
+            self.delClass = '.' + self.opt.delClass;
+        if (self.opt.detailQueryClass)
+            self.detailQueryClass = '.' + self.opt.detailQueryClass;
 
         self.queryDom = $('#' + self.opt.queryId);
         self.queryContainerDom = $('#' + self.opt.queryContainerId);
@@ -78,8 +110,7 @@ module.prototype = {
 
         self.saveDom = $('#' + self.opt.saveId);
         self.addDom = $('#' + self.opt.addId);
-
-
+        
         self.bindEvent();
         if (self.operation.query) {
             self.pager = new my.pager({
@@ -98,22 +129,18 @@ module.prototype = {
     bindEvent: function () {
         var self = this;
 
-        if(self.operation.query){
+        if (self.operation.query) {
             self.queryDom.on('click', function () {
                 self.pager.gotoPage(1);
             });
         }
 
-        if(self.operation.detailQuery){
-
-        }
-
-        if(self.operation.save){
+        if (self.operation.save) {
             self.addDom.on('click', function () {
                 self.edit();
             });
 
-            if(self.operation.query){
+            if (self.operation.query) {
                 self.queryContainerDom.on('click', self.editClass, function () {
                     var row = $(this).closest(self.rowClass);
                     self.edit(row.data('item'));
@@ -124,16 +151,26 @@ module.prototype = {
                 self.save();
             });
         }
-
-        if(self.operation.del){
-
+        
+        if (self.operation.detailQuery) {
+            self.queryContainerDom.on('click', self.detailQueryClass, function () {
+                var row = $(this).closest(self.rowClass);
+                self.detailQuery(row.data('item'));
+            });
+        }
+        
+        if (self.operation.del) {
+            self.queryContainerDom.on('click', self.delClass, function () {
+                var row = $(this).closest(self.rowClass);
+                self.del(row.data('item'));
+            });
         }
         self.opt.bindEvent(self);
     },
     query: function (pageIndex) {
         var self = this;
-        return extend.promise().then(function () {
-            self.queryContainerDom.find('.error').addClass('hidden');
+        return extend.promise().then(function (res) {
+            var errorDom = self.queryContainerDom.find('.error').hide();
             var data = null;
             var checkRes = self.opt.beforeQuery();
             if (checkRes) {
@@ -149,11 +186,12 @@ module.prototype = {
                 }
                 data = checkRes.model;
             }
-            if(!data) data={};
+            if (!data) data = {};
             data.page_index = pageIndex || self.pager.pageIndex;
             data.page_size = self.pager.pageSize;
             var method = self.opt.interfacePrefix + 'Query';
-            return my.interface[method](data).then(function (t) {
+            var notice = extend.msgNotice({type: 1, msg: '查询中...', noClose:true});
+            my.interface[method](data).then(function (t) {
                 self.queryContainerDom.find(self.rowClass).remove();
                 var temp = self.queryItemTemp;
                 $(t.list).each(function (i) {
@@ -161,19 +199,26 @@ module.prototype = {
                     item.colNum = i + 1;
                     self.queryContainerDom.append($(ejs.render(temp, item)).data('item', item));
                 });
-                return t;
+                return res.resolve(t);
             }).fail(function (e) {
                 self.queryContainerDom.find(self.rowClass).remove();
                 if (e instanceof Error) e = e.message;
                 if (typeof e == 'object') e = JSON.stringify(e);
-                self.queryContainerDom.find('[name=errorContent]').html(e);
-                self.queryContainerDom.find('.error').removeClass('hidden');
+                if(errorDom.length) {
+                    self.queryContainerDom.find('[name=errorContent]').html(e);
+                    errorDom.show();
+                    e = null;
+                }
+                return res.reject(e);
+            }).always(function () {
+                notice.close();
             });
+            return res;
         }).fail(function (e) {
-            console.log(e);
-            if(e)
+            if (e) {
+                console.log(e);
                 extend.msgNotice({type: 1, msg: e.message});
-            return $.Deferred().reject(e);
+            }
         });
     },
     edit: function (item) {
@@ -188,30 +233,82 @@ module.prototype = {
     },
     save: function () {
         var self = this;
-        var data = null;
-        try {
+        return extend.promise().then(function (res) {
+            var data = null;
             var checkRes = self.opt.beforeSave();
             if (checkRes) {
                 console.log(checkRes)
                 if (!checkRes.success) {
+                    var err = null;
                     if (checkRes.dom) {
                         extend.msgNotice({target: checkRes.dom.selector, msg: checkRes.desc});
                     } else {
-                        throw new Error(checkRes.desc);
+                        err = new Error(checkRes.desc);
                     }
-                    return;
+                    return $.Deferred().reject(err);
                 }
+                var notice = extend.msgNotice({type: 1, msg: '保存中...', noClose: true});
                 data = checkRes.model;
                 var method = self.opt.interfacePrefix + 'Save';
                 my.interface[method](data).then(function (t) {
                     self.opt.onSaveSuccess(t, self);
+                    return res.resolve(t);
                 }).fail(function (e) {
-                    console.log(e)
-                    extend.msgNotice({type: 1, msg: e.message});
+                    self.opt.onSaveFail(e, self);
+                    return res.reject();
+                }).always(function () {
+                    notice.close();
                 });
+                return res;
             }
-        }catch(e){
-            extend.msgNotice({type: 1, msg: e.message});
-        }
+        }).fail(function (e) {
+            if(e)
+                extend.msgNotice({type: 1, msg: e.message});
+        });
+    },
+    del: function (item) {
+        var self = this;
+        return extend.promise().then(function (res) {
+            extend.msgNotice({
+                type: 1, msg: '是否删除?',
+                btnOptList: [{
+                    content: '确认',
+                    cb: function () {
+                        res.resolve();
+                    }
+                }, {
+                    content: '取消',
+                    cb: function () {
+                    }
+                }]
+            });
+            return res;
+        }).then(function () {
+            var notice = extend.msgNotice({type: 1, msg: '删除中...', noClose: true});
+            var data = {id: item.id};
+            var method = self.opt.interfacePrefix + 'Del';
+            return my.interface[method](data).then(function (t) {
+                self.opt.onDelSuccess(t, self);
+            }).fail(function (e) {
+                self.opt.onDelFail(e, self);
+            }).always(function () {
+                notice.close();
+            });
+        });
+    },
+    detailQuery:function (item) {
+        var self = this;
+        return extend.promise().then(function (res) {
+            var notice = extend.msgNotice({type: 1, msg: '查询中...', noClose: true});
+            var data = {id: item.id};
+            var method = self.opt.interfacePrefix + 'DetailQuery';
+            return my.interface[method](data).then(function (t) {
+                self.opt.onDetailQuerySuccess(t, self);
+            }).fail(function (e) {
+                self.opt.onDetailQueryFail(e, self);
+            }).always(function () {
+                notice.close();
+            });
+        });
     }
 };

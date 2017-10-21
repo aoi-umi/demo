@@ -70,7 +70,7 @@ var restList = [
         path: 'index',
     },
     {
-        url: '/main_content_type/del',
+        url: '/:module/del',
         method: {
             checkAuthOnly: true,//仅检查权限，功能由后面路由实现
         },

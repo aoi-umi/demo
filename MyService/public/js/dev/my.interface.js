@@ -4,7 +4,7 @@
 namespace('my.interface');
 my.interface = {
     opt: {
-        interfaceList: {
+        interfaceConfig: {
             login: {
                 url: '/login'
             },
@@ -16,17 +16,23 @@ my.interface = {
             },
             mainContentTypeSave: {
                 url: '/main_content_type/save'
+            },
+            mainContentTypeDetailQuery: {
+                url: '/main_content_type/detailQuery'
+            },
+            mainContentTypeDel: {
+                url: '/main_content_type/del'
             }
         }
     },
     init: function () {
         var self = this;
-        var interfaceList = this.opt.interfaceList;
-        for (var key in interfaceList) {
+        var interfaceConfig = this.opt.interfaceConfig;
+        for (var key in interfaceConfig) {
             if (self[key])
                 throw new Error('interface [' + key + '] is exist!');
             eval(`self['${key}'] = function(data, option) {
-                var url = '${interfaceList[key].url}';
+                var url = '${interfaceConfig[key].url}';
                 var opt = {
                     url: url,
                     data: data,
