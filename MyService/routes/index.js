@@ -19,7 +19,11 @@ exports.signUp = function (req, res) {
     var args = req.body;
     common.promise().then(function (e) {
         if (!args.userName)
-            throw common.error('', errorConfig.CAN_NOT_BE_EMPTY);
+            throw common.error('', 'CAN_NOT_BE_EMPTY', {
+                format: function (msg) {
+                    return common.stringFormat(msg, '用户名');
+                }
+            });
         return userInfoBll.isAccountExist(args.userName);
     }).then(function (t) {
         if (t)
