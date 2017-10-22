@@ -804,7 +804,6 @@ public static List<string> CreateMySqlJs(DatabaseModel databaseModel)
     
     var jsStrList = new List<string>();
     jsStrList.Add("var db = require('../_system/db');");
-    jsStrList.Add("module.exports = {");
     
     operateTypeList.ForEach(operateType=>{
         var level = 1;
@@ -841,15 +840,14 @@ public static List<string> CreateMySqlJs(DatabaseModel databaseModel)
         if(!string.IsNullOrEmpty(functionName))
         {
             sqlStr = string.Format(sqlStr, procName, string.Join(", ", paramsList.Select(x=> ":" + x)));  
-            jsStrList.Add(Tabs(1) + functionName + ": function(params, conn) {");
-            jsStrList.Add(Tabs(2) + sqlStr);
-            jsStrList.Add(Tabs(2) + "return db.query(sql, params, conn);");
-            jsStrList.Add(Tabs(1) + "}," + Environment.NewLine);
+            jsStrList.Add("exports." + functionName + " = function(params, conn) {");
+            jsStrList.Add(Tabs(1) + sqlStr);
+            jsStrList.Add(Tabs(1) + "return db.query(sql, params, conn);");
+            jsStrList.Add("};" + Environment.NewLine);
         }
         
     });
     
-    jsStrList.Add("};");
     list.Add(string.Join(Environment.NewLine, jsStrList.ToArray()));
     return list;
 }

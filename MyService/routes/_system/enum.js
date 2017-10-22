@@ -36,7 +36,7 @@ module.exports = {
             '2':{},
         },
         statusEnum2:{
-            '0':{'1':'superis operation'}
+            '0':{'1':'surprise operation'}
         }
     }
 };
