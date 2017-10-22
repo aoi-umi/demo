@@ -55,7 +55,8 @@ module.prototype = {
         },
         beforeQuery: function () {
         },
-        beforeEdit: function (item) {
+        beforeEdit: function (item, self) {
+            return item;
         },
         afterEdit: function (item) {
         },
@@ -75,8 +76,7 @@ module.prototype = {
             extend.msgNotice({type: 1, msg: '删除失败:' + e.message});
         },
         onDetailQuerySuccess: function (t, self) {
-            //todo
-            extend.msgNotice({type: 1, msg: '查询成功<br>' + JSON.stringify(t)});
+            self.detailRender(t);
         },
         onDetailQueryFail: function (e, self) {
             extend.msgNotice({type: 1, msg: '查询失败:' + e.message});
@@ -226,9 +226,8 @@ module.prototype = {
         if (!item) {
             item = self.opt.saveDefaultModel;
         }
-        self.opt.beforeEdit(item);
-        var temp = self.detailTemp;
-        self.detailContainerDom.html(ejs.render(temp, item));
+        item = self.opt.beforeEdit(item, self);
+        self.detailRender(item);
         self.opt.afterEdit(item);
     },
     save: function () {
@@ -310,5 +309,10 @@ module.prototype = {
                 notice.close();
             });
         });
+    },
+    detailRender:function (item) {
+        var self = this;
+        var temp = self.detailTemp;
+        self.detailContainerDom.html(ejs.render(temp, item));
     }
 };
