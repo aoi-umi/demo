@@ -14,39 +14,39 @@ var pool = require('mysql').createPool({
     port: config.datebase.port
 });
 
-module.exports = {
-    query: function (sql, params, conn) {
-        if(!conn)
-            return myQuery(sql, params);
-        else
-            return myTranQuery(sql, params, conn);
-    },
-    //事务连接
-    tranConnect: function (queryFunction) {
-        var connection = null;
-        return common.promise().then(function () {
-            return getConnection();
-        }).then(function (t) {
-            connection = t;
-            return beginTransaction(connection);
-        }).then(function (t) {
-            var res = q.defer();
-            queryFunction(connection)
-                .then(res.resolve)
-                .fail(res.reject);
-            return res.promise;
-        }).then(function (t) {
-            return commit(connection);
-        }).fail(function (e) {
-            if (connection)
-                rollback(connection);
-            throw e;
-        }).finally(function () {
-            if (connection)
-                release(connection);
-        });
-    },
+exports.query = function (sql, params, conn) {
+    if (!conn)
+        return myQuery(sql, params);
+    else
+        return myTranQuery(sql, params, conn);
 };
+
+//事务连接
+exports.tranConnect = function (queryFunction) {
+    var connection = null;
+    return common.promise().then(function () {
+        return getConnection();
+    }).then(function (t) {
+        connection = t;
+        return beginTransaction(connection);
+    }).then(function (t) {
+        var res = q.defer();
+        queryFunction(connection)
+            .then(res.resolve)
+            .fail(res.reject);
+        return res.promise;
+    }).then(function (t) {
+        return commit(connection);
+    }).fail(function (e) {
+        if (connection)
+            rollback(connection);
+        throw e;
+    }).finally(function () {
+        if (connection)
+            release(connection);
+    });
+};
+
 function myQuery(sql, params) {
     if (!params)
         params = [];

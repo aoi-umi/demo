@@ -200,7 +200,7 @@ exports.requestServicePromise = function (option) {
                 if (encoding) {
                     switch (encoding) {
                         case 'gzip':
-                            return zlib.unzipPromise(data).then(function (buffer) {
+                            return common.unzipPromise(data).then(function (buffer) {
                                 data = buffer.toString();
                                 if (data && typeof data == 'string')
                                     data = JSON.parse(data);
@@ -229,7 +229,7 @@ exports.requestServicePromise = function (option) {
     });
 };
 
-zlib.unzipPromise = common.promisify(zlib.unzip);
+exports.unzipPromise = common.promisify(zlib.unzip);
 
 exports.formatRes = function (err, detail, opt) {
     //result    是否成功
