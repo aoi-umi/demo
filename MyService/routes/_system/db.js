@@ -15,27 +15,13 @@ var pool = require('mysql').createPool({
 });
 
 module.exports = {
-    query: function (sql, params) {
-        if (!params)
-            params = [];
-
-        var connection = null;
-        return common.promise().then(function () {
-            return getConnection();
-        }).then(function (t) {
-            connection = t;
-            return query(connection, sql, params);
-        }).then(function (t) {
-            return (t);
-        }).fail(function (e) {
-            common.writeError(e);
-            throw e;
-        }).finally(function () {
-            release(connection);
-        });
+    query: function (sql, params, conn) {
+        if(!conn)
+            return myQuery(sql, params);
+        else
+            return myTranQuery(sql, params, conn);
     },
-
-    //事务处理
+    //事务连接
     tranConnect: function (queryFunction) {
         var connection = null;
         return common.promise().then(function () {
@@ -60,48 +46,44 @@ module.exports = {
                 release(connection);
         });
     },
-    tranQuery: function (sql, params, conn) {
-        if (!conn) {
-            conn = params;
-            params = [];
-        }
-        if (!params)
-            params = [];
-
-        var connection = conn;
-        return common.promise().then(function (t) {
-            return query(connection, sql, params);
-        }).then(function (t) {
-            return (t);
-        }).fail(function (e) {
-            throw e;
-        });
-    }
 };
+function myQuery(sql, params) {
+    if (!params)
+        params = [];
 
-//var exports = module.exports;
-//exports.query('call p_auto_t_user_info_query(:id, :account, :password,:nickname, :auth, :edit_date,:create_date, :remark,:null_list, :page_size, :page_index)').then(function(t){
-//    console.log(JSON.stringify(t))
-//}).fail(function(e){
-//    console.log(e)
-//});
-//事务处理
-//var sql = 'call p_auto_t_user_info_query(:id, :account, :password,:nickname, :auth, :edit_date,:create_date, :remark,:null_list, :page_size, :page_index)';
-//var sql = 'call p_auto_t_user_info_save(:id, :account, :password,:nickname, :auth, :edit_date,:create_date, :remark,:null_list)';
-//var sqlArgs = {id:12, account:'account41', password:'123456', create_date:new Date()};
-//exports.tranConnect(function(conn){
-//    return common.promise().then(function(){
-//        return exports.tranQuery(sql,sqlArgs, conn);
-//    }).then(function(t){
-//        console.log(JSON.stringify(t));
-//        //throw 'rollback test';
-//        return exports.tranQuery(sql,sqlArgs, conn);
-//    }).then(function(t){
-//        console.log(JSON.stringify(t));
-//    });
-//}).fail(function(e) {
-//    console.log(e);
-//});
+    var connection = null;
+    return common.promise().then(function () {
+        return getConnection();
+    }).then(function (t) {
+        connection = t;
+        return query(connection, sql, params);
+    }).then(function (t) {
+        return (t);
+    }).fail(function (e) {
+        common.writeError(e);
+        throw e;
+    }).finally(function () {
+        release(connection);
+    });
+}
+
+function myTranQuery(sql, params, conn) {
+    if (!conn) {
+        conn = params;
+        params = [];
+    }
+    if (!params)
+        params = [];
+
+    var connection = conn;
+    return common.promise().then(function (t) {
+        return query(connection, sql, params);
+    }).then(function (t) {
+        return (t);
+    }).fail(function (e) {
+        throw e;
+    });
+}
 
 function queryFormat(query, values) {
     if (!values) return query;
