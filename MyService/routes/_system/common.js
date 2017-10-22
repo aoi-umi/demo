@@ -285,7 +285,7 @@ exports.error = function (msg, code, option) {
         opt = common.extend(opt, option);
     if (!code)
         code = '';
-
+    
     if (code && errorConfig[code]) {
         var error = errorConfig[code];
         code = error.code;
