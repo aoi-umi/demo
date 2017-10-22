@@ -149,6 +149,11 @@ private static string GetRepeatStr(string str, int count)
     return returnStr;
 }
 
+private static string Tabs(int count)
+{
+    return GetRepeatStr("\t", count);
+}
+
 #region 存储过程
 public static List<string> CreateProcedure(DatabaseModel databaseModel, DatabaseTypeEnum databaseType)
 {
@@ -799,7 +804,7 @@ public static List<string> CreateMySqlJs(DatabaseModel databaseModel)
     
     var jsStrList = new List<string>();
     jsStrList.Add("var db = require('../_system/db');");
-    jsStrList.Add("var exports = module.exports;");
+    jsStrList.Add("module.exports = {");
     
     operateTypeList.ForEach(operateType=>{
         var level = 1;
@@ -835,16 +840,16 @@ public static List<string> CreateMySqlJs(DatabaseModel databaseModel)
         }      
         if(!string.IsNullOrEmpty(functionName))
         {
-            sqlStr = string.Format(sqlStr, procName, string.Join(", ", paramsList.Select(x=> ":" + x)));                        
-            jsStrList.Add("exports." + functionName + " = function (params, conn) {");
-            jsStrList.Add(tabStr + sqlStr);
-            jsStrList.Add(tabStr + "if(!conn)");
-            jsStrList.Add(tabStr + "\t" + "return db.query(sql, params);");
-            jsStrList.Add(tabStr + "else");
-            jsStrList.Add(tabStr + "\t" + "return db.tranQuery(sql, params, conn);");
-            jsStrList.Add("};" + Environment.NewLine);
+            sqlStr = string.Format(sqlStr, procName, string.Join(", ", paramsList.Select(x=> ":" + x)));  
+            jsStrList.Add(Tabs(1) + functionName + ": function(params, conn) {");
+            jsStrList.Add(Tabs(2) + sqlStr);
+            jsStrList.Add(Tabs(2) + "return db.query(sql, params, conn);");
+            jsStrList.Add(Tabs(1) + "}," + Environment.NewLine);
         }
+        
     });
+    
+    jsStrList.Add("};");
     list.Add(string.Join(Environment.NewLine, jsStrList.ToArray()));
     return list;
 }
