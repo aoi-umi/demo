@@ -36,6 +36,10 @@ function getBll(module, method, req){
     ) {
         opt.isUsedCustom = true;
     }
+    if(common.isInList(['detailQuery'], method)){
+        if(!args || !args.id)
+            throw common.error('args error');
+    }
 
     //不记录日志
     if(module == 'log'){

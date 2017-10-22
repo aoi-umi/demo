@@ -120,6 +120,10 @@
                     }]
                 });
                 self.pager.refresh();
+            },
+            onDetailQuerySuccess:function (t, self) {
+                self.detailRender(t);
+                $('#mainContentTypeSave').modal('show');
             }
         };
         var moduleMainContentType = new module(opt);
