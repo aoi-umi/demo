@@ -31,6 +31,13 @@
         </tbody>
     </table>
     <div id="pager"></div>
+    <div>
+        <a id="tree" href="javascript:;">tree</a>
+        <div>
+            <ul id="treeList">
+            </ul>
+        </div>
+    </div>
 </div>
 <div id="mainContentTypeSave" data-backdrop="false" role="dialog" tabindex="-1" class="modal fade" style="z-index: 1040">
     <div class="modal-dialog" style="top:100px">
@@ -56,6 +63,13 @@
 </script>
 <script type="text/template" id="mainContentTypeItem">
     <% include ../_template_web/mainContentTypeItem%>
+</script>
+<script type="text/template" id="mainContentTypeItem2">
+    <li>
+        <span title="">{%=type%}</span>
+        <ul class="child">
+        </ul>
+    </li>
 </script>
 <script type="text/javascript" src="/js/<%=env%>/my.pager.js?v=<%=version%>"></script>
 <script type="text/javascript" src="/js/<%=env%>/module.js?v=<%=version%>"></script>
@@ -83,6 +97,43 @@
 //            rowClass: 'itemRow',
 //            editClass: 'itemEdit',
             interfacePrefix: 'mainContentType',
+
+            bindEvent: function() {
+                $('#tree').on('click', function () {
+                    var data = {};
+                    var method = 'mainContentTypeQuery';
+                    my.interface[method](data).then(function (t) {
+                        var rootTree = {};
+                        var noParentTree = {};
+                        $('#treeList').empty();
+                        function setTree(tree, parent_type, list) {
+                            $(list).each(function (i, item) {
+                                if(item.parent_type == parent_type) {
+                                    if (!tree[item.type]) {
+                                        tree[item.type] = {
+                                            item: item,
+                                            child: {}
+                                        }
+                                    }
+                                    setTree(tree[item.type].child, item.type, list);
+                                }
+                            });
+                        }
+                        setTree(rootTree, '', t.list);
+                        var temp = $('#mainContentTypeItem2').html();
+                        function renderTree(leave, treeDom){
+                            var leaveDom = $(ejs.render(temp, leave.item));
+                            treeDom.append(leaveDom);
+                            for(var key in leave.child){
+                                renderTree(leave.child[key], leaveDom.find('.child:eq(0)'));
+                            }
+                        }
+                        for(var key in rootTree){
+                            renderTree(rootTree[key], $('#treeList'));
+                        }
+                    })
+                });
+            },
             afterEdit: function (item) {
                 $('#mainContentTypeSave [name=title]').html(item.id ? ('修改:' + item.id) : '新增');
                 $('#mainContentTypeSave').modal('show');
