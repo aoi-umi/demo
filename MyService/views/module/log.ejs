@@ -71,7 +71,7 @@
                 name: 'id',
                 dom: $('#log_id'),
                 checkValue: function (val) {
-                    if (val && !val.match(/^[\d]+$/))
+                    if (val && !my.vaild.isInt(val, '001'))
                         return '请输入正确的正整数';
                 }
             }, {
