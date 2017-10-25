@@ -14,7 +14,7 @@ moduleLog = {
             rowClass: 'itemRow',
             interfacePrefix: 'log',
 
-            queryArgs: [{
+            queryArgsOpt: [{
                 name: 'id',
                 dom: $('#log_id'),
                 checkValue: function (val) {
@@ -69,31 +69,11 @@ moduleLog = {
                         content.slideDown();
                     }
                 });
-
-                $(this.queryArgs).each(function(){
-                    var item = this;
-                    if(item.dom){
-                        item.dom.on('blur', function(){
-                            var checkRes = extend.dataCheck({list: [item]});
-                            if(checkRes.success){
-                                $('[data-target="' + checkRes.dom.selector + '"]').hide();
-                            }else{
-                                extend.msgNotice({target: checkRes.dom.selector, msg: checkRes.desc});
-                            }
-                        });
-                    }
-                });
             },
-            beforeQuery: function(){
-                var list = this.queryArgs;
-                var checkRes = extend.dataCheck({list: list});
-                if(checkRes.success) {
-                    var data = checkRes.model;
-                    if (!data.id) data.id = null;
-                    if (!data.create_date_start) data.create_date_start = null;
-                    if (!data.create_date_end) data.create_date_end = null;
-                }
-                return checkRes;
+            beforeQuery: function(data){
+                if (!data.id) data.id = null;
+                if (!data.create_date_start) data.create_date_start = null;
+                if (!data.create_date_end) data.create_date_end = null;
             }
         };
         opt = $.extend(opt, option);
