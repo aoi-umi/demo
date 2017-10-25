@@ -27,7 +27,7 @@ moduleMainContentType = {
 //            rowClass: 'itemRow',
 //            editClass: 'itemEdit',
             interfacePrefix: 'mainContentType',
-            queryArgs: [{
+            queryArgsOpt: [{
                 name: 'id',
                 dom: $('#id'),
                 checkValue: function (val) {
@@ -106,30 +106,10 @@ moduleMainContentType = {
                         }
                     })
                 });
-
-                $(this.queryArgs).each(function () {
-                    var item = this;
-                    if (item.dom) {
-                        item.dom.on('blur', function () {
-                            var checkRes = extend.dataCheck({list: [item]});
-                            if (checkRes.success) {
-                                $('[data-target="' + checkRes.dom.selector + '"]').hide();
-                            } else {
-                                extend.msgNotice({target: checkRes.dom.selector, msg: checkRes.desc});
-                            }
-                        });
-                    }
-                });
             },
-            beforeQuery: function () {
-                var list = this.queryArgs;
-                var checkRes = extend.dataCheck({list: list});
-                if (checkRes.success) {
-                    var data = checkRes.model;
-                    if (!data.id) data.id = null;
-                    if (!data.level) data.level = null;
-                }
-                return checkRes;
+            beforeQuery: function (data) {
+                if (!data.id) data.id = null;
+                if (!data.level) data.level = null;
             },
             afterEdit: function (item) {
                 $('#mainContentTypeSave [name=title]').html(item.id ? ('修改:' + item.id) : '新增');
