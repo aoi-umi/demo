@@ -40,6 +40,7 @@ module.prototype = {
 
         detailContainerId: 'detailContainer',
         detailTempId: 'detailTemp',
+        queryArgsOpt: null,
 
         saveId: 'save',
         saveDefaultModel: null,
@@ -53,7 +54,17 @@ module.prototype = {
 
         bindEvent: function (self) {
         },
-        beforeQuery: function () {
+        beforeQueryDataCheck: function (self) {
+            var list = self.opt.queryArgsOpt;
+            if(list) {
+                var checkRes = extend.dataCheck({list: list});
+                if (checkRes.success) {
+                    var data = checkRes.model;
+                }
+                return checkRes;
+            }
+        },
+        beforeQuery: function(t){
         },
         beforeEdit: function (item, self) {
             return item;
@@ -133,6 +144,22 @@ module.prototype = {
             self.queryDom.on('click', function () {
                 self.pager.gotoPage(1);
             });
+
+            if(self.opt.queryArgsOpt) {
+                $(self.opt.queryArgsOpt).each(function () {
+                    var item = this;
+                    if (item.dom) {
+                        item.dom.on('blur', function () {
+                            var checkRes = extend.dataCheck({list: [item]});
+                            if (checkRes.success) {
+                                $('[data-target="' + checkRes.dom.selector + '"]').hide();
+                            } else {
+                                extend.msgNotice({target: checkRes.dom.selector, msg: checkRes.desc});
+                            }
+                        });
+                    }
+                });
+            }
         }
 
         if (self.operation.save) {
@@ -172,7 +199,7 @@ module.prototype = {
         return extend.promise().then(function (res) {
             var errorDom = self.queryContainerDom.find('.error').hide();
             var data = null;
-            var checkRes = self.opt.beforeQuery();
+            var checkRes = self.opt.beforeQueryDataCheck(self);
             if (checkRes) {
                 console.log(checkRes)
                 var err = null;
@@ -189,6 +216,7 @@ module.prototype = {
             if (!data) data = {};
             data.page_index = pageIndex || self.pager.pageIndex;
             data.page_size = self.pager.pageSize;
+            self.opt.beforeQuery(data);
             var method = self.opt.interfacePrefix + 'Query';
             var notice = extend.msgNotice({type: 1, msg: '查询中...', noClose:true});
             my.interface[method](data).then(function (t) {
