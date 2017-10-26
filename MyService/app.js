@@ -66,6 +66,7 @@ app.use(function (req, res, next) {
             var log = common.logModle();
             log.url = url;
             log.result = result;
+            log.code = formatRes.code;
             log.method = logMethod
             log.req = logReq;
             log.res = logRes;
