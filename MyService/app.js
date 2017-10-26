@@ -26,6 +26,11 @@ app.use(function (req, res, next) {
     //req.body  post的参数
     //req.params /:params1/:params2
     //console.log(require('./routes/_system/common').getClientIp(req));
+
+    // console.log(__dirname);
+    // console.log(__filename);
+    // console.log(process.cwd());
+    // console.log(path.resolve('./'));
     req.myData = {
         method: {},
         user: {
@@ -112,8 +117,15 @@ restConfig.forEach(function(rest) {
     if(!method.checkAuthOnly) {
         var reqfile = require(path);
         if (!reqfile[functionName])
-            throw new Error('[' + path + '] is not exist function [' + functionName + ']');
-        routerMethodList.push(reqfile[functionName]);
+            throw common.error('[' + path + '] is not exist function [' + functionName + ']', 'CODE_ERROR');
+        var methodFun = function (req, res, next) {
+            try{
+                reqfile[functionName](req, res, next);
+            }catch(e){
+                next(e);
+            }
+        };
+        routerMethodList.push(methodFun);
     }
 
     var methodName = method.name.toLowerCase();

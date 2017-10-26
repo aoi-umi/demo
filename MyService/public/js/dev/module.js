@@ -32,7 +32,7 @@ module.prototype = {
     },
     opt: {
         //query detailQuery save del
-        operation: ['query'],
+        operation: [],
         pagerId: 'pager',
         queryId: 'query',
         queryItemTempId: 'queryItemTemp',
