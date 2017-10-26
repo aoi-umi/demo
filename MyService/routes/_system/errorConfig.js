@@ -17,6 +17,13 @@ module.exports= {
             'en':'code error',
         }
     },
+    BAD_REQUEST:{
+        code: 'BAD_REQUEST',
+        desc: {
+            'zh':'错误请求',
+            'en':'bad request',
+        }
+    },
 
     TOKEN_WRONG: {
         code: 'TOKEN_WRONG',

@@ -1,32 +1,38 @@
 /**
  * Created by bang on 2017-9-7.
  */
+var path = require('path');
+var fs = require('fs');
 var common = require('../_system/common');
 var autoBll = require('../_bll/auto');
 
-module.exports = {
-    post: function (req, res) {
-        var params = req.params;
-        common.promise().then(function (e) {
-            switch (params.method){
-                case 'save':
-                case 'del':
-                case 'query':
-                case 'detailQuery':
-                    break;
-                default: throw common.error('no match method[' + params.method + ']');
-            }
-            return getBll(params.module, params.method, req);
-        }).then(function (t) {
-            res.mySend(null, t);
-        }).fail(function (e) {
-            res.mySend(e);
-        });
-    }
+exports.post = function (req, res, next) {
+    var bll = getBll(req, res, next);
+    if(!bll)
+        return next();
+    common.promise().then(function () {
+        return bll;
+    }).then(function (t) {
+        res.mySend(null, t);
+    }).fail(function (e) {
+        res.mySend(e);
+    });
 };
 
-function getBll(module, method, req){
+function getBll(req, res, next){
+    var params = req.params;
     var args = req.body;
+    var module = params.module;
+    var method = params.method;
+    switch (method) {
+        case 'save':
+        case 'del':
+        case 'query':
+        case 'detailQuery':
+            break;
+        default:
+            throw common.error('no match method[' + method + ']', 'BAD_REQUEST');
+    }
     var opt = {
         isUsedCustom: false
     };
@@ -49,6 +55,11 @@ function getBll(module, method, req){
     if(opt.isUsedCustom){
         return autoBll.custom(module, method, args);
     }else {
+        var modulePath = path.resolve(__dirname + '/../_bll/' + module + '.js');
+        var isExist = fs.existsSync(modulePath);
+        if(!isExist){
+            return null;
+        }
         return autoBll[method](module, args);
     }
 }
