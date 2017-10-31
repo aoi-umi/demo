@@ -38,7 +38,8 @@ function getBll(req, res, next){
     };
     //使用custom
     if((module == 'log' && common.isInList(['query'], method))
-    || (module == 'main_content_type' && common.isInList(['save'], method))
+        || (module == 'main_content_type' && common.isInList(['save'], method))
+        || (module == 'main_content' && common.isInList(['query'], method))
     ) {
         opt.isUsedCustom = true;
     }
@@ -55,7 +56,7 @@ function getBll(req, res, next){
     if(opt.isUsedCustom){
         return autoBll.custom(module, method, args);
     }else {
-        var modulePath = path.resolve(__dirname + '/../_bll/' + module + '.js');
+        var modulePath = path.resolve(__dirname + '/../_dal/' + module + '_auto.js');
         var isExist = fs.existsSync(modulePath);
         if(!isExist){
             return null;
