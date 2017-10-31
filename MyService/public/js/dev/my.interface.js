@@ -11,6 +11,59 @@ my.interface = {
             logQuery: {
                 url: '/log/query'
             },
+
+            mainContentQuery: {
+                url: '/main_content/query'
+            },
+            mainContentSave: {
+                url: '/main_content/save'
+            },
+            mainContentDetailQuery: {
+                url: '/main_content/detailQuery'
+            },
+            mainContentDel: {
+                url: '/main_content/del'
+            },
+
+            mainContentChildQuery: {
+                url: '/main_content_child/query'
+            },
+            mainContentChildSave: {
+                url: '/main_content_child/save'
+            },
+            mainContentChildDetailQuery: {
+                url: '/main_content_child/detailQuery'
+            },
+            mainContentChildDel: {
+                url: '/main_content_child/del'
+            },
+
+            mainContentLogQuery: {
+                url: '/main_content_log/query'
+            },
+            mainContentLogSave: {
+                url: '/main_content_log/save'
+            },
+            mainContentLogDetailQuery: {
+                url: '/main_content_log/detailQuery'
+            },
+            mainContentLogDel: {
+                url: '/main_content_log/del'
+            },
+
+            mainContentTypeIdQuery: {
+                url: '/main_content_type_id/query'
+            },
+            mainContentTypeIdSave: {
+                url: '/main_content_type_id/save'
+            },
+            mainContentTypeIdDetailQuery: {
+                url: '/main_content_type_id/detailQuery'
+            },
+            mainContentTypeIdDel: {
+                url: '/main_content_type_id/del'
+            },
+
             mainContentTypeQuery: {
                 url: '/main_content_type/query'
             },

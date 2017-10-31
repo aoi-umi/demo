@@ -5,7 +5,6 @@ var autoBll = require('./auto');
 var db = require('../_system/db');
 var common = require('../_system/common');
 var logDal = require('../_dal/log');
-var exports = module.exports;
 
 //事务测试
 exports.tranTest = function (opt) {

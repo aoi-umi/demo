@@ -1,0 +1,89 @@
+<div class="container">
+    <% var rowItemClass = 'col-lg-3 col-md-4 col-sm-6 col-xs-12';%>
+    <div class="form-group">
+        <div class="row my-row">
+            <%
+            var prefix = '';
+            var searchItemList = [{
+                text: 'id',
+                id:'id',
+            },{
+                text: 'type',
+                id:'type',
+            },{
+                text: 'status',
+                id:'status',
+            },{
+                text: 'user_info_id',
+                id:'user_info_id',
+            },{
+                text: 'title',
+                id:'title',
+            },{
+                text: 'create_date',
+                id:'create_date',
+            },{
+                text: 'operate_date',
+                id:'operate_date',
+            },{
+                text: 'operator',
+                id:'operator',
+            },];
+            for(var i = 0;i< searchItemList.length;i++){
+                var item = searchItemList[i];
+            %>
+            <div class="<%=rowItemClass%>">
+                <div class="input-group">
+                    <span class="input-group-addon"><%=item.text%></span>
+                    <input id="<%=prefix + item.id%>" type="text" class="form-control" />
+                </div>
+            </div>
+            <%}%>
+        </div>
+        <div class="row my-row">
+            <div class="<%=rowItemClass%> col-lg-offset-6 col-md-offset-4">
+                <button id="search" class="btn btn-default btn-block">
+                    search
+                </button>
+            </div>
+            <div class="<%=rowItemClass%>">
+                <button id="add" class="btn btn-default btn-block">
+                    add
+                </button>
+            </div>
+        </div>
+    </div>
+    <table id="list" class="table table-bordered">
+        <thead>
+            <tr>
+                <th class="text-center" colspan="100">mainContent</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th>id</th><th>type</th><th>status</th>
+                <th>user_info_id</th><th>title</th><th>desc</th>
+                <th>create_date</th><th>operate_date</th><th>operator</th>
+                <th>操作</th>
+            </tr>
+        </tbody>
+        <tbody class="error">
+            <tr><td class="text-center" colspan="100" name="errorContent"></td></tr>
+        </tbody>
+    </table>
+    <div id="pager"></div>
+</div>
+<script type="text/template" id="mainContentItem">
+    <% include ../_template_web/mainContentItem%>
+</script>
+<script type="text/javascript" src="/js/<%=env%>/my.pager.js?v=<%=version%>"></script>
+<script type="text/javascript" src="/js/<%=env%>/module.js?v=<%=version%>"></script>
+<script type="text/javascript" src="/js/<%=env%>/moduleMainContent.js?v=<%=version%>"></script>
+<script type="text/javascript">
+    $(function () {
+        var opt = {
+            operation:['query']
+        };
+        var mainContent = moduleMainContent.init(opt);
+    });
+</script>
