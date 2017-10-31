@@ -2,51 +2,63 @@
     <div class="row">
         <div class="col-xs-2 col-sm-2 col-md-2 sidebar">
             <% var menuList = [{
-                        text: '菜单Test',
-                        listId: 'menuItemListTest',
-                        childs: [{
-                            text: 'Home',
-                            tab:{
-                              target:'home'
-                            },
-                        }, {
-                            text: 'Index',
-                            tab:{
-                                target:'index',
-                                content:'/?noNav=true'
-                            },
-                        }, {
-                            text: 'Help',
-                            tab:{
-                                target:'help',
-                                content:'/help?noNav=true'
-                            },
-                        }, {
-                            text: 'Log',
-                            tab:{
-                                target:'log',
-                                content:'/log?noNav=true'
-                            },
-                        }, {
-                            text: 'test',
-                            tab:{
-                                target:'test',
-                                content:'testTemplate',
-                                type:'template'
-                            },
-                        },]
-                    }, {
-                        text: 'main content menu',
-                        listId: '',
-                        childs: [{
-                            text: 'main content type',
-                            tab:{
-                                target:'mainContentType',
-                                content:'/mainContentType?noNav=true',
-                                name:'main content type list'
-                            },
-                        },]
-                    }];
+                text: 'main content menu',
+                listId: '',
+                childs: [{
+                    text: 'main content type',
+                    tab:{
+                        target:'mainContentType',
+                        content:'/mainContentType?noNav=true',
+                        name:'main content type list'
+                    },
+                },]
+            }, {
+                text: '菜单Test',
+                listId: 'menuItemListTest',
+                childs: [{
+                    text: 'Home',
+                    tab: {
+                        target: 'home'
+                    },
+                }, {
+                    text: 'Index',
+                    tab: {
+                        target: 'index',
+                        content: '/?noNav=true'
+                    },
+                }, {
+                    text: 'Help',
+                    tab: {
+                        target: 'help',
+                        content: '/help?noNav=true'
+                    },
+                }, {
+                    text: 'Log',
+                    tab: {
+                        target: 'log',
+                        content: '/log?noNav=true'
+                    },
+                }, {
+                    text: 'Status',
+                    tab: {
+                        target: 'status',
+                        content: '/status?noNav=true'
+                    },
+                }, {
+                    text: 'Color',
+                    tab: {
+                        target: 'color',
+                        content: '/color?noNav=true'
+                    },
+                }, {
+                    text: 'test',
+                    tab: {
+                        target: 'test',
+                        content: 'testTemplate',
+                        type: 'template'
+                    },
+                },]
+            }, ];
             menuList.forEach(function(t){
                 if (!t.listId)
                     t.listId = 'menuId' + new Date().getTime();
