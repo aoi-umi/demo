@@ -5,4 +5,4 @@ MyService/error
 MyService/public/js/prd
 MyService/file
 MyService/views/_template_web
-MyService/routes/_dal/*_auto
+MyService/routes/_dal/*_auto.js
