@@ -52,6 +52,8 @@ app.use(function (req, res, next) {
             user: req.myData.user,
             noNav: req.query.noNav,
         };
+        if (opt.noNav == 'false')
+            opt.noNav = false;
         opt = common.extend(opt, options);
         res.render(view, common.formatViewtRes(opt));
     };

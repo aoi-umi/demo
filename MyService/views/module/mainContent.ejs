@@ -82,18 +82,31 @@
 <script type="text/javascript">
     $(function () {
         var opt = {
+            mainContentDetailUrl:'/mainContentDetail',
             operation:['query'],
-            bindEvent: function(){
+            bindEvent: function(self){
                 $('#add').on('click', function(){
-                    var data = {
-                        id: 'addMainContent',
-                        name: '新增内容',
-                        content: '/mainContentAdd?noNav=1'
+                    var url = self.opt.mainContentDetailUrl + '?id=0';
+                    var args = {
+                        id: 0,
+                        noNav: true
                     };
-                    if(parent.my.tab)
+                    var url = self.opt.mainContentDetailUrl + '?';
+
+                    if(parent.my.tab) {
+                        var params = extend.getUrlParamsFromArgs(args);
+                        var data = {
+                            id: 'mainContentDetail',
+                            name: '新增内容',
+                            content: url + params
+                        };
                         parent.my.tab.addOrOpenTab(data);
-                    else
-                        window.open('/mainContentAdd');
+                    }
+                    else {
+                        args.noNav = false;
+                        var params = extend.getUrlParamsFromArgs(args);
+                        window.open(url + params);
+                    }
                 });
             }
         };
