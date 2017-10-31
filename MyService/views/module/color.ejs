@@ -65,7 +65,7 @@
         </div>
     </div>
     <p>
-        <b>R</b> <input type="hidden" class="span2" value=""  data-slider-id="sliderR" id="r"/>
+        <b>R</b> <input type="hidden" class="span2" value="" data-slider-id="sliderR" id="r"/>
     </p>
     <p>
         <b>G</b> <input type="hidden" class="span2" value="" data-slider-id="sliderG" id="g"/>
@@ -79,7 +79,7 @@
     <div id="rgba"></div>
     <label id="colorText"></label><label>颜色</label>
 </div>
-<script src="/js/plugin/bootstrap-slider.min.js"></script>
+<script src="/js/plugins/bootstrap-slider.min.js"></script>
 <script type="text/javascript">
     $(function(){
         var rgba = {
@@ -139,9 +139,9 @@
                 opt.step = 0.1;
                 opt.value = 0.5;
             }
-            rgba[key] = $('#' + key).slider(opt)
+            rgba[key] = $('#' + key).bootstrapSlider(opt)
                     .on('slide change', RGBChange)
-                    .data('slider');
+                    .data('bootstrapSlider');
         }
         RGBChange();
 
