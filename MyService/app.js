@@ -21,6 +21,10 @@ app.use(bodyParser.urlencoded());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+//
+Date.prototype.toJSON = function(){
+  return common.dateFormat(this, 'yyyy-MM-dd HH:mm:ss');
+};
 app.use(function (req, res, next) {
     //req.query  /?params1=1&params2=2
     //req.body  post的参数

@@ -423,11 +423,17 @@ exports.dateFormat = function (date, format) {
             h: date.getHours() % 12,
             H: date.getHours(),
             m: date.getMinutes(),
-            s: date.getSeconds()
+            s: date.getSeconds(),
+            S: date.getMilliseconds()
         };
-        return format.replace(/(y+|M+|d+|h+|H+|m+|s+)/g, function (e) {
-            return ((e.length > 1 ? '0' : '') + eval('o.' + e.slice(-1))).slice(-(e.length > 2 ? e.length : 2))
+
+        var formatStr = format.replace(/(y+|M+|d+|h+|H+|m+|s+|S+)/g, function (e) {
+            if (e.match(/S+/))
+                return ('' + eval('o.' + e.slice(-1))).slice(0, e.length);
+            else
+                return ((e.length > 1 ? '0' : '') + eval('o.' + e.slice(-1))).slice(-(e.length > 2 ? e.length : 2));
         });
+        return formatStr;
     } catch (ex) {
         return '';
     }

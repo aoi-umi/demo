@@ -32,8 +32,8 @@ exports.query = function(opt){
         resData.list = t[0];
         if(resData.list.length){
             resData.list.forEach(function(item){
-                if(item.create_date)
-                    item.create_date = common.dateFormat(item.create_date, 'yyyy-MM-dd HH:mm:ss');
+                //if(item.create_date)
+                //    item.create_date = common.dateFormat(item.create_date, 'yyyy-MM-dd HH:mm:ss');
             });
         }
         resData.count = t[1][0].count;
