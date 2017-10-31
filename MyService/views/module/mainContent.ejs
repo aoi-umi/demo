@@ -82,7 +82,20 @@
 <script type="text/javascript">
     $(function () {
         var opt = {
-            operation:['query']
+            operation:['query'],
+            bindEvent: function(){
+                $('#add').on('click', function(){
+                    var data = {
+                        id: 'addMainContent',
+                        name: '新增内容',
+                        content: '/mainContentAdd?noNav=1'
+                    };
+                    if(parent.my.tab)
+                        parent.my.tab.addOrOpenTab(data);
+                    else
+                        window.open('/mainContentAdd');
+                });
+            }
         };
         var mainContent = moduleMainContent.init(opt);
     });

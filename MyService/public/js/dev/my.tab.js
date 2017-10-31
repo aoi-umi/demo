@@ -188,5 +188,31 @@ my.tab = {
                 list.push(dom);
         }
         return list;
+    },
+    addOrOpenTab:function(data){
+        var self = this;
+        var tabContainer = self.tabContainer;
+        var panelContainer = self.panelContainer;
+        var tabId = 'tab-' + data.id;
+        var headerId = 'tab-header-' + data.id;
+        var panelId = 'panel-' + data.id;
+        var tabData = {
+            id: tabId,
+            name: data.name,
+            headerId: headerId,
+            targetId: panelId,
+            closeTarget: '#' + headerId + ',#' + panelId,
+        };
+        if(!$('#' + tabId).length)
+            tabContainer.append(self.tab(tabData));
+
+        var tabPanelData = {
+            type: data.type,
+            id: panelId,
+            content: data.content
+        };
+        if(!$('#' + panelId).length)
+            panelContainer.append(self.panel(tabPanelData));
+        $('#' + tabId).click();
     }
 }
