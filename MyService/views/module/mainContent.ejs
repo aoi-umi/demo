@@ -82,33 +82,7 @@
 <script type="text/javascript">
     $(function () {
         var opt = {
-            mainContentDetailUrl:'/mainContentDetail',
-            operation:['query'],
-            bindEvent: function(self){
-                $('#add').on('click', function(){
-                    var url = self.opt.mainContentDetailUrl + '?id=0';
-                    var args = {
-                        id: 0,
-                        noNav: true
-                    };
-                    var url = self.opt.mainContentDetailUrl + '?';
-
-                    if(parent.my.tab) {
-                        var params = extend.getUrlParamsFromArgs(args);
-                        var data = {
-                            id: 'mainContentDetail',
-                            name: '新增内容',
-                            content: url + params
-                        };
-                        parent.my.tab.addOrOpenTab(data);
-                    }
-                    else {
-                        args.noNav = false;
-                        var params = extend.getUrlParamsFromArgs(args);
-                        window.open(url + params);
-                    }
-                });
-            }
+            operation:['query']
         };
         var mainContent = moduleMainContent.init(opt);
     });

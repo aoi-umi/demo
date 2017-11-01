@@ -6,7 +6,9 @@ moduleMainContent = {
     init: function (option) {
         var self = this;
         var opt = {
-            operation: ['query', 'save', 'del', 'detailQuery'],
+            mainContentDetailUrl:'/mainContentDetail',
+            //module参数
+            operation: [],
             queryId: 'search',
             queryItemTempId: 'mainContentItem',
             queryContainerId: 'list',
@@ -60,7 +62,37 @@ moduleMainContent = {
                 name: 'operator',
                 dom: $('#operator'),
             }],
-            bindEvent: function () {
+            init: function(self){
+                if(self.operation.detailQuery) {
+                    console.log(extend.getArgsFromUrlParams());
+                }
+            },
+            bindEvent: function (self) {
+                if(self.operation.query) {
+                    self.addDom.on('click', function () {
+                        var url = self.opt.mainContentDetailUrl + '?id=0';
+                        var args = {
+                            id: 0,
+                            noNav: true
+                        };
+                        var url = self.opt.mainContentDetailUrl + '?';
+
+                        if (parent.my.tab) {
+                            var params = extend.getUrlParamsFromArgs(args);
+                            var data = {
+                                id: 'mainContentDetail',
+                                name: '新增内容',
+                                content: url + params
+                            };
+                            parent.my.tab.addOrOpenTab(data);
+                        }
+                        else {
+                            args.noNav = false;
+                            var params = extend.getUrlParamsFromArgs(args);
+                            window.open(url + params);
+                        }
+                    });
+                }
             },
             beforeQuery: function (data) {
                 if (!data.id) data.id = null;
@@ -71,16 +103,12 @@ moduleMainContent = {
                 if (!data.operate_date) data.operate_date = null;
             },
             afterEdit: function (item) {
-
             },
             beforeSave: function () {
-
             },
             onSaveSuccess: function (t, self) {
-
             },
             onDetailQuerySuccess: function (t, self) {
-
             }
         };
         opt = $.extend(opt, option);
