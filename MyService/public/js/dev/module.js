@@ -52,11 +52,13 @@ module.prototype = {
         detailQueryClass: 'itemDetailQuery',
         interfacePrefix: '',
 
+        init: function (self) {
+        },
         bindEvent: function (self) {
         },
         beforeQueryDataCheck: function (self) {
             var list = self.opt.queryArgsOpt;
-            if(list) {
+            if (list) {
                 var checkRes = extend.dataCheck({list: list});
                 if (checkRes.success) {
                     var data = checkRes.model;
@@ -64,7 +66,10 @@ module.prototype = {
                 return checkRes;
             }
         },
-        beforeQuery: function(t){
+        beforeQuery: function (t) {
+        },
+        onQueryFail: function (e, self) {
+            extend.msgNotice({type: 1, msg: e.message});
         },
         beforeEdit: function (item, self) {
             return item;
@@ -79,12 +84,16 @@ module.prototype = {
         onSaveFail: function (e, self) {
             extend.msgNotice({type: 1, msg: '保存失败:' + e.message});
         },
+        beforeDel: function (t) {
+        },
         onDelSuccess: function (t, self) {
             extend.msgNotice({type: 1, msg: '删除成功'});
             self.pager.refresh();
         },
         onDelFail: function (e, self) {
             extend.msgNotice({type: 1, msg: '删除失败:' + e.message});
+        },
+        beforeDetailQuery: function (t) {
         },
         onDetailQuerySuccess: function (t, self) {
             self.detailRender(t);
@@ -121,7 +130,8 @@ module.prototype = {
 
         self.saveDom = $('#' + self.opt.saveId);
         self.addDom = $('#' + self.opt.addId);
-        
+
+        self.opt.init(self);
         self.bindEvent();
         if (self.operation.query) {
             self.pager = new my.pager({
@@ -145,7 +155,7 @@ module.prototype = {
                 self.pager.gotoPage(1);
             });
 
-            if(self.opt.queryArgsOpt) {
+            if (self.opt.queryArgsOpt) {
                 $(self.opt.queryArgsOpt).each(function () {
                     var item = this;
                     if (item.dom) {
@@ -178,14 +188,14 @@ module.prototype = {
                 self.save();
             });
         }
-        
+
         if (self.operation.detailQuery) {
             self.queryContainerDom.on('click', self.detailQueryClass, function () {
                 var row = $(this).closest(self.rowClass);
                 self.detailQuery(row.data('item'));
             });
         }
-        
+
         if (self.operation.del) {
             self.queryContainerDom.on('click', self.delClass, function () {
                 var row = $(this).closest(self.rowClass);
@@ -218,7 +228,7 @@ module.prototype = {
             data.page_size = self.pager.pageSize;
             self.opt.beforeQuery(data);
             var method = self.opt.interfacePrefix + 'Query';
-            var notice = extend.msgNotice({type: 1, msg: '查询中...', noClose:true});
+            var notice = extend.msgNotice({type: 1, msg: '查询中...', noClose: true});
             my.interface[method](data).then(function (t) {
                 self.queryContainerDom.find(self.rowClass).remove();
                 var temp = self.queryItemTemp;
@@ -230,9 +240,9 @@ module.prototype = {
                 return res.resolve(t);
             }).fail(function (e) {
                 self.queryContainerDom.find(self.rowClass).remove();
-                if (e instanceof Error) e = e.message;
-                if (typeof e == 'object') e = JSON.stringify(e);
-                if(errorDom.length) {
+                if (errorDom.length) {
+                    if (e instanceof Error) e = e.message;
+                    if (typeof e == 'object') e = JSON.stringify(e);
                     self.queryContainerDom.find('[name=errorContent]').html(e);
                     errorDom.show();
                     e = null;
@@ -245,7 +255,7 @@ module.prototype = {
         }).fail(function (e) {
             if (e) {
                 console.log(e);
-                extend.msgNotice({type: 1, msg: e.message});
+                self.opt.onQueryFail(e, self);
             }
         });
     },
@@ -289,7 +299,7 @@ module.prototype = {
                 return res;
             }
         }).fail(function (e) {
-            if(e)
+            if (e)
                 extend.msgNotice({type: 1, msg: e.message});
         });
     },
@@ -312,7 +322,10 @@ module.prototype = {
             return res;
         }).then(function () {
             var notice = extend.msgNotice({type: 1, msg: '删除中...', noClose: true});
-            var data = {id: item.id};
+            var data = {};
+            if (item && item.id)
+                data.id = item.id;
+            self.opt.beforeDel(data);
             var method = self.opt.interfacePrefix + 'Del';
             return my.interface[method](data).then(function (t) {
                 self.opt.onDelSuccess(t, self);
@@ -323,11 +336,14 @@ module.prototype = {
             });
         });
     },
-    detailQuery:function (item) {
+    detailQuery: function (item) {
         var self = this;
         return extend.promise().then(function (res) {
             var notice = extend.msgNotice({type: 1, msg: '查询中...', noClose: true});
-            var data = {id: item.id};
+            var data = {};
+            if (item && item.id)
+                data.id = item.id;
+            self.opt.beforeDetailQuery(data);
             var method = self.opt.interfacePrefix + 'DetailQuery';
             return my.interface[method](data).then(function (t) {
                 self.opt.onDetailQuerySuccess(t, self);
@@ -338,7 +354,7 @@ module.prototype = {
             });
         });
     },
-    detailRender:function (item) {
+    detailRender: function (item) {
         var self = this;
         var temp = self.detailTemp;
         self.detailContainerDom.html(ejs.render(temp, item));

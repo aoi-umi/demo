@@ -11,11 +11,14 @@ my.pager.prototype = {
         maxPageCount: 5,
         pageIndex: 1,
         pageSize: 10,
+        totalPage: 0,
         template:
             `<form class="form-inline text-right">
                 <ul class="pagination">
-                    <li><a name="myPagerPrev" href="javascript:;">&laquo;</a></li>
-                    <li><a name="myPagerNext" href="javascript:;">&raquo;</a></li>
+                    <li class="my-pager-prev"><a name="myPagerFirst" href="javascript:;">first</a></li>
+                    <li class="my-pager-prev"><a name="myPagerPrev" href="javascript:;">&laquo;</a></li>
+                    <li class="my-pager-next"><a name="myPagerNext" href="javascript:;">&raquo;</a></li>
+                    <li class="my-pager-next"><a name="myPagerLast" href="javascript:;">last</a></li>
                     <li><span style="margin-left:5px" name="count">0</span></li>
                     <li><span style="margin-right:5px" name="currPage">1/1</span></li>
                     <div class="input-group" style="width:100px">
@@ -39,10 +42,14 @@ my.pager.prototype = {
         }).on('click', '[name=myPagerPage]', function () {
             var page = $(this).data('page');
             self.gotoPage(page);
+        }).on('click', 'li:not(.disabled) [name=myPageFirst]', function () {
+            self.gotoPage(1);
         }).on('click', 'li:not(.disabled) [name=myPagerPrev]', function () {
             self.gotoPage(self.pageIndex - 1);
         }).on('click', 'li:not(.disabled) [name=myPagerNext]', function () {
             self.gotoPage(self.pageIndex + 1);
+        }).on('click', 'li:not(.disabled) [name=myPagerLast]', function () {
+            self.gotoPage(self.totalPage);
         });
     },
     gotoPage: function (page) {
@@ -52,13 +59,13 @@ my.pager.prototype = {
         page = parseInt(page);
         if(isNaN(page) || page <= 0)
             throw  new Error('page must be a int and large than 0');
-        pagerDom.empty();
         if(opt.changeHandle){
             self.pageIndex = page;
             opt.changeHandle(function (t) {
                 if(t && t.count) {
+                    pagerDom.empty();
                     var dom = $(opt.template);
-                    var totalPage = Math.ceil(t.count / opt.pageSize);
+                    var totalPage = self.totalPage = Math.ceil(t.count / opt.pageSize);
                     var pageHtml = [];
                     var pageStart = 1;
                     var pageEnd = totalPage;
@@ -73,9 +80,9 @@ my.pager.prototype = {
                         pageHtml.push(`<li class="${page==i?'active':''}"><a href="javascript:;" name="myPagerPage" data-page="${i}">${i}</a></li>`);
                     }
                     if(page == 1)
-                        dom.find('[name=myPagerPrev]').closest('li').addClass('disabled');
+                        dom.find('.my-pager-prev').addClass('disabled');
                     if(page >= totalPage)
-                        dom.find('[name=myPagerNext]').closest('li').addClass('disabled');
+                        dom.find('.my-pager-next').addClass('disabled');
                     dom.find('[name=myPagerPrev]').closest('li').after(pageHtml);
                     dom.find('[name=count]').html(t.count);
                     dom.find('[name=currPage]').html(page + '/' + totalPage);

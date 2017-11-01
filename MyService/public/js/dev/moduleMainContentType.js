@@ -144,10 +144,10 @@ moduleMainContentType = {
                     }, {
                         content: '关闭', cb: function () {
                             $('#mainContentTypeSave').modal('hide');
+                            self.pager.refresh();
                         }
                     }]
                 });
-                self.pager.refresh();
             },
             onDetailQuerySuccess: function (t, self) {
                 self.detailRender(t);

@@ -1,0 +1,17 @@
+<div class="container">
+//todo mainContentDetail
+</div>
+<script type="text/template" id="mainContentItem">
+    <% include ../_template_web/mainContentItem%>
+</script>
+<script type="text/javascript" src="/js/<%=env%>/my.pager.js?v=<%=version%>"></script>
+<script type="text/javascript" src="/js/<%=env%>/module.js?v=<%=version%>"></script>
+<script type="text/javascript" src="/js/<%=env%>/moduleMainContent.js?v=<%=version%>"></script>
+<script type="text/javascript">
+    $(function () {
+        var opt = {
+            operation:['detailQuery']
+        };
+        var mainContentDetail = moduleMainContent.init(opt);
+    });
+</script>
