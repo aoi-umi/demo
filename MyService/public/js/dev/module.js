@@ -54,7 +54,7 @@ module.prototype = {
         beforeQueryDataCheck: function (self) {
             var list = self.opt.queryArgsOpt;
             if (list) {
-                var checkRes = extend.dataCheck({list: list});
+                var checkRes = common.dataCheck({list: list});
                 if (checkRes.success) {
                     var data = checkRes.model;
                 }
@@ -64,7 +64,7 @@ module.prototype = {
         beforeQuery: function (t) {
         },
         onQueryFail: function (e, self) {
-            extend.msgNotice({type: 1, msg: e.message});
+            common.msgNotice({type: 1, msg: e.message});
         },
         beforeEdit: function (item, self) {
             return item;
@@ -74,19 +74,19 @@ module.prototype = {
         beforeSave: function () {
         },
         onSaveSuccess: function (t, self) {
-            extend.msgNotice({type: 1, msg: '保存成功:' + t});
+            common.msgNotice({type: 1, msg: '保存成功:' + t});
         },
         onSaveFail: function (e, self) {
-            extend.msgNotice({type: 1, msg: '保存失败:' + e.message});
+            common.msgNotice({type: 1, msg: '保存失败:' + e.message});
         },
         beforeDel: function (t) {
         },
         onDelSuccess: function (t, self) {
-            extend.msgNotice({type: 1, msg: '删除成功'});
+            common.msgNotice({type: 1, msg: '删除成功'});
             self.pager.refresh();
         },
         onDelFail: function (e, self) {
-            extend.msgNotice({type: 1, msg: '删除失败:' + e.message});
+            common.msgNotice({type: 1, msg: '删除失败:' + e.message});
         },
         beforeDetailQuery: function (t) {
         },
@@ -94,7 +94,7 @@ module.prototype = {
             self.detailRender(t);
         },
         onDetailQueryFail: function (e, self) {
-            extend.msgNotice({type: 1, msg: '查询失败:' + e.message});
+            common.msgNotice({type: 1, msg: '查询失败:' + e.message});
         }
     },
     init: function (option) {
@@ -175,11 +175,11 @@ module.prototype = {
                     var item = this;
                     if (item.dom) {
                         item.dom.on('blur', function () {
-                            var checkRes = extend.dataCheck({list: [item]});
+                            var checkRes = common.dataCheck({list: [item]});
                             if (checkRes.success) {
                                 $('[data-target="' + checkRes.dom.selector + '"]').hide();
                             } else {
-                                extend.msgNotice({target: checkRes.dom.selector, msg: checkRes.desc});
+                                common.msgNotice({target: checkRes.dom.selector, msg: checkRes.desc});
                             }
                         });
                     }
@@ -221,7 +221,7 @@ module.prototype = {
     },
     query: function (pageIndex) {
         var self = this;
-        return extend.promise().then(function (res) {
+        return common.promise().then(function (res) {
             var errorDom = self.queryContainerDom.find('.error').hide();
             var data = null;
             var checkRes = self.opt.beforeQueryDataCheck(self);
@@ -230,7 +230,7 @@ module.prototype = {
                 var err = null;
                 if (!checkRes.success) {
                     if (checkRes.dom) {
-                        extend.msgNotice({target: checkRes.dom.selector, msg: checkRes.desc});
+                        common.msgNotice({target: checkRes.dom.selector, msg: checkRes.desc});
                     } else {
                         err = new Error(checkRes.desc);
                     }
@@ -243,7 +243,7 @@ module.prototype = {
             data.page_size = self.pager.pageSize;
             self.opt.beforeQuery(data);
             var method = self.opt.interfacePrefix + 'Query';
-            var notice = extend.msgNotice({type: 1, msg: '查询中...', noClose: true});
+            var notice = common.msgNotice({type: 1, msg: '查询中...', noClose: true});
             my.interface[method](data).then(function (t) {
                 self.queryContainerDom.find(self.rowClass).remove();
                 var temp = self.queryItemTemp;
@@ -285,7 +285,7 @@ module.prototype = {
     },
     save: function () {
         var self = this;
-        return extend.promise().then(function (res) {
+        return common.promise().then(function (res) {
             var data = null;
             var checkRes = self.opt.beforeSave();
             if (checkRes) {
@@ -293,13 +293,13 @@ module.prototype = {
                 if (!checkRes.success) {
                     var err = null;
                     if (checkRes.dom) {
-                        extend.msgNotice({target: checkRes.dom.selector, msg: checkRes.desc});
+                        common.msgNotice({target: checkRes.dom.selector, msg: checkRes.desc});
                     } else {
                         err = new Error(checkRes.desc);
                     }
                     return $.Deferred().reject(err);
                 }
-                var notice = extend.msgNotice({type: 1, msg: '保存中...', noClose: true});
+                var notice = common.msgNotice({type: 1, msg: '保存中...', noClose: true});
                 data = checkRes.model;
                 var method = self.opt.interfacePrefix + 'Save';
                 my.interface[method](data).then(function (t) {
@@ -315,13 +315,13 @@ module.prototype = {
             }
         }).fail(function (e) {
             if (e)
-                extend.msgNotice({type: 1, msg: e.message});
+                common.msgNotice({type: 1, msg: e.message});
         });
     },
     del: function (item) {
         var self = this;
-        return extend.promise().then(function (res) {
-            extend.msgNotice({
+        return common.promise().then(function (res) {
+            common.msgNotice({
                 type: 1, msg: '是否删除?',
                 btnOptList: [{
                     content: '确认',
@@ -336,7 +336,7 @@ module.prototype = {
             });
             return res;
         }).then(function () {
-            var notice = extend.msgNotice({type: 1, msg: '删除中...', noClose: true});
+            var notice = common.msgNotice({type: 1, msg: '删除中...', noClose: true});
             var data = {};
             if (item && item.id)
                 data.id = item.id;
@@ -353,8 +353,8 @@ module.prototype = {
     },
     detailQuery: function (item) {
         var self = this;
-        return extend.promise().then(function (res) {
-            var notice = extend.msgNotice({type: 1, msg: '查询中...', noClose: true});
+        return common.promise().then(function (res) {
+            var notice = common.msgNotice({type: 1, msg: '查询中...', noClose: true});
             var data = {};
             if (item && item.id)
                 data.id = item.id;

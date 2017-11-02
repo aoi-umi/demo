@@ -52,7 +52,7 @@ init = {
 
         var userInfo = $.cookie(config.cacheKey.userInfo);
         if(!userInfo){
-            userInfo = extend.guid();
+            userInfo = common.guid();
         }
         $.cookie(config.cacheKey.userInfo, userInfo, { expires: 30 });
 

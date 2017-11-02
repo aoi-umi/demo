@@ -1,8 +1,8 @@
 /**
  * Created by bang on 2017-7-26.
  */
-namespace('extend');
-extend = {
+namespace('common');
+common = {
     stringToBase64: function (str) {
         return btoa(encodeURIComponent(str));
     },

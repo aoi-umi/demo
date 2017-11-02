@@ -64,7 +64,7 @@ moduleMainContent = {
             }],
             init: function(self){
                 if(self.operation.detailQuery) {
-                    console.log(extend.getArgsFromUrlParams());
+                    console.log(common.getArgsFromUrlParams());
                 }
             },
             bindEvent: function (self) {
@@ -83,7 +83,7 @@ moduleMainContent = {
                         var url = self.opt.mainContentDetailUrl + '?';
 
                         if (parent.my.tab) {
-                            var params = extend.getUrlParamsFromArgs(args);
+                            var params = common.getUrlParamsFromArgs(args);
                             var data = {
                                 id: 'mainContentDetail',
                                 name: args.id == 0 ? '新增内容' : '内容:' + args.id,
@@ -93,7 +93,7 @@ moduleMainContent = {
                         }
                         else {
                             args.noNav = false;
-                            var params = extend.getUrlParamsFromArgs(args);
+                            var params = common.getUrlParamsFromArgs(args);
                             window.open(url + params);
                         }
                     });

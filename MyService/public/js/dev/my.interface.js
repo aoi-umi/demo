@@ -91,7 +91,7 @@ my.interface = {
                     data: data,
                 };
                 if (option) opt = $.extend(opt, option);
-                return extend.ajax(opt);
+                return common.ajax(opt);
             }`);
         }
     }
