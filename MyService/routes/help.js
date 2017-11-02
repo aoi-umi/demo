@@ -7,8 +7,9 @@ exports.get = function (req, res) {
     for (var i = 0; i < restConfig.length; i++) {
         var rest = restConfig[i];
         var isRouter = true;
-        var method = rest.method;
-        switch (method.name.toLowerCase()) {
+        if(!rest.method)
+            rest.method = 'post';
+        switch (rest.method.toLowerCase()) {
             case 'get':
             case 'post':
                 break;
@@ -17,10 +18,10 @@ exports.get = function (req, res) {
                 break;
         }
         if (isRouter) {
-            var exampleRequest = method.exampleRequest;
+            var exampleRequest = rest.exampleRequest;
             if (typeof exampleRequest == 'object')
                 exampleRequest = JSON.stringify(exampleRequest);
-            restList.push({url: rest.url, method: method.name, exampleRequest: exampleRequest});
+            restList.push({url: rest.url, method: rest.method, exampleRequest: exampleRequest});
         }
     }
 

@@ -5,98 +5,78 @@
 var restList = [
     {
         url: '/',
-        method: {
-            name: 'post',
-            functionName: '',
-            exampleRequest:{"arg":"123"},
-            methodName:'index-post',//用于记录日志
-        },
+        method: 'post',
+        functionName: '',
+        exampleRequest: {"arg": "123"},
+        methodName: 'index-post',//用于记录日志
         path: 'index',
         auth: [],
     },
     {
-        url:'/login',
-        method:{
-            name: 'post',
-            functionName: 'loginPost',
-            exampleRequest:{"userName":"user", "pwd":"123456"}
-        },
-        path:'index',
-        auth:[]
+        url: '/login',
+        method: 'post',
+        functionName: 'loginPost',
+        exampleRequest: {"userName": "user", "pwd": "123456"},
+        path: 'index',
+        auth: []
     },
     {
-        url:'/loginOut',
-        method:{
-            name: 'post',
-            functionName: 'loginOut',
-        },
-        path:'index',
-        auth:[]
+        url: '/loginOut',
+        method: 'post',
+        functionName: 'loginOut',
+        path: 'index',
+        auth: []
     },
     {
-        url:'/signUp',
-        method:{
-            name: 'post',
-            functionName: 'signUp',
-            exampleRequest:{"userName":"user", "pwd":"123456"}
-        },
-        path:'index',
+        url: '/signUp',
+        method: 'post',
+        functionName: 'signUp',
+        exampleRequest: {"userName": "user", "pwd": "123456"},
+        path: 'index',
     },
     {
-        url:'/help',
-        method:{
-            name: 'get',
-            functionName: ''
-        },
-        path:'',
-        auth:['dev'],
+        url: '/help',
+        method: 'get',
+        functionName: '',
+        path: '',
+        auth: ['dev'],
     },
 
     {
         url: '/tranTest',
-        method: {
-            name: 'post',
-            functionName: 'tranTest',
-            exampleRequest: {error: false}
-        },
+        method: 'post',
+        functionName: 'tranTest',
+        exampleRequest: {error: false},
         path: 'index',
     },
     {
         url: '/upload',
-        method: {
-            name: 'post',
-            functionName: 'upload',
-        },
+        method: 'post',
+        functionName: 'upload',
         path: 'index',
     },
     {
         url: '/:module/del',
-        method: {
-            checkAuthOnly: true,//仅检查权限，功能由后面路由实现
-        },
-        auth:['login']
+        checkAuthOnly: true,//仅检查权限，功能由后面路由实现
+        auth: ['login']
     },
 ];
 
 //默认接口
 restList.push({
     url: '/:module/:method',
-    method: {
-        name: 'post',
-        functionName: '',
-        exampleRequest:'',
-    },
+    method: 'post',
+    functionName: '',
+    methodName: 'module-method',
     path: '/module/_default',
     auth: [],
 });
 //module-get放在最后
 restList.push({
     url: '*',
-    method: {
-        name: 'get',
-        functionName: '',
-        exampleRequest:'',
-    },
+    method: 'get',
+    functionName: '',
+    methodName: 'module-view',
     path: '/module/_view',
     auth: [],
 });
