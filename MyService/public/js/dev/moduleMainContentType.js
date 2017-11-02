@@ -133,11 +133,11 @@ moduleMainContentType = {
                     name: 'level',
                     dom: $('#mainContentTypeSave [name=level]'),
                 }];
-                var checkRes = extend.dataCheck({list: list});
+                var checkRes = common.dataCheck({list: list});
                 return checkRes;
             },
             onSaveSuccess: function (t, self) {
-                extend.msgNotice({
+                common.msgNotice({
                     type: 1, msg: '保存成功:' + t,
                     btnOptList: [{
                         content: '继续'
