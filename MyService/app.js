@@ -22,8 +22,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 //
-Date.prototype.toJSON = function(){
-  return common.dateFormat(this, 'yyyy-MM-dd HH:mm:ss');
+Date.prototype.toJSON = function() {
+    return common.dateFormat(this, 'yyyy-MM-dd HH:mm:ss');
 };
 app.use(function (req, res, next) {
     //req.query  /?params1=1&params2=2
@@ -58,6 +58,7 @@ app.use(function (req, res, next) {
         res.render(view, common.formatViewtRes(opt));
     };
 
+    var startTime = new Date().getTime();
     res.mySend = function (err, detail, opt) {
         var formatRes = common.formatRes(err, detail, opt);
         res.send(formatRes);
@@ -79,6 +80,7 @@ app.use(function (req, res, next) {
             log.ip = common.getClientIp(req);
             log.remark = formatRes.desc;
             log.guid = formatRes.guid;
+            log.duration = new Date().getTime() - startTime;
             common.logSave(log);
         }
     };

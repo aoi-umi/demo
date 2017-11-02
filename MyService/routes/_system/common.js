@@ -121,6 +121,7 @@ exports.requestServiceByConfigPromise = function (option) {
     var method = '';
     var url = '';
     var log = common.logModle();
+    var startTime = new Date().getTime();
     return common.promise().then(function () {
         var errStr = 'service "' + option.serviceName + '"';
         var service = config.api[option.serviceName];
@@ -162,6 +163,7 @@ exports.requestServiceByConfigPromise = function (option) {
         log.url = url;
         log.req = opt.body;
         log.method = '[' + option.serviceName + '][' + option.methodName + ']';
+        log.duration = startTime - new Date().getTime();
         return common.requestServicePromise(opt);
     }).then(function (t) {
         log.result = true;
