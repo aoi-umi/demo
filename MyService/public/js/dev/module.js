@@ -19,11 +19,6 @@ module.prototype = {
     saveDom: null,
     addDom: null,
 
-    rowClass: '',
-    editClass: '',
-    delClass: '',
-    detailQueryClass: '',
-
     operation: {
         query: false,
         detailQuery: false,
@@ -112,24 +107,44 @@ module.prototype = {
             });
         }
 
-        if (self.opt.rowClass)
-            self.rowClass = '.' + self.opt.rowClass;
-        if (self.opt.editClass)
-            self.editClass = '.' + self.opt.editClass;
-        if (self.opt.delClass)
-            self.delClass = '.' + self.opt.delClass;
-        if (self.opt.detailQueryClass)
-            self.detailQueryClass = '.' + self.opt.detailQueryClass;
+        var classList = [
+            'rowClass',
+            'editClass',
+            'delClass',
+            'detailQueryClass'
+        ];
+        $(classList).each(function(){
+            if(self.opt[this])
+                self[this] = '.' + self.opt[this];
+            else
+                self[this] = '';
+        });
 
-        self.queryDom = $('#' + self.opt.queryId);
-        self.queryContainerDom = $('#' + self.opt.queryContainerId);
-        self.queryItemTemp = $('#' + self.opt.queryItemTempId).html();
+        var idList = [
+            'queryId',
+            'queryContainerId',
+            'queryItemTempId',
+            'detailContainerId',
+            'detailTempId',
+            'saveId',
+            'addId'
+        ];
 
-        self.detailContainerDom = $('#' + self.opt.detailContainerId);
-        self.detailTemp = $('#' + self.opt.detailTempId).html();
+        $(idList).each(function(){
+            if(self.opt[this])
+                self[this] = '#' + self.opt[this];
+            else
+                self[this] = '';
+        });
+        self.queryDom = $(self.queryId);
+        self.queryContainerDom = $(self.queryContainerId);
+        self.queryItemTemp = $(self.queryItemTempId).html();
 
-        self.saveDom = $('#' + self.opt.saveId);
-        self.addDom = $('#' + self.opt.addId);
+        self.detailContainerDom = $(self.detailContainerId);
+        self.detailTemp = $(self.detailTempId).html();
+
+        self.saveDom = $(self.saveId);
+        self.addDom = $(self.addId);
 
         self.opt.init(self);
         self.bindEvent();
