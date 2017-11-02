@@ -72,23 +72,21 @@ moduleMainContent = {
                     var toDetail = [self.addId, self.detailQueryClass].join(',');
                     $(document).on('click', toDetail, function () {
                         var dom = $(this);
-                        var item = {id: 0};
-                        if (dom.attr('id') == self.opt.addId) {
-                        } else {
-                            item.id = dom.closest(self.rowClass).data('item').id;
-                        }
-                        var url = self.opt.mainContentDetailUrl + '?id=' + item.id;
                         var args = {
                             id: 0,
                             noNav: true
                         };
+                        if (dom.attr('id') == self.opt.addId) {
+                        } else {
+                            args.id = dom.closest(self.rowClass).data('item').id;
+                        }
                         var url = self.opt.mainContentDetailUrl + '?';
 
                         if (parent.my.tab) {
                             var params = extend.getUrlParamsFromArgs(args);
                             var data = {
                                 id: 'mainContentDetail',
-                                name: item.id == 0 ? '新增内容' : '内容:' + item.id,
+                                name: args.id == 0 ? '新增内容' : '内容:' + args.id,
                                 content: url + params
                             };
                             parent.my.tab.addOrOpenTab(data);
