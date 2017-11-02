@@ -109,19 +109,19 @@ restConfig.forEach(function(rest) {
         path = '/' + path;
     path = './routes' + path;
     var isRouter = true;
-    if(!method.name)
-        method.name = 'post';
-    var functionName = method.functionName || method.name;
+    if(!method)
+        method = 'post';
+    var functionName = rest.functionName || method;
     var routerMethodList = [];
 
     function init(req, res, next) {
         req.myData.auth = rest.auth;
-        req.myData.method = method;
+        req.myData.method = {methodName: rest.methodName};
         auth.auth(req, res, next);
     }
     routerMethodList.push(init);
 
-    if(!method.checkAuthOnly) {
+    if(!rest.checkAuthOnly) {
         var reqfile = require(path);
         if (!reqfile[functionName])
             throw common.error('[' + path + '] is not exist function [' + functionName + ']', 'CODE_ERROR');
@@ -135,7 +135,7 @@ restConfig.forEach(function(rest) {
         routerMethodList.push(methodFun);
     }
 
-    var methodName = method.name.toLowerCase();
+    var methodName = method.toLowerCase();
     switch (methodName) {
         case 'get':
         case 'post':
@@ -146,7 +146,7 @@ restConfig.forEach(function(rest) {
             break;
     }
     if (isRouter) {
-        restList.push({url: rest.url, method: method, path: path});
+        restList.push({url: rest.url, functionName: functionName, path: path});
     }
 });
 //console.log(restList);
