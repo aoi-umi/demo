@@ -85,7 +85,7 @@ moduleMainContent = {
                         if (parent.my.tab) {
                             var params = common.getUrlParamsFromArgs(args);
                             var data = {
-                                id: 'mainContentDetail',
+                                id: 'mainContentDetail' + args.id,
                                 name: args.id == 0 ? '新增内容' : '内容:' + args.id,
                                 content: url + params
                             };

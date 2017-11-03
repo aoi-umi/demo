@@ -21,10 +21,14 @@ app.use(bodyParser.urlencoded());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-//
+//init
 Date.prototype.toJSON = function() {
     return common.dateFormat(this, 'yyyy-MM-dd HH:mm:ss');
 };
+Date.prototype.toString = function() {
+    return common.dateFormat(this, 'yyyy-MM-dd HH:mm:ss');
+};
+
 app.use(function (req, res, next) {
     //req.query  /?params1=1&params2=2
     //req.body  post的参数
@@ -52,7 +56,7 @@ app.use(function (req, res, next) {
             user: req.myData.user,
             noNav: req.query.noNav,
         };
-        if (opt.noNav == 'false')
+        if (opt.noNav && opt.noNav.toString().toLowerCase() == 'false')
             opt.noNav = false;
         opt = common.extend(opt, options);
         res.render(view, common.formatViewtRes(opt));
