@@ -67,6 +67,14 @@ module.exports= {
             'en':'{0} can not change to {1}',
         }
     },
+    //数据库
+    DB_NO_DATA:{
+        code: 'DB_NO_DATA',
+        desc: {
+            'zh':'查无数据',
+            'en':'No Data',
+        }
+    },
     //缓存
     CACHE_TIMEOUT:{
         code: 'CACHE_TIMEOUT',
