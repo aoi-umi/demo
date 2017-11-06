@@ -3,6 +3,7 @@
  */
 var autoBll = require('./auto');
 var common = require('../_system/common');
+var myEnum = require('../_system/enum');
 var main_content = exports;
 
 exports.query= function(opt) {
@@ -15,10 +16,16 @@ exports.query= function(opt) {
 
 exports.detailQuery = function(opt) {
     return common.promise().then(function () {
-        return autoBll.detailQuery('main_content', opt).then(function (t) {
-            if(!t)
+        return autoBll.customDal('main_content', 'detailQuery', opt).then(function (t) {
+            var detail = {};
+            detail.main_content = t[0][0];
+            detail.main_content_type_list = t[1];
+            detail.main_content_child_list = t[2];
+            detail.main_content_log_list = t[3];
+            if(!detail.main_content)
                 throw common.error('', 'DB_NO_DATA');
-            return t;
+            detail.main_content.status_name = myEnum.getValue('main_content_status_enum', detail.main_content.status);
+            return detail;
         });
     });
 };

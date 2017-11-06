@@ -1,10 +1,14 @@
 ﻿var db = require('../_system/db');
 var common = require('../_system/common');
+
 function getRequire(name, custom) {
     if(!custom)
 	    return require('../_dal/' + name + '_auto');
-    else
+    else if(custom == 'dal')
+        return require('../_dal/' + name);
+    else if(custom == 'bll')
         return require('./' + name);
+
 }
 exports.save = function (name, params, conn) {
     return getRequire(name).save(params, conn).then(function (t) {
@@ -42,6 +46,8 @@ exports.tran = function (fn) {
     return res.promise;
 };
 exports.custom = function (name, method, opt) {
-    return getRequire(name, true)[method](opt);
+    return getRequire(name, 'bll')[method](opt);
 };
-
+exports.customDal = function (name, method, opt) {
+    return getRequire(name, 'dal')[method](opt);
+};
