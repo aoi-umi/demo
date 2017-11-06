@@ -16,9 +16,6 @@ module.prototype = {
     detailContainerDom: null,
     detailTemp: null,
 
-    saveDom: null,
-    addDom: null,
-
     operation: {
         query: false,
         detailQuery: false,
@@ -38,9 +35,9 @@ module.prototype = {
         detailTempId: 'detailTemp',
         queryArgsOpt: null,
 
-        saveId: 'save',
+        saveClass: 'save',
         saveDefaultModel: null,
-        addId: 'add',
+        addClass: 'add',
 
         rowClass: 'itemRow',
         editClass: 'itemEdit',
@@ -112,7 +109,9 @@ module.prototype = {
             'rowClass',
             'editClass',
             'delClass',
-            'detailQueryClass'
+            'detailQueryClass',
+            'saveClass',
+            'addClass'
         ];
         $(classList).each(function(){
             if(self.opt[this])
@@ -127,8 +126,6 @@ module.prototype = {
             'queryItemTempId',
             'detailContainerId',
             'detailTempId',
-            'saveId',
-            'addId'
         ];
 
         $(idList).each(function(){
@@ -143,9 +140,6 @@ module.prototype = {
 
         self.detailContainerDom = $(self.detailContainerId);
         self.detailTemp = $(self.detailTempId).html();
-
-        self.saveDom = $(self.saveId);
-        self.addDom = $(self.addId);
 
         self.opt.init(self);
         self.bindEvent();
@@ -189,7 +183,7 @@ module.prototype = {
         }
 
         if (self.operation.save) {
-            self.addDom.on('click', function () {
+            $(document).on('click', self.addClass, function () {
                 self.edit();
             });
 
@@ -200,7 +194,7 @@ module.prototype = {
                 });
             }
 
-            self.saveDom.on('click', function () {
+            $(document).on('click', self.saveClass, function () {
                 self.save();
             });
         }

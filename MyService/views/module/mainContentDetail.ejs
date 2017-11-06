@@ -10,7 +10,7 @@
     <% var rowItemClass = 'col-xs-12 col-md-6';%>
     <%var main_content = mainContentDetail.main_content;%>
     <div class="hidden">
-        <input value="<%=main_content.id%>"/>
+        <input id="id" value="<%=main_content.id%>"/>
     </div>
     <%if(false){%>
     <pre>
@@ -49,7 +49,7 @@
                     <div class="form-group">
                         <label class="col-sm-2 control-label">描述</label>
                         <div class="col-sm-10">
-                            <textarea class="form-control no-resize" id="desc" placeholder=""><%=main_content.desc || ''%></textarea>
+                            <textarea class="form-control no-resize" id="description" placeholder=""><%=main_content.description || ''%></textarea>
                         </div>
                     </div>
                 </div>
@@ -77,8 +77,8 @@
         </div>
 
         <div class="my-row text-center">
-            <button class="btn btn-default">保存</button>
-            <button class="btn btn-default">提交</button>
+            <button class="btn btn-default save">保存</button>
+            <button class="btn btn-default save">提交</button>
         </div>
         <div>
             <table class="table table-bordered">
@@ -140,7 +140,7 @@
     var mainContentDetail;
     $(function () {
         var opt = {
-            operation:['detailQuery']
+            operation:['detailQuery', 'save']
         };
         mainContentDetail = moduleMainContent.init(opt);
     });
