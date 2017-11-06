@@ -4,7 +4,6 @@
 var autoBll = require('./auto');
 var db = require('../_system/db');
 var common = require('../_system/common');
-var logDal = require('../_dal/log');
 
 //事务测试
 exports.tranTest = function (opt) {
@@ -27,7 +26,7 @@ exports.tranTest = function (opt) {
 };
 
 exports.query = function(opt){
-    return logDal.query(opt).then(function(t){
+    return autoBll.customDal('log', 'query', opt).then(function(t){
         var resData = {};
         resData.list = t[0];
         resData.count = t[1][0].count;

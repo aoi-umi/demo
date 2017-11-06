@@ -20,7 +20,8 @@ module.exports = {
     },
     enumDict: {
         statusEnum: {'0': '状态0', '1': '状态1', '2': '状态2',},
-        statusEnum2: {'0': '状态0', '1': '状态1', '2': '状态2',}
+        statusEnum2: {'0': '状态0', '1': '状态1', '2': '状态2',},
+        main_content_status_enum:{'-1':'已删除', '0':'草稿','1':'待审核','2':'审核中','3':'通过','4':'退回',},
     },
     enumCheck:{
         statusEnum:{
