@@ -25,6 +25,7 @@ module.prototype = {
         save: false,
         del: false,
     },
+    variable: {},
     opt: {
         //query detailQuery save del
         operation: [],

@@ -6,7 +6,7 @@ moduleMainContent = {
     init: function (option) {
         var self = this;
         var opt = {
-            mainContentDetailUrl:'/mainContentDetail',
+            mainContentDetailUrl: '/mainContentDetail',
             //module参数
             operation: [],
             queryId: 'search',
@@ -62,13 +62,20 @@ moduleMainContent = {
                 name: 'operator',
                 dom: $('#operator'),
             }],
-            init: function(self){
-                if(self.operation.detailQuery) {
+            init: function (self) {
+                self.variable.delMainContentChildList = [];
+                self.variable.defaultMainCotentChild = {
+                    id: 0,
+                    num: 0,
+                    type: 0,
+                    content: ''
+                };
+                if (self.operation.detailQuery) {
                     console.log(common.getArgsFromUrlParams());
                 }
             },
             bindEvent: function (self) {
-                if(self.operation.query) {
+                if (self.operation.query) {
                     var toDetail = [self.addId, self.detailQueryClass].join(',');
                     $(document).on('click', toDetail, function () {
                         var dom = $(this);
@@ -98,6 +105,75 @@ moduleMainContent = {
                         }
                     });
                 }
+
+                if (self.operation.detailQuery) {
+                    $(document).on('click', '#mainContentChildList .itemDel', function () {
+                        var row = $(this).closest('.itemRow');
+                        var item = row.data('item');
+                        self.variable.delMainContentChildList.push(row.data('item').id);
+                        row.remove();
+                        self.opt.updateView(['mainContentChild']);
+                    });
+
+                    $(document).on('click', '#mainContentChildList .itemEdit', function () {
+                        self.opt.setMainContentChildDetail($(this).closest('.itemRow').data('item'));
+                        $('#mainContentChild').modal('show');
+                    });
+                    $('#mainContentChildList').on('click', '.moveUp, .moveDown', function () {
+                        var dom = $(this);
+                        var row;
+                        var secondRow;
+                        if (dom.hasClass('moveUp')) {
+                            row = dom.closest('.itemRow')
+                            secondRow = row.prev('.itemRow');
+                        }
+                        else {
+                            secondRow = dom.closest('.itemRow')
+                            row = secondRow.next('.itemRow');
+                        }
+                        if (row.length && secondRow.length) {
+                            var item = row.data('item');
+                            var changeItem = secondRow.data('item');
+                            var t = item.num;
+                            item.num = changeItem.num;
+                            changeItem.num = t;
+                            row.find('[name=num]').text(item.num);
+                            secondRow.find('[name=num]').text(changeItem.num);
+                            row.after(secondRow);
+                        }
+                    });
+
+                    $('#showMainContentChild').on('click', function () {
+                        self.opt.setMainContentChildDetail();
+                        $('#mainContentChild').modal('show');
+                    });
+                    $('#addMainContentChild').on('click', function () {
+                        var mainContentChildDetailDom = $('#mainContentChildDetail');
+                        var argsOpt = [{
+                            name: 'type',
+                            dom: mainContentChildDetailDom.find('[name=type]'),
+                        }, {
+                            name: 'content',
+                            dom: mainContentChildDetailDom.find('[name=content]'),
+                            canNotNull: true
+                        }];
+                        var checkRes = common.dataCheck({list: argsOpt});
+                        if (!checkRes.success) {
+                            common.msgNotice({
+                                type: checkRes.dom ? 0 : 1,
+                                msg: checkRes.desc,
+                                dom: checkRes.dom,
+                            });
+                        } else {
+                            var item = checkRes.model;
+                            item.num = $('#mainContentChildList .itemRow').length + 1;
+                            item.stringify = JSON.stringify(item);
+                            var temp = $('#mainContentChildItem').html();
+                            $('#mainContentChildList').append(ejs.render(temp, item));
+                            $('#mainContentChild').modal('hide');
+                        }
+                    });
+                }
             },
             beforeQuery: function (data) {
                 if (!data.id) data.id = null;
@@ -114,6 +190,30 @@ moduleMainContent = {
             onSaveSuccess: function (t, self) {
             },
             onDetailQuerySuccess: function (t, self) {
+            },
+
+            getDefaultMainCotentChild: function (self) {
+                return self.variable.defaultMainCotentChild;
+            },
+            setMainContentChildDetail: function (item) {
+                var mainContentChildDetailDom = $('#mainContentChildDetail');
+                if (!item) {
+                    mainContentChildDetailDom.find(':input').val('');
+                    mainContentChildDetailDom.find('option:eq(0)').prop('selected', true);
+                } else {
+                    mainContentChildDetailDom.find('[name=content]').val(item.content);
+                    mainContentChildDetailDom.find(`[name=type] option[value=${item.type}]`).prop('selected', true);
+                }
+            },
+            updateView: function (updateList) {
+                if (!updateList || common.isInArray('mainContentChild', updateList)) {
+                    $('#mainContentChildList .itemRow').each(function (index) {
+                        var row = $(this);
+                        var val = index + 1;
+                        row.data('item').num = val;
+                        row.find('[name=num]').text(val);
+                    });
+                }
             }
         };
         opt = $.extend(opt, option);

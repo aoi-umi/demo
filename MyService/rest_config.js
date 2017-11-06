@@ -66,7 +66,7 @@ var restList = [
 restList.push({
     url: '/:module/:method',
     method: 'post',
-    functionName: '',
+    functionName: 'default',
     methodName: 'module-method',
     path: '/module/_default',
     auth: [],
@@ -75,9 +75,9 @@ restList.push({
 restList.push({
     url: '*',
     method: 'get',
-    functionName: '',
+    functionName: 'view',
     methodName: 'module-view',
-    path: '/module/_view',
+    path: '/module/_default',
     auth: [],
 });
 

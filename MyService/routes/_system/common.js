@@ -443,7 +443,7 @@ exports.dateFormat = function (date, format) {
 //console.log(exports.dateFormat(null,'yyyy-MM-dd hh:mm:ss'))
 //console.log(exports.dateFormat(null,'yyyy-MM-dd H:mm:ss'))
 
-exports.isInList = function (list, obj) {
+exports.isInArray = function (obj, list) {
     var result = false;
     if (list) {
         list.forEach(function (t) {
