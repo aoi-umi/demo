@@ -240,6 +240,7 @@ common = {
             type: 0,
             msg: '',
             template: '',
+            dom: null,
 
             //type 0 参数
             target: '',
@@ -251,7 +252,6 @@ common = {
             noClose: false,
             btnTemplate: `<button class="btn" type="button" name="btnContent" style="margin: 0 5px"></button>`,
             btnOptList: null,
-            dom: null
         };
         //btnOpt = {
         // class:'btn-default'
@@ -270,6 +270,8 @@ common = {
         switch (opt.type){
             case 0:
                 if(true){
+                    if(!opt.target && opt.dom)
+                        opt.target = opt.dom.selector;
                     if(!opt.target)
                         throw new Error('target can not be null');
                     if(!opt.msg)

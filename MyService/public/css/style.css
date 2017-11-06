@@ -52,8 +52,11 @@ tbody{
   word-wrap:break-word;
 }
 
+.my-row {
+    margin: 10px 0;
+}
 .my-row>div {
-  margin-top: 10px;
+    margin-top: 10px;
 }
 
 .error{
