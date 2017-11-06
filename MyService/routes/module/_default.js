@@ -41,7 +41,7 @@ function getBll(req, res, next){
     //使用custom
     if((module == 'log' && common.isInArray(method, ['query']))
         || (module == 'main_content_type' && common.isInArray(method, ['save']))
-        || (module == 'main_content' && common.isInArray(method, ['query']))
+        || (module == 'main_content' && common.isInArray(method, ['query','save']))
     ) {
         opt.isUsedCustom = true;
     }

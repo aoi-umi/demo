@@ -16,20 +16,6 @@ moduleMainContent = {
             detailContainerId: 'detailContainer',
             detailTempId: 'mainContentSaveTemp',
 
-            saveId: 'save',
-            saveDefaultModel: {
-                id: 0,
-                type: '',
-                status: '',
-                user_info_id: '',
-                title: '',
-                desc: '',
-                create_date: '',
-                operate_date: '',
-                operator: '',
-            },
-            addId: 'add',
-
 //            rowClass: 'itemRow',
 //            editClass: 'itemEdit',
             interfacePrefix: 'mainContent',
@@ -76,14 +62,14 @@ moduleMainContent = {
             },
             bindEvent: function (self) {
                 if (self.operation.query) {
-                    var toDetail = [self.addId, self.detailQueryClass].join(',');
+                    var toDetail = [self.addClass, self.detailQueryClass].join(',');
                     $(document).on('click', toDetail, function () {
                         var dom = $(this);
                         var args = {
                             id: 0,
                             noNav: true
                         };
-                        if (dom.attr('id') == self.opt.addId) {
+                        if (dom.hasClass(self.opt.addClass)) {
                         } else {
                             args.id = dom.closest(self.rowClass).data('item').id;
                         }
@@ -186,9 +172,39 @@ moduleMainContent = {
             afterEdit: function (item) {
             },
             beforeSave: function () {
+                var saveArgsOpt = [{
+                    name: 'id',
+                    desc: 'id',
+                    dom: $('#id'),
+                },{
+                    name: 'title',
+                    desc: '标题',
+                    dom: $('#title'),
+                    canNotNull: true,
+                },{
+                    name: 'description',
+                    desc: '描述',
+                    dom: $('#description'),
+                    canNotNull: true,
+                }];
+                var detail = {};
+                var checkRes = common.dataCheck({list:saveArgsOpt});
+                if(checkRes.success){
+                    detail.main_content = checkRes.model;
+                    detail.main_content_child_list = [];
+                    $('#mainContentChildList>.itemRow').each(function () {
+                        detail.main_content_child_list.push($(this).data('item'));
+                    });
+                    checkRes.model = detail;
+                    if(!detail.main_content_child_list.length) {
+                        checkRes.success = false;
+                        checkRes.desc = '请添加内容';
+                    }
+                }
+                return checkRes;
             },
-            onSaveSuccess: function (t, self) {
-            },
+            // onSaveSuccess: function (t, self) {
+            // },
             onDetailQuerySuccess: function (t, self) {
             },
 

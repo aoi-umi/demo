@@ -14,7 +14,7 @@ moduleMainContentType = {
             detailContainerId: 'detailContainer',
             detailTempId: 'mainContentTypeSaveTemp',
 
-            saveId: 'save',
+            saveClass: 'save',
             saveDefaultModel: {
                 id: 0,
                 type: '',
@@ -22,7 +22,7 @@ moduleMainContentType = {
                 parent_type: '',
                 level: 0
             },
-            addId: 'add',
+            addClass: 'add',
 
 //            rowClass: 'itemRow',
 //            editClass: 'itemEdit',

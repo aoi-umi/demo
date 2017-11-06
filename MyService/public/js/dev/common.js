@@ -217,6 +217,7 @@ common = {
                 return data;
             }
         }
+        data.dom = null;
         data.success = true;
         return data;
     },
