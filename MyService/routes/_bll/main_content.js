@@ -57,12 +57,11 @@ exports.save = function (opt) {
     }).then(function(main_content_detail) {
         //todo 权限检查
         if(opt.id != 0){
-
+            myEnum.enumChangeCheck('main_content_status_enum', main_content_detail.main_content.status, main_content.status);
         }
         return autoBll.tran(function (conn) {
             var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
             main_content.type = 0;
-            main_content.status = 0;
             main_content.user_info_id = 1;
             main_content.operator = 'system';
             main_content.create_date =
@@ -95,6 +94,10 @@ exports.save = function (opt) {
                     operate_date: now,
                     operator: 'system'
                 };
+                if(main_content.status == 1){
+                    main_content_log.type = 1;
+                    main_content_log.content = '提交';
+                }
                 list.push(autoBll.save('main_content_log', main_content_log, conn));
                 return q.all(list).then(function () {
                     return main_content_id;

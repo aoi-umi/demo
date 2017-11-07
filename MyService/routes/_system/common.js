@@ -245,8 +245,12 @@ exports.formatRes = function (err, detail, opt) {
         desc: null,
         guid: common.guid()
     };
-    if (opt)
-        res = common.extend(res, opt);
+    if (err && err.code)
+        res.code = err.code;
+    if (opt && opt.code)
+        res.code = opt.code;
+    if (opt && opt.desc)
+        res.desc = opt.desc;
     if (err) {
         common.writeError(err);
         var errMsg = err;

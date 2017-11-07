@@ -1,11 +1,12 @@
 /**
  * Created by bang on 2017-7-29.
  */
+var config = require('../../config');
 var common = require('./common');
 var myEnum = exports;
 exports.getEnum = function (enumName) {
     var enumType = this.enumDict[enumName];
-    if (!enumType) throw new Error('enum "' + enumName + '" not exist!');
+    if (!enumType) throw common.error('enum "' + enumName + '" not exist!', 'CODE_ERROR');
     return enumType;
 };
 
@@ -46,27 +47,35 @@ exports.enumChangeDict = {
 };
 
 //状态变更
-exports.enumChangeCheck = function (srcEnum, destEnum, enumType) {
+exports.enumChangeCheck = function (enumType, srcEnum, destEnum) {
     if (enumType == undefined)
-        throw new Error('enumType can not be empty!');
+        throw common.error('enumType can not be empty!');
 
     var matchEnum = myEnum.getEnum(enumType);
     var changeDict = myEnum.enumChangeDict[enumType];
+    if(srcEnum == undefined || srcEnum == null || destEnum == undefined || destEnum == null)
+        throw common.error('','ARGS_ERROR');
     srcEnum = srcEnum.toString();
     destEnum = destEnum.toString();
-    if (typeof matchEnum[srcEnum] == 'undefined')
-        throw common.error(common.stringFormat('no match src enum [{0}] in [{1}]!', srcEnum, enumType));
+    if (matchEnum[srcEnum] == undefined || matchEnum[srcEnum] == null)
+        throw common.error(common.stringFormat('no match src enum [{0}] in [{1}]!', srcEnum, enumType), 'CODE_ERROR');
 
-    if (typeof matchEnum[destEnum] == 'undefined')
-        throw common.error(common.stringFormat('no match dest enum [{0}] in [{1}]!', destEnum, enumType));
+    if (matchEnum[destEnum] == undefined || matchEnum[destEnum] == null)
+        throw common.error(common.stringFormat('no match dest enum [{0}] in [{1}]!', destEnum, enumType), 'CODE_ERROR');
 
     if (!changeDict[srcEnum] || !changeDict[srcEnum][destEnum]) {
         throw common.error(null, 'ENUM_CHANGED_INVALID', {
             //lang:'en',
             format: function (msg) {
-                return common.stringFormat(msg,
-                    enumType + ':[' + srcEnum + '](' + myEnum.getValue(enumType, srcEnum) + ')',
-                    '[' + destEnum + '](' + myEnum.getValue(enumType, destEnum) + ')');
+                if(config.env == 'dev') {
+                    return common.stringFormat(msg,
+                        `${enumType}:` + `[${srcEnum}](${ myEnum.getValue(enumType, srcEnum)})`,
+                        `[${destEnum}](${myEnum.getValue(enumType, destEnum)})`);
+                }else{
+                    return common.stringFormat(msg,
+                        `[${ myEnum.getValue(enumType, srcEnum)}]`,
+                        `[${myEnum.getValue(enumType, destEnum)}]`);
+                }
             }
         });
     }
