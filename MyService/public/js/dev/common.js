@@ -112,6 +112,14 @@ common = {
             throw e;
         }
     },
+    //时间
+    dateParse: function(date){
+        if(typeof date == 'string')
+            date = date.replace('-', '/');
+        if(!(date instanceof Date))
+            date = new Date(date);
+        return date;
+    },
     dateFormat: function (date, format) {
         try {
             if (!format)format = 'yyyy-MM-dd';
@@ -137,10 +145,36 @@ common = {
                     return ((e.length > 1 ? '0' : '') + eval('o.' + e.slice(-1))).slice(-(e.length > 2 ? e.length : 2));
             });
             return formatStr;
-        } catch (ex) {
+        } catch (e) {
+            console.log(e);
             return '';
         }
     },
+    getDateDiff:function(date1, date2) {
+        date1 = common.dateParse(date1);
+        date2 = common.dateParse(date2);
+
+        var isMinus = false;
+        //date1 开始日期 ，date2 结束日期
+        var timestamp = date2.getTime() - date1.getTime(); //时间差的毫秒数
+        if (date1 > date2) {
+            timestamp = date1.getTime() - date2.getTime();
+            isMinus = true;
+        }
+        timestamp /= 1000;
+        var seconds = Math.floor(timestamp % 60);
+        timestamp /= 60;
+        var minutes = Math.floor(timestamp % 60);
+        timestamp /= 60;
+        var hours = Math.floor(timestamp % 24);
+        timestamp /= 24;
+        var days = Math.floor(timestamp);
+        var diff = (days ? days + ' ' : '') + ('0' + hours).slice(-2) + ':' + ('0' + minutes).slice(-2) + ':' + ('0' + seconds).slice(-2);
+        if (isMinus)
+            diff = '-' + diff;
+        return diff;
+    },
+
     dataCheck: function (option) {
         var self = this;
         var data = {
