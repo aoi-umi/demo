@@ -92,7 +92,7 @@ exports.view = function (req, res, next) {
         switch (opt.view) {
             case '/status':
                 opt.enumDict = myEnum.enumDict;
-                opt.enumCheck = myEnum.enumCheck;
+                opt.enumChangeDict = myEnum.enumChangeDict;
                 break;
             case '/mainContentDetail':
                 return autoBll.custom('main_content', 'detailQuery', {id: query.id}).then(function (t) {
