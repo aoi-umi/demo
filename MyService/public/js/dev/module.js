@@ -69,7 +69,7 @@ module.prototype = {
         },
         afterEdit: function (item) {
         },
-        beforeSave: function () {
+        beforeSave: function (self) {
         },
         onSaveSuccess: function (t, self) {
             common.msgNotice({type: 1, msg: '保存成功:' + t});
@@ -282,7 +282,7 @@ module.prototype = {
         var self = this;
         return common.promise().then(function (res) {
             var data = null;
-            var checkRes = self.opt.beforeSave();
+            var checkRes = self.opt.beforeSave(self);
             if (checkRes) {
                 console.log(checkRes)
                 if (!checkRes.success) {

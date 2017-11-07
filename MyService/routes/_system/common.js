@@ -10,7 +10,6 @@ var q = require('q');
 var zlib = require('zlib');
 var config = require('../../config');
 var errorConfig = require('./errorConfig');
-var myEnum = require('./enum');
 var logService = require('../_service/logService');
 var common = exports;
 
@@ -480,35 +479,6 @@ function s4() {
 exports.guid = function () {
     return (s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4());
 };
-
-//状态变更
-exports.enumCheck = function (srcEnum, destEnum, enumType) {
-    if (enumType == undefined)
-        throw new Error('enumType can not be empty!');
-
-    var matchEnum = myEnum.getEnum(enumType);
-    var enumCheck = myEnum.enumCheck[enumType];
-    srcEnum = srcEnum.toString();
-    destEnum = destEnum.toString();
-    if (typeof matchEnum[srcEnum] == 'undefined')
-        throw common.error(common.stringFormat('no match src enum [{0}] in [{1}]!', srcEnum, enumType));
-
-    if (typeof matchEnum[destEnum] == 'undefined')
-        throw common.error(common.stringFormat('no match dest enum [{0}] in [{1}]!', destEnum, enumType));
-
-    if (!enumCheck[srcEnum] || !enumCheck[srcEnum][destEnum]) {
-        throw common.error(null, errorConfig.ENUM_CHANGED_INVALID.code, {
-            //lang:'en',
-            format: function (msg) {
-                return common.stringFormat(msg,
-                    enumType + ':[' + srcEnum + '](' + myEnum.getValue(enumType, srcEnum) + ')',
-                    '[' + destEnum + '](' + myEnum.getValue(enumType, destEnum) + ')');
-            }
-        });
-    }
-};
-
-//common.enumCheck(0,9,'statusEnum');
 
 exports.logModle = function () {
     return {

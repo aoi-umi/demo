@@ -3,7 +3,6 @@ var common = require('./_system/common');
 var cache = require('./_system/cache');
 var errorConfig = require('./_system/errorConfig');
 var config = require('../config');
-var myEnum = require('./_system/enum');
 var fs = require('fs');
 
 var autoBll = require('./_bll/auto');
@@ -115,15 +114,6 @@ function login(userName, token, req) {
         return userInfo;
     });
 }
-
-exports.status = function (req, res) {
-    var opt = {
-        view: 'status',
-        enumDict: myEnum.enumDict,
-        enumCheck: myEnum.enumCheck,
-    };
-    res.myRender('view', opt);
-};
 
 exports.tranTest = function(req, res){
     var reqData = req.body;

@@ -57,7 +57,6 @@ moduleMainContent = {
                     content: ''
                 };
                 if (self.operation.detailQuery) {
-                    console.log(common.getArgsFromUrlParams());
                 }
             },
             bindEvent: function (self) {
@@ -96,7 +95,8 @@ moduleMainContent = {
                     $(document).on('click', '#mainContentChildList .itemDel', function () {
                         var row = $(this).closest('.itemRow');
                         var item = row.data('item');
-                        self.variable.delMainContentChildList.push(row.data('item').id);
+                        if(item.id)
+                            self.variable.delMainContentChildList.push(item.id);
                         row.remove();
                         self.opt.updateView(['mainContentChild']);
                     });
@@ -171,7 +171,7 @@ moduleMainContent = {
             },
             afterEdit: function (item) {
             },
-            beforeSave: function () {
+            beforeSave: function (self) {
                 var saveArgsOpt = [{
                     name: 'id',
                     desc: 'id',
@@ -195,16 +195,23 @@ moduleMainContent = {
                     $('#mainContentChildList>.itemRow').each(function () {
                         detail.main_content_child_list.push($(this).data('item'));
                     });
-                    checkRes.model = detail;
                     if(!detail.main_content_child_list.length) {
                         checkRes.success = false;
                         checkRes.desc = '请添加内容';
                     }
+                    detail.delMainContentChildList = self.variable.delMainContentChildList;
+                    checkRes.model = detail;
                 }
                 return checkRes;
             },
-            // onSaveSuccess: function (t, self) {
-            // },
+             onSaveSuccess: function (t, self) {
+                 common.msgNotice({type: 1, msg: '保存成功:' + t, btnOptList:{
+                     content:'确认',
+                     cb:function(){
+                         location.reload(true);
+                     }
+                 }});
+             },
             onDetailQuerySuccess: function (t, self) {
             },
 
