@@ -69,7 +69,7 @@ module.prototype = {
         },
         afterEdit: function (item) {
         },
-        beforeSave: function (self) {
+        beforeSave: function (dom, self) {
         },
         onSaveSuccess: function (t, self) {
             common.msgNotice({type: 1, msg: '保存成功:' + t});
@@ -195,7 +195,7 @@ module.prototype = {
             }
 
             $(document).on('click', self.saveClass, function () {
-                self.save();
+                self.save($(this));
             });
         }
 
@@ -278,35 +278,39 @@ module.prototype = {
         self.detailRender(item);
         self.opt.afterEdit(item);
     },
-    save: function () {
+    save: function (dom) {
         var self = this;
         return common.promise().then(function (res) {
             var data = null;
-            var checkRes = self.opt.beforeSave(self);
-            if (checkRes) {
-                console.log(checkRes)
-                if (!checkRes.success) {
-                    var err = null;
-                    if (checkRes.dom) {
-                        common.msgNotice({target: checkRes.dom.selector, msg: checkRes.desc});
-                    } else {
-                        err = new Error(checkRes.desc);
+            try{
+                var checkRes = self.opt.beforeSave(dom, self);
+                if (checkRes) {
+                    console.log(checkRes)
+                    if (!checkRes.success) {
+                        var err = null;
+                        if (checkRes.dom) {
+                            common.msgNotice({target: checkRes.dom.selector, msg: checkRes.desc});
+                        } else {
+                            err = new Error(checkRes.desc);
+                        }
+                        throw err;
                     }
-                    return $.Deferred().reject(err);
+                    var notice = common.msgNotice({type: 1, msg: '保存中...', noClose: true});
+                    data = checkRes.model;
+                    var method = self.opt.interfacePrefix + 'Save';
+                    my.interface[method](data).then(function (t) {
+                        self.opt.onSaveSuccess(t, self);
+                        return res.resolve(t);
+                    }).fail(function (e) {
+                        self.opt.onSaveFail(e, self);
+                        return res.reject();
+                    }).always(function () {
+                        notice.close();
+                    });
+                    return res;
                 }
-                var notice = common.msgNotice({type: 1, msg: '保存中...', noClose: true});
-                data = checkRes.model;
-                var method = self.opt.interfacePrefix + 'Save';
-                my.interface[method](data).then(function (t) {
-                    self.opt.onSaveSuccess(t, self);
-                    return res.resolve(t);
-                }).fail(function (e) {
-                    self.opt.onSaveFail(e, self);
-                    return res.reject();
-                }).always(function () {
-                    notice.close();
-                });
-                return res;
+            }catch (e) {
+                return $.Deferred().reject(e);
             }
         }).fail(function (e) {
             if (e)

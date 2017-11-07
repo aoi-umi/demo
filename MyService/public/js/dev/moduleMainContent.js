@@ -171,7 +171,7 @@ moduleMainContent = {
             },
             afterEdit: function (item) {
             },
-            beforeSave: function (self) {
+            beforeSave: function (dom, self) {
                 var saveArgsOpt = [{
                     name: 'id',
                     desc: 'id',
@@ -190,7 +190,15 @@ moduleMainContent = {
                 var detail = {};
                 var checkRes = common.dataCheck({list:saveArgsOpt});
                 if(checkRes.success){
+                    var main_content =
                     detail.main_content = checkRes.model;
+                    var operate = dom.data('operate');
+                    if(operate == 'save')
+                        main_content.status = 0;
+                    else if(operate == 'submit')
+                        main_content.status = 1;
+                    else
+                        throw new Error(`错误的操作类型[${operate}]`);
                     detail.main_content_child_list = [];
                     $('#mainContentChildList>.itemRow').each(function () {
                         detail.main_content_child_list.push($(this).data('item'));

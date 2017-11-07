@@ -77,8 +77,37 @@
         </div>
 
         <div class="my-row text-center">
-            <button class="btn btn-default save">保存</button>
-            <button class="btn btn-default save">提交</button>
+            <%
+            var operateList = [];
+            switch (main_content.status){
+                case 0:
+                    operateList.push({
+                        text:'保存',
+                        operate:'save',
+                        className:'save'
+                    });
+                    operateList.push({
+                        text:'提交',
+                        operate:'submit',
+                        className:'save'
+                    });
+                    break;
+                case 1:
+                    operateList.push({
+                        text:'审核通过',
+                        operate:'pass',
+                        className:'statusUpdate'
+                    });
+                    operateList.push({
+                        text:'审核不通过',
+                        operate:'not-pass',
+                        className:'statusUpdate'
+                    });
+                    break;
+            }
+            operateList.forEach(function(item){ %>
+            <button class="btn btn-default <%=item.className%>" data-operate="<%=item.operate%>"><%=item.text%></button>
+            <%});%>
         </div>
         <div>
             <table class="table table-bordered">
