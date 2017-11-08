@@ -1,14 +1,31 @@
-﻿var db = require('../_system/db');
+﻿var path = require('path');
+var fs = require('fs');
+
+var db = require('../_system/db');
 var common = require('../_system/common');
+var errorConfig = require('../_system/errorConfig');
 
 function getRequire(name, custom) {
-    if(!custom)
-	    return require('../_dal/' + name + '_auto');
-    else if(custom == 'dal')
-        return require('../_dal/' + name);
-    else if(custom == 'bll')
-        return require('./' + name);
+    var filepath = '';
+    if (!custom)
+        filepath = '../_dal/' + name + '_auto';
+    else {
+        if (custom == 'dal')
+            filepath = '../_dal/' + name;
+        else if (custom == 'bll')
+            filepath = './' + name;
+    }
+    if (!filepath)
+        throw common.error('path is null', errorConfig.CODE_ERROR.code);
 
+    var resolvePath = path.resolve(__dirname + '/' + filepath + '.js');
+    var isExist = fs.existsSync(resolvePath);
+    if (!isExist) {
+        console.error(resolvePath);
+        throw common.error('file is not exist', errorConfig.CODE_ERROR.code);
+    }
+
+    return require(filepath);
 }
 exports.save = function (name, params, conn) {
     return getRequire(name).save(params, conn).then(function (t) {
@@ -46,8 +63,14 @@ exports.tran = function (fn) {
     return res.promise;
 };
 exports.custom = function (name, method, opt) {
-    return getRequire(name, 'bll')[method](opt);
+    var bll = getRequire(name, 'bll');
+    if(!bll[method])
+        throw common.error(`method[${method}] is not exist`, errorConfig.CODE_ERROR.code);
+    return bll[method](opt);
 };
 exports.customDal = function (name, method, opt) {
-    return getRequire(name, 'dal')[method](opt);
+    var dal = getRequire(name, 'dal');
+    if(!dal[method])
+        throw common.error(`method[${method}] is not exist`, errorConfig.CODE_ERROR.code);
+    return dal[method](opt);
 };

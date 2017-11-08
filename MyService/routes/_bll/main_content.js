@@ -86,18 +86,7 @@ exports.save = function (opt) {
                     list.push(autoBll.save('main_content_child', item, conn));
                 });
                 //日志
-                var main_content_log = {
-                    main_content_id: main_content_id,
-                    type: 0,
-                    content: '保存',
-                    create_date: now,
-                    operate_date: now,
-                    operator: 'system'
-                };
-                if(main_content.status == 1){
-                    main_content_log.type = 1;
-                    main_content_log.content = '提交';
-                }
+                var main_content_log = createLog({id: main_content_id, status: main_content.status});
                 list.push(autoBll.save('main_content_log', main_content_log, conn));
                 return q.all(list).then(function () {
                     return main_content_id;
@@ -108,6 +97,68 @@ exports.save = function (opt) {
         });
     });
 };
+
+exports.statusUpdate = function(opt){
+    var main_content = opt;
+    return common.promise().then(function () {
+        if (!main_content.id) {
+            throw common.error('', 'ARGS_ERROR');
+        }
+        return main_content_bll.detailQuery({id: opt.id});
+    }).then(function(main_content_detail) {
+        //todo 检查权限
+        myEnum.enumChangeCheck('main_content_status_enum', main_content_detail.main_content.status, main_content.status);
+        return autoBll.tran(function (conn) {
+            var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
+            var updateStatusOpt = {
+                id: main_content.id,
+                status: main_content.status,
+                operate_date: now
+            };
+            return autoBll.save('main_content', updateStatusOpt, conn).then(function(t) {
+                var main_content_id = t;
+                var list = [];
+                //日志
+                var main_content_log = createLog({id: main_content_id, status: main_content.status});
+                list.push(autoBll.save('main_content_log', main_content_log, conn));
+                return q.all(list).then(function () {
+                    return main_content_id;
+                });
+            });
+        });
+    });
+};
+
+function createLog(opt) {
+    var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
+    var main_content_log = {
+        main_content_id: opt.id,
+        type: 0,
+        content: '保存',
+        create_date: now,
+        operate_date: now,
+        operator: 'system'
+    };
+    if (opt.status == 1) {
+        main_content_log.type = 1;
+        main_content_log.content = '提交';
+    } else if (opt.status == 2) {
+        main_content_log.type = 2;
+        main_content_log.content = '审核';
+    } else if (opt.status == 3) {
+        main_content_log.type = 3;
+        main_content_log.content = '审核通过';
+    } else if (opt.status == 4) {
+        main_content_log.type = 4;
+        main_content_log.content = '审核不通过';
+    } else if (opt.status == -1) {
+        main_content_log.type = 5;
+        main_content_log.content = '删除';
+    }
+    if (opt.content)
+        main_content_log.content = content;
+    return main_content_log;
+}
 
 function updateMainContent(item){
     item.status_name = myEnum.getValue('main_content_status_enum', item.status);

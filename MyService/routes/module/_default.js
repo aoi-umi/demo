@@ -6,14 +6,12 @@ var fs = require('fs');
 var common = require('../_system/common');
 var myEnum = require('./../_system/enum');
 var autoBll = require('../_bll/auto');
+var errorConfig = require('../_system/errorConfig');
 
 //module post 接口
 exports.default = function (req, res, next) {
-    var bll = getBll(req, res, next);
-    if(!bll)
-        return next();
     common.promise().then(function () {
-        return bll;
+        return getBll(req, res, next);
     }).then(function (t) {
         res.mySend(null, t);
     }).fail(function (e) {
@@ -26,23 +24,14 @@ function getBll(req, res, next){
     var args = req.body;
     var module = params.module;
     var method = params.method;
-    console.log(`[module:${module}][method:${method}]`)
-    switch (method) {
-        case 'save':
-        case 'del':
-        case 'query':
-        case 'detailQuery':
-            break;
-        default:
-            throw common.error('no match method[' + method + ']', 'BAD_REQUEST');
-    }
+    console.log(`[module:${module}][method:${method}]`);
     var opt = {
         isUsedCustom: false
     };
     //使用custom
     if((module == 'log' && common.isInArray(method, ['query']))
         || (module == 'mainContentType' && common.isInArray(method, ['save']))
-        || (module == 'mainContent' && common.isInArray(method, ['query','save']))
+        || (module == 'mainContent' && common.isInArray(method, ['query','save','statusUpdate']))
     ) {
         opt.isUsedCustom = true;
     }
@@ -52,7 +41,7 @@ function getBll(req, res, next){
     }
 
     //不记录日志
-    if(module == 'log'){
+    if(common.isInArray(module, ['log'])){
         req.myData.noLog = true;
     }
 
@@ -63,9 +52,10 @@ function getBll(req, res, next){
     }else {
         var modulePath = path.resolve(__dirname + '/../_dal/' + module + '_auto.js');
         var isExist = fs.existsSync(modulePath);
-        if(!isExist){
-            return null;
-        }
+        if (!isExist)
+            throw common.error('file is not exist', errorConfig.BAD_REQUEST.code);
+        if (!autoBll[method])
+            throw common.error(`method[${method}] is not exist`, errorConfig.BAD_REQUEST.code);
         return autoBll[method](module, args);
     }
 }

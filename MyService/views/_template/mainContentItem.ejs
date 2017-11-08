@@ -10,8 +10,10 @@
         <td><%=operate_date%></td>
         <td><%=operator%></td>
         <td>
-            <a class="itemDetailQuery" href="javascript:;">详细</a>
-            <a class="itemDel" href="javascript:;">删除</a>
+            <a href="javascript:;" class="itemDetailQuery">详细</a>
+            <%if(status != -1){%>
+                <a href="javascript:;" class="itemDel statusUpdate" data-id="<%=id%>" data-operate="del">删除</a>
+            <%}%>
         </td>
     </tr>
 </tbody>

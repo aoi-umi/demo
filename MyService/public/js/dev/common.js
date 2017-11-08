@@ -384,7 +384,6 @@ common = {
                                 </div>
                             </div>
                         </div>`;
-                    //dom = $('#msgNoticeBox');
                     dom = opt.dom;
                     if (!dom || !dom.length) {
                         dom = $(opt.template).attr('id', 'msgNoticeBox_' + new Date().getTime());
