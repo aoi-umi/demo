@@ -58,7 +58,7 @@ var restList = [
     {
         url: '/:module/del',
         checkAuthOnly: true,//仅检查权限，功能由后面路由实现
-        auth: ['login']
+        auth: ['admin']
     },
 ];
 

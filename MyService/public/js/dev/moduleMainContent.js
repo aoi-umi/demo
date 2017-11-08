@@ -91,11 +91,15 @@ moduleMainContent = {
                     });
                 }
 
+                $(document).on('click', '.statusUpdate', function () {
+                    self.opt.statusUpdate($(this), self);
+                });
+
                 if (self.operation.detailQuery) {
                     $(document).on('click', '#mainContentChildList .itemDel', function () {
                         var row = $(this).closest('.itemRow');
                         var item = row.data('item');
-                        if(item.id)
+                        if (item.id)
                             self.variable.delMainContentChildList.push(item.id);
                         row.remove();
                         self.opt.updateView(['mainContentChild']);
@@ -169,33 +173,31 @@ moduleMainContent = {
                 if (!data.create_date) data.create_date = null;
                 if (!data.operate_date) data.operate_date = null;
             },
-            afterEdit: function (item) {
-            },
             beforeSave: function (dom, self) {
                 var saveArgsOpt = [{
                     name: 'id',
                     desc: 'id',
                     dom: $('#id'),
-                },{
+                }, {
                     name: 'title',
                     desc: '标题',
                     dom: $('#title'),
                     canNotNull: true,
-                },{
+                }, {
                     name: 'description',
                     desc: '描述',
                     dom: $('#description'),
                     canNotNull: true,
                 }];
                 var detail = {};
-                var checkRes = common.dataCheck({list:saveArgsOpt});
-                if(checkRes.success){
+                var checkRes = common.dataCheck({list: saveArgsOpt});
+                if (checkRes.success) {
                     var main_content =
-                    detail.main_content = checkRes.model;
+                        detail.main_content = checkRes.model;
                     var operate = dom.data('operate');
-                    if(operate == 'save')
+                    if (operate == 'save')
                         main_content.status = 0;
-                    else if(operate == 'submit')
+                    else if (operate == 'submit')
                         main_content.status = 1;
                     else
                         throw new Error(`错误的操作类型[${operate}]`);
@@ -203,7 +205,7 @@ moduleMainContent = {
                     $('#mainContentChildList>.itemRow').each(function () {
                         detail.main_content_child_list.push($(this).data('item'));
                     });
-                    if(!detail.main_content_child_list.length) {
+                    if (!detail.main_content_child_list.length) {
                         checkRes.success = false;
                         checkRes.desc = '请添加内容';
                     }
@@ -212,14 +214,16 @@ moduleMainContent = {
                 }
                 return checkRes;
             },
-             onSaveSuccess: function (t, self) {
-                 common.msgNotice({type: 1, msg: '保存成功:' + t, btnOptList:{
-                     content:'确认',
-                     cb:function(){
-                         location.reload(true);
-                     }
-                 }});
-             },
+            onSaveSuccess: function (t, self) {
+                common.msgNotice({
+                    type: 1, msg: '保存成功:' + t, btnOptList: {
+                        content: '确认',
+                        cb: function () {
+                            location.reload(true);
+                        }
+                    }
+                });
+            },
             onDetailQuerySuccess: function (t, self) {
             },
 
@@ -245,7 +249,50 @@ moduleMainContent = {
                         row.find('[name=num]').text(val);
                     });
                 }
-            }
+            },
+
+            statusUpdate: function (dom, self) {
+                var main_content = {id: dom.data('id')};
+                return common.promise().then(function () {
+                    try {
+                        var operate = dom.data('operate');
+                        if (operate == 'audit')
+                            main_content.status = 2;
+                        else if (operate == 'pass')
+                            main_content.status = 3;
+                        else if (operate == 'notPass')
+                            main_content.status = 4;
+                        else if (operate == 'del')
+                            main_content.status = -1;
+                        else
+                            throw new Error(`错误的操作类型[${operate}]`);
+                        var notice = common.msgNotice({type: 1, msg: '处理中', noClose: true});
+                        return my.interface['mainContentStatusUpdate'](main_content).then(function () {
+                            common.msgNotice({
+                                type: 1, msg: '处理成功!', btnOptList: {
+                                    content: '确认',
+                                    cb: function () {
+                                        location.reload(true);
+                                    }
+                                }
+                            });
+                        }).always(function () {
+                            notice.close();
+                        });
+                    }
+                    catch (e) {
+                        return $.Deferred().reject(e);
+                    }
+                }).fail(function (e) {
+                    common.msgNotice({
+                        type: 1, msg: '处理失败:' + e, btnOptList: {
+                            content: '确认',
+                            cb: function () {
+                            }
+                        }
+                    });
+                });
+            },
         };
         opt = $.extend(opt, option);
         return new module(opt);

@@ -65,6 +65,9 @@ init = {
                 logQuery: {
                     url: '/log/query'
                 },
+                mainContentStatusUpdate: {
+                    url: '/mainContent/statusUpdate'
+                },
             },
             moduleList: [
                 'mainContent',

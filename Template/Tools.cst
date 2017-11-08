@@ -286,9 +286,9 @@ private static List<string> CreateMySqlSaveProcedure(DatabaseModel databaseModel
         if(x.Name == databaseModel.IdCol.Name)
             continue;
         procStrList.Add(string.Format(tabStr + "IF " + paraPerfix + "{0} IS NOT NULL THEN", x.Name));
-        procStrList.Add(string.Format(tabStr + "\tSET @Sql = CONCAT(@Sql,' {0} = ''', replace_special_char(" + paraPerfix + "{0}), ''',');", x.Name));
+        procStrList.Add(string.Format(tabStr + "\tSET @Sql = CONCAT(@Sql,' `{0}` = ''', replace_special_char(" + paraPerfix + "{0}), ''',');", x.Name));
         procStrList.Add(string.Format(tabStr + "ELSEIF LOCATE('," + x.Name +",', " + nullListName + ")>0 THEN"));
-        procStrList.Add(string.Format(tabStr + "\tSET @Sql = CONCAT(@Sql,' {0} = null,');", x.Name));
+        procStrList.Add(string.Format(tabStr + "\tSET @Sql = CONCAT(@Sql,' `{0}` = null,');", x.Name));
         procStrList.Add(string.Format(tabStr + "END IF;" + Environment.NewLine));
     };    
 

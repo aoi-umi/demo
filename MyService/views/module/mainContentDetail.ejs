@@ -93,6 +93,12 @@
                     });
                     break;
                 case 1:
+                case 2:
+                    operateList.push({
+                        text:'审核',
+                        operate:'audit',
+                        className:'statusUpdate'
+                    });
                     operateList.push({
                         text:'审核通过',
                         operate:'pass',
@@ -105,8 +111,18 @@
                     });
                     break;
             }
+            if(main_content.id && main_content.status != -1){
+                operateList.push({
+                    text:'删除',
+                    operate:'del',
+                    className:'statusUpdate'
+                });
+            }
             operateList.forEach(function(item){ %>
-            <button class="btn btn-default <%=item.className%>" data-operate="<%=item.operate%>"><%=item.text%></button>
+            <button class="btn btn-default <%=item.className%>"
+                    data-operate="<%=item.operate%>" data-id="<%=main_content.id%>">
+                <%=item.text%>
+            </button>
             <%});%>
         </div>
         <div>
