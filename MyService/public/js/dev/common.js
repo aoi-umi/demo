@@ -112,69 +112,6 @@ common = {
             throw e;
         }
     },
-    //时间
-    dateParse: function(date){
-        if(typeof date == 'string')
-            date = date.replace('-', '/');
-        if(!(date instanceof Date))
-            date = new Date(date);
-        return date;
-    },
-    dateFormat: function (date, format) {
-        try {
-            if (!format)format = 'yyyy-MM-dd';
-            if (!date)
-                date = new Date();
-            if (typeof date == 'string')
-                date = Date.parse(date);
-
-            var o = {
-                y: date.getFullYear(),
-                M: date.getMonth() + 1,
-                d: date.getDate(),
-                h: date.getHours() % 12,
-                H: date.getHours(),
-                m: date.getMinutes(),
-                s: date.getSeconds(),
-                S: date.getMilliseconds()
-            };
-            var formatStr = format.replace(/(y+|M+|d+|h+|H+|m+|s+|S+)/g, function (e) {
-                if (e.match(/S+/))
-                    return ('' + eval('o.' + e.slice(-1))).slice(0, e.length);
-                else
-                    return ((e.length > 1 ? '0' : '') + eval('o.' + e.slice(-1))).slice(-(e.length > 2 ? e.length : 2));
-            });
-            return formatStr;
-        } catch (e) {
-            console.log(e);
-            return '';
-        }
-    },
-    getDateDiff:function(date1, date2) {
-        date1 = common.dateParse(date1);
-        date2 = common.dateParse(date2);
-
-        var isMinus = false;
-        //date1 开始日期 ，date2 结束日期
-        var timestamp = date2.getTime() - date1.getTime(); //时间差的毫秒数
-        if (date1 > date2) {
-            timestamp = date1.getTime() - date2.getTime();
-            isMinus = true;
-        }
-        timestamp /= 1000;
-        var seconds = Math.floor(timestamp % 60);
-        timestamp /= 60;
-        var minutes = Math.floor(timestamp % 60);
-        timestamp /= 60;
-        var hours = Math.floor(timestamp % 24);
-        timestamp /= 24;
-        var days = Math.floor(timestamp);
-        var diff = (days ? days + ' ' : '') + ('0' + hours).slice(-2) + ':' + ('0' + minutes).slice(-2) + ':' + ('0' + seconds).slice(-2);
-        if (isMinus)
-            diff = '-' + diff;
-        return diff;
-    },
-
     dataCheck: function (option) {
         var self = this;
         var data = {
@@ -255,6 +192,70 @@ common = {
         data.success = true;
         return data;
     },
+    //时间
+    dateParse: function (date) {
+        if (typeof date == 'string')
+            date = date.replace('-', '/');
+        if (!(date instanceof Date))
+            date = new Date(date);
+        return date;
+    },
+    dateFormat: function (date, format) {
+        try {
+            if (!format)format = 'yyyy-MM-dd';
+            if (!date)
+                date = new Date();
+            if (typeof date == 'string')
+                date = Date.parse(date);
+
+            var o = {
+                y: date.getFullYear(),
+                M: date.getMonth() + 1,
+                d: date.getDate(),
+                h: date.getHours() % 12,
+                H: date.getHours(),
+                m: date.getMinutes(),
+                s: date.getSeconds(),
+                S: date.getMilliseconds()
+            };
+            var formatStr = format.replace(/(y+|M+|d+|h+|H+|m+|s+|S+)/g, function (e) {
+                if (e.match(/S+/))
+                    return ('' + eval('o.' + e.slice(-1))).slice(0, e.length);
+                else
+                    return ((e.length > 1 ? '0' : '') + eval('o.' + e.slice(-1))).slice(-(e.length > 2 ? e.length : 2));
+            });
+            return formatStr;
+        } catch (e) {
+            console.log(e);
+            return '';
+        }
+    },
+    getDateDiff: function (date1, date2) {
+        date1 = common.dateParse(date1);
+        date2 = common.dateParse(date2);
+
+        var isMinus = false;
+        //date1 开始日期 ，date2 结束日期
+        var timestamp = date2.getTime() - date1.getTime(); //时间差的毫秒数
+        if (date1 > date2) {
+            timestamp = date1.getTime() - date2.getTime();
+            isMinus = true;
+        }
+        timestamp /= 1000;
+        var seconds = Math.floor(timestamp % 60);
+        timestamp /= 60;
+        var minutes = Math.floor(timestamp % 60);
+        timestamp /= 60;
+        var hours = Math.floor(timestamp % 24);
+        timestamp /= 24;
+        var days = Math.floor(timestamp);
+        var diff = (days ? days + ' ' : '') + ('0' + hours).slice(-2) + ':' + ('0' + minutes).slice(-2) + ':' + ('0' + seconds).slice(-2);
+        if (isMinus)
+            diff = '-' + diff;
+        return diff;
+    },
+
+    //字符串
     stringFormat: function () {
         var args = arguments;
         var reg = /(\{\d\})/g
@@ -270,6 +271,10 @@ common = {
         res = split.join('');
         return res;
     },
+    littleCamelCaseToBigCamelCase: function (str) {
+        return str[0].toUpperCase() + str.substr(1);
+    },
+
     msgNotice: function (option) {
         var opt = {
             type: 0,
@@ -302,20 +307,20 @@ common = {
         //弹出提示
         var dom = null;
         opt = $.extend(opt, option);
-        switch (opt.type){
+        switch (opt.type) {
             case 0:
-                if(true){
-                    if(!opt.target && opt.dom)
+                if (true) {
+                    if (!opt.target && opt.dom)
                         opt.target = opt.dom.selector;
-                    if(!opt.target)
+                    if (!opt.target)
                         throw new Error('target can not be null');
-                    if(!opt.msg)
+                    if (!opt.msg)
                         throw new Error('msg can not be null');
-                    if(!opt.template){
+                    if (!opt.template) {
                         opt.template = '<div class="popover right" role="tooltip"><div class="arrow"></div><div class="popover-content"></div></div>';
                     }
                     dom = $('[data-target="' + opt.target + '"]');
-                    if(!dom.length){
+                    if (!dom.length) {
                         dom = $(opt.template);
                         $('body').append(dom);
                     }
@@ -323,7 +328,7 @@ common = {
                     dom.removeClass('top bottom left right').addClass(opt.position);
                     var x = 0, y = 0;
                     var targetDom = $(opt.target);
-                    switch(opt.position){
+                    switch (opt.position) {
                         case 'top':
                             x = targetDom.offset().left;
                             y = targetDom.offset().top - dom.outerHeight() - 3;
@@ -346,20 +351,20 @@ common = {
                     dom.css('left', x)
                         .css('top', y)
                         .show();
-                    dom.close = function(){
+                    dom.close = function () {
                         dom.remove();
                     };
-                    if(opt.focus)
+                    if (opt.focus)
                         targetDom.focus();
-                    if(opt.autoHide){
-                        targetDom.on('blur', function(){
+                    if (opt.autoHide) {
+                        targetDom.on('blur', function () {
                             dom.remove();
                         });
                     }
                 }
                 break;
             case 1:
-                if(true){
+                if (true) {
                     opt.template =
                         `<div data-backdrop="static" role="dialog" tabindex="-1" class="modal fade">
                             <div class="modal-dialog" style="top:100px">
@@ -381,37 +386,37 @@ common = {
                         </div>`;
                     //dom = $('#msgNoticeBox');
                     dom = opt.dom;
-                    if(!dom || !dom.length) {
+                    if (!dom || !dom.length) {
                         dom = $(opt.template).attr('id', 'msgNoticeBox_' + new Date().getTime());
-                        dom.find('[name=closeBtn]').on('click', function(){
+                        dom.find('[name=closeBtn]').on('click', function () {
                             dom.close();
                         });
                     }
-                    if(opt.noClose)
+                    if (opt.noClose)
                         dom.find('[name=closeBtn]').addClass('hidden');
                     else
                         dom.find('[name=closeBtn]').removeClass('hidden');
                     dom.find('[name=content]').html(opt.msg);
                     dom.find('[name=footer]').empty();
-                    if(!opt.btnOptList && !opt.noClose) {
+                    if (!opt.btnOptList && !opt.noClose) {
                         opt.btnOptList = [{
                             content: '确认'
                         }];
                     }
-                    if(opt.btnOptList){
+                    if (opt.btnOptList) {
                         var btnList = [];
-                        $(opt.btnOptList).each(function(){
+                        $(opt.btnOptList).each(function () {
                             var item = this;
                             var btn = $(opt.btnTemplate);
                             var btnClass = item.class || 'btn-default';
                             btn.addClass(btnClass);
-                            if(btn.attr('name') == 'btnContent')
+                            if (btn.attr('name') == 'btnContent')
                                 btn.html(item.content);
                             else
                                 btn.find('[name=btnContent]').html(item.content);
-                            btn.on('click', function(){
+                            btn.on('click', function () {
                                 dom.close();
-                                if(item.cb)
+                                if (item.cb)
                                     item.cb(item.cbOpt);
                             });
                             btnList.push(btn);
@@ -419,9 +424,9 @@ common = {
                         dom.find('[name=footer]').append(btnList);
                     }
                     $('.popover').hide();
-                    if(dom.is(':hidden'))
+                    if (dom.is(':hidden'))
                         dom.modal('show');
-                    dom.close = function() {
+                    dom.close = function () {
                         dom.modal('hide');
                     }
                 }
@@ -429,10 +434,10 @@ common = {
         }
         return dom;
     },
-    isInArray: function(obj, list, startIndex){
+    isInArray: function (obj, list, startIndex) {
         return $.inArray(obj, list, startIndex) >= 0;
     },
-    promise: function(){
+    promise: function () {
         var def = $.Deferred();
         var res = $.Deferred();
         def.resolve(res);

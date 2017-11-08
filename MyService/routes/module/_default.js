@@ -26,6 +26,7 @@ function getBll(req, res, next){
     var args = req.body;
     var module = params.module;
     var method = params.method;
+    console.log(`[module:${module}][method:${method}]`)
     switch (method) {
         case 'save':
         case 'del':
@@ -40,8 +41,8 @@ function getBll(req, res, next){
     };
     //使用custom
     if((module == 'log' && common.isInArray(method, ['query']))
-        || (module == 'main_content_type' && common.isInArray(method, ['save']))
-        || (module == 'main_content' && common.isInArray(method, ['query','save']))
+        || (module == 'mainContentType' && common.isInArray(method, ['save']))
+        || (module == 'mainContent' && common.isInArray(method, ['query','save']))
     ) {
         opt.isUsedCustom = true;
     }
@@ -55,6 +56,8 @@ function getBll(req, res, next){
         req.myData.noLog = true;
     }
 
+    //转换为小写下划线;
+    module = common.upperCaseToLowerCaseWithUnderscode(module);
     if(opt.isUsedCustom){
         return autoBll.custom(module, method, args);
     }else {
