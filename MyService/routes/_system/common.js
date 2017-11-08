@@ -397,6 +397,7 @@ exports.IPv4ToIPv6 = function (ip, convert) {
 // console.log(exports.IPv4ToIPv6('192.168.1.1'))
 // console.log(exports.IPv4ToIPv6('192.168.1.1', true))
 
+//字符串
 exports.stringFormat = function () {
     var args = arguments;
     var reg = /(\{\d\})/g
@@ -411,6 +412,16 @@ exports.stringFormat = function () {
     }
     res = split.join('');
     return res;
+};
+//大写转 为 下划线小写
+exports.upperCaseToLowerCaseWithUnderscode = function(str) {
+    return str.replace(/[A-Z]/g, function () {
+        return '_' + arguments[0].toLowerCase()
+    });
+};
+//小驼峰转大驼峰
+exports.littleCamelCaseToBigCamelCase = function(str){
+    return str[0].toUpperCase() + str.substr(1);
 };
 
 exports.dateFormat = function (date, format) {

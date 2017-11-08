@@ -4,83 +4,31 @@
 namespace('my.interface');
 my.interface = {
     opt: {
-        interfaceConfig: {
-            login: {
-                url: '/login'
-            },
-            logQuery: {
-                url: '/log/query'
-            },
-
-            mainContentQuery: {
-                url: '/main_content/query'
-            },
-            mainContentSave: {
-                url: '/main_content/save'
-            },
-            mainContentDetailQuery: {
-                url: '/main_content/detailQuery'
-            },
-            mainContentDel: {
-                url: '/main_content/del'
-            },
-
-            mainContentChildQuery: {
-                url: '/main_content_child/query'
-            },
-            mainContentChildSave: {
-                url: '/main_content_child/save'
-            },
-            mainContentChildDetailQuery: {
-                url: '/main_content_child/detailQuery'
-            },
-            mainContentChildDel: {
-                url: '/main_content_child/del'
-            },
-
-            mainContentLogQuery: {
-                url: '/main_content_log/query'
-            },
-            mainContentLogSave: {
-                url: '/main_content_log/save'
-            },
-            mainContentLogDetailQuery: {
-                url: '/main_content_log/detailQuery'
-            },
-            mainContentLogDel: {
-                url: '/main_content_log/del'
-            },
-
-            mainContentTypeIdQuery: {
-                url: '/main_content_type_id/query'
-            },
-            mainContentTypeIdSave: {
-                url: '/main_content_type_id/save'
-            },
-            mainContentTypeIdDetailQuery: {
-                url: '/main_content_type_id/detailQuery'
-            },
-            mainContentTypeIdDel: {
-                url: '/main_content_type_id/del'
-            },
-
-            mainContentTypeQuery: {
-                url: '/main_content_type/query'
-            },
-            mainContentTypeSave: {
-                url: '/main_content_type/save'
-            },
-            mainContentTypeDetailQuery: {
-                url: '/main_content_type/detailQuery'
-            },
-            mainContentTypeDel: {
-                url: '/main_content_type/del'
+        interfaceConfig: {},
+        moduleList: [],
+        defaultMethod: ['query', 'detailQuery', 'save', 'del'],
+        setModuleConfig: function(module, method) {
+            var key = module + common.littleCamelCaseToBigCamelCase(method);
+            if (!this.interfaceConfig[key]) {
+                this.interfaceConfig[key] = {
+                    url: `/${module}/${method}`
+                }
             }
         }
     },
-    init: function () {
+    init: function (option) {
         var self = this;
-        var interfaceConfig = this.opt.interfaceConfig;
+        self.opt = $.extend(self.opt, option);
+        var interfaceConfig = self.opt.interfaceConfig;
+        var moduleList = self.opt.moduleList;
+        var defaultMethod = self.opt.defaultMethod;
+        $(moduleList).each(function() {
+            var module = this;
+            $(defaultMethod).each(function () {
+                var method = this;
+                self.opt.setModuleConfig(module, method);
+            });
+        });
         for (var key in interfaceConfig) {
             if (self[key])
                 throw new Error('interface [' + key + '] is exist!');

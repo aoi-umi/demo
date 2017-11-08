@@ -57,7 +57,23 @@ init = {
         $.cookie(config.cacheKey.userInfo, userInfo, { expires: 30 });
 
         socket.init();
-        my.interface.init();
+        my.interface.init({
+            interfaceConfig: {
+                login: {
+                    url: '/login'
+                },
+                logQuery: {
+                    url: '/log/query'
+                },
+            },
+            moduleList: [
+                'mainContent',
+                //'mainContentChild',
+                //'mainContentLog',
+                //'mainContentTypeId',
+                'mainContentType',
+            ]
+        });
 
         $(`.nav.navbar-nav a[href="${location.pathname}"]`).closest('li').addClass('active');
 
