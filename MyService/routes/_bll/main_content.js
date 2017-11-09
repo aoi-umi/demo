@@ -10,9 +10,15 @@ var main_content_bll = exports;
 
 exports.query = function(opt) {
     return common.promise().then(function () {
-        return autoBll.query('main_content', opt).then(function (t) {
-            if(t.list && t.list.length){
-                t.list.forEach(function(item){
+        return autoBll.customDal('main_content', 'query', opt).then(function (t) {
+            var detail = {
+                list: t[0],
+                count: t[1][0].count
+            }
+            return detail;
+        }).then(function (t) {
+            if (t.list && t.list.length) {
+                t.list.forEach(function (item) {
                     updateMainContent(item);
                 });
             }
