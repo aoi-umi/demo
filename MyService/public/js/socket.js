@@ -37,14 +37,14 @@ socket = {
             var msg = $('#msg').val();
             if(msg) {
                 var userInfo = $.cookie(config.cacheKey.userInfo);
-                var msgId = extend.s4();
+                var msgId = common.s4();
                 socket.emit('postMsg', {
                     user: userInfo,
                     content: msg,
                     msgId: msgId,
                 });
                 self.appendMsg({
-                    datetime: extend.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss'),
+                    datetime: common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss'),
                     user: userInfo,
                     content: msg,
                     msgId: msgId,
