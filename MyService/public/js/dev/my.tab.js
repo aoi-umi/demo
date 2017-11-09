@@ -11,6 +11,7 @@ my.tab = {
     tabContainer: null,
     panelContainer: null,
     tabHeaderContextMenu: null,
+    clickTabIdList: [],
     init: function (option) {
         var self = this;
         self.opt = $.extend(self.opt, option);
@@ -73,12 +74,22 @@ my.tab = {
                 tabDom.click();
             }
         });
+        tabContainer.on('click', '[data-toggle=tab]', function(){
+            var id = $(this).attr('id');
+            self.clickTabIdList.push(id);
+        });
+        //关闭
         tabContainer.on('click','.close', function () {
             $($(this).data('close-target')).remove();
             if(tabContainer.find('> .active').length == 0) {
-                tabContainer.find('a:eq(0)').click();
+                var lastId = self.clickTabIdList[self.clickTabIdList.length - 2];
+                if (!$('#' + lastId).length)
+                    tabContainer.find('a:eq(0)').click();
+                else
+                    $('#' + lastId).click();
             }
         });
+        //tab header右键
         tabContainer.on('contextmenu', '.tab-header', function(e){
             var x = e.clientX;
             var y = e.clientY;
