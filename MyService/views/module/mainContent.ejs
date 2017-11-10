@@ -11,9 +11,6 @@
                 text: 'type',
                 id:'type',
             },{
-                text: 'status',
-                id:'status',
-            },{
                 text: 'user_info_id',
                 id:'user_info_id',
             },{
@@ -39,6 +36,14 @@
                 </div>
             </div>
             <%}%>
+        </div>
+        <div class="row">
+            <div name="statusBox" class="col-xs-12">
+            <%for(var key in mainContentStatusEnum){ %>
+            <label><input class="status" type="checkbox" value="<%=key%>"/><%=mainContentStatusEnum[key]%></label>
+            <%
+            }%>
+            </div>
         </div>
         <div class="row my-row">
             <div class="<%=rowItemClass%> col-lg-offset-6 col-md-offset-4">
