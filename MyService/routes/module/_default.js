@@ -87,10 +87,11 @@ exports.view = function (req, res, next) {
                 opt.enumDict = myEnum.enumDict;
                 opt.enumChangeDict = myEnum.enumChangeDict;
                 break;
+            case '/mainContent':
+                opt.mainContentStatusEnum = myEnum.getEnum('main_content_status_enum');
+                break;
             case '/mainContentDetail':
-                return autoBll.custom('main_content', 'detailQuery', {id: query.id}).then(function (t) {
-                    opt.mainContentDetail = t;
-                });
+                return require('./mainContent').detailQuery({id: query.id}, opt);
                 break;
         }
     }).then(function(){

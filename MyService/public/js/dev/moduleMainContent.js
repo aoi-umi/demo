@@ -31,7 +31,14 @@ moduleMainContent = {
                 dom: $('#type'),
             }, {
                 name: 'status',
-                dom: $('#status'),
+                dom: $('[name=statusBox]'),
+                getValue:function() {
+                    var val = [];
+                    this.dom.find('.status:checked').each(function () {
+                        val.push($(this).val());
+                    });
+                    return val.join(',');
+                }
             }, {
                 name: 'user_info_id',
                 dom: $('#user_info_id'),
