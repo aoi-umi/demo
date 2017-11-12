@@ -87,8 +87,9 @@ exports.save = function (opt) {
                     }
                 }
                 //保存child
-                opt.main_content_child_list.forEach(function (item) {
+                opt.main_content_child_list.forEach(function (item, index) {
                     item.main_content_id = main_content_id;
+                    item.num = index + 1;
                     list.push(autoBll.save('main_content_child', item, conn));
                 });
                 //日志
@@ -167,5 +168,6 @@ function createLog(opt) {
 }
 
 function updateMainContent(item){
+    item.type_name = myEnum.getValue('main_content_type_enum', item.type);
     item.status_name = myEnum.getValue('main_content_status_enum', item.status);
 }

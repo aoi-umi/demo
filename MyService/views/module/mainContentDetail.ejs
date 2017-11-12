@@ -20,12 +20,17 @@
     <div class="form-group">
         <div>
             <p>
-                <span>创建人:</span><span><%=main_content.nickname || ''%></span>
+                <span>创建人:</span><span>
+                    <%=main_content.account || ''%>
+                    (<%=main_content.nickname || ''%>)
+                </span>
+                <span>状态:</span><span><%=main_content.status_name || ''%></span>
             </p>
-            <span>状态:</span><span><%=main_content.status_name || ''%></span>
-            <span>创建时间:</span><span><%=main_content.create_date || ''%></span>
-            <span>修改时间:</span><span><%=main_content.operate_date || ''%></span>
-            <span>修改人:</span><span><%=main_content.operator || ''%></span>
+            <p>
+                <span>创建时间:</span><span><%=main_content.create_date || ''%></span>
+                <span>修改时间:</span><span><%=main_content.operate_date || ''%></span>
+                <span>修改人:</span><span><%=main_content.operator || ''%></span>
+            </p>
             <p>
             <%
             var main_content_type_list = mainContentDetail.main_content_type_list;
@@ -81,6 +86,7 @@
             var operateList = [];
             switch (main_content.status){
                 case 0:
+                case 4:
                     operateList.push({
                         text:'保存',
                         operate:'save',
@@ -153,6 +159,8 @@
                 </h4>
             </div>
             <div id="mainContentChildDetail" class="modal-body">
+                <div class="hidden">
+                </div>
                 <div class="form-horizontal">
                     <div class="form-group">
                         <label class="col-sm-2 control-label">type</label>

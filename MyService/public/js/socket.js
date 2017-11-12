@@ -29,6 +29,12 @@ socket = {
     bindEvent:function () {
         var self = this;
         var socket = self.socket;
+        socket.on('connect', function () {
+            var userInfo = $.cookie(config.cacheKey.userInfo);
+            socket.emit('init', {
+                user: userInfo,
+            });
+        });
         socket.on('onlineCount', function (onlineCount) {
             $('#onlineCount').html(onlineCount >= 0 ? onlineCount : '获取失败');
         });
