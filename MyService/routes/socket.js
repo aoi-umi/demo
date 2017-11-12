@@ -5,6 +5,7 @@ var common = require('./_system/common');
 var mySocket = exports;
 
 exports.onlineCount = 0;
+exports.onlineUser = {};
 exports.io = null;
 exports.init = function (io) {
     mySocket.io = io;
@@ -13,8 +14,17 @@ exports.init = function (io) {
 exports.bindEvent= function () {
     var io = mySocket.io;
     io.on('connection', function (socket) {
-        mySocket.onlineCount++;
-        io.sockets.emit('onlineCount', mySocket.onlineCount);
+        socket.myData = {};
+        socket.on('init', function (opt) {
+            socket.myData.user = opt.user;
+            if (!mySocket.onlineUser[opt.user]) {
+                mySocket.onlineUser[opt.user] = 1;
+                mySocket.onlineCount++;
+            }
+            else
+                mySocket.onlineUser[opt.user]++;
+            io.sockets.emit('onlineCount', mySocket.onlineCount);
+        });
 
         socket.on('postMsg', function (opt) {
             //将消息发送到除自己外的所有用户
@@ -31,7 +41,10 @@ exports.bindEvent= function () {
         });
 
         socket.on('disconnect', function () {
-            if (mySocket.onlineCount > 0) {
+            var userLinks = mySocket.onlineUser[socket.myData.user];
+            if(userLinks && userLinks > 0)
+                userLinks = --mySocket.onlineUser[socket.myData.user];
+            if (userLinks <= 0 && mySocket.onlineCount > 0) {
                 mySocket.onlineCount--;
                 io.sockets.emit('onlineCount', mySocket.onlineCount);
             }

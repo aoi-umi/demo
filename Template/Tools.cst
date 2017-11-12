@@ -429,13 +429,13 @@ private static List<string> CreateMySqlQueryProcedure(DatabaseModel databaseMode
     procStrList.Add(tabStr + "\tSET " + nullListName + " = '';"); 
     procStrList.Add(tabStr + "END IF;");       
     procStrList.Add(tabStr + "SET " + nullListName + " = CONCAT(',', " + nullListName + ", ',');" + Environment.NewLine); 
-    procStrList.Add(string.Format(tabStr + "SET @Sql ='SELECT SQL_CALC_FOUND_ROWS * FROM {0} WHERE 1 = 1 ';", tableName));    
+    procStrList.Add(string.Format(tabStr + "SET @Sql ='SELECT SQL_CALC_FOUND_ROWS * FROM {0} t1 WHERE 1 = 1 ';", tableName));    
     
     cols.ForEach(x=>{
         procStrList.Add(string.Format(tabStr + "IF {0} IS NOT NULL AND length({0}) > 0 THEN", paraPerfix + x.Name));
-        procStrList.Add(string.Format(tabStr + "\tSET @Sql = CONCAT(@Sql, ' AND `{0}` = ''',replace_special_char(" + paraPerfix +"{0}), '''');", x.Name)); 
+        procStrList.Add(string.Format(tabStr + "\tSET @Sql = CONCAT(@Sql, ' AND t1.`{0}` = ''',replace_special_char(" + paraPerfix +"{0}), '''');", x.Name)); 
         procStrList.Add(string.Format(tabStr + "ELSEIF LOCATE(',{0},', {1}) > 0 THEN", x.Name, nullListName));  
-        procStrList.Add(string.Format(tabStr + "\tSET @Sql = CONCAT(@Sql, ' AND `{0}` IS NULL');", x.Name)); 
+        procStrList.Add(string.Format(tabStr + "\tSET @Sql = CONCAT(@Sql, ' AND t1.`{0}` IS NULL');", x.Name)); 
         procStrList.Add(tabStr + "END IF;" + Environment.NewLine);  
     });
     

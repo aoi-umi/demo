@@ -104,16 +104,16 @@ moduleMainContent = {
 
                 if (self.operation.detailQuery) {
                     $(document).on('click', '#mainContentChildList .itemDel', function () {
-                        var row = $(this).closest('.itemRow');
+                        var row = $(this).closest(self.rowClass);
                         var item = row.data('item');
                         if (item.id)
                             self.variable.delMainContentChildList.push(item.id);
                         row.remove();
-                        self.opt.updateView(['mainContentChild']);
+                        self.opt.updateView(['mainContentChild'], self);
                     });
 
                     $(document).on('click', '#mainContentChildList .itemEdit', function () {
-                        self.opt.setMainContentChildDetail($(this).closest('.itemRow').data('item'));
+                        self.opt.setMainContentChildDetail($(this).closest(self.rowClass).data('item'), self);
                         $('#mainContentChild').modal('show');
                     });
                     $('#mainContentChildList').on('click', '.moveUp, .moveDown', function () {
@@ -121,27 +121,21 @@ moduleMainContent = {
                         var row;
                         var secondRow;
                         if (dom.hasClass('moveUp')) {
-                            row = dom.closest('.itemRow')
-                            secondRow = row.prev('.itemRow');
+                            row = dom.closest(self.rowClass)
+                            secondRow = row.prev(self.rowClass);
                         }
                         else {
-                            secondRow = dom.closest('.itemRow')
-                            row = secondRow.next('.itemRow');
+                            secondRow = dom.closest(self.rowClass)
+                            row = secondRow.next(self.rowClass);
                         }
                         if (row.length && secondRow.length) {
-                            var item = row.data('item');
-                            var changeItem = secondRow.data('item');
-                            var t = item.num;
-                            item.num = changeItem.num;
-                            changeItem.num = t;
-                            row.find('[name=num]').text(item.num);
-                            secondRow.find('[name=num]').text(changeItem.num);
                             row.after(secondRow);
+                            self.opt.updateView(['mainContentChild'], self);
                         }
                     });
 
                     $('#showMainContentChild').on('click', function () {
-                        self.opt.setMainContentChildDetail();
+                        self.opt.setMainContentChildDetail(null, self);
                         $('#mainContentChild').modal('show');
                     });
                     $('#addMainContentChild').on('click', function () {
@@ -163,10 +157,16 @@ moduleMainContent = {
                             });
                         } else {
                             var item = checkRes.model;
-                            item.num = $('#mainContentChildList .itemRow').length + 1;
+                            var dataItem = mainContentChildDetailDom.data('item');
+                            delete dataItem.stringify;
+                            item = $.extend(dataItem, item);
                             item.stringify = JSON.stringify(item);
                             var temp = $('#mainContentChildItem').html();
-                            $('#mainContentChildList').append(ejs.render(temp, item));
+                            var replaceDom = $('#mainContentChildList').find(`[data-num=${item.num}]`);
+                            if(!replaceDom.length)
+                                $('#mainContentChildList').append(ejs.render(temp, item));
+                            else
+                                replaceDom.after(ejs.render(temp, item)).remove();
                             $('#mainContentChild').modal('hide');
                         }
                     });
@@ -209,7 +209,7 @@ moduleMainContent = {
                     else
                         throw new Error(`错误的操作类型[${operate}]`);
                     detail.main_content_child_list = [];
-                    $('#mainContentChildList>.itemRow').each(function () {
+                    $(`#mainContentChildList>${self.rowClass}`).each(function () {
                         detail.main_content_child_list.push($(this).data('item'));
                     });
                     if (!detail.main_content_child_list.length) {
@@ -237,21 +237,24 @@ moduleMainContent = {
             getDefaultMainCotentChild: function (self) {
                 return self.variable.defaultMainCotentChild;
             },
-            setMainContentChildDetail: function (item) {
+            setMainContentChildDetail: function (item, self) {
                 var mainContentChildDetailDom = $('#mainContentChildDetail');
                 if (!item) {
+                    mainContentChildDetailDom.data('item',{num: $(`#mainContentChildList ${self.rowClass}`).length + 1});
                     mainContentChildDetailDom.find(':input').val('');
                     mainContentChildDetailDom.find('option:eq(0)').prop('selected', true);
                 } else {
+                    mainContentChildDetailDom.data('item',item);
                     mainContentChildDetailDom.find('[name=content]').val(item.content);
                     mainContentChildDetailDom.find(`[name=type] option[value=${item.type}]`).prop('selected', true);
                 }
             },
-            updateView: function (updateList) {
+            updateView: function (updateList, self) {
                 if (!updateList || common.isInArray('mainContentChild', updateList)) {
-                    $('#mainContentChildList .itemRow').each(function (index) {
+                    $(`#mainContentChildList ${self.rowClass}`).each(function (index) {
                         var row = $(this);
                         var val = index + 1;
+                        row.attr('data-num', val);
                         row.data('item').num = val;
                         row.find('[name=num]').text(val);
                     });
