@@ -8,9 +8,6 @@
                 text: 'id',
                 id:'id',
             },{
-                text: 'type',
-                id:'type',
-            },{
                 text: 'user_info_id',
                 id:'user_info_id',
             },{
@@ -38,12 +35,17 @@
             <%}%>
         </div>
         <div class="row">
+            <div name="typeBox" class="col-xs-12">
+                <span>类型:</span>
+                <%for(var key in mainContentTypeEnum){ %>
+                <label><input class="type" type="checkbox" value="<%=key%>"/><%=mainContentTypeEnum[key]%></label>
+                <%}%>
+            </div>
             <div name="statusBox" class="col-xs-12">
                 <span>状态:</span>
-            <%for(var key in mainContentStatusEnum){ %>
-            <label><input class="status" type="checkbox" value="<%=key%>"/><%=mainContentStatusEnum[key]%></label>
-            <%
-            }%>
+                <%for(var key in mainContentStatusEnum){ %>
+                <label><input class="status" type="checkbox" value="<%=key%>"/><%=mainContentStatusEnum[key]%></label>
+                <%}%>
             </div>
         </div>
         <div class="row my-row">

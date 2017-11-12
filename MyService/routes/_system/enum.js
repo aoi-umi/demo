@@ -26,6 +26,10 @@ exports.getValue = function (enumName, key) {
 exports.enumDict = {
     main_content_type_enum: {'0': '文章',},
     main_content_status_enum: {'-1': '已删除', '0': '草稿', '1': '待审核', '2': '审核中', '3': '通过', '4': '退回',},
+    main_content_log_type_enum:{
+        //main_conetnt
+        '0':'主内容保存','1':'主内容提交','2':'主内容审核','3':'主内容审核通过','4':'主内容审核不通过','5':'主内容删除',
+    },
 };
 
 exports.enumChangeDict = {

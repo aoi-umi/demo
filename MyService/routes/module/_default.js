@@ -89,6 +89,7 @@ exports.view = function (req, res, next) {
                 break;
             case '/mainContent':
                 opt.mainContentStatusEnum = myEnum.getEnum('main_content_status_enum');
+                opt.mainContentTypeEnum = myEnum.getEnum('main_content_type_enum');
                 break;
             case '/mainContentDetail':
                 return require('./mainContent').detailQuery({id: query.id}, opt);

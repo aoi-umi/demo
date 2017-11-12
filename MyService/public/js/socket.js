@@ -35,6 +35,9 @@ socket = {
                 user: userInfo,
             });
         });
+        socket.on('err', function (e) {
+            console.log(e);
+        });
         socket.on('onlineCount', function (onlineCount) {
             $('#onlineCount').html(onlineCount >= 0 ? onlineCount : '获取失败');
         });
