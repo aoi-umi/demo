@@ -28,7 +28,14 @@ moduleMainContent = {
                 }
             }, {
                 name: 'type',
-                dom: $('#type'),
+                dom: $('[name=typeBox]'),
+                getValue:function() {
+                    var val = [];
+                    this.dom.find('.type:checked').each(function () {
+                        val.push($(this).val());
+                    });
+                    return val.join(',');
+                }
             }, {
                 name: 'status',
                 dom: $('[name=statusBox]'),

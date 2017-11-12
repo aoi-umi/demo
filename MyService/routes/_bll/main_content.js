@@ -51,6 +51,11 @@ exports.detailQuery = function(opt) {
         });
     }).then(function(t){
         updateMainContent(t.main_content);
+        if(t.main_content_log_list) {
+            t.main_content_log_list.forEach(function (item) {
+                updateMainContentLog(item);
+            });
+        }
         return t;
     });
 };
@@ -170,4 +175,8 @@ function createLog(opt) {
 function updateMainContent(item){
     item.type_name = myEnum.getValue('main_content_type_enum', item.type);
     item.status_name = myEnum.getValue('main_content_status_enum', item.status);
+}
+
+function updateMainContentLog(item) {
+    item.type_name = myEnum.getValue('main_content_log_type_enum', item.type);
 }
