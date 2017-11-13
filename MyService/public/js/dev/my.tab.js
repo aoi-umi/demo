@@ -179,8 +179,14 @@ my.tab = {
         switch (t.type) {
             case 'iframe':
             default:
-                if(t.content)
-                    content = `<iframe src="${t.content}" width="100%" height="100%" frameborder="no"></iframe>`;
+                if(t.content) {
+                    var iframeId = 'iframe-' + t.id;
+                    if(t.content.indexOf('?') >= 0)
+                        t.content += '&iframeId=' + iframeId;
+                    else
+                        t.content += '?iframeId=' + iframeId;
+                    content = `<iframe id="${iframeId}" src="${t.content}" width="100%" height="100%" frameborder="no"></iframe>`;
+                }
                 break;
             case 'template':
                 content = $('#' + t.content).html();

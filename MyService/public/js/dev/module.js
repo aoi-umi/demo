@@ -172,7 +172,8 @@ module.prototype = {
                         item.dom.on('blur', function () {
                             var checkRes = common.dataCheck({list: [item]});
                             if (checkRes.success) {
-                                $('[data-target="' + checkRes.dom.selector + '"]').hide();
+                                if(checkRes.dom)
+                                    $('[data-target="' + checkRes.dom.selector + '"]').hide();
                             } else {
                                 common.msgNotice({target: checkRes.dom.selector, msg: checkRes.desc});
                             }
