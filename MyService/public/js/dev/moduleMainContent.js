@@ -220,10 +220,10 @@ moduleMainContent = {
                         detail.main_content_child_list.push($(this).data('item'));
                     });
                     if (!detail.main_content_child_list.length) {
-                        checkRes.success = false;
-                        checkRes.desc = '请添加内容';
+                        throw new Error('请添加内容');
                     }
                     detail.delMainContentChildList = self.variable.delMainContentChildList;
+                    detail.remark = $('#remark').val();
                     checkRes.model = detail;
                 }
                 return checkRes;
@@ -283,8 +283,12 @@ moduleMainContent = {
                             main_content.status = -1;
                         else
                             throw new Error(`错误的操作类型[${operate}]`);
+                        var detail = {
+                            main_content: main_content,
+                            remark: $('#remark').val()
+                        };
                         var notice = common.msgNotice({type: 1, msg: '处理中', noClose: true});
-                        return my.interface['mainContentStatusUpdate'](main_content).then(function () {
+                        return my.interface['mainContentStatusUpdate'](detail).then(function () {
                             common.msgNotice({
                                 type: 1, msg: '处理成功!', btnOptList: {
                                     content: '确认',
