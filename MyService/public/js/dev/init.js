@@ -102,5 +102,17 @@ init = {
                 }
             }
         });
+
+        var args = common.getArgsFromUrlParams();
+        if(args.iframeId) {
+            var dom = iframe = $(parent.document).find('#' + args.iframeId);
+            if(iframe.closest('.tab-pane').length)
+                dom = iframe.closest('.tab-pane');
+            $(document).on('load scroll click', function(){
+                var height = $(this).height();
+                if(height > iframe.height())
+                    dom.height(height);
+            });
+        }
     }
 };
