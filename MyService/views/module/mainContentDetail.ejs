@@ -15,7 +15,7 @@
     var rowItemClass = 'col-xs-12 col-md-6';
     var main_content = mainContentDetail.main_content;
     var isEditable = false;
-    if(main_content.status == 0)
+    if(main_content.status == 0 || main_content.status == 4)
         isEditable = true;
     var debug = false;
     %>
@@ -106,6 +106,7 @@
             <label class="control-label">备注</label><textarea class="form-control no-resize" id="remark" placeholder=""></textarea>
         </div>
 
+        <!--操作-->
         <div class="my-row text-center">
             <%
             var operateList = [];
@@ -141,6 +142,13 @@
                         className:'statusUpdate'
                     });
                     break;
+                case -1:
+                    operateList.push({
+                        text:'恢复',
+                        operate:'recovery',
+                        className:'statusUpdate'
+                    });
+                    break;
             }
             if(main_content.id && main_content.status != -1){
                 operateList.push({
@@ -160,11 +168,13 @@
             <label class="control-label">日志</label>
             <table class="table table-bordered">
                 <thead>
-                    <tr><th>类型</th><th>内容</th><th>操作人</th><th>创建时间</th></tr>
+                    <tr><th>类型</th><th>源状态</th><th>目状态</th><th>内容</th><th>操作人</th><th>创建时间</th></tr>
                 </thead>
                 <%mainContentDetail.main_content_log_list.forEach(function(item){%>
                 <tr>
                     <td><%=item.type_name%></td>
+                    <td><%=item.src_status_name%></td>
+                    <td><%=item.dest_status_name%></td>
                     <td><%=item.content%></td>
                     <td><%=item.operator%></td>
                     <td><%=item.create_date%></td>

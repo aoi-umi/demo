@@ -83,7 +83,16 @@ exports.save = function (opt) {
                 //删除child
                 if(opt.id != 0 && opt.delMainContentChildList){
                     var del_list = _.filter(main_content_detail.main_content_child_list, function(child){
-                        return _.find(opt.delMainContentChildList, function(child_id){return child_id == child.id});
+                        //查找删除列表中的项
+                        var match = _.find(opt.delMainContentChildList, function(child_id){return child_id == child.id});
+                        if(!match) {
+                            //查找不存在于保存列表中的项
+                            var match2 = _.find(opt.main_content_child_list, function (save_child) {
+                                return save_child.id == child.id
+                            });
+                            match = !match2;
+                        }
+                        return match;
                     });
                     if(del_list && del_list.length) {
                         del_list.forEach(function (item) {
@@ -98,7 +107,12 @@ exports.save = function (opt) {
                     list.push(autoBll.save('main_content_child', item, conn));
                 });
                 //日志
-                var main_content_log = createLog({id: main_content_id, status: main_content.status, content:opt.remark});
+                var main_content_log = createLog({
+                    id: main_content_id,
+                    src_status: main_content_detail.main_content.status,
+                    dest_status: main_content.status,
+                    content: opt.remark
+                });
                 list.push(autoBll.save('main_content_log', main_content_log, conn));
                 return q.all(list).then(function () {
                     return main_content_id;
@@ -120,6 +134,14 @@ exports.statusUpdate = function(opt) {
     }).then(function (main_content_detail) {
         //todo 检查权限
         myEnum.enumChangeCheck('main_content_status_enum', main_content_detail.main_content.status, main_content.status);
+        if(main_content.status == 'recovery'){
+            var main_content_log_list = main_content_detail.main_content_log_list;
+            if(!main_content_log_list || !main_content_log_list.length
+            || main_content_log_list[0].src_status == undefined){
+                throw common.error('数据有误');
+            }
+            main_content.status = main_content_log_list[0].src_status;
+        }
         return autoBll.tran(function (conn) {
             var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
             var updateStatusOpt = {
@@ -133,7 +155,8 @@ exports.statusUpdate = function(opt) {
                 //日志
                 var main_content_log = createLog({
                     id: main_content_id,
-                    status: main_content.status,
+                    src_status: main_content_detail.main_content.status,
+                    dest_status: main_content.status,
                     content: opt.remark
                 });
                 list.push(autoBll.save('main_content_log', main_content_log, conn));
@@ -150,24 +173,30 @@ function createLog(opt) {
     var main_content_log = {
         main_content_id: opt.id,
         type: 0,
+        src_status: opt.src_status,
+        dest_status: opt.dest_status,
         content: '保存',
         create_date: now,
         operate_date: now,
         operator: 'system'
     };
-    if (opt.status == 1) {
+    if(opt.src_status == -1){
+        main_content_log.type = 6;
+        main_content_log.content = '恢复';
+    }
+    else if (opt.dest_status == 1) {
         main_content_log.type = 1;
         main_content_log.content = '提交';
-    } else if (opt.status == 2) {
+    } else if (opt.dest_status == 2) {
         main_content_log.type = 2;
         main_content_log.content = '审核';
-    } else if (opt.status == 3) {
+    } else if (opt.dest_status == 3) {
         main_content_log.type = 3;
         main_content_log.content = '审核通过';
-    } else if (opt.status == 4) {
+    } else if (opt.dest_status == 4) {
         main_content_log.type = 4;
         main_content_log.content = '审核不通过';
-    } else if (opt.status == -1) {
+    } else if (opt.dest_status == -1) {
         main_content_log.type = 5;
         main_content_log.content = '删除';
     }
@@ -183,4 +212,6 @@ function updateMainContent(item){
 
 function updateMainContentLog(item) {
     item.type_name = myEnum.getValue('main_content_log_type_enum', item.type);
+    item.src_status_name = myEnum.getValue('main_content_status_enum', item.src_status);
+    item.dest_status_name = myEnum.getValue('main_content_status_enum', item.dest_status);
 }

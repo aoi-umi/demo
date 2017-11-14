@@ -50,10 +50,10 @@
                 if (url == '/login') {
                     var userInfo = $.cookie(config.cacheKey.userInfo);
                     if (!userInfo) {
-                        userInfo = extend.guid();
+                        userInfo = common.guid();
                         $.cookie(config.cacheKey.userInfo, userInfo, {expires: 1});
                     }
-                    var token = extend.createToken(req.userName + $.md5(req.pwd) + JSON.stringify(req));
+                    var token = common.createToken(req.userName + $.md5(req.pwd) + JSON.stringify(req));
                     headers = {
                         'User-Name': req.userName,
                         'Token': token,
@@ -64,7 +64,7 @@
                 var reqStr = req;
                 if (typeof reqStr != 'string');
                 reqStr = JSON.stringify(reqStr);
-                extend.ajax({
+                common.ajax({
                     url: url,
                     data: reqStr,
                     headers: headers,
