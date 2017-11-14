@@ -61,6 +61,13 @@
             </div>
         </div>
     </div>
+    <div name="statusBox" class="col-xs-12">
+        <%for(var key in mainContentStatusEnum){ %>
+        <a class="statusSearch" href="javascript:;" data-status="<%=key%>"><%=mainContentStatusEnum[key]%>
+            (<span class="statusCount" data-status="<%=key%>">0</span>)
+        </a>
+        <%}%>
+    </div>
     <table id="list" class="table table-bordered">
         <thead>
             <tr>

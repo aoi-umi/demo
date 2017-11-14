@@ -61,6 +61,8 @@ module.prototype = {
         },
         beforeQuery: function (t) {
         },
+        onQuerySuccess: function(t) {
+        },
         onQueryFail: function (e, self) {
             common.msgNotice({type: 1, msg: e.message});
         },
@@ -148,6 +150,7 @@ module.prototype = {
                 pagerId: self.opt.pagerId,
                 changeHandle: function (cb) {
                     self.query().then(function (t) {
+                        self.opt.onQuerySuccess(t);
                         cb({count: t.count});
                     }).fail(function () {
                         cb();

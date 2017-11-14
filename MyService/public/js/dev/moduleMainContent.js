@@ -104,6 +104,13 @@ moduleMainContent = {
                             window.open(url + params);
                         }
                     });
+
+                    $(document).on('click', '.statusSearch', function(){
+                        var status = $(this).data('status');
+                        $('[name=statusBox] .status').prop('checked', false);
+                        $(`[name=statusBox] .status[value=${status}]`).prop('checked', true);
+                        self.queryDom.click();
+                    });
                 }
 
                 $(document).on('click', '.statusUpdate', function () {
@@ -187,6 +194,15 @@ moduleMainContent = {
                 if (!data.user_info_id) data.user_info_id = null;
                 if (!data.create_date) data.create_date = null;
                 if (!data.operate_date) data.operate_date = null;
+            },
+            onQuerySuccess: function(t){
+                $('.statusCount').text(0);
+                if(t.status_list){
+                    $(t.status_list).each(function(){
+                        var item = this;
+                        $(`.statusCount[data-status=${item.status}]`).text(item.count);
+                    });
+                }
             },
             beforeSave: function (dom, self) {
                 var saveArgsOpt = [{
