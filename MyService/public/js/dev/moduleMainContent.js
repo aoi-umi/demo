@@ -76,6 +76,7 @@ moduleMainContent = {
             bindEvent: function (self) {
                 if (self.operation.query) {
                     var toDetail = [self.addClass, self.detailQueryClass].join(',');
+                    //打开detail页
                     $(document).on('click', toDetail, function () {
                         var dom = $(this);
                         var args = {
@@ -88,7 +89,7 @@ moduleMainContent = {
                         }
                         var url = self.opt.mainContentDetailUrl + '?';
 
-                        if (parent.my.tab) {
+                        if (parent && parent.my && parent.my.tab) {
                             var params = common.getUrlParamsFromArgs(args);
                             var data = {
                                 id: 'mainContentDetail' + args.id,
@@ -281,6 +282,8 @@ moduleMainContent = {
                             main_content.status = 4;
                         else if (operate == 'del')
                             main_content.status = -1;
+                        else if(operate == 'recovery')
+                            main_content.status = 'recovery';
                         else
                             throw new Error(`错误的操作类型[${operate}]`);
                         var detail = {

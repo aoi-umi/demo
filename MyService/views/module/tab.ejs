@@ -162,7 +162,7 @@
                 if (notice0)
                     notice0.toggle();
                 else
-                    notice0 = extend.msgNotice({msg: '12333', target: '.msgNotice[data-type=0]'});
+                    notice0 = common.msgNotice({msg: '12333', target: '.msgNotice[data-type=0]'});
             } else if (type == 1) {
                 var msgNoticeBtnCount = parseInt($('#msgNoticeBtnCount').val());
                 var btnOptList = [];
@@ -175,7 +175,7 @@
                         }
                     });
                 }
-                extend.msgNotice({
+                common.msgNotice({
                     msg: '12333',
                     type: 1,
                     noClose: $('#msgNoticeNoClose').prop('checked'),

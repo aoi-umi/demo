@@ -45,16 +45,20 @@ function getBrowserType() {
 
 namespace('init');
 init = {
-    init:function(){
+    variable: {
+        frameDom: null,
+        frameDefaultHeight: 0,
+    },
+    init: function () {
         var self = this;
         ejs.open = '{%';
         ejs.close = '%}';
 
         var userInfo = $.cookie(config.cacheKey.userInfo);
-        if(!userInfo){
+        if (!userInfo) {
             userInfo = common.guid();
         }
-        $.cookie(config.cacheKey.userInfo, userInfo, { expires: 30 });
+        $.cookie(config.cacheKey.userInfo, userInfo, {expires: 30});
 
         socket.init();
         my.interface.init({
@@ -83,6 +87,7 @@ init = {
         self.bindEvent();
     },
     bindEvent: function () {
+        var self = this;
         $('.nav.navbar-nav').on('click', 'li', function () {
             $(this).addClass('active').siblings().removeClass('active');
         });
@@ -104,15 +109,37 @@ init = {
         });
 
         var args = common.getArgsFromUrlParams();
-        if(args.iframeId) {
+        if (args.iframeId) {
             var dom = iframe = $(parent.document).find('#' + args.iframeId);
-            if(iframe.closest('.tab-pane').length)
+            if (iframe.closest('.tab-pane').length)
                 dom = iframe.closest('.tab-pane');
-            $(document).on('load scroll click', function(){
-                var height = $(this).height();
-                if(height > iframe.height())
-                    dom.height(height);
-            });
+            if(dom.length) {
+                self.variable.frameDom = dom;
+                self.variable.frameDefaultHeight = args.height || 512;
+                $(window).on('load resize mousemove', function (e) {
+                    self.updateView(['scroll']);
+                });
+            }
+        }
+    },
+    updateView: function (list) {
+        var self = this;
+        if (!list || common.isInArray('scroll', list)) {
+            var height = $('body').outerHeight(true);
+            var isChanged = false;
+            var frameHeight = self.variable.frameDom.height();
+            if (height < self.variable.frameDefaultHeight) {
+                if(frameHeight != self.variable.frameDefaultHeight) {
+                    self.variable.frameDom.height(self.variable.frameDefaultHeight);
+                    isChanged = 'smaller than defaultHeight';
+                }
+            }
+            else if(height != frameHeight) {
+                self.variable.frameDom.height(height);
+                isChanged = 'not equal ' + height + ' ' + frameHeight;
+            }
+            if(isChanged)
+                console.log('change', isChanged);
         }
     }
 };
