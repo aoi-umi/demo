@@ -196,6 +196,8 @@ common = {
     dateParse: function (date) {
         if (typeof date == 'string')
             date = date.replace('-', '/');
+        if(!isNaN(date) && !isNaN(parseInt(date)))
+            date = parseInt(date);
         if (!(date instanceof Date))
             date = new Date(date);
         return date;

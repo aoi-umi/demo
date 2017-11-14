@@ -13,8 +13,9 @@ exports.query = function(opt) {
         return autoBll.customDal('main_content', 'query', opt).then(function (t) {
             var detail = {
                 list: t[0],
-                count: t[1][0].count
-            }
+                count: t[1][0].count,
+                status_list: t[2]
+            };
             return detail;
         }).then(function (t) {
             if (t.list && t.list.length) {
