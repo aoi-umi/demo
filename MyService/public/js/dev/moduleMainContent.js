@@ -106,9 +106,11 @@ moduleMainContent = {
                     });
 
                     $(document).on('click', '.statusSearch', function(){
-                        var status = $(this).data('status');
+                        var status = $(this).find('.statusCount').data('status');
                         $('[name=statusBox] .status').prop('checked', false);
-                        $(`[name=statusBox] .status[value=${status}]`).prop('checked', true);
+                        if(status !== '') {
+                            $(`[name=statusBox] .status[value=${status}]`).prop('checked', true);
+                        }
                         self.queryDom.click();
                     });
                 }
@@ -197,6 +199,8 @@ moduleMainContent = {
             },
             onQuerySuccess: function(t){
                 $('.statusCount').text(0);
+                if(t.count)
+                    $(`.statusCount[data-status=""]`).text(t.count);
                 if(t.status_list){
                     $(t.status_list).each(function(){
                         var item = this;
