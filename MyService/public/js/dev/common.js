@@ -64,7 +64,7 @@ common = {
                 if (typeof t.desc == 'object')
                     t.desc = JSON.stringify(t.desc);
                 var err = new Error(t.desc);
-                err.code = t.detail;
+                err.code = t.code;
                 return $.Deferred().reject(err);
             }
             else

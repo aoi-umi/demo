@@ -328,6 +328,8 @@ moduleMainContent = {
                         return $.Deferred().reject(e);
                     }
                 }).fail(function (e) {
+                    if(e && e.message)
+                        e = e.message;
                     common.msgNotice({
                         type: 1, msg: '处理失败:' + e, btnOptList: {
                             content: '确认',
