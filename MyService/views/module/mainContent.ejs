@@ -43,10 +43,7 @@
             </div>
             <div name="statusBox" class="col-xs-12">
                 <span>状态:</span>
-                <%for(var key in mainContentStatusEnum){
-                    if(isNaN(key))
-                        continue;
-                %>
+                <%for(var key in mainContentStatusEnum){%>
                 <label><input class="status" type="checkbox" value="<%=key%>"/><%=mainContentStatusEnum[key]%></label>
                 <%}%>
             </div>
@@ -67,10 +64,7 @@
     <div name="statusBox" class="col-xs-12">
         <a class="statusSearch" href="javascript:;">全部
             (<span class="statusCount" data-status="">0</span>)
-        <%for(var key in mainContentStatusEnum){
-            if(isNaN(key))
-                continue;
-        %>
+        <%for(var key in mainContentStatusEnum){%>
         <a class="statusSearch" href="javascript:;"><%=mainContentStatusEnum[key]%>
             (<span class="statusCount" data-status="<%=key%>">0</span>)
         </a>
