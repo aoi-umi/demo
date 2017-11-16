@@ -44,66 +44,53 @@ exports.promise = function (obj, methodName) {
     var defer = q.defer();
     if (!args.length) {
         var res = q.defer();
-        // defer.promise.then(function () {
-        //     return res.promise;
-        // });
-        // defer.resolve(res.resolve, res.reject);
         defer.resolve(res);
     } else {
         var funArgs = [];
         for (var key in args) {
             if (key != 0 && key != 1)
-                funArgs.push('args[' + key + ']');
+                funArgs.push(args[key]);
         }
-        var cbStr =
-        `function(){
+
+        funArgs.push(function(err) {
             var cbArgs = arguments;
-            if(cbArgs && cbArgs[0])
-                defer.reject (cbArgs[0]);
-            else{
+            if (err)
+                defer.reject (err);
+            else {
                 var resolveArgs = [];
-                if(cbArgs){
-                    for(var cbArgKey in cbArgs){
-                        if(cbArgKey != 0){
-                            resolveArgs.push('cbArgs[' + cbArgKey + ']');
-                        }
+                for (var cbArgKey in cbArgs) {
+                    if (cbArgKey != 0) {
+                        resolveArgs.push(cbArgs[cbArgKey]);
                     }
                 }
-                var resovleEval = \`defer.resolve(\${resolveArgs.length ? resolveArgs.join(','):''});\`;
-                eval(resovleEval);
+                defer.resolve.apply(void 0, resolveArgs);
             }
-        }`;
-        funArgs.push(cbStr);
-        var evalStr = 'obj[methodName](';
-        if (funArgs.length) evalStr += funArgs.join(',');
-        evalStr += ');';
-        eval(evalStr);
+        });
+        obj[methodName].apply(obj, funArgs);
     }
     return defer.promise;
 };
 
 exports.promisify = function (fun) {
     return function () {
-        var args = arguments;
-        var funArgs = [];
-        for (var key in args) {
-            funArgs.push('args[' + key + ']');
+        var args = [];
+        for (var key in arguments) {
+            args.push(arguments[key]);
         }
-        var cbStr =
-            `function(){
-                var cbArgs = arguments;
-                //console.log(cbArgs);
-                if(cbArgs && cbArgs[0])
-                    return res.reject(cbArgs[0]);
-                return res.resolve(cbArgs[1]);
-            }`;
-        funArgs.push(cbStr);
-
-        var evalStr = `fun(${funArgs.length ? funArgs.join(','):''});`;
         return common.promise().then(function () {
-            //console.log(evalStr);
             var res = q.defer();
-            eval(evalStr);
+            args.push(function(err, t) {
+                if (err)
+                    return res.reject(err);
+
+                var cbArgs = [];
+                for (var key in arguments) {
+                    if(key != 0)
+                        cbArgs.push(arguments[key]);
+                }
+                return res.resolve.apply(void 0, cbArgs);
+            });
+            fun.apply(void 0, args);
             return res.promise;
         });
     };
