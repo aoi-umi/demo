@@ -29,6 +29,43 @@ Date.prototype.toString = function() {
     return common.dateFormat(this, 'yyyy-MM-dd HH:mm:ss');
 };
 
+var myRender = function(req, res, view, options){
+    var opt = {
+        user: req.myData.user,
+        noNav: req.query.noNav,
+    };
+    if (opt.noNav && opt.noNav.toString().toLowerCase() == 'false')
+        opt.noNav = false;
+    opt = common.extend(opt, options);
+    res.render(view, common.formatViewtRes(opt));
+};
+
+var mySend = function(req, res, err, detail, opt){
+    var formatRes = common.formatRes(err, detail, opt);
+    res.send(formatRes);
+    var url = req.originalUrl;
+    var result = formatRes.result;
+    var logReq = req.method == 'POST' ? req.body : '';
+    var logRes = formatRes.detail;
+    var logMethod = '[' + (config.name + '][' + (req.myData.method.methodName || url)) + ']';
+
+    url = req.header('host') + url;
+    if(!req.myData.noLog) {
+        var log = common.logModle();
+        log.url = url;
+        log.result = result;
+        log.code = formatRes.code;
+        log.method = logMethod
+        log.req = logReq;
+        log.res = logRes;
+        log.ip = common.getClientIp(req);
+        log.remark = formatRes.desc;
+        log.guid = formatRes.guid;
+        log.duration = new Date().getTime() - req.myData.startTime;
+        common.logSave(log);
+    }
+};
+
 app.use(function (req, res, next) {
     //req.query  /?params1=1&params2=2
     //req.body  post的参数
@@ -45,48 +82,19 @@ app.use(function (req, res, next) {
             nickname: 'guest',
             authority: {}
         },
-        viewPath: app.get('views')
+        viewPath: app.get('views'),
+        startTime: new Date().getTime(),
     };
     var user = req.myData.user;
     if(config.env == 'dev')
         user.authority['dev'] = true;
 
-    res.myRender = function (view, options, fn) {
-        var opt = {
-            user: req.myData.user,
-            noNav: req.query.noNav,
-        };
-        if (opt.noNav && opt.noNav.toString().toLowerCase() == 'false')
-            opt.noNav = false;
-        opt = common.extend(opt, options);
-        res.render(view, common.formatViewtRes(opt));
+    res.myRender = function (view, options) {
+        myRender(req, res, view, options);
     };
 
-    var startTime = new Date().getTime();
     res.mySend = function (err, detail, opt) {
-        var formatRes = common.formatRes(err, detail, opt);
-        res.send(formatRes);
-        var url = req.originalUrl;
-        var result = formatRes.result;
-        var logReq = req.method == 'POST' ? req.body : '';
-        var logRes = formatRes.detail;
-        var logMethod = '[' + (config.name + '][' + (req.myData.method.methodName || url)) + ']';
-
-        url = req.header('host') + url;
-        if(!req.myData.noLog) {
-            var log = common.logModle();
-            log.url = url;
-            log.result = result;
-            log.code = formatRes.code;
-            log.method = logMethod
-            log.req = logReq;
-            log.res = logRes;
-            log.ip = common.getClientIp(req);
-            log.remark = formatRes.desc;
-            log.guid = formatRes.guid;
-            log.duration = new Date().getTime() - startTime;
-            common.logSave(log);
-        }
+        mySend(req, res, err, detail, opt)
     };
 
     var userInfoKey = req.cookies[config.cacheKey.userInfo];
