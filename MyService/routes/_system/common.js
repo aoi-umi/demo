@@ -400,14 +400,31 @@ exports.stringFormat = function () {
     res = split.join('');
     return res;
 };
-//大写转 为 下划线小写
-exports.upperCaseToLowerCaseWithUnderscode = function(str) {
-    return str.replace(/[A-Z]/g, function () {
-        return '_' + arguments[0].toLowerCase()
+
+//小写下划线
+exports.stringToLowerCaseWithUnderscore = function(str){
+    str = str.replace(/^[A-Z]+/, function () {
+        return arguments[0].toLowerCase();
     });
+    str = str.replace(/_/g, '');
+    str = str.replace(/[A-Z]/g, function () {
+        return '_' + arguments[0].toLowerCase();
+    });
+    str = str.toLowerCase();
+    return str;
 };
-//小驼峰转大驼峰
-exports.littleCamelCaseToBigCamelCase = function(str){
+//驼峰（小驼峰）
+exports.stringToCamelCase = function(str){
+    str = str.replace(/_([a-zA-Z])/g, function () {
+        return arguments[1].toUpperCase();
+    });
+    return str[0].toLowerCase() + str.substr(1);
+};
+//帕斯卡（大驼峰）
+exports.stringToPascal = function(str){
+    str = str.replace(/_([a-zA-Z])/g, function () {
+        return arguments[1].toUpperCase();
+    });
     return str[0].toUpperCase() + str.substr(1);
 };
 

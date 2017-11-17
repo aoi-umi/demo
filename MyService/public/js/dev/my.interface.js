@@ -8,7 +8,7 @@ my.interface = {
         moduleList: [],
         defaultMethod: ['query', 'detailQuery', 'save', 'del'],
         setModuleConfig: function(module, method) {
-            var key = module + common.littleCamelCaseToBigCamelCase(method);
+            var key = module + common.stringToPascal(method);
             if (!this.interfaceConfig[key]) {
                 this.interfaceConfig[key] = {
                     url: `/${module}/${method}`

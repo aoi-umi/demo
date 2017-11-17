@@ -46,7 +46,7 @@ function getBll(req, res, next){
     }
 
     //转换为小写下划线;
-    module = common.upperCaseToLowerCaseWithUnderscode(module);
+    module = common.stringToLowerCaseWithUnderscore(module);
     if(opt.isUsedCustom){
         return autoBll.custom(module, method, args);
     }else {
