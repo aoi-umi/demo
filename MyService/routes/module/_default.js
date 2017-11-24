@@ -70,6 +70,9 @@ exports.view = function (req, res, next) {
         case '/':
             opt.method = 'get';
             break;
+        case '/sign/up':
+            opt.view = 'signUp';
+            break;
         default:
             opt.view = req._parsedUrl.pathname;
             break;

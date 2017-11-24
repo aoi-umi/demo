@@ -35,14 +35,6 @@ exports.enumDict = {
 };
 
 exports.enumChangeDict = {
-    statusEnum: {
-        //源状态
-        '0': {
-            //目标状态
-            '0': '',//不可变更
-            '1': '状态0变为状态1',
-        },
-    },
     main_content_status_enum: {
         //初始状态
         '0': {'0': '保存', '1': '提交', '-1': '删除'},
@@ -63,8 +55,8 @@ exports.enumChangeCheck = function (enumType, srcEnum, destEnum) {
     var matchEnum = myEnum.getEnum(enumType);
     var operateEnum = myEnum.getEnum(enumOperateType, true);
     var changeDict = myEnum.enumChangeDict[enumType];
-    if(srcEnum == undefined || srcEnum == null || destEnum == undefined || destEnum == null)
-        throw common.error('','ARGS_ERROR');
+    if (srcEnum == undefined || srcEnum == null || destEnum == undefined || destEnum == null)
+        throw common.error('', 'ARGS_ERROR');
     srcEnum = srcEnum.toString();
     destEnum = destEnum.toString();
     var undefinedOrNull = [undefined, null];
@@ -84,11 +76,11 @@ exports.enumChangeCheck = function (enumType, srcEnum, destEnum) {
         throw common.error(null, 'ENUM_CHANGED_INVALID', {
             //lang:'en',
             format: function (msg) {
-                if(config.env == 'dev') {
+                if (config.env == 'dev') {
                     return common.stringFormat(msg,
                         `${enumType}:` + `[${srcEnum}](${srcEnumName})`,
                         `[${destEnum}](${destEnumName})`);
-                }else{
+                } else {
                     return common.stringFormat(msg,
                         `[${srcEnumName}]`,
                         `[${destEnumName}]`);

@@ -295,7 +295,7 @@ common = {
 
             //type 1 参数
             noClose: false,
-            btnTemplate: `<button class="btn" type="button" name="btnContent" style="margin: 0 5px"></button>`,
+            btnTemplate: `<button class="btn btn-content" type="button" style="margin: 0 5px"></button>`,
             btnOptList: null,
         };
         //btnOpt = {
@@ -414,10 +414,10 @@ common = {
                             var btn = $(opt.btnTemplate);
                             var btnClass = item.class || 'btn-default';
                             btn.addClass(btnClass);
-                            if (btn.attr('name') == 'btnContent')
+                            if (btn.hasClass('btn-content'))
                                 btn.html(item.content);
                             else
-                                btn.find('[name=btnContent]').html(item.content);
+                                btn.find('.btn-content').html(item.content);
                             btn.on('click', function () {
                                 dom.close();
                                 if (item.cb)

@@ -4,35 +4,12 @@
 
 var restList = [
     {
-        url: '/',
+        url: '/sign/:method',
         method: 'post',
-        functionName: '',
-        exampleRequest: {"arg": "123"},
-        methodName: 'index-post',//用于记录日志
-        path: 'index',
+        functionName: 'sign',
+        methodName: 'sign',//用于记录日志
+        path: 'module/sign',
         auth: [],
-    },
-    {
-        url: '/login',
-        method: 'post',
-        functionName: 'loginPost',
-        exampleRequest: {"userName": "user", "pwd": "123456"},
-        path: 'index',
-        auth: []
-    },
-    {
-        url: '/loginOut',
-        method: 'post',
-        functionName: 'loginOut',
-        path: 'index',
-        auth: []
-    },
-    {
-        url: '/signUp',
-        method: 'post',
-        functionName: 'signUp',
-        exampleRequest: {"userName": "user", "pwd": "123456"},
-        path: 'index',
     },
     {
         url: '/help',
@@ -40,14 +17,6 @@ var restList = [
         functionName: '',
         path: '',
         auth: ['dev'],
-    },
-
-    {
-        url: '/tranTest',
-        method: 'post',
-        functionName: 'tranTest',
-        exampleRequest: {error: false},
-        path: 'index',
     },
     {
         url: '/upload',

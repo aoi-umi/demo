@@ -32,15 +32,19 @@ my.interface = {
         for (var key in interfaceConfig) {
             if (self[key])
                 throw new Error('interface [' + key + '] is exist!');
-            eval(`self['${key}'] = function(data, option) {
-                var url = '${interfaceConfig[key].url}';
-                var opt = {
-                    url: url,
-                    data: data,
-                };
-                if (option) opt = $.extend(opt, option);
-                return common.ajax(opt);
-            }`);
+            self[key] = self.createFunction(interfaceConfig[key]);
         }
+    },
+    createFunction:function (interfaceConfig) {
+        var fun = function (data, option) {
+            var url = interfaceConfig.url;
+            var opt = {
+                url: url,
+                data: data,
+            };
+            if (option) opt = $.extend(opt, option);
+            return common.ajax(opt);
+        }
+        return fun;
     }
 };
