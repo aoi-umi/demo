@@ -4,7 +4,7 @@
 function namespace(namespace) {
     var list = namespace.split('.');
     var ns = window[list[0]];
-    if(ns && list.length == 1)
+    if (ns && list.length == 1)
         throw new Error('namespace [' + namespace + '] is exist!');
     if (!ns)
         ns = window[list[0]] = {};
@@ -63,8 +63,14 @@ init = {
         socket.init();
         my.interface.init({
             interfaceConfig: {
-                login: {
-                    url: '/login'
+                signUp: {
+                    url: '/sign/up'
+                },
+                signIn: {
+                    url: '/sign/in'
+                },
+                signOut: {
+                    url: '/sign/out'
                 },
                 logQuery: {
                     url: '/log/query'
@@ -81,13 +87,14 @@ init = {
                 'mainContentType',
             ]
         });
-
+        sign.init();
         $(`.nav.navbar-nav a[href="${location.pathname}"]`).closest('li').addClass('active');
 
         self.bindEvent();
     },
     bindEvent: function () {
         var self = this;
+        //导航
         $('.nav.navbar-nav').on('click', 'li', function () {
             $(this).addClass('active').siblings().removeClass('active');
         });
@@ -113,7 +120,7 @@ init = {
             var dom = iframe = $(parent.document).find('#' + args.iframeId);
             if (iframe.closest('.tab-pane').length)
                 dom = iframe.closest('.tab-pane');
-            if(dom.length) {
+            if (dom.length) {
                 self.variable.frameDom = dom;
                 self.variable.frameDefaultHeight = args.height || 512;
                 $(window).on('load resize mousemove', function (e) {
@@ -129,17 +136,17 @@ init = {
             var isChanged = false;
             var frameHeight = self.variable.frameDom.height();
             if (height < self.variable.frameDefaultHeight) {
-                if(frameHeight != self.variable.frameDefaultHeight) {
+                if (frameHeight != self.variable.frameDefaultHeight) {
                     self.variable.frameDom.height(self.variable.frameDefaultHeight);
                     isChanged = 'smaller than defaultHeight';
                 }
             }
-            else if(height != frameHeight) {
+            else if (height != frameHeight) {
                 self.variable.frameDom.height(height);
                 isChanged = 'not equal ' + height + ' ' + frameHeight;
             }
-            if(isChanged)
+            if (isChanged)
                 console.log('change', isChanged);
         }
-    }
+    },
 };

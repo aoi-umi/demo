@@ -5,9 +5,9 @@ var common = require('../_system/common');
 var myEnum = require('./../_system/enum');
 var autoBll = require('../_bll/auto');
 
-exports.detailQuery = function(opt, viewOpt){
+exports.detailQuery = function (opt, viewOpt) {
     return autoBll.custom('main_content', 'detailQuery', opt).then(function (t) {
-        if(viewOpt){
+        if (viewOpt) {
             viewOpt.mainContentDetail = t;
         }
     });

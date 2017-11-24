@@ -79,6 +79,7 @@ app.use(function (req, res, next) {
     req.myData = {
         method: {},
         user: {
+            id: 0,
             nickname: 'guest',
             authority: {}
         },

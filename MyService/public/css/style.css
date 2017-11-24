@@ -66,3 +66,14 @@ tbody{
 .no-resize{
   resize: none;
 }
+
+/*登录*/
+.nav-sign>.sign.in{
+  display: none;
+}
+.nav-sign.in>.sign.in{
+  display: block;
+}
+.nav-sign.in>.sign.out{
+  display: none;
+}

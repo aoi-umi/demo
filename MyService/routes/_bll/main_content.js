@@ -8,7 +8,7 @@ var common = require('../_system/common');
 var myEnum = require('../_system/enum');
 var main_content_bll = exports;
 
-exports.query = function(opt) {
+exports.query = function (opt) {
     return common.promise().then(function () {
         return autoBll.customDal('main_content', 'query', opt).then(function (t) {
             var detail = {
@@ -28,16 +28,16 @@ exports.query = function(opt) {
     });
 };
 
-exports.detailQuery = function(opt) {
+exports.detailQuery = function (opt) {
     return common.promise().then(function () {
-        if(opt.id == 0){
+        if (opt.id == 0) {
             var detail = {};
-            detail.main_content = {id:0, status:0};
+            detail.main_content = {id: 0, status: 0};
             detail.main_content_type_list = [];
             detail.main_content_child_list = [];
             detail.main_content_log_list = [];
             return detail;
-        }else if(!opt.id) {
+        } else if (!opt.id) {
             throw common.error('', 'ARGS_ERROR');
         }
         return autoBll.customDal('main_content', 'detailQuery', opt).then(function (t) {
@@ -46,13 +46,13 @@ exports.detailQuery = function(opt) {
             detail.main_content_type_list = t[1];
             detail.main_content_child_list = t[2];
             detail.main_content_log_list = t[3];
-            if(!detail.main_content)
+            if (!detail.main_content)
                 throw common.error('', 'DB_NO_DATA');
             return detail;
         });
-    }).then(function(t){
+    }).then(function (t) {
         updateMainContent(t.main_content);
-        if(t.main_content_log_list) {
+        if (t.main_content_log_list) {
             t.main_content_log_list.forEach(function (item) {
                 updateMainContentLog(item);
             });
@@ -66,9 +66,9 @@ exports.save = function (opt) {
     return common.promise().then(function () {
         main_content = opt.main_content;
         return main_content_bll.detailQuery({id: main_content.id});
-    }).then(function(main_content_detail) {
+    }).then(function (main_content_detail) {
         //todo 权限检查
-        if(opt.id != 0){
+        if (opt.id != 0) {
             myEnum.enumChangeCheck('main_content_status_enum', main_content_detail.main_content.status, main_content.status);
         }
         return autoBll.tran(function (conn) {
@@ -82,11 +82,13 @@ exports.save = function (opt) {
                 var main_content_id = t;
                 var list = [];
                 //删除child
-                if(opt.id != 0 && opt.delMainContentChildList){
-                    var del_list = _.filter(main_content_detail.main_content_child_list, function(child){
+                if (opt.id != 0 && opt.delMainContentChildList) {
+                    var del_list = _.filter(main_content_detail.main_content_child_list, function (child) {
                         //查找删除列表中的项
-                        var match = _.find(opt.delMainContentChildList, function(child_id){return child_id == child.id});
-                        if(!match) {
+                        var match = _.find(opt.delMainContentChildList, function (child_id) {
+                            return child_id == child.id
+                        });
+                        if (!match) {
                             //查找不存在于保存列表中的项
                             var match2 = _.find(opt.main_content_child_list, function (save_child) {
                                 return save_child.id == child.id
@@ -95,7 +97,7 @@ exports.save = function (opt) {
                         }
                         return match;
                     });
-                    if(del_list && del_list.length) {
+                    if (del_list && del_list.length) {
                         del_list.forEach(function (item) {
                             list.push(autoBll.del('main_content_child', {id: item.id}, conn));
                         });
@@ -125,7 +127,7 @@ exports.save = function (opt) {
     });
 };
 
-exports.statusUpdate = function(opt) {
+exports.statusUpdate = function (opt) {
     var main_content = opt.main_content;
     return common.promise().then(function () {
         if (!main_content.id) {
@@ -135,10 +137,10 @@ exports.statusUpdate = function(opt) {
     }).then(function (main_content_detail) {
         //todo 检查权限
         myEnum.enumChangeCheck('main_content_status_enum', main_content_detail.main_content.status, main_content.status);
-        if(main_content.status == 'recovery'){
+        if (main_content.status == 'recovery') {
             var main_content_log_list = main_content_detail.main_content_log_list;
-            if(!main_content_log_list || !main_content_log_list.length
-            || main_content_log_list[0].src_status == undefined){
+            if (!main_content_log_list || !main_content_log_list.length
+                || main_content_log_list[0].src_status == undefined) {
                 throw common.error('数据有误');
             }
             main_content.status = main_content_log_list[0].src_status;
@@ -181,7 +183,7 @@ function createLog(opt) {
         operate_date: now,
         operator: 'system'
     };
-    if(opt.src_status == -1){
+    if (opt.src_status == -1) {
         main_content_log.type = 6;
         main_content_log.content = '恢复';
     }
@@ -206,7 +208,7 @@ function createLog(opt) {
     return main_content_log;
 }
 
-function updateMainContent(item){
+function updateMainContent(item) {
     item.type_name = myEnum.getValue('main_content_type_enum', item.type);
     item.status_name = myEnum.getValue('main_content_status_enum', item.status);
 }

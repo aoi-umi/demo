@@ -27,6 +27,7 @@ function getRequire(name, custom) {
 
     return require(filepath);
 }
+
 exports.save = function (name, params, conn) {
     return getRequire(name).save(params, conn).then(function (t) {
         return t[0][0].id;
@@ -64,13 +65,13 @@ exports.tran = function (fn) {
 };
 exports.custom = function (name, method, opt) {
     var bll = getRequire(name, 'bll');
-    if(!bll[method])
+    if (!bll[method])
         throw common.error(`method[${method}] is not exist`, errorConfig.CODE_ERROR.code);
     return bll[method](opt);
 };
 exports.customDal = function (name, method, opt) {
     var dal = getRequire(name, 'dal');
-    if(!dal[method])
+    if (!dal[method])
         throw common.error(`method[${method}] is not exist`, errorConfig.CODE_ERROR.code);
     return dal[method](opt);
 };

@@ -1,19 +1,20 @@
 <tbody class="itemRow">
-    <tr>
-        <td><%=id%></td>
-        <td><%=type_name%></td>
-        <td><%=status_name%></td>
-        <td><%=account +'(' +  nickname + ')[' + user_info_id + ']'%></td>
-        <td><%=title%></td>>
-        <td><%=description%></td>
-        <td><%=create_date%></td>
-        <td><%=operate_date%></td>
-        <td><%=operator%></td>
-        <td>
-            <a href="javascript:;" class="itemDetailQuery">详细</a>
-            <%if(status != -1){%>
-                <a href="javascript:;" class="itemDel statusUpdate" data-id="<%=id%>" data-operate="del">删除</a>
-            <%}%>
-        </td>
-    </tr>
+<tr>
+    <td><%= id %></td>
+    <td><%= type_name %></td>
+    <td><%= status_name %></td>
+    <td><%= account +'(' +  nickname + ')[' + user_info_id + ']' %></td>
+    <td><%= title %></td>
+    >
+    <td><%= description %></td>
+    <td><%= create_date %></td>
+    <td><%= operate_date %></td>
+    <td><%= operator %></td>
+    <td>
+        <a href="javascript:;" class="itemDetailQuery">详细</a>
+        <% if(status != -1){ %>
+        <a href="javascript:;" class="itemDel statusUpdate" data-id="<%= id %>" data-operate="del">删除</a>
+        <% } %>
+    </td>
+</tr>
 </tbody>

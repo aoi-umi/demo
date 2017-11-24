@@ -1,0 +1,115 @@
+var common = require('../_system/common');
+var cache = require('../_system/cache');
+var config = require('../../config');
+var errorConfig = require('../_system/errorConfig');
+var autoBll = require('../_bll/auto');
+
+exports.sign = function (req, res, next) {
+    var method = req.params.method;
+    switch (method) {
+        case 'up':
+            signUp(req, res, next);
+            break;
+        case 'in':
+            signIn(req, res, next).then(function (t) {
+                var userInfoKey = req.cookies[config.cacheKey.userInfo];
+                if (userInfoKey) {
+                    userInfoKey = config.cacheKey.userInfo + userInfoKey;
+                    var user = req.myData.user;
+                    user.id = t.id;
+                    user.nickname = t.nickname;
+                    user.authority['login'] = true;
+                    if (t.auth) {
+                        var authList = t.auth.split(',');
+                        authList.forEach(function (auth) {
+                            user.authority[auth] = true;
+                        });
+                    }
+                    var hours = new Date().getHours();
+                    var seconds = parseInt((24 - hours) * 60 * 60);
+                    cache.setPromise(userInfoKey, user, seconds);
+                }
+                return res.mySend(null, {
+                    d: t.id,
+                    nickname: t.nickname
+                });
+            }).fail(function (e) {
+                return res.mySend(e);
+            });
+            break;
+        case 'out':
+            signOut(req, res, next);
+            break;
+        default:
+            next();
+    }
+};
+
+function signUp(req, res, next) {
+    var args = req.body;
+    return common.promise().then(function (e) {
+        if (!args.username)
+            throw common.error('', 'CAN_NOT_BE_EMPTY', {
+                format: function (msg) {
+                    return common.stringFormat(msg, '用户名');
+                }
+            });
+        return autoBll.custom('user_info', 'isAccountExist', args.username)
+    }).then(function (t) {
+        if (t)
+            throw common.error('account is exist!');
+        return autoBll.save('user_info', {
+            account: args.username,
+            password: args.password,
+            create_datetime: new Date()
+        });
+    }).then(function (t) {
+        res.send(common.formatRes(null, t));
+    }).fail(function (e) {
+        res.send(common.formatRes(e));
+    });
+}
+
+function signIn(req, res) {
+    var username = req.header('username');
+    var token = req.header('token');
+    var reqBody = req.body;
+    return common.promise().then(function () {
+        if (!username)
+            throw common.error(null, errorConfig.CAN_NOT_BE_EMPTY.code, {
+                format: function (msg) {
+                    return common.stringFormat(msg, 'username');
+                }
+            });
+        if (!reqBody)
+            reqBody = '';
+        if (typeof req != 'string')
+            reqBody = JSON.stringify(reqBody);
+        return autoBll.query('user_info', {account: username});
+    }).then(function (t) {
+        if (!t.count)
+            throw common.error('no account or password wrong!');
+        if (t.count > 1)
+            throw common.error('system error: data wrong');
+        var userInfo = t.list[0];
+        var pwd = userInfo.password;
+        var checkToken = common.createToken(username + pwd + reqBody);
+        if (token != checkToken)
+            throw common.error(null, errorConfig.TOKEN_WRONG.code);
+        return userInfo;
+    });
+}
+
+function signOut(req, res, next) {
+    var userInfoKey = req.cookies[config.cacheKey.userInfo];
+    common.promise().then(function () {
+        if (userInfoKey) {
+            userInfoKey = config.cacheKey.userInfo + userInfoKey;
+            return cache.delPromise(userInfoKey);
+        }
+    }).then(function () {
+        res.mySend(null, 'success');
+    }).catch(function (e) {
+        res.mySend(e, e.code);
+    });
+}

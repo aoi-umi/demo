@@ -52,10 +52,10 @@ exports.promise = function (obj, methodName) {
                 funArgs.push(args[key]);
         }
 
-        funArgs.push(function(err) {
+        funArgs.push(function (err) {
             var cbArgs = arguments;
             if (err)
-                defer.reject (err);
+                defer.reject(err);
             else {
                 var resolveArgs = [];
                 for (var cbArgKey in cbArgs) {
@@ -79,13 +79,13 @@ exports.promisify = function (fun) {
         }
         return common.promise().then(function () {
             var res = q.defer();
-            args.push(function(err, t) {
+            args.push(function (err, t) {
                 if (err)
                     return res.reject(err);
 
                 var cbArgs = [];
                 for (var key in arguments) {
-                    if(key != 0)
+                    if (key != 0)
                         cbArgs.push(arguments[key]);
                 }
                 return res.resolve.apply(void 0, cbArgs);
@@ -277,7 +277,7 @@ exports.error = function (msg, code, option) {
         opt = common.extend(opt, option);
     if (!code)
         code = '';
-    
+
     if (code && errorConfig[code]) {
         var error = errorConfig[code];
         code = error.code;
@@ -402,7 +402,7 @@ exports.stringFormat = function () {
 };
 
 //小写下划线
-exports.stringToLowerCaseWithUnderscore = function(str){
+exports.stringToLowerCaseWithUnderscore = function (str) {
     str = str.replace(/^[A-Z]+/, function () {
         return arguments[0].toLowerCase();
     });
@@ -414,14 +414,14 @@ exports.stringToLowerCaseWithUnderscore = function(str){
     return str;
 };
 //驼峰（小驼峰）
-exports.stringToCamelCase = function(str){
+exports.stringToCamelCase = function (str) {
     str = str.replace(/_([a-zA-Z])/g, function () {
         return arguments[1].toUpperCase();
     });
     return str[0].toLowerCase() + str.substr(1);
 };
 //帕斯卡（大驼峰）
-exports.stringToPascal = function(str){
+exports.stringToPascal = function (str) {
     str = str.replace(/_([a-zA-Z])/g, function () {
         return arguments[1].toUpperCase();
     });
@@ -430,7 +430,7 @@ exports.stringToPascal = function(str){
 
 exports.dateFormat = function (date, format) {
     try {
-        if (!format)format = 'yyyy-MM-dd';
+        if (!format) format = 'yyyy-MM-dd';
         if (!date)
             date = new Date();
         if (typeof date == 'string')
