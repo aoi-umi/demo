@@ -75,7 +75,7 @@ exports.save = function (opt) {
             var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
             main_content.type = 0;
             main_content.user_info_id = 1;
-            main_content.operator = 'system';
+            main_content.operator = opt.user.account;
             main_content.create_date =
                 main_content.operate_date = now;
             return autoBll.save('main_content', main_content, conn).then(function (t) {
@@ -114,7 +114,8 @@ exports.save = function (opt) {
                     id: main_content_id,
                     src_status: main_content_detail.main_content.status,
                     dest_status: main_content.status,
-                    content: opt.remark
+                    content: opt.remark,
+                    operator:opt.user.account
                 });
                 list.push(autoBll.save('main_content_log', main_content_log, conn));
                 return q.all(list).then(function () {
@@ -160,7 +161,8 @@ exports.statusUpdate = function (opt) {
                     id: main_content_id,
                     src_status: main_content_detail.main_content.status,
                     dest_status: main_content.status,
-                    content: opt.remark
+                    content: opt.remark,
+                    operator: opt.user.account
                 });
                 list.push(autoBll.save('main_content_log', main_content_log, conn));
                 return q.all(list).then(function () {
@@ -181,7 +183,7 @@ function createLog(opt) {
         content: '保存',
         create_date: now,
         operate_date: now,
-        operator: 'system'
+        operator: opt.operator
     };
     if (opt.src_status == -1) {
         main_content_log.type = 6;

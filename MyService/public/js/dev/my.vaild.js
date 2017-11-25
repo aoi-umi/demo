@@ -3,17 +3,17 @@
  */
 namespace('my.vaild');
 my.vaild = {
-    isInt: function(val, type){
+    isInt: function (val, type) {
         //- 0 +
         //1 1 1 -> 0-7
         var reg = /^-?[\d]+$/;
         var t = '';
-        if(typeof type == 'number'){
-            while(type > 0){
+        if (typeof type == 'number') {
+            while (type > 0) {
                 t = type % 2 + t;
                 type = parseInt(type / 2);
             }
-        }else{
+        } else {
             t = type;
         }
         switch (t) {
@@ -37,5 +37,8 @@ my.vaild = {
                 break;
         }
         return reg.test(val);
+    },
+    isAccount: function (val) {
+        return /[a-zA-Z][a-zA-Z\d_]{5,}/.test(val);
     }
 };

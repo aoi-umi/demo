@@ -115,6 +115,22 @@ init = {
             }
         });
 
+        //浮动
+        $('.hover').on('mouseover mouseleave', function (e) {
+            var dom = $(this);
+            if (dom.hasClass('hover-source')) {
+                $('.hover-target').css('left', dom.position().left);
+            }
+            switch (e.type) {
+                case 'mouseover':
+                    $('.hover-target').show();
+                    break;
+                case 'mouseleave':
+                    $('.hover-target').hide();
+                    break;
+            }
+        });
+
         var args = common.getArgsFromUrlParams();
         if (args.iframeId) {
             var dom = iframe = $(parent.document).find('#' + args.iframeId);

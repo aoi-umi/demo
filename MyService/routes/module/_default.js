@@ -28,6 +28,15 @@ function getBll(req, res, next){
     var opt = {
         isUsedCustom: false
     };
+    //对外接口模块
+    var acceptModuleList = [
+        'log',
+        'mainContent',
+        'mainContentType',
+    ];
+    if(!common.isInArray(module, acceptModuleList)){
+        throw common.error(`[${module}]不可用`, errorConfig.BAD_REQUEST.code);
+    }
     //使用custom
     if((module == 'log' && common.isInArray(method, ['query']))
         || (module == 'mainContentType' && common.isInArray(method, ['save']))
@@ -48,6 +57,7 @@ function getBll(req, res, next){
     //转换为小写下划线;
     module = common.stringToLowerCaseWithUnderscore(module);
     if(opt.isUsedCustom){
+        args.user = req.myData.user;
         return autoBll.custom(module, method, args);
     }else {
         var modulePath = path.resolve(__dirname + '/../_dal/' + module + '_auto.js');
@@ -68,7 +78,6 @@ exports.view = function (req, res, next) {
     //console.log(req.originalUrl, req._parsedUrl.pathname)
     switch (req._parsedUrl.pathname) {
         case '/':
-            opt.method = 'get';
             break;
         case '/sign/up':
             opt.view = 'signUp';

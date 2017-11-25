@@ -33,10 +33,10 @@ sign = {
     signIn: function (dom) {
         var form = dom.closest('.sign-in-form');
         var signInArgsOpt = [{
-            name: 'username',
+            name: 'account',
             desc: '用户名',
-            dom: form.find('[name=username]'),
-            canNotNull: true,
+            dom: form.find('[name=account]'),
+            canNotNull: true
         }, {
             name: 'password',
             desc: '密码',
@@ -58,9 +58,9 @@ sign = {
             ;
             var model = checkRes.model;
             var data = {random: common.s4(2)};
-            var token = common.createToken(model.username + $.md5(model.password) + JSON.stringify(data));
+            var token = common.createToken(model.account + $.md5(model.password) + JSON.stringify(data));
             var headers = {
-                'username': model.username,
+                'account': model.account,
                 'token': token,
             };
             var req = {
@@ -80,9 +80,18 @@ sign = {
     signUp: function () {
 
         var signUpArgsOpt = [{
-            name: 'username',
+            name: 'account',
             desc: '用户名',
-            dom: $('#username'),
+            dom: $('#account'),
+            canNotNull: true,
+            checkValue: function (val) {
+                if (!my.vaild.isAccount(val))
+                    return '请输入正确的{0}';
+            }
+        }, {
+            name: 'nickname',
+            desc: '昵称',
+            dom: $('#nickname'),
             canNotNull: true,
         }, {
             name: 'password',
@@ -111,6 +120,7 @@ sign = {
                 }
                 return $.Deferred().reject(err);
             }
+            checkRes.model.password = $.md5(checkRes.model.password);
             return my.interface.signUp(checkRes.model);
         }).then(function (t) {
             location.href = '/';

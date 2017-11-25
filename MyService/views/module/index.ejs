@@ -1,181 +1,195 @@
-<link href="css/fileinput.min.css" rel="stylesheet" />
+<link href="css/fileinput.min.css" rel="stylesheet"/>
 <style>
-    .hover-source{
+    .hover-source {
         position: relative;
         left: 100px;
     }
+
     .hover-target {
         display: none;
         position: absolute;
         z-index: 999;
         padding-top: 50px;
     }
-    .content{
+
+    .content {
         background-color: #ffffff;
         border: 1px solid #47a8ef;
         width: 100px;
         height: 100px;
     }
 </style>
-
-<div class="container">
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
-    <p>Method <%= method %></p>
-    <a class="hover hover-source" href="javascript:;">hover</a>
-    <div class="hover hover-target">
-        <div class="content" class="fill_main"></div>
-    </div>
-    <a class="hover hover-source" href="javascript:;">hover</a>
-    <form method="post" action="/upload" enctype="multipart/form-data">
-        <div class="row">
-            <div class="col-md-6">
-                <input name="upfile" id="upfile" type="file"/>
-            </div>
-
-            <!--<div class="col-md-6">-->
-                <!--<input type="submit" value="提交" class="btn btn-default"/>-->
-            <!--</div>-->
-        </div>
-    </form>
+<div class="container-fluid">
     <div class="row">
-        <div class="col-md-6 form-inline">
-            <input type="text" id="msg" class="form-control"/>
-            <input id="postMsg" type="button" class="btn btn-default" value="发送"/>
-        </div>
-        <div class="col-md-6">
-            <div class=" panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">message</h3>
+        <div class="col-xs-2 col-sm-2 col-md-2 sidebar">
+            <% var menuList = [{
+                text: 'main content menu',
+                listId: '',
+                childs: [{
+                    text: 'main content',
+                    tab: {
+                        target: 'mainContent',
+                        content: '/mainContent?noNav=true',
+                        name: 'main content list'
+                    },
+                }, {
+                    text: 'main content type',
+                    tab: {
+                        target: 'mainContentType',
+                        content: '/mainContentType?noNav=true',
+                        name: 'main content type list'
+                    },
+                },]
+            }, {
+                text: '菜单Test',
+                listId: 'menuItemListTest',
+                childs: [{
+                    text: 'Home',
+                    tab: {
+                        target: 'home'
+                    },
+                }, {
+                    text: 'Index',
+                    tab: {
+                        target: 'index',
+                        content: '/?noNav=true'
+                    },
+                }, {
+                    text: 'Help',
+                    tab: {
+                        target: 'help',
+                        content: '/help?noNav=true'
+                    },
+                }, {
+                    text: 'Log',
+                    tab: {
+                        target: 'log',
+                        content: '/log?noNav=true'
+                    },
+                }, {
+                    text: 'Status',
+                    tab: {
+                        target: 'status',
+                        content: '/status?noNav=true'
+                    },
+                }, {
+                    text: 'Color',
+                    tab: {
+                        target: 'color',
+                        content: '/color?noNav=true'
+                    },
+                }, {
+                    text: 'test',
+                    tab: {
+                        target: 'test',
+                        content: 'testTemplate',
+                        type: 'template'
+                    },
+                },]
+            },];
+            menuList.forEach(function(t){
+                if (!t.listId)
+                    t.listId = 'menuId' + new Date().getTime();
+            %>
+            <div class="list-group">
+                <a class="list-group-item active" data-toggle="collapse" href="#<%= t.listId %>">
+                    <%= t.text %>
+                </a>
+
+                <div class="collapse in" id="<%= t.listId %>">
+                    <% t.childs.forEach(function(child){
+                        if (!child.tab)
+                            child.tab = {}; %>
+                    <a class="list-group-item tab" href="javascript:;"
+                            <% for(var key in child.tab){
+                            if(child.tab[key]){ %>
+                       data-tab-<%= key %>="<%= child.tab[key] %>"
+                            <% }
+                            } %>
+                            <%- child.attr || '' %>><%= child.text %></a>
+                    <% }) %>
                 </div>
-                <div id="msgBox">
+            </div>
+            <% }); %>
+        </div>
+
+        <div class="col-xs-10 col-sm-10 col-md-10 main">
+            <ul class="nav nav-tabs" id="myTab"></ul>
+            <div class="tab-content" id="myPanel">
+                <div style="height: 512px" id="panel-home" class="tab-pane fade">
+                    <h1><%= title %></h1>
+                    Home Page
+                    <div class="my-row">
+                        <p>Welcome to <%= title %></p>
+                        <a class="hover hover-source" href="javascript:;">hover</a>
+                        <div class="hover hover-target">
+                            <div class="content" class="fill_main"></div>
+                        </div>
+                        <a class="hover hover-source" href="javascript:;">hover</a>
+                        <div class="row">
+                            <div class="my-row col-xs-6">
+                                <div>
+                                    <button class="btn btn-default msgNotice" data-type="0">弹出提示</button>
+                                </div>
+                                <div>
+                                    <button class="btn btn-default msgNotice" data-type="1">弹出提示</button>
+                                    <label>no close<input type="checkbox" id="msgNoticeNoClose"/></label>
+                                    <select id="msgNoticeBtnCount">
+                                        <% for(var i = 1;i <= 10;i++){ %>
+                                        <option value="<%= i %>"><%= i %></option>
+                                        <% } %>
+                                    </select>
+                                </div>
+                                <div>
+                                    <input id="autocomplete" class="form-control"/>
+                                </div>
+                                <div>
+                                    <span id="countdown"></span>
+                                </div>
+                                <div>
+                                    <span id="countdown2"></span>
+                                </div>
+                            </div>
+                            <div class="my-row col-xs-6">
+                                <form method="post" action="/upload" enctype="multipart/form-data">
+                                    <input name="upfile" id="upfile" type="file"/>
+                                    <!--<div class="col-md-6">-->
+                                    <!--<input type="submit" value="提交" class="btn btn-default"/>-->
+                                    <!--</div>-->
+                                </form>
+                                <div class="form-inline">
+                                    <input type="text" id="msg" class="form-control"/>
+                                    <input id="postMsg" type="button" class="btn btn-default" value="发送"/>
+                                </div>
+                                <div class=" panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">message</h3>
+                                    </div>
+                                    <div id="msgBox">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<script src="/js/<%= env %>/my.tab.js?v=<%= version %>"></script>
+<script type="text/template" id="testTemplate">
+    <div>
+        test
+    </div>
+</script>
+
 <script type="text/template" id="msgItem">
     <% include ../_template_web/msgItem %>
 </script>
 <script src="js/plugins/fileinput.min.js"></script>
+<script src="js/<%=env%>/index.js?v=<%=version%>"></script>
 <script type="text/javascript">
-    $(function(){
-        $('.hover').on('mouseover mouseleave', function(e){
-            var dom = $(this);
-            if(dom.hasClass('hover-source')){
-                $('.hover-target').css('left', dom.position().left);
-            }
-            switch (e.type) {
-                case 'mouseover':
-                    $('.hover-target').show();
-                    break;
-                case 'mouseleave':
-                    $('.hover-target').hide();
-                    break;
-            }
-        });
-
-
-        //socket
-        var socketData= {
-            postSuccess: {}
-        };
-
-        var connection = socket.connection;
-
-        $('#postMsg').on('click', function () {
-            var msg = $('#msg').val();
-            if(msg) {
-                var userInfo = $.cookie(config.cacheKey.userInfo);
-                var msgId = common.s4();
-                connection.emit('postMsg', {
-                    user: userInfo,
-                    content: msg,
-                    msgId: msgId,
-                });
-                appendMsg({
-                    datetime: common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss'),
-                    user: userInfo,
-                    content: msg,
-                    msgId: msgId,
-                    status: 0,
-                    self: true,
-                });
-            }
-        });
-        var appendMsg = function (opt) {
-            //status
-            //0  发送中 1 发送成功
-            //-1 发送失败
-            var className = [];
-            switch(opt.status){
-                case 0:
-                    className.push('loading');
-                    break;
-                case 1:
-                    className.push('success');
-                    break;
-                case -1:
-                    className.push('fail');
-                    break;
-            }
-            var userInfo = $.cookie(config.cacheKey.userInfo);
-            if(opt.self || userInfo == opt.user){
-                className.push('self');
-            }
-            opt.className = className.join(' ');
-            var msgItemTemp = $('#msgItem').html();
-
-            $('#msgBox').append(ejs.render(msgItemTemp, opt));
-        }
-
-        setInterval(function() {
-            for(var id in socketData.postSuccess){
-                var existMsg = $('[data-id="' + id + '"]');
-                if(existMsg.length){
-                    existMsg.removeClass('loading').addClass('success');
-                }else {
-                    socketData.postSuccess[id].times++;
-                    if(socketData.postSuccess[id].times > 5)
-                        delete socketData.postSuccess[id];
-                }
-            }
-        }, 1000);
-
-        connection.on('newMsg', function (data) {
-            data.status = 1;
-            appendMsg(data);
-        });
-
-        connection.on('postSuccess', function (data) {
-            var id = data.user + data.msgId;
-            var existMsg = $('[data-id="' + id + '"]');
-            if(existMsg.length){
-                existMsg.removeClass('loading').addClass('success');
-            }else {
-                socketData.postSuccess[id] = {
-                    times: 0
-                };
-            }
-        });
-
-
-        var control = $('#upfile');
-        control.fileinput({
-            showUpload: true, //是否显示上传按钮
-            showRemove:true,
-            dropZoneEnabled: true,
-            showCaption: true,//是否显示标题
-            //showPreview:false,
-            allowedPreviewTypes: ['image'],
-            allowedFileTypes: ['image'],
-            //allowedFileExtensions:  ['jpg', 'png'],
-            maxFileSize : 2000,
-            maxFileCount: 1,
-            //initialPreview: [
-            //预览图片的设置
-            //      "<img src='' class='file-preview-image' alt='' title=''>",
-            //],
-        });
+    $(function () {
+        index.init();
     });
 </script>

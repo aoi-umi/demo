@@ -7,7 +7,14 @@ var getOption = function () {
     var opt = {
         noLog: true,
         serviceName: 'logService',
-        beforeSend: function (option, args) {
+        beforeRequest: function (option, args) {
+        },
+        afterResponse: function (t) {
+            if(!t)
+                throw common.error('null response');
+            if(!t.result) {
+                throw common.error(t.desc);
+            }
         }
     };
     return opt;
