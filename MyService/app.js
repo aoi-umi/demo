@@ -59,7 +59,7 @@ var mySend = function(req, res, err, detail, opt){
         log.req = logReq;
         log.res = logRes;
         log.ip = common.getClientIp(req);
-        log.remark = formatRes.desc;
+        log.remark = formatRes.desc + `[account:${req.myData.user.account}]`;
         log.guid = formatRes.guid;
         log.duration = new Date().getTime() - req.myData.startTime;
         common.logSave(log);
@@ -81,12 +81,17 @@ app.use(function (req, res, next) {
         user: {
             id: 0,
             nickname: 'guest',
+            account: '#guest',
             authority: {}
         },
         viewPath: app.get('views'),
         startTime: new Date().getTime(),
     };
     var user = req.myData.user;
+    if(req._parsedUrl.pathname == '/log/save') {
+        req.myData.noLog = true;
+        user.authority['login'] = true;
+    }
     if(config.env == 'dev')
         user.authority['dev'] = true;
 

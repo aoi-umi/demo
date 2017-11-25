@@ -18,6 +18,7 @@ exports.sign = function (req, res, next) {
                     var user = req.myData.user;
                     user.id = t.id;
                     user.nickname = t.nickname;
+                    user.account = t.account;
                     user.authority['login'] = true;
                     if (t.auth) {
                         var authList = t.auth.split(',');
@@ -48,18 +49,18 @@ exports.sign = function (req, res, next) {
 function signUp(req, res, next) {
     var args = req.body;
     return common.promise().then(function (e) {
-        if (!args.username)
+        if (!args.account)
             throw common.error('', 'CAN_NOT_BE_EMPTY', {
                 format: function (msg) {
                     return common.stringFormat(msg, '用户名');
                 }
             });
-        return autoBll.custom('user_info', 'isAccountExist', args.username)
+        return autoBll.custom('user_info', 'isAccountExist', args.account)
     }).then(function (t) {
         if (t)
             throw common.error('account is exist!');
         return autoBll.save('user_info', {
-            account: args.username,
+            account: args.account,
             password: args.password,
             create_datetime: new Date()
         });
@@ -71,21 +72,21 @@ function signUp(req, res, next) {
 }
 
 function signIn(req, res) {
-    var username = req.header('username');
+    var account = req.header('account');
     var token = req.header('token');
     var reqBody = req.body;
     return common.promise().then(function () {
-        if (!username)
+        if (!account)
             throw common.error(null, errorConfig.CAN_NOT_BE_EMPTY.code, {
                 format: function (msg) {
-                    return common.stringFormat(msg, 'username');
+                    return common.stringFormat(msg, 'account');
                 }
             });
         if (!reqBody)
             reqBody = '';
         if (typeof req != 'string')
             reqBody = JSON.stringify(reqBody);
-        return autoBll.query('user_info', {account: username});
+        return autoBll.query('user_info', {account: account});
     }).then(function (t) {
         if (!t.count)
             throw common.error('no account or password wrong!');
@@ -93,7 +94,7 @@ function signIn(req, res) {
             throw common.error('system error: data wrong');
         var userInfo = t.list[0];
         var pwd = userInfo.password;
-        var checkToken = common.createToken(username + pwd + reqBody);
+        var checkToken = common.createToken(account + pwd + reqBody);
         if (token != checkToken)
             throw common.error(null, errorConfig.TOKEN_WRONG.code);
         return userInfo;

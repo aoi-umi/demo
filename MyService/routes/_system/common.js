@@ -139,7 +139,10 @@ exports.requestServiceByConfigPromise = function (option) {
         var opt = {
             url: url,
             body: option.data,
-            method: method
+            method: method,
+            headers: {
+                'x-requested-with': 'xmlhttprequest'
+            }
         };
         if (option.beforeRequest) {
             //发送的参数 当前所用参数
@@ -519,7 +522,9 @@ exports.logSave = function (log) {
         if (value !== null && type == 'object')
             log[key] = JSON.stringify(value);
     }
-    return logService.save(log);
+    return logService.save(log).fail(function () {
+
+    });
 };
 
 // var soap = require('soap');

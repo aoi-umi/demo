@@ -25,6 +25,11 @@ var restList = [
         path: 'index',
     },
     {
+        url: '/:module/save',
+        checkAuthOnly: true,//仅检查权限，功能由后面路由实现
+        auth: ['login']
+    },
+    {
         url: '/:module/del',
         checkAuthOnly: true,//仅检查权限，功能由后面路由实现
         auth: ['admin']
