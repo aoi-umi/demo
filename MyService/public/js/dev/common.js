@@ -196,7 +196,7 @@ common = {
     dateParse: function (date) {
         if (typeof date == 'string')
             date = date.replace('-', '/');
-        if(!isNaN(date) && !isNaN(parseInt(date)))
+        if (!isNaN(date) && !isNaN(parseInt(date)))
             date = parseInt(date);
         if (!(date instanceof Date))
             date = new Date(date);
@@ -204,7 +204,7 @@ common = {
     },
     dateFormat: function (date, format) {
         try {
-            if (!format)format = 'yyyy-MM-dd';
+            if (!format) format = 'yyyy-MM-dd';
             if (!date)
                 date = new Date();
             if (typeof date == 'string')
@@ -353,8 +353,7 @@ common = {
                             y = targetDom.offset().top + (targetDom.outerHeight() - dom.outerHeight()) / 2;
                             break;
                     }
-                    dom.css('left', x)
-                        .css('top', y)
+                    dom.css({'left': x, 'top': y})
                         .show();
                     dom.close = function () {
                         dom.remove();

@@ -1,17 +1,5 @@
 <link href="css/fileinput.min.css" rel="stylesheet"/>
 <style>
-    .hover-source {
-        position: relative;
-        left: 100px;
-    }
-
-    .hover-target {
-        display: none;
-        position: absolute;
-        z-index: 999;
-        padding-top: 50px;
-    }
-
     .content {
         background-color: #ffffff;
         border: 1px solid #47a8ef;
@@ -87,11 +75,13 @@
                     },
                 },]
             },];
-            menuList.forEach(function(t){
-                if (!t.listId)
-                    t.listId = 'menuId' + new Date().getTime();
             %>
             <div class="list-group">
+                <%
+                menuList.forEach(function(t){
+                    if (!t.listId)
+                        t.listId = 'menuId' + new Date().getTime();
+                %>
                 <a class="list-group-item active" data-toggle="collapse" href="#<%= t.listId %>">
                     <%= t.text %>
                 </a>
@@ -109,8 +99,8 @@
                             <%- child.attr || '' %>><%= child.text %></a>
                     <% }) %>
                 </div>
+                <% }); %>
             </div>
-            <% }); %>
         </div>
 
         <div class="col-xs-10 col-sm-10 col-md-10 main">
@@ -121,11 +111,11 @@
                     Home Page
                     <div class="my-row">
                         <p>Welcome to <%= title %></p>
-                        <a class="hover hover-source" href="javascript:;">hover</a>
-                        <div class="hover hover-target">
+                        <a class="hover hover-source" href="#hoverTest">hover</a>
+                        <div class="hover hover-target" id="hoverTest">
                             <div class="content" class="fill_main"></div>
                         </div>
-                        <a class="hover hover-source" href="javascript:;">hover</a>
+                        <a class="hover hover-source" href="#hoverTest">hover</a>
                         <div class="row">
                             <div class="my-row col-xs-6">
                                 <div>
@@ -187,7 +177,7 @@
     <% include ../_template_web/msgItem %>
 </script>
 <script src="js/plugins/fileinput.min.js"></script>
-<script src="js/<%=env%>/index.js?v=<%=version%>"></script>
+<script src="js/<%= env %>/index.js?v=<%= version %>"></script>
 <script type="text/javascript">
     $(function () {
         index.init();

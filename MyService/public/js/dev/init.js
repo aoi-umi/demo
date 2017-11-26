@@ -118,15 +118,19 @@ init = {
         //浮动
         $('.hover').on('mouseover mouseleave', function (e) {
             var dom = $(this);
-            if (dom.hasClass('hover-source')) {
-                $('.hover-target').css('left', dom.position().left);
-            }
+            var target = $(dom.attr('href'));
+            if (target.length && dom.hasClass('hover-source')) {
+                target.css({'left': dom.position().left, 'margin-top': '0px'});
+            }else if(dom.hasClass('hover-target'))
+                target = dom;
+            if(!target.length)
+                return;
             switch (e.type) {
                 case 'mouseover':
-                    $('.hover-target').show();
+                    target.show();
                     break;
                 case 'mouseleave':
-                    $('.hover-target').hide();
+                    target.hide();
                     break;
             }
         });

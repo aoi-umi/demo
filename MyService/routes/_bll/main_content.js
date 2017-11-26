@@ -115,7 +115,7 @@ exports.save = function (opt) {
                     src_status: main_content_detail.main_content.status,
                     dest_status: main_content.status,
                     content: opt.remark,
-                    operator:opt.user.account
+                    operator: opt.user.account
                 });
                 list.push(autoBll.save('main_content_log', main_content_log, conn));
                 return q.all(list).then(function () {
