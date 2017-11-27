@@ -11,25 +11,7 @@ exports.sign = function (req, res, next) {
             signUp(req, res, next);
             break;
         case 'in':
-            signIn(req, res, next).then(function (t) {
-                var userInfoKey = req.cookies[config.cacheKey.userInfo];
-                if (userInfoKey) {
-                    userInfoKey = config.cacheKey.userInfo + userInfoKey;
-                    var user = req.myData.user;
-                    user.id = t.id;
-                    user.nickname = t.nickname;
-                    user.account = t.account;
-                    user.authority['login'] = true;
-                    if (t.auth) {
-                        var authList = t.auth.split(',');
-                        authList.forEach(function (auth) {
-                            user.authority[auth] = true;
-                        });
-                    }
-                    var hours = new Date().getHours();
-                    var seconds = parseInt((24 - hours) * 60 * 60);
-                    cache.setPromise(userInfoKey, user, seconds);
-                }
+            signIn(req).then(function (t) {
                 return res.mySend(null, {
                     d: t.id,
                     nickname: t.nickname
@@ -71,10 +53,16 @@ function signUp(req, res, next) {
     });
 }
 
-function signIn(req, res) {
+var signIn = exports.signIn = function (req, signInReq) {
     var account = req.header('account');
     var token = req.header('token');
     var reqBody = req.body;
+    var user = req.myData.user;
+    if(req.myData.autoSignIn){
+        account = user.account;
+        token = user.token;
+        reqBody = user.reqBody;
+    }
     return common.promise().then(function () {
         if (!account)
             throw common.error(null, errorConfig.CAN_NOT_BE_EMPTY.code, {
@@ -84,7 +72,7 @@ function signIn(req, res) {
             });
         if (!reqBody)
             reqBody = '';
-        if (typeof req != 'string')
+        if (typeof reqBody != 'string')
             reqBody = JSON.stringify(reqBody);
         return autoBll.query('user_info', {account: account});
     }).then(function (t) {
@@ -98,6 +86,29 @@ function signIn(req, res) {
         if (token != checkToken)
             throw common.error(null, errorConfig.TOKEN_WRONG.code);
         return userInfo;
+    }).then(function (t) {
+        user.id = t.id;
+        user.nickname = t.nickname;
+        user.account = t.account;
+        user.authority['login'] = true;
+        user.reqBody = reqBody;
+        user.token = token;
+        if (t.auth) {
+            var authList = t.auth.split(',');
+            authList.forEach(function (auth) {
+                user.authority[auth] = true;
+            });
+        }
+        user.cacheDatetime = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
+
+        var userInfoKey = req.cookies[config.cacheKey.userInfo];
+        if (userInfoKey) {
+            userInfoKey = config.cacheKey.userInfo + userInfoKey;
+            var hours = new Date().getHours();
+            var seconds = parseInt(24 * 7 * 60 * 60);
+            cache.setPromise(userInfoKey, user, seconds);
+        }
+        return t;
     });
 }
 
