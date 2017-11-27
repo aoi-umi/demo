@@ -8,6 +8,7 @@ var bodyParser = require('body-parser');
 var config = require('./config');
 var common = require('./routes/_system/common');
 var cache = require('./routes/_system/cache');
+var sign = require('./routes/module/sign');
 var app = express();
 console.log(config.name, 'run at port ', config.port, ',version:', config.version);
 // view engine setup
@@ -108,11 +109,27 @@ app.use(function (req, res, next) {
     if (userInfoKey) {
         userInfoKey = config.cacheKey.userInfo + userInfoKey;
         cache.getPromise(userInfoKey).then(function (t) {
-            if (t) {
-                req.myData.user = t;
+                if (t) {
+                    req.myData.user = t;
+                    //自动重新登录获取信息
+                    if (!t.cacheDatetime || new Date() - new Date(t.cacheDatetime) > 12 * 3600 * 1000) {
+                        req.myData.autoSignIn = true;
+                        return common.promise().then(function (promiseRes) {
+                            sign.signIn(req).then(promiseRes.resolve).fail(function (e) {
+                                //console.log(e);
+                                cache.delPromise(userInfoKey).then(function () {
+                                    throw common.error('请重新登录！');
+                                }).fail(promiseRes.reject);
+                            });
+                            return promiseRes.promise;
+                        });
+                    }
+                }
             }
+        ).then(function () {
+            req.myData.autoSignIn = false;
             next();
-        }).catch(function (e) {
+        }).fail(function (e) {
             next(e);
         });
     } else {
