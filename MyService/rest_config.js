@@ -25,6 +25,13 @@ var restList = [
         path: 'index',
         auth: ['login'],
     },
+    {
+        url: '/msg',
+        method: 'get',
+        functionName: 'msg',
+        path: 'index',
+        auth: [],
+    },
 
     //模块路由
     {

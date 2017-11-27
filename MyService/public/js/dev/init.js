@@ -137,7 +137,8 @@ init = {
 
         var args = common.getArgsFromUrlParams();
         if (args.iframeId) {
-            var dom = iframe = $(parent.document).find('#' + args.iframeId);
+            var iframe = $(parent.document).find('#' + args.iframeId);
+            var dom = iframe;
             if (iframe.closest('.tab-pane').length)
                 dom = iframe.closest('.tab-pane');
             if (dom.length) {
