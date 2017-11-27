@@ -9,7 +9,7 @@ var config = require('./config');
 var common = require('./routes/_system/common');
 var cache = require('./routes/_system/cache');
 var app = express();
-console.log(config.name,'run at port ', config.port, ',version:', config.version);
+console.log(config.name, 'run at port ', config.port, ',version:', config.version);
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -22,17 +22,18 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 //init
-Date.prototype.toJSON = function() {
+Date.prototype.toJSON = function () {
     return common.dateFormat(this, 'yyyy-MM-dd HH:mm:ss');
 };
-Date.prototype.toString = function() {
+Date.prototype.toString = function () {
     return common.dateFormat(this, 'yyyy-MM-dd HH:mm:ss');
 };
 
-var myRender = function(req, res, view, options){
+var myRender = function (req, res, view, options) {
     var opt = {
         user: req.myData.user,
         noNav: req.query.noNav,
+        isHadAuthority: auth.isHadAuthority,
     };
     if (opt.noNav && opt.noNav.toString().toLowerCase() == 'false')
         opt.noNav = false;
@@ -40,7 +41,7 @@ var myRender = function(req, res, view, options){
     res.render(view, common.formatViewtRes(opt));
 };
 
-var mySend = function(req, res, err, detail, opt){
+var mySend = function (req, res, err, detail, opt) {
     var formatRes = common.formatRes(err, detail, opt);
     res.send(formatRes);
     var url = req.originalUrl;
@@ -50,7 +51,7 @@ var mySend = function(req, res, err, detail, opt){
     var logMethod = '[' + (config.name + '][' + (req.myData.method.methodName || url)) + ']';
 
     url = req.header('host') + url;
-    if(!req.myData.noLog) {
+    if (!req.myData.noLog) {
         var log = common.logModle();
         log.url = url;
         log.result = result;
@@ -88,11 +89,11 @@ app.use(function (req, res, next) {
         startTime: new Date().getTime(),
     };
     var user = req.myData.user;
-    if(req._parsedUrl.pathname == '/log/save') {
+    if (req._parsedUrl.pathname == '/log/save') {
         req.myData.noLog = true;
         user.authority['login'] = true;
     }
-    if(config.env == 'dev')
+    if (config.env == 'dev')
         user.authority['dev'] = true;
 
     res.myRender = function (view, options) {
@@ -122,14 +123,14 @@ app.use(function (req, res, next) {
 var auth = require('./routes/_system/auth');
 var restConfig = require('./rest_config');
 var restList = [];
-restConfig.forEach(function(rest) {
+restConfig.forEach(function (rest) {
     var method = rest.method;
     var path = rest.path || rest.url;
     if (path && path.substr(0, 1) !== '/')
         path = '/' + path;
     path = './routes' + path;
     var isRouter = true;
-    if(!method)
+    if (!method)
         method = 'post';
     var functionName = rest.functionName || method;
     var routerMethodList = [];
@@ -139,16 +140,17 @@ restConfig.forEach(function(rest) {
         req.myData.method = {methodName: rest.methodName};
         auth.auth(req, res, next);
     }
+
     routerMethodList.push(init);
 
-    if(!rest.checkAuthOnly) {
+    if (!rest.checkAuthOnly) {
         var reqfile = require(path);
         if (!reqfile[functionName])
             throw common.error('[' + path + '] is not exist function [' + functionName + ']', 'CODE_ERROR');
         var methodFun = function (req, res, next) {
-            try{
+            try {
                 reqfile[functionName](req, res, next);
-            }catch(e){
+            } catch (e) {
                 next(e);
             }
         };
@@ -172,7 +174,7 @@ restConfig.forEach(function(rest) {
 //console.log(restList);
 
 /// catch 404 and forwarding to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
     var err = new Error('Not Found');
     err.status = 404;
     next(err);
@@ -184,8 +186,8 @@ app.use(function(req, res, next) {
 // will print stacktrace
 var errorConfig = require('./routes/_system/errorConfig');
 
-app.use(function(err, req, res, next) {
-    if(config.env !== 'dev'){
+app.use(function (err, req, res, next) {
+    if (config.env !== 'dev') {
         err.stack = '';
     }
     err.status = err.status || 500;
@@ -208,9 +210,9 @@ app.use(function(err, req, res, next) {
 });
 
 
-process.on('unhandledRejection', function(e){
+process.on('unhandledRejection', function (e) {
     var stack = e;
-    if(e && e.stack)
+    if (e && e.stack)
         stack = e.stack;
     console.error('unhandledRejection');
     console.error(stack);

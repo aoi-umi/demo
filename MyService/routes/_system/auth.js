@@ -4,13 +4,14 @@
 var _ = require('underscore');
 var common = require('./common');
 var errorConfig = require('./errorConfig');
+var auth = exports;
 exports.auth = function (req, res, next) {
     //url权限认证
     var auth = req.myData.auth;
     var user = req.myData.user;
     // console.log(user.authority);
     // console.log(auth);
-    var permissionRes = authenticationCheck(user, auth);
+    var permissionRes = authorityCheck(user, auth);
     if (permissionRes.noPermission) {
         var err = common.error('', permissionRes.errCode || errorConfig.NO_PERMISSIONS.code);
         err.status = 403;
@@ -22,6 +23,17 @@ exports.auth = function (req, res, next) {
     } else {
         next();
     }
+};
+
+exports.isHadAuthority = function (user, auth) {
+    if (typeof auth == 'string')
+        auth = auth.split(',');
+    for (var i = 0; i < auth.length; i++) {
+        var item = auth[i];
+        if (!user.authority[item])
+            return false;
+    }
+    return true;
 };
 
 var authConfig = {
@@ -39,7 +51,7 @@ var authConfig = {
     }
 };
 
-var authenticationCheck = function (user, authList) {
+var authorityCheck = function (user, authList) {
     var noPermission = true;
     var desc = '';
     var errCode = '';
@@ -49,12 +61,12 @@ var authenticationCheck = function (user, authList) {
     } else {
         if (user && user.authority) {
             noPermission = false;
-            for(var i in authList) {
+            for (var i in authList) {
                 var key = authList[i];
                 var checkAuth = authConfig[key];
-                if(!checkAuth || !checkAuth.key)
-                    throw common.error('no auth [' + key + ']!','CODE_ERROR');
-                if(!user.authority[checkAuth.key]){
+                if (!checkAuth || !checkAuth.key)
+                    throw common.error('no auth [' + key + ']!', 'CODE_ERROR');
+                if (!auth.isHadAuthority(user, checkAuth.key)) {
                     notPassAuth = checkAuth;
                     break;
                 }

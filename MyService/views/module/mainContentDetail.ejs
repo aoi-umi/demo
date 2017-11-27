@@ -1,12 +1,13 @@
 <style>
-    tbody>tr:first-child .moveUp{
-        display: none;
-    }
-    tbody>tr:last-child .moveDown{
+    tbody > tr:first-child .moveUp {
         display: none;
     }
 
-    .not-editable .editable{
+    tbody > tr:last-child .moveDown {
+        display: none;
+    }
+
+    .not-editable .editable {
         display: none;
     }
 </style>
@@ -15,65 +16,71 @@
     var rowItemClass = 'col-xs-12 col-md-6';
     var main_content = mainContentDetail.main_content;
     var isEditable = false;
-    if(main_content.status == 0 || main_content.status == 4)
+    if (main_content.status == 0 || main_content.status == 4)
         isEditable = true;
     var debug = false;
     %>
     <div class="hidden">
-        <input id="id" value="<%=main_content.id%>"/>
+        <input id="id" value="<%= main_content.id %>"/>
     </div>
-    <%if(debug){%>
+    <% if(debug){ %>
     <pre>
-<%=JSON.stringify(mainContentDetail, null, '\t')%>
+<%= JSON.stringify(mainContentDetail, null, '\t') %>
     </pre>
-    <%}%>
+    <% } %>
     <div class="form-group">
         <div>
             <p>
                 <span>创建人:</span><span>
-                    <%=main_content.account || ''%>
-                    (<%=main_content.nickname || ''%>)
+                    <%= main_content.account || '' %>
+                    (<%= main_content.nickname || '' %>)
                 </span>
-                <span>类型:</span><span><%=main_content.type_name || ''%></span>
-                <span>状态:</span><span><%=main_content.status_name || ''%></span>
+                <span>类型:</span><span><%= main_content.type_name || '' %></span>
+                <span>状态:</span><span><%= main_content.status_name || '' %></span>
             </p>
+
             <p>
-                <span>创建时间:</span><span><%=main_content.create_date || ''%></span>
-                <span>修改时间:</span><span><%=main_content.operate_date || ''%></span>
-                <span>修改人:</span><span><%=main_content.operator || ''%></span>
+                <span>创建时间:</span><span><%= main_content.create_date || '' %></span>
+                <span>修改时间:</span><span><%= main_content.operate_date || '' %></span>
+                <span>修改人:</span><span><%= main_content.operator || '' %></span>
             </p>
+
             <p>
-            <%
-            var main_content_type_list = mainContentDetail.main_content_type_list;
-            main_content_type_list.forEach(function(item, index){%>
-            <a href="javascript:;"><%=item.type_name%></a>
-                <%if(index < main_content_type_list.length - 1){%>
+                <%
+                var main_content_type_list = mainContentDetail.main_content_type_list;
+                main_content_type_list.forEach(function(item, index){ %>
+                <a href="javascript:;"><%= item.type_name %></a>
+                <% if(index < main_content_type_list.length - 1){ %>
                 >>
-                <%}%>
-            <%})%>
+                <% } %>
+                <% }) %>
             </p>
         </div>
         <div class="row my-row">
-            <div class="<%=rowItemClass%>">
+            <div class="<%= rowItemClass %>">
                 <div class="form-horizontal">
                     <div class="form-group">
                         <label class="col-sm-2 control-label">标题</label>
+
                         <div class="col-sm-10">
-                            <%if(isEditable){%>
-                                <input class="form-control" id="title" placeholder="请输入标题" value="<%=main_content.title || ''%>"/>
-                            <%}else{%>
-                                <label class="control-label"><%=main_content.title || ''%></label>
-                            <%}%>
+                            <% if(isEditable){ %>
+                            <input class="form-control" id="title" placeholder="请输入标题"
+                                   value="<%= main_content.title || '' %>"/>
+                            <% }else{ %>
+                            <label class="control-label"><%= main_content.title || '' %></label>
+                            <% } %>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label">描述</label>
+
                         <div class="col-sm-10">
-                            <%if(isEditable){%>
-                                <textarea class="form-control no-resize" id="description" placeholder="请输入描述"><%=main_content.description || ''%></textarea>
-                            <%}else{%>
-                                <label class="control-label"><%=main_content.description || ''%></label>
-                            <%}%>
+                            <% if(isEditable){ %>
+                            <textarea class="form-control no-resize" id="description"
+                                      placeholder="请输入描述"><%= main_content.description || '' %></textarea>
+                            <% }else{ %>
+                            <label class="control-label"><%= main_content.description || '' %></label>
+                            <% } %>
                         </div>
                     </div>
                 </div>
@@ -81,105 +88,120 @@
         </div>
 
         <div>
-            <%if(isEditable){%>
+            <% if(isEditable){ %>
             <div class="my-row">
                 <button id="showMainContentChild" class="btn btn-default">新增</button>
             </div>
-            <%}%>
-            <table class="table table-bordered <%=isEditable ? '': 'not-editable'%>">
+            <% } %>
+            <table class="table table-bordered <%= isEditable ? '': 'not-editable' %>">
                 <thead>
-                <tr><th>顺序</th><th>类型</th><th>内容</th><th class="editable">操作</th></tr>
+                <tr>
+                    <th>顺序</th>
+                    <th>类型</th>
+                    <th>内容</th>
+                    <th class="editable">操作</th>
+                </tr>
                 </thead>
                 <tbody id="mainContentChildList">
-                    <%mainContentDetail.main_content_child_list.forEach(function(item){
-                        item.stringify = JSON.stringify(item);
+                <% mainContentDetail.main_content_child_list.forEach(function(item){
+                    item.stringify = JSON.stringify(item);
                         with(item){
-                    %>
-                        <%include ../_template/mainContentChildItem%>
-                    <%}
-                    })%>
+                %>
+                <% include ../_template/mainContentChildItem %>
+                <% }
+                }) %>
                 </tbody>
             </table>
         </div>
 
         <div>
-            <label class="control-label">备注</label><textarea class="form-control no-resize" id="remark" placeholder=""></textarea>
+            <label class="control-label">备注</label><textarea class="form-control no-resize" id="remark"
+                                                             placeholder=""></textarea>
         </div>
 
         <!--操作-->
         <div class="my-row text-center">
             <%
-            var operateList = [];
-            switch (main_content.status){
-                case 0:
-                case 4:
+            if(isHadAuthority(user, 'login')){
+                var operateList = [];
+                switch (main_content.status) {
+                    case 0:
+                    case 4:
+                        operateList.push({
+                            text: '保存',
+                            operate: 'save',
+                            className: 'save'
+                        });
+                        operateList.push({
+                            text: '提交',
+                            operate: 'submit',
+                            className: 'save'
+                        });
+                        break;
+                    case 1:
+                    case 2:
+                        operateList.push({
+                            text: '审核',
+                            operate: 'audit',
+                            className: 'statusUpdate'
+                        });
+                        operateList.push({
+                            text: '审核通过',
+                            operate: 'pass',
+                            className: 'statusUpdate'
+                        });
+                        operateList.push({
+                            text: '审核不通过',
+                            operate: 'notPass',
+                            className: 'statusUpdate'
+                        });
+                        break;
+                    case -1:
+                        operateList.push({
+                            text: '恢复',
+                            operate: 'recovery',
+                            className: 'statusUpdate'
+                        });
+                        break;
+                }
+                if (main_content.id && main_content.status != -1) {
                     operateList.push({
-                        text:'保存',
-                        operate:'save',
-                        className:'save'
+                        text: '删除',
+                        operate: 'del',
+                        className: 'statusUpdate'
                     });
-                    operateList.push({
-                        text:'提交',
-                        operate:'submit',
-                        className:'save'
-                    });
-                    break;
-                case 1:
-                case 2:
-                    operateList.push({
-                        text:'审核',
-                        operate:'audit',
-                        className:'statusUpdate'
-                    });
-                    operateList.push({
-                        text:'审核通过',
-                        operate:'pass',
-                        className:'statusUpdate'
-                    });
-                    operateList.push({
-                        text:'审核不通过',
-                        operate:'notPass',
-                        className:'statusUpdate'
-                    });
-                    break;
-                case -1:
-                    operateList.push({
-                        text:'恢复',
-                        operate:'recovery',
-                        className:'statusUpdate'
-                    });
-                    break;
-            }
-            if(main_content.id && main_content.status != -1){
-                operateList.push({
-                    text:'删除',
-                    operate:'del',
-                    className:'statusUpdate'
-                });
-            }
+                }
             operateList.forEach(function(item){ %>
-            <button class="btn btn-default <%=item.className%>"
-                    data-operate="<%=item.operate%>" data-id="<%=main_content.id%>">
-                <%=item.text%>
+            <button class="btn btn-default <%= item.className %>"
+                    data-operate="<%= item.operate %>" data-id="<%= main_content.id %>">
+                <%= item.text %>
             </button>
-            <%});%>
+            <% });
+            } %>
         </div>
         <div>
             <label class="control-label">日志</label>
             <table class="table table-bordered">
                 <thead>
-                    <tr><th>类型</th><th>源状态</th><th>目状态</th><th>内容</th><th>操作人</th><th>创建时间</th></tr>
-                </thead>
-                <%mainContentDetail.main_content_log_list.forEach(function(item){%>
                 <tr>
-                    <td><%=item.type_name%></td>
-                    <td><%=item.src_status_name%></td>
-                    <td><%=item.dest_status_name%></td>
-                    <td><%=item.content%></td>
-                    <td><%=item.operator%></td>
-                    <td><%=item.create_date%></td>
+                    <th>类型</th>
+                    <th>源状态</th>
+                    <th>目状态</th>
+                    <th>内容</th>
+                    <th>操作人</th>
+                    <th>创建时间</th>
                 </tr>
-                <%})%>
+                </thead>
+                <% mainContentDetail.main_content_log_list.forEach(function(item){ %>
+                <tr>
+                    <td><%= item.type_name %></td>
+                    <td><%= item.src_status_name %></td>
+                    <td><%= item.dest_status_name %></td>
+                    <td><%= item.content %></td>
+                    <td><%= item.operator %></td>
+                    <td><%= item.create_date %></td>
+                </tr>
+                <% }) %>
             </table>
         </div>
     </div>
@@ -200,12 +222,16 @@
                 <div class="form-horizontal">
                     <div class="form-group">
                         <label class="col-sm-2 control-label">type</label>
+
                         <div class="col-sm-10">
-                            <select class="form-control" name="type"><option value="0">0</option></select>
+                            <select class="form-control" name="type">
+                                <option value="0">0</option>
+                            </select>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label">content</label>
+
                         <div class="col-sm-10">
                             <textarea class="form-control no-resize" name="content"></textarea>
                         </div>
@@ -220,16 +246,16 @@
     </div>
 </div>
 <script type="text/template" id="mainContentChildItem">
-    <%include ../_template_web/mainContentChildItem%>
+    <% include ../_template_web/mainContentChildItem %>
 </script>
-<script type="text/javascript" src="/js/<%=env%>/my.pager.js?v=<%=version%>"></script>
-<script type="text/javascript" src="/js/<%=env%>/module.js?v=<%=version%>"></script>
-<script type="text/javascript" src="/js/<%=env%>/moduleMainContent.js?v=<%=version%>"></script>
+<script type="text/javascript" src="/js/<%= env %>/my.pager.js?v=<%= version %>"></script>
+<script type="text/javascript" src="/js/<%= env %>/module.js?v=<%= version %>"></script>
+<script type="text/javascript" src="/js/<%= env %>/moduleMainContent.js?v=<%= version %>"></script>
 <script type="text/javascript">
     var mainContentDetail;
     $(function () {
         var opt = {
-            operation:['detailQuery', 'save']
+            operation: ['detailQuery', 'save']
         };
         mainContentDetail = moduleMainContent.init(opt);
     });

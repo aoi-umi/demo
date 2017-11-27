@@ -195,7 +195,7 @@ common = {
     //时间
     dateParse: function (date) {
         if (typeof date == 'string')
-            date = date.replace('-', '/');
+            date = date.replace(/-/g, '/');
         if (!isNaN(date) && !isNaN(parseInt(date)))
             date = parseInt(date);
         if (!(date instanceof Date))
@@ -222,9 +222,9 @@ common = {
             };
             var formatStr = format.replace(/(y+|M+|d+|h+|H+|m+|s+|S+)/g, function (e) {
                 if (e.match(/S+/))
-                    return ('' + eval('o.' + e.slice(-1))).slice(0, e.length);
+                    return ('' + o[e.slice(-1)]).slice(0, e.length);
                 else
-                    return ((e.length > 1 ? '0' : '') + eval('o.' + e.slice(-1))).slice(-(e.length > 2 ? e.length : 2));
+                    return ((e.length > 1 ? '0' : '') + o[e.slice(-1)]).slice(-(e.length > 2 ? e.length : 2));
             });
             return formatStr;
         } catch (e) {

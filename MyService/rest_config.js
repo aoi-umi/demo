@@ -24,35 +24,39 @@ var restList = [
         functionName: 'upload',
         path: 'index',
     },
+
+    //模块路由
     {
         url: '/:module/save',
         checkAuthOnly: true,//仅检查权限，功能由后面路由实现
         auth: ['login']
     },
     {
+        url: '/:module/statusUpdate',
+        checkAuthOnly: true,
+        auth: ['login']
+    },
+    {
         url: '/:module/del',
-        checkAuthOnly: true,//仅检查权限，功能由后面路由实现
+        checkAuthOnly: true,
         auth: ['admin']
     },
+    {
+        url: '/:module/:method',
+        method: 'post',
+        functionName: 'default',
+        methodName: 'module-method',
+        path: '/module/_default',
+        auth: [],
+    },
+    {
+        url: '*',
+        method: 'get',
+        functionName: 'view',
+        methodName: 'module-view',
+        path: '/module/_default',
+        auth: [],
+    }
 ];
-
-//默认接口
-restList.push({
-    url: '/:module/:method',
-    method: 'post',
-    functionName: 'default',
-    methodName: 'module-method',
-    path: '/module/_default',
-    auth: [],
-});
-//module-get放在最后
-restList.push({
-    url: '*',
-    method: 'get',
-    functionName: 'view',
-    methodName: 'module-view',
-    path: '/module/_default',
-    auth: [],
-});
 
 module.exports = restList;
