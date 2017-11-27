@@ -72,22 +72,17 @@ function getBll(req, res, next) {
 
 //页面 get
 exports.view = function (req, res, next) {
+    var pathname = req._parsedUrl.pathname;
     var opt = {
-        view: '/index',
+        view: pathname,
     }
     //console.log(req.originalUrl, req._parsedUrl.pathname)
-    var pathname = req._parsedUrl.pathname;
     switch (pathname) {
         case '/':
+            opt.view = '/index';
             break;
         case '/sign/up':
             opt.view = 'signUp';
-            break;
-        default:
-            opt.view = req._parsedUrl.pathname;
-            if (pathname == '/msg') {
-                opt.message = req.query.message;
-            }
             break;
     }
 
