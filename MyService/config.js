@@ -10,13 +10,18 @@ module.exports = {
     errorDir: __dirname + '/error',
     fileDir: __dirname + '/file',
     api: {
-        logService:{
+        logService: {
             defaultArgs: {
                 host: 'http://localhost:3010',
             },
-            method:{
+            method: {
                 save: {
                     url: '/log/save',
+                    method: 'POST',
+                    isUseDefault: false,
+                    args: {
+                        host: 'http://localhost:3010',
+                    }
                 },
             }
         }

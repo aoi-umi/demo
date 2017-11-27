@@ -6,6 +6,7 @@ var _ = require('underscore');
 var autoBll = require('./auto');
 var common = require('../_system/common');
 var myEnum = require('../_system/enum');
+var auth = require('../_system/auth');
 var main_content_bll = exports;
 
 exports.query = function (opt) {
@@ -20,6 +21,10 @@ exports.query = function (opt) {
         }).then(function (t) {
             if (t.list && t.list.length) {
                 t.list.forEach(function (item) {
+                    item.operation = ['detailQuery'];
+                    if(item.status != -1 && auth.isHadAuthority(opt.user, 'login')){
+                        item.operation.push('del');
+                    }
                     updateMainContent(item);
                 });
             }
