@@ -19,7 +19,7 @@ exports.default = function (req, res, next) {
     });
 };
 
-function getBll(req, res, next){
+function getBll(req, res, next) {
     var params = req.params;
     var args = req.body;
     var module = params.module;
@@ -34,32 +34,32 @@ function getBll(req, res, next){
         'mainContent',
         'mainContentType',
     ];
-    if(!common.isInArray(module, acceptModuleList)){
+    if (!common.isInArray(module, acceptModuleList)) {
         throw common.error(`[${module}]不可用`, errorConfig.BAD_REQUEST.code);
     }
     //使用custom
-    if((module == 'log' && common.isInArray(method, ['query']))
+    if ((module == 'log' && common.isInArray(method, ['query']))
         || (module == 'mainContentType' && common.isInArray(method, ['save']))
-        || (module == 'mainContent' && common.isInArray(method, ['query','save','statusUpdate']))
+        || (module == 'mainContent' && common.isInArray(method, ['query', 'save', 'statusUpdate']))
     ) {
         opt.isUsedCustom = true;
     }
-    if(common.isInArray(method, ['detailQuery'])){
-        if(!args || !args.id)
+    if (common.isInArray(method, ['detailQuery'])) {
+        if (!args || !args.id)
             throw common.error('args error');
     }
 
     //不记录日志
-    if(common.isInArray(module, ['log'])){
+    if (common.isInArray(module, ['log'])) {
         req.myData.noLog = true;
     }
 
     //转换为小写下划线;
     module = common.stringToLowerCaseWithUnderscore(module);
-    if(opt.isUsedCustom){
+    if (opt.isUsedCustom) {
         args.user = req.myData.user;
         return autoBll.custom(module, method, args);
-    }else {
+    } else {
         var modulePath = path.resolve(__dirname + '/../_dal/' + module + '_auto.js');
         var isExist = fs.existsSync(modulePath);
         if (!isExist)
@@ -76,7 +76,8 @@ exports.view = function (req, res, next) {
         view: '/index',
     }
     //console.log(req.originalUrl, req._parsedUrl.pathname)
-    switch (req._parsedUrl.pathname) {
+    var pathname = req._parsedUrl.pathname;
+    switch (pathname) {
         case '/':
             break;
         case '/sign/up':
@@ -84,6 +85,9 @@ exports.view = function (req, res, next) {
             break;
         default:
             opt.view = req._parsedUrl.pathname;
+            if (pathname == '/msg') {
+                opt.message = req.query.message;
+            }
             break;
     }
 
@@ -93,7 +97,7 @@ exports.view = function (req, res, next) {
         return next();
 
     var query = req.query;
-    common.promise().then(function(){
+    common.promise().then(function () {
         switch (opt.view) {
             case '/status':
                 opt.enumDict = myEnum.enumDict;
@@ -107,9 +111,9 @@ exports.view = function (req, res, next) {
                 return require('./mainContent').detailQuery({id: query.id}, opt);
                 break;
         }
-    }).then(function(){
+    }).then(function () {
         res.myRender('view', opt);
-    }).fail(function(e){
+    }).fail(function (e) {
         next(e);
     });
 };

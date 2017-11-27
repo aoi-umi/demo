@@ -9,6 +9,10 @@ body.no-nav {
     padding-bottom: 10px;
 }
 
+body.no-nav .container{
+    width: 100%;
+}
+
 .container-fluid {
     margin: 0 10px;
 }
