@@ -121,9 +121,9 @@ init = {
             var target = $(dom.attr('href'));
             if (target.length && dom.hasClass('hover-source')) {
                 target.css({'left': dom.position().left, 'margin-top': '0px'});
-            }else if(dom.hasClass('hover-target'))
+            } else if (dom.hasClass('hover-target'))
                 target = dom;
-            if(!target.length)
+            if (!target.length)
                 return;
             switch (e.type) {
                 case 'mouseover':

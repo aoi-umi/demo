@@ -88,7 +88,7 @@
         </div>
 
         <div>
-            <% if(isEditable){ %>
+            <% if(isEditable && isHadAuthority(user, 'login')){ %>
             <div class="my-row">
                 <button id="showMainContentChild" class="btn btn-default">新增</button>
             </div>
@@ -115,8 +115,8 @@
         </div>
 
         <div>
-            <label class="control-label">备注</label><textarea class="form-control no-resize" id="remark"
-                                                             placeholder=""></textarea>
+            <label class="control-label">备注</label>
+            <textarea class="form-control no-resize" id="remark" placeholder=""></textarea>
         </div>
 
         <!--操作-->

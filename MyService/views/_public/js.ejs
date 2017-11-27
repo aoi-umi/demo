@@ -1,3 +1,9 @@
+<script>
+    (function () {
+        if (!('placeholder' in document.createElement('input')) && location.pathname != '/msg')
+            location.href = '/msg?message=不支持的浏览器！';
+    })();
+</script>
 <script type="text/javascript" src="/js/plugins/jquery-2.1.1.min.js"></script>
 <script type="text/javascript" src="/js/plugins/jquery.cookie.js"></script>
 <script type="text/javascript" src="/js/plugins/jquery-ui.min.js"></script>
@@ -8,16 +14,16 @@
 <script type="text/javascript" src="/js/plugins/My97DatePicker/WdatePicker.js"></script>
 <script type="text/javascript" src="/js/plugins/underscore-min.js"></script>
 
-<script type="text/javascript" src="/js/config.js?v=<%=version%>"></script>
-<script type="text/javascript" src="/js/<%=env%>/init.js?v=<%=version%>"></script>
+<script type="text/javascript" src="/js/config.js?v=<%= version %>"></script>
+<script type="text/javascript" src="/js/<%= env %>/init.js?v=<%= version %>"></script>
 
-<script type="text/javascript" src="/js/<%=env%>/common.js?v=<%=version%>"></script>
-<script type="text/javascript" src="/js/<%=env%>/sign.js?v=<%=version%>"></script>
-<script type="text/javascript" src="/js/socket.js?v=<%=version%>"></script>
-<script type="text/javascript" src="/js/<%=env%>/my.interface.js?v=<%=version%>"></script>
-<script type="text/javascript" src="/js/<%=env%>/my.vaild.js?v=<%=version%>"></script>
+<script type="text/javascript" src="/js/<%= env %>/common.js?v=<%= version %>"></script>
+<script type="text/javascript" src="/js/<%= env %>/sign.js?v=<%= version %>"></script>
+<script type="text/javascript" src="/js/socket.js?v=<%= version %>"></script>
+<script type="text/javascript" src="/js/<%= env %>/my.interface.js?v=<%= version %>"></script>
+<script type="text/javascript" src="/js/<%= env %>/my.vaild.js?v=<%= version %>"></script>
 <script type="text/javascript">
-    $(function(){
-       init.init();
+    $(function () {
+        init.init();
     });
 </script>

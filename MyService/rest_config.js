@@ -23,6 +23,7 @@ var restList = [
         method: 'post',
         functionName: 'upload',
         path: 'index',
+        auth: ['login'],
     },
 
     //模块路由
