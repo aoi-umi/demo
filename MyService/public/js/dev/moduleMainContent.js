@@ -29,7 +29,7 @@ moduleMainContent = {
             }, {
                 name: 'type',
                 dom: $('[name=typeBox]'),
-                getValue:function() {
+                getValue: function () {
                     var val = [];
                     this.dom.find('.type:checked').each(function () {
                         val.push($(this).val());
@@ -39,7 +39,7 @@ moduleMainContent = {
             }, {
                 name: 'status',
                 dom: $('[name=statusBox]'),
-                getValue:function() {
+                getValue: function () {
                     var val = [];
                     this.dom.find('.status:checked').each(function () {
                         val.push($(this).val());
@@ -105,10 +105,10 @@ moduleMainContent = {
                         }
                     });
 
-                    $(document).on('click', '.statusSearch', function(){
+                    $(document).on('click', '.statusSearch', function () {
                         var status = $(this).find('.statusCount').data('status');
                         $('[name=statusBox] .status').prop('checked', false);
-                        if(status !== '') {
+                        if (status !== '') {
                             $(`[name=statusBox] .status[value=${status}]`).prop('checked', true);
                         }
                         self.queryDom.click();
@@ -180,7 +180,7 @@ moduleMainContent = {
                             item.stringify = JSON.stringify(item);
                             var temp = $('#mainContentChildItem').html();
                             var replaceDom = $('#mainContentChildList').find(`[data-num=${item.num}]`);
-                            if(!replaceDom.length)
+                            if (!replaceDom.length)
                                 $('#mainContentChildList').append(ejs.render(temp, item));
                             else
                                 replaceDom.after(ejs.render(temp, item)).remove();
@@ -196,7 +196,7 @@ moduleMainContent = {
                 if (!data.status) {
                     data.status = null;
                     $('.statusCount[data-status=""]').closest('li').addClass('active');
-                }else{
+                } else {
                     $(data.status.split(',')).each(function () {
                         $('.statusCount[data-status=' + this + ']').closest('li').addClass('active');
                     });
@@ -205,11 +205,11 @@ moduleMainContent = {
                 if (!data.create_date) data.create_date = null;
                 if (!data.operate_date) data.operate_date = null;
             },
-            onQuerySuccess: function(t){
+            onQuerySuccess: function (t) {
                 $('.statusCount').text(0);
                 var totalCount = 0;
-                if(t.status_list){
-                    $(t.status_list).each(function(){
+                if (t.status_list) {
+                    $(t.status_list).each(function () {
                         var item = this;
                         $(`.statusCount[data-status=${item.status}]`).text(item.count);
                         totalCount += item.count;
@@ -277,11 +277,11 @@ moduleMainContent = {
             setMainContentChildDetail: function (item, self) {
                 var mainContentChildDetailDom = $('#mainContentChildDetail');
                 if (!item) {
-                    mainContentChildDetailDom.data('item',{num: $(`#mainContentChildList ${self.rowClass}`).length + 1});
+                    mainContentChildDetailDom.data('item', {num: $(`#mainContentChildList ${self.rowClass}`).length + 1});
                     mainContentChildDetailDom.find(':input').val('');
                     mainContentChildDetailDom.find('option:eq(0)').prop('selected', true);
                 } else {
-                    mainContentChildDetailDom.data('item',item);
+                    mainContentChildDetailDom.data('item', item);
                     mainContentChildDetailDom.find('[name=content]').val(item.content);
                     mainContentChildDetailDom.find(`[name=type] option[value=${item.type}]`).prop('selected', true);
                 }
@@ -311,7 +311,7 @@ moduleMainContent = {
                             main_content.status = 4;
                         else if (operate == 'del')
                             main_content.status = -1;
-                        else if(operate == 'recovery')
+                        else if (operate == 'recovery')
                             main_content.status = 'recovery';
                         else
                             throw new Error(`错误的操作类型[${operate}]`);
@@ -325,7 +325,7 @@ moduleMainContent = {
                                 type: 1, msg: '处理成功!', btnOptList: {
                                     content: '确认',
                                     cb: function () {
-                                        location.reload(true);
+                                        self.opt.onStatusUpdateSuccess(self);
                                     }
                                 }
                             });
@@ -337,7 +337,7 @@ moduleMainContent = {
                         return $.Deferred().reject(e);
                     }
                 }).fail(function (e) {
-                    if(e && e.message)
+                    if (e && e.message)
                         e = e.message;
                     common.msgNotice({
                         type: 1, msg: '处理失败:' + e, btnOptList: {
@@ -348,6 +348,12 @@ moduleMainContent = {
                     });
                 });
             },
+            onStatusUpdateSuccess: function (self) {
+                if (self.operation.query)
+                    self.queryDom.click();
+                else
+                    location.reload(true);
+            }
         };
         opt = $.extend(opt, option);
         return new module(opt);
