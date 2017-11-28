@@ -6,7 +6,7 @@ moduleMainContent = {
     init: function (option) {
         var self = this;
         var opt = {
-            mainContentDetailUrl: '/mainContentDetail',
+            mainContentDetailUrl: '/mainContent/detail',
             //module参数
             operation: [],
             queryId: 'search',

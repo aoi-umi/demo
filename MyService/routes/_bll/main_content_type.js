@@ -3,6 +3,7 @@
  */
 var autoBll = require('./auto');
 var common = require('../_system/common');
+var auth = require('../_system/auth');
 var main_content_type = exports;
 exports.save = function (opt) {
     return main_content_type.isExist(opt).then(function (t) {
@@ -13,7 +14,7 @@ exports.save = function (opt) {
     });
 };
 
-exports.isExist= function(opt) {
+exports.isExist = function (opt) {
     return common.promise().then(function () {
         if (!opt || (opt.id != 0 && !opt.id) || !opt.type)
             throw common.error(null, 'ARGS_ERROR');

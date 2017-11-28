@@ -20,7 +20,8 @@ moduleMainContentType = {
                 type: '',
                 type_name: '',
                 parent_type: '',
-                level: 0
+                level: 0,
+                operation: ['save']
             },
             addClass: 'add',
 
@@ -111,8 +112,9 @@ moduleMainContentType = {
                 if (!data.id) data.id = null;
                 if (!data.level) data.level = null;
             },
-            afterEdit: function (item) {
+            afterEdit: function (item, self) {
                 $('#mainContentTypeSave [name=title]').html(item.id ? ('修改:' + item.id) : '新增');
+                self.opt.updateView(['mainContentTypeDetail'], {mainContentTypeDetail: item});
                 $('#mainContentTypeSave').modal('show');
             },
             beforeSave: function () {
@@ -151,7 +153,19 @@ moduleMainContentType = {
             },
             onDetailQuerySuccess: function (t, self) {
                 self.detailRender(t);
+                self.opt.updateView(['mainContentTypeDetail'], {mainContentTypeDetail: t});
                 $('#mainContentTypeSave').modal('show');
+            },
+            updateView: function (list, opt, self) {
+                if (!list || common.isInArray('mainContentTypeDetail', list)) {
+                    if (opt.mainContentTypeDetail) {
+                        if (common.isInArray('save', opt.mainContentTypeDetail.operation)) {
+                            $('#mainContentTypeSave [name=footer]').show();
+                        } else {
+                            $('#mainContentTypeSave [name=footer]').hide();
+                        }
+                    }
+                }
             }
         };
         opt = $.extend(opt, option);

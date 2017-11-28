@@ -4,6 +4,7 @@
 var path = require('path');
 var fs = require('fs');
 var common = require('../_system/common');
+var auth = require('../_system/auth');
 var myEnum = require('./../_system/enum');
 var autoBll = require('../_bll/auto');
 var errorConfig = require('../_system/errorConfig');
@@ -66,7 +67,16 @@ function getBll(req, res, next) {
             throw common.error('file is not exist', errorConfig.BAD_REQUEST.code);
         if (!autoBll[method])
             throw common.error(`method[${method}] is not exist`, errorConfig.BAD_REQUEST.code);
-        return autoBll[method](module, args);
+        return autoBll[method](module, args).then(function (t) {
+            if (common.isInArray(method, ['query']) && t.list) {
+                t.list.forEach(function (item) {
+                    setOperation({item: item, user: req.myData.user});
+                });
+            } else if (common.isInArray(method, ['detailQuery']) && t) {
+                setOperation({item: t, user: req.myData.user});
+            }
+            return t;
+        });
     }
 }
 
@@ -80,9 +90,6 @@ exports.view = function (req, res, next) {
     switch (pathname) {
         case '/':
             opt.view = '/index';
-            break;
-        case '/sign/up':
-            opt.view = 'signUp';
             break;
     }
 
@@ -98,11 +105,11 @@ exports.view = function (req, res, next) {
                 opt.enumDict = myEnum.enumDict;
                 opt.enumChangeDict = myEnum.enumChangeDict;
                 break;
-            case '/mainContent':
+            case '/mainContent/list':
                 opt.mainContentStatusEnum = myEnum.getEnum('main_content_status_enum');
                 opt.mainContentTypeEnum = myEnum.getEnum('main_content_type_enum');
                 break;
-            case '/mainContentDetail':
+            case '/mainContent/detail':
                 return require('./mainContent').detailQuery({id: query.id}, opt);
                 break;
         }
@@ -112,3 +119,14 @@ exports.view = function (req, res, next) {
         next(e);
     });
 };
+
+var setOperation = function (opt) {
+    var item = opt.item;
+    item.operation = [];
+    if (auth.isHadAuthority(opt.user, 'login')) {
+        item.operation.push('save');
+    }
+    if (auth.isHadAuthority(opt.user, 'admin')) {
+        item.operation.push('del');
+    }
+}

@@ -69,7 +69,7 @@ module.prototype = {
         beforeEdit: function (item, self) {
             return item;
         },
-        afterEdit: function (item) {
+        afterEdit: function (item, self) {
         },
         beforeSave: function (dom, self) {
         },
@@ -280,7 +280,7 @@ module.prototype = {
         }
         item = self.opt.beforeEdit(item, self);
         self.detailRender(item);
-        self.opt.afterEdit(item);
+        self.opt.afterEdit(item, self);
     },
     save: function (dom) {
         var self = this;
