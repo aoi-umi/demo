@@ -27,10 +27,12 @@
                         content: '/mainContentType/list?noNav=true',
                         name: 'main content type list'
                     },
+                    existAuth: ['dev', 'admin'],
                 },]
             }, {
                 text: '菜单Test',
                 listId: 'menuItemListTest',
+                existAuth: ['dev'],
                 childs: [{
                     text: 'Home',
                     tab: {
@@ -42,6 +44,7 @@
                         target: 'help',
                         content: '/help?noNav=true'
                     },
+                    existAuth: ['dev']
                 }, {
                     text: 'Log',
                     tab: {
@@ -67,12 +70,16 @@
                         content: 'testTemplate',
                         type: 'template'
                     },
+                    existAuth: ['dev'],
                 },]
             },];
             %>
             <div class="list-group">
                 <%
                 menuList.forEach(function(t){
+                    if ((t.auth && !isHadAuthority(user, t.auth))
+                            || (t.existAuth && !isExistAuthority(user, t.existAuth)))
+                        return;
                     if (!t.listId)
                         t.listId = 'menuId' + new Date().getTime();
                 %>
@@ -82,6 +89,9 @@
 
                 <div class="collapse in" id="<%= t.listId %>">
                     <% t.childs.forEach(function(child){
+                        if ((child.auth && !isHadAuthority(user, child.auth))
+                                || (child.existAuth && !isExistAuthority(user, child.existAuth)))
+                            return;
                         if (!child.tab)
                             child.tab = {}; %>
                     <a class="list-group-item tab" href="javascript:;"

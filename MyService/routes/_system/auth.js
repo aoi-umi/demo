@@ -7,40 +7,28 @@ var errorConfig = require('./errorConfig');
 var auth = exports;
 exports.auth = function (req, res, next) {
     //url权限认证
-    var auth = req.myData.auth;
     var user = req.myData.user;
-    // console.log(user.authority);
-    // console.log(auth);
-    var permissionRes = authorityCheck(user, auth);
-    if (permissionRes.noPermission) {
-        var err = common.error('', permissionRes.errCode || errorConfig.NO_PERMISSIONS.code);
-        err.status = 403;
-        if (errorConfig.DEV.code == permissionRes.errCode) {
-            err.message = 'Not Found';
-            err.code = err.status = 404;
-        }
-        next(err);
-    } else {
-        next();
-    }
+    var pathname = req._parsedUrl.pathname;
+    var accessableUrl = req.myData.accessableUrl = auth.getAccessableUrl(user, pathname);
+    next();
 };
 
-exports.isHadAuthority = function (user, auth) {
-    if (typeof auth == 'string')
-        auth = auth.split(',');
-    for (var i = 0; i < auth.length; i++) {
-        var item = auth[i];
+exports.isHadAuthority = function (user, authData) {
+    if (typeof authData == 'string')
+        authData = authData.split(',');
+    for (var i = 0; i < authData.length; i++) {
+        var item = authData[i];
         if (!user.authority[item])
             return false;
     }
     return true;
 };
 
-exports.isExistAuthority = function (user, auth) {
-    if (typeof auth == 'string')
-        auth = auth.split(',');
-    for (var i = 0; i < auth.length; i++) {
-        var item = auth[i];
+exports.isExistAuthority = function (user, authData) {
+    if (typeof authData == 'string')
+        authData = authData.split(',');
+    for (var i = 0; i < authData.length; i++) {
+        var item = authData[i];
         if (user.authority[item])
             return true;
     }
@@ -49,46 +37,90 @@ exports.isExistAuthority = function (user, auth) {
 
 var authConfig = {
     'login': {
-        key: 'login',
         errCode: 'NO_LOGIN',
     },
+    'accessable': {
+        errCode: 'NO_PERMISSIONS',
+    },
     'admin': {
-        key: 'admin',
         errCode: 'NO_PERMISSIONS',
     },
     'dev': {
-        key: 'dev',
         errCode: 'DEV',
     }
 };
 
-var authorityCheck = function (user, authList) {
-    var noPermission = true;
-    var desc = '';
-    var errCode = '';
-    var notPassAuth = null;
-    if (!authList || !authList.length) {
-        noPermission = false;
-    } else {
-        if (user && user.authority) {
-            noPermission = false;
-            for (var i in authList) {
-                var key = authList[i];
-                var checkAuth = authConfig[key];
-                if (!checkAuth || !checkAuth.key)
-                    throw common.error('no auth [' + key + ']!', 'CODE_ERROR');
-                if (!auth.isHadAuthority(user, checkAuth.key)) {
-                    notPassAuth = checkAuth;
-                    break;
-                }
-            }
-        } else {
-            notPassAuth = authList[0];
-        }
-        if (notPassAuth) {
-            errCode = notPassAuth.errCode;
-            noPermission = true;
-        }
-    }
-    return {noPermission: noPermission, errCode: errCode};
-}
+exports.getAccessableUrl = function (user, pathname) {
+    var urlList = [];
+    var argList = [{
+        //不检查
+        list: [
+            '/',
+            '/msg',
+            '/sign/up',
+            '/sign/in',
+            '/sign/out',
+
+            '/mainContent/list',
+            '/mainContent/query',
+            '/mainContent/detail',
+
+            '/mainContentType/list',
+            '/mainContentType/query',
+            '/mainContentType/detailQuery',
+        ],
+        auth: '',
+        errorCode: authConfig.accessable.errCode
+    }, {
+        //本地
+        list: [
+            '/log/save'
+        ],
+        auth: 'local',
+        errorCode: authConfig.accessable.errCode
+    }, {
+        //开发
+        list: [
+            '/log',
+            '/log/query',
+            '/help',
+            '/status',
+            '/color',
+        ],
+        auth: 'dev',
+        errorCode: authConfig.dev.errCode
+    }, {
+        //admin
+        list: [
+            '/mainContent/del',
+            '/mainContentType/del',
+        ],
+        auth: 'admin',
+        errorCode: authConfig.admin.errCode
+    }, {
+        //login
+        list: [
+            '/mainContent/save',
+            '/mainContent/statusUpdate',
+
+            '/mainContentType/save',
+        ],
+        auth: 'login',
+        errorCode: authConfig.login.errCode
+    }];
+
+    var accessable = false;
+    argList.forEach(function (item) {
+        var isHadAuthority = !item.auth || auth.isHadAuthority(user, item.auth);
+        var isInArray = common.isInArray(pathname, item.list);
+        if (isHadAuthority) {
+            urlList = urlList.concat(item.list);
+            if (isInArray)
+                accessable = true;
+        } else if (isInArray)
+            throw common.error('', item.errorCode);
+    });
+    if (!accessable)
+        throw common.error('', authConfig.accessable.errCode);
+    return urlList;
+};
