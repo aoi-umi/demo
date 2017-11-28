@@ -42,7 +42,7 @@ my.pager.prototype = {
         }).on('click', '[name=myPagerPage]', function () {
             var page = $(this).data('page');
             self.gotoPage(page);
-        }).on('click', 'li:not(.disabled) [name=myPageFirst]', function () {
+        }).on('click', 'li:not(.disabled) [name=myPagerFirst]', function () {
             self.gotoPage(1);
         }).on('click', 'li:not(.disabled) [name=myPagerPrev]', function () {
             self.gotoPage(self.pageIndex - 1);

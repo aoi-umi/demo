@@ -22,7 +22,7 @@ exports.query = function (opt) {
             if (t.list && t.list.length) {
                 t.list.forEach(function (item) {
                     item.operation = ['detailQuery'];
-                    if(item.status != -1 && auth.isHadAuthority(opt.user, 'login')){
+                    if (item.status != -1 && auth.isHadAuthority(opt.user, 'login')) {
                         item.operation.push('del');
                     }
                     updateMainContent(item);
@@ -156,6 +156,7 @@ exports.statusUpdate = function (opt) {
             var updateStatusOpt = {
                 id: main_content.id,
                 status: main_content.status,
+                operator: opt.user.account,
                 operate_date: now
             };
             return autoBll.save('main_content', updateStatusOpt, conn).then(function (t) {
