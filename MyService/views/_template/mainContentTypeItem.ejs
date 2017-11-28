@@ -1,14 +1,15 @@
 <tbody class="itemRow">
-    <tr>
-        <td><%=id%></td>
-        <td><%=type%></td>
-        <td><%=type_name%></td>
-        <td><%=parent_type%></td>
-        <td><%=level%></td>
-        <td>
-            <a class="itemEdit" href="javascript:;">修改</a>
-            <a class="itemDetailQuery" href="javascript:;">详细</a>
-            <a class="itemDel" href="javascript:;">删除</a>
-        </td>
-    </tr>
+<tr>
+    <td><%= id %></td>
+    <td><%= type %></td>
+    <td><%= type_name %></td>
+    <td><%= parent_type %></td>
+    <td><%= level %></td>
+    <td>
+        <a class="itemDetailQuery" href="javascript:;">详细</a>
+        <% if(common.isInArray('del', operation)){ %>
+        <a class="itemDel" href="javascript:;">删除</a>
+        <% } %>
+    </td>
+</tr>
 </tbody>

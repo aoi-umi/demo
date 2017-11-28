@@ -15,7 +15,7 @@ sign = {
             if (event.which == 13)
                 self.signIn($(this));
         });
-        $(document).on('click', '.sign-in', function () {
+        $(document).on('click', '[name=signIn]', function () {
             self.signIn($(this));
         });
         $(document).on('click', '.sign-out', function () {
@@ -49,13 +49,12 @@ sign = {
             var err = null;
             if (!checkRes.success) {
                 if (checkRes.dom) {
-                    common.msgNotice({target: checkRes.dom.selector, msg: checkRes.desc});
+                    common.msgNotice({dom: checkRes.dom, msg: checkRes.desc});
                 } else {
                     err = new Error(checkRes.desc);
                 }
                 return $.Deferred().reject(err);
-            }
-            ;
+            };
             var model = checkRes.model;
             var data = {random: common.s4(2)};
             var token = common.createToken(model.account + $.md5(model.password) + JSON.stringify(data));

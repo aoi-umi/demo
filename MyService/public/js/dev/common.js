@@ -332,7 +332,7 @@ common = {
                     dom.attr('data-target', opt.target).find('.popover-content').html(opt.msg);
                     dom.removeClass('top bottom left right').addClass(opt.position);
                     var x = 0, y = 0;
-                    var targetDom = $(opt.target);
+                    var targetDom = opt.dom || $(opt.target);
                     switch (opt.position) {
                         case 'top':
                             x = targetDom.offset().left;

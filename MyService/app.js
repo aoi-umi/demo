@@ -213,7 +213,7 @@ app.use(function (err, req, res, next) {
         res.mySend(err, err, {code: err.code});
     } else {
         if (errorConfig.NO_LOGIN.code == err.code)
-            res.redirect('/login');
+            res.redirect('/sign/in');
         else {
             res.status(err.status);
             res.myRender('view', {

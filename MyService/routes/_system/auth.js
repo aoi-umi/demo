@@ -36,6 +36,17 @@ exports.isHadAuthority = function (user, auth) {
     return true;
 };
 
+exports.isExistAuthority = function (user, auth) {
+    if (typeof auth == 'string')
+        auth = auth.split(',');
+    for (var i = 0; i < auth.length; i++) {
+        var item = auth[i];
+        if (user.authority[item])
+            return true;
+    }
+    return false;
+};
+
 var authConfig = {
     'login': {
         key: 'login',
