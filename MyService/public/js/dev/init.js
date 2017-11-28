@@ -60,7 +60,8 @@ init = {
         }
         $.cookie(config.cacheKey.userInfo, userInfo, {expires: 30});
 
-        socket.init();
+        if (parent == window)
+            socket.init();
         my.interface.init({
             interfaceConfig: {
                 signUp: {
