@@ -35,6 +35,8 @@ var myRender = function (req, res, view, options) {
         user: req.myData.user,
         noNav: req.query.noNav,
         isHadAuthority: auth.isHadAuthority,
+        isExistAuthority: auth.isExistAuthority,
+        accessableUrl: req.myData.accessableUrl,
     };
     if (opt.noNav && opt.noNav.toString().toLowerCase() == 'false')
         opt.noNav = false;
@@ -60,7 +62,7 @@ var mySend = function (req, res, err, detail, opt) {
         log.method = logMethod
         log.req = logReq;
         log.res = logRes;
-        log.ip = common.getClientIp(req);
+        log.ip = req.myData.ip;
         log.remark = formatRes.desc + `[account:${req.myData.user.account}]`;
         log.guid = formatRes.guid;
         log.duration = new Date().getTime() - req.myData.startTime;
@@ -88,8 +90,13 @@ app.use(function (req, res, next) {
         },
         viewPath: app.get('views'),
         startTime: new Date().getTime(),
+        accessableUrl: [],
+        ip: common.getClientIp(req),
     };
     var user = req.myData.user;
+    if (req.myData.ip == '::ffff:127.0.0.1')
+        user.authority['local'] = true;
+
     if (req._parsedUrl.pathname == '/log/save') {
         req.myData.noLog = true;
         user.authority['login'] = true;
@@ -153,26 +160,23 @@ restConfig.forEach(function (rest) {
     var routerMethodList = [];
 
     function init(req, res, next) {
-        req.myData.auth = rest.auth;
-        req.myData.method = {methodName: rest.methodName};
         auth.auth(req, res, next);
     }
 
     routerMethodList.push(init);
 
-    if (!rest.checkAuthOnly) {
-        var reqfile = require(path);
-        if (!reqfile[functionName])
-            throw common.error('[' + path + '] is not exist function [' + functionName + ']', 'CODE_ERROR');
-        var methodFun = function (req, res, next) {
-            try {
-                reqfile[functionName](req, res, next);
-            } catch (e) {
-                next(e);
-            }
-        };
-        routerMethodList.push(methodFun);
-    }
+    var reqfile = require(path);
+    if (!reqfile[functionName])
+        throw common.error('[' + path + '] is not exist function [' + functionName + ']', 'CODE_ERROR');
+    var methodFun = function (req, res, next) {
+        req.myData.method = {methodName: rest.methodName};
+        try {
+            reqfile[functionName](req, res, next);
+        } catch (e) {
+            next(e);
+        }
+    };
+    routerMethodList.push(methodFun);
 
     var methodName = method.toLowerCase();
     switch (methodName) {

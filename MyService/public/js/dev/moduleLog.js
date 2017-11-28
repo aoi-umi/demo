@@ -3,7 +3,7 @@
  */
 namespace('moduleLog');
 moduleLog = {
-    init: function(option){
+    init: function (option) {
         var self = this;
         var opt = {
             operation: ['query'],
@@ -22,6 +22,22 @@ moduleLog = {
                         return '请输入正确的正整数';
                 }
             }, {
+                name: 'url',
+                dom: $('#log_url'),
+            }, {
+                name: 'result',
+                dom: $('#log_result'),
+                checkValue: function (val) {
+                    if (val && (val != 0 && val != 1))
+                        return '请输入0或1';
+                }
+            }, {
+                name: 'method',
+                dom: $('#log_method'),
+            }, {
+                name: 'code',
+                dom: $('#log_code'),
+            }, {
                 name: 'create_date_start',
                 dom: $('#log_create_date_start'),
             }, {
@@ -33,6 +49,15 @@ moduleLog = {
             }, {
                 name: 'guid',
                 dom: $('#log_guid'),
+            }, {
+                name: 'req',
+                dom: $('#log_req'),
+            }, {
+                name: 'res',
+                dom: $('#log_res'),
+            }, {
+                name: 'remark',
+                dom: $('#log_remark'),
             }],
             bindEvent: function (self) {
                 $('#log_create_date_start').on('click', function () {
@@ -70,8 +95,9 @@ moduleLog = {
                     }
                 });
             },
-            beforeQuery: function(data){
+            beforeQuery: function (data) {
                 if (!data.id) data.id = null;
+                if (!data.result) data.result = null;
                 if (!data.create_date_start) data.create_date_start = null;
                 if (!data.create_date_end) data.create_date_end = null;
             }
