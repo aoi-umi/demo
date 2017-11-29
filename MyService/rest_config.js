@@ -4,7 +4,7 @@
 
 var restList = [
     {
-        url: '/sign/:method',
+        url: '/interface/sign/:method',
         method: 'post',
         functionName: 'sign',
         methodName: 'sign',//用于记录日志
@@ -17,7 +17,7 @@ var restList = [
         path: '',
     },
     {
-        url: '/upload',
+        url: '/interface/upload',
         method: 'post',
         functionName: 'upload',
         path: 'index',
@@ -30,7 +30,7 @@ var restList = [
     },
 
     {
-        url: '/:module/:method',
+        url: '/interface/:module/:method',
         method: 'post',
         functionName: 'default',
         methodName: 'module-method',
