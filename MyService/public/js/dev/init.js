@@ -65,19 +65,19 @@ init = {
         my.interface.init({
             interfaceConfig: {
                 signUp: {
-                    url: '/sign/up'
+                    url: '/interface/sign/up'
                 },
                 signIn: {
-                    url: '/sign/in'
+                    url: '/interface/sign/in'
                 },
                 signOut: {
-                    url: '/sign/out'
+                    url: '/interface/sign/out'
                 },
                 logQuery: {
-                    url: '/log/query'
+                    url: '/interface/log/query'
                 },
                 mainContentStatusUpdate: {
-                    url: '/mainContent/statusUpdate'
+                    url: '/interface/mainContent/statusUpdate'
                 },
             },
             moduleList: [

@@ -9,33 +9,46 @@ exports.auth = function (req, res, next) {
     //url权限认证
     var user = req.myData.user;
     var pathname = req._parsedUrl.pathname;
-    var accessableUrl = req.myData.accessableUrl = auth.getAccessableUrl(user, pathname);
+    req.myData.accessableUrl = auth.getAccessableUrl(user, pathname);
     next();
 };
 
-exports.isHadAuthority = function (user, authData) {
+exports.isHadAuthority = function (user, authData, opt) {
     if (typeof authData == 'string')
-        authData = authData.split(',');
+        authData = [authData];
     for (var i = 0; i < authData.length; i++) {
         var item = authData[i];
-        if (!user.authority[item])
+        if (!auth.isExistAuthority(user, item, opt))
             return false;
     }
     return true;
 };
 
-exports.isExistAuthority = function (user, authData) {
+exports.isExistAuthority = function (user, authData, opt) {
+    var result = false;
     if (typeof authData == 'string')
         authData = authData.split(',');
     for (var i = 0; i < authData.length; i++) {
         var item = authData[i];
-        if (user.authority[item])
-            return true;
+        if (user.authority[item]) {
+            if (opt) opt.notExistAuthority = null;
+            result = true;
+            return result;
+        }
+        if (opt) {
+            opt.notExistAuthority = item;
+        }
     }
-    return false;
+    return result;
 };
 
 var authConfig = {
+    'dev': {
+        errCode: 'DEV',
+    },
+    'local': {
+        errCode: 'NO_PERMISSIONS',
+    },
     'login': {
         errCode: 'NO_LOGIN',
     },
@@ -45,82 +58,60 @@ var authConfig = {
     'admin': {
         errCode: 'NO_PERMISSIONS',
     },
-    'dev': {
-        errCode: 'DEV',
-    }
 };
 
 exports.getAccessableUrl = function (user, pathname) {
-    var urlList = [];
-    var argList = [{
-        //不检查
-        list: [
-            '/',
-            '/msg',
-            '/sign/up',
-            '/sign/in',
-            '/sign/out',
+    var url = {};
+    var argList = [
+        {url: '/'},
+        {url: '/msg'},
+        {url: '/interface/upload'},
+        {url: '/help', auth: ['dev']},
+        {url: '/status', auth: ['dev']},
+        {url: '/color', auth: ['dev']},
 
-            '/mainContent/list',
-            '/mainContent/query',
-            '/mainContent/detail',
+        {url: '/log', auth: ['dev']},
+        {url: '/interface/log/query', auth: ['dev']},
+        {url: '/interface/log/save', auth: ['local']},
 
-            '/mainContentType/list',
-            '/mainContentType/query',
-            '/mainContentType/detailQuery',
-        ],
-        auth: '',
-        errorCode: authConfig.accessable.errCode
-    }, {
-        //本地
-        list: [
-            '/log/save'
-        ],
-        auth: 'local',
-        errorCode: authConfig.accessable.errCode
-    }, {
-        //开发
-        list: [
-            '/log',
-            '/log/query',
-            '/help',
-            '/status',
-            '/color',
-        ],
-        auth: 'dev',
-        errorCode: authConfig.dev.errCode
-    }, {
-        //admin
-        list: [
-            '/mainContent/del',
-            '/mainContentType/del',
-        ],
-        auth: 'admin',
-        errorCode: authConfig.admin.errCode
-    }, {
-        //login
-        list: [
-            '/mainContent/save',
-            '/mainContent/statusUpdate',
+        {url: '/sign/up'},
+        {url: '/sign/in'},
+        {url: '/interface/sign/up'},
+        {url: '/interface/sign/in'},
+        {url: '/interface/sign/out'},
 
-            '/mainContentType/save',
-        ],
-        auth: 'login',
-        errorCode: authConfig.login.errCode
-    }];
+        {url: '/mainContent/list'},
+        {url: '/mainContent/detail'},
+        {url: '/interface/mainContent/query'},
+        {url: '/interface/mainContent/save', auth: ['login']},
+        {url: '/interface/mainContent/statusUpdate', auth: ['login']},
+        {url: '/interface/mainContent/del', auth: ['admin']},
+
+        {url: '/mainContentType/list'},
+        {url: '/interface/mainContentType/query'},
+        {url: '/interface/mainContentType/detailQuery'},
+        {url: '/interface/mainContentType/save', auth: ['login']},
+        {url: '/interface/mainContentType/del', auth: ['admin']},
+    ];
 
     var accessable = false;
     argList.forEach(function (item) {
-        var isHadAuthority = !item.auth || auth.isHadAuthority(user, item.auth);
-        var isInArray = common.isInArray(pathname, item.list);
+        var opt = {notExistAuthority: null};
+        var isHadAuthority = !item.auth || auth.isHadAuthority(user, item.auth, opt);
+        var isExist = item.url == pathname;
         if (isHadAuthority) {
-            urlList = urlList.concat(item.list);
-            if (isInArray)
+            url[item.url] = true;
+            if (isExist)
                 accessable = true;
-        } else if (isInArray)
-            throw common.error('', item.errorCode);
+        } else if (isExist) {
+            var errCode = authConfig.accessable.errCode;
+            if (opt.notExistAuthority && authConfig[opt.notExistAuthority])
+                errCode = authConfig[opt.notExistAuthority].errCode;
+            throw common.error('', errCode);
+        }
     });
     if (!accessable)
         throw common.error('', authConfig.accessable.errCode);
-    return urlList;
-};
+    return url;
+}
+;

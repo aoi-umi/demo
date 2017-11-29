@@ -17,22 +17,20 @@
                     text: 'main content',
                     tab: {
                         target: 'mainContent',
-                        content: '/mainContent/list?noNav=true',
                         name: 'main content list'
                     },
+                    tabUrl: '/mainContent/list',
                 }, {
                     text: 'main content type',
                     tab: {
                         target: 'mainContentType',
-                        content: '/mainContentType/list?noNav=true',
                         name: 'main content type list'
                     },
-                    existAuth: ['dev', 'admin'],
+                    tabUrl: '/mainContentType/list',
                 },]
             }, {
                 text: '菜单Test',
                 listId: 'menuItemListTest',
-                existAuth: ['dev'],
                 childs: [{
                     text: 'Home',
                     tab: {
@@ -42,27 +40,26 @@
                     text: 'Help',
                     tab: {
                         target: 'help',
-                        content: '/help?noNav=true'
                     },
-                    existAuth: ['dev']
+                    tabUrl: '/help',
                 }, {
                     text: 'Log',
                     tab: {
                         target: 'log',
-                        content: '/log?noNav=true'
                     },
+                    tabUrl: '/log',
                 }, {
                     text: 'Status',
                     tab: {
                         target: 'status',
-                        content: '/status?noNav=true'
                     },
+                    tabUrl: '/status',
                 }, {
                     text: 'Color',
                     tab: {
                         target: 'color',
-                        content: '/color?noNav=true'
                     },
+                    tabUrl: '/color',
                 }, {
                     text: 'test',
                     tab: {
@@ -70,15 +67,14 @@
                         content: 'testTemplate',
                         type: 'template'
                     },
-                    existAuth: ['dev'],
+                    auth: ['dev', 'login']
                 },]
             },];
             %>
             <div class="list-group">
                 <%
                 menuList.forEach(function(t){
-                    if ((t.auth && !isHadAuthority(user, t.auth))
-                            || (t.existAuth && !isExistAuthority(user, t.existAuth)))
+                    if (t.auth && !isHadAuthority(user, t.auth))
                         return;
                     if (!t.listId)
                         t.listId = 'menuId' + new Date().getTime();
@@ -89,12 +85,16 @@
 
                 <div class="collapse in" id="<%= t.listId %>">
                     <% t.childs.forEach(function(child){
-                        if ((child.auth && !isHadAuthority(user, child.auth))
-                                || (child.existAuth && !isExistAuthority(user, child.existAuth)))
+                        if (child.auth && !isHadAuthority(user, child.auth))
+                            return;
+                        if (child.tabUrl && !accessableUrl[child.tabUrl])
                             return;
                         if (!child.tab)
                             child.tab = {}; %>
                     <a class="list-group-item tab" href="javascript:;"
+                            <% if(child.tabUrl){ %>
+                       data-tab-content="<%= child.tabUrl + (child.tabUrlArgs || '?noNav=true') %>"
+                            <% } %>
                             <% for(var key in child.tab){
                             if(child.tab[key]){ %>
                        data-tab-<%= key %>="<%= child.tab[key] %>"
@@ -147,7 +147,7 @@
                                 </div>
                             </div>
                             <div class="my-row col-xs-6">
-                                <form method="post" action="/upload" enctype="multipart/form-data">
+                                <form method="post" action="/interface/upload" enctype="multipart/form-data">
                                     <input name="upfile" id="upfile" type="file"/>
                                     <!--<div class="col-md-6">-->
                                     <!--<input type="submit" value="提交" class="btn btn-default"/>-->

@@ -11,7 +11,7 @@ my.interface = {
             var key = module + common.stringToPascal(method);
             if (!this.interfaceConfig[key]) {
                 this.interfaceConfig[key] = {
-                    url: `/${module}/${method}`
+                    url: `/interface/${module}/${method}`
                 }
             }
         }

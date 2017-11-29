@@ -97,9 +97,8 @@ app.use(function (req, res, next) {
     if (req.myData.ip == '::ffff:127.0.0.1')
         user.authority['local'] = true;
 
-    if (req._parsedUrl.pathname == '/log/save') {
+    if (req._parsedUrl.pathname == '/interface/log/save') {
         req.myData.noLog = true;
-        user.authority['login'] = true;
     }
     if (config.env == 'dev')
         user.authority['dev'] = true;

@@ -16,7 +16,7 @@ module.exports = {
             },
             method: {
                 save: {
-                    url: '/log/save',
+                    url: '/interface/log/save',
                     method: 'POST',
                     isUseDefault: false,
                     args: {

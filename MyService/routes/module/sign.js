@@ -44,6 +44,7 @@ function signUp(req, res, next) {
         return autoBll.save('user_info', {
             account: args.account,
             password: args.password,
+            nickname: args.nickname,
             create_datetime: new Date()
         });
     }).then(function (t) {

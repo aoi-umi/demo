@@ -5,7 +5,7 @@ var config = require('../config');
 
 exports.msg = function (req, res) {
     var opt = {
-        message: req.query.message,
+        message: req.query.message || '',
     };
     res.myRender('msg', opt);
 };
