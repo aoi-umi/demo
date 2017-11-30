@@ -291,7 +291,7 @@ common = {
 
             //type 0 参数
             target: '',
-            position: 'right',
+            position: 'bottom',
             autoHide: true,
             focus: true,
 

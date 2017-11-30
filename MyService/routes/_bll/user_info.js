@@ -16,12 +16,13 @@ exports.isAccountExist = function (account) {
 };
 
 exports.save = function (opt) {
+    var user = opt.user;
     var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
     return common.promise().then(function () {
         if (opt.newPassword) {
             if (!opt.password)
                 throw common.error('原密码不能为空', 'ARGS_ERROR');
-            return autoBll.detailQuery('user_info', {id: opt.user.id}).then(function (t) {
+            return autoBll.detailQuery('user_info', {id: user.id}).then(function (t) {
                 if (!t || !t.id)
                     throw common.error('查询用户信息为空');
                 if (t.password != opt.password)
@@ -30,14 +31,21 @@ exports.save = function (opt) {
         }
     }).then(function () {
         var saveOpt = {
-            id: opt.user.id,
+            id: user.id,
             nickname: opt.nickname || null,
             password: opt.newPassword || null,
             edit_datetime: now,
         };
         return autoBll.save('user_info', saveOpt);
     }).then(function () {
-        if(opt.user.key)
-            return cache.delPromise(opt.user.key);
+        if (user.key) {
+            if (opt.newPassword)
+                return cache.delPromise(opt.user.key);
+            else if (opt.nickname) {
+                user.nickname = opt.nickname;
+                var seconds = 7 * 24 * 3600;
+                return cache.setPromise(user.key, user, seconds);
+            }
+        }
     });
 };

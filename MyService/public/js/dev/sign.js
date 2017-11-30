@@ -54,7 +54,8 @@ sign = {
                     err = new Error(checkRes.desc);
                 }
                 return $.Deferred().reject(err);
-            };
+            }
+            ;
             var model = checkRes.model;
             var data = {random: common.s4(2)};
             var token = common.createToken(model.account + $.md5(model.password) + JSON.stringify(data));
@@ -67,10 +68,16 @@ sign = {
             };
             return my.interface.signIn(data, req);
         }).then(function (t) {
-            $('#signInBox').modal('hide');
-            $('.nav-user-link').attr('href', '/user/' + t.id);
-            $('.nav-nickname').text(t.nickname);
-            $('.nav-sign').addClass('in');
+            if (location.pathname == '/sign/in') {
+                var args = common.getArgsFromUrlParams();
+                location.href = '/?noNav=' + (args.noNav || '');
+            }
+            else {
+                $('#signInBox').modal('hide');
+                $('.nav-user-link').attr('href', '/user/' + t.id);
+                $('.nav-nickname').text(t.nickname);
+                $('.nav-sign').addClass('in');
+            }
         }).fail(function (e) {
             if (e)
                 common.msgNotice({type: 1, msg: e.message});

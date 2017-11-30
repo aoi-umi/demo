@@ -8,37 +8,37 @@ index = {
         };
 
         var connection = socket.connection;
+        if (connection) {
+            setInterval(function () {
+                for (var id in socketData.postSuccess) {
+                    var existMsg = $('[data-id="' + id + '"]');
+                    if (existMsg.length) {
+                        existMsg.removeClass('loading').addClass('success');
+                    } else {
+                        socketData.postSuccess[id].times++;
+                        if (socketData.postSuccess[id].times > 5)
+                            delete socketData.postSuccess[id];
+                    }
+                }
+            }, 1000);
 
-        setInterval(function () {
-            for (var id in socketData.postSuccess) {
+            connection.on('newMsg', function (data) {
+                data.status = 1;
+                self.appendMsg(data);
+            });
+
+            connection.on('postSuccess', function (data) {
+                var id = data.user + data.msgId;
                 var existMsg = $('[data-id="' + id + '"]');
                 if (existMsg.length) {
                     existMsg.removeClass('loading').addClass('success');
                 } else {
-                    socketData.postSuccess[id].times++;
-                    if (socketData.postSuccess[id].times > 5)
-                        delete socketData.postSuccess[id];
+                    socketData.postSuccess[id] = {
+                        times: 0
+                    };
                 }
-            }
-        }, 1000);
-
-        connection.on('newMsg', function (data) {
-            data.status = 1;
-            self.appendMsg(data);
-        });
-
-        connection.on('postSuccess', function (data) {
-            var id = data.user + data.msgId;
-            var existMsg = $('[data-id="' + id + '"]');
-            if (existMsg.length) {
-                existMsg.removeClass('loading').addClass('success');
-            } else {
-                socketData.postSuccess[id] = {
-                    times: 0
-                };
-            }
-        });
-
+            });
+        }
         //上传文件
         var control = $('#upfile');
         control.fileinput({
@@ -182,27 +182,30 @@ index = {
     },
     bindEvent: function () {
         var self = this;
-        $('#postMsg').on('click', function () {
-            var connection = socket.connection;
-            var msg = $('#msg').val();
-            if (msg) {
-                var userInfo = $.cookie(config.cacheKey.userInfo);
-                var msgId = common.s4();
-                connection.emit('postMsg', {
-                    user: userInfo,
-                    content: msg,
-                    msgId: msgId,
-                });
-                self.appendMsg({
-                    datetime: common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss'),
-                    user: userInfo,
-                    content: msg,
-                    msgId: msgId,
-                    status: 0,
-                    self: true,
-                });
-            }
-        });
+
+        var connection = socket.connection;
+        if (connection) {
+            $('#postMsg').on('click', function () {
+                var msg = $('#msg').val();
+                if (msg) {
+                    var userInfo = $.cookie(config.cacheKey.userInfo);
+                    var msgId = common.s4();
+                    connection.emit('postMsg', {
+                        user: userInfo,
+                        content: msg,
+                        msgId: msgId,
+                    });
+                    self.appendMsg({
+                        datetime: common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss'),
+                        user: userInfo,
+                        content: msg,
+                        msgId: msgId,
+                        status: 0,
+                        self: true,
+                    });
+                }
+            });
+        }
     },
     appendMsg: function (opt) {
         //status
