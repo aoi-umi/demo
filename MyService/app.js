@@ -33,13 +33,11 @@ Date.prototype.toString = function () {
 var myRender = function (req, res, view, options) {
     var opt = {
         user: req.myData.user,
-        noNav: req.query.noNav,
+        noNav: req.myData.noNav,
         isHadAuthority: auth.isHadAuthority,
         isExistAuthority: auth.isExistAuthority,
         accessableUrl: req.myData.accessableUrl,
     };
-    if (opt.noNav && opt.noNav.toString().toLowerCase() == 'false')
-        opt.noNav = false;
     opt = common.extend(opt, options);
     res.render(view, common.formatViewtRes(opt));
 };
@@ -94,6 +92,11 @@ app.use(function (req, res, next) {
         ip: common.getClientIp(req),
     };
     var user = req.myData.user;
+    var noNav = req.query.noNav;
+    if (noNav && noNav.toString().toLowerCase() == 'false')
+        noNav = false;
+    req.myData.noNav = noNav;
+
     if (req.myData.ip == '::ffff:127.0.0.1')
         user.authority['local'] = true;
 
@@ -116,6 +119,7 @@ app.use(function (req, res, next) {
         userInfoKey = config.cacheKey.userInfo + userInfoKey;
         cache.getPromise(userInfoKey).then(function (t) {
                 if (t) {
+                    t.key = userInfoKey;
                     req.myData.user = t;
                     //自动重新登录获取信息
                     if (!t.cacheDatetime || new Date() - new Date(t.cacheDatetime) > 12 * 3600 * 1000) {
@@ -201,9 +205,6 @@ app.use(function (req, res, next) {
 });
 
 /// error handlers
-
-// development error handler
-// will print stacktrace
 var errorConfig = require('./routes/_system/errorConfig');
 
 app.use(function (err, req, res, next) {
@@ -215,8 +216,10 @@ app.use(function (err, req, res, next) {
     if (req.headers['x-requested-with'] && req.headers['x-requested-with'].toLowerCase() == 'xmlhttprequest') {
         res.mySend(err, err, {code: err.code});
     } else {
-        if (errorConfig.NO_LOGIN.code == err.code)
-            res.redirect('/sign/in');
+        if (errorConfig.NO_LOGIN.code == err.code) {
+            var signIn = '/sign/in?noNav=' + req.myData.noNav;
+            res.redirect(signIn);
+        }
         else {
             res.status(err.status);
             res.myRender('view', {
@@ -229,15 +232,9 @@ app.use(function (err, req, res, next) {
     }
 });
 
-
 process.on('unhandledRejection', function (e) {
-    var stack = e;
-    if (e && e.stack)
-        stack = e.stack;
     console.error('unhandledRejection');
-    console.error(stack);
+    common.writeError(e)
 });
-// production error handler
-// no stacktraces leaked to user
 
 module.exports = app;

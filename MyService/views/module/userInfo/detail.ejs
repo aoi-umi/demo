@@ -1,0 +1,59 @@
+<div class="container">
+    <form class="form-horizontal">
+        <% var list = [{
+            content: '用户名',
+            readOnly: true,
+            value: userInfoDetail.account,
+            attr: 'id="account"'
+        }, {
+            content: '注册时间',
+            readOnly: true,
+            value: userInfoDetail.create_datetime,
+            attr: 'id="create_datetime"'
+        }, {
+            content: '最后修改时间',
+            readOnly: true,
+            value: userInfoDetail.edit_datetime,
+            attr: 'id="edit_datetime"'
+        }, {
+            content: '昵称',
+            value: userInfoDetail.nickname,
+            attr: 'id="nickname" placeholder="请输昵称"'
+        }, {
+            content: '密码',
+            attr: 'id="password" placeholder="请输入密码" type="password"'
+        }, {
+            content: '新密码',
+            attr: 'id="newPassword" placeholder="不修改密码不用输入" type="password"'
+        }, {
+            content: '再次输入新密码',
+            attr: 'id="newPasswordRepeat" placeholder="不修改密码不用输入" type="password"'
+        },];
+        list.forEach(function (item) {
+        %>
+        <div class="form-group">
+            <label class="col-sm-2 control-label"><%= item.content %></label>
+            <div class="col-sm-8">
+                <% if(item.readOnly){ %>
+                <label class="control-label">
+                    <%= item.value %>
+                </label>
+                <% } else{ %>
+                <input class="form-control" <%- item.attr %> value="<%= item.value %>">
+                <% } %>
+            </div>
+        </div>
+        <% }); %>
+        <div class="form-group">
+            <div class="col-sm-8 col-sm-push-2">
+                <button id="save" type="button" class="btn btn-default btn-block">修改</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script type="text/javascript" src="/js/<%=env%>/userInfo.js"></script>
+<script type="text/javascript">
+    $(function(){
+        userInfo.init();
+    });
+</script>

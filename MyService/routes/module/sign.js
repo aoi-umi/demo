@@ -59,7 +59,7 @@ var signIn = exports.signIn = function (req, signInReq) {
     var token = req.header('token');
     var reqBody = req.body;
     var user = req.myData.user;
-    if(req.myData.autoSignIn){
+    if (req.myData.autoSignIn) {
         account = user.account;
         token = user.token;
         reqBody = user.reqBody;
@@ -105,6 +105,7 @@ var signIn = exports.signIn = function (req, signInReq) {
         var userInfoKey = req.cookies[config.cacheKey.userInfo];
         if (userInfoKey) {
             userInfoKey = config.cacheKey.userInfo + userInfoKey;
+            user.key = userInfoKey;
             var hours = new Date().getHours();
             var seconds = parseInt(24 * 7 * 60 * 60);
             cache.setPromise(userInfoKey, user, seconds);
@@ -122,7 +123,7 @@ function signOut(req, res, next) {
         }
     }).then(function () {
         res.mySend(null, 'success');
-    }).catch(function (e) {
+    }).fail(function (e) {
         res.mySend(e, e.code);
     });
 }

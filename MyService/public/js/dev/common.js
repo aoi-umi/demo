@@ -147,6 +147,7 @@ common = {
             data.dom = t.focusDom || t.dom;
             if (typeof t.isTrim == 'undefined') t.isTrim = true;
             if (!t.canNotNullDesc) t.canNotNullDesc = '{0}不能为空';
+            var checkOpt = {};
             try {
                 var value = '';
                 var typeOfGetValue = typeof t.getValue;
@@ -174,13 +175,14 @@ common = {
                     throw self.stringFormat(t.canNotNullDesc, name);
                 }
                 if (t.checkValue) {
-                    var err = t.checkValue(value, data.model);
+                    var err = t.checkValue(value, data.model, checkOpt);
                     if (err) {
                         noName = true;
                         throw self.stringFormat(err, name);
                     }
                 }
             } catch (e) {
+                if (checkOpt.dom) data.dom = checkOpt.dom;
                 if (e && e.message) e = e.message;
                 var errStr = (typeof e == 'object') ? JSON.stringify(e) : e;
                 data.desc = (noName ? '' : name) + errStr;

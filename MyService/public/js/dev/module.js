@@ -178,7 +178,7 @@ module.prototype = {
                                 if(checkRes.dom)
                                     $('[data-target="' + checkRes.dom.selector + '"]').hide();
                             } else {
-                                common.msgNotice({target: checkRes.dom.selector, msg: checkRes.desc});
+                                common.msgNotice({dom: checkRes.dom, msg: checkRes.desc});
                             }
                         });
                     }
@@ -229,7 +229,7 @@ module.prototype = {
                 var err = null;
                 if (!checkRes.success) {
                     if (checkRes.dom) {
-                        common.msgNotice({target: checkRes.dom.selector, msg: checkRes.desc});
+                        common.msgNotice({dom: checkRes.dom, msg: checkRes.desc});
                     } else {
                         err = new Error(checkRes.desc);
                     }
@@ -293,7 +293,7 @@ module.prototype = {
                     if (!checkRes.success) {
                         var err = null;
                         if (checkRes.dom) {
-                            common.msgNotice({target: checkRes.dom.selector, msg: checkRes.desc});
+                            common.msgNotice({dom: checkRes.dom, msg: checkRes.desc});
                         } else {
                             err = new Error(checkRes.desc);
                         }
