@@ -82,10 +82,8 @@ init = {
             },
             moduleList: [
                 'mainContent',
-                //'mainContentChild',
-                //'mainContentLog',
-                //'mainContentTypeId',
                 'mainContentType',
+                'userInfo',
             ]
         });
         sign.init();

@@ -29,17 +29,10 @@ function getBll(req, res, next) {
     var opt = {
         isUsedCustom: false
     };
-    //对外接口模块
-    var acceptModuleList = [
-        'log',
-        'mainContent',
-        'mainContentType',
-    ];
-    if (!common.isInArray(module, acceptModuleList)) {
-        throw common.error(`[${module}]不可用`, errorConfig.BAD_REQUEST.code);
-    }
+
     //使用custom
     if ((module == 'log' && common.isInArray(method, ['query']))
+        || (module == 'userInfo' && common.isInArray(method, ['save']))
         || (module == 'mainContentType' && common.isInArray(method, ['save']))
         || (module == 'mainContent' && common.isInArray(method, ['query', 'save', 'statusUpdate']))
     ) {
@@ -105,6 +98,13 @@ exports.view = function (req, res, next) {
                 opt.enumDict = myEnum.enumDict;
                 opt.enumChangeDict = myEnum.enumChangeDict;
                 break;
+
+            case '/userInfo/detail':
+                return autoBll.detailQuery('user_info', {id: req.myData.user.id}).then(function(t){
+                    opt.userInfoDetail = t;
+                });
+                break;
+
             case '/mainContent/list':
                 opt.mainContentStatusEnum = myEnum.getEnum('main_content_status_enum');
                 opt.mainContentTypeEnum = myEnum.getEnum('main_content_type_enum');

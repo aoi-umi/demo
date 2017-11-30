@@ -80,6 +80,9 @@ exports.getAccessableUrl = function (user, pathname) {
         {url: '/interface/sign/in'},
         {url: '/interface/sign/out'},
 
+        {url: '/userInfo/detail', auth: ['login']},
+        {url: '/interface/userInfo/save', auth: ['login']},
+
         {url: '/mainContent/list'},
         {url: '/mainContent/detail'},
         {url: '/interface/mainContent/query'},
