@@ -106,13 +106,12 @@ var signIn = exports.signIn = function (req, signInReq) {
         if (userInfoKey) {
             userInfoKey = config.cacheKey.userInfo + userInfoKey;
             user.key = userInfoKey;
-            var hours = new Date().getHours();
-            var seconds = parseInt(24 * 7 * 60 * 60);
+            var seconds = 7 * 24 * 3600;
             cache.setPromise(userInfoKey, user, seconds);
         }
         return t;
     });
-}
+};
 
 function signOut(req, res, next) {
     var userInfoKey = req.cookies[config.cacheKey.userInfo];

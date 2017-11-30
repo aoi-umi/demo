@@ -116,5 +116,4 @@ exports.getAccessableUrl = function (user, pathname) {
     if (!accessable)
         throw common.error('', authConfig.accessable.errCode);
     return url;
-}
-;
+};
