@@ -1,23 +1,25 @@
 <div class="container">
     <form class="form-horizontal">
-        <% var list = [{
+        <%
+        var user_info = userInfoDetail.user_info;
+        var list = [{
             content: '用户名',
             readOnly: true,
-            value: userInfoDetail.account,
+            value: user_info.account,
             attr: 'id="account"'
         }, {
             content: '注册时间',
             readOnly: true,
-            value: userInfoDetail.create_datetime,
+            value: user_info.create_datetime,
             attr: 'id="create_datetime"'
         }, {
             content: '最后修改时间',
             readOnly: true,
-            value: userInfoDetail.edit_datetime,
+            value: user_info.edit_datetime,
             attr: 'id="edit_datetime"'
         }, {
             content: '昵称',
-            value: userInfoDetail.nickname,
+            value: user_info.nickname,
             attr: 'id="nickname" placeholder="请输昵称"'
         }, {
             content: '密码',
@@ -33,6 +35,7 @@
         %>
         <div class="form-group">
             <label class="col-sm-2 control-label"><%= item.content %></label>
+
             <div class="col-sm-8">
                 <% if(item.readOnly){ %>
                 <label class="control-label">
@@ -50,10 +53,30 @@
             </div>
         </div>
     </form>
+    <div class="row">
+        <div class="col-xs-9 col-xs-push-1">
+            <label class="control-label">日志</label>
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>内容</th>
+                    <th>创建时间</th>
+                </tr>
+                </thead>
+
+                <% userInfoDetail.user_info_log.forEach(function(item){ %>
+                <tr>
+                    <td><%= item.content %></td>
+                    <td><%= item.create_date %></td>
+                </tr>
+                <% }); %>
+            </table>
+        </div>
+    </div>
 </div>
-<script type="text/javascript" src="/js/<%=env%>/userInfo.js"></script>
+<script type="text/javascript" src="/js/<%= env %>/userInfo.js"></script>
 <script type="text/javascript">
-    $(function(){
+    $(function () {
         userInfo.init();
     });
 </script>
