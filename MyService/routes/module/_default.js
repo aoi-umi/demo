@@ -100,7 +100,7 @@ exports.view = function (req, res, next) {
                 break;
 
             case '/userInfo/detail':
-                return autoBll.detailQuery('user_info', {id: req.myData.user.id}).then(function(t){
+                return autoBll.custom('user_info', 'detailQuery', {id: req.myData.user.id}).then(function (t) {
                     opt.userInfoDetail = t;
                 });
                 break;
