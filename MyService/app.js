@@ -117,7 +117,7 @@ app.use(function (req, res, next) {
     var userInfoKey = req.cookies[config.cacheKey.userInfo];
     if (userInfoKey) {
         userInfoKey = config.cacheKey.userInfo + userInfoKey;
-        cache.getPromise(userInfoKey).then(function (t) {
+        cache.get(userInfoKey).then(function (t) {
                 if (t) {
                     t.key = userInfoKey;
                     req.myData.user = t;
@@ -127,7 +127,7 @@ app.use(function (req, res, next) {
                         return common.promise().then(function (promiseRes) {
                             sign.signIn(req).then(promiseRes.resolve).fail(function (e) {
                                 //console.log(e);
-                                cache.delPromise(userInfoKey).then(function () {
+                                cache.del(userInfoKey).then(function () {
                                     throw common.error('请重新登录！');
                                 }).fail(promiseRes.reject);
                             });
@@ -208,6 +208,7 @@ app.use(function (req, res, next) {
 var errorConfig = require('./routes/_system/errorConfig');
 
 app.use(function (err, req, res, next) {
+    common.writeError(err);
     if (config.env !== 'dev') {
         err.stack = '';
     }
@@ -234,7 +235,7 @@ app.use(function (err, req, res, next) {
 
 process.on('unhandledRejection', function (e) {
     console.error('unhandledRejection');
-    common.writeError(e)
+    common.writeError(e);
 });
 
 module.exports = app;

@@ -107,7 +107,7 @@ var signIn = exports.signIn = function (req, signInReq) {
             userInfoKey = config.cacheKey.userInfo + userInfoKey;
             user.key = userInfoKey;
             var seconds = 7 * 24 * 3600;
-            cache.setPromise(userInfoKey, user, seconds);
+            cache.set(userInfoKey, user, seconds);
         }
         return t;
     });
@@ -118,7 +118,7 @@ function signOut(req, res, next) {
     common.promise().then(function () {
         if (userInfoKey) {
             userInfoKey = config.cacheKey.userInfo + userInfoKey;
-            return cache.delPromise(userInfoKey);
+            return cache.del(userInfoKey);
         }
     }).then(function () {
         res.mySend(null, 'success');

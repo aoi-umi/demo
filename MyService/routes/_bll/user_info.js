@@ -40,11 +40,11 @@ exports.save = function (opt) {
     }).then(function () {
         if (user.key) {
             if (opt.newPassword)
-                return cache.delPromise(opt.user.key);
+                return cache.del(opt.user.key);
             else if (opt.nickname) {
                 user.nickname = opt.nickname;
                 var seconds = 7 * 24 * 3600;
-                return cache.setPromise(user.key, user, seconds);
+                return cache.set(user.key, user, seconds);
             }
         }
     });
