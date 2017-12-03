@@ -185,7 +185,7 @@ my.tab = {
                         t.content += '&iframeId=' + iframeId;
                     else
                         t.content += '?iframeId=' + iframeId;
-                    content = `<iframe id="${iframeId}" src="${t.content}" width="100%" height="100%" frameborder="no"></iframe>`;
+                    content = `<iframe id="${iframeId}" src="${t.content}" width="100%" height="100%" frameborder="no" scrolling="no"></iframe>`;
                 }
                 break;
             case 'template':
