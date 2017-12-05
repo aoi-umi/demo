@@ -2,7 +2,7 @@
  * Created by bang on 2017-9-11.
  */
 namespace('module');
-module = function(option) {
+module = function (option) {
     this.init(option);
 };
 module.prototype = {
@@ -61,7 +61,7 @@ module.prototype = {
         },
         beforeQuery: function (t) {
         },
-        onQuerySuccess: function(t) {
+        onQuerySuccess: function (t) {
         },
         onQueryFail: function (e, self) {
             common.msgNotice({type: 1, msg: e.message});
@@ -115,8 +115,8 @@ module.prototype = {
             'saveClass',
             'addClass'
         ];
-        $(classList).each(function(){
-            if(self.opt[this])
+        $(classList).each(function () {
+            if (self.opt[this])
                 self[this] = '.' + self.opt[this];
             else
                 self[this] = '';
@@ -130,8 +130,8 @@ module.prototype = {
             'detailTempId',
         ];
 
-        $(idList).each(function(){
-            if(self.opt[this])
+        $(idList).each(function () {
+            if (self.opt[this])
                 self[this] = '#' + self.opt[this];
             else
                 self[this] = '';
@@ -175,11 +175,16 @@ module.prototype = {
                         item.dom.on('blur', function () {
                             var checkRes = common.dataCheck({list: [item]});
                             if (checkRes.success) {
-                                if(checkRes.dom)
+                                if (checkRes.dom)
                                     $('[data-target="' + checkRes.dom.selector + '"]').hide();
                             } else {
                                 common.msgNotice({dom: checkRes.dom, msg: checkRes.desc});
                             }
+                        });
+
+                        item.dom.on('keyup', function (event) {
+                            if (event.which == 13)
+                                self.queryDom.click();
                         });
                     }
                 });
@@ -286,7 +291,7 @@ module.prototype = {
         var self = this;
         return common.promise().then(function (res) {
             var data = null;
-            try{
+            try {
                 var checkRes = self.opt.beforeSave(dom, self);
                 if (checkRes) {
                     console.log(checkRes)
@@ -313,7 +318,7 @@ module.prototype = {
                     });
                     return res;
                 }
-            }catch (e) {
+            } catch (e) {
                 return $.Deferred().reject(e);
             }
         }).fail(function (e) {

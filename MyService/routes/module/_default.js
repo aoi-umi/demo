@@ -32,7 +32,7 @@ function getBll(req, res, next) {
 
     //使用custom
     if ((module == 'log' && common.isInArray(method, ['query']))
-        || (module == 'userInfo' && common.isInArray(method, ['save']))
+        || (module == 'userInfo' && common.isInArray(method, ['query', 'save']))
         || (module == 'mainContentType' && common.isInArray(method, ['save']))
         || (module == 'mainContent' && common.isInArray(method, ['query', 'save', 'statusUpdate']))
     ) {

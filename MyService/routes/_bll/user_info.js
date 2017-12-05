@@ -84,3 +84,12 @@ exports.detailQuery = function (opt) {
         return detail;
     });
 };
+
+exports.query = function (opt) {
+    return autoBll.customDal('user_info', 'query', opt).then(function (t) {
+        var resData = {};
+        resData.list = t[0];
+        resData.count = t[1][0].count;
+        return resData;
+    });
+};
