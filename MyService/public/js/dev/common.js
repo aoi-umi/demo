@@ -299,6 +299,7 @@ common = {
             noClose: false,
             btnTemplate: `<button class="btn btn-content" type="button" style="margin: 0 5px"></button>`,
             btnOptList: null,
+            createNew: false
         };
         //btnOpt = {
         // class:'btn-default'
@@ -371,8 +372,8 @@ common = {
                 break;
             case 1:
                 if (true) {
-                    opt.template =
-                        `<div data-backdrop="static" role="dialog" tabindex="-1" class="modal fade">
+                    if (!opt.template) {
+                        opt.template = `<div data-backdrop="static" role="dialog" tabindex="-1" class="modal fade msg-notice-1">
                             <div class="modal-dialog" style="top:100px">
                                 <div class="modal-content">
                                     <div class="modal-body">
@@ -390,7 +391,11 @@ common = {
                                 </div>
                             </div>
                         </div>`;
+                    }
                     dom = opt.dom;
+                    if (!opt.createNew && !dom) {
+                        dom = $('.msg-notice-1:eq(0)');
+                    }
                     if (!dom || !dom.length) {
                         dom = $(opt.template).attr('id', 'msgNoticeBox_' + new Date().getTime());
                         dom.find('[name=closeBtn]').on('click', function () {
