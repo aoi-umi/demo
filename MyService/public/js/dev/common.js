@@ -299,7 +299,7 @@ common = {
             noClose: false,
             btnTemplate: `<button class="btn btn-content" type="button" style="margin: 0 5px"></button>`,
             btnOptList: null,
-            createNew: false
+            createNew: true
         };
         //btnOpt = {
         // class:'btn-default'
@@ -401,6 +401,9 @@ common = {
                         dom.find('[name=closeBtn]').on('click', function () {
                             dom.close();
                         });
+                        dom.close = function () {
+                            dom.modal('hide');
+                        }
                     }
                     if (opt.noClose)
                         dom.find('[name=closeBtn]').addClass('hidden');
@@ -436,9 +439,6 @@ common = {
                     $('.popover').hide();
                     if (dom.is(':hidden'))
                         dom.modal('show');
-                    dom.close = function () {
-                        dom.modal('hide');
-                    }
                 }
                 break;
         }
