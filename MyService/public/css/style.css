@@ -9,12 +9,16 @@ body.no-nav {
     padding-bottom: 10px;
 }
 
-body.no-nav .container{
+body.no-nav .container {
     width: 100%;
 }
 
 .container-fluid {
     margin: 0 10px;
+}
+
+.tab-header > a {
+    min-height: 45px;
 }
 
 .tab-content {
