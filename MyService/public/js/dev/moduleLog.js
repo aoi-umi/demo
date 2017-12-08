@@ -26,10 +26,10 @@ moduleLog = {
                 dom: $('#log_url'),
             }, {
                 name: 'result',
-                dom: $('#log_result'),
-                checkValue: function (val) {
-                    if (val && (val != 0 && val != 1))
-                        return '请输入0或1';
+                dom: $('#queryBox'),
+                focusDom: $('#queryBox [name=log_result]'),
+                getValue: function () {
+                    return this.dom.find('[name=log_result]:checked').val();
                 }
             }, {
                 name: 'method',
