@@ -84,6 +84,8 @@ init = {
                 'mainContent',
                 'mainContentType',
                 'userInfo',
+                'authority',
+                'role',
             ]
         });
         sign.init();

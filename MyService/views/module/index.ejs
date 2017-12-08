@@ -10,6 +10,17 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-xs-2 col-sm-2 col-md-2 sidebar">
+            <div class="list-group">
+                <a class="list-group-item active" data-toggle="collapse" href="#searchResult">
+                    search
+                </a>
+                <input id="menuSearch" type="text" class="form-control" placeholder="search"/>
+
+                <div class="collapse in" id="searchResult">
+                </div>
+            </div>
+
+            <br>
             <% var menuList = [{
                 text: 'main content menu',
                 listId: '',
@@ -39,7 +50,7 @@
                         name: 'userInfo detail'
                     },
                     tabUrl: '/userInfo/detail',
-                },{
+                }, {
                     text: 'user info list',
                     tab: {
                         target: 'userInfoList',
@@ -88,9 +99,27 @@
                     },
                     auth: ['dev', 'login']
                 },]
-            },];
+            },{
+                text: 'admin',
+                listId: '',
+                childs: [{
+                    text: 'role',
+                    tab: {
+                        target: 'role',
+                        name: 'role list'
+                    },
+                    tabUrl: '/role/list',
+                }, {
+                    text: 'authority',
+                    tab: {
+                        target: 'authority',
+                        name: 'authority list'
+                    },
+                    tabUrl: '/authority/list',
+                },]
+            }, ];
             %>
-            <div class="list-group">
+            <div id="menu" class="list-group">
                 <%
                 menuList.forEach(function(t){
                     if (t.auth && !isHadAuthority(user, t.auth))
@@ -110,7 +139,7 @@
                             return;
                         if (!child.tab)
                             child.tab = {}; %>
-                    <a class="list-group-item tab" href="javascript:;"
+                    <a class="list-group-item tab menuItem" href="javascript:;"
                             <% if(child.tabUrl){ %>
                        data-tab-content="<%= child.tabUrl + (child.tabUrlArgs || '?noNav=true') %>"
                             <% } %>

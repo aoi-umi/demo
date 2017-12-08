@@ -80,6 +80,18 @@ exports.getAccessableUrl = function (user, pathname) {
         {url: '/interface/sign/in'},
         {url: '/interface/sign/out'},
 
+        //角色
+        {url: '/role/list', auth: []},
+        {url: '/interface/role/query', auth: []},
+        {url: '/interface/role/save', auth: []},
+        {url: '/interface/role/detailQuery', auth: []},
+
+        //权限
+        {url: '/authority/list', auth: []},
+        {url: '/interface/authority/query', auth: []},
+        {url: '/interface/authority/save', auth: []},
+        {url: '/interface/authority/detailQuery', auth: []},
+
         {url: '/userInfo/detail', auth: ['login']},
         {url: '/userInfo/list', auth: ['admin']},
         {url: '/interface/userInfo/query', auth: ['admin']},
@@ -102,7 +114,7 @@ exports.getAccessableUrl = function (user, pathname) {
     var accessable = false;
     argList.forEach(function (item) {
         var opt = {notExistAuthority: null};
-        var isHadAuthority = !item.auth || auth.isHadAuthority(user, item.auth, opt);
+        var isHadAuthority = !item.auth || !item.auth.length || auth.isHadAuthority(user, item.auth, opt);
         var isExist = item.url == pathname;
         if (isHadAuthority) {
             url[item.url] = true;

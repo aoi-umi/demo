@@ -1,0 +1,103 @@
+<div class="container">
+    <div class="form-group">
+        <% var rowItemClass = 'col-lg-3 col-md-4 col-sm-6 col-xs-12'; %>
+        <div class="row my-row">
+            <%
+            var prefix = '';
+            var searchItemList = [{
+                text: 'id',
+                id: 'id',
+            }, {
+                text: 'code',
+                id: 'code',
+            }, {
+                text: 'name',
+                id: 'name',
+            }, {
+                text: 'status',
+                id: 'status',
+            },];
+            for(var i = 0;i < searchItemList.length;i++){
+                var item = searchItemList[i];
+            %>
+            <div class="<%= rowItemClass %>">
+                <div class="input-group">
+                    <span class="input-group-addon"><%= item.text %></span>
+                    <input id="<%= prefix + item.id %>" type="text" class="form-control"/>
+                </div>
+            </div>
+            <% } %>
+        </div>
+        <div class="row my-row">
+            <div class="<%= rowItemClass %> col-lg-offset-6 col-md-offset-4">
+                <button id="query" class="btn btn-default btn-block">
+                    search
+                </button>
+            </div>
+            <div class="<%= rowItemClass %>">
+                <button class="btn btn-default btn-block add">
+                    add
+                </button>
+            </div>
+        </div>
+    </div>
+    <table id="list" class="table table-bordered">
+        <thead>
+        <tr>
+            <th class="text-center" colspan="100">authority</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <th>id</th>
+            <th>code</th>
+            <th>name</th>
+            <th>status</th>
+            <th>操作</th>
+        </tr>
+        </tbody>
+        <tbody class="error">
+        <tr>
+            <td class="text-center" colspan="100" name="errorContent"></td>
+        </tr>
+        </tbody>
+    </table>
+    <div id="pager"></div>
+</div>
+
+<div id="authoritySave" data-backdrop="false" role="dialog" tabindex="-1" class="modal fade" style="z-index: 1040">
+    <div class="modal-dialog" style="top:100px">
+        <div class="modal-content">
+            <div class="modal-body">
+                <button class="close" type="button" data-dismiss="modal">
+                    ×
+                </button>
+                <h4 name="title" class="modal-title">
+                </h4>
+            </div>
+            <div id="detailContainer" class="modal-body">
+            </div>
+            <div name="footer" class="modal-body">
+                <button style="margin: 0 5px" type="button" class="btn btn-default save btn-content">确认</button>
+                <button style="margin: 0 5px" type="button" class="btn btn-default btn-content" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/template" id="itemTemp">
+    <!--template-->
+    <% include ../../_template_web/authorityItem %>
+</script>
+<script type="text/template" id="detailTemp">
+    <!--template-->
+    <% include ../../_template_web/authorityDetail %>
+</script>
+<script type="text/javascript" src="/js/<%= env %>/my.pager.js?v=<%= version %>"></script>
+<script type="text/javascript" src="/js/<%= env %>/module.js?v=<%= version %>"></script>
+<script type="text/javascript" src="/js/<%= env %>/moduleAuthority.js?v=<%= version %>"></script>
+<script type="text/javascript">
+    $(function () {
+        //module init
+        moduleAuthority.init();
+    });
+</script>

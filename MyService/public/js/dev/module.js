@@ -66,10 +66,10 @@ module.prototype = {
         onQueryFail: function (e, self) {
             common.msgNotice({type: 1, msg: e.message});
         },
-        beforeEdit: function (item, self) {
+        editBeforeRender: function (item, self) {
             return item;
         },
-        afterEdit: function (item, self) {
+        editAfterRender: function (item, self) {
         },
         beforeSave: function (dom, self) {
         },
@@ -283,9 +283,9 @@ module.prototype = {
         if (!item) {
             item = self.opt.saveDefaultModel;
         }
-        item = self.opt.beforeEdit(item, self);
+        item = self.opt.editBeforeRender(item, self);
         self.detailRender(item);
-        self.opt.afterEdit(item, self);
+        self.opt.editAfterRender(item, self);
     },
     save: function (dom) {
         var self = this;
