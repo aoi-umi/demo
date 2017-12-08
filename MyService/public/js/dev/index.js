@@ -174,7 +174,7 @@ index = {
         };
 
         var timer1 = setInterval(function () {
-            $('#countdown').html(common.getDateDiff(new Date(), '2018-02-01'));
+            $('#countdown').html(common.getDateDiff(new Date(), '2017-12-19'));
             $('#countdown2').html(common.getDateDiff(new Date(), common.dateFormat(new Date()) + ' 18:30'));
         }, 1000);
 

@@ -38,7 +38,11 @@ moduleAuthority = {
                 dom: $('#name'),
             }, {
                 name: 'status',
-                dom: $('#status'),
+                dom: $('#queryBox'),
+                focusDom: $('#queryBox [name=status]'),
+                getValue: function () {
+                    return this.dom.find('[name=status]:checked').val();
+                }
             },],
             bindEvent: function (self) {
 

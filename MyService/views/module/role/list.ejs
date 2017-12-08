@@ -1,5 +1,5 @@
 <div class="container">
-    <div class="form-group">
+    <div id="queryBox" class="form-group">
         <% var rowItemClass = 'col-lg-3 col-md-4 col-sm-6 col-xs-12'; %>
         <div class="row my-row">
             <%
@@ -13,9 +13,6 @@
             },{
                 text: 'name',
                 id: 'name',
-            },{
-                text: 'status',
-                id: 'status',
             },];
             for(var i = 0;i < searchItemList.length;i++){
                 var item = searchItemList[i];
@@ -27,6 +24,18 @@
                 </div>
             </div>
             <% } %>
+        </div>
+        <div class="row my-row">
+            <label class="control-label">状态</label>
+            <label class="control-label">
+                <input type="radio" name="status" value="" checked/>全部
+            </label>
+            <label class="control-label">
+                <input type="radio" name="status" value="1"/>启用
+            </label>
+            <label class="control-label">
+                <input type="radio" name="status" value="0"/>禁用
+            </label>
         </div>
         <div class="row my-row">
             <div class="<%=rowItemClass%> col-lg-offset-6 col-md-offset-4">
@@ -63,9 +72,33 @@
     </table>
     <div id="pager"></div>
 </div>
+
+<div id="roleSave" data-backdrop="false" role="dialog" tabindex="-1" class="modal fade" style="z-index: 1040">
+    <div class="modal-dialog" style="top:100px">
+        <div class="modal-content">
+            <div class="modal-body">
+                <button class="close" type="button" data-dismiss="modal">
+                    ×
+                </button>
+                <h4 name="title" class="modal-title">
+                </h4>
+            </div>
+            <div id="detailContainer" class="modal-body">
+            </div>
+            <div name="footer" class="modal-body">
+                <button style="margin: 0 5px" type="button" class="btn btn-default save btn-content">确认</button>
+                <button style="margin: 0 5px" type="button" class="btn btn-default btn-content" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script type="text/template" id="itemTemp">
     <!--template-->
     <%include ../../_template_web/roleItem%>
+</script>
+<script type="text/template" id="detailTemp">
+    <!--template-->
+    <% include ../../_template_web/roleDetail %>
 </script>
 <script type="text/javascript" src="/js/<%= env %>/my.pager.js?v=<%= version %>"></script>
 <script type="text/javascript" src="/js/<%= env %>/module.js?v=<%= version %>"></script>
