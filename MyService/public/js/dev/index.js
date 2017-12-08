@@ -206,6 +206,20 @@ index = {
                 }
             });
         }
+        $('#menuSearch').on('keyup', function () {
+            var val = $.trim($(this).val());
+            $('#searchResult').empty();
+            if (val) {
+                var list = [];
+                $('#menu .menuItem').each(function () {
+                    var itemValue = $(this).text();
+                    if (itemValue.indexOf(val) >= 0) {
+                        list.push($(this).clone());
+                    }
+                });
+                $('#searchResult').append(list);
+            }
+        });
     },
     appendMsg: function (opt) {
         //status

@@ -1,0 +1,42 @@
+<div class="container">
+    <form class="form-horizontal">
+        <%
+        var list = [{
+            content: 'example1',
+            readOnly: true,
+            value: 'val',
+            attr: 'id="example1"'
+        }, {
+            content: 'example2',
+            value: 'val',
+            attr: 'id="example1" placeholder=""'
+        }, ];
+        list.forEach(function (item) {
+        %>
+        <div class="form-group">
+            <label class="col-sm-2 control-label"><%= item.content %></label>
+
+            <div class="col-sm-8">
+                <% if(item.readOnly){ %>
+                <label class="control-label">
+                    <%= item.value %>
+                </label>
+                <% } else{ %>
+                <input class="form-control" <%- item.attr %> value="<%= item.value %>">
+                <% } %>
+            </div>
+        </div>
+        <% }); %>
+        <div class="form-group">
+            <div class="col-sm-8 col-sm-push-2">
+                <button id="save" type="button" class="btn btn-default btn-block">修改</button>
+            </div>
+        </div>
+    </form>
+    <div class="row">
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+    });
+</script>

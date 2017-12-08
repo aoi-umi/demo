@@ -112,7 +112,7 @@ moduleMainContentType = {
                 if (!data.id) data.id = null;
                 if (!data.level) data.level = null;
             },
-            afterEdit: function (item, self) {
+            editAfterRender: function (item, self) {
                 $('#mainContentTypeSave [name=title]').html(item.id ? ('修改:' + item.id) : '新增');
                 self.opt.updateView(['mainContentTypeDetail'], {mainContentTypeDetail: item});
                 $('#mainContentTypeSave').modal('show');
