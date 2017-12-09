@@ -10,7 +10,7 @@ gulp.task('clear-template', function() {
 });
 
 gulp.task('make-template', function() {
-	gulp.src('views/_template/*')
+	gulp.src('views/_template/**')
 		.pipe(replace('<%', '{%'))
 		.pipe(replace('%>', '%}'))
 		.pipe(gulp.dest('views/_template_web'));
@@ -25,7 +25,7 @@ gulp.task('clear-web-js', function() {
 });
 
 gulp.task('make-web-js', function() {
-	gulp.src("public/js/dev/*")
+	gulp.src("public/js/dev/**")
 		.pipe(babel({
 			presets: ['es2015']
 		}))
