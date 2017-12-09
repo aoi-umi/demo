@@ -76,6 +76,24 @@ exports.save = function (opt) {
         if (opt.id != 0) {
             myEnum.enumChangeCheck('main_content_status_enum', main_content_detail.main_content.status, main_content.status);
         }
+        var delChildList;
+        //要删除的child
+        if (opt.id != 0 && opt.delMainContentChildList) {
+            var delChildList = _.filter(main_content_detail.main_content_child_list, function (child) {
+                //查找删除列表中的项
+                var match = _.find(opt.delMainContentChildList, function (child_id) {
+                    return child_id == child.id
+                });
+                if (!match) {
+                    //查找不存在于保存列表中的项
+                    var match2 = _.find(opt.main_content_child_list, function (save_child) {
+                        return save_child.id == child.id
+                    });
+                    match = !match2;
+                }
+                return match;
+            });
+        }
         return autoBll.tran(function (conn) {
             var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
             main_content.type = 0;
@@ -87,27 +105,12 @@ exports.save = function (opt) {
                 var main_content_id = t;
                 var list = [];
                 //删除child
-                if (opt.id != 0 && opt.delMainContentChildList) {
-                    var del_list = _.filter(main_content_detail.main_content_child_list, function (child) {
-                        //查找删除列表中的项
-                        var match = _.find(opt.delMainContentChildList, function (child_id) {
-                            return child_id == child.id
-                        });
-                        if (!match) {
-                            //查找不存在于保存列表中的项
-                            var match2 = _.find(opt.main_content_child_list, function (save_child) {
-                                return save_child.id == child.id
-                            });
-                            match = !match2;
-                        }
-                        return match;
+                if (delChildList && delChildList.length) {
+                    delChildList.forEach(function (item) {
+                        list.push(autoBll.del('main_content_child', {id: item.id}, conn));
                     });
-                    if (del_list && del_list.length) {
-                        del_list.forEach(function (item) {
-                            list.push(autoBll.del('main_content_child', {id: item.id}, conn));
-                        });
-                    }
                 }
+
                 //保存child
                 opt.main_content_child_list.forEach(function (item, index) {
                     item.main_content_id = main_content_id;

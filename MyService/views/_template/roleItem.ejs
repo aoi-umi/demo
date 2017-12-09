@@ -3,6 +3,11 @@
     <td><%= id %></td>
     <td><%= code %></td>
     <td><%= name %></td>
+    <td>
+        <% authority_list.forEach(function (t) { %>
+        <%= t.code %>;
+        <% }); %>
+    </td>
     <td><%= status %></td>
     <td>
         <a class="itemDetailQuery" href="javascript:;">详细</a>

@@ -105,7 +105,7 @@ index = {
             }
         });
 
-        var availableTags = [
+        var sourceList = [
             'ActionScript',
             'AppleScript',
             'Asp',
@@ -129,49 +129,10 @@ index = {
             'Scala',
             'Scheme'
         ];
-        var sourceList = [];
-        //sourceList = availableTags;
-        $(availableTags).each(function () {
-            sourceList.push({key: this});
+        common.autoComplete({
+            source: sourceList,
+            dom: $('#autocomplete')
         });
-
-        function clearData() {
-            if (!$('#autocomplete').val()) {
-                $('#autocomplete').data('item', null);
-            }
-        }
-
-        $('#autocomplete').on('keydown', function (event) {
-            if (event.keyCode === $.ui.keyCode.TAB &&
-                $(this).data('ui-autocomplete').menu.active) {
-                event.preventDefault();
-            }
-            clearData();
-        }).on('blur', function () {
-            clearData();
-        }).on('focus', function () {
-            $(this).autocomplete('search');
-        }).autocomplete({
-            minLength: 0,
-            source: function (request, response) {
-                var match = _.filter(sourceList, function (t) {
-                    var matcher = new RegExp($.ui.autocomplete.escapeRegex(request.term), 'i');
-                    return matcher.test(t.key);
-                });
-                response(match.slice(0, 10));
-            },
-            focus: function () {
-                return false;
-            },
-            select: function (event, ui) {
-                $(this).data('item', ui.item).val(ui.item.key);
-                return false;
-            }
-        }).data('ui-autocomplete')._renderItem = function (ul, item) {
-            return $('<li>')
-                .append('<div>' + item.key + '</div>')
-                .appendTo(ul);
-        };
 
         var timer1 = setInterval(function () {
             $('#countdown').html(common.getDateDiff(new Date(), '2017-12-19'));
