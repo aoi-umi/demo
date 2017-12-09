@@ -474,4 +474,80 @@ common = {
         }
         return list.join('&');
     },
+
+    autoComplete: function (opt) {
+        var option = {
+            maxLength: 10,
+            source: [],
+            select: function (dom, item) {
+                dom.data('item', item).val(item.value);
+            },
+            renderItem: function (ul, item) {
+                return $('<li>')
+                    .append('<div>' + item.label + '</div>')
+                    .appendTo(ul);
+            },
+            match: function (input, item) {
+                if (typeof item != 'object') {
+                    item = {
+                        label: item
+                    };
+                }
+                var matcher = new RegExp($.ui.autocomplete.escapeRegex(input), 'i');
+                return matcher.test(item.label);
+            }
+        };
+        opt = $.extend(option, opt);
+        var dom = opt.dom;
+
+        function clearData() {
+            if (!dom.val()) {
+                dom.data('item', null);
+            }
+        }
+
+        function match(request, response) {
+            var match = _.filter(request.sourceList, function (t) {
+                return opt.match(request.term, t);
+            });
+            if (opt.maxLength)
+                match = match.slice(0, opt.maxLength);
+            response(match);
+        }
+
+        dom.on('keydown', function (event) {
+            if (event.keyCode === $.ui.keyCode.TAB &&
+                $(this).data('ui-autocomplete').menu.active) {
+                event.preventDefault();
+            }
+            clearData();
+        }).on('blur', function () {
+            clearData();
+        }).on('focus', function () {
+            $(this).autocomplete('search');
+        }).autocomplete({
+            minLength: 0,
+            source: function (request, response) {
+                var source = opt.source;
+                if (typeof opt.source == 'function') {
+                    request.sourceList = source = opt.source();
+                }
+                if (source.then) {
+                    source.then(function (t) {
+                        request.sourceList = t;
+                        match(request, response);
+                    });
+                } else {
+                    match(request, response);
+                }
+            },
+            focus: function () {
+                return false;
+            },
+            select: function (event, ui) {
+                opt.select(dom, ui.item);
+                return false;
+            }
+        }).data('ui-autocomplete')._renderItem = opt.renderItem;
+    }
 };

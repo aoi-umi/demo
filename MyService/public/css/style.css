@@ -92,3 +92,20 @@ tbody {
     z-index: 999;
     padding-top: 10px;
 }
+
+.pop-up-box {
+    z-index: 1040;
+}
+
+.ui-autocomplete {
+    z-index: 1041;
+}
+
+.my-label {
+    margin-right: 5px;
+    white-space: normal
+}
+
+.my-label .close {
+    margin: -3px 0 0 4px;
+}

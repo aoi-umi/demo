@@ -27,16 +27,17 @@ function getBll(req, res, next) {
     var method = params.method;
     console.log(`[module:${module}][method:${method}]`);
     var opt = {
-        isUsedCustom: false
+        isCustom: false
     };
 
     //使用custom
     if ((module == 'log' && common.isInArray(method, ['query']))
+        || (module == 'role' && common.isInArray(method, ['query', 'save', 'detailQuery']))
         || (module == 'userInfo' && common.isInArray(method, ['query', 'save']))
         || (module == 'mainContentType' && common.isInArray(method, ['save']))
         || (module == 'mainContent' && common.isInArray(method, ['query', 'save', 'statusUpdate']))
     ) {
-        opt.isUsedCustom = true;
+        opt.isCustom = true;
     }
     if (common.isInArray(method, ['detailQuery'])) {
         if (!args || !args.id)
@@ -50,27 +51,28 @@ function getBll(req, res, next) {
 
     //转换为小写下划线;
     module = common.stringToLowerCaseWithUnderscore(module);
-    if (opt.isUsedCustom) {
-        args.user = req.myData.user;
-        return autoBll.custom(module, method, args);
-    } else {
-        var modulePath = path.resolve(__dirname + '/../_dal/' + module + '_auto.js');
-        var isExist = fs.existsSync(modulePath);
-        if (!isExist)
-            throw common.error('file is not exist', errorConfig.BAD_REQUEST.code);
-        if (!autoBll[method])
-            throw common.error(`method[${method}] is not exist`, errorConfig.BAD_REQUEST.code);
-        return autoBll[method](module, args).then(function (t) {
-            if (common.isInArray(method, ['query']) && t.list) {
-                t.list.forEach(function (item) {
-                    setOperation({item: item, user: req.myData.user});
-                });
-            } else if (common.isInArray(method, ['detailQuery']) && t) {
-                setOperation({item: t, user: req.myData.user});
-            }
-            return t;
+    return common.promise().then(function () {
+        if (opt.isCustom) {
+            args.user = req.myData.user;
+            return autoBll.custom(module, method, args);
+        } else {
+            var modulePath = path.resolve(__dirname + '/../_dal/' + module + '_auto.js');
+            var isExist = fs.existsSync(modulePath);
+            if (!isExist)
+                throw common.error('file is not exist', errorConfig.BAD_REQUEST.code);
+            if (!autoBll[method])
+                throw common.error(`method[${method}] is not exist`, errorConfig.BAD_REQUEST.code);
+            return autoBll[method](module, args);
+        }
+    }).then(function (t) {
+        updateValue({
+            t: t,
+            module: module,
+            method: method,
+            user: req.myData.user
         });
-    }
+        return t;
+    });
 }
 
 //页面 get
@@ -120,7 +122,26 @@ exports.view = function (req, res, next) {
     });
 };
 
-var setOperation = function (opt) {
+var updateValue = function (opt) {
+    var module = opt.module;
+    var method = opt.method;
+    var t = opt.t;
+    if(module == 'role' && method == 'detailQuery'){
+        delete t.role_authority_id_list;
+    }
+    var setDefault = true;
+    if (setDefault) {
+        if (common.isInArray(method, ['query']) && t.list) {
+            t.list.forEach(function (item) {
+                setOperationDefault({item: item, user: opt.user});
+            });
+        } else if (common.isInArray(method, ['detailQuery']) && t) {
+            setOperationDefault({item: t, user: opt.user});
+        }
+    }
+};
+
+var setOperationDefault = function (opt) {
     var item = opt.item;
     item.operation = [];
     if (auth.isHadAuthority(opt.user, 'login')) {
