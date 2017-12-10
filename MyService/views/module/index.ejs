@@ -59,8 +59,28 @@
                     tabUrl: '/userInfo/list',
                 },]
             }, {
+                text: 'admin',
+                listId: '',
+                auth: ['admin'],
+                childs: [{
+                    text: 'role',
+                    tab: {
+                        target: 'role',
+                        name: 'role list'
+                    },
+                    tabUrl: '/role/list',
+                }, {
+                    text: 'authority',
+                    tab: {
+                        target: 'authority',
+                        name: 'authority list'
+                    },
+                    tabUrl: '/authority/list',
+                },]
+            }, {
                 text: '菜单Test',
                 listId: 'menuItemListTest',
+                auth: ['dev'],
                 childs: [{
                     text: 'Home',
                     tab: {
@@ -99,25 +119,7 @@
                     },
                     auth: ['dev', 'login']
                 },]
-            },{
-                text: 'admin',
-                listId: '',
-                childs: [{
-                    text: 'role',
-                    tab: {
-                        target: 'role',
-                        name: 'role list'
-                    },
-                    tabUrl: '/role/list',
-                }, {
-                    text: 'authority',
-                    tab: {
-                        target: 'authority',
-                        name: 'authority list'
-                    },
-                    tabUrl: '/authority/list',
-                },]
-            }, ];
+            },];
             %>
             <div id="menu" class="list-group">
                 <%

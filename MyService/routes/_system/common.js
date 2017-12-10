@@ -8,6 +8,7 @@ var net = require('net');
 var crypto = require('crypto');
 var q = require('q');
 var zlib = require('zlib');
+var _ = require('underscore');
 var config = require('../../config');
 var errorConfig = require('./errorConfig');
 var logService = require('../_service/logService');
@@ -561,4 +562,47 @@ exports.streamToBuffer = function (stream) {
         stream.on('error', res.reject);
         return res.promise;
     });
+};
+
+exports.getListDiff = function (option) {
+    var opt = {
+        compare: function (item1, item2) {
+            return item1 == item2;
+        },
+        delReturnValue: function (item) {
+            return item;
+        },
+        addReturnValue: function (item) {
+            return item;
+        }
+    };
+    opt = common.extend(opt, option);
+    var list = opt.list, newList = opt.newList,
+        compare = opt.compare, delReturnValue = opt.delReturnValue, addReturnValue = opt.addReturnValue;
+    var delList = [];
+    var addList = [];
+    if (newList && newList.length) {
+        list.forEach(function (item) {
+            var match = _.find(newList, function (item2) {
+                return compare(item, item2);
+            });
+            if (!match)
+                delList.push(delReturnValue(item));
+        });
+        newList.forEach(function (item2) {
+            var match = _.find(list, function (item) {
+                return compare(item, item2);
+            });
+            if (!match)
+                addList.push(addReturnValue(item2));
+        });
+    } else {
+        list.forEach(function (item) {
+            delList.push(delReturnValue(item));
+        });
+    }
+    return {
+        addList: addList,
+        delList: delList
+    };
 };

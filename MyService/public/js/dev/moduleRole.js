@@ -58,7 +58,6 @@ moduleRole = {
             },
 
             editAfterRender: function (item, self) {
-                $('#roleSave [name=title]').html(item.id ? ('修改:' + item.id) : '新增');
                 self.opt.updateView(['roleDetail'], {roleDetail: item}, self);
                 $('#roleSave').modal('show');
             },
@@ -108,44 +107,52 @@ moduleRole = {
             },
             onDetailQuerySuccess: function (t, self) {
                 self.detailRender(t.role);
-                self.opt.updateView(['roleDetail'], {roleDetail: t}, self);
+                self.opt.updateView(['roleDetail'], {roleAllDetail: t}, self);
                 $('#roleSave').modal('show');
             },
 
             updateView: function (list, opt, self) {
                 if (!list || common.isInArray('roleDetail', list)) {
-                    common.autoComplete({
-                        source: self.opt.getAuthority,
-                        dom: $('#roleSave [name=authority]'),
-                        select: function (dom, item) {
-                            //dom.data('item', item).val(item.code);
-                            var match = $('#roleSave [name=authorityBox]').find(`[name=roleAuthority][data-id=${item.id}]`);
-                            if (!match.length) {
-                                self.opt.setAuthority(item, self);
-                            }
-                        },
-                        renderItem: function (ul, item) {
-                            return $('<li>')
-                                .append('<div>' + item.code + '</div>')
-                                .appendTo(ul);
-                        },
-                        match: function (input, item) {
-                            var matcher = new RegExp($.ui.autocomplete.escapeRegex(input), 'i');
-                            return matcher.test(item.code);
-                        }
-                    });
+                    self.opt.setAuthorityAutoComplete(self);
 
-                    if (opt.roleDetail) {
-                        $(opt.roleDetail.authority_list).each(function (i, item) {
+                    if (opt.roleAllDetail) {
+                        opt.roleDetail = opt.roleAllDetail.role;
+                        opt.roleDetail.operation = opt.roleAllDetail.operation;
+                        $(opt.roleAllDetail.authority_list).each(function (i, item) {
                             self.opt.setAuthority(item, self);
                         });
+                    }
+                    if (opt.roleDetail) {
+                        $('#roleSave [name=footer]').hide();
+                        var role = opt.roleDetail;
+                        $('#roleSave [name=title]').html(role.id ? ('修改:' + role.id) : '新增');
                         if (common.isInArray('save', opt.roleDetail.operation)) {
                             $('#roleSave [name=footer]').show();
-                        } else {
-                            $('#roleSave [name=footer]').hide();
                         }
                     }
                 }
+            },
+            setAuthorityAutoComplete: function (self) {
+                common.autoComplete({
+                    source: self.opt.getAuthority,
+                    dom: $('#roleSave [name=authority]'),
+                    select: function (dom, item) {
+                        //dom.data('item', item).val(item.code);
+                        var match = $('#roleSave [name=authorityBox]').find(`[name=roleAuthority][data-id=${item.id}]`);
+                        if (!match.length) {
+                            self.opt.setAuthority(item, self);
+                        }
+                    },
+                    renderItem: function (ul, item) {
+                        return $('<li>')
+                            .append('<div>' + item.code + '</div>')
+                            .appendTo(ul);
+                    },
+                    match: function (input, item) {
+                        var matcher = new RegExp($.ui.autocomplete.escapeRegex(input), 'i');
+                        return matcher.test(item.code);
+                    }
+                });
             },
             getAuthority: function (self) {
                 return my.interface.authorityQuery({status: 1}).then(function (t) {
@@ -153,12 +160,8 @@ moduleRole = {
                 });
             },
             setAuthority: function (item, self) {
-                var temp =
-                    `<div name="roleAuthority" data-id="{%=id%}" class="label label-info my-label">
-                        <label>{%=code%}
-                            <button class="close" type="button" data-close-target="[name=roleAuthority][data-id={%=id%}]">×</button>
-                        </label>
-                    </div>`;
+                item.labelName = 'roleAuthority';
+                var temp = $('#authorityLabelTemp').html();
                 var dom = $(ejs.render(temp, item));
                 dom.data('item', item);
                 $('#roleSave [name=authorityBox]').append(dom);

@@ -55,7 +55,6 @@ moduleAuthority = {
             },
 
             editAfterRender: function (item, self) {
-                $('#authoritySave [name=title]').html(item.id ? ('修改:' + item.id) : '新增');
                 self.opt.updateView(['authorityDetail'], {authorityDetail: item});
                 $('#authoritySave').modal('show');
             },
@@ -102,6 +101,8 @@ moduleAuthority = {
             updateView: function (list, opt, self) {
                 if (!list || common.isInArray('authorityDetail', list)) {
                     if (opt.authorityDetail) {
+                        var authority = opt.authorityDetail;
+                        $('#authoritySave [name=title]').html(authority.id ? ('修改:' + authority.id) : '新增');
                         if (common.isInArray('save', opt.authorityDetail.operation)) {
                             $('#authoritySave [name=footer]').show();
                         } else {
@@ -114,4 +115,4 @@ moduleAuthority = {
         opt = $.extend(opt, option);
         return new module(opt);
     },
-}
+};

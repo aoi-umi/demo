@@ -31,11 +31,13 @@ function getBll(req, res, next) {
     };
 
     //使用custom
-    if ((module == 'log' && common.isInArray(method, ['query']))
+    if (!common.isInArray(method, ['query', 'save', 'detailQuery', 'del'])
+        || (module == 'log' && common.isInArray(method, ['query']))
         || (module == 'role' && common.isInArray(method, ['query', 'save', 'detailQuery']))
-        || (module == 'userInfo' && common.isInArray(method, ['query', 'save']))
+        || (module == 'authority' && common.isInArray(method, ['save']))
+        || (module == 'userInfo' && common.isInArray(method, ['query', 'save', 'detailQuery']))
         || (module == 'mainContentType' && common.isInArray(method, ['save']))
-        || (module == 'mainContent' && common.isInArray(method, ['query', 'save', 'statusUpdate']))
+        || (module == 'mainContent' && common.isInArray(method, ['query', 'save']))
     ) {
         opt.isCustom = true;
     }
@@ -49,6 +51,7 @@ function getBll(req, res, next) {
         req.myData.noLog = true;
     }
 
+    var reqModule = module;
     //转换为小写下划线;
     module = common.stringToLowerCaseWithUnderscore(module);
     return common.promise().then(function () {
@@ -67,7 +70,7 @@ function getBll(req, res, next) {
     }).then(function (t) {
         updateValue({
             t: t,
-            module: module,
+            module: reqModule,
             method: method,
             user: req.myData.user
         });
@@ -126,10 +129,13 @@ var updateValue = function (opt) {
     var module = opt.module;
     var method = opt.method;
     var t = opt.t;
-    if(module == 'role' && method == 'detailQuery'){
+    if (module == 'role' && method == 'detailQuery') {
         delete t.role_authority_id_list;
     }
     var setDefault = true;
+    if ((module == 'mainContent' && common.isInArray(method, ['query']))) {
+        setDefault = false;
+    }
     if (setDefault) {
         if (common.isInArray(method, ['query']) && t.list) {
             t.list.forEach(function (item) {

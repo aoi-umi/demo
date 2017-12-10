@@ -1,10 +1,12 @@
 /**
  * Created by umi on 2017-8-7.
  */
+var q = require('q');
+var _ = require('underscore');
 var autoBll = require('./auto');
 var common = require('../_system/common');
 var cache = require('../_system/cache');
-
+var userInfo = exports;
 exports.isAccountExist = function (account) {
     return common.promise().then(function () {
         if (!account)
@@ -80,16 +82,175 @@ exports.detailQuery = function (opt) {
         var detail = {
             user_info: t[0][0],
             user_info_log: t[1],
-        }
+            authority_list: t[2],
+            role_list: t[3],
+            role_authority_list: t[4],
+            auth: {}
+        };
+        updateUserInfo(detail);
         return detail;
     });
 };
 
 exports.query = function (opt) {
     return autoBll.customDal('user_info', 'query', opt).then(function (t) {
-        var resData = {};
-        resData.list = t[0];
-        resData.count = t[1][0].count;
-        return resData;
+        var data = {
+            list: t[0],
+            count: t[1][0].count
+        };
+        var user_info_authority_id_list = t[2];
+        var authority_list = t[3];
+        var user_info_role_id_list = t[4];
+        var role_list = t[5];
+        var role_authority_list = t[6];
+        // for (var i = 2; i <= 6; i++) {
+        //     console.log(t[i]);
+        // }
+        data.list.forEach(function (item) {
+            var detail = {
+                auth: {},
+                authority_list: [],
+                role_authority_list: [],
+            };
+            user_info_authority_id_list.forEach(function (u_auth_id) {
+                if (u_auth_id.user_info_id == item.id) {
+                    var matchAuth = _.filter(authority_list, function (auth) {
+                        return u_auth_id.authority_id == auth.id;
+                    });
+                    if (matchAuth)
+                        detail.authority_list = detail.authority_list.concat(matchAuth);
+                }
+            });
+
+            user_info_role_id_list.forEach(function (u_role_id) {
+                if (u_role_id.user_info_id == item.id) {
+                    var matchAuth = _.filter(role_authority_list, function (role_auth) {
+                        return u_role_id.role_id == role_auth.role_id;
+                    });
+                    if (matchAuth)
+                        detail.role_authority_list = detail.role_authority_list.concat(matchAuth);
+                }
+            });
+            updateUserInfo(detail);
+            item.auth = '';
+            for (var key in detail.auth) {
+                item.auth += key + ';';
+            }
+        });
+        return data;
     });
 };
+
+exports.adminSave = function (opt) {
+    var delUserRoleIdList = [];
+    var userRoleIdList = [];
+    var delUserAuthIdList = [];
+    var userAuthIdList = [];
+    var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
+    var id = opt.id;
+    var userInfoLog = {
+        user_info_id: id,
+        type: 1,
+        content: '',
+        create_date: now,
+    };
+    return common.promise().then(function () {
+        if (!id)
+            throw common.error('id为空', 'CAN_NOT_BE_EMPTY');
+        return autoBll.query('user_info_authority_id', {user_info_id: id});
+    }).then(function (t) {
+        var diffOpt = {
+            list: t.list,
+            newList: opt.authorityIdList,
+            compare: function (item, item2) {
+                return item.authority_id == item2;
+            },
+            delReturnValue: function (item) {
+                return item.id;
+            }
+        };
+        var diffRes = common.getListDiff(diffOpt);
+        userAuthIdList = diffRes.addList;
+        delUserAuthIdList = diffRes.delList;
+        return autoBll.query('user_info_role_id', {user_info_id: id});
+    }).then(function (t) {
+        var diffOpt = {
+            list: t.list,
+            newList: opt.roleIdList,
+            compare: function (item, item2) {
+                return item.role_id == item2;
+            },
+            delReturnValue: function (item) {
+                return item.id;
+            }
+        };
+        var diffRes = common.getListDiff(diffOpt);
+        userRoleIdList = diffRes.addList;
+        delUserRoleIdList = diffRes.delList;
+        // console.log(delUserRoleIdList)
+        // console.log(userRoleIdList)
+        // console.log(delUserAuthIdList)
+        // console.log(userAuthIdList)
+        var isChanged = false;
+        if (delUserRoleIdList.length || userRoleIdList.length) {
+            userInfoLog.content += '[修改了角色]';
+            isChanged = true;
+        }
+        if (delUserAuthIdList.length || userAuthIdList.length) {
+            userInfoLog.content += '[修改了权限]';
+            isChanged = true;
+        }
+        if (!isChanged)
+            throw common.error('没有变更的信息');
+        return autoBll.tran(function (conn) {
+            return autoBll.save('user_info', {id: id, edit_datetime: now}, conn).then(function (t) {
+                var list = [];
+                //删除权限
+                if (delUserAuthIdList.length) {
+                    delUserAuthIdList.forEach(function (item) {
+                        list.push(autoBll.del('user_info_authority_id', {id: item}, conn));
+                    })
+                }
+                //保存权限
+                if (userAuthIdList.length) {
+                    userAuthIdList.forEach(function (item) {
+                        list.push(autoBll.save('user_info_authority_id', {user_info_id: id, authority_id: item}));
+                    });
+                }
+
+                //删除角色
+                if (delUserRoleIdList.length) {
+                    delUserRoleIdList.forEach(function (item) {
+                        list.push(autoBll.del('user_info_role_id', {id: item}, conn));
+                    })
+                }
+                //保存角色
+                if (userRoleIdList.length) {
+                    userRoleIdList.forEach(function (item) {
+                        list.push(autoBll.save('user_info_role_id', {user_info_id: id, role_id: item}));
+                    });
+                }
+
+                return q.all(list);
+            }).then(function () {
+                //日志
+                autoBll.save('user_info_log', userInfoLog, conn);
+            });
+        });
+    }).then(function (t) {
+        return id;
+    });
+};
+
+var updateUserInfo = function (detail) {
+    detail.authority_list.forEach(function (t) {
+        if (t.status == 1) {
+            detail.auth[t.code] = true;
+        }
+    });
+    detail.role_authority_list.forEach(function (t) {
+        if (t.status == 1) {
+            detail.auth[t.code] = true;
+        }
+    });
+}
