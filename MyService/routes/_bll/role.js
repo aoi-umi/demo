@@ -12,30 +12,27 @@ exports.save = function (opt) {
     var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
     var id;
     return common.promise().then(function () {
-        return role.detailQuery({id: opt.role.id});
-    }).then(function (roleDetail) {
-        var authorityIdList = [];
+        return role.isExist(opt.role);
+    }).then(function (t) {
+        if (t)
+            throw common.error(`code[${opt.role.code}]已存在`);
+        return autoBll.query('role_authority_id', {role_id: opt.role.id});
+    }).then(function (t) {
+        var roleAuthIdList = [];
         var delRoleAuthIdList = [];
-        if (opt.authorityIdList && opt.authorityIdList.length) {
-            roleDetail.role_authority_id_list.forEach(function (item) {
-                var match = _.find(opt.authorityIdList, function (optId) {
-                    return item.authority_id == optId;
-                });
-                if (!match)
-                    delRoleAuthIdList.push(item.id);
-            });
-            opt.authorityIdList.forEach(function (optId) {
-                var match = _.find(roleDetail.role_authority_id_list, function (item) {
-                    return item.authority_id == optId;
-                });
-                if (!match)
-                    authorityIdList.push(optId);
-            });
-        } else {
-            roleDetail.role_authority_id_list.forEach(function (item) {
-                delRoleAuthIdList.push(item.id);
-            });
-        }
+        var diffOpt = {
+            list: t.list,
+            newList: opt.authorityIdList,
+            compare: function (item, item2) {
+                return item.authority_id == item2;
+            },
+            delReturnValue: function (item) {
+                return item.id;
+            }
+        };
+        var diffRes = common.getListDiff(diffOpt);
+        roleAuthIdList = diffRes.addList;
+        delRoleAuthIdList = diffRes.delList;
         return autoBll.tran(function (conn) {
             return autoBll.save('role', opt.role, conn).then(function (t) {
                 id = t;
@@ -47,8 +44,8 @@ exports.save = function (opt) {
                     })
                 }
                 //保存权限
-                if (authorityIdList.length) {
-                    authorityIdList.forEach(function (item) {
+                if (roleAuthIdList.length) {
+                    roleAuthIdList.forEach(function (item) {
                         list.push(autoBll.save('role_authority_id', {role_id: id, authority_id: item}));
                     });
                 }
@@ -64,8 +61,7 @@ exports.detailQuery = function (opt) {
     return autoBll.customDal('role', 'detailQuery', opt).then(function (t) {
         var data = {
             role: t[0][0],
-            role_authority_id_list: t[1],
-            authority_list: t[2],
+            authority_list: t[1],
         };
         return data;
     });
@@ -93,3 +89,18 @@ exports.query = function (opt) {
         return data;
     });
 };
+
+exports.isExist = function (opt) {
+    var code = opt.code;
+    return common.promise().then(function () {
+        if (!code)
+            throw common.error('code不能为空');
+        return autoBll.query('role', {code: code});
+    }).then(function (t) {
+        var result = false;
+        if (t.list.length && t.list[0].id != opt.id) {
+            result = true;
+        }
+        return result;
+    });
+}

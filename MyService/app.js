@@ -92,7 +92,7 @@ app.use(function (req, res, next) {
         ip: common.getClientIp(req),
     };
     var user = req.myData.user;
-    var noNav = req.query.noNav;
+    var noNav = req.query.noNav || false;
     if (noNav && noNav.toString().toLowerCase() == 'false')
         noNav = false;
     req.myData.noNav = noNav;

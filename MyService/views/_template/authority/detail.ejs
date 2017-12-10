@@ -1,5 +1,10 @@
 <div class="my-row">
     <div class="input-group">
+        <label class="control-label">启用
+            <input type="checkbox" name="status" <%= status == 1 ? 'checked':'' %>/>
+        </label>
+    </div>
+    <div class="input-group">
         <span class="input-group-addon">id</span>
         <input type="text" class="form-control" disabled name="id" value="<%= id %>"/>
     </div>
@@ -10,10 +15,5 @@
     <div class="input-group">
         <span class="input-group-addon">name</span>
         <input type="text" class="form-control" name="name" value="<%= name %>"/>
-    </div>
-    <div class="input-group">
-        <label class="control-label">启用
-            <input type="checkbox" checked="" name="status" <%= status == 1 ? 'checked':'' %>/>
-        </label>
     </div>
 </div>

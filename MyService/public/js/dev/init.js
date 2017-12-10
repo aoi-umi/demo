@@ -79,6 +79,9 @@ init = {
                 mainContentStatusUpdate: {
                     url: '/interface/mainContent/statusUpdate'
                 },
+                userInfoAdminSave: {
+                    url: '/interface/userInfo/adminSave'
+                },
             },
             moduleList: [
                 'mainContent',

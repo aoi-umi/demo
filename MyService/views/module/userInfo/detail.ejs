@@ -53,6 +53,17 @@
             </div>
         </div>
     </form>
+
+    <div class="row">
+        <div class="col-xs-9 col-xs-push-1">
+            <label class="control-label">权限</label>
+            <%for(var key in userInfoDetail.auth){
+              %>
+            <%=key%>;
+            <%
+            } %>
+        </div>
+    </div>
     <div class="row">
         <div class="col-xs-9 col-xs-push-1">
             <label class="control-label">日志</label>

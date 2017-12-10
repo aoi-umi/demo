@@ -81,21 +81,24 @@ exports.getAccessableUrl = function (user, pathname) {
         {url: '/interface/sign/out'},
 
         //角色
-        {url: '/role/list', auth: []},
-        {url: '/interface/role/query', auth: []},
-        {url: '/interface/role/save', auth: []},
-        {url: '/interface/role/detailQuery', auth: []},
+        {url: '/role/list', auth: ['admin']},
+        {url: '/interface/role/query', auth: ['admin']},
+        {url: '/interface/role/save', auth: ['admin']},
+        {url: '/interface/role/detailQuery', auth: ['admin']},
 
         //权限
-        {url: '/authority/list', auth: []},
-        {url: '/interface/authority/query', auth: []},
-        {url: '/interface/authority/save', auth: []},
-        {url: '/interface/authority/detailQuery', auth: []},
+        {url: '/authority/list', auth: ['admin']},
+        {url: '/interface/authority/query', auth: ['admin']},
+        {url: '/interface/authority/save', auth: ['admin']},
+        {url: '/interface/authority/detailQuery', auth: ['admin']},
 
+        //用户信息
         {url: '/userInfo/detail', auth: ['login']},
         {url: '/userInfo/list', auth: ['admin']},
         {url: '/interface/userInfo/query', auth: ['admin']},
+        {url: '/interface/userInfo/detailQuery', auth: ['admin']},
         {url: '/interface/userInfo/save', auth: ['login']},
+        {url: '/interface/userInfo/adminSave', auth: ['admin']},
 
         {url: '/mainContent/list'},
         {url: '/mainContent/detail'},

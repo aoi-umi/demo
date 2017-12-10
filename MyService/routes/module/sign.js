@@ -86,20 +86,25 @@ var signIn = exports.signIn = function (req, signInReq) {
         var checkToken = common.createToken(account + pwd + reqBody);
         if (token != checkToken)
             throw common.error(null, errorConfig.TOKEN_WRONG.code);
-        return userInfo;
+        return autoBll.custom('user_info', 'detailQuery', {id: userInfo.id});
     }).then(function (t) {
-        user.id = t.id;
-        user.nickname = t.nickname;
-        user.account = t.account;
+        //console.log(t);
+        var userInfo = t.user_info;
+        user.id = userInfo.id;
+        user.nickname = userInfo.nickname;
+        user.account = userInfo.account;
         user.authority['login'] = true;
         user.reqBody = reqBody;
         user.token = token;
-        if (t.auth) {
-            var authList = t.auth.split(',');
-            authList.forEach(function (auth) {
-                user.authority[auth] = true;
-            });
+        for(var key in t.auth){
+            user.authority[key] = true;
         }
+        // if (userInfo.auth) {
+        //     var authList = t.auth.split(',');
+        //     authList.forEach(function (auth) {
+        //         user.authority[auth] = true;
+        //     });
+        // }
         user.cacheDatetime = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
 
         var userInfoKey = req.cookies[config.cacheKey.userInfo];
