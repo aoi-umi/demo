@@ -73,17 +73,19 @@ exports.save = function (opt) {
         return main_content_bll.detailQuery({id: main_content.id});
     }).then(function (main_content_detail) {
         //todo 权限检查
-        if (opt.id != 0) {
-            myEnum.enumChangeCheck('main_content_status_enum', main_content_detail.main_content.status, main_content.status);
-        }
+        myEnum.enumChangeCheck('main_content_status_enum', main_content_detail.main_content.status, main_content.status);
+
         var delChildList;
-        //要删除的child
-        if (opt.id != 0 && opt.delMainContentChildList) {
+        if (main_content.id != 0) {
+            //要删除的child
             var delChildList = _.filter(main_content_detail.main_content_child_list, function (child) {
                 //查找删除列表中的项
-                var match = _.find(opt.delMainContentChildList, function (child_id) {
-                    return child_id == child.id
-                });
+                var match = null;
+                if (opt.delMainContentChildList) {
+                    match = _.find(opt.delMainContentChildList, function (child_id) {
+                        return child_id == child.id
+                    });
+                }
                 if (!match) {
                     //查找不存在于保存列表中的项
                     var match2 = _.find(opt.main_content_child_list, function (save_child) {
@@ -93,11 +95,13 @@ exports.save = function (opt) {
                 }
                 return match;
             });
+        } else {
+            main_content.user_info_id = opt.user.id;
         }
+
         return autoBll.tran(function (conn) {
             var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
             main_content.type = 0;
-            main_content.user_info_id = 1;
             main_content.operator = opt.user.account;
             main_content.create_date =
                 main_content.operate_date = now;

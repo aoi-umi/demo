@@ -127,7 +127,7 @@
                     if (t.auth && !isHadAuthority(user, t.auth))
                         return;
                     if (!t.listId)
-                        t.listId = 'menuId' + new Date().getTime();
+                        t.listId = 'menuId' + new Date().getTime() + '_' + parseInt(Math.random() * 100);
                 %>
                 <a class="list-group-item active" data-toggle="collapse" href="#<%= t.listId %>">
                     <%= t.text %>
