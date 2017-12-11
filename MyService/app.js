@@ -169,17 +169,29 @@ restConfig.forEach(function (rest) {
     routerMethodList.push(init);
 
     var reqfile = require(path);
-    if (!reqfile[functionName])
+    var reqFun = reqfile[functionName];
+    if (!reqFun)
         throw common.error('[' + path + '] is not exist function [' + functionName + ']', 'CODE_ERROR');
-    var methodFun = function (req, res, next) {
-        req.myData.method = {methodName: rest.methodName};
-        try {
-            reqfile[functionName](req, res, next);
-        } catch (e) {
-            next(e);
-        }
+
+    var createFun = function (fun) {
+        return function (req, res, next) {
+            req.myData.method = {methodName: rest.methodName};
+            try {
+                fun(req, res, next);
+            } catch (e) {
+                next(e);
+            }
+        };
     };
-    routerMethodList.push(methodFun);
+    if (reqFun instanceof Array) {
+        reqFun.forEach(function (fun) {
+            var methodFun = createFun(fun);
+            routerMethodList.push(methodFun);
+        });
+    } else {
+        var methodFun = createFun(reqFun);
+        routerMethodList.push(methodFun);
+    }
 
     var methodName = method.toLowerCase();
     switch (methodName) {
