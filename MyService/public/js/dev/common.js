@@ -515,9 +515,9 @@ common = {
             response(match);
         }
 
-        dom.on('keydown', function (event) {
-            if (event.keyCode === $.ui.keyCode.TAB &&
-                $(this).data('ui-autocomplete').menu.active) {
+        dom.on('up', function (event) {
+            if ((event.keyCode === $.ui.keyCode.TAB)
+                && $(this).data('ui-autocomplete').menu.active) {
                 event.preventDefault();
             }
             clearData();
