@@ -13,8 +13,8 @@ exports.sign = function (req, res, next) {
         case 'in':
             signIn(req).then(function (t) {
                 return res.mySend(null, {
-                    d: t.id,
-                    nickname: t.nickname
+                    id: t.user_info.id,
+                    nickname: t.user_info.nickname
                 });
             }).fail(function (e) {
                 return res.mySend(e);

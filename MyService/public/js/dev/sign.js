@@ -74,7 +74,6 @@ sign = {
             }
             else {
                 $('#signInBox').modal('hide');
-                $('.nav-user-link').attr('href', '/user/' + t.id);
                 $('.nav-nickname').text(t.nickname);
                 $('.nav-sign').addClass('in');
             }
