@@ -100,18 +100,18 @@ exports.getAccessableUrl = function (user, pathname) {
         {url: '/interface/userInfo/save', auth: ['login']},
         {url: '/interface/userInfo/adminSave', auth: ['admin']},
 
-        {url: '/mainContent/list', auth: ['admin,mainContentQuery']},
-        {url: '/mainContent/detail', auth: ['admin,mainContentQuery']},
-        {url: '/interface/mainContent/query', auth: ['admin,mainContentQuery']},
-        {url: '/interface/mainContent/save', auth: ['admin,mainContentSave']},
-        {url: '/interface/mainContent/statusUpdate', auth: ['admin,mainContentSave']},
+        {url: '/mainContent/list', auth: ['mainContentQuery']},
+        {url: '/mainContent/detail', auth: ['mainContentQuery']},
+        {url: '/interface/mainContent/query', auth: ['mainContentQuery']},
+        {url: '/interface/mainContent/save', auth: ['mainContentSave']},
+        {url: '/interface/mainContent/statusUpdate', auth: ['mainContentSave']},
         //{url: '/interface/mainContent/del', auth: ['admin']},
 
-        {url: '/mainContentType/list', auth: ['admin,mainContentTypeQuery']},
-        {url: '/interface/mainContentType/query', auth: ['admin,mainContentTypeQuery']},
-        {url: '/interface/mainContentType/detailQuery', auth: ['admin,mainContentTypeQuery']},
-        {url: '/interface/mainContentType/save', auth: ['admin,mainContentTypeSave']},
-        {url: '/interface/mainContentType/del', auth: ['admin,mainContentTypeDel']},
+        {url: '/mainContentType/list', auth: ['mainContentTypeQuery']},
+        {url: '/interface/mainContentType/query', auth: ['mainContentTypeQuery']},
+        {url: '/interface/mainContentType/detailQuery', auth: ['mainContentTypeQuery']},
+        {url: '/interface/mainContentType/save', auth: ['mainContentTypeSave']},
+        {url: '/interface/mainContentType/del', auth: ['mainContentTypeDel']},
     ];
 
     var accessable = false;

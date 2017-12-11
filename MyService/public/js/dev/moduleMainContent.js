@@ -303,17 +303,9 @@ moduleMainContent = {
                 return common.promise().then(function () {
                     try {
                         var operate = dom.data('operate');
-                        if (operate == 'audit')
-                            main_content.status = 2;
-                        else if (operate == 'pass')
-                            main_content.status = 3;
-                        else if (operate == 'notPass')
-                            main_content.status = 4;
-                        else if (operate == 'del')
-                            main_content.status = -1;
-                        else if (operate == 'recovery')
-                            main_content.status = 'recovery';
-                        else
+                        main_content.operate = operate;
+                        var operateList = ['audit', 'pass', 'notPass', 'del', 'recovery'];
+                        if (!common.isInArray(operate, operateList))
                             throw new Error(`错误的操作类型[${operate}]`);
                         var detail = {
                             main_content: main_content,

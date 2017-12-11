@@ -34,8 +34,9 @@ var myRender = function (req, res, view, options) {
     var opt = {
         user: req.myData.user,
         noNav: req.myData.noNav,
-        isHadAuthority: auth.isHadAuthority,
-        isExistAuthority: auth.isExistAuthority,
+        isHadAuthority: function(authData){
+            return auth.isHadAuthority(req.myData.user, authData);
+        },
         accessableUrl: req.myData.accessableUrl,
     };
     opt = common.extend(opt, options);
