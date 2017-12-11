@@ -1,5 +1,6 @@
-<div data-id="<%=user%><%=msgId%>" class="item panel-body <%=className%>">
-    <span><%=datetime%></span>
-    <span><%=user%></span>
-    <div class="item-content"><%=content%></div>
+<div data-id="<%= user + msgId %>" class="item panel-body <%= className %>">
+    <span><%= userName %></span>
+    <span><%= datetime %></span>
+
+    <div class="item-content"><%= content %></div>
 </div>

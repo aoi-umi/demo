@@ -57,11 +57,16 @@
     <div class="row">
         <div class="col-xs-9 col-xs-push-1">
             <label class="control-label">权限</label>
-            <%for(var key in userInfoDetail.auth){
-              %>
-            <%=key%>;
-            <%
-            } %>
+            <% for(var key in userInfoDetail.auth){
+                var model = {
+                    id: 0,
+                    code: key,
+                }
+                with(model){
+            %>
+                    <%include ../../_template/authorityLabel%>
+            <% }
+            }%>
         </div>
     </div>
     <div class="row">

@@ -200,6 +200,7 @@ index = {
         }
         var userInfo = $.cookie(config.cacheKey.userInfo);
         if (opt.self || userInfo == opt.user) {
+            opt.userName = '';
             className.push('self');
         }
         opt.className = className.join(' ');

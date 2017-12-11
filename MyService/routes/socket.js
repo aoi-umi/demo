@@ -1,7 +1,9 @@
 /**
  * Created by umi on 2017-8-31.
  */
+var config = require('../config');
 var common = require('./_system/common');
+var cache = require('./_system/cache');
 var mySocket = exports;
 
 exports.onlineCount = 0;
@@ -11,7 +13,7 @@ exports.init = function (io) {
     mySocket.io = io;
     mySocket.bindEvent();
 };
-exports.bindEvent= function () {
+exports.bindEvent = function () {
     var io = mySocket.io;
     io.on('connection', function (socket) {
         socket.myData = {};
@@ -30,16 +32,24 @@ exports.bindEvent= function () {
 
         socket.on('postMsg', function (opt) {
             tryFn(socket, function () {
-                //将消息发送到除自己外的所有用户
-                socket.broadcast.emit('newMsg', {
-                    datetime: common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss'),
-                    user: opt.user,
-                    content: opt.content,
-                    msgId: opt.msgId,
-                });
-                socket.emit('postSuccess', {
-                    user: opt.user,
-                    msgId: opt.msgId,
+                var userInfoKey = config.cacheKey.userInfo + opt.user;
+                var userName = '';
+                cache.get(userInfoKey).then(function (t) {
+                    if (t && t.nickname)
+                        userName = t.nickname;
+                }).finally(function () {
+                    //将消息发送到除自己外的所有用户
+                    socket.broadcast.emit('newMsg', {
+                        datetime: common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss'),
+                        user: opt.user,
+                        userName: userName,
+                        content: opt.content,
+                        msgId: opt.msgId,
+                    });
+                    socket.emit('postSuccess', {
+                        user: opt.user,
+                        msgId: opt.msgId,
+                    });
                 });
             });
         });
@@ -59,9 +69,9 @@ exports.bindEvent= function () {
 };
 
 function tryFn(socket, fn) {
-    try{
+    try {
         fn();
-    }catch(e){
+    } catch (e) {
         socket.emit('err', e.message);
     }
 }
