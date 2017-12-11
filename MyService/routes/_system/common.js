@@ -268,6 +268,9 @@ exports.formatViewtRes = function (option) {
         noNav: false,
     };
     opt = common.extend(opt, option);
+    if (opt.env == 'dev') {
+        opt.title += '[开发版]';
+    }
     return opt;
 };
 
