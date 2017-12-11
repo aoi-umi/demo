@@ -70,13 +70,13 @@ exports.save = function (opt) {
     var main_content;
     return common.promise().then(function () {
         main_content = opt.main_content;
-        return main_content_bll.detailQuery({id: main_content.id});
+        if (main_content.id != 0)
+            return main_content_bll.detailQuery({id: main_content.id});
     }).then(function (main_content_detail) {
         //todo 权限检查
-        myEnum.enumChangeCheck('main_content_status_enum', main_content_detail.main_content.status, main_content.status);
-
         var delChildList;
         if (main_content.id != 0) {
+            myEnum.enumChangeCheck('main_content_status_enum', main_content_detail.main_content.status, main_content.status);
             //要删除的child
             var delChildList = _.filter(main_content_detail.main_content_child_list, function (child) {
                 //查找删除列表中的项
@@ -122,9 +122,12 @@ exports.save = function (opt) {
                     list.push(autoBll.save('main_content_child', item, conn));
                 });
                 //日志
+                var src_status = 0;
+                if (main_content.id != 0)
+                    src_status = main_content_detail.main_content.status;
                 var main_content_log = createLog({
                     id: main_content_id,
-                    src_status: main_content_detail.main_content.status,
+                    src_status: src_status,
                     dest_status: main_content.status,
                     content: opt.remark,
                     operator: opt.user.account

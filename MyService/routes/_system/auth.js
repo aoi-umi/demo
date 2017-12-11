@@ -100,25 +100,27 @@ exports.getAccessableUrl = function (user, pathname) {
         {url: '/interface/userInfo/save', auth: ['login']},
         {url: '/interface/userInfo/adminSave', auth: ['admin']},
 
-        {url: '/mainContent/list'},
-        {url: '/mainContent/detail'},
-        {url: '/interface/mainContent/query'},
-        {url: '/interface/mainContent/save', auth: ['login']},
-        {url: '/interface/mainContent/statusUpdate', auth: ['login']},
-        {url: '/interface/mainContent/del', auth: ['admin']},
+        {url: '/mainContent/list', auth: ['admin,mainContentQuery']},
+        {url: '/mainContent/detail', auth: ['admin,mainContentQuery']},
+        {url: '/interface/mainContent/query', auth: ['admin,mainContentQuery']},
+        {url: '/interface/mainContent/save', auth: ['admin,mainContentSave']},
+        {url: '/interface/mainContent/statusUpdate', auth: ['admin,mainContentSave']},
+        //{url: '/interface/mainContent/del', auth: ['admin']},
 
-        {url: '/mainContentType/list'},
-        {url: '/interface/mainContentType/query'},
-        {url: '/interface/mainContentType/detailQuery'},
-        {url: '/interface/mainContentType/save', auth: ['login']},
-        {url: '/interface/mainContentType/del', auth: ['admin']},
+        {url: '/mainContentType/list', auth: ['admin,mainContentTypeQuery']},
+        {url: '/interface/mainContentType/query', auth: ['admin,mainContentTypeQuery']},
+        {url: '/interface/mainContentType/detailQuery', auth: ['admin,mainContentTypeQuery']},
+        {url: '/interface/mainContentType/save', auth: ['admin,mainContentTypeSave']},
+        {url: '/interface/mainContentType/del', auth: ['admin,mainContentTypeDel']},
     ];
 
     var accessable = false;
+    var isUrlExist = false;
     argList.forEach(function (item) {
         var opt = {notExistAuthority: null};
         var isHadAuthority = !item.auth || !item.auth.length || auth.isHadAuthority(user, item.auth, opt);
         var isExist = item.url == pathname;
+        if (isExist)isUrlExist = true;
         if (isHadAuthority) {
             url[item.url] = true;
             if (isExist)
@@ -130,6 +132,8 @@ exports.getAccessableUrl = function (user, pathname) {
             throw common.error('', errCode);
         }
     });
+    if (!isUrlExist)
+        throw common.error('', errorConfig.NOT_FOUND.code);
     if (!accessable)
         throw common.error('', authConfig.accessable.errCode);
     return url;

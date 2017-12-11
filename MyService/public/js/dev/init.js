@@ -119,6 +119,12 @@ init = {
             }
         });
 
+        //auto complete
+        $(document).on('keyup', '.ui-menu-item', function (event) {
+            if (event.keyCode === $.ui.keyCode.ENTER) {
+                $(this).click();
+            }
+        })
         //浮动
         $('.hover').on('mouseover mouseleave', function (e) {
             var dom = $(this);

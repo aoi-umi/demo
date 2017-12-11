@@ -18,10 +18,10 @@ my.vaild = {
         }
         switch (t) {
             case '001':
-                reg = /[1-9][\d]*/;
+                reg = /^[1-9][\d]*$/;
                 break;
             case '010':
-                reg = /0+/;
+                reg = /^0+$/;
                 break;
             case '011':
                 reg = /^[\d]+$/;
@@ -39,6 +39,12 @@ my.vaild = {
         return reg.test(val);
     },
     isAccount: function (val) {
-        return /[a-zA-Z][a-zA-Z\d_]{5,}/.test(val);
+        return /^[a-zA-Z][a-zA-Z\d_]{5,}$/.test(val);
+    },
+    isAuthority: function (val) {
+        return /^[a-zA-Z\d_]+$/.test(val);
+    },
+    isRole: function (val) {
+        return /^[a-zA-Z\d_]+$/.test(val);
     }
 };

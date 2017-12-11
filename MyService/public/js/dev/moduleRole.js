@@ -67,8 +67,13 @@ moduleRole = {
                     dom: $('#roleSave [name=id]'),
                 }, {
                     name: 'code',
+                    desc: '角色编号',
                     dom: $('#roleSave [name=code]'),
                     canNotNull: true,
+                    checkValue: function (val) {
+                        if (!my.vaild.isRole(val))
+                            return '{0}只能由字母、数字、下划线组成';
+                    }
                 }, {
                     name: 'name',
                     dom: $('#roleSave [name=name]'),

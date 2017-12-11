@@ -24,6 +24,13 @@ module.exports= {
             'en':'bad request',
         }
     },
+    NOT_FOUND:{
+        code: 'NOT_FOUND',
+        desc: {
+            'zh':'无法找到路径',
+            'en':'Not Found',
+        }
+    },
 
     TOKEN_WRONG: {
         code: 'TOKEN_WRONG',

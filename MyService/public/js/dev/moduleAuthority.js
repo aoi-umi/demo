@@ -64,8 +64,13 @@ moduleAuthority = {
                     dom: $('#authoritySave [name=id]'),
                 }, {
                     name: 'code',
+                    desc: '权限编号',
                     dom: $('#authoritySave [name=code]'),
                     canNotNull: true,
+                    checkValue: function (val) {
+                        if (!my.vaild.isAuthority(val))
+                            return '{0}只能由字母、数字、下划线组成';
+                    }
                 }, {
                     name: 'name',
                     dom: $('#authoritySave [name=name]'),
