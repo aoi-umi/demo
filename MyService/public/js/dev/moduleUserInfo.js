@@ -197,7 +197,7 @@ moduleUserInfo = {
                 });
             },
             getAuthority: function (self) {
-                return my.interface.authorityQuery({status: 1}).then(function (t) {
+                return my.interface.authorityQuery({status: 1, page_size: 10}).then(function (t) {
                     return t.list;
                 });
             },
@@ -233,7 +233,7 @@ moduleUserInfo = {
                 });
             },
             getRole: function (self) {
-                return my.interface.roleQuery({status: 1}).then(function (t) {
+                return my.interface.roleQuery({status: 1, page_size: 10}).then(function (t) {
                     return t.list;
                 });
             },

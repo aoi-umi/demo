@@ -22,7 +22,9 @@ exports.query = function (opt) {
             if (t.list && t.list.length) {
                 t.list.forEach(function (item) {
                     item.operation = ['detailQuery'];
-                    if (item.status != -1 && auth.isHadAuthority(opt.user, 'login')) {
+                    if (item.status != -1
+                        && auth.isHadAuthority(opt.user, ['mainContentDel'])
+                        && (opt.user.id == item.user_info_id)) {
                         item.operation.push('del');
                     }
                     updateMainContent(item);
@@ -37,7 +39,7 @@ exports.detailQuery = function (opt) {
     return common.promise().then(function () {
         if (opt.id == 0) {
             var detail = {};
-            detail.main_content = {id: 0, status: 0};
+            detail.main_content = {id: 0, status: 0, type: 0};
             detail.main_content_type_list = [];
             detail.main_content_child_list = [];
             detail.main_content_log_list = [];
@@ -68,14 +70,16 @@ exports.detailQuery = function (opt) {
 
 exports.save = function (opt) {
     var main_content;
+    var user = opt.user;
     return common.promise().then(function () {
         main_content = opt.main_content;
-        if (main_content.id != 0)
-            return main_content_bll.detailQuery({id: main_content.id});
+        return main_content_bll.detailQuery({id: main_content.id});
     }).then(function (main_content_detail) {
-        //todo 权限检查
         var delChildList;
         if (main_content.id != 0) {
+            //权限检查
+            if (user.id != main_content.user_info_id)
+                throw common.error('没有权限处理此记录');
             myEnum.enumChangeCheck('main_content_status_enum', main_content_detail.main_content.status, main_content.status);
             //要删除的child
             var delChildList = _.filter(main_content_detail.main_content_child_list, function (child) {
@@ -96,7 +100,7 @@ exports.save = function (opt) {
                 return match;
             });
         } else {
-            main_content.user_info_id = opt.user.id;
+            main_content.user_info_id = user.id;
         }
 
         return autoBll.tran(function (conn) {
@@ -145,10 +149,28 @@ exports.save = function (opt) {
 
 exports.statusUpdate = function (opt) {
     var main_content = opt.main_content;
+    var user = opt.user;
     return common.promise().then(function () {
         if (!main_content.id) {
             throw common.error('', 'ARGS_ERROR');
         }
+        var operate = main_content.operate;
+        if (operate == 'audit')
+            main_content.status = 2;
+        else if (operate == 'pass')
+            main_content.status = 3;
+        else if (operate == 'notPass')
+            main_content.status = 4;
+        else if (operate == 'del')
+            main_content.status = -1;
+        else if (operate == 'recovery')
+            main_content.status = 'recovery';
+        else
+            throw common.error(`错误的操作类型[${operate}]`);
+
+        var necessaryAuth = 'mainContent' + common.stringToPascal(operate);
+        if (!auth.isHadAuthority(user, necessaryAuth))
+            throw common.error(`没有[${necessaryAuth}]权限`);
         return main_content_bll.detailQuery({id: main_content.id});
     }).then(function (main_content_detail) {
         //todo 检查权限

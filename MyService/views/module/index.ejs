@@ -124,7 +124,7 @@
             <div id="menu" class="list-group">
                 <%
                 menuList.forEach(function(t){
-                    if (t.auth && !isHadAuthority(user, t.auth))
+                    if (t.auth && !isHadAuthority(t.auth))
                         return;
                     if (!t.listId)
                         t.listId = 'menuId' + new Date().getTime() + '_' + parseInt(Math.random() * 100);
@@ -135,7 +135,7 @@
 
                 <div class="collapse in" id="<%= t.listId %>">
                     <% t.childs.forEach(function(child){
-                        if (child.auth && !isHadAuthority(user, child.auth))
+                        if (child.auth && !isHadAuthority(child.auth))
                             return;
                         if (child.tabUrl && !accessableUrl[child.tabUrl])
                             return;

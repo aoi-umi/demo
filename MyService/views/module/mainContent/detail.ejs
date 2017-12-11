@@ -32,8 +32,13 @@
         <div>
             <p>
                 <span>创建人:</span><span>
-                    <%= main_content.account || '' %>
-                    (<%= main_content.nickname || '' %>)
+                    <% if(main_content.id == 0){ %>
+                    <%= user.account %>
+                    (<%= user.nickname %>#<%= user.id %>)
+                    <% }else{ %>
+                    <%= main_content.account %>
+                    (<%= main_content.nickname %>#<%= main_content.user_info_id %>)
+                    <% } %>
                 </span>
                 <span>类型:</span><span><%= main_content.type_name || '' %></span>
                 <span>状态:</span><span><%= main_content.status_name || '' %></span>
@@ -88,12 +93,12 @@
         </div>
 
         <div>
-            <% if(isEditable && isHadAuthority(user, 'login')){ %>
+            <% if(isEditable && isHadAuthority('login')){ %>
             <div class="my-row">
                 <button id="showMainContentChild" class="btn btn-default">新增</button>
             </div>
             <% } %>
-            <table class="table table-bordered <%= isEditable ? '': 'not-editable' %>">
+            <table class="table table-bordered <%= isEditable ? '' : 'not-editable' %>">
                 <thead>
                 <tr>
                     <th>顺序</th>
@@ -122,11 +127,12 @@
         <!--操作-->
         <div class="my-row text-center">
             <%
-            if(isHadAuthority(user, 'login')){
-                var operateList = [];
-                switch (main_content.status) {
-                    case 0:
-                    case 4:
+            var operateList = [];
+            switch (main_content.status) {
+                case 0:
+                case 4:
+                    if (isHadAuthority('mainContentSave')
+                            && (!main_content.id || main_content.user_info_id == user.id)) {
                         operateList.push({
                             text: '保存',
                             operate: 'save',
@@ -137,47 +143,55 @@
                             operate: 'submit',
                             className: 'save'
                         });
-                        break;
-                    case 1:
-                    case 2:
+                    }
+                    break;
+                case 1:
+                case 2:
+                    if (isHadAuthority('mainContentAudit')) {
                         operateList.push({
                             text: '审核',
                             operate: 'audit',
                             className: 'statusUpdate'
                         });
+                    }
+                    if (isHadAuthority('mainContentPass')) {
                         operateList.push({
                             text: '审核通过',
                             operate: 'pass',
                             className: 'statusUpdate'
                         });
+                    }
+                    if (isHadAuthority('mainContentNotPass')) {
                         operateList.push({
                             text: '审核不通过',
                             operate: 'notPass',
                             className: 'statusUpdate'
                         });
-                        break;
-                    case -1:
+                    }
+                    break;
+                case -1:
+                    if (isHadAuthority('mainContentRecovery')) {
                         operateList.push({
                             text: '恢复',
                             operate: 'recovery',
                             className: 'statusUpdate'
                         });
-                        break;
-                }
-                if (main_content.id && main_content.status != -1) {
-                    operateList.push({
-                        text: '删除',
-                        operate: 'del',
-                        className: 'statusUpdate'
-                    });
-                }
+                    }
+                    break;
+            }
+            if (main_content.id && main_content.status != -1 && isHadAuthority('mainContentDel')) {
+                operateList.push({
+                    text: '删除',
+                    operate: 'del',
+                    className: 'statusUpdate'
+                });
+            }
             operateList.forEach(function(item){ %>
             <button class="btn btn-default <%= item.className %>"
                     data-operate="<%= item.operate %>" data-id="<%= main_content.id %>">
                 <%= item.text %>
             </button>
-            <% });
-            } %>
+            <% }); %>
         </div>
         <div>
             <label class="control-label">日志</label>
