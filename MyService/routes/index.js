@@ -1,3 +1,5 @@
+var fs = require('fs');
+
 var common = require('./_system/common');
 var cache = require('./_system/cache');
 var errorConfig = require('./_system/errorConfig');
@@ -23,8 +25,7 @@ exports.upload = [require('./_system/multer').any(), function (req, res) {
         });
     }
     var opt = {
-        view: 'msg',
         message: success,
     };
-    res.myRender('view', opt);
+    res.myRender('msg', opt);
 }];
