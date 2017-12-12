@@ -9,7 +9,8 @@ var myEnum = require('../_system/enum');
 var auth = require('../_system/auth');
 var main_content_bll = exports;
 
-exports.query = function (opt) {
+exports.query = function (opt, exOpt) {
+    var user = exOpt.user;
     return common.promise().then(function () {
         return autoBll.customDal('main_content', 'query', opt).then(function (t) {
             var detail = {
@@ -23,8 +24,8 @@ exports.query = function (opt) {
                 t.list.forEach(function (item) {
                     item.operation = ['detailQuery'];
                     if (item.status != -1
-                        && auth.isHadAuthority(opt.user, ['mainContentDel'])
-                        && (opt.user.id == item.user_info_id)) {
+                        && auth.isHadAuthority(user, ['mainContentDel'])
+                        && (user.id == item.user_info_id)) {
                         item.operation.push('del');
                     }
                     updateMainContent(item);
@@ -68,9 +69,9 @@ exports.detailQuery = function (opt) {
     });
 };
 
-exports.save = function (opt) {
+exports.save = function (opt, exOpt) {
     var main_content;
-    var user = opt.user;
+    var user = exOpt.user;
     return common.promise().then(function () {
         main_content = opt.main_content;
         return main_content_bll.detailQuery({id: main_content.id});
@@ -106,7 +107,7 @@ exports.save = function (opt) {
         return autoBll.tran(function (conn) {
             var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
             main_content.type = 0;
-            main_content.operator = opt.user.account;
+            main_content.operator = user.account;
             main_content.create_date =
                 main_content.operate_date = now;
             return autoBll.save('main_content', main_content, conn).then(function (t) {
@@ -134,7 +135,7 @@ exports.save = function (opt) {
                     src_status: src_status,
                     dest_status: main_content.status,
                     content: opt.remark,
-                    operator: opt.user.account
+                    operator: user.account
                 });
                 list.push(autoBll.save('main_content_log', main_content_log, conn));
                 return q.all(list).then(function () {
@@ -147,9 +148,9 @@ exports.save = function (opt) {
     });
 };
 
-exports.statusUpdate = function (opt) {
+exports.statusUpdate = function (opt, exOpt) {
     var main_content = opt.main_content;
-    var user = opt.user;
+    var user = exOpt.user;
     return common.promise().then(function () {
         if (!main_content.id) {
             throw common.error('', 'ARGS_ERROR');
@@ -188,7 +189,7 @@ exports.statusUpdate = function (opt) {
             var updateStatusOpt = {
                 id: main_content.id,
                 status: main_content.status,
-                operator: opt.user.account,
+                operator: user.account,
                 operate_date: now
             };
             return autoBll.save('main_content', updateStatusOpt, conn).then(function (t) {
@@ -200,7 +201,7 @@ exports.statusUpdate = function (opt) {
                     src_status: main_content_detail.main_content.status,
                     dest_status: main_content.status,
                     content: opt.remark,
-                    operator: opt.user.account
+                    operator: user.account
                 });
                 list.push(autoBll.save('main_content_log', main_content_log, conn));
                 return q.all(list).then(function () {

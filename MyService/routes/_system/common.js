@@ -236,14 +236,24 @@ exports.formatRes = function (err, detail, opt) {
         desc: null,
         guid: common.guid()
     };
-    if (err && err.code)
-        res.code = err.code;
-    if (opt && opt.code)
-        res.code = opt.code;
-    if (opt && opt.desc)
-        res.desc = opt.desc;
+    var url = '';
+    if (opt) {
+        if (opt.code)
+            res.code = opt.code;
+        if (opt.desc)
+            res.desc = opt.desc;
+        if (opt.url)
+            url = opt.url;
+    }
     if (err) {
-        common.writeError(err);
+        if (err.code)
+            res.code = err.code;
+        var writeOpt = {
+            guid: res.guid
+        };
+        if (url)
+            writeOpt.url = url;
+        common.writeError(err, writeOpt);
         var errMsg = err;
         if (err.message) errMsg = err.message;
         res.result = false;
@@ -301,13 +311,15 @@ exports.error = function (msg, code, option) {
     return err;
 };
 
-exports.writeError = function (err) {
+exports.writeError = function (err, opt) {
     console.error(err);
 
     var list = [];
     var createDate = common.dateFormat(new Date(), 'yyyy-MM-dd');
     var createDateTime = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
     list.push(createDateTime);
+    if (opt)
+        list.push(JSON.stringify(opt));
     list.push(err);
     //用于查找上一级调用
     var stack = new Error().stack;

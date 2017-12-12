@@ -53,8 +53,10 @@ function getBll(req, res, next) {
     module = common.stringToLowerCaseWithUnderscore(module);
     return common.promise().then(function () {
         if (opt.isCustom) {
-            args.user = req.myData.user;
-            return autoBll.custom(module, method, args);
+            var exOpt = {
+                user: req.myData.user
+            };
+            return autoBll.custom(module, method, args, exOpt);
         } else {
             var modulePath = path.resolve(__dirname + '/../_dal/' + module + '_auto.js');
             var isExist = fs.existsSync(modulePath);

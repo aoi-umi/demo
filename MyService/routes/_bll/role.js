@@ -7,8 +7,8 @@ var autoBll = require('./auto');
 var common = require('../_system/common');
 var role = exports;
 
-exports.save = function (opt) {
-    var user = opt.user;
+exports.save = function (opt, exOpt) {
+    var user = exOpt.user;
     var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
     var id;
     var dataRole = opt.role;

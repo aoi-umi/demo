@@ -34,7 +34,7 @@ var myRender = function (req, res, view, options) {
     var opt = {
         user: req.myData.user,
         noNav: req.myData.noNav,
-        isHadAuthority: function(authData){
+        isHadAuthority: function (authData) {
             return auth.isHadAuthority(req.myData.user, authData);
         },
         accessableUrl: req.myData.accessableUrl,
@@ -43,16 +43,19 @@ var myRender = function (req, res, view, options) {
     res.render(view, common.formatViewtRes(opt));
 };
 
-var mySend = function (req, res, err, detail, opt) {
+var mySend = function (req, res, err, detail, option) {
+    var url = req.header('host') + req.originalUrl;
+    var opt = {
+        url: url,
+    };
+    opt = common.extend(opt, option);
     var formatRes = common.formatRes(err, detail, opt);
     res.send(formatRes);
-    var url = req.originalUrl;
     var result = formatRes.result;
     var logReq = req.method == 'POST' ? req.body : '';
     var logRes = formatRes.detail;
-    var logMethod = '[' + (config.name + '][' + (req.myData.method.methodName || url)) + ']';
+    var logMethod = '[' + (config.name + '][' + (req.myData.method.methodName || req.originalUrl)) + ']';
 
-    url = req.header('host') + url;
     if (!req.myData.noLog) {
         var log = common.logModle();
         log.url = url;
