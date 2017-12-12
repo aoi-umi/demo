@@ -88,7 +88,11 @@ module.prototype = {
         onDelFail: function (e, self) {
             common.msgNotice({type: 1, msg: '删除失败:' + e.message});
         },
-        beforeDetailQuery: function (t) {
+        beforeDetailQuery: function (t, self) {
+            var data = {};
+            if (t && t.id)
+                data.id = t.id;
+            return data;
         },
         onDetailQuerySuccess: function (t, self) {
             self.detailRender(t);
@@ -363,10 +367,7 @@ module.prototype = {
         var self = this;
         return common.promise().then(function (res) {
             var notice = common.msgNotice({type: 1, msg: '查询中...', noClose: true});
-            var data = {};
-            if (item && item.id)
-                data.id = item.id;
-            self.opt.beforeDetailQuery(data);
+            var data = self.opt.beforeDetailQuery(item, self);
             var method = self.opt.interfacePrefix + 'DetailQuery';
             return my.interface[method](data).then(function (t) {
                 self.opt.onDetailQuerySuccess(t, self);

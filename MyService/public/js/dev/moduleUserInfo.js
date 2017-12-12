@@ -145,15 +145,15 @@ moduleUserInfo = {
             adminSave: function (self) {
                 var data = {
                     id: $('#userInfoSave [name=id]').val(),
-                    authorityIdList: [],
-                    roleIdList: []
+                    authorityList: [],
+                    roleList: []
                 };
                 $('#userInfoSave [name=userAuthority]').each(function () {
-                    data.authorityIdList.push($(this).data('id'));
+                    data.authorityList.push($(this).data('code'));
                 });
 
                 $('#userInfoSave [name=userRole]').each(function () {
-                    data.roleIdList.push($(this).data('id'));
+                    data.roleList.push($(this).data('code'));
                 });
                 common.promise().then(function () {
                     if (!data.id || data.id == 0)
@@ -180,7 +180,7 @@ moduleUserInfo = {
                     dom: $('#userInfoSave [name=authority]'),
                     select: function (dom, item) {
                         //dom.data('item', item).val(item.code);
-                        var match = $('#userInfoSave [name=authorityBox]').find(`[name=userAuthority][data-id=${item.id}]`);
+                        var match = $('#userInfoSave [name=authorityBox]').find(`[name=userAuthority][data-code=${item.code}]`);
                         if (!match.length) {
                             self.opt.setAuthority(item, self);
                         }
@@ -216,7 +216,7 @@ moduleUserInfo = {
                     dom: $('#userInfoSave [name=role]'),
                     select: function (dom, item) {
                         //dom.data('item', item).val(item.code);
-                        var match = $('#userInfoSave [name=roleBox]').find(`[name=userRole][data-id=${item.id}]`);
+                        var match = $('#userInfoSave [name=roleBox]').find(`[name=userRole][data-code=${item.code}]`);
                         if (!match.length) {
                             self.opt.setRole(item, self);
                         }

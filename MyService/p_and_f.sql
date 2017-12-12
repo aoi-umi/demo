@@ -1,7 +1,7 @@
 /*
 Navicat MySQL Data Transfer
 
-Source Server         : mysql
+Source Server         : localhost
 Source Server Version : 50710
 Source Host           : localhost:3306
 Source Database       : myweb
@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50710
 File Encoding         : 65001
 
-Date: 2017-12-10 18:11:25
+Date: 2017-12-12 13:29:10
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -1782,143 +1782,6 @@ END
 DELIMITER ;
 
 -- ----------------------------
--- Procedure structure for p_role_authority_id_del_auto
--- ----------------------------
-DROP PROCEDURE IF EXISTS `p_role_authority_id_del_auto`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `p_role_authority_id_del_auto`(
-	pr_id int
-)
-    SQL SECURITY INVOKER
-BEGIN
-	DELETE FROM t_role_authority_id WHERE `id` = pr_id;
-END
-;;
-DELIMITER ;
-
--- ----------------------------
--- Procedure structure for p_role_authority_id_detail_query_auto
--- ----------------------------
-DROP PROCEDURE IF EXISTS `p_role_authority_id_detail_query_auto`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `p_role_authority_id_detail_query_auto`(
-	pr_id int
-)
-    SQL SECURITY INVOKER
-BEGIN
-	SELECT * FROM t_role_authority_id WHERE `id` = pr_id;
-END
-;;
-DELIMITER ;
-
--- ----------------------------
--- Procedure structure for p_role_authority_id_query_auto
--- ----------------------------
-DROP PROCEDURE IF EXISTS `p_role_authority_id_query_auto`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `p_role_authority_id_query_auto`(
-	pr_id int,
-	pr_role_id int,
-	pr_authority_id int,
-	pr_null_list varchar(1000),
-	pr_page_index int,
-	pr_page_size int
-)
-    SQL SECURITY INVOKER
-BEGIN
-	IF pr_null_list IS NULL THEN
-		SET pr_null_list = '';
-	END IF;
-	SET pr_null_list = CONCAT(',', pr_null_list, ',');
-
-	SET @Sql ='SELECT SQL_CALC_FOUND_ROWS * FROM t_role_authority_id t1 WHERE 1 = 1 ';
-	IF pr_id IS NOT NULL AND length(pr_id) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND t1.`id` = ''',replace_special_char(pr_id), '''');
-	ELSEIF LOCATE(',id,', pr_null_list) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND t1.`id` IS NULL');
-	END IF;
-
-	IF pr_role_id IS NOT NULL AND length(pr_role_id) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND t1.`role_id` = ''',replace_special_char(pr_role_id), '''');
-	ELSEIF LOCATE(',role_id,', pr_null_list) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND t1.`role_id` IS NULL');
-	END IF;
-
-	IF pr_authority_id IS NOT NULL AND length(pr_authority_id) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND t1.`authority_id` = ''',replace_special_char(pr_authority_id), '''');
-	ELSEIF LOCATE(',authority_id,', pr_null_list) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND t1.`authority_id` IS NULL');
-	END IF;
-
-	IF pr_page_index IS NOT NULL AND pr_page_size IS NOT NULL THEN
-		SET @Sql = CONCAT(@Sql, ' limit ', (pr_page_index - 1) * pr_page_size, ',', pr_page_size);
-	END IF;
-	SET @Sql = CONCAT(@Sql, ';');
-	-- SELECT @Sql;
-	PREPARE stmt1 FROM @Sql;
-	EXECUTE stmt1;
-	SELECT FOUND_ROWS() AS 'count';
-END
-;;
-DELIMITER ;
-
--- ----------------------------
--- Procedure structure for p_role_authority_id_save_auto
--- ----------------------------
-DROP PROCEDURE IF EXISTS `p_role_authority_id_save_auto`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `p_role_authority_id_save_auto`(
-	pr_id int,
-	pr_role_id int,
-	pr_authority_id int,
-	pr_null_list varchar(1000)
-)
-    SQL SECURITY INVOKER
-BEGIN
-
-IF pr_id IS NULL OR pr_id = 0 
-THEN
-	INSERT INTO t_role_authority_id (
-		`role_id`,
-		`authority_id`
-	) VALUES( 
-		pr_role_id,
-		pr_authority_id
-	);
-	SELECT LAST_INSERT_ID() as 'id';
-ELSE
-	IF pr_null_list IS NULL THEN
-		SET pr_null_list = '';
-	END IF;
-	SET pr_null_list = CONCAT(',', pr_null_list, ',');
-
-	SET @Sql ='UPDATE t_role_authority_id SET ';
-	IF pr_role_id IS NOT NULL THEN
-		SET @Sql = CONCAT(@Sql,' `role_id` = ''', replace_special_char(pr_role_id), ''',');
-	ELSEIF LOCATE(',role_id,', pr_null_list)>0 THEN
-		SET @Sql = CONCAT(@Sql,' `role_id` = null,');
-	END IF;
-
-	IF pr_authority_id IS NOT NULL THEN
-		SET @Sql = CONCAT(@Sql,' `authority_id` = ''', replace_special_char(pr_authority_id), ''',');
-	ELSEIF LOCATE(',authority_id,', pr_null_list)>0 THEN
-		SET @Sql = CONCAT(@Sql,' `authority_id` = null,');
-	END IF;
-
-	-- SELECT @Sql;
-	IF LOCATE(',',@Sql)>0 THEN
-		SET @Sql = LEFT(@Sql,CHAR_LENGTH(@Sql)-1);
-		SET @Sql = CONCAT(@Sql,' WHERE id = ''', pr_id, ''';	');
-		PREPARE stmt1 FROM @Sql;
-		EXECUTE stmt1;
-	END IF;
-	SELECT pr_id AS 'id';
-END IF;
-END
-;;
-DELIMITER ;
-
--- ----------------------------
 -- Procedure structure for p_role_del_auto
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `p_role_del_auto`;
@@ -1938,12 +1801,12 @@ DELIMITER ;
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `p_role_detail_query`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `p_role_detail_query`(pr_id int)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p_role_detail_query`(pr_code varchar(256))
     SQL SECURITY INVOKER
 BEGIN 
-	SELECT * FROM t_role WHERE `id` = pr_id;
+	SELECT * FROM t_role WHERE `code` = pr_code;
 	SELECT * FROM t_authority WHERE 
-		`id` in (SELECT authority_id from  t_role_authority_id where`role_id` = pr_id);
+		`code` in (SELECT authority_code from  t_role_with_authority where`role_code` = pr_code);
 END
 ;;
 DELIMITER ;
@@ -2023,9 +1886,9 @@ BEGIN
 	SELECT FOUND_ROWS() AS 'count';
 
 	-- 权限关联信息
-	SELECT * FROM t_role_authority_id where`role_id` in (select id from temp_p_role_query00);
+	SELECT * FROM t_role_with_authority where`role_code` in (select `code` from temp_p_role_query00);
 	SELECT * FROM t_authority WHERE 
-		`id` in (SELECT authority_id from  t_role_authority_id where`role_id` in (select id from temp_p_role_query00));
+		`code` in (SELECT authority_code from  t_role_with_authority where`role_code` in (select `code` from temp_p_role_query00));
 
 END
 ;;
@@ -2155,44 +2018,44 @@ END
 DELIMITER ;
 
 -- ----------------------------
--- Procedure structure for p_user_info_authority_id_del_auto
+-- Procedure structure for p_role_with_authority_del_auto
 -- ----------------------------
-DROP PROCEDURE IF EXISTS `p_user_info_authority_id_del_auto`;
+DROP PROCEDURE IF EXISTS `p_role_with_authority_del_auto`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `p_user_info_authority_id_del_auto`(
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p_role_with_authority_del_auto`(
 	pr_id int
 )
     SQL SECURITY INVOKER
 BEGIN
-	DELETE FROM t_user_info_authority_id WHERE `id` = pr_id;
+	DELETE FROM t_role_with_authority WHERE `id` = pr_id;
 END
 ;;
 DELIMITER ;
 
 -- ----------------------------
--- Procedure structure for p_user_info_authority_id_detail_query_auto
+-- Procedure structure for p_role_with_authority_detail_query_auto
 -- ----------------------------
-DROP PROCEDURE IF EXISTS `p_user_info_authority_id_detail_query_auto`;
+DROP PROCEDURE IF EXISTS `p_role_with_authority_detail_query_auto`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `p_user_info_authority_id_detail_query_auto`(
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p_role_with_authority_detail_query_auto`(
 	pr_id int
 )
     SQL SECURITY INVOKER
 BEGIN
-	SELECT * FROM t_user_info_authority_id WHERE `id` = pr_id;
+	SELECT * FROM t_role_with_authority WHERE `id` = pr_id;
 END
 ;;
 DELIMITER ;
 
 -- ----------------------------
--- Procedure structure for p_user_info_authority_id_query_auto
+-- Procedure structure for p_role_with_authority_query_auto
 -- ----------------------------
-DROP PROCEDURE IF EXISTS `p_user_info_authority_id_query_auto`;
+DROP PROCEDURE IF EXISTS `p_role_with_authority_query_auto`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `p_user_info_authority_id_query_auto`(
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p_role_with_authority_query_auto`(
 	pr_id int,
-	pr_user_info_id int,
-	pr_authority_id int,
+	pr_role_code varchar(256),
+	pr_authority_code varchar(256),
 	pr_null_list varchar(1000),
 	pr_page_index int,
 	pr_page_size int
@@ -2204,23 +2067,23 @@ BEGIN
 	END IF;
 	SET pr_null_list = CONCAT(',', pr_null_list, ',');
 
-	SET @Sql ='SELECT SQL_CALC_FOUND_ROWS * FROM t_user_info_authority_id t1 WHERE 1 = 1 ';
+	SET @Sql ='SELECT SQL_CALC_FOUND_ROWS * FROM t_role_with_authority t1 WHERE 1 = 1 ';
 	IF pr_id IS NOT NULL AND length(pr_id) > 0 THEN
 		SET @Sql = CONCAT(@Sql, ' AND t1.`id` = ''',replace_special_char(pr_id), '''');
 	ELSEIF LOCATE(',id,', pr_null_list) > 0 THEN
 		SET @Sql = CONCAT(@Sql, ' AND t1.`id` IS NULL');
 	END IF;
 
-	IF pr_user_info_id IS NOT NULL AND length(pr_user_info_id) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND t1.`user_info_id` = ''',replace_special_char(pr_user_info_id), '''');
-	ELSEIF LOCATE(',user_info_id,', pr_null_list) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND t1.`user_info_id` IS NULL');
+	IF pr_role_code IS NOT NULL AND length(pr_role_code) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND t1.`role_code` = ''',replace_special_char(pr_role_code), '''');
+	ELSEIF LOCATE(',role_code,', pr_null_list) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND t1.`role_code` IS NULL');
 	END IF;
 
-	IF pr_authority_id IS NOT NULL AND length(pr_authority_id) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND t1.`authority_id` = ''',replace_special_char(pr_authority_id), '''');
-	ELSEIF LOCATE(',authority_id,', pr_null_list) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND t1.`authority_id` IS NULL');
+	IF pr_authority_code IS NOT NULL AND length(pr_authority_code) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND t1.`authority_code` = ''',replace_special_char(pr_authority_code), '''');
+	ELSEIF LOCATE(',authority_code,', pr_null_list) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND t1.`authority_code` IS NULL');
 	END IF;
 
 	IF pr_page_index IS NOT NULL AND pr_page_size IS NOT NULL THEN
@@ -2236,14 +2099,14 @@ END
 DELIMITER ;
 
 -- ----------------------------
--- Procedure structure for p_user_info_authority_id_save_auto
+-- Procedure structure for p_role_with_authority_save_auto
 -- ----------------------------
-DROP PROCEDURE IF EXISTS `p_user_info_authority_id_save_auto`;
+DROP PROCEDURE IF EXISTS `p_role_with_authority_save_auto`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `p_user_info_authority_id_save_auto`(
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p_role_with_authority_save_auto`(
 	pr_id int,
-	pr_user_info_id int,
-	pr_authority_id int,
+	pr_role_code varchar(256),
+	pr_authority_code varchar(256),
 	pr_null_list varchar(1000)
 )
     SQL SECURITY INVOKER
@@ -2251,12 +2114,12 @@ BEGIN
 
 IF pr_id IS NULL OR pr_id = 0 
 THEN
-	INSERT INTO t_user_info_authority_id (
-		`user_info_id`,
-		`authority_id`
+	INSERT INTO t_role_with_authority (
+		`role_code`,
+		`authority_code`
 	) VALUES( 
-		pr_user_info_id,
-		pr_authority_id
+		pr_role_code,
+		pr_authority_code
 	);
 	SELECT LAST_INSERT_ID() as 'id';
 ELSE
@@ -2265,17 +2128,17 @@ ELSE
 	END IF;
 	SET pr_null_list = CONCAT(',', pr_null_list, ',');
 
-	SET @Sql ='UPDATE t_user_info_authority_id SET ';
-	IF pr_user_info_id IS NOT NULL THEN
-		SET @Sql = CONCAT(@Sql,' `user_info_id` = ''', replace_special_char(pr_user_info_id), ''',');
-	ELSEIF LOCATE(',user_info_id,', pr_null_list)>0 THEN
-		SET @Sql = CONCAT(@Sql,' `user_info_id` = null,');
+	SET @Sql ='UPDATE t_role_with_authority SET ';
+	IF pr_role_code IS NOT NULL THEN
+		SET @Sql = CONCAT(@Sql,' `role_code` = ''', replace_special_char(pr_role_code), ''',');
+	ELSEIF LOCATE(',role_code,', pr_null_list)>0 THEN
+		SET @Sql = CONCAT(@Sql,' `role_code` = null,');
 	END IF;
 
-	IF pr_authority_id IS NOT NULL THEN
-		SET @Sql = CONCAT(@Sql,' `authority_id` = ''', replace_special_char(pr_authority_id), ''',');
-	ELSEIF LOCATE(',authority_id,', pr_null_list)>0 THEN
-		SET @Sql = CONCAT(@Sql,' `authority_id` = null,');
+	IF pr_authority_code IS NOT NULL THEN
+		SET @Sql = CONCAT(@Sql,' `authority_code` = ''', replace_special_char(pr_authority_code), ''',');
+	ELSEIF LOCATE(',authority_code,', pr_null_list)>0 THEN
+		SET @Sql = CONCAT(@Sql,' `authority_code` = null,');
 	END IF;
 
 	-- SELECT @Sql;
@@ -2318,15 +2181,15 @@ BEGIN
 	SELECT * FROM t_user_info_log WHERE `user_info_id` = pr_id ORDER BY id DESC;
 	-- 用户权限
 	SELECT * FROM t_authority WHERE 
-		`id` in (select `authority_id` from t_user_info_authority_id where `user_info_id` = pr_id);
+		`code` in (select `authority_code` from t_user_info_with_authority where `user_info_id` = pr_id);
 	-- 角色
 	SELECT * FROM t_role WHERE 
-		`id` in (select `role_id` from t_user_info_role_id where `user_info_id` = pr_id);
+		`code` in (select `role_code` from t_user_info_with_role where `user_info_id` = pr_id);
 	-- 角色权限
 	SELECT DISTINCT t4.* FROM t_role t1 
-		LEFT JOIN t_user_info_role_id t2 ON t1.id = t2.role_id AND t1.`status` = 1
-		LEFT JOIN t_role_authority_id t3 ON t2.role_id = t3.role_id 
-		LEFT JOIN t_authority t4 ON t3.authority_id = t4.id
+		LEFT JOIN t_user_info_with_role t2 ON t1.`code` = t2.role_code AND t1.`status` = 1
+		LEFT JOIN t_role_with_authority t3 ON t2.role_code = t3.role_code 
+		LEFT JOIN t_authority t4 ON t3.authority_code = t4.`code`
 		WHERE t2.user_info_id = pr_id;
 END
 ;;
@@ -2616,22 +2479,22 @@ BEGIN
 	SELECT FOUND_ROWS() AS 'count';
 	
 	-- 用户权限
-	SELECT * from t_user_info_authority_id where `user_info_id` in (SELECT id FROM temp_p_user_info_query00);	
+	SELECT * from t_user_info_with_authority where `user_info_id` in (SELECT id FROM temp_p_user_info_query00);	
 	SELECT * FROM t_authority WHERE 
-		`id` in (select `authority_id` from t_user_info_authority_id 
+		`code` in (select `authority_code` from t_user_info_with_authority 
 				where `user_info_id` in (SELECT id FROM temp_p_user_info_query00));
 	
 	-- 角色
-	SELECT * from t_user_info_role_id where `user_info_id` in (SELECT id FROM temp_p_user_info_query00);	
+	SELECT * from t_user_info_with_role where `user_info_id` in (SELECT id FROM temp_p_user_info_query00);	
 	SELECT * FROM t_role WHERE 
-		`id` in (select `role_id` from t_user_info_role_id 
+		`code` in (select `role_code` from t_user_info_with_role 
 				where `user_info_id` in (SELECT id FROM temp_p_user_info_query00));
 
 	-- 角色权限
 	SELECT DISTINCT t4.*, t1.id AS role_id FROM t_role t1 
-		LEFT JOIN t_user_info_role_id t2 ON t1.id = t2.role_id AND t1.`status` = 1
-		LEFT JOIN t_role_authority_id t3 ON t2.role_id = t3.role_id 
-		LEFT JOIN t_authority t4 ON t3.authority_id = t4.id
+		LEFT JOIN t_user_info_with_role t2 ON t1.`code` = t2.role_code AND t1.`status` = 1
+		LEFT JOIN t_role_with_authority t3 ON t2.role_code = t3.role_code 
+		LEFT JOIN t_authority t4 ON t3.authority_code = t4.`code`
 		WHERE t2.user_info_id in (SELECT id FROM temp_p_user_info_query00);
 END
 ;;
@@ -2724,143 +2587,6 @@ END
 DELIMITER ;
 
 -- ----------------------------
--- Procedure structure for p_user_info_role_id_del_auto
--- ----------------------------
-DROP PROCEDURE IF EXISTS `p_user_info_role_id_del_auto`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `p_user_info_role_id_del_auto`(
-	pr_id int
-)
-    SQL SECURITY INVOKER
-BEGIN
-	DELETE FROM t_user_info_role_id WHERE `id` = pr_id;
-END
-;;
-DELIMITER ;
-
--- ----------------------------
--- Procedure structure for p_user_info_role_id_detail_query_auto
--- ----------------------------
-DROP PROCEDURE IF EXISTS `p_user_info_role_id_detail_query_auto`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `p_user_info_role_id_detail_query_auto`(
-	pr_id int
-)
-    SQL SECURITY INVOKER
-BEGIN
-	SELECT * FROM t_user_info_role_id WHERE `id` = pr_id;
-END
-;;
-DELIMITER ;
-
--- ----------------------------
--- Procedure structure for p_user_info_role_id_query_auto
--- ----------------------------
-DROP PROCEDURE IF EXISTS `p_user_info_role_id_query_auto`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `p_user_info_role_id_query_auto`(
-	pr_id int,
-	pr_user_info_id int,
-	pr_role_id int,
-	pr_null_list varchar(1000),
-	pr_page_index int,
-	pr_page_size int
-)
-    SQL SECURITY INVOKER
-BEGIN
-	IF pr_null_list IS NULL THEN
-		SET pr_null_list = '';
-	END IF;
-	SET pr_null_list = CONCAT(',', pr_null_list, ',');
-
-	SET @Sql ='SELECT SQL_CALC_FOUND_ROWS * FROM t_user_info_role_id t1 WHERE 1 = 1 ';
-	IF pr_id IS NOT NULL AND length(pr_id) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND t1.`id` = ''',replace_special_char(pr_id), '''');
-	ELSEIF LOCATE(',id,', pr_null_list) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND t1.`id` IS NULL');
-	END IF;
-
-	IF pr_user_info_id IS NOT NULL AND length(pr_user_info_id) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND t1.`user_info_id` = ''',replace_special_char(pr_user_info_id), '''');
-	ELSEIF LOCATE(',user_info_id,', pr_null_list) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND t1.`user_info_id` IS NULL');
-	END IF;
-
-	IF pr_role_id IS NOT NULL AND length(pr_role_id) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND t1.`role_id` = ''',replace_special_char(pr_role_id), '''');
-	ELSEIF LOCATE(',role_id,', pr_null_list) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND t1.`role_id` IS NULL');
-	END IF;
-
-	IF pr_page_index IS NOT NULL AND pr_page_size IS NOT NULL THEN
-		SET @Sql = CONCAT(@Sql, ' limit ', (pr_page_index - 1) * pr_page_size, ',', pr_page_size);
-	END IF;
-	SET @Sql = CONCAT(@Sql, ';');
-	-- SELECT @Sql;
-	PREPARE stmt1 FROM @Sql;
-	EXECUTE stmt1;
-	SELECT FOUND_ROWS() AS 'count';
-END
-;;
-DELIMITER ;
-
--- ----------------------------
--- Procedure structure for p_user_info_role_id_save_auto
--- ----------------------------
-DROP PROCEDURE IF EXISTS `p_user_info_role_id_save_auto`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `p_user_info_role_id_save_auto`(
-	pr_id int,
-	pr_user_info_id int,
-	pr_role_id int,
-	pr_null_list varchar(1000)
-)
-    SQL SECURITY INVOKER
-BEGIN
-
-IF pr_id IS NULL OR pr_id = 0 
-THEN
-	INSERT INTO t_user_info_role_id (
-		`user_info_id`,
-		`role_id`
-	) VALUES( 
-		pr_user_info_id,
-		pr_role_id
-	);
-	SELECT LAST_INSERT_ID() as 'id';
-ELSE
-	IF pr_null_list IS NULL THEN
-		SET pr_null_list = '';
-	END IF;
-	SET pr_null_list = CONCAT(',', pr_null_list, ',');
-
-	SET @Sql ='UPDATE t_user_info_role_id SET ';
-	IF pr_user_info_id IS NOT NULL THEN
-		SET @Sql = CONCAT(@Sql,' `user_info_id` = ''', replace_special_char(pr_user_info_id), ''',');
-	ELSEIF LOCATE(',user_info_id,', pr_null_list)>0 THEN
-		SET @Sql = CONCAT(@Sql,' `user_info_id` = null,');
-	END IF;
-
-	IF pr_role_id IS NOT NULL THEN
-		SET @Sql = CONCAT(@Sql,' `role_id` = ''', replace_special_char(pr_role_id), ''',');
-	ELSEIF LOCATE(',role_id,', pr_null_list)>0 THEN
-		SET @Sql = CONCAT(@Sql,' `role_id` = null,');
-	END IF;
-
-	-- SELECT @Sql;
-	IF LOCATE(',',@Sql)>0 THEN
-		SET @Sql = LEFT(@Sql,CHAR_LENGTH(@Sql)-1);
-		SET @Sql = CONCAT(@Sql,' WHERE id = ''', pr_id, ''';	');
-		PREPARE stmt1 FROM @Sql;
-		EXECUTE stmt1;
-	END IF;
-	SELECT pr_id AS 'id';
-END IF;
-END
-;;
-DELIMITER ;
-
--- ----------------------------
 -- Procedure structure for p_user_info_save_auto
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `p_user_info_save_auto`;
@@ -2946,6 +2672,280 @@ ELSE
 		SET @Sql = CONCAT(@Sql,' remark = ''', replace_special_char(pr_remark), ''',');
 	ELSEIF LOCATE(',remark,', pr_null_list)>0 THEN
 		SET @Sql = CONCAT(@Sql,' remark = null,');
+	END IF;
+
+	-- SELECT @Sql;
+	IF LOCATE(',',@Sql)>0 THEN
+		SET @Sql = LEFT(@Sql,CHAR_LENGTH(@Sql)-1);
+		SET @Sql = CONCAT(@Sql,' WHERE id = ''', pr_id, ''';	');
+		PREPARE stmt1 FROM @Sql;
+		EXECUTE stmt1;
+	END IF;
+	SELECT pr_id AS 'id';
+END IF;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for p_user_info_with_authority_del_auto
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `p_user_info_with_authority_del_auto`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p_user_info_with_authority_del_auto`(
+	pr_id int
+)
+    SQL SECURITY INVOKER
+BEGIN
+	DELETE FROM t_user_info_with_authority WHERE `id` = pr_id;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for p_user_info_with_authority_detail_query_auto
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `p_user_info_with_authority_detail_query_auto`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p_user_info_with_authority_detail_query_auto`(
+	pr_id int
+)
+    SQL SECURITY INVOKER
+BEGIN
+	SELECT * FROM t_user_info_with_authority WHERE `id` = pr_id;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for p_user_info_with_authority_query_auto
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `p_user_info_with_authority_query_auto`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p_user_info_with_authority_query_auto`(
+	pr_id int,
+	pr_user_info_id int,
+	pr_authority_code varchar(256),
+	pr_null_list varchar(1000),
+	pr_page_index int,
+	pr_page_size int
+)
+    SQL SECURITY INVOKER
+BEGIN
+	IF pr_null_list IS NULL THEN
+		SET pr_null_list = '';
+	END IF;
+	SET pr_null_list = CONCAT(',', pr_null_list, ',');
+
+	SET @Sql ='SELECT SQL_CALC_FOUND_ROWS * FROM t_user_info_with_authority t1 WHERE 1 = 1 ';
+	IF pr_id IS NOT NULL AND length(pr_id) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND t1.`id` = ''',replace_special_char(pr_id), '''');
+	ELSEIF LOCATE(',id,', pr_null_list) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND t1.`id` IS NULL');
+	END IF;
+
+	IF pr_user_info_id IS NOT NULL AND length(pr_user_info_id) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND t1.`user_info_id` = ''',replace_special_char(pr_user_info_id), '''');
+	ELSEIF LOCATE(',user_info_id,', pr_null_list) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND t1.`user_info_id` IS NULL');
+	END IF;
+
+	IF pr_authority_code IS NOT NULL AND length(pr_authority_code) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND t1.`authority_code` = ''',replace_special_char(pr_authority_code), '''');
+	ELSEIF LOCATE(',authority_code,', pr_null_list) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND t1.`authority_code` IS NULL');
+	END IF;
+
+	IF pr_page_index IS NOT NULL AND pr_page_size IS NOT NULL THEN
+		SET @Sql = CONCAT(@Sql, ' limit ', (pr_page_index - 1) * pr_page_size, ',', pr_page_size);
+	END IF;
+	SET @Sql = CONCAT(@Sql, ';');
+	-- SELECT @Sql;
+	PREPARE stmt1 FROM @Sql;
+	EXECUTE stmt1;
+	SELECT FOUND_ROWS() AS 'count';
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for p_user_info_with_authority_save_auto
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `p_user_info_with_authority_save_auto`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p_user_info_with_authority_save_auto`(
+	pr_id int,
+	pr_user_info_id int,
+	pr_authority_code varchar(256),
+	pr_null_list varchar(1000)
+)
+    SQL SECURITY INVOKER
+BEGIN
+
+IF pr_id IS NULL OR pr_id = 0 
+THEN
+	INSERT INTO t_user_info_with_authority (
+		`user_info_id`,
+		`authority_code`
+	) VALUES( 
+		pr_user_info_id,
+		pr_authority_code
+	);
+	SELECT LAST_INSERT_ID() as 'id';
+ELSE
+	IF pr_null_list IS NULL THEN
+		SET pr_null_list = '';
+	END IF;
+	SET pr_null_list = CONCAT(',', pr_null_list, ',');
+
+	SET @Sql ='UPDATE t_user_info_with_authority SET ';
+	IF pr_user_info_id IS NOT NULL THEN
+		SET @Sql = CONCAT(@Sql,' `user_info_id` = ''', replace_special_char(pr_user_info_id), ''',');
+	ELSEIF LOCATE(',user_info_id,', pr_null_list)>0 THEN
+		SET @Sql = CONCAT(@Sql,' `user_info_id` = null,');
+	END IF;
+
+	IF pr_authority_code IS NOT NULL THEN
+		SET @Sql = CONCAT(@Sql,' `authority_code` = ''', replace_special_char(pr_authority_code), ''',');
+	ELSEIF LOCATE(',authority_code,', pr_null_list)>0 THEN
+		SET @Sql = CONCAT(@Sql,' `authority_code` = null,');
+	END IF;
+
+	-- SELECT @Sql;
+	IF LOCATE(',',@Sql)>0 THEN
+		SET @Sql = LEFT(@Sql,CHAR_LENGTH(@Sql)-1);
+		SET @Sql = CONCAT(@Sql,' WHERE id = ''', pr_id, ''';	');
+		PREPARE stmt1 FROM @Sql;
+		EXECUTE stmt1;
+	END IF;
+	SELECT pr_id AS 'id';
+END IF;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for p_user_info_with_role_del_auto
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `p_user_info_with_role_del_auto`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p_user_info_with_role_del_auto`(
+	pr_id int
+)
+    SQL SECURITY INVOKER
+BEGIN
+	DELETE FROM t_user_info_with_role WHERE `id` = pr_id;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for p_user_info_with_role_detail_query_auto
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `p_user_info_with_role_detail_query_auto`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p_user_info_with_role_detail_query_auto`(
+	pr_id int
+)
+    SQL SECURITY INVOKER
+BEGIN
+	SELECT * FROM t_user_info_with_role WHERE `id` = pr_id;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for p_user_info_with_role_query_auto
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `p_user_info_with_role_query_auto`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p_user_info_with_role_query_auto`(
+	pr_id int,
+	pr_user_info_id int,
+	pr_role_code varchar(256),
+	pr_null_list varchar(1000),
+	pr_page_index int,
+	pr_page_size int
+)
+    SQL SECURITY INVOKER
+BEGIN
+	IF pr_null_list IS NULL THEN
+		SET pr_null_list = '';
+	END IF;
+	SET pr_null_list = CONCAT(',', pr_null_list, ',');
+
+	SET @Sql ='SELECT SQL_CALC_FOUND_ROWS * FROM t_user_info_with_role t1 WHERE 1 = 1 ';
+	IF pr_id IS NOT NULL AND length(pr_id) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND t1.`id` = ''',replace_special_char(pr_id), '''');
+	ELSEIF LOCATE(',id,', pr_null_list) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND t1.`id` IS NULL');
+	END IF;
+
+	IF pr_user_info_id IS NOT NULL AND length(pr_user_info_id) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND t1.`user_info_id` = ''',replace_special_char(pr_user_info_id), '''');
+	ELSEIF LOCATE(',user_info_id,', pr_null_list) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND t1.`user_info_id` IS NULL');
+	END IF;
+
+	IF pr_role_code IS NOT NULL AND length(pr_role_code) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND t1.`role_code` = ''',replace_special_char(pr_role_code), '''');
+	ELSEIF LOCATE(',role_code,', pr_null_list) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND t1.`role_code` IS NULL');
+	END IF;
+
+	IF pr_page_index IS NOT NULL AND pr_page_size IS NOT NULL THEN
+		SET @Sql = CONCAT(@Sql, ' limit ', (pr_page_index - 1) * pr_page_size, ',', pr_page_size);
+	END IF;
+	SET @Sql = CONCAT(@Sql, ';');
+	-- SELECT @Sql;
+	PREPARE stmt1 FROM @Sql;
+	EXECUTE stmt1;
+	SELECT FOUND_ROWS() AS 'count';
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for p_user_info_with_role_save_auto
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `p_user_info_with_role_save_auto`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p_user_info_with_role_save_auto`(
+	pr_id int,
+	pr_user_info_id int,
+	pr_role_code varchar(256),
+	pr_null_list varchar(1000)
+)
+    SQL SECURITY INVOKER
+BEGIN
+
+IF pr_id IS NULL OR pr_id = 0 
+THEN
+	INSERT INTO t_user_info_with_role (
+		`user_info_id`,
+		`role_code`
+	) VALUES( 
+		pr_user_info_id,
+		pr_role_code
+	);
+	SELECT LAST_INSERT_ID() as 'id';
+ELSE
+	IF pr_null_list IS NULL THEN
+		SET pr_null_list = '';
+	END IF;
+	SET pr_null_list = CONCAT(',', pr_null_list, ',');
+
+	SET @Sql ='UPDATE t_user_info_with_role SET ';
+	IF pr_user_info_id IS NOT NULL THEN
+		SET @Sql = CONCAT(@Sql,' `user_info_id` = ''', replace_special_char(pr_user_info_id), ''',');
+	ELSEIF LOCATE(',user_info_id,', pr_null_list)>0 THEN
+		SET @Sql = CONCAT(@Sql,' `user_info_id` = null,');
+	END IF;
+
+	IF pr_role_code IS NOT NULL THEN
+		SET @Sql = CONCAT(@Sql,' `role_code` = ''', replace_special_char(pr_role_code), ''',');
+	ELSEIF LOCATE(',role_code,', pr_null_list)>0 THEN
+		SET @Sql = CONCAT(@Sql,' `role_code` = null,');
 	END IF;
 
 	-- SELECT @Sql;
