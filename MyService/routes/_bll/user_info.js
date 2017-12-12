@@ -19,8 +19,8 @@ exports.isAccountExist = function (account) {
     });
 };
 
-exports.save = function (opt) {
-    var user = opt.user;
+exports.save = function (opt, exOpt) {
+    var user = exOpt.user;
     var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
     var userInfoLog = {
         user_info_id: user.id,
@@ -69,7 +69,7 @@ exports.save = function (opt) {
     }).then(function () {
         if (user.key) {
             if (opt.newPassword)
-                return cache.del(opt.user.key);
+                return cache.del(user.key);
             else if (opt.nickname) {
                 user.nickname = opt.nickname;
                 var seconds = 7 * 24 * 3600;

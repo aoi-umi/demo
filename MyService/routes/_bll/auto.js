@@ -63,11 +63,11 @@ exports.tran = function (fn) {
     }).fail(res.reject);
     return res.promise;
 };
-exports.custom = function (name, method, opt) {
+exports.custom = function (name, method, opt, exOpt) {
     var bll = getRequire(name, 'bll');
     if (!bll[method])
         throw common.error(`method[${method}] is not exist`, errorConfig.CODE_ERROR.code);
-    return bll[method](opt);
+    return bll[method](opt, exOpt);
 };
 exports.customDal = function (name, method, opt) {
     var dal = getRequire(name, 'dal');
