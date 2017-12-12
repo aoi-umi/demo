@@ -5,7 +5,9 @@
     <td><%= name %></td>
     <td>
         <% authority_list.forEach(function (t) { %>
-        <%= t.code %>;
+        <div class="label <%= t.status == 1 ? 'label-info' : 'label-default' %> my-label">
+            <label><%= t.code %></label>
+        </div>
         <% }); %>
     </td>
     <td><%= status == 1 ? '启用' : '禁用' %></td>

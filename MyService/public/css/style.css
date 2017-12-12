@@ -102,10 +102,13 @@ tbody {
 }
 
 .my-label {
-    margin-right: 5px;
-    white-space: normal
+    margin: 5px 0 0 5px;
+    white-space: normal;
+    display: inline-block;
 }
-
+.my-label label {
+    margin: 2px;
+}
 .my-label .close {
-    margin: -3px 0 0 4px;
+    margin: -0.2em 0 -0.2em 0.2em;
 }

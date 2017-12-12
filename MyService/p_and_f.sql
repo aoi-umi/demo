@@ -1,4 +1,4 @@
-/*
+﻿/*
 Navicat MySQL Data Transfer
 
 Source Server         : localhost
@@ -2197,7 +2197,7 @@ BEGIN
 		`code` in (select `role_code` from t_user_info_with_role where `user_info_id` = pr_id);
 	-- 角色权限
 	SELECT DISTINCT t4.* FROM t_role t1 
-		LEFT JOIN t_user_info_with_role t2 ON t1.`code` = t2.role_code AND t1.`status` = 1
+		LEFT JOIN t_user_info_with_role t2 ON t1.`code` = t2.role_code
 		LEFT JOIN t_role_with_authority t3 ON t2.role_code = t3.role_code 
 		LEFT JOIN t_authority t4 ON t3.authority_code = t4.`code`
 		WHERE t2.user_info_id = pr_id;
@@ -2513,7 +2513,7 @@ BEGIN
 
 	-- 角色权限
 	SELECT DISTINCT t4.*, t1.code AS role_code FROM t_role t1 
-		LEFT JOIN t_user_info_with_role t2 ON t1.`code` = t2.role_code AND t1.`status` = 1
+		LEFT JOIN t_user_info_with_role t2 ON t1.`code` = t2.role_code
 		LEFT JOIN t_role_with_authority t3 ON t2.role_code = t3.role_code 
 		LEFT JOIN t_authority t4 ON t3.authority_code = t4.`code`
 		WHERE t2.user_info_id in (SELECT id FROM temp_p_user_info_query00);

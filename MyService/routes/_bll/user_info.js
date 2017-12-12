@@ -133,8 +133,8 @@ exports.query = function (opt) {
                         detail.role_authority_list = detail.role_authority_list.concat(matchAuth);
                 }
             });
-            updateUserInfo(detail);
-            item.auth = '';
+            var updateRes = updateUserInfo(detail);
+            item.authority_list = updateRes.authority_list;
             for (var key in detail.auth) {
                 item.auth += key + ';';
             }
@@ -245,14 +245,20 @@ exports.adminSave = function (opt) {
 };
 
 var updateUserInfo = function (detail) {
+    var authority_list = [];
     detail.authority_list.forEach(function (t) {
         if (t.status == 1) {
+            if (!detail.auth[t.code]) authority_list.push(t);
             detail.auth[t.code] = true;
         }
     });
     detail.role_authority_list.forEach(function (t) {
         if (t.status == 1) {
+            if (!detail.auth[t.code]) authority_list.push(t);
             detail.auth[t.code] = true;
         }
     });
+    return {
+        authority_list: authority_list
+    };
 }
