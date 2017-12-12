@@ -30,6 +30,7 @@ exports.sign = function (req, res, next) {
 
 function signUp(req, res, next) {
     var args = req.body;
+    var user_info_id = 0;
     return common.promise().then(function (e) {
         if (!args.account)
             throw common.error('', 'CAN_NOT_BE_EMPTY', {
@@ -41,11 +42,19 @@ function signUp(req, res, next) {
     }).then(function (t) {
         if (t)
             throw common.error('account is exist!');
-        return autoBll.save('user_info', {
-            account: args.account,
-            password: args.password,
-            nickname: args.nickname,
-            create_datetime: new Date()
+        return autoBll.tran(function (conn) {
+            return autoBll.save('user_info', {
+                account: args.account,
+                password: args.password,
+                nickname: args.nickname,
+                create_datetime: new Date()
+            }, conn).then(function (t) {
+                user_info_id = t;
+                //默认角色
+                return autoBll.save('user_info_with_role', {user_info_id: user_info_id, role_code: 'default'}, conn);
+            }).then(function () {
+                return user_info_id;
+            });
         });
     }).then(function (t) {
         res.send(common.formatRes(null, t));
@@ -96,7 +105,7 @@ var signIn = exports.signIn = function (req, signInReq) {
         user.authority['login'] = true;
         user.reqBody = reqBody;
         user.token = token;
-        for(var key in t.auth){
+        for (var key in t.auth) {
             user.authority[key] = true;
         }
         // if (userInfo.auth) {
