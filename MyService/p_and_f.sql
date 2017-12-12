@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50710
 File Encoding         : 65001
 
-Date: 2017-12-12 13:29:10
+Date: 2017-12-12 15:39:45
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -1845,12 +1845,7 @@ BEGIN
 	END IF;
 	SET pr_null_list = CONCAT(',', pr_null_list, ',');
 
-
-	DROP TEMPORARY TABLE IF EXISTS temp_p_role_query00; 
- 
-	SET @Sql ='CREATE TEMPORARY TABLE temp_p_role_query00 ';
-
-	SET @Sql = CONCAT(@Sql,' SELECT SQL_CALC_FOUND_ROWS t1.* FROM t_role t1 WHERE 1 = 1 ');
+	SET @Sql = 'FROM t_role t1 WHERE 1 = 1 ';
 	IF pr_id IS NOT NULL AND length(pr_id) > 0 THEN
 		SET @Sql = CONCAT(@Sql, ' AND t1.`id` = ''',replace_special_char(pr_id), '''');
 	ELSEIF LOCATE(',id,', pr_null_list) > 0 THEN
@@ -1875,15 +1870,30 @@ BEGIN
 		SET @Sql = CONCAT(@Sql, ' AND t1.`status` IS NULL');
 	END IF;
 
+
+-- 匹配数据
+	SET @dataSql = CONCAT('SELECT * ',@Sql);
+	SET @tempSql = CONCAT('CREATE TEMPORARY TABLE temp_p_role_query00 SELECT code ',@Sql);
 	IF pr_page_index IS NOT NULL AND pr_page_size IS NOT NULL THEN
-		SET @Sql = CONCAT(@Sql, ' limit ', (pr_page_index - 1) * pr_page_size, ',', pr_page_size);
+		SET @dataSql = CONCAT(@dataSql, ' limit ', (pr_page_index - 1) * pr_page_size, ',', pr_page_size);
+		SET @tempSql = CONCAT(@tempSql, ' limit ', (pr_page_index - 1) * pr_page_size, ',', pr_page_size);
 	END IF;
-	SET @Sql = CONCAT(@Sql, ';');
+	SET @dataSql = CONCAT(@dataSql, ';');
+	SET @tempSql = CONCAT(@tempSql, ';');
 	-- SELECT @Sql;
-	PREPARE stmt1 FROM @Sql;
+	PREPARE stmt1 FROM @dataSql;
 	EXECUTE stmt1;
-	SELECT * FROM temp_p_role_query00;
-	SELECT FOUND_ROWS() AS 'count';
+
+	-- 匹配临时表
+	DROP TEMPORARY TABLE IF EXISTS temp_p_role_query00;  
+	PREPARE stmt2 FROM @tempSql;
+	EXECUTE stmt2;
+
+	-- 数量
+	SET @countSql = CONCAT('SELECT count(*) AS count ',@Sql);	
+	SET @countSql = CONCAT(@countSql, ';');
+	PREPARE stmt3 FROM @countSql;
+	EXECUTE stmt3;	
 
 	-- 权限关联信息
 	SELECT * FROM t_role_with_authority where`role_code` in (select `code` from temp_p_role_query00);
@@ -2404,10 +2414,7 @@ BEGIN
 	END IF;
 	SET pr_null_list = CONCAT(',', pr_null_list, ',');
 
-	DROP TEMPORARY TABLE IF EXISTS temp_p_user_info_query00; 
- 
-	SET @Sql ='CREATE TEMPORARY TABLE temp_p_user_info_query00 ';
-	SET @Sql = CONCAT(@Sql,'SELECT SQL_CALC_FOUND_ROWS * FROM t_user_info WHERE 1 = 1 ');
+	SET @Sql = ' FROM t_user_info WHERE 1 = 1 ';
 	IF pr_id IS NOT NULL THEN
 		SET @Sql = CONCAT(@Sql, ' AND `id` = ''',replace_special_char(pr_id), '''');
 	ELSEIF LOCATE(',id,', pr_null_list) > 0 THEN
@@ -2468,15 +2475,29 @@ BEGIN
 		SET @Sql = CONCAT(@Sql, ' AND `remark` IS NULL');
 	END IF;
 
+	-- 匹配数据
+	SET @dataSql = CONCAT('SELECT * ',@Sql);
+	SET @tempSql = CONCAT('CREATE TEMPORARY TABLE temp_p_user_info_query00 SELECT id ',@Sql);
 	IF pr_page_index IS NOT NULL AND pr_page_size IS NOT NULL THEN
-		SET @Sql = CONCAT(@Sql, ' limit ', (pr_page_index - 1) * pr_page_size, ',', pr_page_size);
+		SET @dataSql = CONCAT(@dataSql, ' limit ', (pr_page_index - 1) * pr_page_size, ',', pr_page_size);
+		SET @tempSql = CONCAT(@tempSql, ' limit ', (pr_page_index - 1) * pr_page_size, ',', pr_page_size);
 	END IF;
-	SET @Sql = CONCAT(@Sql, ';');
+	SET @dataSql = CONCAT(@dataSql, ';');
+	SET @tempSql = CONCAT(@tempSql, ';');
 	-- SELECT @Sql;
-	PREPARE stmt1 FROM @Sql;
+	PREPARE stmt1 FROM @dataSql;
 	EXECUTE stmt1;
-	SELECT * FROM temp_p_user_info_query00;
-	SELECT FOUND_ROWS() AS 'count';
+
+	-- 匹配临时表
+	DROP TEMPORARY TABLE IF EXISTS temp_p_user_info_query00;  
+	PREPARE stmt2 FROM @tempSql;
+	EXECUTE stmt2;
+
+	-- 数量
+	SET @countSql = CONCAT('SELECT count(*) AS count ',@Sql);	
+	SET @countSql = CONCAT(@countSql, ';');
+	PREPARE stmt3 FROM @countSql;
+	EXECUTE stmt3;
 	
 	-- 用户权限
 	SELECT * from t_user_info_with_authority where `user_info_id` in (SELECT id FROM temp_p_user_info_query00);	
@@ -2491,7 +2512,7 @@ BEGIN
 				where `user_info_id` in (SELECT id FROM temp_p_user_info_query00));
 
 	-- 角色权限
-	SELECT DISTINCT t4.*, t1.id AS role_id FROM t_role t1 
+	SELECT DISTINCT t4.*, t1.code AS role_code FROM t_role t1 
 		LEFT JOIN t_user_info_with_role t2 ON t1.`code` = t2.role_code AND t1.`status` = 1
 		LEFT JOIN t_role_with_authority t3 ON t2.role_code = t3.role_code 
 		LEFT JOIN t_authority t4 ON t3.authority_code = t4.`code`

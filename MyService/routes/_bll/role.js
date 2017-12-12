@@ -34,8 +34,8 @@ exports.save = function (opt) {
         var diffRes = common.getListDiff(diffOpt);
         roleAuthList = diffRes.addList;
         delRoleAuthList = diffRes.delList;
-        console.log(diffOpt);
-        console.log(diffRes);
+        //console.log(diffOpt);
+        //console.log(diffRes);
         return autoBll.tran(function (conn) {
             return autoBll.save('role', opt.role, conn).then(function (t) {
                 id = t;
