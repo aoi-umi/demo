@@ -12,7 +12,9 @@ exports.isAccountExist = function (account) {
         if (!account)
             throw common.error(null, 'ARGS_ERROR');
         return autoBll.query('user_info', {account: account}).then(function (t) {
-            return t.list.length;
+            if (t.list.length > 1)
+                throw common.error('数据库中存在重复账号');
+            return t.list.length ? true : false;
         });
     });
 };
@@ -98,9 +100,9 @@ exports.query = function (opt) {
             list: t[0],
             count: t[1][0].count
         };
-        var user_info_authority_id_list = t[2];
+        var user_info_with_authority_list = t[2];
         var authority_list = t[3];
-        var user_info_role_id_list = t[4];
+        var user_info_with_role_list = t[4];
         var role_list = t[5];
         var role_authority_list = t[6];
         // for (var i = 2; i <= 6; i++) {
@@ -112,20 +114,20 @@ exports.query = function (opt) {
                 authority_list: [],
                 role_authority_list: [],
             };
-            user_info_authority_id_list.forEach(function (u_auth_id) {
-                if (u_auth_id.user_info_id == item.id) {
+            user_info_with_authority_list.forEach(function (u_with_auth) {
+                if (u_with_auth.user_info_id == item.id) {
                     var matchAuth = _.filter(authority_list, function (auth) {
-                        return u_auth_id.authority_id == auth.id;
+                        return u_with_auth.authority_code == auth.code;
                     });
                     if (matchAuth)
                         detail.authority_list = detail.authority_list.concat(matchAuth);
                 }
             });
 
-            user_info_role_id_list.forEach(function (u_role_id) {
-                if (u_role_id.user_info_id == item.id) {
+            user_info_with_role_list.forEach(function (u_with_role) {
+                if (u_with_role.user_info_id == item.id) {
                     var matchAuth = _.filter(role_authority_list, function (role_auth) {
-                        return u_role_id.role_id == role_auth.role_id;
+                        return u_with_role.role_code == role_auth.role_code;
                     });
                     if (matchAuth)
                         detail.role_authority_list = detail.role_authority_list.concat(matchAuth);
@@ -157,13 +159,13 @@ exports.adminSave = function (opt) {
     return common.promise().then(function () {
         if (!id)
             throw common.error('id为空', 'CAN_NOT_BE_EMPTY');
-        return autoBll.query('user_info_authority_id', {user_info_id: id});
+        return autoBll.query('user_info_with_authority', {user_info_id: id});
     }).then(function (t) {
         var diffOpt = {
             list: t.list,
-            newList: opt.authorityIdList,
+            newList: opt.authorityList,
             compare: function (item, item2) {
-                return item.authority_id == item2;
+                return item.authority_code == item2;
             },
             delReturnValue: function (item) {
                 return item.id;
@@ -172,13 +174,13 @@ exports.adminSave = function (opt) {
         var diffRes = common.getListDiff(diffOpt);
         userAuthIdList = diffRes.addList;
         delUserAuthIdList = diffRes.delList;
-        return autoBll.query('user_info_role_id', {user_info_id: id});
+        return autoBll.query('user_info_with_role', {user_info_id: id});
     }).then(function (t) {
         var diffOpt = {
             list: t.list,
-            newList: opt.roleIdList,
+            newList: opt.roleList,
             compare: function (item, item2) {
-                return item.role_id == item2;
+                return item.role_code == item2;
             },
             delReturnValue: function (item) {
                 return item.id;
@@ -208,26 +210,26 @@ exports.adminSave = function (opt) {
                 //删除权限
                 if (delUserAuthIdList.length) {
                     delUserAuthIdList.forEach(function (item) {
-                        list.push(autoBll.del('user_info_authority_id', {id: item}, conn));
+                        list.push(autoBll.del('user_info_with_authority', {id: item}, conn));
                     })
                 }
                 //保存权限
                 if (userAuthIdList.length) {
                     userAuthIdList.forEach(function (item) {
-                        list.push(autoBll.save('user_info_authority_id', {user_info_id: id, authority_id: item}));
+                        list.push(autoBll.save('user_info_with_authority', {user_info_id: id, authority_code: item}));
                     });
                 }
 
                 //删除角色
                 if (delUserRoleIdList.length) {
                     delUserRoleIdList.forEach(function (item) {
-                        list.push(autoBll.del('user_info_role_id', {id: item}, conn));
+                        list.push(autoBll.del('user_info_with_role', {id: item}, conn));
                     })
                 }
                 //保存角色
                 if (userRoleIdList.length) {
                     userRoleIdList.forEach(function (item) {
-                        list.push(autoBll.save('user_info_role_id', {user_info_id: id, role_id: item}));
+                        list.push(autoBll.save('user_info_with_role', {user_info_id: id, role_code: item}));
                     });
                 }
 

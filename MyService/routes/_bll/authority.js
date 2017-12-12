@@ -20,7 +20,9 @@ exports.isExist = function (opt) {
         return autoBll.query('authority', {code: code});
     }).then(function (t) {
         var result = false;
-        if(t.list.length && t.list[0].id != opt.id){
+        if (t.list.length > 1)
+            throw common.error('数据库中存在重复权限');
+        if (t.list.length && t.list[0].id != opt.id) {
             result = true;
         }
         return result;

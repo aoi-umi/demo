@@ -88,10 +88,10 @@ moduleRole = {
                 if (checkRes.success) {
                     var data = {
                         role: checkRes.model,
-                        authorityIdList: []
+                        authorityList: []
                     };
                     $('#roleSave [name=roleAuthority]').each(function () {
-                        data.authorityIdList.push($(this).data('id'));
+                        data.authorityList.push($(this).data('code'));
                     });
                     checkRes.model = data;
                 }
@@ -109,6 +109,9 @@ moduleRole = {
                         }
                     }]
                 });
+            },
+            beforeDetailQuery: function (t, self) {
+                return {code: t.code};
             },
             onDetailQuerySuccess: function (t, self) {
                 self.detailRender(t.role);
@@ -143,7 +146,7 @@ moduleRole = {
                     dom: $('#roleSave [name=authority]'),
                     select: function (dom, item) {
                         //dom.data('item', item).val(item.code);
-                        var match = $('#roleSave [name=authorityBox]').find(`[name=roleAuthority][data-id=${item.id}]`);
+                        var match = $('#roleSave [name=authorityBox]').find(`[name=roleAuthority][data-code=${item.code}]`);
                         if (!match.length) {
                             self.opt.setAuthority(item, self);
                         }

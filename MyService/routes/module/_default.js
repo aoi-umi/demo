@@ -41,10 +41,7 @@ function getBll(req, res, next) {
     ) {
         opt.isCustom = true;
     }
-    if (common.isInArray(method, ['detailQuery'])) {
-        if (!args || !args.id)
-            throw common.error('args error');
-    }
+    checkArgs({method: method, module: module, args: args});
 
     //不记录日志
     if (common.isInArray(module, ['log'])) {
@@ -123,6 +120,27 @@ exports.view = function (req, res, next) {
     }).fail(function (e) {
         next(e);
     });
+};
+
+var checkArgs = function (opt) {
+    var method = opt.method;
+    var module = opt.module;
+    var args = opt.args;
+    if (common.isInArray(method, ['detailQuery'])) {
+        var argsError = false;
+        if (module == 'role') {
+            if (!args.code)
+                argsError = true;
+        }
+        else if (module == 'authority') {
+            if (!args.code)
+                argsError = true;
+        }
+        else if (!args || !args.id)
+            argsError = true;
+        if (argsError)
+            throw common.error('args error');
+    }
 };
 
 var updateValue = function (opt) {
