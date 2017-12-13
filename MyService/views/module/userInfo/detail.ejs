@@ -56,17 +56,54 @@
 
     <div class="row">
         <div class="col-xs-9 col-xs-push-1 my-row">
+            <label class="control-label">角色</label>
+            <% userInfoDetail.role_list.forEach(function(item){
+                item.id = 0;
+                    with(item){
+            %>
+            <a class="hover hover-source" href="#hoverTargetRole_<%= item.code %>">
+                <% include ../../_template/roleLabel %>
+            </a>
+
+            <div class="hover hover-target hover-role-authority" id="hoverTargetRole_<%= item.code %>">
+                <%
+                item.authority_list.forEach(function (authority) {
+                    authority.id = 0;
+                        with(authority){ %>
+                <% include ../../_template/authorityLabel %>
+                <% }
+                }); %>
+            </div>
+            <% }
+            } ); %>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-9 col-xs-push-1 my-row">
             <label class="control-label">权限</label>
+            <% userInfoDetail.authority_list.forEach(function(item){
+                item.id = 0;
+                    with(item){
+            %>
+            <% include ../../_template/authorityLabel %>
+            <% }
+            } ); %>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-9 col-xs-push-1 my-row">
+            <label class="control-label">可用权限</label>
             <% for(var key in userInfoDetail.auth){
-                var model = {
+                var item = {
                     id: 0,
                     code: key,
+                    status: 1
                 }
-                with(model){
+                    with(item){
             %>
-                    <%include ../../_template/authorityLabel%>
+            <% include ../../_template/authorityLabel %>
             <% }
-            }%>
+            } %>
         </div>
     </div>
     <div class="row">

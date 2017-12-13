@@ -85,12 +85,22 @@ tbody {
 }
 
 /*浮动*/
+a.hover {
+    text-decoration: none;
+}
 
 .hover-target {
     display: none;
     position: absolute;
     z-index: 999;
     padding-top: 10px;
+}
+
+.hover-role-authority {
+    background: white;
+    border: 2px solid #5bc0de;
+    border-radius: 8px;
+    padding: 0 4px 4px 0;
 }
 
 .pop-up-box {
@@ -106,9 +116,11 @@ tbody {
     white-space: normal;
     display: inline-block;
 }
+
 .my-label label {
     margin: 2px;
 }
+
 .my-label .close {
     margin: -0.2em 0 -0.2em 0.2em;
 }
