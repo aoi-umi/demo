@@ -4,7 +4,6 @@
 namespace('moduleAuthority');
 moduleAuthority = {
     init: function (option) {
-        var self = this;
         var opt = {
             operation: ['query', 'save', 'detailQuery'],
             queryId: 'query',
@@ -58,31 +57,45 @@ moduleAuthority = {
                 self.opt.updateView(['authorityDetail'], {authorityDetail: item});
                 $('#authoritySave').modal('show');
             },
-            beforeSave: function () {
-                var list = [{
-                    name: 'id',
-                    dom: $('#authoritySave [name=id]'),
-                }, {
-                    name: 'code',
-                    desc: '权限编号',
-                    dom: $('#authoritySave [name=code]'),
-                    canNotNull: true,
-                    checkValue: function (val) {
-                        if (!my.vaild.isAuthority(val))
-                            return '{0}只能由字母、数字、下划线组成';
-                    }
-                }, {
-                    name: 'name',
-                    dom: $('#authoritySave [name=name]'),
-                }, {
-                    name: 'status',
-                    dom: $('#authoritySave [name=status]'),
-                    getValue: function () {
-                        return this.dom.prop('checked');
-                    }
-                },];
-                var checkRes = common.dataCheck({list: list});
-                return checkRes;
+            beforeSave: function (dom, self) {
+                if (dom.hasClass('itemStatusUpdate')) {
+                    var row = dom.closest(self.rowClass);
+                    var item = row.data('item');
+                    var checkRes = {
+                        success: true,
+                        model: {
+                            id: item.id,
+                            status: item.status == 1 ? 0 : 1,
+                            statusUpdateOnly: true
+                        }
+                    };
+                    return checkRes;
+                } else {
+                    var list = [{
+                        name: 'id',
+                        dom: $('#authoritySave [name=id]'),
+                    }, {
+                        name: 'code',
+                        desc: '权限编号',
+                        dom: $('#authoritySave [name=code]'),
+                        canNotNull: true,
+                        checkValue: function (val) {
+                            if (!my.vaild.isAuthority(val))
+                                return '{0}只能由字母、数字、下划线组成';
+                        }
+                    }, {
+                        name: 'name',
+                        dom: $('#authoritySave [name=name]'),
+                    }, {
+                        name: 'status',
+                        dom: $('#authoritySave [name=status]'),
+                        getValue: function () {
+                            return this.dom.prop('checked');
+                        }
+                    },];
+                    var checkRes = common.dataCheck({list: list});
+                    return checkRes;
+                }
             },
             onSaveSuccess: function (t, self) {
                 common.msgNotice({

@@ -7,57 +7,64 @@ var autoBll = require('./auto');
 var common = require('../_system/common');
 var role = exports;
 
-exports.save = function (opt, exOpt) {
-    var user = exOpt.user;
-    var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
+exports.save = function (opt) {
     var id;
     var dataRole = opt.role;
     return common.promise().then(function () {
-        return role.isExist(opt.role);
-    }).then(function (t) {
-        if (t)
-            throw common.error(`code[${dataRole.code}]已存在`);
-        return autoBll.query('role_with_authority', {role_code: dataRole.code});
-    }).then(function (t) {
-        var roleAuthList = [];
-        var delRoleAuthList = [];
-        var diffOpt = {
-            list: t.list,
-            newList: opt.authorityList,
-            compare: function (item, item2) {
-                return item.authority_code == item2;
-            },
-            delReturnValue: function (item) {
-                return item.id;
-            }
-        };
-        var diffRes = common.getListDiff(diffOpt);
-        roleAuthList = diffRes.addList;
-        delRoleAuthList = diffRes.delList;
-        //console.log(diffOpt);
-        //console.log(diffRes);
-        return autoBll.tran(function (conn) {
-            return autoBll.save('role', opt.role, conn).then(function (t) {
+        if (opt.statusUpdateOnly) {
+            if (!dataRole.id || dataRole.id == 0)
+                throw common.error('id不能为空');
+            return autoBll.save('role', {id: dataRole.id, status: dataRole.status}).then(function (t) {
                 id = t;
-                var list = [];
-                //删除权限
-                if (delRoleAuthList.length) {
-                    delRoleAuthList.forEach(function (item) {
-                        list.push(autoBll.del('role_with_authority', {id: item}, conn));
-                    })
-                }
-                //保存权限
-                if (roleAuthList.length) {
-                    roleAuthList.forEach(function (item) {
-                        list.push(autoBll.save('role_with_authority', {
-                            role_code: dataRole.code,
-                            authority_code: item
-                        }, conn));
-                    });
-                }
-                return q.all(list);
             });
-        });
+        } else {
+            return role.isExist(dataRole).then(function (t) {
+                if (t)
+                    throw common.error(`code[${dataRole.code}]已存在`);
+
+                return autoBll.query('role_with_authority', {role_code: dataRole.code});
+            }).then(function (t) {
+                var roleAuthList = [];
+                var delRoleAuthList = [];
+                var diffOpt = {
+                    list: t.list,
+                    newList: opt.authorityList,
+                    compare: function (item, item2) {
+                        return item.authority_code == item2;
+                    },
+                    delReturnValue: function (item) {
+                        return item.id;
+                    }
+                };
+                var diffRes = common.getListDiff(diffOpt);
+                roleAuthList = diffRes.addList;
+                delRoleAuthList = diffRes.delList;
+                //console.log(diffOpt);
+                //console.log(diffRes);
+                return autoBll.tran(function (conn) {
+                    return autoBll.save('role', dataRole, conn).then(function (t) {
+                        id = t;
+                        var list = [];
+                        //删除权限
+                        if (delRoleAuthList.length) {
+                            delRoleAuthList.forEach(function (item) {
+                                list.push(autoBll.del('role_with_authority', {id: item}, conn));
+                            })
+                        }
+                        //保存权限
+                        if (roleAuthList.length) {
+                            roleAuthList.forEach(function (item) {
+                                list.push(autoBll.save('role_with_authority', {
+                                    role_code: dataRole.code,
+                                    authority_code: item
+                                }, conn));
+                            });
+                        }
+                        return q.all(list);
+                    });
+                });
+            });
+        }
     }).then(function (t) {
         return id;
     });
@@ -111,4 +118,4 @@ exports.isExist = function (opt) {
         }
         return result;
     });
-}
+};

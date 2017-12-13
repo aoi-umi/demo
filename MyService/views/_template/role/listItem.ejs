@@ -12,7 +12,8 @@
     </td>
     <td><%= status == 1 ? '启用' : '禁用' %></td>
     <td>
-        <a class="itemDetailQuery" href="javascript:;">详细</a>
+        <p><a class="itemDetailQuery" href="javascript:;">详细</a></p>
+        <p><a class="itemStatusUpdate save" href="javascript:;"><%= status != 1 ? '启用' : '禁用' %></a></p>
     </td>
 </tr>
 </tbody>
