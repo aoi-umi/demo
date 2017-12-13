@@ -28,9 +28,6 @@ moduleUserInfo = {
                 name: 'nickname',
                 dom: $('#nickname'),
             }, {
-                name: 'auth',
-                dom: $('#auth'),
-            }, {
                 name: 'create_datetime_start',
                 dom: $('#create_datetime_start'),
             }, {

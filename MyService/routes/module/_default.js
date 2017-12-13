@@ -134,10 +134,6 @@ var checkArgs = function (opt) {
             if (!args.code)
                 argsError = true;
         }
-        else if (module == 'authority') {
-            if (!args.code)
-                argsError = true;
-        }
         else if (!args || !args.id)
             argsError = true;
         if (argsError)

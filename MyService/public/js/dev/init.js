@@ -126,7 +126,7 @@ init = {
             }
         })
         //浮动
-        $('.hover').on('mouseover mouseleave', function (e) {
+        $(document).on('mouseover mouseleave', '.hover', function (e) {
             var dom = $(this);
             var target = $(dom.attr('href'));
             if (target.length && dom.hasClass('hover-source')) {

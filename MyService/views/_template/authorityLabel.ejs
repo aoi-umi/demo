@@ -1,13 +1,13 @@
 <!--read only-->
 <% if(id == 0){ %>
-<div class="label label-info my-label">
+<div class="label <%= status == 1 ? 'label-info' : 'label-default' %> my-label">
     <label><%= code %></label>
 </div>
 <% } else{ %>
 <div name="<%= labelName %>" data-code="<%= code %>"
      class="label <%= status == 1 ? 'label-info' : 'label-default' %> my-label">
     <label><%= code %>
-        <button class="close" type="button" data-close-target="[name=<%= labelName %>][data-id=<%= id %>]">×</button>
+        <button class="close" type="button" data-close-target="[name=<%= labelName %>][data-code=<%= code %>]">×</button>
     </label>
 </div>
 <% } %>

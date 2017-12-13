@@ -1,11 +1,13 @@
 <tbody class="itemRow">
 <tr>
     <td><%= account %>(<%= nickname || '' %>#<%= id %>)</td>
-    <td><% authority_list.forEach(function (t) { %>
-        <div class="label <%= t.status == 1 ? 'label-info' : 'label-default' %> my-label">
-            <label><%= t.code %></label>
+    <td>
+        <% for(var key in auth){ %>
+        <div class="label label-info my-label">
+            <label><%= key %></label>
         </div>
-        <% }); %></td>
+        <% } %>
+    </td>
     <td><%= create_datetime %></td>
     <td><%= edit_datetime || '' %></td>
     <td><%= remark || '' %></td>

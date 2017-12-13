@@ -111,6 +111,7 @@ exports.query = function (opt) {
         data.list.forEach(function (item) {
             var detail = {
                 auth: {},
+                role_list: [],
                 authority_list: [],
                 role_authority_list: [],
             };
@@ -131,13 +132,15 @@ exports.query = function (opt) {
                     });
                     if (matchAuth)
                         detail.role_authority_list = detail.role_authority_list.concat(matchAuth);
+                    var matchRole = _.filter(role_list, function (role) {
+                        return u_with_role.role_code == role.code;
+                    });
+                    if (matchRole)
+                        detail.role_list.push(matchRole);
                 }
             });
-            var updateRes = updateUserInfo(detail);
-            item.authority_list = updateRes.authority_list;
-            for (var key in detail.auth) {
-                item.auth += key + ';';
-            }
+            updateUserInfo(detail);
+            item.auth = detail.auth;
         });
         return data;
     });
@@ -246,19 +249,40 @@ exports.adminSave = function (opt) {
 
 var updateUserInfo = function (detail) {
     var authority_list = [];
+    var auth = {};
     detail.authority_list.forEach(function (t) {
         if (t.status == 1) {
-            if (!detail.auth[t.code]) authority_list.push(t);
-            detail.auth[t.code] = true;
+            if (!auth[t.code]) authority_list.push(t);
+            auth[t.code] = true;
         }
     });
     detail.role_authority_list.forEach(function (t) {
-        if (t.status == 1) {
-            if (!detail.auth[t.code]) authority_list.push(t);
-            detail.auth[t.code] = true;
+        if (t.status == 1 && t.role_status == 1) {
+            if (!auth[t.code]) authority_list.push(t);
+            auth[t.code] = true;
         }
     });
-    return {
-        authority_list: authority_list
-    };
+
+    detail.role_list.forEach(function (role) {
+        role.authority_list = _.filter(detail.role_authority_list, function (role_authority) {
+                return role_authority.role_code == role.code;
+            }) || [];
+        role.authority_list = _.sortBy(role.authority_list, function (t) {
+            return t.code;
+        });
+    });
+    detail.authority_list = _.sortBy(detail.authority_list, function (t) {
+        return t.code;
+    });
+    detail.role_list = _.sortBy(detail.role_list, function (t) {
+        return t.code;
+    });
+    authority_list = _.sortBy(authority_list, function (t) {
+        return t.code;
+    });
+    if (!detail.auth)
+        detail.auth = {};
+    authority_list.forEach(function (t) {
+        detail.auth[t.code] = true;
+    });
 }
