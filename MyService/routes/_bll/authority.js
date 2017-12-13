@@ -4,10 +4,19 @@ var authority = exports;
 
 exports.save = function (opt) {
     return common.promise().then(function () {
-        return authority.isExist(opt);
+        if (opt.statusUpdateOnly) {
+            if (!opt.id || opt.id == 0)
+                throw common.error('id不能为空');
+            opt = {
+                id: opt.id,
+                status: opt.status
+            };
+        } else {
+            return authority.isExist(opt).then(function (t) {
+                throw common.error(`code[${opt.code}]已存在`);
+            });
+        }
     }).then(function (t) {
-        if (t)
-            throw common.error(`code[${opt.code}]已存在`);
         return autoBll.save('authority', opt);
     });
 };

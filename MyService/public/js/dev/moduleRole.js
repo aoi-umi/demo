@@ -48,7 +48,6 @@ moduleRole = {
             init: function (self) {
             },
             bindEvent: function (self) {
-
             },
             beforeQuery: function (data) {
                 if (!data.id) data.id = null;
@@ -61,41 +60,57 @@ moduleRole = {
                 self.opt.updateView(['roleDetail'], {roleDetail: item}, self);
                 $('#roleSave').modal('show');
             },
-            beforeSave: function () {
-                var list = [{
-                    name: 'id',
-                    dom: $('#roleSave [name=id]'),
-                }, {
-                    name: 'code',
-                    desc: '角色编号',
-                    dom: $('#roleSave [name=code]'),
-                    canNotNull: true,
-                    checkValue: function (val) {
-                        if (!my.vaild.isRole(val))
-                            return '{0}只能由字母、数字、下划线组成';
-                    }
-                }, {
-                    name: 'name',
-                    dom: $('#roleSave [name=name]'),
-                }, {
-                    name: 'status',
-                    dom: $('#roleSave [name=status]'),
-                    getValue: function () {
-                        return this.dom.prop('checked');
-                    }
-                },];
-                var checkRes = common.dataCheck({list: list});
-                if (checkRes.success) {
-                    var data = {
-                        role: checkRes.model,
-                        authorityList: []
+            beforeSave: function (dom, self) {
+                if (dom.hasClass('itemStatusUpdate')) {
+                    var row = dom.closest(self.rowClass);
+                    var item = row.data('item');
+                    var checkRes = {
+                        success: true,
+                        model: {
+                            role: {
+                                id: item.id,
+                                status: item.status == 1 ? 0 : 1
+                            },
+                            statusUpdateOnly: true
+                        }
                     };
-                    $('#roleSave [name=roleAuthority]').each(function () {
-                        data.authorityList.push($(this).data('code'));
-                    });
-                    checkRes.model = data;
+                    return checkRes;
+                } else {
+                    var list = [{
+                        name: 'id',
+                        dom: $('#roleSave [name=id]'),
+                    }, {
+                        name: 'code',
+                        desc: '角色编号',
+                        dom: $('#roleSave [name=code]'),
+                        canNotNull: true,
+                        checkValue: function (val) {
+                            if (!my.vaild.isRole(val))
+                                return '{0}只能由字母、数字、下划线组成';
+                        }
+                    }, {
+                        name: 'name',
+                        dom: $('#roleSave [name=name]'),
+                    }, {
+                        name: 'status',
+                        dom: $('#roleSave [name=status]'),
+                        getValue: function () {
+                            return this.dom.prop('checked');
+                        }
+                    },];
+                    var checkRes = common.dataCheck({list: list});
+                    if (checkRes.success) {
+                        var data = {
+                            role: checkRes.model,
+                            authorityList: []
+                        };
+                        $('#roleSave [name=roleAuthority]').each(function () {
+                            data.authorityList.push($(this).data('code'));
+                        });
+                        checkRes.model = data;
+                    }
+                    return checkRes;
                 }
-                return checkRes;
             },
             onSaveSuccess: function (t, self) {
                 common.msgNotice({
