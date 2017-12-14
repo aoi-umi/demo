@@ -2,11 +2,30 @@
 <tr>
     <td><%= account %>(<%= nickname || '' %>#<%= id %>)</td>
     <td>
-        <% for(var key in auth){ %>
-        <div class="label label-info my-label">
-            <label><%= key %></label>
+        <% role_list.forEach(function (t) { %>
+        <a class="hover hover-source" href="#hoverTargetUserRole_<%= id + '_' + t.code %>">
+            <div class="label <%= t.status == 1 ? 'label-info' : 'label-default' %> my-label">
+                <label><%= t.code %></label>
+            </div>
+        </a>
+
+        <div class="hover hover-target" id="hoverTargetUserRole_<%= id + '_' + t.code %>">
+            <div class="hover-role-authority">
+                <% t.authority_list.forEach(function (authority) { %>
+                <div class="label <%= authority.status == 1 ? 'label-info' : 'label-default' %> my-label">
+                    <label><%= authority.code %></label>
+                </div>
+                <% }); %>
+            </div>
         </div>
-        <% } %>
+        <% }); %>
+    </td>
+    <td>
+        <% authority_list.forEach(function (t) { %>
+        <div class="label <%= t.status == 1 ? 'label-info' : 'label-default' %> my-label">
+            <label><%= t.code %></label>
+        </div>
+        <% }); %>
     </td>
     <td><%= create_datetime %></td>
     <td><%= edit_datetime || '' %></td>

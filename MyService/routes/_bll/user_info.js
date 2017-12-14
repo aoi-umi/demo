@@ -136,11 +136,12 @@ exports.query = function (opt) {
                         return u_with_role.role_code == role.code;
                     });
                     if (matchRole)
-                        detail.role_list.push(matchRole);
+                        detail.role_list = detail.role_list.concat(matchRole);
                 }
             });
             updateUserInfo(detail);
-            item.auth = detail.auth;
+            item.role_list = detail.role_list;
+            item.authority_list = detail.authority_list;
         });
         return data;
     });
