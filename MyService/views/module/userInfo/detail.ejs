@@ -65,14 +65,16 @@
                 <% include ../../_template/roleLabel %>
             </a>
 
-            <div class="hover hover-target hover-role-authority" id="hoverTargetRole_<%= item.code %>">
-                <%
-                item.authority_list.forEach(function (authority) {
-                    authority.id = 0;
-                        with(authority){ %>
-                <% include ../../_template/authorityLabel %>
-                <% }
-                }); %>
+            <div class="hover hover-target" id="hoverTargetRole_<%= item.code %>">
+                <div class="hover-role-authority">
+                    <%
+                    item.authority_list.forEach(function (authority) {
+                        authority.id = 0;
+                            with(authority){ %>
+                    <% include ../../_template/authorityLabel %>
+                    <% }
+                    }); %>
+                </div>
             </div>
             <% }
             } ); %>

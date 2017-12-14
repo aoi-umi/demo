@@ -94,6 +94,7 @@ a.hover {
     position: absolute;
     z-index: 999;
     padding-top: 10px;
+    background: transparent;
 }
 
 .hover-role-authority {
