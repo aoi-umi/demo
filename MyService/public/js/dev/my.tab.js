@@ -28,6 +28,12 @@ my.tab = {
                 <li><a href="javascript:;" class="menu-item" data-menu-type="closeRightAll">关闭右侧全部</a></li>
             </ul>`);
         $('body').append(tabHeaderContextMenu);
+        var tabContextMenu = self.tabContextMenu =
+            $(`<ul class="dropdown-menu" id="tab-header-context-menu">
+                <li><a href="javascript:;" class="menu-item" data-menu-type="_blank">在新标签打开</a></li>
+                <li><a href="javascript:;" class="menu-item" data-menu-type="_self">在本页打开</a></li>
+            </ul>`);
+        $('body').append(tabContextMenu);
 
         self.bindEvent();
     },
@@ -36,7 +42,8 @@ my.tab = {
         var tabContainer = self.tabContainer;
         var panelContainer = self.panelContainer;
         var tabHeaderContextMenu = self.tabHeaderContextMenu;
-        $(document).on('click', '.tab', function () {
+        var tabContextMenu = self.tabContextMenu;
+        $(document).on('click', '.tab', function (event) {
             var clickTab = $(this);
             var targetId = clickTab.attr('data-tab-target');
             if (targetId) {
@@ -74,14 +81,25 @@ my.tab = {
                 tabDom.click();
             }
         });
-        tabContainer.on('click', '[data-toggle=tab]', function(){
+        $(document).on('contextmenu', '.tab[data-url]', function (e) {
+            var x = e.pageX;
+            var y = e.pageY;
+            tabContextMenu.css({
+                left: x,
+                top: y,
+            }).show();
+            tabContextMenu.currTab = $(this);
+            return false;
+
+        });
+        tabContainer.on('click', '[data-toggle=tab]', function () {
             var id = $(this).attr('id');
             self.clickTabIdList.push(id);
         });
         //关闭
-        tabContainer.on('click','.close', function () {
+        tabContainer.on('click', '.close', function () {
             $($(this).data('close-target')).remove();
-            if(tabContainer.find('> .active').length == 0) {
+            if (tabContainer.find('> .active').length == 0) {
                 var lastId = self.clickTabIdList[self.clickTabIdList.length - 2];
                 if (!$('#' + lastId).length)
                     tabContainer.find('a:eq(0)').click();
@@ -90,29 +108,31 @@ my.tab = {
             }
         });
         //tab header右键
-        tabContainer.on('contextmenu', '.tab-header', function(e){
-            var x = e.clientX;
-            var y = e.clientY;
-            self.tabHeaderContextMenu.css({
+        tabContainer.on('contextmenu', '.tab-header', function (e) {
+            var x = e.pageX;
+            var y = e.pageY;
+            tabHeaderContextMenu.css({
                 left: x,
                 top: y,
             }).show();
-            self.tabHeaderContextMenu.currTabHeader = $(this);
+            tabHeaderContextMenu.currTabHeader = $(this);
             return false;
         });
 
-        $(document).on('click', function(){
+        $(document).on('click', function () {
             tabHeaderContextMenu.hide();
             tabHeaderContextMenu.currTabHeader = null;
+            tabContextMenu.hide();
+            tabContextMenu.currTab = null;
         });
-        tabHeaderContextMenu.on('click','.menu-item', function(e){
+        tabHeaderContextMenu.on('click', '.menu-item', function (e) {
             var currTabHeader = tabHeaderContextMenu.currTabHeader;
-            if(currTabHeader) {
+            if (currTabHeader) {
                 var type = $(this).data('menu-type');
                 switch (type) {
                     case 'refresh':
                         var iframe = $(currTabHeader.find('a').attr('href')).find('iframe');
-                        if(iframe.length){
+                        if (iframe.length) {
                             iframe.attr('src', iframe.attr('src'));
                         }
                         break;
@@ -134,6 +154,17 @@ my.tab = {
                 }
             }
         });
+
+        tabContextMenu.on('click', '.menu-item', function (e) {
+            var currTab = tabContextMenu.currTab;
+            if (currTab) {
+                var url = currTab.data('url');
+                var type = $(this).data('menu-type');
+                if(url && type){
+                    window.open(url, type);
+                }
+            }
+        });
     },
     //tabData {type:'', id:'', name:'', targetId:'', closeTarget:''}
     tab: function (data) {
@@ -152,7 +183,7 @@ my.tab = {
                 if (t.closeTarget) {
                     var closeBtn = dom.find('[name=tab-close-btn]');
                     closeBtn.removeClass('hidden').attr('data-close-target', t.closeTarget)
-                    dom.on('dblclick', function(){
+                    dom.on('dblclick', function () {
                         closeBtn.click();
                     });
                 }
@@ -160,12 +191,12 @@ my.tab = {
         }
         return dom;
     },
-    tabs:function(data){
+    tabs: function (data) {
         var self = this;
         var list = [];
-        for(var i = 0;i < data.length;i++){
+        for (var i = 0; i < data.length; i++) {
             var dom = self.tab(data[i]);
-            if(dom)
+            if (dom)
                 list.push(dom);
         }
         return list;
@@ -179,9 +210,9 @@ my.tab = {
         switch (t.type) {
             case 'iframe':
             default:
-                if(t.content) {
+                if (t.content) {
                     var iframeId = 'iframe-' + t.id;
-                    if(t.content.indexOf('?') >= 0)
+                    if (t.content.indexOf('?') >= 0)
                         t.content += '&iframeId=' + iframeId;
                     else
                         t.content += '?iframeId=' + iframeId;
@@ -196,17 +227,17 @@ my.tab = {
         dom = $(`<div style="height: 512px" id="${t.id || ''}" class="tab-pane fade">${content}</div>`);
         return dom;
     },
-    panels:function(data){
+    panels: function (data) {
         var self = this;
         var list = [];
         for (var i = 0; i < data.length; i++) {
             var dom = self.panel(data[i]);
-            if(dom)
+            if (dom)
                 list.push(dom);
         }
         return list;
     },
-    addOrOpenTab:function(data){
+    addOrOpenTab: function (data) {
         var self = this;
         var tabContainer = self.tabContainer;
         var panelContainer = self.panelContainer;
@@ -220,7 +251,7 @@ my.tab = {
             targetId: panelId,
             closeTarget: '#' + headerId + ',#' + panelId,
         };
-        if(!$('#' + tabId).length)
+        if (!$('#' + tabId).length)
             tabContainer.append(self.tab(tabData));
 
         var tabPanelData = {
@@ -228,7 +259,7 @@ my.tab = {
             id: panelId,
             content: data.content
         };
-        if(!$('#' + panelId).length)
+        if (!$('#' + panelId).length)
             panelContainer.append(self.panel(tabPanelData));
         $('#' + tabId).click();
     }

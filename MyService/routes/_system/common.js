@@ -140,10 +140,7 @@ exports.requestServiceByConfigPromise = function (option) {
         var opt = {
             url: url,
             body: option.data,
-            method: method,
-            headers: {
-                'x-requested-with': 'xmlhttprequest'
-            }
+            method: method
         };
         if (option.beforeRequest) {
             //发送的参数 当前所用参数
@@ -182,6 +179,8 @@ exports.requestServicePromise = function (option) {
         encoding: null,
     };
     opt = common.extend(opt, option);
+    if (!opt.headers) opt.headers = {};
+    opt.headers['x-requested-with'] = 'xmlhttprequest';
     //console.log(opt)
     return common.promise().then(function (res) {
         request(opt, function (err, response, data) {

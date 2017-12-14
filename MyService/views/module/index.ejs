@@ -144,13 +144,15 @@
                     <a class="list-group-item tab menuItem" href="javascript:;"
                             <% if(child.tabUrl){ %>
                        data-tab-content="<%= child.tabUrl + (child.tabUrlArgs || '?noNav=true') %>"
+                       data-url="<%= child.tabUrl + (child.tabUrlArgs || '') %>"
                             <% } %>
                             <% for(var key in child.tab){
                             if(child.tab[key]){ %>
                        data-tab-<%= key %>="<%= child.tab[key] %>"
                             <% }
                             } %>
-                            <%- child.attr || '' %>><%= child.text %></a>
+                            <%- child.attr || '' %>><%= child.text %>
+                    </a>
                     <% }) %>
                 </div>
                 <% }); %>
