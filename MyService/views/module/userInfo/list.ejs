@@ -5,26 +5,32 @@
             <%
             var prefix = '';
             var searchItemList = [{
-                text: 'id',
-                id: 'id',
-            }, {
-                text: 'account',
+                text: '账号',
                 id: 'account',
             }, {
-                text: 'nickname',
+                text: '昵称',
                 id: 'nickname',
             }, {
-                text: 'create_datetime_s',
+                text: '角色',
+                id: 'role',
+            }, {
+                text: '权限',
+                id: 'authority',
+            }, {
+                text: '创建时间起始',
                 id: 'create_datetime_start',
             }, {
-                text: 'create_datetime_e',
+                text: '创建时间结束',
                 id: 'create_datetime_end',
             }, {
-                text: 'edit_datetime_s',
+                text: '修改时间起始',
                 id: 'edit_datetime_start',
             }, {
-                text: 'edit_datetime_e',
+                text: '修改时间结束',
                 id: 'edit_datetime_end',
+            }, {
+                text: 'id',
+                id: 'id',
             },];
             for(var i = 0;i < searchItemList.length;i++){
                 var item = searchItemList[i];
