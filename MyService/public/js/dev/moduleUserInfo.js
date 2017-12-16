@@ -15,18 +15,17 @@ moduleUserInfo = {
             interfacePrefix: 'userInfo',
 
             queryArgsOpt: [{
-                name: 'id',
-                dom: $('#id'),
-                checkValue: function (val) {
-                    if (val && !my.vaild.isInt(val, '001'))
-                        return '请输入正确的正整数';
-                }
-            }, {
                 name: 'account',
                 dom: $('#account'),
             }, {
                 name: 'nickname',
                 dom: $('#nickname'),
+            },  {
+                name: 'role',
+                dom: $('#role'),
+            },  {
+                name: 'authority',
+                dom: $('#authority'),
             }, {
                 name: 'create_datetime_start',
                 dom: $('#create_datetime_start'),
@@ -39,7 +38,14 @@ moduleUserInfo = {
             }, {
                 name: 'edit_datetime_end',
                 dom: $('#edit_datetime_end'),
-            }
+            }, {
+                name: 'id',
+                dom: $('#id'),
+                checkValue: function (val) {
+                    if (val && !my.vaild.isInt(val, '001'))
+                        return '请输入正确的正整数';
+                }
+            },
             ],
             bindEvent: function (self) {
                 $('#create_datetime_start').on('click', function () {
@@ -98,12 +104,48 @@ moduleUserInfo = {
                     else
                         authBox.addClass('hidden');
                 });
+
+                //角色
+                common.autoComplete({
+                    source: self.opt.getRole,
+                    dom: $('#role'),
+                    select: function (dom, item) {
+                        dom.data('item', item).val(item.code);
+                    },
+                    renderItem: function (ul, item) {
+                        return $('<li>')
+                            .append('<div>' + item.code + '</div>')
+                            .appendTo(ul);
+                    },
+                    match: function (input, item) {
+                        var matcher = new RegExp($.ui.autocomplete.escapeRegex(input), 'i');
+                        return matcher.test(item.code);
+                    }
+                });
+                //权限
+                common.autoComplete({
+                    source: self.opt.getAuthority,
+                    dom: $('#authority'),
+                    select: function (dom, item) {
+                        dom.data('item', item).val(item.code);
+                    },
+                    renderItem: function (ul, item) {
+                        return $('<li>')
+                            .append('<div>' + item.code + '</div>')
+                            .appendTo(ul);
+                    },
+                    match: function (input, item) {
+                        var matcher = new RegExp($.ui.autocomplete.escapeRegex(input), 'i');
+                        return matcher.test(item.code);
+                    }
+                });
             },
             beforeQuery: function (data) {
                 if (!data.id) data.id = null;
                 if (!data.account) data.account = null;
                 if (!data.nickname) data.nickname = null;
-                if (!data.auth) data.auth = null;
+                if (!data.role) data.role = null;
+                if (!data.authority) data.authority = null;
                 if (!data.create_datetime_start) data.create_datetime_start = null;
                 if (!data.create_datetime_end) data.create_datetime_end = null;
                 if (!data.edit_datetime_start) data.edit_datetime_start = null;
