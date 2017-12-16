@@ -549,5 +549,37 @@ common = {
                 return false;
             }
         }).data('ui-autocomplete')._renderItem = opt.renderItem;
+    },
+    setCountdown: function (option) {
+        //seconds
+        var opt = {
+            countdown: 10,
+            interval: 1,
+            onCountdown: function (dom, endDate) {
+                dom.html(common.getDateDiff(new Date(), endDate));
+            },
+            onCountdownEnd: function (dom, content) {
+                dom.html(content);
+            }
+        };
+        var opt = $.extend(opt, option);
+        var dom = opt.dom;
+        if (dom.hasClass('disabled'))
+            return;
+        dom.addClass('disabled');
+        if (this.countDownInterval) {
+            clearInterval(this.countDownInterval);
+        }
+        var content = dom.html();
+        var date = new Date(new Date().getTime() + opt.countdown * 1000);
+        dom.countDownInterval = this.countDownInterval = setInterval(function () {
+            if (new Date() >= date && dom.countDownInterval) {
+                clearInterval(dom.countDownInterval);
+                dom.removeClass('disabled');
+                opt.onCountdownEnd(dom, content);
+            } else {
+                opt.onCountdown(dom, date);
+            }
+        }, opt.interval * 1000);
     }
 };

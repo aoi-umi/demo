@@ -142,6 +142,7 @@ exports.query = function (opt) {
             updateUserInfo(detail);
             item.role_list = detail.role_list;
             item.authority_list = detail.authority_list;
+            item.auth = detail.auth;
         });
         return data;
     });
