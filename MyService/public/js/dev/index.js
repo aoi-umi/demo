@@ -171,6 +171,8 @@ index = {
             var val = $.trim($(this).val());
             $('#searchResult').empty();
             if (val) {
+                if(!$('#searchResult').hasClass('in'))
+                    $('#menuSearchBtn').click();
                 var list = [];
                 $('#menu .menuItem').each(function () {
                     var itemValue = $(this).text();
@@ -180,6 +182,15 @@ index = {
                 });
                 $('#searchResult').append(list);
             }
+        });
+
+        $('#countdownBtn').on('click', function () {
+            var dom = $(this);
+            common.setCountdown({
+                dom: dom,
+                countdown: 21,
+                interval: 1
+            });
         });
     },
     appendMsg: function (opt) {

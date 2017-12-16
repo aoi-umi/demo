@@ -1,6 +1,6 @@
 <tbody class="itemRow">
 <tr>
-    <td><%= account %>(<%= nickname || '' %>#<%= id %>)</td>
+    <td rowspan="2"><%= account %>(<%= nickname || '' %>#<%= id %>)</td>
     <td>
         <% role_list.forEach(function (t) { %>
         <a class="hover hover-source" href="#hoverTargetUserRole_<%= id + '_' + t.code %>">
@@ -27,11 +27,23 @@
         </div>
         <% }); %>
     </td>
-    <td><%= create_datetime %></td>
-    <td><%= edit_datetime || '' %></td>
-    <td><%= remark || '' %></td>
-    <td>
+    <td rowspan="2"><%= create_datetime %></td>
+    <td rowspan="2"><%= edit_datetime || '' %></td>
+    <td rowspan="2"><%= remark || '' %></td>
+    <td rowspan="2">
         <a class="itemDetailQuery" href="javascript:;">详细</a>
+    </td>
+</tr>
+<tr>
+    <td colspan="2">
+        <a href="javascript:;" class="toggle-auth">可用权限</a>
+        <div class="hidden auth-box">
+            <% for(var key in auth){ %>
+            <div class="label label-info my-label">
+                <label><%= key %></label>
+            </div>
+            <% } %>
+        </div>
     </td>
 </tr>
 </tbody>

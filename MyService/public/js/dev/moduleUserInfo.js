@@ -91,6 +91,13 @@ moduleUserInfo = {
                 $(document).on('click', '.admin-save', function () {
                     self.opt.adminSave(self);
                 });
+                self.queryContainerDom.on('click', '.toggle-auth', function () {
+                    var authBox = $(this).siblings('.auth-box');
+                    if (authBox.hasClass('hidden'))
+                        authBox.removeClass('hidden');
+                    else
+                        authBox.addClass('hidden');
+                });
             },
             beforeQuery: function (data) {
                 if (!data.id) data.id = null;

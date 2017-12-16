@@ -10,13 +10,14 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-xs-2 col-sm-2 col-md-2 sidebar">
-            <div class="list-group">
-                <a class="list-group-item active" data-toggle="collapse" href="#searchResult">
-                    search
-                </a>
-                <input id="menuSearch" type="text" class="form-control" placeholder="search"/>
+            <div class="panel panel-primary">
+                    <a id="menuSearchBtn" class="list-group-item active" data-toggle="collapse" href="#searchResult">
+                        search
+                    </a>
+                    <input id="menuSearch" type="text" class="form-control" placeholder="search"/>
 
-                <div class="collapse in" id="searchResult">
+
+                <div class="panel-body my-panel-body collapse in" id="searchResult">
                 </div>
             </div>
 
@@ -82,11 +83,6 @@
                 listId: 'menuItemListTest',
                 auth: ['dev'],
                 childs: [{
-                    text: 'Home',
-                    tab: {
-                        target: 'home'
-                    },
-                }, {
                     text: 'Help',
                     tab: {
                         target: 'help',
@@ -121,7 +117,7 @@
                 },]
             },];
             %>
-            <div id="menu" class="list-group">
+            <div id="menu" class="panel panel-primary">
                 <%
                 menuList.forEach(function(t){
                     if (t.auth && !isHadAuthority(t.auth))
@@ -133,7 +129,7 @@
                     <%= t.text %>
                 </a>
 
-                <div class="collapse in" id="<%= t.listId %>">
+                <div class="panel-body my-panel-body collapse in" id="<%= t.listId %>">
                     <% t.childs.forEach(function(child){
                         if (child.auth && !isHadAuthority(child.auth))
                             return;
@@ -189,6 +185,9 @@
                                 </div>
                                 <div>
                                     <input id="autocomplete" class="form-control"/>
+                                </div>
+                                <div>
+                                    <button id="countdownBtn" class="btn btn-default">倒计时按钮</button>
                                 </div>
                                 <div>
                                     <span id="countdown"></span>
