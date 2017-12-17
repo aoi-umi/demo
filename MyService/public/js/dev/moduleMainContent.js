@@ -20,13 +20,6 @@ moduleMainContent = {
 //            editClass: 'itemEdit',
             interfacePrefix: 'mainContent',
             queryArgsOpt: [{
-                name: 'id',
-                dom: $('#id'),
-                checkValue: function (val) {
-                    if (val && !my.vaild.isInt(val, '001'))
-                        return '请输入正确的正整数';
-                }
-            }, {
                 name: 'type',
                 dom: $('[name=typeBox]'),
                 getValue: function () {
@@ -47,21 +40,34 @@ moduleMainContent = {
                     return val.join(',');
                 }
             }, {
-                name: 'user_info_id',
-                dom: $('#user_info_id'),
+                name: 'user',
+                dom: $('#user'),
             }, {
                 name: 'title',
                 dom: $('#title'),
             }, {
-                name: 'create_date',
-                dom: $('#create_date'),
+                name: 'create_date_start',
+                dom: $('#create_date_start'),
             }, {
-                name: 'operate_date',
-                dom: $('#operate_date'),
+                name: 'create_date_end',
+                dom: $('#create_date_end'),
+            }, {
+                name: 'operate_date_start',
+                dom: $('#operate_date_start'),
+            }, {
+                name: 'operate_date_end',
+                dom: $('#operate_date_end'),
             }, {
                 name: 'operator',
                 dom: $('#operator'),
-            }],
+            },{
+                name: 'id',
+                dom: $('#id'),
+                checkValue: function (val) {
+                    if (val && !my.vaild.isInt(val, '001'))
+                        return '请输入正确的正整数';
+                }
+            }, ],
             init: function (self) {
                 self.variable.delMainContentChildList = [];
                 self.variable.defaultMainCotentChild = {
@@ -75,6 +81,51 @@ moduleMainContent = {
             },
             bindEvent: function (self) {
                 if (self.operation.query) {
+                    $('#create_date_start').on('click', function () {
+                        var datePickerArgs = {
+                            el: this,
+                            //startDate: '#{%y-30}-01-01',
+                            doubleCalendar: true,
+                            dateFmt: 'yyyy-MM-dd',
+                            minDate: '1900-01-01',
+                            maxDate: '#F{$dp.$D(\'create_date_end\')}',
+                        };
+                        WdatePicker(datePickerArgs);
+                    });
+                    $('#create_date_end').on('click', function () {
+                        var datePickerArgs = {
+                            el: this,
+                            //startDate: minDate || '#{%y-30}-01-01',
+                            doubleCalendar: true,
+                            dateFmt: 'yyyy-MM-dd',
+                            minDate: '#F{$dp.$D(\'create_date_start\')||\'1900-01-01\'}',
+                            maxDate: '',
+                        };
+                        WdatePicker(datePickerArgs);
+                    });
+
+                    $('#operate_date_start').on('click', function () {
+                        var datePickerArgs = {
+                            el: this,
+                            //startDate: '#{%y-30}-01-01',
+                            doubleCalendar: true,
+                            dateFmt: 'yyyy-MM-dd',
+                            minDate: '1900-01-01',
+                            maxDate: '#F{$dp.$D(\'operate_date_end\')}',
+                        };
+                        WdatePicker(datePickerArgs);
+                    });
+                    $('#operate_date_end').on('click', function () {
+                        var datePickerArgs = {
+                            el: this,
+                            //startDate: minDate || '#{%y-30}-01-01',
+                            doubleCalendar: true,
+                            dateFmt: 'yyyy-MM-dd',
+                            minDate: '#F{$dp.$D(\'operate_date_start\')||\'1900-01-01\'}',
+                            maxDate: '',
+                        };
+                        WdatePicker(datePickerArgs);
+                    });
                     var toDetail = [self.addClass, self.detailQueryClass].join(',');
                     //打开detail页
                     $(document).on('click', toDetail, function () {
@@ -201,9 +252,10 @@ moduleMainContent = {
                         $('.statusCount[data-status=' + this + ']').closest('li').addClass('active');
                     });
                 }
-                if (!data.user_info_id) data.user_info_id = null;
-                if (!data.create_date) data.create_date = null;
-                if (!data.operate_date) data.operate_date = null;
+                if (!data.create_date_start) data.create_date_start = null;
+                if (!data.create_date_end) data.create_date_end = null;
+                if (!data.operate_date_start) data.operate_date_start = null;
+                if (!data.operate_date_end) data.operate_date_end = null;
             },
             onQuerySuccess: function (t) {
                 $('.statusCount').text(0);

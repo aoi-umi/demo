@@ -20,10 +20,10 @@ moduleUserInfo = {
             }, {
                 name: 'nickname',
                 dom: $('#nickname'),
-            },  {
+            }, {
                 name: 'role',
                 dom: $('#role'),
-            },  {
+            }, {
                 name: 'authority',
                 dom: $('#authority'),
             }, {
@@ -107,7 +107,9 @@ moduleUserInfo = {
 
                 //角色
                 common.autoComplete({
-                    source: self.opt.getRole,
+                    source: function () {
+                        return self.opt.getRole({code: this.dom.val()}, self)
+                    },
                     dom: $('#role'),
                     select: function (dom, item) {
                         dom.data('item', item).val(item.code);
@@ -124,7 +126,9 @@ moduleUserInfo = {
                 });
                 //权限
                 common.autoComplete({
-                    source: self.opt.getAuthority,
+                    source: function () {
+                        return self.opt.getAuthority({code: this.dom.val()}, self)
+                    },
                     dom: $('#authority'),
                     select: function (dom, item) {
                         dom.data('item', item).val(item.code);
@@ -222,7 +226,9 @@ moduleUserInfo = {
             //权限
             setAuthorityAutoComplete: function (self) {
                 common.autoComplete({
-                    source: self.opt.getAuthority,
+                    source: function () {
+                        return self.opt.getAuthority({code: this.dom.val()}, self)
+                    },
                     dom: $('#userInfoSave [name=authority]'),
                     select: function (dom, item) {
                         //dom.data('item', item).val(item.code);
@@ -242,8 +248,10 @@ moduleUserInfo = {
                     }
                 });
             },
-            getAuthority: function (self) {
-                return my.interface.authorityQuery({status: 1, page_size: 10}).then(function (t) {
+            getAuthority: function (opt, self) {
+                var queryOpt = {status: 1};
+                if (opt) queryOpt.code = opt.code;
+                return my.interface.authorityQuery(queryOpt).then(function (t) {
                     return t.list;
                 });
             },
@@ -258,7 +266,9 @@ moduleUserInfo = {
             //角色
             setRoleAutoComplete: function (self) {
                 common.autoComplete({
-                    source: self.opt.getRole,
+                    source: function () {
+                        return self.opt.getRole({code: this.dom.val()}, self)
+                    },
                     dom: $('#userInfoSave [name=role]'),
                     select: function (dom, item) {
                         //dom.data('item', item).val(item.code);
@@ -278,8 +288,10 @@ moduleUserInfo = {
                     }
                 });
             },
-            getRole: function (self) {
-                return my.interface.roleQuery({status: 1, page_size: 10}).then(function (t) {
+            getRole: function (opt, self) {
+                var queryOpt = {status: 1};
+                if (opt) queryOpt.code = opt.code;
+                return my.interface.roleQuery(queryOpt).then(function (t) {
                     return t.list;
                 });
             },

@@ -157,7 +157,9 @@ moduleRole = {
             },
             setAuthorityAutoComplete: function (self) {
                 common.autoComplete({
-                    source: self.opt.getAuthority,
+                    source: function () {
+                        return self.opt.getAuthority({code: this.dom.val()}, self)
+                    },
                     dom: $('#roleSave [name=authority]'),
                     select: function (dom, item) {
                         //dom.data('item', item).val(item.code);
@@ -177,8 +179,10 @@ moduleRole = {
                     }
                 });
             },
-            getAuthority: function (self) {
-                return my.interface.authorityQuery({status: 1, page_size: 10}).then(function (t) {
+            getAuthority: function (opt, self) {
+                var queryOpt = {status: 1};
+                if (opt) queryOpt.code = opt.code;
+                return my.interface.authorityQuery(queryOpt).then(function (t) {
                     return t.list;
                 });
             },
