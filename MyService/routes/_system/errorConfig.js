@@ -35,8 +35,8 @@ module.exports= {
     TOKEN_WRONG: {
         code: 'TOKEN_WRONG',
         desc: {
-            'zh':'token错误',
-            'en':'token is wrong',
+            'zh':'密码错误或参数有误',
+            'en':'password wrong or bad request!',
         }
     },
     NO_LOGIN:{

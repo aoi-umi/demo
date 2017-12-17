@@ -36,5 +36,14 @@ exports.isExist = function (opt) {
         }
         return result;
     });
+};
+
+exports.query = function (opt) {
+    return autoBll.customDal('authority', 'query', opt).then(function (t) {
+        return {
+            list: t[0],
+            count: t[1][0].count,
+        };
+    })
 }
 

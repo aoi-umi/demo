@@ -34,7 +34,7 @@ function getBll(req, res, next) {
     if (!common.isInArray(method, ['query', 'save', 'detailQuery', 'del'])
         || (module == 'log' && common.isInArray(method, ['query']))
         || (module == 'role' && common.isInArray(method, ['query', 'save', 'detailQuery']))
-        || (module == 'authority' && common.isInArray(method, ['save']))
+        || (module == 'authority' && common.isInArray(method, ['query', 'save']))
         || (module == 'userInfo' && common.isInArray(method, ['query', 'save', 'detailQuery']))
         || (module == 'mainContentType' && common.isInArray(method, ['save']))
         || (module == 'mainContent' && common.isInArray(method, ['query', 'save']))
@@ -128,6 +128,10 @@ var checkArgs = function (opt) {
     var method = opt.method;
     var module = opt.module;
     var args = opt.args;
+    if (common.isInArray(method, ['query'])) {
+        if (!args.page_index) args.page_index = 1;
+        if (!args.page_size) args.page_size = 10;
+    }
     if (common.isInArray(method, ['detailQuery'])) {
         var argsError = false;
         if (module == 'role') {

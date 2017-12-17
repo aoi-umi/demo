@@ -374,7 +374,7 @@ common = {
                 if (true) {
                     if (!opt.template) {
                         opt.template = `<div data-backdrop="static" role="dialog" tabindex="-1" class="modal fade msg-notice-1">
-                            <div class="modal-dialog" style="top:100px">
+                            <div class="modal-dialog" >
                                 <div class="modal-content">
                                     <div class="modal-body">
                                         <button name="closeBtn" class="close" type="button">
@@ -515,7 +515,7 @@ common = {
             response(match);
         }
 
-        dom.on('up', function (event) {
+        dom.on('keyup', function (event) {
             if ((event.keyCode === $.ui.keyCode.TAB)
                 && $(this).data('ui-autocomplete').menu.active) {
                 event.preventDefault();

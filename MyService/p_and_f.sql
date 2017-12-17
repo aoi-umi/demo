@@ -10,10 +10,66 @@ Target Server Type    : MYSQL
 Target Server Version : 50710
 File Encoding         : 65001
 
-Date: 2017-12-16 15:12:59
+Date: 2017-12-17 16:34:56
 */
 
 SET FOREIGN_KEY_CHECKS=0;
+
+-- ----------------------------
+-- Procedure structure for p_authority_query
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `p_authority_query`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p_authority_query`(pr_id int,
+	pr_code varchar(256),
+	pr_name varchar(256),
+	pr_status int,
+	pr_null_list varchar(1000),
+	pr_page_index int,
+	pr_page_size int)
+    SQL SECURITY INVOKER
+BEGIN 
+	IF pr_null_list IS NULL THEN
+		SET pr_null_list = '';
+	END IF;
+	SET pr_null_list = CONCAT(',', pr_null_list, ',');
+
+	SET @Sql ='SELECT SQL_CALC_FOUND_ROWS * FROM t_authority t1 WHERE 1 = 1 ';
+	IF pr_id IS NOT NULL AND length(pr_id) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND t1.`id` = ''',replace_special_char(pr_id), '''');
+	ELSEIF LOCATE(',id,', pr_null_list) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND t1.`id` IS NULL');
+	END IF;
+
+	IF pr_code IS NOT NULL AND length(pr_code) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND t1.`code` like ''%',replace_special_char(pr_code), '%''');
+	ELSEIF LOCATE(',code,', pr_null_list) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND t1.`code` IS NULL');
+	END IF;
+
+	IF pr_name IS NOT NULL AND length(pr_name) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND t1.`name` like ''%',replace_special_char(pr_name), '%''');
+	ELSEIF LOCATE(',name,', pr_null_list) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND t1.`name` IS NULL');
+	END IF;
+
+	IF pr_status IS NOT NULL AND length(pr_status) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND t1.`status` = ''',replace_special_char(pr_status), '''');
+	ELSEIF LOCATE(',status,', pr_null_list) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND t1.`status` IS NULL');
+	END IF;
+
+	IF pr_page_index IS NOT NULL AND pr_page_size IS NOT NULL THEN
+		SET @Sql = CONCAT(@Sql, ' limit ', (pr_page_index - 1) * pr_page_size, ',', pr_page_size);
+	END IF;
+	SET @Sql = CONCAT(@Sql, ';');
+	-- SELECT @Sql;
+	PREPARE stmt1 FROM @Sql;
+	EXECUTE stmt1;
+	SELECT FOUND_ROWS() AS 'count';
+END
+;;
+DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for p_log_query
@@ -162,23 +218,26 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `p_main_content_query`(pr_id int,
 	pr_type int,
 	pr_status varchar(50),
-	pr_user_info_id int,
+	pr_user varchar(50),
 	pr_title varchar(50),
 	pr_description text,
-	pr_create_date datetime,
-	pr_operate_date datetime,
+	pr_create_date_start datetime,
+	pr_create_date_end datetime,
+	pr_operate_date_start datetime,
+	pr_operate_date_end datetime,
 	pr_operator varchar(50),
 	pr_null_list varchar(1000),
 	pr_page_index int,
 	pr_page_size int)
     SQL SECURITY INVOKER
-BEGIN 
+BEGIN  
 	IF pr_null_list IS NULL THEN
 		SET pr_null_list = '';
 	END IF;
 	SET pr_null_list = CONCAT(',', pr_null_list, ',');
 
-	DROP TEMPORARY TABLE IF EXISTS temp_p_main_content_query00; 
+	DROP TEMPORARY TABLE IF EXISTS temp_p_main_content_query00;
+
  
 	SET @Sql ='CREATE TEMPORARY TABLE temp_p_main_content_query00 ';
 	SET @Sql = CONCAT(@Sql, 'SELECT t1.id, t1.status, t2.account, t2.nickname FROM t_main_content t1 left join t_user_info t2 on t1.user_info_id = t2.id WHERE 1 = 1 ');
@@ -194,12 +253,6 @@ BEGIN
 		SET @Sql = CONCAT(@Sql, ' AND t1.`type` IS NULL');
 	END IF;
 
-	IF pr_user_info_id IS NOT NULL AND length(pr_user_info_id) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND t1.`user_info_id` = ''',replace_special_char(pr_user_info_id), '''');
-	ELSEIF LOCATE(',user_info_id,', pr_null_list) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND t1.`user_info_id` IS NULL');
-	END IF;
-
 	IF pr_title IS NOT NULL AND length(pr_title) > 0 THEN
 		SET @Sql = CONCAT(@Sql, ' AND t1.`title` = ''',replace_special_char(pr_title), '''');
 	ELSEIF LOCATE(',title,', pr_null_list) > 0 THEN
@@ -212,22 +265,35 @@ BEGIN
 		SET @Sql = CONCAT(@Sql, ' AND t1.`description` IS NULL');
 	END IF;
 
-	IF pr_create_date IS NOT NULL AND length(pr_create_date) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND t1.`create_date` = ''',replace_special_char(pr_create_date), '''');
-	ELSEIF LOCATE(',create_date,', pr_null_list) > 0 THEN
+	IF pr_create_date_start IS NOT NULL AND length(pr_create_date_start) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND t1.`create_date` >= ''',replace_special_char(pr_create_date_start), '''');
+	END IF;
+	IF pr_create_date_end IS NOT NULL AND length(pr_create_date_end) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND t1.`create_date` <= ''',replace_special_char(pr_create_date_end), '''');
+	END IF;
+	IF LOCATE(',create_date,', pr_null_list) > 0 THEN
 		SET @Sql = CONCAT(@Sql, ' AND t1.`create_date` IS NULL');
 	END IF;
 
-	IF pr_operate_date IS NOT NULL AND length(pr_operate_date) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND t1.`operate_date` = ''',replace_special_char(pr_operate_date), '''');
-	ELSEIF LOCATE(',operate_date,', pr_null_list) > 0 THEN
+	IF pr_operate_date_start IS NOT NULL AND length(pr_operate_date_start) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND t1.`operate_date` >= ''',replace_special_char(pr_operate_date_start), '''');
+	END IF;
+	IF pr_operate_date_end IS NOT NULL AND length(pr_operate_date_end) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND t1.`operate_date` <= ''',replace_special_char(pr_operate_date_end), '''');
+	END IF;
+	IF LOCATE(',operate_date,', pr_null_list) > 0 THEN
 		SET @Sql = CONCAT(@Sql, ' AND t1.`operate_date` IS NULL');
+	END IF;	
+
+
+	IF pr_user IS NOT NULL AND length(pr_user) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND t1.`user_info_id` in ( SELECT id FROM t_user_info WHERE `account` like ''%', 
+				replace_special_char(pr_user), '%'' OR `nickname` like ''%',replace_special_char(pr_user), '%'')');
 	END IF;
 
 	IF pr_operator IS NOT NULL AND length(pr_operator) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND t1.`operator` = ''',replace_special_char(pr_operator), '''');
-	ELSEIF LOCATE(',operator,', pr_null_list) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND t1.`operator` IS NULL');
+		SET @Sql = CONCAT(@Sql, ' AND t1.`id` in ( SELECT distinct main_content_id FROM t_main_content_log WHERE `operator` like ''%', 
+				replace_special_char(pr_operator), '%'')');
 	END IF;
 
 	SET @Sql = CONCAT(@Sql, ';');
@@ -311,13 +377,13 @@ BEGIN
 	END IF;
 
 	IF pr_code IS NOT NULL AND length(pr_code) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND t1.`code` = ''',replace_special_char(pr_code), '''');
+		SET @Sql = CONCAT(@Sql, ' AND t1.`code` like ''%',replace_special_char(pr_code), '%''');
 	ELSEIF LOCATE(',code,', pr_null_list) > 0 THEN
 		SET @Sql = CONCAT(@Sql, ' AND t1.`code` IS NULL');
 	END IF;
 
 	IF pr_name IS NOT NULL AND length(pr_name) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND t1.`name` = ''',replace_special_char(pr_name), '''');
+		SET @Sql = CONCAT(@Sql, ' AND t1.`name` like ''%',replace_special_char(pr_name), '%''');
 	ELSEIF LOCATE(',name,', pr_null_list) > 0 THEN
 		SET @Sql = CONCAT(@Sql, ' AND t1.`name` IS NULL');
 	END IF;

@@ -112,6 +112,10 @@ a.hover {
     z-index: 1041;
 }
 
+.modal-dialog {
+    top: 50px;
+}
+
 .my-label {
     margin: 5px 0 0 5px;
     white-space: normal;
@@ -126,6 +130,11 @@ a.hover {
     margin: -0.2em 0 -0.2em 0.2em;
 }
 
-.my-panel-body{
+.my-panel-body {
     padding: 0px;
+}
+
+.modal-content {
+    max-height: 400px;
+    overflow-y: auto
 }

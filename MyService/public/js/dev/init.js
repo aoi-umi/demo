@@ -123,6 +123,7 @@ init = {
         $(document).on('keyup', '.ui-menu-item', function (event) {
             if (event.keyCode === $.ui.keyCode.ENTER) {
                 $(this).click();
+                return false;
             }
         })
         //浮动

@@ -87,7 +87,7 @@ var signIn = exports.signIn = function (req, signInReq) {
         return autoBll.query('user_info', {account: account});
     }).then(function (t) {
         if (!t.count)
-            throw common.error('no account or password wrong!');
+            throw common.error('no account!');
         if (t.count > 1)
             throw common.error('system error: data wrong');
         var userInfo = t.list[0];
@@ -108,12 +108,6 @@ var signIn = exports.signIn = function (req, signInReq) {
         for (var key in t.auth) {
             user.authority[key] = true;
         }
-        // if (userInfo.auth) {
-        //     var authList = t.auth.split(',');
-        //     authList.forEach(function (auth) {
-        //         user.authority[auth] = true;
-        //     });
-        // }
         user.cacheDatetime = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
 
         var userInfoKey = req.cookies[config.cacheKey.userInfo];

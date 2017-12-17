@@ -24,8 +24,9 @@ exports.query = function (opt, exOpt) {
                 t.list.forEach(function (item) {
                     item.operation = ['detailQuery'];
                     if (item.status != -1
-                        && auth.isHadAuthority(user, ['mainContentDel'])
-                        && (user.id == item.user_info_id)) {
+                        && ((auth.isHadAuthority(user, ['mainContentDel']) && (user.id == item.user_info_id))
+                            || auth.isHadAuthority(user, ['admin']))
+                    ) {
                         item.operation.push('del');
                     }
                     updateMainContent(item);
@@ -151,6 +152,7 @@ exports.save = function (opt, exOpt) {
 exports.statusUpdate = function (opt, exOpt) {
     var main_content = opt.main_content;
     var user = exOpt.user;
+    var necessaryAuth;
     return common.promise().then(function () {
         if (!main_content.id) {
             throw common.error('', 'ARGS_ERROR');
@@ -169,12 +171,15 @@ exports.statusUpdate = function (opt, exOpt) {
         else
             throw common.error(`错误的操作类型[${operate}]`);
 
-        var necessaryAuth = 'mainContent' + common.stringToPascal(operate);
+        necessaryAuth = 'mainContent' + common.stringToPascal(operate);
         if (!auth.isHadAuthority(user, necessaryAuth))
             throw common.error(`没有[${necessaryAuth}]权限`);
         return main_content_bll.detailQuery({id: main_content.id});
     }).then(function (main_content_detail) {
-        //todo 检查权限
+        if (necessaryAuth == 'mainContentDel'
+            && (!auth.isHadAuthority(user, 'admin') && main_content_detail.main_content.user_info_id != user.id))
+            throw common.error(`没有权限`);
+
         myEnum.enumChangeCheck('main_content_status_enum', main_content_detail.main_content.status, main_content.status);
         if (main_content.status == 'recovery') {
             var main_content_log_list = main_content_detail.main_content_log_list;

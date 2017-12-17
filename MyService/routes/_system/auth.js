@@ -109,7 +109,7 @@ exports.getAccessableUrl = function (user, pathname) {
 
         {url: '/mainContentType/list', auth: ['mainContentTypeQuery']},
         {url: '/interface/mainContentType/query', auth: ['mainContentTypeQuery']},
-        {url: '/interface/mainContentType/detailQuery', auth: ['mainContentTypeQuery']},
+        {url: '/interface/mainContentType/detailQuery', auth: ['mainContentTypeDetailQuery']},
         {url: '/interface/mainContentType/save', auth: ['mainContentTypeSave']},
         {url: '/interface/mainContentType/del', auth: ['mainContentTypeDel']},
     ];

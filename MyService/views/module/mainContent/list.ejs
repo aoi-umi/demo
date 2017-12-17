@@ -5,24 +5,30 @@
             <%
             var prefix = '';
             var searchItemList = [{
-                text: 'id',
-                id: 'id',
+                text: '用户',
+                id: 'user',
             }, {
-                text: 'user_info_id',
-                id: 'user_info_id',
-            }, {
-                text: 'title',
+                text: '标题',
                 id: 'title',
             }, {
-                text: 'create_date',
-                id: 'create_date',
+                text: '创建时间起始',
+                id: 'create_date_start',
             }, {
-                text: 'operate_date',
-                id: 'operate_date',
+                text: '创建时间结束',
+                id: 'create_date_end',
             }, {
-                text: 'operator',
+                text: '操作时间开始',
+                id: 'operate_date_start',
+            }, {
+                text: '操作时间结束',
+                id: 'operate_date_end',
+            }, {
+                text: '操作人',
                 id: 'operator',
-            },];
+            },{
+                text: 'id',
+                id: 'id',
+            }, ];
             for(var i = 0;i < searchItemList.length;i++){
                 var item = searchItemList[i];
             %>
