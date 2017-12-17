@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50710
 File Encoding         : 65001
 
-Date: 2017-12-17 16:34:56
+Date: 2017-12-17 17:35:51
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -287,8 +287,9 @@ BEGIN
 
 
 	IF pr_user IS NOT NULL AND length(pr_user) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND t1.`user_info_id` in ( SELECT id FROM t_user_info WHERE `account` like ''%', 
-				replace_special_char(pr_user), '%'' OR `nickname` like ''%',replace_special_char(pr_user), '%'')');
+		SET @Sql = CONCAT(@Sql, ' AND (t1.`user_info` like ''%', replace_special_char(pr_user), 
+				'%'' OR t1.`user_info_id` in ( SELECT id FROM t_user_info WHERE `account` like ''%', 
+				replace_special_char(pr_user), '%'' OR `nickname` like ''%',replace_special_char(pr_user), '%''))');
 	END IF;
 
 	IF pr_operator IS NOT NULL AND length(pr_operator) > 0 THEN
