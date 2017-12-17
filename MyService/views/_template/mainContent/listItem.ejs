@@ -3,7 +3,9 @@
     <td><%= id %></td>
     <td><%= type_name %></td>
     <td><%= status_name %></td>
-    <td><%= account + '(' + nickname + '#' + user_info_id + ')' %></td>
+    <td>
+        <span title="<%= account + '(' + nickname + '#' + user_info_id + ')' %>"><%= user_info %></span>
+    </td>
     <td><%= title %></td>
     <td><%= description %></td>
     <td><%= create_date %></td>

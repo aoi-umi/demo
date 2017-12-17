@@ -103,12 +103,13 @@ exports.save = function (opt, exOpt) {
             });
         } else {
             main_content.user_info_id = user.id;
+            main_content.user_info = user.account + `(${user.nickname}#${user.id})`;
         }
 
         return autoBll.tran(function (conn) {
             var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
             main_content.type = 0;
-            main_content.operator = user.account;
+            main_content.operator = user.account + `(${user.nickname}#${user.id})`;
             main_content.create_date =
                 main_content.operate_date = now;
             return autoBll.save('main_content', main_content, conn).then(function (t) {
@@ -136,7 +137,7 @@ exports.save = function (opt, exOpt) {
                     src_status: src_status,
                     dest_status: main_content.status,
                     content: opt.remark,
-                    operator: user.account
+                    user: user
                 });
                 list.push(autoBll.save('main_content_log', main_content_log, conn));
                 return q.all(list).then(function () {
@@ -194,7 +195,8 @@ exports.statusUpdate = function (opt, exOpt) {
             var updateStatusOpt = {
                 id: main_content.id,
                 status: main_content.status,
-                operator: user.account,
+                operator_id: user.id,
+                operator: user.account + `(${user.nickname}#${user.id})`,
                 operate_date: now
             };
             return autoBll.save('main_content', updateStatusOpt, conn).then(function (t) {
@@ -206,7 +208,7 @@ exports.statusUpdate = function (opt, exOpt) {
                     src_status: main_content_detail.main_content.status,
                     dest_status: main_content.status,
                     content: opt.remark,
-                    operator: user.account
+                    user: user,
                 });
                 list.push(autoBll.save('main_content_log', main_content_log, conn));
                 return q.all(list).then(function () {
@@ -219,6 +221,7 @@ exports.statusUpdate = function (opt, exOpt) {
 
 function createLog(opt) {
     var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
+    var user = opt.user;
     var main_content_log = {
         main_content_id: opt.id,
         type: 0,
@@ -227,7 +230,8 @@ function createLog(opt) {
         content: '保存',
         create_date: now,
         operate_date: now,
-        operator: opt.operator
+        operator_id: user.id,
+        operator: user.account + `(${user.nickname}#${user.id})`,
     };
     if (opt.src_status == -1) {
         main_content_log.type = 6;
