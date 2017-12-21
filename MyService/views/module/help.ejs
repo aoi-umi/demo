@@ -47,19 +47,8 @@
                 if (typeof req == 'string')
                     req = JSON.parse(req);
                 var headers = {};
-                if (url == '/login') {
-                    var userInfo = $.cookie(config.cacheKey.userInfo);
-                    if (!userInfo) {
-                        userInfo = common.guid();
-                        $.cookie(config.cacheKey.userInfo, userInfo, {expires: 1});
-                    }
-                    var token = common.createToken(req.userName + $.md5(req.pwd) + JSON.stringify(req));
-                    headers = {
-                        'User-Name': req.userName,
-                        'Token': token,
-                    };
-                } else if (url == '/signUp') {
-                    req.pwd = $.md5(req.pwd);
+                if (url == '/signUp') {
+                    req.pwd = common.md5(req.pwd);
                 }
                 var reqStr = req;
                 if (typeof reqStr != 'string');

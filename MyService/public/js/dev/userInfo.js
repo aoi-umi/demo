@@ -56,8 +56,8 @@ userInfo = {
                     }
                     data = checkRes.model;
                     if(data.newPassword){
-                        data.newPassword = $.md5(data.newPassword);
-                        data.password = $.md5(data.password);
+                        data.newPassword = common.md5(data.newPassword);
+                        data.password = common.md5(data.password);
                     }
                     var notice = common.msgNotice({type: 1, msg: '保存中...', noClose: true});
                     var method = 'userInfoSave';

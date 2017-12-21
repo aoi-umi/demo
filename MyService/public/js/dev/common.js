@@ -27,8 +27,47 @@ common = {
         var s4 = self.s4;
         return (s4(2) + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4(3));
     },
+    md5: function (str) {
+        return SparkMD5.hash(str);
+    },
+    md5File: function (file) {
+        return common.promise().then(function (res) {
+            var blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice,
+                chunkSize = 2097152,                             // Read in chunks of 2MB
+                chunks = Math.ceil(file.size / chunkSize),
+                currentChunk = 0,
+                spark = new SparkMD5.ArrayBuffer(),
+                fileReader = new FileReader();
+
+            fileReader.onload = function (e) {
+                //console.log('read chunk nr', currentChunk + 1, 'of', chunks);
+                spark.append(e.target.result);                   // Append array buffer
+                currentChunk++;
+
+                if (currentChunk < chunks) {
+                    loadNext();
+                } else {
+                    // console.log('finished loading');
+                    // console.info('computed hash', spark.end());  // Compute hash
+                    return res.resolve(spark.end());
+                }
+            };
+
+            fileReader.onerror = function (e) {
+                return res.reject(e);
+            };
+
+            function loadNext() {
+                var start = currentChunk * chunkSize,
+                    end = ((start + chunkSize) >= file.size) ? file.size : start + chunkSize;
+                fileReader.readAsArrayBuffer(blobSlice.call(file, start, end));
+            }
+            loadNext();
+            return res;
+        });
+    },
     createToken: function (str) {
-        return $.md5(str);
+        return common.md5(str);
     },
     ajax: function (option) {
         var opt = {
@@ -74,7 +113,7 @@ common = {
         }).fail(function (e) {
             if (!e)
                 e = new Error();
-            if(e.responseJSON){
+            if (e.responseJSON) {
                 var resData = e.responseJSON
                 e = new Error(resData.desc);
                 e.code = resData.code;
