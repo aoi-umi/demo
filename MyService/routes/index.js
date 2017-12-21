@@ -27,5 +27,5 @@ exports.upload = [require('./_system/multer').any(), function (req, res) {
     var opt = {
         message: success,
     };
-    res.myRender('msg', opt);
+    res.mySend(null, opt);
 }];

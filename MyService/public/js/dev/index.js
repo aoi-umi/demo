@@ -42,20 +42,33 @@ index = {
         //上传文件
         var control = $('#upfile');
         control.fileinput({
+            uploadUrl: '/interface/upload?useStatus=true',
             showUpload: true, //是否显示上传按钮
             showRemove: true,
             dropZoneEnabled: true,
             showCaption: true,//是否显示标题
             //showPreview:false,
+            multiple: true,
             allowedPreviewTypes: ['image'],
             allowedFileTypes: ['image'],
             //allowedFileExtensions:  ['jpg', 'png'],
             maxFileSize: 2000,
-            maxFileCount: 1,
+            maxFileCount: 10,
             //initialPreview: [
             //预览图片的设置
             //      "<img src='' class='file-preview-image' alt='' title=''>",
             //],
+        }).on('fileuploaded', function (event, data) {
+            var res = data.response;
+        }).on('fileuploaderror', function(event, data, msg) {
+            var args = arguments;
+            var res = data.response;
+            if(!res.result) {
+                return {
+                    message: res.desc,
+                    data: res.detail
+                };
+            }
         });
 
         //tab
@@ -171,7 +184,7 @@ index = {
             var val = $.trim($(this).val());
             $('#searchResult').empty();
             if (val) {
-                if(!$('#searchResult').hasClass('in'))
+                if (!$('#searchResult').hasClass('in'))
                     $('#menuSearchBtn').click();
                 var list = [];
                 $('#menu .menuItem').each(function () {

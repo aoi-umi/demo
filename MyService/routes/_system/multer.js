@@ -22,5 +22,5 @@ module.exports = multer({
     storage: storage,
     limits: {
         fieldNameSize: '10M'
-}
+    }
 });

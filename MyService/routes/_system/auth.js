@@ -65,7 +65,7 @@ exports.getAccessableUrl = function (user, pathname) {
     var argList = [
         {url: '/'},
         {url: '/msg'},
-        {url: '/interface/upload'},
+        {url: '/interface/upload', auth: ['login']},
         {url: '/help', auth: ['dev']},
         {url: '/status', auth: ['dev']},
         {url: '/color', auth: ['dev']},
@@ -120,7 +120,7 @@ exports.getAccessableUrl = function (user, pathname) {
         var opt = {notExistAuthority: null};
         var isHadAuthority = !item.auth || !item.auth.length || auth.isHadAuthority(user, item.auth, opt);
         var isExist = item.url == pathname;
-        if (isExist)isUrlExist = true;
+        if (isExist) isUrlExist = true;
         if (isHadAuthority) {
             url[item.url] = true;
             if (isExist)
