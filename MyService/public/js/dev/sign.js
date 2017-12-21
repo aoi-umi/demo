@@ -58,7 +58,7 @@ sign = {
             ;
             var model = checkRes.model;
             var data = {random: common.s4(2)};
-            var token = common.createToken(model.account + $.md5(model.password) + JSON.stringify(data));
+            var token = common.createToken(model.account + common.md5(model.password) + JSON.stringify(data));
             var headers = {
                 'account': model.account,
                 'token': token,
@@ -125,7 +125,7 @@ sign = {
                 }
                 return $.Deferred().reject(err);
             }
-            checkRes.model.password = $.md5(checkRes.model.password);
+            checkRes.model.password = common.md5(checkRes.model.password);
             return my.interface.signUp(checkRes.model);
         }).then(function (t) {
             location.href = '/';
