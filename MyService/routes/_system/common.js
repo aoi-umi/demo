@@ -289,6 +289,7 @@ exports.error = function (msg, code, option) {
         lang: 'zh',
         format: null,
     };
+    var status = null;
     if (option)
         opt = common.extend(opt, option);
     if (!code)
@@ -297,6 +298,7 @@ exports.error = function (msg, code, option) {
     if (code && errorConfig[code]) {
         var error = errorConfig[code];
         code = error.code;
+        status = error.status;
         if (!msg) {
             msg = error.desc[opt.lang];
             if (typeof opt.format == 'function')
@@ -307,6 +309,7 @@ exports.error = function (msg, code, option) {
     if (typeof msg == 'object') msg = JSON.stringify(msg);
     var err = new Error(msg);
     err.code = code;
+    err.status = status;
     return err;
 };
 

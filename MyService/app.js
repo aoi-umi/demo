@@ -50,6 +50,8 @@ var mySend = function (req, res, err, detail, option) {
     };
     opt = common.extend(opt, option);
     var formatRes = common.formatRes(err, detail, opt);
+    if (req.myData.useStatus && err && err.status)
+        res.status(err.status);
     res.send(formatRes);
     var result = formatRes.result;
     var logReq = req.method == 'POST' ? req.body : '';
@@ -100,6 +102,11 @@ app.use(function (req, res, next) {
     if (noNav && noNav.toString().toLowerCase() == 'false')
         noNav = false;
     req.myData.noNav = noNav;
+
+    var useStatus = req.query.useStatus || false;
+    if (useStatus && useStatus.toString().toLowerCase() == 'false')
+        useStatus = false;
+    req.myData.useStatus = useStatus;
 
     if (req.myData.ip == '::ffff:127.0.0.1')
         user.authority['local'] = true;

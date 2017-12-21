@@ -63,8 +63,8 @@ common = {
             if (!t.result) {
                 if (typeof t.desc == 'object')
                     t.desc = JSON.stringify(t.desc);
-                var err = new Error(t.desc);
-                err.code = t.code;
+                var err = new Error();
+                err.responseJSON = t;
                 return $.Deferred().reject(err);
             }
             else
@@ -74,7 +74,12 @@ common = {
         }).fail(function (e) {
             if (!e)
                 e = new Error();
-            if (e.statusText) {
+            if(e.responseJSON){
+                var resData = e.responseJSON
+                e = new Error(resData.desc);
+                e.code = resData.code;
+            }
+            else if (e.statusText) {
                 e = new Error(e.statusText);
                 e.code = e.status;
             }
