@@ -2,7 +2,7 @@ var common = require('../_system/common');
 var cache = require('../_system/cache');
 var config = require('../../config');
 var errorConfig = require('../_system/errorConfig');
-var autoBll = require('../_bll/auto');
+var autoBll = require('../bll/auto');
 
 exports.sign = function (req, res, next) {
     var method = req.params.method;

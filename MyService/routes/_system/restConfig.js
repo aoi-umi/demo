@@ -1,13 +1,20 @@
 /**
  * Created by umi on 2017-5-29.
  */
-
+//路由配置
 var restList = [
+    {
+        url: '/',
+        method: 'get',
+        functionName: 'view',//为空时按method
+        methodName: 'index',//用于记录日志
+        path: '/module/_default',//为空时则按url
+    },
     {
         url: '/interface/sign/:method',
         method: 'post',
         functionName: 'sign',
-        methodName: 'sign',//用于记录日志
+        methodName: 'sign',
         path: 'module/sign',
     },
     {

@@ -1,7 +1,7 @@
 var common = require('./_system/common');
 
 var exports = module.exports;
-var restConfig = require('../rest_config');
+var restConfig = require('./_system/restConfig');
 exports.get = function (req, res) {
     var restList = [];
     for (var i = 0; i < restConfig.length; i++) {

@@ -11,7 +11,7 @@ var zlib = require('zlib');
 var _ = require('underscore');
 var config = require('../../config');
 var errorConfig = require('./errorConfig');
-var logService = require('../_service/logService');
+var logService = require('../service/logService');
 var common = exports;
 
 exports.extend = function () {
