@@ -159,7 +159,7 @@ app.use(function (req, res, next) {
 });
 
 var auth = require('./routes/_system/auth');
-var restConfig = require('./rest_config');
+var restConfig = require('./routes/_system/restConfig');
 var restList = [];
 restConfig.forEach(function (rest) {
     var method = rest.method;

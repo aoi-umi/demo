@@ -6,7 +6,7 @@ var fs = require('fs');
 var common = require('../_system/common');
 var auth = require('../_system/auth');
 var myEnum = require('./../_system/enum');
-var autoBll = require('../_bll/auto');
+var autoBll = require('../bll/auto');
 var errorConfig = require('../_system/errorConfig');
 
 //module post 接口
@@ -58,7 +58,7 @@ function getBll(req, res, next) {
             };
             return autoBll.custom(module, method, args, exOpt);
         } else {
-            var modulePath = path.resolve(__dirname + '/../_dal/' + module + '_auto.js');
+            var modulePath = path.resolve(__dirname + '/../dal/' + module + '_auto.js');
             var isExist = fs.existsSync(modulePath);
             if (!isExist)
                 throw common.error('file is not exist', errorConfig.BAD_REQUEST.code);

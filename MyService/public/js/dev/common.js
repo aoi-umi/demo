@@ -62,6 +62,7 @@ common = {
                     end = ((start + chunkSize) >= file.size) ? file.size : start + chunkSize;
                 fileReader.readAsArrayBuffer(blobSlice.call(file, start, end));
             }
+
             loadNext();
             return res;
         });
@@ -625,5 +626,5 @@ common = {
                 opt.onCountdown(dom, date);
             }
         }, opt.interval * 1000);
-    }
+    },
 };
