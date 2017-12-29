@@ -623,3 +623,10 @@ exports.getListDiff = function (option) {
         delList: delList
     };
 };
+
+exports.parseBool = function (b) {
+    var result = false;
+    if (b && b.toLocaleString() == 'true')
+        result = true;
+    return result;
+}

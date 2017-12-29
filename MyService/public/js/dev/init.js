@@ -76,6 +76,12 @@ init = {
                 logQuery: {
                     url: '/interface/log/query'
                 },
+                onlineUserQuery: {
+                    url: '/interface/onlineUser/query'
+                },
+                onlineUserDetailQuery: {
+                    url: '/interface/onlineUser/detailQuery'
+                },
                 mainContentStatusUpdate: {
                     url: '/interface/mainContent/statusUpdate'
                 },

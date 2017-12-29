@@ -1,7 +1,7 @@
 <script>
     (function () {
         if (!('placeholder' in document.createElement('input')) && location.pathname != '/msg')
-            location.href = '/msg?message=' + encodeURI('不支持的浏览器！');
+            location.href = '/msg?notSupportedBrowser=true';
     })();
 </script>
 <script type="text/javascript" src="/js/plugins/jquery-2.1.1.min.js"></script>

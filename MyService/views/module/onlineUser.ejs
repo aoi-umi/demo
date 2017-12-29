@@ -1,0 +1,60 @@
+<% var rowItemClass = 'col-lg-3 col-md-3 col-sm-6 col-xs-12'; %>
+<div class="row my-row">
+    <div class="<%= rowItemClass %> col-lg-offset-9 col-md-offset-8 col-sm-offset-6">
+        <button id="search" class="btn btn-default btn-block">
+            search
+        </button>
+    </div>
+</div>
+
+<table id="list" class="table table-bordered">
+    <thead>
+    <tr>
+        <th class="text-center" colspan="100">onlineUser</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <th>key</th>
+        <th></th>
+    </tr>
+    </tbody>
+    <tbody class="error">
+    <tr>
+        <td class="text-center" colspan="100" name="errorContent"></td>
+    </tr>
+    </tbody>
+</table>
+<script type="text/javascript">
+    $(function () {
+        var temp = '<tbody class="row"><td><a href="javascript:;" class="onlineUserKey" data-key="{%=key%}">{%=key%}</a></td><td>{%=count%}</td></tbody>'
+        $('#search').on('click', function () {
+            $('#list [name=errorContent]').empty();
+            $('#list .row').remove();
+
+            my.interface.onlineUserQuery().then(function (t) {
+                for (var key in t) {
+                    $('#list').append(ejs.render(temp, {key: key, count: t[key]}));
+                }
+            }).fail(function (e) {
+                $('#list [name=errorContent]').text(e);
+            });
+        });
+
+        $('#list').on('click', '.onlineUserKey', function () {
+            var key = $(this).data('key');
+            my.interface.onlineUserDetailQuery({key: key}).then(function (t) {
+                var msg = t;
+                if (!msg)
+                    msg = '未登录的用户';
+                else
+                    msg = `${t.account}(${t.nickname}#${t.id})`;
+                common.msgNotice({type: 1, msg: msg});
+            }).fail(function (e) {
+                common.msgNotice({type: 1, msg: e});
+            });
+        });
+
+        $('#search').click();
+    });
+</script>

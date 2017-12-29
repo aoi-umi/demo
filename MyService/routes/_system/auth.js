@@ -67,6 +67,9 @@ exports.getAccessableUrl = function (user, pathname) {
     var argList = [
         {url: '/'},
         {url: '/msg'},
+        {url: '/onlineUser', auth: ['admin']},
+        {url: '/interface/onlineUser/query', auth: ['admin']},
+        {url: '/interface/onlineUser/detailQuery', auth: ['admin']},
         {url: '/interface/upload', auth: ['login']},
         {url: '/help', auth: ['dev']},
         {url: '/status', auth: ['dev']},
