@@ -96,6 +96,7 @@ exports.view = function (req, res, next) {
         return next();
 
     var query = req.query;
+    var user = req.myData.user;
     common.promise().then(function () {
         switch (opt.view) {
             case '/status':
@@ -104,7 +105,12 @@ exports.view = function (req, res, next) {
                 break;
 
             case '/userInfo/detail':
-                return autoBll.custom('user_info', 'detailQuery', {id: req.myData.user.id}).then(function (t) {
+                var userInfoId = user.id;
+                if (query.id && query.id != userInfoId) {
+                    auth.isHadAuthority(user, 'admin', {throwError: true});
+                    userInfoId = query.id;
+                }
+                return autoBll.custom('user_info', 'detailQuery', {id: userInfoId}).then(function (t) {
                     opt.userInfoDetail = t;
                 });
                 break;

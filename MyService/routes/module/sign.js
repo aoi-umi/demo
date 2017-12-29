@@ -3,6 +3,7 @@ var cache = require('../_system/cache');
 var config = require('../../config');
 var errorConfig = require('../_system/errorConfig');
 var autoBll = require('../bll/auto');
+var userInfo = require('../bll/user_info');
 
 exports.sign = function (req, res, next) {
     var method = req.params.method;
@@ -53,6 +54,11 @@ function signUp(req, res, next) {
                 //默认角色
                 return autoBll.save('user_info_with_role', {user_info_id: user_info_id, role_code: 'default'}, conn);
             }).then(function () {
+                //日志
+                var userInfoLog = userInfo.createLog();
+                userInfoLog.user_info_id = user_info_id;
+                userInfoLog.content = '[创建账号]';
+                return autoBll.save('user_info_log', userInfoLog, conn);
                 return user_info_id;
             });
         });
