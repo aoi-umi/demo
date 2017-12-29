@@ -11,6 +11,30 @@ var restList = [
         path: '/module/_default',//为空时则按url
     },
     {
+        url: '/help',
+        method: 'get',
+        functionName: '',
+        path: '',
+    },
+    {
+        url: '/msg',
+        method: 'get',
+        functionName: 'msg',
+        path: 'index',
+    },
+    {
+        url: '/interface/onlineUser/query',
+        method: 'post',
+        functionName: 'onlineUserQuery',
+        path: 'index',
+    },
+    {
+        url: '/interface/onlineUser/detailQuery',
+        method: 'post',
+        functionName: 'onlineUserDetailQuery',
+        path: 'index',
+    },
+    {
         url: '/interface/sign/:method',
         method: 'post',
         functionName: 'sign',
@@ -18,21 +42,9 @@ var restList = [
         path: 'module/sign',
     },
     {
-        url: '/help',
-        method: 'get',
-        functionName: '',
-        path: '',
-    },
-    {
         url: '/interface/upload',
         method: 'post',
         functionName: 'upload',
-        path: 'index',
-    },
-    {
-        url: '/msg',
-        method: 'get',
-        functionName: 'msg',
         path: 'index',
     },
 

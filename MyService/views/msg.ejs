@@ -1,5 +1,6 @@
+<% if(notSupportedBrowser){ %>
 <h1 style="text-align: center">
-    <%= message %>
+    不支持的浏览器！
 </h1>
 <script>
     (function () {
@@ -7,3 +8,10 @@
             location.href = '/';
     })();
 </script>
+<% } else{ %>
+<% include _public/header %>
+<h1 style="text-align: center">
+    <%= message %>
+</h1>
+<% include _public/footer %>
+<% } %>
