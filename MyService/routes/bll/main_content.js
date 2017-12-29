@@ -109,7 +109,7 @@ exports.save = function (opt, exOpt) {
         return autoBll.tran(function (conn) {
             var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
             main_content.type = 0;
-            main_content.operator = user.account + `(${user.nickname}#${user.id})`;
+            main_content.operator = `${user.account}(${user.nickname}#${user.id})`;
             main_content.create_date =
                 main_content.operate_date = now;
             return autoBll.save('main_content', main_content, conn).then(function (t) {

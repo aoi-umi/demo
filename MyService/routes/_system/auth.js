@@ -18,28 +18,30 @@ exports.isHadAuthority = function (user, authData, opt) {
         authData = [authData];
     for (var i = 0; i < authData.length; i++) {
         var item = authData[i];
-        if (!auth.isExistAuthority(user, item, opt))
+        if (!auth.isExistAuthority(user, item, opt)) {
             return false;
+        }
     }
     return true;
 };
 
 exports.isExistAuthority = function (user, authData, opt) {
-    var result = false;
     if (typeof authData == 'string')
         authData = authData.split(',');
     for (var i = 0; i < authData.length; i++) {
         var item = authData[i];
         if (user.authority[item]) {
             if (opt) opt.notExistAuthority = null;
-            result = true;
-            return result;
+            return true;
         }
         if (opt) {
             opt.notExistAuthority = item;
         }
     }
-    return result;
+    if (opt && opt.throwError) {
+        throw common.error('', auth.getErrorCode(opt.notExistAuthority));
+    }
+    return false;
 };
 
 var authConfig = {
@@ -127,8 +129,8 @@ exports.getAccessableUrl = function (user, pathname) {
                 accessable = true;
         } else if (isExist) {
             var errCode = authConfig.accessable.errCode;
-            if (opt.notExistAuthority && authConfig[opt.notExistAuthority])
-                errCode = authConfig[opt.notExistAuthority].errCode;
+            if (opt.notExistAuthority)
+                errCode = auth.getErrorCode(opt.notExistAuthority);
             throw common.error('', errCode);
         }
     });
@@ -137,4 +139,10 @@ exports.getAccessableUrl = function (user, pathname) {
     if (!accessable)
         throw common.error('', authConfig.accessable.errCode);
     return url;
+};
+
+exports.getErrorCode = function (authData) {
+    if (authConfig[authData] && authConfig[authData].errCode)
+        return authConfig[authData].errCode;
+    return 'NO_PERMISSIONS';
 };

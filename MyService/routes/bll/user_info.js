@@ -22,12 +22,8 @@ exports.isAccountExist = function (account) {
 exports.save = function (opt, exOpt) {
     var user = exOpt.user;
     var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
-    var userInfoLog = {
-        user_info_id: user.id,
-        type: 0,
-        content: '',
-        create_date: now,
-    };
+    var userInfoLog = userInfo.createLog();
+    userInfoLog.user_info_id = user.id;
     return common.promise().then(function () {
         return autoBll.detailQuery('user_info', {id: user.id}).then(function (t) {
             if (!t || !t.id)
@@ -148,19 +144,18 @@ exports.query = function (opt) {
     });
 };
 
-exports.adminSave = function (opt) {
+exports.adminSave = function (opt, exOpt) {
     var delUserRoleIdList = [];
     var userRoleIdList = [];
     var delUserAuthIdList = [];
     var userAuthIdList = [];
     var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
     var id = opt.id;
-    var userInfoLog = {
-        user_info_id: id,
-        type: 1,
-        content: '',
-        create_date: now,
-    };
+    var user = exOpt.user;
+    var userInfoLog = userInfo.createLog();
+    userInfoLog.user_info_id = id;
+    userInfoLog.type = 1;
+    userInfoLog.content = `${user.account}(${user.nickname}#${user.id})`;
     return common.promise().then(function () {
         if (!id)
             throw common.error('id为空', 'CAN_NOT_BE_EMPTY');
@@ -267,8 +262,8 @@ var updateUserInfo = function (detail) {
 
     detail.role_list.forEach(function (role) {
         role.authority_list = _.filter(detail.role_authority_list, function (role_authority) {
-                return role_authority.role_code == role.code;
-            }) || [];
+            return role_authority.role_code == role.code;
+        }) || [];
         role.authority_list = _.sortBy(role.authority_list, function (t) {
             return t.code;
         });
@@ -287,4 +282,15 @@ var updateUserInfo = function (detail) {
     authority_list.forEach(function (t) {
         detail.auth[t.code] = true;
     });
-}
+};
+
+exports.createLog = function () {
+    var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
+    var model = {
+        user_info_id: 0,
+        type: 0,
+        content: '',
+        create_date: now,
+    };
+    return model;
+};

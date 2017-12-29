@@ -103,6 +103,10 @@ sign = {
             desc: '密码',
             dom: $('#password'),
             canNotNull: true,
+            checkValue: function (val, model) {
+                if (val.length < 6)
+                    return '请输入大于等于6位的{0}';
+            }
         }, {
             name: 'passwordRepeat',
             desc: '密码',
