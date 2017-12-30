@@ -179,9 +179,7 @@
                     }
                     break;
             }
-            if (main_content.id && main_content.status != -1
-                    && (isHadAuthority('admin') || ((isHadAuthority('mainContentDel') && user.id == main_content.user_info_id)))
-            ) {
+            if (mainContentDetail.canDelete) {
                 operateList.push({
                     text: '删除',
                     operate: 'del',
@@ -223,7 +221,7 @@
     </div>
 </div>
 <div id="mainContentChild" data-backdrop="false" role="dialog" tabindex="-1" class="modal fade pop-up-box">
-    <div class="modal-dialog" >
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-body">
                 <button class="close" type="button" data-dismiss="modal">

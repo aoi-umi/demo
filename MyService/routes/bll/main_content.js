@@ -23,12 +23,8 @@ exports.query = function (opt, exOpt) {
             if (t.list && t.list.length) {
                 t.list.forEach(function (item) {
                     item.operation = ['detailQuery'];
-                    if (item.status != -1
-                        && ((auth.isHadAuthority(user, ['mainContentDel']) && (user.id == item.user_info_id))
-                            || auth.isHadAuthority(user, ['admin']))
-                    ) {
+                    if (canDelete(item, user))
                         item.operation.push('del');
-                    }
                     updateMainContent(item);
                 });
             }
@@ -37,7 +33,7 @@ exports.query = function (opt, exOpt) {
     });
 };
 
-exports.detailQuery = function (opt) {
+exports.detailQuery = function (opt, exOpt) {
     return common.promise().then(function () {
         if (opt.id == 0) {
             var detail = {};
@@ -60,6 +56,7 @@ exports.detailQuery = function (opt) {
             return detail;
         });
     }).then(function (t) {
+        t.canDelete = canDelete(t.main_content, exOpt.user);
         updateMainContent(t.main_content);
         if (t.main_content_log_list) {
             t.main_content_log_list.forEach(function (item) {
@@ -175,48 +172,49 @@ exports.statusUpdate = function (opt, exOpt) {
         necessaryAuth = 'mainContent' + common.stringToPascal(operate);
         if (!auth.isHadAuthority(user, necessaryAuth))
             throw common.error(`没有[${necessaryAuth}]权限`);
-        return main_content_bll.detailQuery({id: main_content.id});
+        return main_content_bll.detailQuery({id: main_content.id}, {user: exOpt.user});
     }).then(function (main_content_detail) {
-        if (necessaryAuth == 'mainContentDel'
-            && (!auth.isHadAuthority(user, 'admin') && main_content_detail.main_content.user_info_id != user.id))
-            throw common.error(`没有权限`);
-
-        myEnum.enumChangeCheck('main_content_status_enum', main_content_detail.main_content.status, main_content.status);
-        if (main_content.status == 'recovery') {
-            var main_content_log_list = main_content_detail.main_content_log_list;
-            if (!main_content_log_list || !main_content_log_list.length
-                || main_content_log_list[0].src_status == undefined) {
-                throw common.error('数据有误');
+            if (necessaryAuth == 'mainContentDel' && !main_content_detail.canDelete) {
+                throw common.error(`没有权限`);
             }
-            main_content.status = main_content_log_list[0].src_status;
-        }
-        return autoBll.tran(function (conn) {
-            var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
-            var updateStatusOpt = {
-                id: main_content.id,
-                status: main_content.status,
-                operator_id: user.id,
-                operator: user.account + `(${user.nickname}#${user.id})`,
-                operate_date: now
-            };
-            return autoBll.save('main_content', updateStatusOpt, conn).then(function (t) {
-                var main_content_id = t;
-                var list = [];
-                //日志
-                var main_content_log = createLog({
-                    id: main_content_id,
-                    src_status: main_content_detail.main_content.status,
-                    dest_status: main_content.status,
-                    content: opt.remark,
-                    user: user,
-                });
-                list.push(autoBll.save('main_content_log', main_content_log, conn));
-                return q.all(list).then(function () {
-                    return main_content_id;
+
+            myEnum.enumChangeCheck('main_content_status_enum', main_content_detail.main_content.status, main_content.status);
+            if (main_content.status == 'recovery') {
+                var main_content_log_list = main_content_detail.main_content_log_list;
+                if (!main_content_log_list || !main_content_log_list.length
+                    || main_content_log_list[0].src_status == undefined) {
+                    throw common.error('数据有误');
+                }
+                main_content.status = main_content_log_list[0].src_status;
+            }
+            return autoBll.tran(function (conn) {
+                var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
+                var updateStatusOpt = {
+                    id: main_content.id,
+                    status: main_content.status,
+                    operator_id: user.id,
+                    operator: user.account + `(${user.nickname}#${user.id})`,
+                    operate_date: now
+                };
+                return autoBll.save('main_content', updateStatusOpt, conn).then(function (t) {
+                    var main_content_id = t;
+                    var list = [];
+                    //日志
+                    var main_content_log = createLog({
+                        id: main_content_id,
+                        src_status: main_content_detail.main_content.status,
+                        dest_status: main_content.status,
+                        content: opt.remark,
+                        user: user,
+                    });
+                    list.push(autoBll.save('main_content_log', main_content_log, conn));
+                    return q.all(list).then(function () {
+                        return main_content_id;
+                    });
                 });
             });
-        });
-    });
+        }
+    );
 };
 
 function createLog(opt) {
@@ -267,4 +265,14 @@ function updateMainContentLog(item) {
     item.type_name = myEnum.getValue('main_content_log_type_enum', item.type);
     item.src_status_name = myEnum.getValue('main_content_status_enum', item.src_status);
     item.dest_status_name = myEnum.getValue('main_content_status_enum', item.dest_status);
+}
+
+function canDelete(main_content, user) {
+    if (main_content.status != -1
+        && ((auth.isHadAuthority(user, ['mainContentDel']) && (user.id == main_content.user_info_id))
+            || (auth.isHadAuthority(user, ['admin']) && main_content.status != 0))
+    ) {
+        return true;
+    }
+    return false;
 }

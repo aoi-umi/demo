@@ -82,6 +82,7 @@ exports.view = function (req, res, next) {
     var pathname = req._parsedUrl.pathname;
     var opt = {
         view: pathname,
+        user: req.myData.user,
     }
     //console.log(req.originalUrl, req._parsedUrl.pathname)
     switch (pathname) {
