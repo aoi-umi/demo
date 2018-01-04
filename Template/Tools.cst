@@ -32,6 +32,7 @@ public class DatabaseModel
 public static void DeleteFilesAndFolders(string path)  
 {  
     // Delete files.  
+    if(!Directory.Exists(path)) return;
     string[] files = Directory.GetFiles(path);  
     foreach (var file in files)  
     {  
