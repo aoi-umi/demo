@@ -14,8 +14,11 @@ Description="数据库类型"%>
 Tools.DeleteFilesAndFolders("./Output");
 var temp = new Make();
 temp.DataBaseType = DataBaseType;
+
+int i = 0;                
 SourceDatabase.ForEach(x=>{    
     try{
+        i++;
         var fileName = x.Name;
         var dbName = x.Database.Name;
         if(!string.IsNullOrEmpty(RemoveTablePrefix)){
@@ -36,8 +39,43 @@ SourceDatabase.ForEach(x=>{
                 }
                 temp.MakeType = makeType;
                 temp.RenderToFile(string.Format(outputFormat, dbName, fileName), true);
-                if(makeType == Make.MakeTypeEnum.Procedure)
+                if(makeType == Make.MakeTypeEnum.Procedure){
+                    var str = "";
+                    if(i == 1){
+                        switch(DataBaseType){
+                            case Make.Tools.DatabaseTypeEnum.MySql:
+                                //替换特殊字符
+                                str += 
+@"DROP FUNCTION IF EXISTS `replace_special_char`;
+DELIMITER ;;
+CREATE FUNCTION `replace_special_char`(`fun_str` text) RETURNS text CHARSET utf8
+BEGIN
+    SET fun_str = REPLACE(fun_str, '\\', '\\\\');
+    SET fun_str = REPLACE(fun_str, '''', '''''');
+    RETURN fun_str;
+END
+;;
+DELIMITER ;";
+                                break;
+                            case Make.Tools.DatabaseTypeEnum.SqlServer:
+                                str += 
+@"if exists(SELECT * FROM SYSOBJECTS WHERE NAME='replace_special_char')
+    drop function replace_special_char;
+GO
+
+CREATE FUNCTION  replace_special_char(@fun_str nvarchar(max))
+RETURNS nvarchar(max)
+AS
+BEGIN
+    SET @fun_str = REPLACE(@fun_str, '''', '''''');
+    RETURN @fun_str;
+END ";
+                                break;
+                        }                        
+                        File.AppendAllText(string.Format("./Output/{0}/sql/_all.sql", dbName), str);
+                    }
                     File.AppendAllText(string.Format("./Output/{0}/sql/_all.sql", dbName), temp.RenderToString());
+                }
         %>
 <%=string.Format("{0}:{1} {2}", x.Name, makeType, "success")%>
         <%
@@ -53,35 +91,6 @@ SourceDatabase.ForEach(x=>{
 });
 %>
 <script runat="template">
-
-//sql替换特殊字符
-/**
-DROP FUNCTION IF EXISTS `replace_special_char`;
-DELIMITER ;;
-CREATE FUNCTION `replace_special_char`(`fun_str` text) RETURNS text CHARSET utf8
-BEGIN
-    SET fun_str = REPLACE(fun_str, '\\', '\\\\');
-    SET fun_str = REPLACE(fun_str, '''', '''''');
-    RETURN fun_str;
-END
-;;
-DELIMITER ;
-**/
-
-//sql server
-/**
-if exists(SELECT * FROM SYSOBJECTS WHERE NAME='replace_special_char')
-    drop function replace_special_char;
-GO
-
-CREATE FUNCTION  replace_special_char(@fun_str nvarchar(max))
-RETURNS nvarchar(max)
-AS
-BEGIN
-    SET @fun_str = REPLACE(@fun_str, '''', '''''');
-    RETURN @fun_str;
-END 
-**/
 
 </script>
 
