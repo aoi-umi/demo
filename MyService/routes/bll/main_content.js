@@ -72,12 +72,12 @@ exports.save = function (opt, exOpt) {
     var user = exOpt.user;
     return common.promise().then(function () {
         main_content = opt.main_content;
-        return main_content_bll.detailQuery({id: main_content.id});
+        return main_content_bll.detailQuery({id: main_content.id}, exOpt);
     }).then(function (main_content_detail) {
         var delChildList;
         if (main_content.id != 0) {
             //权限检查
-            if (user.id != main_content.user_info_id)
+            if (user.id != main_content_detail.main_content.user_info_id)
                 throw common.error('没有权限处理此记录');
             myEnum.enumChangeCheck('main_content_status_enum', main_content_detail.main_content.status, main_content.status);
             //要删除的child

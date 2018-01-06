@@ -6,9 +6,15 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var config = require('./config');
+
 var common = require('./routes/_system/common');
+var main = require('./routes/_system/_main');
+var auth = require('./routes/_system/auth');
+var errorConfig = require('./routes/_system/errorConfig');
 var cache = require('./routes/_system/cache');
+
 var sign = require('./routes/module/sign');
+
 var app = express();
 console.log(config.name, 'run at port ', config.port, ',version:', config.version);
 // view engine setup
@@ -22,13 +28,8 @@ app.use(bodyParser.urlencoded());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-//init
-Date.prototype.toJSON = function () {
-    return common.dateFormat(this, 'yyyy-MM-dd HH:mm:ss');
-};
-Date.prototype.toString = function () {
-    return common.dateFormat(this, 'yyyy-MM-dd HH:mm:ss');
-};
+//初始化
+main.init();
 
 var myRender = function (req, res, view, options) {
     var opt = {
@@ -42,7 +43,6 @@ var myRender = function (req, res, view, options) {
     opt = common.extend(opt, options);
     res.render(view, common.formatViewtRes(opt));
 };
-
 var mySend = function (req, res, err, detail, option) {
     var url = req.header('host') + req.originalUrl;
     var opt = {
@@ -73,7 +73,6 @@ var mySend = function (req, res, err, detail, option) {
         common.logSave(log);
     }
 };
-
 app.use(function (req, res, next) {
     //req.query  /?params1=1&params2=2
     //req.body  post的参数
@@ -151,10 +150,9 @@ app.use(function (req, res, next) {
     }
 });
 
-var auth = require('./routes/_system/auth');
-var restConfig = require('./routes/_system/restConfig');
+//按restConfig 注册路由
 var restList = [];
-restConfig.forEach(function (rest) {
+main.restConfig.forEach(function (rest) {
     var method = rest.method;
     var path = rest.path || rest.url;
     if (path && path.substr(0, 1) !== '/')
@@ -175,7 +173,7 @@ restConfig.forEach(function (rest) {
     var reqfile = require(path);
     var reqFun = reqfile[functionName];
     if (!reqFun)
-        throw common.error('[' + path + '] is not exist function [' + functionName + ']', 'CODE_ERROR');
+        throw common.error(`[${path}] is not exist function [${functionName}]`, errorConfig.CODE_ERROR.code);
 
     var createFun = function (fun) {
         return function (req, res, next) {
@@ -221,7 +219,6 @@ app.use(function (req, res, next) {
 });
 
 /// error handlers
-var errorConfig = require('./routes/_system/errorConfig');
 
 app.use(function (err, req, res, next) {
     common.writeError(err);

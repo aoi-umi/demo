@@ -1,9 +1,10 @@
 var common = require('./_system/common');
 
 var exports = module.exports;
-var restConfig = require('./_system/restConfig');
+var main = require('./_system/_main');
 exports.get = function (req, res) {
     var restList = [];
+    var restConfig = main.restConfig;
     for (var i = 0; i < restConfig.length; i++) {
         var rest = restConfig[i];
         var isRouter = true;
