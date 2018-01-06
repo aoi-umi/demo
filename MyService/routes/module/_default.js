@@ -5,7 +5,8 @@ var path = require('path');
 var fs = require('fs');
 var common = require('../_system/common');
 var auth = require('../_system/auth');
-var myEnum = require('./../_system/enum');
+var myEnum = require('../_system/enum');
+var main = require('../_system/_main');
 var autoBll = require('../bll/auto');
 var errorConfig = require('../_system/errorConfig');
 
@@ -101,8 +102,8 @@ exports.view = function (req, res, next) {
     common.promise().then(function () {
         switch (opt.view) {
             case '/status':
-                opt.enumDict = myEnum.enumDict;
-                opt.enumChangeDict = myEnum.enumChangeDict;
+                opt.enumDict = main.enumDict;
+                opt.enumChangeDict = main.enumChangeDict;
                 break;
 
             case '/userInfo/detail':

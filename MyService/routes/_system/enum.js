@@ -3,9 +3,10 @@
  */
 var config = require('../../config');
 var common = require('./common');
+var main = require('./_main');
 var myEnum = exports;
 exports.getEnum = function (enumName, notThrowError) {
-    var enumType = this.enumDict[enumName];
+    var enumType = main.enumDict[enumName];
     if (!enumType && !notThrowError) throw common.error('enum "' + enumName + '" not exist!', 'CODE_ERROR');
     return enumType;
 };
@@ -23,29 +24,6 @@ exports.getValue = function (enumName, key) {
     return enumType[key];
 };
 
-exports.enumDict = {
-    main_content_type_enum: {'0': '文章',},
-    main_content_status_enum: {'-1': '已删除', '0': '草稿', '1': '待审核', '2': '审核中', '3': '通过', '4': '退回'},
-    //添加 _operate 后缀
-    main_content_status_enum_operate: {'recovery': '恢复'},
-    main_content_log_type_enum: {
-        //main_conetnt
-        '0': '主内容保存', '1': '主内容提交', '2': '主内容审核', '3': '主内容审核通过', '4': '主内容审核不通过', '5': '主内容删除', '6': '主内容恢复',
-    },
-};
-
-exports.enumChangeDict = {
-    main_content_status_enum: {
-        //初始状态
-        '0': {'0': '保存', '1': '提交', '-1': '删除'},
-        '1': {'2': '审核', '3': '审核通过', '4': '审核不通过', '-1': '删除'},
-        '2': {'2': '审核', '3': '审核通过', '4': '审核不通过', '-1': '删除'},
-        '3': {'-1': '删除'},
-        '4': {'0': '保存', '1': '提交', '-1': '删除'},
-        '-1': {'recovery': '恢复'},
-    }
-};
-
 //状态变更
 exports.enumChangeCheck = function (enumType, srcEnum, destEnum) {
     if (enumType == undefined)
@@ -54,7 +32,7 @@ exports.enumChangeCheck = function (enumType, srcEnum, destEnum) {
     var enumOperateType = enumType + '_operate';
     var matchEnum = myEnum.getEnum(enumType);
     var operateEnum = myEnum.getEnum(enumOperateType, true);
-    var changeDict = myEnum.enumChangeDict[enumType];
+    var changeDict = main.enumChangeDict[enumType];
     if (srcEnum == undefined || srcEnum == null || destEnum == undefined || destEnum == null)
         throw common.error('', 'ARGS_ERROR');
     srcEnum = srcEnum.toString();
