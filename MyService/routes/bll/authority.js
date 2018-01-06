@@ -13,7 +13,8 @@ exports.save = function (opt) {
             };
         } else {
             return authority.isExist(opt).then(function (t) {
-                throw common.error(`code[${opt.code}]已存在`);
+                if(t)
+                    throw common.error(`code[${opt.code}]已存在`);
             });
         }
     }).then(function (t) {
