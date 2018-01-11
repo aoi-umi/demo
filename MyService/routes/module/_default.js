@@ -28,20 +28,9 @@ function getBll(req, res, next) {
     var method = params.method;
     console.log(`[module:${module}][method:${method}]`);
     var opt = {
-        isCustom: false
+        isCustom: isCustom(module, method)
     };
-
-    //使用custom
-    if (!common.isInArray(method, ['query', 'save', 'detailQuery', 'del'])
-        || (module == 'log' && common.isInArray(method, ['query']))
-        || (module == 'role' && common.isInArray(method, ['query', 'save', 'detailQuery']))
-        || (module == 'authority' && common.isInArray(method, ['query', 'save']))
-        || (module == 'userInfo' && common.isInArray(method, ['query', 'save', 'detailQuery']))
-        || (module == 'mainContentType' && common.isInArray(method, ['save']))
-        || (module == 'mainContent' && common.isInArray(method, ['query', 'save']))
-    ) {
-        opt.isCustom = true;
-    }
+    
     checkArgs({method: method, module: module, args: args});
 
     //不记录日志
@@ -77,6 +66,42 @@ function getBll(req, res, next) {
         return t;
     });
 }
+
+var isCustom = function (module, method) {
+    //使用custom
+    if (!common.isInArray(method, ['query', 'save', 'detailQuery', 'del'])
+        || (module == 'log' && common.isInArray(method, ['query']))
+        || (module == 'role' && common.isInArray(method, ['query', 'save', 'detailQuery']))
+        || (module == 'authority' && common.isInArray(method, ['query', 'save']))
+        || (module == 'userInfo' && common.isInArray(method, ['query', 'save', 'detailQuery']))
+        || (module == 'mainContentType' && common.isInArray(method, ['save']))
+        || (module == 'mainContent' && common.isInArray(method, ['query', 'save']))
+    ) {
+        return true;
+    }
+    return false;
+};
+
+var checkArgs = function (opt) {
+    var method = opt.method;
+    var module = opt.module;
+    var args = opt.args;
+    if (common.isInArray(method, ['query'])) {
+        if (!args.page_index) args.page_index = 1;
+        if (!args.page_size) args.page_size = 10;
+    }
+    if (common.isInArray(method, ['detailQuery'])) {
+        var argsError = false;
+        if (module == 'role') {
+            if (!args.code)
+                argsError = true;
+        }
+        else if (!args || !args.id)
+            argsError = true;
+        if (argsError)
+            throw common.error('args error');
+    }
+};
 
 //页面 get
 exports.view = function (req, res, next) {
@@ -130,27 +155,6 @@ exports.view = function (req, res, next) {
     }).fail(function (e) {
         next(e);
     });
-};
-
-var checkArgs = function (opt) {
-    var method = opt.method;
-    var module = opt.module;
-    var args = opt.args;
-    if (common.isInArray(method, ['query'])) {
-        if (!args.page_index) args.page_index = 1;
-        if (!args.page_size) args.page_size = 10;
-    }
-    if (common.isInArray(method, ['detailQuery'])) {
-        var argsError = false;
-        if (module == 'role') {
-            if (!args.code)
-                argsError = true;
-        }
-        else if (!args || !args.id)
-            argsError = true;
-        if (argsError)
-            throw common.error('args error');
-    }
 };
 
 var updateValue = function (opt) {
