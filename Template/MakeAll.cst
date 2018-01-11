@@ -55,7 +55,7 @@ BEGIN
     RETURN fun_str;
 END
 ;;
-DELIMITER ;";
+DELIMITER ;" + Environment.NewLine;
                                 break;
                             case Make.Tools.DatabaseTypeEnum.SqlServer:
                                 str += 
@@ -69,7 +69,7 @@ AS
 BEGIN
     SET @fun_str = REPLACE(@fun_str, '''', '''''');
     RETURN @fun_str;
-END ";
+END " + Environment.NewLine;
                                 break;
                         }                        
                         File.AppendAllText(string.Format("./Output/{0}/sql/_all.sql", dbName), str);

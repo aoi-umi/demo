@@ -454,8 +454,8 @@ exports.dateFormat = function (date, format) {
         if (!format) format = 'yyyy-MM-dd';
         if (!date)
             date = new Date();
-        if (typeof date == 'string')
-            date = Date.parse(date);
+        else if (typeof date == 'number' || typeof date == 'string')
+            date = new Date(date);
 
         var o = {
             y: date.getFullYear(),

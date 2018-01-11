@@ -1,5 +1,6 @@
 node_modules
 .idea
+package-lock.json
 Template/Output
 MyService/error
 MyService/public/js/prd
