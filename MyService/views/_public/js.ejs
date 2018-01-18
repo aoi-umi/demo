@@ -15,15 +15,16 @@
 <script type="text/javascript" src="/js/plugins/underscore-min.js"></script>
 
 <script type="text/javascript" src="/js/config.js?v=<%= version %>"></script>
-<script type="text/javascript" src="/js/<%= env %>/init.js?v=<%= version %>"></script>
+<script type="text/javascript" src="/js/<%= env %>/_main.js?v=<%= version %>"></script>
 
 <script type="text/javascript" src="/js/<%= env %>/common.js?v=<%= version %>"></script>
+<script type="text/javascript" src="/js/<%= env %>/my.enum.js?v=<%= version %>"></script>
 <script type="text/javascript" src="/js/<%= env %>/sign.js?v=<%= version %>"></script>
 <script type="text/javascript" src="/js/<%= env %>/socket.js?v=<%= version %>"></script>
 <script type="text/javascript" src="/js/<%= env %>/my.interface.js?v=<%= version %>"></script>
 <script type="text/javascript" src="/js/<%= env %>/my.vaild.js?v=<%= version %>"></script>
 <script type="text/javascript">
     $(function () {
-        init.init();
+        main.init();
     });
 </script>

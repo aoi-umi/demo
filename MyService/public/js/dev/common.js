@@ -627,4 +627,10 @@ common = {
             }
         }, opt.interval * 1000);
     },
+
+    error: function (msg, errCode) {
+        var err = new Error(msg);
+        err.code = errCode;
+        return err;
+    },
 };

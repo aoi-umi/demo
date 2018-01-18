@@ -13,7 +13,7 @@ Description="数据库类型"%>
 
 if(SourceDatabase.Count > 0){
 
-    Tools.DeleteFilesAndFolders("./Output/" + SourceDatabase[0].Name);
+    Tools.DeleteFilesAndFolders("./Output/" + SourceDatabase[0].Database.Name);
     var temp = new Make();
     temp.DataBaseType = DataBaseType;
 
