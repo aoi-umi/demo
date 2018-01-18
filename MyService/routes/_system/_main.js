@@ -43,13 +43,6 @@ exports.restConfig = [
         path: 'index',
     },
     {
-        url: '/interface/sign/:method',
-        method: 'post',
-        functionName: 'sign',
-        methodName: 'sign',
-        path: 'module/sign',
-    },
-    {
         url: '/interface/upload',
         method: 'post',
         functionName: 'upload',
