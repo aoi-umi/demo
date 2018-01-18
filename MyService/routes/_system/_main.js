@@ -1,4 +1,6 @@
 var common = require('./common');
+var myEnum = require('./enum');
+var auth = require('./auth');
 var main = exports;
 exports.init = function () {
     Date.prototype.toJSON = function () {
@@ -7,6 +9,11 @@ exports.init = function () {
     Date.prototype.toString = function () {
         return common.dateFormat(this, 'yyyy-MM-dd HH:mm:ss');
     };
+
+    auth.accessableUrlConfig = main.accessableUrlConfig;
+
+    myEnum.enumDict = main.enumDict;
+    myEnum.enumChangeDict = main.enumChangeDict;
 }
 
 //路由配置
