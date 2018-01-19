@@ -6,10 +6,10 @@ socket = {
     connection: null,
     init: function () {
         var self = this;
-        self.connection = io.connect(location.origin);
+        self.connection = io.connect(location.host);
         self.bindEvent();
     },
-    bindEvent:function () {
+    bindEvent: function () {
         var self = this;
         var connection = self.connection;
         connection.on('connect', function () {
