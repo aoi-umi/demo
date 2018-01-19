@@ -325,9 +325,10 @@ exports.writeError = function (err, opt) {
     list.push(err);
     //用于查找上一级调用
     var stack = new Error().stack;
-    var stackList = common.getStack(err.stack, 1, 4)
+    var stackList = ['stack:']
+        .concat(common.getStack(err.stack))
         .concat(['help stack:'])
-        .concat(common.getStack(stack, 2, 4));
+        .concat(common.getStack(stack));
     for (var i = 0; i < stackList.length; i++) {
         console.error(stackList[i]);
         list.push(stackList[i]);
@@ -340,10 +341,27 @@ exports.writeError = function (err, opt) {
     });
 };
 
-exports.getStack = function (stack, start, end) {
+exports.getStack = function (stack) {
     var stackList = [];
+    var matchPath = [
+        '../../bin',
+        '../../app',
+        '../../routes',
+    ];
+    for (var i = 0; i < matchPath.length; i++) {
+        matchPath[i] = path.resolve(`${__dirname}/${matchPath[i]}`);
+    }
+    var list = [];
     if (stack) stackList = stack.split('\n');
-    return stackList.slice(start, end);
+    stackList.forEach(t => {
+        for (var i = 0; i < matchPath.length; i++) {
+            if (t.indexOf(matchPath[i]) >= 0) {
+                list.push(t);
+                break;
+            }
+        }
+    });
+    return list;
 };
 
 exports.mkdirsSync = function (dirname, mode) {

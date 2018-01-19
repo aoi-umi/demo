@@ -11,41 +11,43 @@ Description="移除数据表前缀"%>
 Description="数据库类型"%>
 <%
 
-Tools.DeleteFilesAndFolders("./Output");
-var temp = new Make();
-temp.DataBaseType = DataBaseType;
+if(SourceDatabase.Count > 0){
 
-int i = 0;                
-SourceDatabase.ForEach(x=>{    
-    try{
-        i++;
-        var fileName = x.Name;
-        var dbName = x.Database.Name;
-        if(!string.IsNullOrEmpty(RemoveTablePrefix)){
-            if(fileName.StartsWith(RemoveTablePrefix))
-                fileName = fileName.Substring(RemoveTablePrefix.Length);
-        }
-        temp.Table = x;
-        MakeTypeList.ForEach(makeType=>{
-            try{
-                var outputFormat = "./Output/{0}/{1}";
-                switch(makeType){
-                    case Make.MakeTypeEnum.Procedure:
-                        outputFormat = "./Output/{0}/sql/{1}.sql";
-                        break;
-                    case Make.MakeTypeEnum.Js:
-                        outputFormat = "./Output/{0}/js/{1}_auto.js";
-                        break;
-                }
-                temp.MakeType = makeType;
-                temp.RenderToFile(string.Format(outputFormat, dbName, fileName), true);
-                if(makeType == Make.MakeTypeEnum.Procedure){
-                    var str = "";
-                    if(i == 1){
-                        switch(DataBaseType){
-                            case Make.Tools.DatabaseTypeEnum.MySql:
-                                //替换特殊字符
-                                str += 
+    Tools.DeleteFilesAndFolders("./Output/" + SourceDatabase[0].Database.Name);
+    var temp = new Make();
+    temp.DataBaseType = DataBaseType;
+
+    int i = 0;                
+    SourceDatabase.ForEach(x=>{    
+        try{
+            i++;
+            var fileName = x.Name;
+            var dbName = x.Database.Name;
+            if(!string.IsNullOrEmpty(RemoveTablePrefix)){
+                if(fileName.StartsWith(RemoveTablePrefix))
+                    fileName = fileName.Substring(RemoveTablePrefix.Length);
+            }
+            temp.Table = x;
+            MakeTypeList.ForEach(makeType=>{
+                try{
+                    var outputFormat = "./Output/{0}/{1}";
+                    switch(makeType){
+                        case Make.MakeTypeEnum.Procedure:
+                            outputFormat = "./Output/{0}/sql/{1}.sql";
+                            break;
+                        case Make.MakeTypeEnum.Js:
+                            outputFormat = "./Output/{0}/js/{1}_auto.js";
+                            break;
+                    }
+                    temp.MakeType = makeType;
+                    temp.RenderToFile(string.Format(outputFormat, dbName, fileName), true);
+                    if(makeType == Make.MakeTypeEnum.Procedure){
+                        var str = "";
+                        if(i == 1){
+                            switch(DataBaseType){
+                                case Make.Tools.DatabaseTypeEnum.MySql:
+                                    //替换特殊字符
+                                    str += 
 @"DROP FUNCTION IF EXISTS `replace_special_char`;
 DELIMITER ;;
 CREATE FUNCTION `replace_special_char`(`fun_str` text) RETURNS text CHARSET utf8
@@ -70,25 +72,26 @@ BEGIN
     SET @fun_str = REPLACE(@fun_str, '''', '''''');
     RETURN @fun_str;
 END " + Environment.NewLine;
-                                break;
-                        }                        
-                        File.AppendAllText(string.Format("./Output/{0}/sql/_all.sql", dbName), str);
+                                    break;
+                            }                        
+                            File.AppendAllText(string.Format("./Output/{0}/sql/_all.sql", dbName), str);
+                        }
+                        File.AppendAllText(string.Format("./Output/{0}/sql/_all.sql", dbName), temp.RenderToString());
                     }
-                    File.AppendAllText(string.Format("./Output/{0}/sql/_all.sql", dbName), temp.RenderToString());
-                }
-        %>
-<%=string.Format("{0}:{1} {2}", x.Name, makeType, "success")%>
+            %>
+    <%=string.Format("{0}:{1} {2}", x.Name, makeType, "success")%>
+            <%
+                }catch(Exception ex){%>
+    <%=string.Format("{0}:{1}", x.Name, ex.Message)%>
         <%
-            }catch(Exception ex){%>
-<%=string.Format("{0}:{1}", x.Name, ex.Message)%>
-    <%
-            }
-        });        
-    }catch(Exception ex){%>
-<%=string.Format("{0}:{1}", x.Name, ex.Message)%>
-    <%
-    }
-});
+                }
+            });        
+        }catch(Exception ex){%>
+    <%=string.Format("{0}:{1}", x.Name, ex.Message)%>
+        <%
+        }
+    });
+}
 %>
 <script runat="template">
 

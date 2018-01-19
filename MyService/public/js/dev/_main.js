@@ -43,8 +43,8 @@ function getBrowserType() {
     }
 }
 
-namespace('init');
-init = {
+namespace('main');
+main = {
     variable: {
         frameDom: null,
         frameDefaultHeight: 0,
@@ -101,6 +101,8 @@ init = {
         $(`.nav.navbar-nav a[href="${location.pathname}"]`).closest('li').addClass('active');
 
         self.bindEvent();
+
+        my.enum.enumDict = {};
     },
     bindEvent: function () {
         var self = this;

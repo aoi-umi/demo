@@ -30,7 +30,7 @@ function getBll(req, res, next) {
     var opt = {
         isCustom: isCustom(module, method)
     };
-    
+
     checkArgs({method: method, module: module, args: args});
 
     //不记录日志
@@ -44,11 +44,12 @@ function getBll(req, res, next) {
     return common.promise().then(function () {
         if (opt.isCustom) {
             var exOpt = {
-                user: req.myData.user
+                user: req.myData.user,
+                req: req
             };
             return autoBll.custom(module, method, args, exOpt);
         } else {
-            var modulePath = path.resolve(__dirname + '/../dal/' + module + '_auto.js');
+            var modulePath = path.resolve(__dirname + '/../dal/_auto/' + module + '_auto.js');
             var isExist = fs.existsSync(modulePath);
             if (!isExist)
                 throw common.error('file is not exist', errorConfig.BAD_REQUEST.code);
