@@ -13,7 +13,7 @@ var auth = require('./routes/_system/auth');
 var errorConfig = require('./routes/_system/errorConfig');
 var cache = require('./routes/_system/cache');
 
-var sign = require('./routes/module/sign');
+var sign = require('./routes/bll/sign');
 
 var app = express();
 console.log(config.name, 'run at port ', config.port, ',version:', config.version);
@@ -128,7 +128,7 @@ app.use(function (req, res, next) {
                     if (!t.cacheDatetime || new Date() - new Date(t.cacheDatetime) > 12 * 3600 * 1000) {
                         req.myData.autoSignIn = true;
                         return common.promise().then(function (promiseRes) {
-                            sign.signIn(req).then(promiseRes.resolve).fail(function (e) {
+                            sign.inInside(req).then(promiseRes.resolve).fail(function (e) {
                                 //console.log(e);
                                 cache.del(userInfoKey).then(function () {
                                     throw common.error('请重新登录！');

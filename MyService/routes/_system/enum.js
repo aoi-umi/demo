@@ -3,10 +3,13 @@
  */
 var config = require('../../config');
 var common = require('./common');
-var main = require('./_main');
 var myEnum = exports;
+
+exports.enumDict = {};
+exports.enumChangeDict = {};
+
 exports.getEnum = function (enumName, notThrowError) {
-    var enumType = main.enumDict[enumName];
+    var enumType = exports.enumDict[enumName];
     if (!enumType && !notThrowError) throw common.error('enum "' + enumName + '" not exist!', 'CODE_ERROR');
     return enumType;
 };
@@ -32,7 +35,7 @@ exports.enumChangeCheck = function (enumType, srcEnum, destEnum) {
     var enumOperateType = enumType + '_operate';
     var matchEnum = myEnum.getEnum(enumType);
     var operateEnum = myEnum.getEnum(enumOperateType, true);
-    var changeDict = main.enumChangeDict[enumType];
+    var changeDict = exports.enumChangeDict[enumType];
     if (srcEnum == undefined || srcEnum == null || destEnum == undefined || destEnum == null)
         throw common.error('', 'ARGS_ERROR');
     srcEnum = srcEnum.toString();

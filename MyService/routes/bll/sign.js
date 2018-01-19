@@ -2,57 +2,36 @@ var common = require('../_system/common');
 var cache = require('../_system/cache');
 var config = require('../../config');
 var errorConfig = require('../_system/errorConfig');
-var autoBll = require('../bll/auto');
-var userInfo = require('../bll/user_info');
+var autoBll = require('./auto');
+var userInfo = require('./user_info');
+var signBll = exports;
 
-exports.sign = function (req, res, next) {
-    var method = req.params.method;
-    switch (method) {
-        case 'up':
-            signUp(req, res, next);
-            break;
-        case 'in':
-            signIn(req).then(function (t) {
-                return res.mySend(null, {
-                    id: t.user_info.id,
-                    nickname: t.user_info.nickname
-                });
-            }).fail(function (e) {
-                return res.mySend(e);
-            });
-            break;
-        case 'out':
-            signOut(req, res, next);
-            break;
-        default:
-            next();
-    }
-};
-
-function signUp(req, res, next) {
-    var args = req.body;
+exports.up = function (opt, exOpt) {
     var user_info_id = 0;
     return common.promise().then(function (e) {
-        if (!args.account)
+        if (!opt.account)
             throw common.error('', 'CAN_NOT_BE_EMPTY', {
                 format: function (msg) {
                     return common.stringFormat(msg, '用户名');
                 }
             });
-        return autoBll.custom('user_info', 'isAccountExist', args.account)
+        return autoBll.custom('user_info', 'isAccountExist', opt.account)
     }).then(function (t) {
         if (t)
             throw common.error('account is exist!');
         return autoBll.tran(function (conn) {
             return autoBll.save('user_info', {
-                account: args.account,
-                password: args.password,
-                nickname: args.nickname,
+                account: opt.account,
+                password: opt.password,
+                nickname: opt.nickname,
                 create_datetime: new Date()
             }, conn).then(function (t) {
                 user_info_id = t;
                 //默认角色
-                return autoBll.save('user_info_with_role', {user_info_id: user_info_id, role_code: 'default'}, conn);
+                return autoBll.save('user_info_with_role', {
+                    user_info_id: user_info_id,
+                    role_code: 'default'
+                }, conn);
             }).then(function () {
                 //日志
                 var userInfoLog = userInfo.createLog();
@@ -63,13 +42,32 @@ function signUp(req, res, next) {
             });
         });
     }).then(function (t) {
-        res.send(common.formatRes(null, t));
-    }).fail(function (e) {
-        res.send(common.formatRes(e));
+        return user_info_id;
     });
-}
+};
 
-var signIn = exports.signIn = function (req, signInReq) {
+exports.out = function (opt, exOpt) {
+    var user = exOpt.user;
+    return common.promise().then(function () {
+        if (user.key) {
+            return cache.del(user.key);
+        }
+    }).then(function () {
+        return 'success'
+    });
+};
+
+exports.in = function (opt, exOpt) {
+    return signBll.inInside(exOpt.req).then(function (t) {
+        return {
+            id: t.user_info.id,
+            nickname: t.user_info.nickname
+        };
+    });
+};
+
+//内部调用
+exports.inInside = function (req) {
     var account = req.header('account');
     var token = req.header('token');
     var reqBody = req.body;
@@ -126,17 +124,3 @@ var signIn = exports.signIn = function (req, signInReq) {
         return t;
     });
 };
-
-function signOut(req, res, next) {
-    var userInfoKey = req.cookies[config.cacheKey.userInfo];
-    common.promise().then(function () {
-        if (userInfoKey) {
-            userInfoKey = config.cacheKey.userInfo + userInfoKey;
-            return cache.del(userInfoKey);
-        }
-    }).then(function () {
-        res.mySend(null, 'success');
-    }).fail(function (e) {
-        res.mySend(e, e.code);
-    });
-}

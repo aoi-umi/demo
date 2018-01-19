@@ -8,7 +8,7 @@ var errorConfig = require('../_system/errorConfig');
 function getRequire(name, custom) {
     var filepath = '';
     if (!custom)
-        filepath = '../dal/' + name + '_auto';
+        filepath = '../dal/_auto/' + name + '_auto';
     else {
         if (custom == 'dal')
             filepath = '../dal/' + name;
@@ -52,9 +52,8 @@ exports.query = function (name, params, conn) {
 exports.tran = function (fn) {
     var res = common.defer();
     db.tranConnect(function (conn) {
-        var resData = [];
         return common.promise().then(function () {
-            return fn(conn, res);
+            return fn(conn);
         }).then(res.resolve).fail(function (e) {
             throw e;
         });
