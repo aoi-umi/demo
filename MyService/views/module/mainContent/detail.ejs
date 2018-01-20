@@ -14,14 +14,14 @@
 <div class="container">
     <%
     var rowItemClass = 'col-xs-12 col-md-6';
-    var main_content = mainContentDetail.main_content;
+    var mainContent = mainContentDetail.mainContent;
     var isEditable = false;
-    if (main_content.status == 0 || main_content.status == 4)
+    if (mainContent.status == 0 || mainContent.status == 4)
         isEditable = true;
     var debug = false;
     %>
     <div class="hidden">
-        <input id="id" value="<%= main_content.id %>"/>
+        <input id="id" value="<%= mainContent.id %>"/>
     </div>
     <% if(debug){ %>
     <pre>
@@ -32,30 +32,30 @@
         <div>
             <p>
                 <span>创建人:</span><span>
-                    <% if(main_content.id == 0){ %>
+                    <% if(mainContent.id == 0){ %>
                     <%= user.account %>
                     (<%= user.nickname %>#<%= user.id %>)
                     <% }else{ %>
-                    <%= main_content.account %>
-                    (<%= main_content.nickname %>#<%= main_content.user_info_id %>)
+                    <%= mainContent.account %>
+                    (<%= mainContent.nickname %>#<%= mainContent.userInfoId %>)
                     <% } %>
                 </span>
-                <span>类型:</span><span><%= main_content.type_name || '' %></span>
-                <span>状态:</span><span><%= main_content.status_name || '' %></span>
+                <span>类型:</span><span><%= mainContent.typeName || '' %></span>
+                <span>状态:</span><span><%= mainContent.statusName || '' %></span>
             </p>
 
             <p>
-                <span>创建时间:</span><span><%= main_content.create_date || '' %></span>
-                <span>修改时间:</span><span><%= main_content.operate_date || '' %></span>
-                <span>修改人:</span><span><%= main_content.operator || '' %></span>
+                <span>创建时间:</span><span><%= mainContent.createDate || '' %></span>
+                <span>修改时间:</span><span><%= mainContent.operateDate || '' %></span>
+                <span>修改人:</span><span><%= mainContent.operator || '' %></span>
             </p>
 
             <p>
                 <%
-                var main_content_type_list = mainContentDetail.main_content_type_list;
-                main_content_type_list.forEach(function(item, index){ %>
-                <a href="javascript:;"><%= item.type_name %></a>
-                <% if(index < main_content_type_list.length - 1){ %>
+                var mainContentTypeList = mainContentDetail.mainContentTypeList;
+                mainContentTypeList.forEach(function(item, index){ %>
+                <a href="javascript:;"><%= item.typeName %></a>
+                <% if(index < mainContentTypeList.length - 1){ %>
                 >>
                 <% } %>
                 <% }) %>
@@ -70,9 +70,9 @@
                         <div class="col-sm-10">
                             <% if(isEditable){ %>
                             <input class="form-control" id="title" placeholder="请输入标题"
-                                   value="<%= main_content.title || '' %>"/>
+                                   value="<%= mainContent.title || '' %>"/>
                             <% }else{ %>
-                            <label class="control-label"><%= main_content.title || '' %></label>
+                            <label class="control-label"><%= mainContent.title || '' %></label>
                             <% } %>
                         </div>
                     </div>
@@ -82,9 +82,9 @@
                         <div class="col-sm-10">
                             <% if(isEditable){ %>
                             <textarea class="form-control no-resize" id="description"
-                                      placeholder="请输入描述"><%= main_content.description || '' %></textarea>
+                                      placeholder="请输入描述"><%= mainContent.description || '' %></textarea>
                             <% }else{ %>
-                            <label class="control-label"><%= main_content.description || '' %></label>
+                            <label class="control-label"><%= mainContent.description || '' %></label>
                             <% } %>
                         </div>
                     </div>
@@ -108,7 +108,7 @@
                 </tr>
                 </thead>
                 <tbody id="mainContentChildList">
-                <% mainContentDetail.main_content_child_list.forEach(function(item){
+                <% mainContentDetail.mainContentChildList.forEach(function(item){
                     item.stringify = JSON.stringify(item);
                         with(item){
                 %>
@@ -128,11 +128,11 @@
         <div class="my-row text-center">
             <%
             var operateList = [];
-            switch (main_content.status) {
+            switch (mainContent.status) {
                 case 0:
                 case 4:
                     if (isHadAuthority('mainContentSave')
-                            && (!main_content.id || main_content.user_info_id == user.id)) {
+                            && (!mainContent.id || mainContent.userInfoId == user.id)) {
                         operateList.push({
                             text: '保存',
                             operate: 'save',
@@ -188,7 +188,7 @@
             }
             operateList.forEach(function(item){ %>
             <button class="btn btn-default <%= item.className %>"
-                    data-operate="<%= item.operate %>" data-id="<%= main_content.id %>">
+                    data-operate="<%= item.operate %>" data-id="<%= mainContent.id %>">
                 <%= item.text %>
             </button>
             <% }); %>
@@ -206,14 +206,14 @@
                     <th>创建时间</th>
                 </tr>
                 </thead>
-                <% mainContentDetail.main_content_log_list.forEach(function(item){ %>
+                <% mainContentDetail.mainContentLogList.forEach(function(item){ %>
                 <tr>
-                    <td><%= item.type_name %></td>
-                    <td><%= item.src_status_name %></td>
-                    <td><%= item.dest_status_name %></td>
+                    <td><%= item.typeName %></td>
+                    <td><%= item.srcStatusName %></td>
+                    <td><%= item.destStatusName %></td>
                     <td><%= item.content %></td>
                     <td><%= item.operator %></td>
-                    <td><%= item.create_date %></td>
+                    <td><%= item.createDate %></td>
                 </tr>
                 <% }) %>
             </table>

@@ -18,8 +18,8 @@ moduleMainContentType = {
             saveDefaultModel: {
                 id: 0,
                 type: '',
-                type_name: '',
-                parent_type: '',
+                typeName: '',
+                parentType: '',
                 level: 0,
                 operation: ['save']
             },
@@ -39,11 +39,11 @@ moduleMainContentType = {
                 name: 'type',
                 dom: $('#type'),
             }, {
-                name: 'type_name',
-                dom: $('#type_name'),
+                name: 'typeName',
+                dom: $('#typeName'),
             }, {
-                name: 'parent_type',
-                dom: $('#parent_type'),
+                name: 'parentType',
+                dom: $('#parentType'),
             }, {
                 name: 'level',
                 dom: $('#level'),
@@ -64,11 +64,11 @@ moduleMainContentType = {
                             return -n.level;
                         });
 
-                        function setTree(tree, parent_type, list) {
+                        function setTree(tree, parentType, list) {
                             $(list).each(function (i, item) {
                                 if (!itemTree[item.type])
                                     itemTree[item.type] = {item: item, inRoot: false};
-                                if (item.parent_type == parent_type) {
+                                if (item.parentType == parentType) {
                                     itemTree[item.type].inRoot = true;
                                     if (!tree[item.type]) {
                                         tree[item.type] = {
@@ -101,7 +101,7 @@ moduleMainContentType = {
                         for (var key in itemTree) {
                             var val = itemTree[key];
                             if (!val.inRoot) {
-                                val.item.type += '(' + val.item.parent_type + ')';
+                                val.item.type += '(' + val.item.parentType + ')';
                                 renderTree(val, $('#notInRootTreeList'));
                             }
                         }
@@ -126,11 +126,11 @@ moduleMainContentType = {
                     dom: $('#mainContentTypeSave [name=type]'),
                     canNotNull: true,
                 }, {
-                    name: 'type_name',
-                    dom: $('#mainContentTypeSave [name=type_name]'),
+                    name: 'typeName',
+                    dom: $('#mainContentTypeSave [name=typeName]'),
                 }, {
-                    name: 'parent_type',
-                    dom: $('#mainContentTypeSave [name=parent_type]'),
+                    name: 'parentType',
+                    dom: $('#mainContentTypeSave [name=parentType]'),
                 }, {
                     name: 'level',
                     dom: $('#mainContentTypeSave [name=level]'),

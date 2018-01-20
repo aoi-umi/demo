@@ -36,44 +36,44 @@ if(SourceDatabase.Count > 0){
                             outputFormat = "./Output/{0}/sql/{1}.sql";
                             break;
                         case Make.MakeTypeEnum.Js:
-                            outputFormat = "./Output/{0}/js/{1}_auto.js";
+                            outputFormat = "./Output/{0}/js/{1}.js";
                             break;
                     }
                     temp.MakeType = makeType;
                     temp.RenderToFile(string.Format(outputFormat, dbName, fileName), true);
                     if(makeType == Make.MakeTypeEnum.Procedure){
-                        var str = "";
+                        var strList = new List<string>();
                         if(i == 1){
                             switch(DataBaseType){
                                 case Make.Tools.DatabaseTypeEnum.MySql:
                                     //替换特殊字符
-                                    str += 
-@"DROP FUNCTION IF EXISTS `replace_special_char`;
-DELIMITER ;;
-CREATE FUNCTION `replace_special_char`(`fun_str` text) RETURNS text CHARSET utf8
-BEGIN
-    SET fun_str = REPLACE(fun_str, '\\', '\\\\');
-    SET fun_str = REPLACE(fun_str, '''', '''''');
-    RETURN fun_str;
-END
-;;
-DELIMITER ;" + Environment.NewLine;
+                                    
+                                    strList.Add("DROP FUNCTION IF EXISTS `replace_special_char`;");
+                                    strList.Add("DELIMITER ;;");
+                                    strList.Add("CREATE FUNCTION `replace_special_char`(`fun_str` text) RETURNS text CHARSET utf8");
+                                    strList.Add("BEGIN");
+                                    strList.Add("    SET fun_str = REPLACE(fun_str, '\\\\', '\\\\\\\\');");
+                                    strList.Add("    SET fun_str = REPLACE(fun_str, '''', '''''');");
+                                    strList.Add("    RETURN fun_str;");
+                                    strList.Add("END");
+                                    strList.Add(";;");
+                                    strList.Add("DELIMITER ;");
                                 break;
                             case Make.Tools.DatabaseTypeEnum.SqlServer:
-                                str += 
-@"if exists(SELECT * FROM SYSOBJECTS WHERE NAME='replace_special_char')
-    drop function replace_special_char;
-GO
+                                    strList.Add("if exists(SELECT * FROM SYSOBJECTS WHERE NAME='replace_special_char')");
+                                    strList.Add("    drop function replace_special_char;");
+                                    strList.Add("GO");
 
-CREATE FUNCTION  replace_special_char(@fun_str nvarchar(max))
-RETURNS nvarchar(max)
-AS
-BEGIN
-    SET @fun_str = REPLACE(@fun_str, '''', '''''');
-    RETURN @fun_str;
-END " + Environment.NewLine;
+                                    strList.Add("CREATE FUNCTION  replace_special_char(@fun_str nvarchar(max))");
+                                    strList.Add("RETURNS nvarchar(max)");
+                                    strList.Add("AS");
+                                    strList.Add("BEGIN");
+                                    strList.Add("    SET @fun_str = REPLACE(@fun_str, '''', '''''');");
+                                    strList.Add("    RETURN @fun_str;");
+                                    strList.Add("END ");
                                     break;
                             }                        
+                            var str = string.Join(Environment.NewLine, strList.ToArray()) + Environment.NewLine;
                             File.AppendAllText(string.Format("./Output/{0}/sql/_all.sql", dbName), str);
                         }
                         File.AppendAllText(string.Format("./Output/{0}/sql/_all.sql", dbName), temp.RenderToString());

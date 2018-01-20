@@ -8,7 +8,7 @@
         <% var rowItemClass = 'col-lg-3 col-md-3 col-sm-6 col-xs-12';%>
         <div class="row my-row">
             <%
-            var prefix = 'log_';
+            var prefix = '';
             var searchItemList = [{
                 text: 'id',
                 id:'id',
@@ -22,11 +22,11 @@
                 text: 'code',
                 id:'code',
             },{
-                text: 'create_date_s',
-                id:'create_date_start',
+                text: 'createDateStart',
+                id:'createDateStart',
             },{
-                text: 'create_date_e',
-                id:'create_date_end',
+                text: 'createDateEnd',
+                id:'createDateEnd',
             },{
                 text: 'guid',
                 id:'guid',
@@ -54,13 +54,13 @@
         <div class="row my-row">
             <label class="control-label">结果</label>
             <label class="control-label">
-                <input type="radio" name="log_result" value="" checked/>全部
+                <input type="radio" name="result" value="" checked/>全部
             </label>
             <label class="control-label">
-                <input type="radio" name="log_result" value="1"/>成功
+                <input type="radio" name="result" value="1"/>成功
             </label>
             <label class="control-label">
-                <input type="radio" name="log_result" value="0"/>失败
+                <input type="radio" name="result" value="0"/>失败
             </label>
         </div>
         <div class="row my-row">

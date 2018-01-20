@@ -46,17 +46,17 @@ moduleMainContent = {
                 name: 'title',
                 dom: $('#title'),
             }, {
-                name: 'create_date_start',
-                dom: $('#create_date_start'),
+                name: 'createDateStart',
+                dom: $('#createDateStart'),
             }, {
-                name: 'create_date_end',
-                dom: $('#create_date_end'),
+                name: 'createDateEnd',
+                dom: $('#createDateEnd'),
             }, {
-                name: 'operate_date_start',
-                dom: $('#operate_date_start'),
+                name: 'operateDateStart',
+                dom: $('#operateDateStart'),
             }, {
-                name: 'operate_date_end',
-                dom: $('#operate_date_end'),
+                name: 'operateDateEnd',
+                dom: $('#operateDateEnd'),
             }, {
                 name: 'operator',
                 dom: $('#operator'),
@@ -81,47 +81,47 @@ moduleMainContent = {
             },
             bindEvent: function (self) {
                 if (self.operation.query) {
-                    $('#create_date_start').on('click', function () {
+                    $('#createDateStart').on('click', function () {
                         var datePickerArgs = {
                             el: this,
                             //startDate: '#{%y-30}-01-01',
                             doubleCalendar: true,
                             dateFmt: 'yyyy-MM-dd',
                             minDate: '1900-01-01',
-                            maxDate: '#F{$dp.$D(\'create_date_end\')}',
+                            maxDate: '#F{$dp.$D(\'createDateEnd\')}',
                         };
                         WdatePicker(datePickerArgs);
                     });
-                    $('#create_date_end').on('click', function () {
+                    $('#createDateEnd').on('click', function () {
                         var datePickerArgs = {
                             el: this,
                             //startDate: minDate || '#{%y-30}-01-01',
                             doubleCalendar: true,
                             dateFmt: 'yyyy-MM-dd',
-                            minDate: '#F{$dp.$D(\'create_date_start\')||\'1900-01-01\'}',
+                            minDate: '#F{$dp.$D(\'createDateStart\')||\'1900-01-01\'}',
                             maxDate: '',
                         };
                         WdatePicker(datePickerArgs);
                     });
 
-                    $('#operate_date_start').on('click', function () {
+                    $('#operateDateStart').on('click', function () {
                         var datePickerArgs = {
                             el: this,
                             //startDate: '#{%y-30}-01-01',
                             doubleCalendar: true,
                             dateFmt: 'yyyy-MM-dd',
                             minDate: '1900-01-01',
-                            maxDate: '#F{$dp.$D(\'operate_date_end\')}',
+                            maxDate: '#F{$dp.$D(\'operateDateEnd\')}',
                         };
                         WdatePicker(datePickerArgs);
                     });
-                    $('#operate_date_end').on('click', function () {
+                    $('#operateDateEnd').on('click', function () {
                         var datePickerArgs = {
                             el: this,
                             //startDate: minDate || '#{%y-30}-01-01',
                             doubleCalendar: true,
                             dateFmt: 'yyyy-MM-dd',
-                            minDate: '#F{$dp.$D(\'operate_date_start\')||\'1900-01-01\'}',
+                            minDate: '#F{$dp.$D(\'operateDateStart\')||\'1900-01-01\'}',
                             maxDate: '',
                         };
                         WdatePicker(datePickerArgs);
@@ -252,16 +252,16 @@ moduleMainContent = {
                         $('.statusCount[data-status=' + this + ']').closest('li').addClass('active');
                     });
                 }
-                if (!data.create_date_start) data.create_date_start = null;
-                if (!data.create_date_end) data.create_date_end = null;
-                if (!data.operate_date_start) data.operate_date_start = null;
-                if (!data.operate_date_end) data.operate_date_end = null;
+                if (!data.createDateStart) data.createDateStart = null;
+                if (!data.createDateEnd) data.createDateEnd = null;
+                if (!data.operateDateStart) data.operateDateStart = null;
+                if (!data.operateDateEnd) data.operateDateEnd = null;
             },
             onQuerySuccess: function (t) {
                 $('.statusCount').text(0);
                 var totalCount = 0;
-                if (t.status_list) {
-                    $(t.status_list).each(function () {
+                if (t.statusList) {
+                    $(t.statusList).each(function () {
                         var item = this;
                         $(`.statusCount[data-status=${item.status}]`).text(item.count);
                         totalCount += item.count;
@@ -288,20 +288,20 @@ moduleMainContent = {
                 var detail = {};
                 var checkRes = common.dataCheck({list: saveArgsOpt});
                 if (checkRes.success) {
-                    var main_content =
-                        detail.main_content = checkRes.model;
+                    var mainContent =
+                        detail.mainContent = checkRes.model;
                     var operate = dom.data('operate');
                     if (operate == 'save')
-                        main_content.status = 0;
+                        mainContent.status = 0;
                     else if (operate == 'submit')
-                        main_content.status = 1;
+                        mainContent.status = 1;
                     else
                         throw new Error(`错误的操作类型[${operate}]`);
-                    detail.main_content_child_list = [];
+                    detail.mainContentChildList = [];
                     $(`#mainContentChildList>${self.rowClass}`).each(function () {
-                        detail.main_content_child_list.push($(this).data('item'));
+                        detail.mainContentChildList.push($(this).data('item'));
                     });
-                    if (!detail.main_content_child_list.length) {
+                    if (!detail.mainContentChildList.length) {
                         throw new Error('请添加内容');
                     }
                     detail.delMainContentChildList = self.variable.delMainContentChildList;
@@ -351,16 +351,16 @@ moduleMainContent = {
             },
 
             statusUpdate: function (dom, self) {
-                var main_content = {id: dom.data('id')};
+                var mainContent = {id: dom.data('id')};
                 return common.promise().then(function () {
                     try {
                         var operate = dom.data('operate');
-                        main_content.operate = operate;
+                        mainContent.operate = operate;
                         var operateList = ['audit', 'pass', 'notPass', 'del', 'recovery'];
                         if (!common.isInArray(operate, operateList))
                             throw new Error(`错误的操作类型[${operate}]`);
                         var detail = {
-                            main_content: main_content,
+                            mainContent: mainContent,
                             remark: $('#remark').val()
                         };
                         var notice = common.msgNotice({type: 1, msg: '处理中', noClose: true});

@@ -6,7 +6,7 @@ exports.detailQuery = function(params, conn) {
 };
 
 exports.query = function(params, conn) {
-    var sql = 'call p_user_info_query(:id, :account, :password, :nickname, :role, :authority, :edit_datetime_start, :edit_datetime_end, :create_datetime_start, :create_datetime_end, :remark, :null_list, :page_index, :page_size)';
+    var sql = 'call p_user_info_query(:id, :account, :password, :nickname, :role, :authority, :editDateStart, :editDateEnd, :createDateStart, :createDateEnd, :remark, :nullList, :pageIndex, :pageSize)';
     return db.query(sql, params, conn);
 };
 

@@ -247,8 +247,8 @@ module.prototype = {
                 data = checkRes.model;
             }
             if (!data) data = {};
-            data.page_index = pageIndex || self.pager.pageIndex;
-            data.page_size = self.pager.pageSize;
+            data.pageIndex = pageIndex || self.pager.pageIndex;
+            data.pageSize = self.pager.pageSize;
             self.opt.beforeQuery(data);
             var method = self.opt.interfacePrefix + 'Query';
             var notice = common.msgNotice({type: 1, msg: '查询中...', noClose: true});

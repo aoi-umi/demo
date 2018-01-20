@@ -32,7 +32,7 @@ exports.enumChangeCheck = function (enumType, srcEnum, destEnum) {
     if (enumType == undefined)
         throw common.error('enumType can not be empty!');
 
-    var enumOperateType = enumType + '_operate';
+    var enumOperateType = enumType + 'Operate';
     var matchEnum = myEnum.getEnum(enumType);
     var operateEnum = myEnum.getEnum(enumOperateType, true);
     var changeDict = exports.enumChangeDict[enumType];

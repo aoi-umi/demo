@@ -16,68 +16,68 @@ moduleLog = {
 
             queryArgsOpt: [{
                 name: 'id',
-                dom: $('#log_id'),
+                dom: $('#id'),
                 checkValue: function (val) {
                     if (val && !my.vaild.isInt(val, '001'))
                         return '请输入正确的正整数';
                 }
             }, {
                 name: 'url',
-                dom: $('#log_url'),
+                dom: $('#url'),
             }, {
                 name: 'result',
                 dom: $('#queryBox'),
-                focusDom: $('#queryBox [name=log_result]'),
+                focusDom: $('#queryBox [name=result]'),
                 getValue: function () {
-                    return this.dom.find('[name=log_result]:checked').val();
+                    return this.dom.find('[name=result]:checked').val();
                 }
             }, {
                 name: 'method',
-                dom: $('#log_method'),
+                dom: $('#method'),
             }, {
                 name: 'code',
-                dom: $('#log_code'),
+                dom: $('#code'),
             }, {
-                name: 'create_date_start',
-                dom: $('#log_create_date_start'),
+                name: 'createDateStart',
+                dom: $('#createDateStart'),
             }, {
-                name: 'create_date_end',
-                dom: $('#log_create_date_end'),
+                name: 'createDateEnd',
+                dom: $('#createDateEnd'),
             }, {
                 name: 'url',
-                dom: $('#log_url'),
+                dom: $('#url'),
             }, {
                 name: 'guid',
-                dom: $('#log_guid'),
+                dom: $('#guid'),
             }, {
                 name: 'req',
-                dom: $('#log_req'),
+                dom: $('#req'),
             }, {
                 name: 'res',
-                dom: $('#log_res'),
+                dom: $('#res'),
             }, {
                 name: 'remark',
-                dom: $('#log_remark'),
+                dom: $('#remark'),
             }],
             bindEvent: function (self) {
-                $('#log_create_date_start').on('click', function () {
+                $('#createDateStart').on('click', function () {
                     var datePickerArgs = {
                         el: this,
                         //startDate: '#{%y-30}-01-01',
                         doubleCalendar: true,
                         dateFmt: 'yyyy-MM-dd',
                         minDate: '1900-01-01',
-                        maxDate: '#F{$dp.$D(\'log_create_date_end\')}',
+                        maxDate: '#F{$dp.$D(\'createDateEnd\')}',
                     };
                     WdatePicker(datePickerArgs);
                 });
-                $('#log_create_date_end').on('click', function () {
+                $('#createDateEnd').on('click', function () {
                     var datePickerArgs = {
                         el: this,
                         //startDate: minDate || '#{%y-30}-01-01',
                         doubleCalendar: true,
                         dateFmt: 'yyyy-MM-dd',
-                        minDate: '#F{$dp.$D(\'log_create_date_start\')||\'1900-01-01\'}',
+                        minDate: '#F{$dp.$D(\'createDateStart\')||\'1900-01-01\'}',
                         maxDate: '',
                     };
                     WdatePicker(datePickerArgs);
@@ -98,8 +98,8 @@ moduleLog = {
             beforeQuery: function (data) {
                 if (!data.id) data.id = null;
                 if (!data.result) data.result = null;
-                if (!data.create_date_start) data.create_date_start = null;
-                if (!data.create_date_end) data.create_date_end = null;
+                if (!data.createDateStart) data.createDateStart = null;
+                if (!data.createDateEnd) data.createDateEnd = null;
             }
         };
         opt = $.extend(opt, option);

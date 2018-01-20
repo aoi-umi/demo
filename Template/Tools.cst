@@ -209,16 +209,16 @@ private static List<string> CreateMySqlSaveProcedure(DatabaseModel databaseModel
         if(procTableName.StartsWith(databaseModel.RemoveTablePrefix))
             procTableName = procTableName.Substring(databaseModel.RemoveTablePrefix.Length);
     }
-    var procName = "p_" 
+    var procName = "p#auto#" 
         + procTableName
-        + "_save_auto";
+        + "_save";
     var procStrList = new List<string>();
     var cols = databaseModel.Cols;
     var paraPerfix = "pr_";
-    var nullListName = paraPerfix + "null_list";
+    var nullListName = paraPerfix + "nullList";
     procStrList.Add( "drop procedure if exists `" + procName + "`;");
     
-    procStrList.Add( "create procedure " + procName + "(");
+    procStrList.Add( "create procedure `" + procName + "`(");
     level = 1;
     tabStr = GetRepeatStr("\t", level);
     cols.ForEach(x=>{        
@@ -324,15 +324,15 @@ private static List<string> CreateMySqlDelProcedure(DatabaseModel databaseModel)
         if(procTableName.StartsWith(databaseModel.RemoveTablePrefix))
             procTableName = procTableName.Substring(databaseModel.RemoveTablePrefix.Length);
     }
-    var procName = "p_" 
+    var procName = "p#auto#" 
         + procTableName
-        + "_del_auto";
+        + "_del";
     var procStrList = new List<string>();
     var cols = databaseModel.Cols;
     var paraPerfix = "pr_";
     procStrList.Add( "drop procedure if exists `" + procName + "`;");
     
-    procStrList.Add( "create procedure " + procName + "(");
+    procStrList.Add( "create procedure `" + procName + "`(");
     level = 1;
     tabStr = GetRepeatStr("\t", level);
         procStrList.Add(string.Format(tabStr + paraPerfix + "{0} {1}", databaseModel.IdCol.Name , databaseModel.IdCol.NativeType));
@@ -358,15 +358,15 @@ private static List<string> CreateMySqlDetailQueryProcedure(DatabaseModel databa
         if(procTableName.StartsWith(databaseModel.RemoveTablePrefix))
             procTableName = procTableName.Substring(databaseModel.RemoveTablePrefix.Length);
     }
-    var procName = "p_" 
+    var procName = "p#auto#" 
         + procTableName
-        + "_detail_query_auto";
+        + "_detail_query";
     var procStrList = new List<string>();
     var cols = databaseModel.Cols;
     var paraPerfix = "pr_";
     procStrList.Add( "drop procedure if exists `" + procName + "`;");
     
-    procStrList.Add( "create procedure " + procName + "(");
+    procStrList.Add( "create procedure `" + procName + "`(");
     level = 1;
     tabStr = GetRepeatStr("\t", level);
     procStrList.Add(string.Format(tabStr + paraPerfix + "{0} {1}", databaseModel.IdCol.Name , databaseModel.IdCol.NativeType));    
@@ -397,18 +397,18 @@ private static List<string> CreateMySqlQueryProcedure(DatabaseModel databaseMode
         if(procTableName.StartsWith(databaseModel.RemoveTablePrefix))
             procTableName = procTableName.Substring(databaseModel.RemoveTablePrefix.Length);
     }
-    var procName = "p_" 
+    var procName = "p#auto#" 
         + procTableName
-        + "_query_auto";
+        + "_query";
     var procStrList = new List<string>();
     var cols = databaseModel.Cols;
     var paraPerfix = "pr_";
-    var nullListName = paraPerfix + "null_list";
-    var pageIndexName = paraPerfix + "page_index";
-    var pageSizeName = paraPerfix + "page_size";
+    var nullListName = paraPerfix + "nullList";
+    var pageIndexName = paraPerfix + "pageIndex";
+    var pageSizeName = paraPerfix + "pageSize";
     procStrList.Add( "drop procedure if exists `" + procName + "`;");
     
-    procStrList.Add( "create procedure " + procName + "(");
+    procStrList.Add( "create procedure `" + procName + "`(");
     level = 1;
     tabStr = GetRepeatStr("\t", level);
     var i = 0;
@@ -495,13 +495,13 @@ private static List<string> CreateSqlServerSaveProcedure(DatabaseModel databaseM
         if(procTableName.StartsWith(databaseModel.RemoveTablePrefix))
             procTableName = procTableName.Substring(databaseModel.RemoveTablePrefix.Length);
     }
-    var procName = "p_" 
+    var procName = "p#auto#" 
         + procTableName
-        + "_save_auto";
+        + "_save";
     var procStrList = new List<string>();
     var cols = databaseModel.Cols;
     var paraPerfix = "@";
-    var nullListName = paraPerfix + "null_list";
+    var nullListName = paraPerfix + "nullList";
     
     procStrList.Add( "if exists(SELECT * FROM SYSOBJECTS WHERE NAME='" + procName + "')");
     procStrList.Add( "drop PROCEDURE " + procName + ";");
@@ -620,9 +620,9 @@ private static List<string> CreateSqlServerDelProcedure(DatabaseModel databaseMo
         if(procTableName.StartsWith(databaseModel.RemoveTablePrefix))
             procTableName = procTableName.Substring(databaseModel.RemoveTablePrefix.Length);
     }
-    var procName = "p_" 
+    var procName = "p#auto#" 
         + procTableName
-        + "_del_auto";
+        + "_del";
     var procStrList = new List<string>();
     var cols = databaseModel.Cols;
     var paraPerfix = "@";
@@ -661,9 +661,9 @@ private static List<string> CreateSqlServerDetailQueryProcedure(DatabaseModel da
         if(procTableName.StartsWith(databaseModel.RemoveTablePrefix))
             procTableName = procTableName.Substring(databaseModel.RemoveTablePrefix.Length);
     }
-    var procName = "p_" 
+    var procName = "p#auto#" 
         + procTableName
-        + "_detail_query_auto";
+        + "_detail_query";
     var procStrList = new List<string>();
     var cols = databaseModel.Cols;
     var paraPerfix = "@";
@@ -702,15 +702,15 @@ private static List<string> CreateSqlServerQueryProcedure(DatabaseModel database
         if(procTableName.StartsWith(databaseModel.RemoveTablePrefix))
             procTableName = procTableName.Substring(databaseModel.RemoveTablePrefix.Length);
     }
-    var procName = "p_" 
+    var procName = "p#auto#" 
         + procTableName
-        + "_query_auto";
+        + "_query";
     var procStrList = new List<string>();
     var cols = databaseModel.Cols;
     var paraPerfix = "@";
-    var nullListName = paraPerfix + "null_list";
-    var pageIndexName = paraPerfix + "page_index";
-    var pageSizeName = paraPerfix + "page_size";
+    var nullListName = paraPerfix + "nullList";
+    var pageIndexName = paraPerfix + "pageIndex";
+    var pageSizeName = paraPerfix + "pageSize";
     
     procStrList.Add("if exists(SELECT * FROM SYSOBJECTS WHERE NAME='" + procName + "')");
     procStrList.Add("drop PROCEDURE " + procName + ";");
@@ -811,13 +811,13 @@ public static List<string> CreateMySqlJs(DatabaseModel databaseModel)
         var tabStr = GetRepeatStr("\t", level);
         var functionName = "";
         var procName = "";
-        var sqlStr = "var sql = 'call p_" + procTableName + "_{0}_auto({1})';";
+        var sqlStr = "var sql = 'call `p#auto#" + procTableName + "_{0}`({1})';";
         var paramsList = new List<string>();
         switch(operateType){
             case OperateTypeEnum.Save:
                 procName = functionName = "save";
                 paramsList.AddRange(databaseModel.Cols.Select(x=>x.Name));
-                paramsList.Add("null_list");
+                paramsList.Add("nullList");
                 
                 break;
             case OperateTypeEnum.Del:
@@ -833,9 +833,9 @@ public static List<string> CreateMySqlJs(DatabaseModel databaseModel)
             case OperateTypeEnum.Query:
                 procName = functionName = "query";
                 paramsList.AddRange(databaseModel.Cols.Select(x=>x.Name));
-                paramsList.Add("null_list");
-                paramsList.Add("page_index");
-                paramsList.Add("page_size");
+                paramsList.Add("nullList");
+                paramsList.Add("pageIndex");
+                paramsList.Add("pageSize");
                 break;
         }      
         if(!string.IsNullOrEmpty(functionName))

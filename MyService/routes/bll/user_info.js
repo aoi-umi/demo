@@ -23,7 +23,7 @@ exports.save = function (opt, exOpt) {
     var user = exOpt.user;
     var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
     var userInfoLog = userInfo.createLog();
-    userInfoLog.user_info_id = user.id;
+    userInfoLog.userInfoId = user.id;
     return common.promise().then(function () {
         return autoBll.detailQuery('user_info', {id: user.id}).then(function (t) {
             if (!t || !t.id)
@@ -55,7 +55,7 @@ exports.save = function (opt, exOpt) {
             id: user.id,
             nickname: opt.nickname,
             password: opt.newPassword,
-            edit_datetime: now,
+            editDate: now,
         };
         return autoBll.tran(function (conn) {
             return autoBll.save('user_info', saveOpt, conn).then(function () {
@@ -78,11 +78,11 @@ exports.save = function (opt, exOpt) {
 exports.detailQuery = function (opt) {
     return autoBll.customDal('user_info', 'detailQuery', {id: opt.id}).then(function (t) {
         var detail = {
-            user_info: t[0][0],
-            user_info_log: t[1],
-            authority_list: t[2],
-            role_list: t[3],
-            role_authority_list: t[4],
+            userInfo: t[0][0],
+            userInfoLog: t[1],
+            authorityList: t[2],
+            roleList: t[3],
+            roleAuthorityList: t[4],
             auth: {}
         };
         updateUserInfo(detail);
@@ -96,48 +96,46 @@ exports.query = function (opt) {
             list: t[0],
             count: t[1][0].count
         };
-        var user_info_with_authority_list = t[2];
-        var authority_list = t[3];
-        var user_info_with_role_list = t[4];
-        var role_list = t[5];
-        var role_authority_list = t[6];
-        // for (var i = 2; i <= 6; i++) {
-        //     console.log(t[i]);
-        // }
+        var userInfoWithAuthorityList = t[2];
+        var authorityList = t[3];
+        var userInfoWithRoleList = t[4];
+        var roleList = t[5];
+        var roleAuthorityList = t[6];
+
         data.list.forEach(function (item) {
             var detail = {
                 auth: {},
-                role_list: [],
-                authority_list: [],
-                role_authority_list: [],
+                roleList: [],
+                authorityList: [],
+                roleAuthorityList: [],
             };
-            user_info_with_authority_list.forEach(function (u_with_auth) {
-                if (u_with_auth.user_info_id == item.id) {
-                    var matchAuth = _.filter(authority_list, function (auth) {
-                        return u_with_auth.authority_code == auth.code;
+            userInfoWithAuthorityList.forEach(function (uWithAuth) {
+                if (uWithAuth.userInfoId == item.id) {
+                    var matchAuth = _.filter(authorityList, function (auth) {
+                        return uWithAuth.authorityCode == auth.code;
                     });
                     if (matchAuth)
-                        detail.authority_list = detail.authority_list.concat(matchAuth);
+                        detail.authorityList = detail.authorityList.concat(matchAuth);
                 }
             });
 
-            user_info_with_role_list.forEach(function (u_with_role) {
-                if (u_with_role.user_info_id == item.id) {
-                    var matchAuth = _.filter(role_authority_list, function (role_auth) {
-                        return u_with_role.role_code == role_auth.role_code;
+            userInfoWithRoleList.forEach(function (uWithRole) {
+                if (uWithRole.userInfoId == item.id) {
+                    var matchAuth = _.filter(roleAuthorityList, function (roleAuth) {
+                        return uWithRole.roleCode == roleAuth.roleCode;
                     });
                     if (matchAuth)
-                        detail.role_authority_list = detail.role_authority_list.concat(matchAuth);
-                    var matchRole = _.filter(role_list, function (role) {
-                        return u_with_role.role_code == role.code;
+                        detail.roleAuthorityList = detail.roleAuthorityList.concat(matchAuth);
+                    var matchRole = _.filter(roleList, function (role) {
+                        return uWithRole.roleCode == role.code;
                     });
                     if (matchRole)
-                        detail.role_list = detail.role_list.concat(matchRole);
+                        detail.roleList = detail.roleList.concat(matchRole);
                 }
             });
             updateUserInfo(detail);
-            item.role_list = detail.role_list;
-            item.authority_list = detail.authority_list;
+            item.roleList = detail.roleList;
+            item.authorityList = detail.authorityList;
             item.auth = detail.auth;
         });
         return data;
@@ -153,19 +151,19 @@ exports.adminSave = function (opt, exOpt) {
     var id = opt.id;
     var user = exOpt.user;
     var userInfoLog = userInfo.createLog();
-    userInfoLog.user_info_id = id;
+    userInfoLog.userInfoId = id;
     userInfoLog.type = 1;
     userInfoLog.content = `${user.account}(${user.nickname}#${user.id})`;
     return common.promise().then(function () {
         if (!id)
             throw common.error('id为空', 'CAN_NOT_BE_EMPTY');
-        return autoBll.query('user_info_with_authority', {user_info_id: id});
+        return autoBll.query('user_info_with_authority', {userInfoId: id});
     }).then(function (t) {
         var diffOpt = {
             list: t.list,
             newList: opt.authorityList,
             compare: function (item, item2) {
-                return item.authority_code == item2;
+                return item.authorityCode == item2;
             },
             delReturnValue: function (item) {
                 return item.id;
@@ -174,13 +172,13 @@ exports.adminSave = function (opt, exOpt) {
         var diffRes = common.getListDiff(diffOpt);
         userAuthIdList = diffRes.addList;
         delUserAuthIdList = diffRes.delList;
-        return autoBll.query('user_info_with_role', {user_info_id: id});
+        return autoBll.query('user_info_with_role', {userInfoId: id});
     }).then(function (t) {
         var diffOpt = {
             list: t.list,
             newList: opt.roleList,
             compare: function (item, item2) {
-                return item.role_code == item2;
+                return item.roleCode == item2;
             },
             delReturnValue: function (item) {
                 return item.id;
@@ -205,7 +203,7 @@ exports.adminSave = function (opt, exOpt) {
         if (!isChanged)
             throw common.error('没有变更的信息');
         return autoBll.tran(function (conn) {
-            return autoBll.save('user_info', {id: id, edit_datetime: now}, conn).then(function (t) {
+            return autoBll.save('user_info', {id: id, editDate: now}, conn).then(function (t) {
                 var list = [];
                 //删除权限
                 if (delUserAuthIdList.length) {
@@ -216,7 +214,7 @@ exports.adminSave = function (opt, exOpt) {
                 //保存权限
                 if (userAuthIdList.length) {
                     userAuthIdList.forEach(function (item) {
-                        list.push(autoBll.save('user_info_with_authority', {user_info_id: id, authority_code: item}));
+                        list.push(autoBll.save('user_info_with_authority', {userInfoId: id, authorityCode: item}));
                     });
                 }
 
@@ -229,7 +227,7 @@ exports.adminSave = function (opt, exOpt) {
                 //保存角色
                 if (userRoleIdList.length) {
                     userRoleIdList.forEach(function (item) {
-                        list.push(autoBll.save('user_info_with_role', {user_info_id: id, role_code: item}));
+                        list.push(autoBll.save('user_info_with_role', {userInfoId: id, roleCode: item}));
                     });
                 }
 
@@ -245,41 +243,41 @@ exports.adminSave = function (opt, exOpt) {
 };
 
 var updateUserInfo = function (detail) {
-    var authority_list = [];
+    var authorityList = [];
     var auth = {};
-    detail.authority_list.forEach(function (t) {
+    detail.authorityList.forEach(function (t) {
         if (t.status == 1) {
-            if (!auth[t.code]) authority_list.push(t);
+            if (!auth[t.code]) authorityList.push(t);
             auth[t.code] = true;
         }
     });
-    detail.role_authority_list.forEach(function (t) {
-        if (t.status == 1 && t.role_status == 1) {
-            if (!auth[t.code]) authority_list.push(t);
+    detail.roleAuthorityList.forEach(function (t) {
+        if (t.status == 1 && t.roleStatus == 1) {
+            if (!auth[t.code]) authorityList.push(t);
             auth[t.code] = true;
         }
     });
 
-    detail.role_list.forEach(function (role) {
-        role.authority_list = _.filter(detail.role_authority_list, function (role_authority) {
-            return role_authority.role_code == role.code;
+    detail.roleList.forEach(function (role) {
+        role.authorityList = _.filter(detail.roleAuthorityList, function (roleAuthority) {
+            return roleAuthority.roleCode == role.code;
         }) || [];
-        role.authority_list = _.sortBy(role.authority_list, function (t) {
+        role.authorityList = _.sortBy(role.authorityList, function (t) {
             return t.code;
         });
     });
-    detail.authority_list = _.sortBy(detail.authority_list, function (t) {
+    detail.authorityList = _.sortBy(detail.authorityList, function (t) {
         return t.code;
     });
-    detail.role_list = _.sortBy(detail.role_list, function (t) {
+    detail.roleList = _.sortBy(detail.roleList, function (t) {
         return t.code;
     });
-    authority_list = _.sortBy(authority_list, function (t) {
+    authorityList = _.sortBy(authorityList, function (t) {
         return t.code;
     });
     if (!detail.auth)
         detail.auth = {};
-    authority_list.forEach(function (t) {
+    authorityList.forEach(function (t) {
         detail.auth[t.code] = true;
     });
 };
@@ -287,10 +285,10 @@ var updateUserInfo = function (detail) {
 exports.createLog = function () {
     var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
     var model = {
-        user_info_id: 0,
+        userInfoId: 0,
         type: 0,
         content: '',
-        create_date: now,
+        createDate: now,
     };
     return model;
 };

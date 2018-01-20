@@ -46,6 +46,9 @@ exports.promise = function (obj, methodName) {
     if (!args.length) {
         var res = q.defer();
         defer.resolve(res);
+    } else if (typeof obj == 'function') {
+        var res = q.defer();
+        defer.resolve(obj(res));
     } else {
         var funArgs = [];
         for (var key in args) {
@@ -546,7 +549,7 @@ exports.logModle = function () {
         code: null,
         req: null,
         res: null,
-        create_date: common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss'),
+        createDate: common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss'),
         remark: null,
     };
 };

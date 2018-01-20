@@ -7,8 +7,8 @@ var userInfo = require('./user_info');
 var signBll = exports;
 
 exports.up = function (opt, exOpt) {
-    var user_info_id = 0;
-    return common.promise().then(function (e) {
+    var userInfoId = 0;
+    return common.promise(function (e) {
         if (!opt.account)
             throw common.error('', 'CAN_NOT_BE_EMPTY', {
                 format: function (msg) {
@@ -24,31 +24,31 @@ exports.up = function (opt, exOpt) {
                 account: opt.account,
                 password: opt.password,
                 nickname: opt.nickname,
-                create_datetime: new Date()
+                createDate: new Date()
             }, conn).then(function (t) {
-                user_info_id = t;
+                userInfoId = t;
                 //默认角色
                 return autoBll.save('user_info_with_role', {
-                    user_info_id: user_info_id,
-                    role_code: 'default'
+                    userInfoId: userInfoId,
+                    roleCode: 'default'
                 }, conn);
             }).then(function () {
                 //日志
                 var userInfoLog = userInfo.createLog();
-                userInfoLog.user_info_id = user_info_id;
+                userInfoLog.userInfoId = userInfoId;
                 userInfoLog.content = '[创建账号]';
                 return autoBll.save('user_info_log', userInfoLog, conn);
-                return user_info_id;
+                return userInfoId;
             });
         });
     }).then(function (t) {
-        return user_info_id;
+        return userInfoId;
     });
 };
 
 exports.out = function (opt, exOpt) {
     var user = exOpt.user;
-    return common.promise().then(function () {
+    return common.promise(function () {
         if (user.key) {
             return cache.del(user.key);
         }
@@ -60,8 +60,8 @@ exports.out = function (opt, exOpt) {
 exports.in = function (opt, exOpt) {
     return signBll.inInside(exOpt.req).then(function (t) {
         return {
-            id: t.user_info.id,
-            nickname: t.user_info.nickname
+            id: t.userInfo.id,
+            nickname: t.userInfo.nickname
         };
     });
 };
@@ -77,7 +77,7 @@ exports.inInside = function (req) {
         token = user.token;
         reqBody = user.reqBody;
     }
-    return common.promise().then(function () {
+    return common.promise(function () {
         if (!account)
             throw common.error(null, errorConfig.CAN_NOT_BE_EMPTY.code, {
                 format: function (msg) {
@@ -102,7 +102,7 @@ exports.inInside = function (req) {
         return autoBll.custom('user_info', 'detailQuery', {id: userInfo.id});
     }).then(function (t) {
         //console.log(t);
-        var userInfo = t.user_info;
+        var userInfo = t.userInfo;
         user.id = userInfo.id;
         user.nickname = userInfo.nickname;
         user.account = userInfo.account;

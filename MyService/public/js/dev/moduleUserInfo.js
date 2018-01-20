@@ -27,17 +27,17 @@ moduleUserInfo = {
                 name: 'authority',
                 dom: $('#authority'),
             }, {
-                name: 'create_datetime_start',
-                dom: $('#create_datetime_start'),
+                name: 'createDateStart',
+                dom: $('#createDateStart'),
             }, {
-                name: 'create_datetime_end',
-                dom: $('#create_datetime_end'),
+                name: 'createDateEnd',
+                dom: $('#createDateEnd'),
             }, {
-                name: 'edit_datetime_start',
-                dom: $('#edit_datetime_start'),
+                name: 'editDateStart',
+                dom: $('#editDateStart'),
             }, {
-                name: 'edit_datetime_end',
-                dom: $('#edit_datetime_end'),
+                name: 'editDateEnd',
+                dom: $('#editDateEnd'),
             }, {
                 name: 'id',
                 dom: $('#id'),
@@ -48,47 +48,47 @@ moduleUserInfo = {
             },
             ],
             bindEvent: function (self) {
-                $('#create_datetime_start').on('click', function () {
+                $('#createDateStart').on('click', function () {
                     var datePickerArgs = {
                         el: this,
                         //startDate: '#{%y-30}-01-01',
                         doubleCalendar: true,
                         dateFmt: 'yyyy-MM-dd',
                         minDate: '1900-01-01',
-                        maxDate: '#F{$dp.$D(\'create_datetime_end\')}',
+                        maxDate: '#F{$dp.$D(\'createDateEnd\')}',
                     };
                     WdatePicker(datePickerArgs);
                 });
-                $('#create_datetime_end').on('click', function () {
+                $('#createDateEnd').on('click', function () {
                     var datePickerArgs = {
                         el: this,
                         //startDate: minDate || '#{%y-30}-01-01',
                         doubleCalendar: true,
                         dateFmt: 'yyyy-MM-dd',
-                        minDate: '#F{$dp.$D(\'create_datetime_start\')||\'1900-01-01\'}',
+                        minDate: '#F{$dp.$D(\'createDateStart\')||\'1900-01-01\'}',
                         maxDate: '',
                     };
                     WdatePicker(datePickerArgs);
                 });
 
-                $('#edit_datetime_start').on('click', function () {
+                $('#editDateStart').on('click', function () {
                     var datePickerArgs = {
                         el: this,
                         //startDate: '#{%y-30}-01-01',
                         doubleCalendar: true,
                         dateFmt: 'yyyy-MM-dd',
                         minDate: '1900-01-01',
-                        maxDate: '#F{$dp.$D(\'edit_datetime_end\')}',
+                        maxDate: '#F{$dp.$D(\'editDateEnd\')}',
                     };
                     WdatePicker(datePickerArgs);
                 });
-                $('#edit_datetime_end').on('click', function () {
+                $('#editDateEnd').on('click', function () {
                     var datePickerArgs = {
                         el: this,
                         //startDate: minDate || '#{%y-30}-01-01',
                         doubleCalendar: true,
                         dateFmt: 'yyyy-MM-dd',
-                        minDate: '#F{$dp.$D(\'edit_datetime_start\')||\'1900-01-01\'}',
+                        minDate: '#F{$dp.$D(\'editDateStart\')||\'1900-01-01\'}',
                         maxDate: '',
                     };
                     WdatePicker(datePickerArgs);
@@ -150,10 +150,10 @@ moduleUserInfo = {
                 if (!data.nickname) data.nickname = null;
                 if (!data.role) data.role = null;
                 if (!data.authority) data.authority = null;
-                if (!data.create_datetime_start) data.create_datetime_start = null;
-                if (!data.create_datetime_end) data.create_datetime_end = null;
-                if (!data.edit_datetime_start) data.edit_datetime_start = null;
-                if (!data.edit_datetime_end) data.edit_datetime_end = null;
+                if (!data.createDateStart) data.createDateStart = null;
+                if (!data.createDateEnd) data.createDateEnd = null;
+                if (!data.editDateStart) data.editDateStart = null;
+                if (!data.editDateEnd) data.editDateEnd = null;
             },
 
             editAfterRender: function (item, self) {
@@ -165,7 +165,7 @@ moduleUserInfo = {
             onSaveSuccess: function (t, self) {
             },
             onDetailQuerySuccess: function (t, self) {
-                self.detailRender(t.user_info);
+                self.detailRender(t.userInfo);
                 self.opt.updateView(['userInfoDetail'], {userInfoAllDetail: t}, self);
                 $('#userInfoSave').modal('show');
             },
@@ -175,12 +175,12 @@ moduleUserInfo = {
                     self.opt.setAuthorityAutoComplete(self);
                     self.opt.setRoleAutoComplete(self);
                     if (opt.userInfoAllDetail) {
-                        opt.userInfoDetail = opt.userInfoAllDetail.user_info;
+                        opt.userInfoDetail = opt.userInfoAllDetail.userInfo;
                         opt.userInfoDetail.operation = opt.userInfoAllDetail.operation;
-                        $(opt.userInfoAllDetail.authority_list).each(function (i, item) {
+                        $(opt.userInfoAllDetail.authorityList).each(function (i, item) {
                             self.opt.setAuthority(item, self);
                         });
-                        $(opt.userInfoAllDetail.role_list).each(function (i, item) {
+                        $(opt.userInfoAllDetail.roleList).each(function (i, item) {
                             self.opt.setRole(item, self);
                         });
                     }
