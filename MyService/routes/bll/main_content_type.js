@@ -4,9 +4,9 @@
 var autoBll = require('./auto');
 var common = require('../_system/common');
 var auth = require('../_system/auth');
-var main_content_type = exports;
+var mainContentTypeBll = exports;
 exports.save = function (opt) {
-    return main_content_type.isExist(opt).then(function (t) {
+    return mainContentTypeBll.isExist(opt).then(function (t) {
         if (t.isExist && t.detail.id != opt.id) {
             throw common.error('type [' + opt.type + '] is exist');
         }

@@ -7,7 +7,7 @@ var autoBll = require('./auto');
 var common = require('../_system/common');
 var myEnum = require('../_system/enum');
 var auth = require('../_system/auth');
-var main_content_bll = exports;
+var mainContentBll = exports;
 
 exports.query = function (opt, exOpt) {
     var user = exOpt.user;
@@ -16,7 +16,7 @@ exports.query = function (opt, exOpt) {
             var detail = {
                 list: t[0],
                 count: t[1][0].count,
-                status_list: t[2]
+                statusList: t[2]
             };
             return detail;
         }).then(function (t) {
@@ -37,29 +37,29 @@ exports.detailQuery = function (opt, exOpt) {
     return common.promise().then(function () {
         if (opt.id == 0) {
             var detail = {};
-            detail.main_content = {id: 0, status: 0, type: 0};
-            detail.main_content_type_list = [];
-            detail.main_content_child_list = [];
-            detail.main_content_log_list = [];
+            detail.mainContent = {id: 0, status: 0, type: 0};
+            detail.mainContentTypeList = [];
+            detail.mainContentChildList = [];
+            detail.mainContentLogList = [];
             return detail;
         } else if (!opt.id) {
             throw common.error('', 'ARGS_ERROR');
         }
         return autoBll.customDal('main_content', 'detailQuery', opt).then(function (t) {
             var detail = {};
-            detail.main_content = t[0][0];
-            detail.main_content_type_list = t[1];
-            detail.main_content_child_list = t[2];
-            detail.main_content_log_list = t[3];
-            if (!detail.main_content)
+            detail.mainContent = t[0][0];
+            detail.mainContentTypeList = t[1];
+            detail.mainContentChildList = t[2];
+            detail.mainContentLogList = t[3];
+            if (!detail.mainContent)
                 throw common.error('', 'DB_NO_DATA');
             return detail;
         });
     }).then(function (t) {
-        t.canDelete = canDelete(t.main_content, exOpt.user);
-        updateMainContent(t.main_content);
-        if (t.main_content_log_list) {
-            t.main_content_log_list.forEach(function (item) {
+        t.canDelete = canDelete(t.mainContent, exOpt.user);
+        updateMainContent(t.mainContent);
+        if (t.mainContentLogList) {
+            t.mainContentLogList.forEach(function (item) {
                 updateMainContentLog(item);
             });
         }
@@ -68,49 +68,49 @@ exports.detailQuery = function (opt, exOpt) {
 };
 
 exports.save = function (opt, exOpt) {
-    var main_content;
+    var mainContent;
     var user = exOpt.user;
     return common.promise().then(function () {
-        main_content = opt.main_content;
-        return main_content_bll.detailQuery({id: main_content.id}, exOpt);
-    }).then(function (main_content_detail) {
+        mainContent = opt.mainContent;
+        return mainContentBll.detailQuery({id: mainContent.id}, exOpt);
+    }).then(function (mainContentDetail) {
         var delChildList;
-        if (main_content.id != 0) {
+        if (mainContent.id != 0) {
             //权限检查
-            if (user.id != main_content_detail.main_content.user_info_id)
+            if (user.id != mainContentDetail.mainContent.userInfoId)
                 throw common.error('没有权限处理此记录');
-            myEnum.enumChangeCheck('main_content_status_enum', main_content_detail.main_content.status, main_content.status);
+            myEnum.enumChangeCheck('mainContentStatusEnum', mainContentDetail.mainContent.status, mainContent.status);
             //要删除的child
-            var delChildList = _.filter(main_content_detail.main_content_child_list, function (child) {
+            var delChildList = _.filter(mainContentDetail.mainContentChildList, function (child) {
                 //查找删除列表中的项
                 var match = null;
                 if (opt.delMainContentChildList) {
-                    match = _.find(opt.delMainContentChildList, function (child_id) {
-                        return child_id == child.id
+                    match = _.find(opt.delMainContentChildList, function (childId) {
+                        return childId == child.id
                     });
                 }
                 if (!match) {
                     //查找不存在于保存列表中的项
-                    var match2 = _.find(opt.main_content_child_list, function (save_child) {
-                        return save_child.id == child.id
+                    var match2 = _.find(opt.mainContentChildList, function (saveChild) {
+                        return saveChild.id == child.id
                     });
                     match = !match2;
                 }
                 return match;
             });
         } else {
-            main_content.user_info_id = user.id;
-            main_content.user_info = user.account + `(${user.nickname}#${user.id})`;
+            mainContent.userInfoId = user.id;
+            mainContent.userInfo = user.account + `(${user.nickname}#${user.id})`;
         }
 
         return autoBll.tran(function (conn) {
             var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
-            main_content.type = 0;
-            main_content.operator = `${user.account}(${user.nickname}#${user.id})`;
-            main_content.create_date =
-                main_content.operate_date = now;
-            return autoBll.save('main_content', main_content, conn).then(function (t) {
-                var main_content_id = t;
+            mainContent.type = 0;
+            mainContent.operator = `${user.account}(${user.nickname}#${user.id})`;
+            mainContent.createDate =
+                mainContent.operateDate = now;
+            return autoBll.save('main_content', mainContent, conn).then(function (t) {
+                var mainContentId = t;
                 var list = [];
                 //删除child
                 if (delChildList && delChildList.length) {
@@ -120,25 +120,25 @@ exports.save = function (opt, exOpt) {
                 }
 
                 //保存child
-                opt.main_content_child_list.forEach(function (item, index) {
-                    item.main_content_id = main_content_id;
+                opt.mainContentChildList.forEach(function (item, index) {
+                    item.mainContentId = mainContentId;
                     item.num = index + 1;
                     list.push(autoBll.save('main_content_child', item, conn));
                 });
                 //日志
-                var src_status = 0;
-                if (main_content.id != 0)
-                    src_status = main_content_detail.main_content.status;
-                var main_content_log = createLog({
-                    id: main_content_id,
-                    src_status: src_status,
-                    dest_status: main_content.status,
+                var srcStatus = 0;
+                if (mainContent.id != 0)
+                    srcStatus = mainContentDetail.mainContent.status;
+                var mainContentLog = createLog({
+                    id: mainContentId,
+                    srcStatus: srcStatus,
+                    destStatus: mainContent.status,
                     content: opt.remark,
                     user: user
                 });
-                list.push(autoBll.save('main_content_log', main_content_log, conn));
+                list.push(autoBll.save('main_content_log', mainContentLog, conn));
                 return q.all(list).then(function () {
-                    return main_content_id;
+                    return mainContentId;
                 });
             });
         }).then(function (t) {
@@ -148,68 +148,68 @@ exports.save = function (opt, exOpt) {
 };
 
 exports.statusUpdate = function (opt, exOpt) {
-    var main_content = opt.main_content;
+    var mainContent = opt.mainContent;
     var user = exOpt.user;
     var necessaryAuth;
     return common.promise().then(function () {
-        if (!main_content.id) {
+        if (!mainContent.id) {
             throw common.error('', 'ARGS_ERROR');
         }
-        var operate = main_content.operate;
+        var operate = mainContent.operate;
         if (operate == 'audit')
-            main_content.status = 2;
+            mainContent.status = 2;
         else if (operate == 'pass')
-            main_content.status = 3;
+            mainContent.status = 3;
         else if (operate == 'notPass')
-            main_content.status = 4;
+            mainContent.status = 4;
         else if (operate == 'del')
-            main_content.status = -1;
+            mainContent.status = -1;
         else if (operate == 'recovery')
-            main_content.status = 'recovery';
+            mainContent.status = 'recovery';
         else
             throw common.error(`错误的操作类型[${operate}]`);
 
         necessaryAuth = 'mainContent' + common.stringToPascal(operate);
         if (!auth.isHadAuthority(user, necessaryAuth))
             throw common.error(`没有[${necessaryAuth}]权限`);
-        return main_content_bll.detailQuery({id: main_content.id}, {user: exOpt.user});
-    }).then(function (main_content_detail) {
-            if (necessaryAuth == 'mainContentDel' && !main_content_detail.canDelete) {
+        return mainContentBll.detailQuery({id: mainContent.id}, {user: exOpt.user});
+    }).then(function (mainContentDetail) {
+            if (necessaryAuth == 'mainContentDel' && !mainContentDetail.canDelete) {
                 throw common.error(`没有权限`);
             }
 
-            myEnum.enumChangeCheck('main_content_status_enum', main_content_detail.main_content.status, main_content.status);
-            if (main_content.status == 'recovery') {
-                var main_content_log_list = main_content_detail.main_content_log_list;
-                if (!main_content_log_list || !main_content_log_list.length
-                    || main_content_log_list[0].src_status == undefined) {
+            myEnum.enumChangeCheck('mainContentStatusEnum', mainContentDetail.mainContent.status, mainContent.status);
+            if (mainContent.status == 'recovery') {
+                var mainContentLogList = mainContentDetail.mainContentLogList;
+                if (!mainContentLogList || !mainContentLogList.length
+                    || mainContentLogList[0].srcStatus == undefined) {
                     throw common.error('数据有误');
                 }
-                main_content.status = main_content_log_list[0].src_status;
+                mainContent.status = mainContentLogList[0].srcStatus;
             }
             return autoBll.tran(function (conn) {
                 var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
                 var updateStatusOpt = {
-                    id: main_content.id,
-                    status: main_content.status,
-                    operator_id: user.id,
+                    id: mainContent.id,
+                    status: mainContent.status,
+                    operatorId: user.id,
                     operator: user.account + `(${user.nickname}#${user.id})`,
-                    operate_date: now
+                    operateDate: now
                 };
                 return autoBll.save('main_content', updateStatusOpt, conn).then(function (t) {
-                    var main_content_id = t;
+                    var mainContentId = t;
                     var list = [];
                     //日志
-                    var main_content_log = createLog({
-                        id: main_content_id,
-                        src_status: main_content_detail.main_content.status,
-                        dest_status: main_content.status,
+                    var mainContentLog = createLog({
+                        id: mainContentId,
+                        srcStatus: mainContentDetail.mainContent.status,
+                        destStatus: mainContent.status,
                         content: opt.remark,
                         user: user,
                     });
-                    list.push(autoBll.save('main_content_log', main_content_log, conn));
+                    list.push(autoBll.save('main_content_log', mainContentLog, conn));
                     return q.all(list).then(function () {
-                        return main_content_id;
+                        return mainContentId;
                     });
                 });
             });
@@ -220,57 +220,57 @@ exports.statusUpdate = function (opt, exOpt) {
 function createLog(opt) {
     var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
     var user = opt.user;
-    var main_content_log = {
-        main_content_id: opt.id,
+    var mainContentLog = {
+        mainContentId: opt.id,
         type: 0,
-        src_status: opt.src_status,
-        dest_status: opt.dest_status,
+        srcStatus: opt.srcStatus,
+        destStatus: opt.destStatus,
         content: '保存',
-        create_date: now,
-        operate_date: now,
-        operator_id: user.id,
+        createDate: now,
+        operateDate: now,
+        operatorId: user.id,
         operator: user.account + `(${user.nickname}#${user.id})`,
     };
-    if (opt.src_status == -1) {
-        main_content_log.type = 6;
-        main_content_log.content = '恢复';
+    if (opt.srcStatus == -1) {
+        mainContentLog.type = 6;
+        mainContentLog.content = '恢复';
     }
-    else if (opt.dest_status == 1) {
-        main_content_log.type = 1;
-        main_content_log.content = '提交';
-    } else if (opt.dest_status == 2) {
-        main_content_log.type = 2;
-        main_content_log.content = '审核';
-    } else if (opt.dest_status == 3) {
-        main_content_log.type = 3;
-        main_content_log.content = '审核通过';
-    } else if (opt.dest_status == 4) {
-        main_content_log.type = 4;
-        main_content_log.content = '审核不通过';
-    } else if (opt.dest_status == -1) {
-        main_content_log.type = 5;
-        main_content_log.content = '删除';
+    else if (opt.destStatus == 1) {
+        mainContentLog.type = 1;
+        mainContentLog.content = '提交';
+    } else if (opt.destStatus == 2) {
+        mainContentLog.type = 2;
+        mainContentLog.content = '审核';
+    } else if (opt.destStatus == 3) {
+        mainContentLog.type = 3;
+        mainContentLog.content = '审核通过';
+    } else if (opt.destStatus == 4) {
+        mainContentLog.type = 4;
+        mainContentLog.content = '审核不通过';
+    } else if (opt.destStatus == -1) {
+        mainContentLog.type = 5;
+        mainContentLog.content = '删除';
     }
     if (opt.content)
-        main_content_log.content = opt.content;
-    return main_content_log;
+        mainContentLog.content = opt.content;
+    return mainContentLog;
 }
 
 function updateMainContent(item) {
-    item.type_name = myEnum.getValue('main_content_type_enum', item.type);
-    item.status_name = myEnum.getValue('main_content_status_enum', item.status);
+    item.typeName = myEnum.getValue('mainContentTypeEnum', item.type);
+    item.statusName = myEnum.getValue('mainContentStatusEnum', item.status);
 }
 
 function updateMainContentLog(item) {
-    item.type_name = myEnum.getValue('main_content_log_type_enum', item.type);
-    item.src_status_name = myEnum.getValue('main_content_status_enum', item.src_status);
-    item.dest_status_name = myEnum.getValue('main_content_status_enum', item.dest_status);
+    item.typeName = myEnum.getValue('mainContentLogTypeEnum', item.type);
+    item.srcStatusName = myEnum.getValue('mainContentStatusEnum', item.srcStatus);
+    item.destStatusName = myEnum.getValue('mainContentStatusEnum', item.destStatus);
 }
 
-function canDelete(main_content, user) {
-    if (main_content.status != -1
-        && ((auth.isHadAuthority(user, ['mainContentDel']) && (user.id == main_content.user_info_id))
-            || (auth.isHadAuthority(user, ['admin']) && main_content.status != 0))
+function canDelete(mainContent, user) {
+    if (mainContent.status != -1
+        && ((auth.isHadAuthority(user, ['mainContentDel']) && (user.id == mainContent.userInfoId))
+            || (auth.isHadAuthority(user, ['admin']) && mainContent.status != 0))
     ) {
         return true;
     }

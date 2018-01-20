@@ -130,11 +130,11 @@ exports.accessableUrlConfig = [
 
 //枚举
 exports.enumDict = {
-    main_content_type_enum: {'0': '文章',},
-    main_content_status_enum: {'-1': '已删除', '0': '草稿', '1': '待审核', '2': '审核中', '3': '通过', '4': '退回'},
-    //添加 _operate 后缀
-    main_content_status_enum_operate: {'recovery': '恢复'},
-    main_content_log_type_enum: {
+    mainContentTypeEnum: {'0': '文章',},
+    mainContentStatusEnum: {'-1': '已删除', '0': '草稿', '1': '待审核', '2': '审核中', '3': '通过', '4': '退回'},
+    //添加 Operate 后缀
+    mainContentStatusEnumOperate: {'recovery': '恢复'},
+    mainContentLogTypeEnum: {
         //main_conetnt
         '0': '主内容保存', '1': '主内容提交', '2': '主内容审核', '3': '主内容审核通过', '4': '主内容审核不通过', '5': '主内容删除', '6': '主内容恢复',
     },
@@ -142,7 +142,7 @@ exports.enumDict = {
 
 //枚举变更权限
 exports.enumChangeDict = {
-    main_content_status_enum: {
+    mainContentStatusEnum: {
         //初始状态
         '0': {'0': '保存', '1': '提交', '-1': '删除'},
         '1': {'2': '审核', '3': '审核通过', '4': '审核不通过', '-1': '删除'},

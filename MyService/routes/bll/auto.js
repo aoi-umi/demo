@@ -8,7 +8,7 @@ var errorConfig = require('../_system/errorConfig');
 function getRequire(name, custom) {
     var filepath = '';
     if (!custom)
-        filepath = '../dal/_auto/' + name + '_auto';
+        filepath = '../dal/_auto/' + name;
     else {
         if (custom == 'dal')
             filepath = '../dal/' + name;

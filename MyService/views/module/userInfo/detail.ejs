@@ -1,26 +1,26 @@
 <div class="container">
     <form class="form-horizontal">
         <%
-        var user_info = userInfoDetail.user_info;
-        var isReadOnly = user.id != user_info.id;
+        var userInfo = userInfoDetail.userInfo;
+        var isReadOnly = user.id != userInfo.id;
         var list = [{
             content: '用户名',
             readOnly: true,
-            value: user_info.account,
+            value: userInfo.account,
             attr: 'id="account"'
         }, {
             content: '注册时间',
             readOnly: true,
-            value: user_info.create_datetime,
-            attr: 'id="create_datetime"'
+            value: userInfo.createDate,
+            attr: 'id="createDate"'
         }, {
             content: '最后修改时间',
             readOnly: true,
-            value: user_info.edit_datetime,
-            attr: 'id="edit_datetime"'
+            value: userInfo.editDate,
+            attr: 'id="editDate"'
         }, {
             content: '昵称',
-            value: user_info.nickname,
+            value: userInfo.nickname,
             readOnly: isReadOnly,
             attr: 'id="nickname" placeholder="请输昵称"'
         },];
@@ -64,7 +64,7 @@
     <div class="row">
         <div class="col-xs-9 col-xs-push-1 my-row">
             <label class="control-label">角色</label>
-            <% userInfoDetail.role_list.forEach(function(item){
+            <% userInfoDetail.roleList.forEach(function(item){
                 item.id = 0;
                     with(item){
             %>
@@ -75,7 +75,7 @@
             <div class="hover hover-target" id="hoverTargetRole_<%= item.code %>">
                 <div class="hover-role-authority">
                     <%
-                    item.authority_list.forEach(function (authority) {
+                    item.authorityList.forEach(function (authority) {
                         authority.id = 0;
                             with(authority){ %>
                     <% include ../../_template/authorityLabel %>
@@ -90,7 +90,7 @@
     <div class="row">
         <div class="col-xs-9 col-xs-push-1 my-row">
             <label class="control-label">权限</label>
-            <% userInfoDetail.authority_list.forEach(function(item){
+            <% userInfoDetail.authorityList.forEach(function(item){
                 item.id = 0;
                     with(item){
             %>
@@ -126,13 +126,13 @@
                 </tr>
                 </thead>
 
-                <% userInfoDetail.user_info_log.forEach(function(item){
+                <% userInfoDetail.userInfoLog.forEach(function(item){
                     if (item.type != 0 && !isHadAuthority('admin'))
                         return;
                 %>
                 <tr>
                     <td><%= item.content %></td>
-                    <td><%= item.create_date %></td>
+                    <td><%= item.createDate %></td>
                 </tr>
                 <% }); %>
             </table>

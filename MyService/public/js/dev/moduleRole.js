@@ -141,7 +141,7 @@ moduleRole = {
                     if (opt.roleAllDetail) {
                         opt.roleDetail = opt.roleAllDetail.role;
                         opt.roleDetail.operation = opt.roleAllDetail.operation;
-                        $(opt.roleAllDetail.authority_list).each(function (i, item) {
+                        $(opt.roleAllDetail.authorityList).each(function (i, item) {
                             self.opt.setAuthority(item, self);
                         });
                     }

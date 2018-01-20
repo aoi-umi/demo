@@ -2,7 +2,7 @@
 <tr>
     <td rowspan="2"><%= account %>(<%= nickname || '' %>#<%= id %>)</td>
     <td>
-        <% role_list.forEach(function (t) { %>
+        <% roleList.forEach(function (t) { %>
         <a class="hover hover-source" href="#hoverTargetUserRole_<%= id + '_' + t.code %>">
             <div class="label <%= t.status == 1 ? 'label-info' : 'label-default' %> my-label">
                 <label><%= t.code %></label>
@@ -11,7 +11,7 @@
 
         <div class="hover hover-target" id="hoverTargetUserRole_<%= id + '_' + t.code %>">
             <div class="hover-role-authority">
-                <% t.authority_list.forEach(function (authority) { %>
+                <% t.authorityList.forEach(function (authority) { %>
                 <div class="label <%= authority.status == 1 ? 'label-info' : 'label-default' %> my-label">
                     <label><%= authority.code %></label>
                 </div>
@@ -21,14 +21,14 @@
         <% }); %>
     </td>
     <td>
-        <% authority_list.forEach(function (t) { %>
+        <% authorityList.forEach(function (t) { %>
         <div class="label <%= t.status == 1 ? 'label-info' : 'label-default' %> my-label">
             <label><%= t.code %></label>
         </div>
         <% }); %>
     </td>
-    <td rowspan="2"><%= create_datetime %></td>
-    <td rowspan="2"><%= edit_datetime || '' %></td>
+    <td rowspan="2"><%= createDate %></td>
+    <td rowspan="2"><%= editDate || '' %></td>
     <td rowspan="2"><%= remark || '' %></td>
     <td rowspan="2">
         <p><a class="itemDetailQuery" href="javascript:;">修改</a></p>

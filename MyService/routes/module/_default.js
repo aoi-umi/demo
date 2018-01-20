@@ -49,7 +49,7 @@ function getBll(req, res, next) {
             };
             return autoBll.custom(module, method, args, exOpt);
         } else {
-            var modulePath = path.resolve(__dirname + '/../dal/_auto/' + module + '_auto.js');
+            var modulePath = path.resolve(__dirname + '/../dal/_auto/' + module + '.js');
             var isExist = fs.existsSync(modulePath);
             if (!isExist)
                 throw common.error('file is not exist', errorConfig.BAD_REQUEST.code);
@@ -88,8 +88,8 @@ var checkArgs = function (opt) {
     var module = opt.module;
     var args = opt.args;
     if (common.isInArray(method, ['query'])) {
-        if (!args.page_index) args.page_index = 1;
-        if (!args.page_size) args.page_size = 10;
+        if (!args.pageIndex) args.pageIndex = 1;
+        if (!args.pageSize) args.pageSize = 10;
     }
     if (common.isInArray(method, ['detailQuery'])) {
         var argsError = false;
@@ -144,8 +144,8 @@ exports.view = function (req, res, next) {
                 break;
 
             case '/mainContent/list':
-                opt.mainContentStatusEnum = myEnum.getEnum('main_content_status_enum');
-                opt.mainContentTypeEnum = myEnum.getEnum('main_content_type_enum');
+                opt.mainContentStatusEnum = myEnum.getEnum('mainContentStatusEnum');
+                opt.mainContentTypeEnum = myEnum.getEnum('mainContentTypeEnum');
                 break;
             case '/mainContent/detail':
                 return require('./mainContent').detailQuery({id: query.id}, opt);

@@ -5,7 +5,7 @@ var q = require('q');
 var _ = require('underscore');
 var autoBll = require('./auto');
 var common = require('../_system/common');
-var role = exports;
+var roleBll = exports;
 
 exports.save = function (opt) {
     var id;
@@ -18,11 +18,11 @@ exports.save = function (opt) {
                 id = t;
             });
         } else {
-            return role.isExist(dataRole).then(function (t) {
+            return roleBll.isExist(dataRole).then(function (t) {
                 if (t)
                     throw common.error(`code[${dataRole.code}]已存在`);
 
-                return autoBll.query('role_with_authority', {role_code: dataRole.code});
+                return autoBll.query('role_with_authority', {roleCode: dataRole.code});
             }).then(function (t) {
                 var roleAuthList = [];
                 var delRoleAuthList = [];
@@ -30,7 +30,7 @@ exports.save = function (opt) {
                     list: t.list,
                     newList: opt.authorityList,
                     compare: function (item, item2) {
-                        return item.authority_code == item2;
+                        return item.authorityCode == item2;
                     },
                     delReturnValue: function (item) {
                         return item.id;
@@ -55,8 +55,8 @@ exports.save = function (opt) {
                         if (roleAuthList.length) {
                             roleAuthList.forEach(function (item) {
                                 list.push(autoBll.save('role_with_authority', {
-                                    role_code: dataRole.code,
-                                    authority_code: item
+                                    roleCode: dataRole.code,
+                                    authorityCode: item
                                 }, conn));
                             });
                         }
@@ -74,7 +74,7 @@ exports.detailQuery = function (opt) {
     return autoBll.customDal('role', 'detailQuery', opt).then(function (t) {
         var data = {
             role: t[0][0],
-            authority_list: t[1],
+            authorityList: t[1],
         };
         return data;
     });
@@ -86,16 +86,16 @@ exports.query = function (opt) {
             list: t[0],
             count: t[1][0].count,
         };
-        var role_with_authority_list = t[2];
-        var authority_list = t[3];
+        var roleWithAuthorityList = t[2];
+        var authorityList = t[3];
         data.list.forEach(function (item) {
-            item.authority_list = [];
-            role_with_authority_list.forEach(function (role_with_authority) {
-                if (item.code == role_with_authority.role_code) {
-                    var match = _.find(authority_list, function (authority) {
-                        return authority.code == role_with_authority.authority_code;
+            item.authorityList = [];
+            roleWithAuthorityList.forEach(function (roleWithAuthority) {
+                if (item.code == roleWithAuthority.roleCode) {
+                    var match = _.find(authorityList, function (authority) {
+                        return authority.code == roleWithAuthority.authorityCode;
                     });
-                    if (match) item.authority_list.push(match);
+                    if (match) item.authorityList.push(match);
                 }
             });
         });
