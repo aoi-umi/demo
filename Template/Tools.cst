@@ -403,6 +403,7 @@ private static List<string> CreateMySqlQueryProcedure(DatabaseModel databaseMode
     var procStrList = new List<string>();
     var cols = databaseModel.Cols;
     var paraPerfix = "pr_";
+    var orderByName = paraPerfix + "orderBy";
     var nullListName = paraPerfix + "nullList";
     var pageIndexName = paraPerfix + "pageIndex";
     var pageSizeName = paraPerfix + "pageSize";
@@ -416,6 +417,7 @@ private static List<string> CreateMySqlQueryProcedure(DatabaseModel databaseMode
         procStrList.Add(string.Format(tabStr + paraPerfix + "{0} {1},", x.Name , x.NativeType));
         i++;
     });
+    procStrList.Add(string.Format(tabStr + "{0} {1},", orderByName, "varchar(1000)"));
     procStrList.Add(string.Format(tabStr + "{0} {1},", nullListName, "varchar(1000)"));
     procStrList.Add(string.Format(tabStr + "{0} {1},", pageIndexName , "int"));
     procStrList.Add(string.Format(tabStr + "{0} {1}", pageSizeName , "int"));
@@ -439,6 +441,10 @@ private static List<string> CreateMySqlQueryProcedure(DatabaseModel databaseMode
         procStrList.Add(string.Format(tabStr + "\tSET @Sql = CONCAT(@Sql, ' AND t1.`{0}` IS NULL');", x.Name)); 
         procStrList.Add(tabStr + "END IF;" + Environment.NewLine);  
     });
+    
+    procStrList.Add(string.Format(tabStr + "IF {0} IS NOT NULL AND length({0}) > 0 THEN", orderByName));
+    procStrList.Add(string.Format(tabStr + "\tSET @Sql = CONCAT(@Sql, ' ORDER BY ', replace_special_char({0}));", orderByName));
+    procStrList.Add(tabStr + "END IF;");
     
     procStrList.Add(string.Format(tabStr + "IF {0} IS NOT NULL AND {1} IS NOT NULL THEN", pageIndexName, pageSizeName));
     procStrList.Add(string.Format(tabStr + "\tSET @Sql = CONCAT(@Sql, ' limit ', ({0} - 1) * {1}, ',', {1});", pageIndexName, pageSizeName));
@@ -833,6 +839,7 @@ public static List<string> CreateMySqlJs(DatabaseModel databaseModel)
             case OperateTypeEnum.Query:
                 procName = functionName = "query";
                 paramsList.AddRange(databaseModel.Cols.Select(x=>x.Name));
+                paramsList.Add("orderBy");
                 paramsList.Add("nullList");
                 paramsList.Add("pageIndex");
                 paramsList.Add("pageSize");
