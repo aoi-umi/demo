@@ -44,7 +44,9 @@ module.prototype = {
         editClass: 'itemEdit',
         delClass: 'itemDel',
         detailQueryClass: 'itemDetailQuery',
+        itemToDetailClass: 'itemToDetail',
         interfacePrefix: '',
+        detailUrl: '',
 
         init: function (self) {
         },
@@ -118,7 +120,8 @@ module.prototype = {
             'delClass',
             'detailQueryClass',
             'saveClass',
-            'addClass'
+            'addClass',
+            'itemToDetailClass'
         ];
         $(classList).each(function () {
             if (self.opt[this])
@@ -192,6 +195,36 @@ module.prototype = {
                             if (event.which == 13)
                                 self.queryDom.click();
                         });
+                    }
+                });
+            }
+
+            if (self.itemToDetailClass) {
+                $(document).on('click', self.itemToDetailClass, function () {
+                    var dom = $(this);
+                    var args = {
+                        id: 0,
+                        noNav: true
+                    };
+                    if (dom.hasClass(self.opt.addClass)) {
+                    } else {
+                        args.id = dom.closest(self.rowClass).data('item').id;
+                    }
+                    var url = self.opt.detailUrl + '?';
+
+                    if (parent && parent.my && parent.my.tab) {
+                        var params = common.getUrlParamsFromArgs(args);
+                        var data = {
+                            id: self.opt.interfacePrefix + 'Detail' + args.id,
+                            name: args.id == 0 ? '新增' : '详细:' + args.id,
+                            content: url + params
+                        };
+                        parent.my.tab.addOrOpenTab(data);
+                    }
+                    else {
+                        args.noNav = false;
+                        var params = common.getUrlParamsFromArgs(args);
+                        window.open(url + params);
                     }
                 });
             }

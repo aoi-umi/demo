@@ -13,6 +13,7 @@ moduleUserInfo = {
 
             rowClass: 'itemRow',
             interfacePrefix: 'userInfo',
+            detailUrl: '/userInfo/detail',
 
             queryArgsOpt: [{
                 name: 'account',
@@ -45,104 +46,110 @@ moduleUserInfo = {
                     if (val && !my.vaild.isInt(val, '001'))
                         return '请输入正确的正整数';
                 }
+            },],
+            init: function (self) {
+                if (self.operation.query) {
+                    self.detailDom.find('.save').removeClass('save').addClass('admin-save');
+                }
             },
-            ],
             bindEvent: function (self) {
-                $('#createDateStart').on('click', function () {
-                    var datePickerArgs = {
-                        el: this,
-                        //startDate: '#{%y-30}-01-01',
-                        doubleCalendar: true,
-                        dateFmt: 'yyyy-MM-dd',
-                        minDate: '1900-01-01',
-                        maxDate: '#F{$dp.$D(\'createDateEnd\')}',
-                    };
-                    WdatePicker(datePickerArgs);
-                });
-                $('#createDateEnd').on('click', function () {
-                    var datePickerArgs = {
-                        el: this,
-                        //startDate: minDate || '#{%y-30}-01-01',
-                        doubleCalendar: true,
-                        dateFmt: 'yyyy-MM-dd',
-                        minDate: '#F{$dp.$D(\'createDateStart\')||\'1900-01-01\'}',
-                        maxDate: '',
-                    };
-                    WdatePicker(datePickerArgs);
-                });
+                if (self.operation.query) {
+                    $('#createDateStart').on('click', function () {
+                        var datePickerArgs = {
+                            el: this,
+                            //startDate: '#{%y-30}-01-01',
+                            doubleCalendar: true,
+                            dateFmt: 'yyyy-MM-dd',
+                            minDate: '1900-01-01',
+                            maxDate: '#F{$dp.$D(\'createDateEnd\')}',
+                        };
+                        WdatePicker(datePickerArgs);
+                    });
+                    $('#createDateEnd').on('click', function () {
+                        var datePickerArgs = {
+                            el: this,
+                            //startDate: minDate || '#{%y-30}-01-01',
+                            doubleCalendar: true,
+                            dateFmt: 'yyyy-MM-dd',
+                            minDate: '#F{$dp.$D(\'createDateStart\')||\'1900-01-01\'}',
+                            maxDate: '',
+                        };
+                        WdatePicker(datePickerArgs);
+                    });
 
-                $('#editDateStart').on('click', function () {
-                    var datePickerArgs = {
-                        el: this,
-                        //startDate: '#{%y-30}-01-01',
-                        doubleCalendar: true,
-                        dateFmt: 'yyyy-MM-dd',
-                        minDate: '1900-01-01',
-                        maxDate: '#F{$dp.$D(\'editDateEnd\')}',
-                    };
-                    WdatePicker(datePickerArgs);
-                });
-                $('#editDateEnd').on('click', function () {
-                    var datePickerArgs = {
-                        el: this,
-                        //startDate: minDate || '#{%y-30}-01-01',
-                        doubleCalendar: true,
-                        dateFmt: 'yyyy-MM-dd',
-                        minDate: '#F{$dp.$D(\'editDateStart\')||\'1900-01-01\'}',
-                        maxDate: '',
-                    };
-                    WdatePicker(datePickerArgs);
-                });
+                    $('#editDateStart').on('click', function () {
+                        var datePickerArgs = {
+                            el: this,
+                            //startDate: '#{%y-30}-01-01',
+                            doubleCalendar: true,
+                            dateFmt: 'yyyy-MM-dd',
+                            minDate: '1900-01-01',
+                            maxDate: '#F{$dp.$D(\'editDateEnd\')}',
+                        };
+                        WdatePicker(datePickerArgs);
+                    });
+                    $('#editDateEnd').on('click', function () {
+                        var datePickerArgs = {
+                            el: this,
+                            //startDate: minDate || '#{%y-30}-01-01',
+                            doubleCalendar: true,
+                            dateFmt: 'yyyy-MM-dd',
+                            minDate: '#F{$dp.$D(\'editDateStart\')||\'1900-01-01\'}',
+                            maxDate: '',
+                        };
+                        WdatePicker(datePickerArgs);
+                    });
 
-                $(document).on('click', '.admin-save', function () {
-                    self.opt.adminSave(self);
-                });
-                self.queryContainerDom.on('click', '.toggle-auth', function () {
-                    var authBox = $(this).siblings('.auth-box');
-                    if (authBox.hasClass('hidden'))
-                        authBox.removeClass('hidden');
-                    else
-                        authBox.addClass('hidden');
-                });
+                    $(document).on('click', '.admin-save', function () {
+                        self.opt.adminSave(self);
+                    });
+                    self.queryContainerDom.on('click', '.toggle-auth', function () {
+                        var authBox = $(this).siblings('.auth-box');
+                        if (authBox.hasClass('hidden'))
+                            authBox.removeClass('hidden');
+                        else
+                            authBox.addClass('hidden');
+                    });
 
-                //角色
-                common.autoComplete({
-                    source: function () {
-                        return self.opt.getRole({code: this.dom.val()}, self)
-                    },
-                    dom: $('#role'),
-                    select: function (dom, item) {
-                        dom.data('item', item).val(item.code);
-                    },
-                    renderItem: function (ul, item) {
-                        return $('<li>')
-                            .append('<div>' + item.code + '</div>')
-                            .appendTo(ul);
-                    },
-                    match: function (input, item) {
-                        var matcher = new RegExp($.ui.autocomplete.escapeRegex(input), 'i');
-                        return matcher.test(item.code);
-                    }
-                });
-                //权限
-                common.autoComplete({
-                    source: function () {
-                        return self.opt.getAuthority({code: this.dom.val()}, self)
-                    },
-                    dom: $('#authority'),
-                    select: function (dom, item) {
-                        dom.data('item', item).val(item.code);
-                    },
-                    renderItem: function (ul, item) {
-                        return $('<li>')
-                            .append('<div>' + item.code + '</div>')
-                            .appendTo(ul);
-                    },
-                    match: function (input, item) {
-                        var matcher = new RegExp($.ui.autocomplete.escapeRegex(input), 'i');
-                        return matcher.test(item.code);
-                    }
-                });
+                    //角色
+                    common.autoComplete({
+                        source: function () {
+                            return self.opt.getRole({code: this.dom.val()}, self)
+                        },
+                        dom: $('#role'),
+                        select: function (dom, item) {
+                            dom.data('item', item).val(item.code);
+                        },
+                        renderItem: function (ul, item) {
+                            return $('<li>')
+                                .append('<div>' + item.code + '</div>')
+                                .appendTo(ul);
+                        },
+                        match: function (input, item) {
+                            var matcher = new RegExp($.ui.autocomplete.escapeRegex(input), 'i');
+                            return matcher.test(item.code);
+                        }
+                    });
+                    //权限
+                    common.autoComplete({
+                        source: function () {
+                            return self.opt.getAuthority({code: this.dom.val()}, self)
+                        },
+                        dom: $('#authority'),
+                        select: function (dom, item) {
+                            dom.data('item', item).val(item.code);
+                        },
+                        renderItem: function (ul, item) {
+                            return $('<li>')
+                                .append('<div>' + item.code + '</div>')
+                                .appendTo(ul);
+                        },
+                        match: function (input, item) {
+                            var matcher = new RegExp($.ui.autocomplete.escapeRegex(input), 'i');
+                            return matcher.test(item.code);
+                        }
+                    });
+                }
             },
             beforeQuery: function (data) {
                 if (!data.id) data.id = null;
@@ -157,17 +164,60 @@ moduleUserInfo = {
             },
 
             editAfterRender: function (item, self) {
-                // self.opt.updateView(['userInfoDetail'], {userInfoDetail: item});
-                // $('#userInfoSave').modal('show');
             },
             beforeSave: function () {
+                var list = [{
+                    name: 'nickname',
+                    desc: '昵称',
+                    dom: $('#nickname'),
+                    canNotNull: true,
+                }, {
+                    name: 'password',
+                    desc: '密码',
+                    dom: $('#password'),
+                }, {
+                    name: 'newPassword',
+                    desc: '新密码',
+                    dom: $('#newPassword'),
+                    checkValue: function (val, model, checkOpt) {
+                        if (val && !model['password']) {
+                            checkOpt.dom = $('#password');
+                            return '请输入密码';
+                        }
+                    }
+                }, {
+                    name: 'newPasswordRepeat',
+                    desc: '新密码',
+                    dom: $('#newPasswordRepeat'),
+                    checkValue: function (val, model) {
+                        if (model['newPassword'] && val != model['newPassword'])
+                            return '密码不一致';
+                    }
+                }];
+                var checkRes = common.dataCheck({list: list});
+                if (checkRes.success) {
+                    var data = checkRes.model;
+                    if (data.newPassword) {
+                        data.newPassword = common.md5(data.newPassword);
+                        data.password = common.md5(data.password);
+                    }
+                }
+                return checkRes;
             },
             onSaveSuccess: function (t, self) {
+                common.msgNotice({
+                    type: 1, msg: '修改成功', btnOptList: [{
+                        content: '确认',
+                        cb: function () {
+                            location.reload(true);
+                        }
+                    }]
+                });
             },
             onDetailQuerySuccess: function (t, self) {
                 self.detailRender(t.userInfo);
                 self.opt.updateView(['userInfoDetail'], {userInfoAllDetail: t}, self);
-                $('#userInfoSave').modal('show');
+                self.detailDom.modal('show');
             },
 
             updateView: function (list, opt, self) {
@@ -185,24 +235,24 @@ moduleUserInfo = {
                         });
                     }
                     if (opt.userInfoDetail) {
-                        $('#userInfoSave [name=footer]').hide();
+                        self.detailDom.find('.footer').hide();
                         if (common.isInArray('save', opt.userInfoDetail.operation)) {
-                            $('#userInfoSave [name=footer]').show();
+                            self.detailDom.find('.footer').show();
                         }
                     }
                 }
             },
             adminSave: function (self) {
                 var data = {
-                    id: $('#userInfoSave [name=id]').val(),
+                    id: self.detailContainerDom.find('[name=id]').val(),
                     authorityList: [],
                     roleList: []
                 };
-                $('#userInfoSave [name=userAuthority]').each(function () {
+                self.detailContainerDom.find('[name=userAuthority]').each(function () {
                     data.authorityList.push($(this).data('code'));
                 });
 
-                $('#userInfoSave [name=userRole]').each(function () {
+                self.detailContainerDom.find('[name=userRole]').each(function () {
                     data.roleList.push($(this).data('code'));
                 });
                 common.promise().then(function () {
@@ -214,7 +264,7 @@ moduleUserInfo = {
                         type: 1, msg: '保存成功:' + t,
                         btnOptList: [{
                             content: '确定', cb: function () {
-                                $('#userInfoSave').modal('hide');
+                                self.detailDom.modal('hide');
                                 self.pager.refresh();
                             }
                         }]
@@ -229,10 +279,10 @@ moduleUserInfo = {
                     source: function () {
                         return self.opt.getAuthority({code: this.dom.val()}, self)
                     },
-                    dom: $('#userInfoSave [name=authority]'),
+                    dom: self.detailContainerDom.find('[name=authority]'),
                     select: function (dom, item) {
                         //dom.data('item', item).val(item.code);
-                        var match = $('#userInfoSave [name=authorityBox]').find(`[name=userAuthority][data-code=${item.code}]`);
+                        var match = self.detailContainerDom.find('[name=authorityBox]').find(`[name=userAuthority][data-code=${item.code}]`);
                         if (!match.length) {
                             self.opt.setAuthority(item, self);
                         }
@@ -260,7 +310,7 @@ moduleUserInfo = {
                 var temp = $('#authorityLabelTemp').html();
                 var dom = $(ejs.render(temp, item));
                 dom.data('item', item);
-                $('#userInfoSave [name=authorityBox]').append(dom);
+                self.detailContainerDom.find('[name=authorityBox]').append(dom);
             },
 
             //角色
@@ -269,10 +319,10 @@ moduleUserInfo = {
                     source: function () {
                         return self.opt.getRole({code: this.dom.val()}, self)
                     },
-                    dom: $('#userInfoSave [name=role]'),
+                    dom: self.detailContainerDom.find('[name=role]'),
                     select: function (dom, item) {
                         //dom.data('item', item).val(item.code);
-                        var match = $('#userInfoSave [name=roleBox]').find(`[name=userRole][data-code=${item.code}]`);
+                        var match = self.detailContainerDom.find('[name=roleBox]').find(`[name=userRole][data-code=${item.code}]`);
                         if (!match.length) {
                             self.opt.setRole(item, self);
                         }
@@ -300,7 +350,7 @@ moduleUserInfo = {
                 var temp = $('#roleLabelTemp').html();
                 var dom = $(ejs.render(temp, item));
                 dom.data('item', item);
-                $('#userInfoSave [name=roleBox]').append(dom);
+                self.detailContainerDom.find('[name=roleBox]').append(dom);
             },
         };
         opt = $.extend(opt, option);

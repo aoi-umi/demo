@@ -147,11 +147,11 @@ moduleRole = {
                         });
                     }
                     if (opt.roleDetail) {
-                        self.detailDom.find('[name=footer]').hide();
+                        self.detailDom.find('.footer').hide();
                         var role = opt.roleDetail;
-                        self.detailDom.find('[name=title]').html(role.id ? ('修改:' + role.id) : '新增');
+                        self.detailDom.find('.title').html(role.id ? ('修改:' + role.id) : '新增');
                         if (common.isInArray('save', opt.roleDetail.operation)) {
-                            self.detailDom.find('[name=footer]').show();
+                            self.detailDom.find('.footer').show();
                         }
                     }
                 }

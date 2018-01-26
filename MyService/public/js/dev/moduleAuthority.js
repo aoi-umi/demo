@@ -121,11 +121,11 @@ moduleAuthority = {
                 if (!list || common.isInArray('authorityDetail', list)) {
                     if (opt.authorityDetail) {
                         var authority = opt.authorityDetail;
-                        self.detailDom.find('[name=title]').html(authority.id ? ('修改:' + authority.id) : '新增');
+                        self.detailDom.find('.title').html(authority.id ? ('修改:' + authority.id) : '新增');
                         if (common.isInArray('save', opt.authorityDetail.operation)) {
-                            self.detailDom.find('[name=footer]').show();
+                            self.detailDom.find('.footer').show();
                         } else {
-                            self.detailDom.find('[name=footer]').hide();
+                            self.detailDom.find('.footer').hide();
                         }
                     }
                 }

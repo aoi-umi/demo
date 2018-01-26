@@ -159,11 +159,11 @@ moduleMainContentType = {
             updateView: function (list, opt, self) {
                 if (!list || common.isInArray('mainContentTypeDetail', list)) {
                     if (opt.mainContentTypeDetail) {
-                        self.detailDom.find('[name=title]').html(opt.mainContentTypeDetail.id ? ('修改:' + opt.mainContentTypeDetail.id) : '新增');
+                        self.detailDom.find('.title').html(opt.mainContentTypeDetail.id ? ('修改:' + opt.mainContentTypeDetail.id) : '新增');
                         if (common.isInArray('save', opt.mainContentTypeDetail.operation)) {
-                            self.detailDom.find('[name=footer]').show();
+                            self.detailDom.find('.footer').show();
                         } else {
-                            self.detailDom.find('[name=footer]').hide();
+                            self.detailDom.find('.footer').hide();
                         }
                     }
                 }
