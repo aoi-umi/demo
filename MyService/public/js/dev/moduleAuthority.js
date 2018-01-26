@@ -10,7 +10,8 @@ moduleAuthority = {
             queryItemTempId: 'itemTemp',
             queryContainerId: 'list',
 
-            detailContainerId: 'detailContainer',
+            detailId: 'detail',
+            detailContainerName: 'detailContainer',
             detailTempId: 'detailTemp',
 
             rowClass: 'itemRow',
@@ -54,8 +55,8 @@ moduleAuthority = {
             },
 
             editAfterRender: function (item, self) {
-                self.opt.updateView(['authorityDetail'], {authorityDetail: item});
-                $('#authoritySave').modal('show');
+                self.opt.updateView(['authorityDetail'], {authorityDetail: item}, self);
+                self.detailDom.modal('show');
             },
             beforeSave: function (dom, self) {
                 if (dom.hasClass('itemStatusUpdate')) {
@@ -73,11 +74,11 @@ moduleAuthority = {
                 } else {
                     var list = [{
                         name: 'id',
-                        dom: $('#authoritySave [name=id]'),
+                        dom: self.detailContainerDom.find('[name=id]'),
                     }, {
                         name: 'code',
                         desc: '权限编号',
-                        dom: $('#authoritySave [name=code]'),
+                        dom: self.detailContainerDom.find('[name=code]'),
                         canNotNull: true,
                         checkValue: function (val) {
                             if (!my.vaild.isAuthority(val))
@@ -85,10 +86,10 @@ moduleAuthority = {
                         }
                     }, {
                         name: 'name',
-                        dom: $('#authoritySave [name=name]'),
+                        dom: self.detailContainerDom.find('[name=name]'),
                     }, {
                         name: 'status',
-                        dom: $('#authoritySave [name=status]'),
+                        dom: self.detailContainerDom.find('[name=status]'),
                         getValue: function () {
                             return this.dom.prop('checked');
                         }
@@ -104,7 +105,7 @@ moduleAuthority = {
                         content: '继续'
                     }, {
                         content: '关闭', cb: function () {
-                            $('#authoritySave').modal('hide');
+                            self.detailDom.modal('hide');
                             self.pager.refresh();
                         }
                     }]
@@ -112,19 +113,19 @@ moduleAuthority = {
             },
             onDetailQuerySuccess: function (t, self) {
                 self.detailRender(t);
-                self.opt.updateView(['authorityDetail'], {authorityDetail: t});
-                $('#authoritySave').modal('show');
+                self.opt.updateView(['authorityDetail'], {authorityDetail: t}, self);
+                self.detailDom.modal('show');
             },
 
             updateView: function (list, opt, self) {
                 if (!list || common.isInArray('authorityDetail', list)) {
                     if (opt.authorityDetail) {
                         var authority = opt.authorityDetail;
-                        $('#authoritySave [name=title]').html(authority.id ? ('修改:' + authority.id) : '新增');
+                        self.detailDom.find('[name=title]').html(authority.id ? ('修改:' + authority.id) : '新增');
                         if (common.isInArray('save', opt.authorityDetail.operation)) {
-                            $('#authoritySave [name=footer]').show();
+                            self.detailDom.find('[name=footer]').show();
                         } else {
-                            $('#authoritySave [name=footer]').hide();
+                            self.detailDom.find('[name=footer]').hide();
                         }
                     }
                 }

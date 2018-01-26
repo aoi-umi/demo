@@ -116,6 +116,11 @@ a.hover {
     top: 50px;
 }
 
+.modal-body.content{
+    max-height: 300px;
+    overflow-y: auto;
+}
+
 .my-label {
     margin: 5px 0 0 5px;
     white-space: normal;
@@ -134,7 +139,6 @@ a.hover {
     padding: 0px;
 }
 
-.modal-content {
-    max-height: 400px;
-    overflow-y: auto
+.btn{
+    margin: 0 5px 0 0;
 }

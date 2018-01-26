@@ -74,24 +74,8 @@
     <div id="pager"></div>
 </div>
 
-<div id="authoritySave" data-backdrop="false" role="dialog" tabindex="-1" class="modal fade pop-up-box">
-    <div class="modal-dialog" >
-        <div class="modal-content">
-            <div class="modal-body">
-                <button class="close" type="button" data-dismiss="modal">
-                    ×
-                </button>
-                <h4 name="title" class="modal-title">
-                </h4>
-            </div>
-            <div id="detailContainer" class="modal-body">
-            </div>
-            <div name="footer" class="modal-body">
-                <button style="margin: 0 5px" type="button" class="btn btn-default save btn-content">确认</button>
-                <button style="margin: 0 5px" type="button" class="btn btn-default btn-content" data-dismiss="modal">取消</button>
-            </div>
-        </div>
-    </div>
+<div id="detail" data-backdrop="false" role="dialog" tabindex="-1" class="modal fade pop-up-box">
+    <% include ../../_template/detailModal%>
 </div>
 <script type="text/template" id="itemTemp">
     <% include ../../_template_web/authority/listItem %>

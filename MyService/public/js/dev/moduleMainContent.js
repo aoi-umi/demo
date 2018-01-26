@@ -13,11 +13,10 @@ moduleMainContent = {
             queryItemTempId: 'mainContentItem',
             queryContainerId: 'list',
 
-            detailContainerId: 'detailContainer',
+            detailId: 'detail',
+            detailContainerName: 'detailContainer',
             detailTempId: 'mainContentSaveTemp',
 
-//            rowClass: 'itemRow',
-//            editClass: 'itemEdit',
             interfacePrefix: 'mainContent',
             queryArgsOpt: [{
                 name: 'type',

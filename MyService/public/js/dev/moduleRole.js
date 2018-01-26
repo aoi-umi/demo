@@ -11,7 +11,8 @@ moduleRole = {
             queryItemTempId: 'itemTemp',
             queryContainerId: 'list',
 
-            detailContainerId: 'detailContainer',
+            detailId: 'detail',
+            detailContainerName: 'detailContainer',
             detailTempId: 'detailTemp',
 
             rowClass: 'itemRow',
@@ -58,7 +59,7 @@ moduleRole = {
 
             editAfterRender: function (item, self) {
                 self.opt.updateView(['roleDetail'], {roleDetail: item}, self);
-                $('#roleSave').modal('show');
+                self.detailDom.modal('show');
             },
             beforeSave: function (dom, self) {
                 if (dom.hasClass('itemStatusUpdate')) {
@@ -78,11 +79,11 @@ moduleRole = {
                 } else {
                     var list = [{
                         name: 'id',
-                        dom: $('#roleSave [name=id]'),
+                        dom: self.detailContainerDom.find('[name=id]'),
                     }, {
                         name: 'code',
                         desc: '角色编号',
-                        dom: $('#roleSave [name=code]'),
+                        dom: self.detailContainerDom.find('[name=code]'),
                         canNotNull: true,
                         checkValue: function (val) {
                             if (!my.vaild.isRole(val))
@@ -90,10 +91,10 @@ moduleRole = {
                         }
                     }, {
                         name: 'name',
-                        dom: $('#roleSave [name=name]'),
+                        dom: self.detailContainerDom.find('[name=name]'),
                     }, {
                         name: 'status',
-                        dom: $('#roleSave [name=status]'),
+                        dom: self.detailContainerDom.find('[name=status]'),
                         getValue: function () {
                             return this.dom.prop('checked');
                         }
@@ -104,7 +105,7 @@ moduleRole = {
                             role: checkRes.model,
                             authorityList: []
                         };
-                        $('#roleSave [name=roleAuthority]').each(function () {
+                        self.detailContainerDom.find('[name=roleAuthority]').each(function () {
                             data.authorityList.push($(this).data('code'));
                         });
                         checkRes.model = data;
@@ -119,7 +120,7 @@ moduleRole = {
                         content: '继续'
                     }, {
                         content: '关闭', cb: function () {
-                            $('#roleSave').modal('hide');
+                            self.detailDom.modal('hide');
                             self.pager.refresh();
                         }
                     }]
@@ -131,7 +132,7 @@ moduleRole = {
             onDetailQuerySuccess: function (t, self) {
                 self.detailRender(t.role);
                 self.opt.updateView(['roleDetail'], {roleAllDetail: t}, self);
-                $('#roleSave').modal('show');
+                self.detailDom.modal('show');
             },
 
             updateView: function (list, opt, self) {
@@ -146,11 +147,11 @@ moduleRole = {
                         });
                     }
                     if (opt.roleDetail) {
-                        $('#roleSave [name=footer]').hide();
+                        self.detailDom.find('[name=footer]').hide();
                         var role = opt.roleDetail;
-                        $('#roleSave [name=title]').html(role.id ? ('修改:' + role.id) : '新增');
+                        self.detailDom.find('[name=title]').html(role.id ? ('修改:' + role.id) : '新增');
                         if (common.isInArray('save', opt.roleDetail.operation)) {
-                            $('#roleSave [name=footer]').show();
+                            self.detailDom.find('[name=footer]').show();
                         }
                     }
                 }
@@ -160,10 +161,10 @@ moduleRole = {
                     source: function () {
                         return self.opt.getAuthority({code: this.dom.val()}, self)
                     },
-                    dom: $('#roleSave [name=authority]'),
+                    dom: self.detailContainerDom.find('[name=authority]'),
                     select: function (dom, item) {
                         //dom.data('item', item).val(item.code);
-                        var match = $('#roleSave [name=authorityBox]').find(`[name=roleAuthority][data-code=${item.code}]`);
+                        var match = self.detailContainerDom.find('[name=authorityBox]').find(`[name=roleAuthority][data-code=${item.code}]`);
                         if (!match.length) {
                             self.opt.setAuthority(item, self);
                         }
@@ -191,7 +192,7 @@ moduleRole = {
                 var temp = $('#authorityLabelTemp').html();
                 var dom = $(ejs.render(temp, item));
                 dom.data('item', item);
-                $('#roleSave [name=authorityBox]').append(dom);
+                self.detailContainerDom.find('[name=authorityBox]').append(dom);
             },
         };
         opt = $.extend(opt, option);

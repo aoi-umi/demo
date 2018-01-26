@@ -1,16 +1,16 @@
 /*
 Navicat MySQL Data Transfer
 
-Source Server         : mysql
-Source Server Version : 50710
+Source Server         : localhost
+Source Server Version : 50720
 Source Host           : localhost:3306
 Source Database       : myweb
 
 Target Server Type    : MYSQL
-Target Server Version : 50710
+Target Server Version : 50720
 File Encoding         : 65001
 
-Date: 2018-01-20 18:58:52
+Date: 2018-01-26 11:12:41
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -601,7 +601,7 @@ BEGIN
 				where `userInfoId` in (SELECT id FROM temp_p_user_info_query00));
 
 	-- 角色权限
-	SELECT DISTINCT t4.*, t1.code AS roleCode, t1.`status` AS role_status FROM t_role t1 
+	SELECT DISTINCT t4.*, t1.code AS roleCode, t1.`status` AS roleStatus FROM t_role t1 
 		LEFT JOIN t_user_info_with_role t2 ON t1.`code` = t2.roleCode
 		LEFT JOIN t_role_with_authority t3 ON t2.roleCode = t3.roleCode 
 		LEFT JOIN t_authority t4 ON t3.authorityCode = t4.`code`
