@@ -55,7 +55,7 @@
         <div class="form-group">
             <% if(!isReadOnly){ %>
             <div class="col-sm-8 col-sm-push-2">
-                <button id="save" type="button" class="btn btn-default btn-block">修改</button>
+                <button type="button" class="btn btn-default btn-block save">修改</button>
             </div>
             <% } %>
         </div>
@@ -139,9 +139,13 @@
         </div>
     </div>
 </div>
-<script type="text/javascript" src="/js/<%= env %>/userInfo.js?v=<%= version %>"></script>
+<script type="text/javascript" src="/js/<%= env %>/module.js?v=<%= version %>"></script>
+<script type="text/javascript" src="/js/<%= env %>/moduleUserInfo.js?v=<%= version %>"></script>
 <script type="text/javascript">
     $(function () {
-        userInfo.init();
+        var opt = {
+            operation: ['save']
+        }
+        moduleUserInfo.init(opt);
     });
 </script>

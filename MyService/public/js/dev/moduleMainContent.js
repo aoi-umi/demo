@@ -6,8 +6,6 @@ moduleMainContent = {
     init: function (option) {
         var self = this;
         var opt = {
-            mainContentDetailUrl: '/mainContent/detail',
-            //module参数
             operation: [],
             queryId: 'search',
             queryItemTempId: 'mainContentItem',
@@ -18,6 +16,9 @@ moduleMainContent = {
             detailTempId: 'mainContentSaveTemp',
 
             interfacePrefix: 'mainContent',
+            itemToDetailClass: 'itemToDetail',
+            detailUrl: '/mainContent/detail',
+
             queryArgsOpt: [{
                 name: 'type',
                 dom: $('[name=typeBox]'),
@@ -59,14 +60,14 @@ moduleMainContent = {
             }, {
                 name: 'operator',
                 dom: $('#operator'),
-            },{
+            }, {
                 name: 'id',
                 dom: $('#id'),
                 checkValue: function (val) {
                     if (val && !my.vaild.isInt(val, '001'))
                         return '请输入正确的正整数';
                 }
-            }, ],
+            },],
             init: function (self) {
                 self.variable.delMainContentChildList = [];
                 self.variable.defaultMainCotentChild = {
@@ -124,35 +125,6 @@ moduleMainContent = {
                             maxDate: '',
                         };
                         WdatePicker(datePickerArgs);
-                    });
-                    var toDetail = [self.addClass, self.detailQueryClass].join(',');
-                    //打开detail页
-                    $(document).on('click', toDetail, function () {
-                        var dom = $(this);
-                        var args = {
-                            id: 0,
-                            noNav: true
-                        };
-                        if (dom.hasClass(self.opt.addClass)) {
-                        } else {
-                            args.id = dom.closest(self.rowClass).data('item').id;
-                        }
-                        var url = self.opt.mainContentDetailUrl + '?';
-
-                        if (parent && parent.my && parent.my.tab) {
-                            var params = common.getUrlParamsFromArgs(args);
-                            var data = {
-                                id: 'mainContentDetail' + args.id,
-                                name: args.id == 0 ? '新增内容' : '内容:' + args.id,
-                                content: url + params
-                            };
-                            parent.my.tab.addOrOpenTab(data);
-                        }
-                        else {
-                            args.noNav = false;
-                            var params = common.getUrlParamsFromArgs(args);
-                            window.open(url + params);
-                        }
                     });
 
                     $(document).on('click', '.statusSearch', function () {
