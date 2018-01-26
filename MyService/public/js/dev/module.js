@@ -31,7 +31,8 @@ module.prototype = {
         queryItemTempId: 'queryItemTemp',
         queryContainerId: 'queryContainer',
 
-        detailContainerId: 'detailContainer',
+        detailId: 'detail',
+        detailContainerName: 'detailContainer',
         detailTempId: 'detailTemp',
         queryArgsOpt: null,
 
@@ -130,7 +131,7 @@ module.prototype = {
             'queryId',
             'queryContainerId',
             'queryItemTempId',
-            'detailContainerId',
+            'detailId',
             'detailTempId',
         ];
 
@@ -144,7 +145,8 @@ module.prototype = {
         self.queryContainerDom = $(self.queryContainerId);
         self.queryItemTemp = $(self.queryItemTempId).html();
 
-        self.detailContainerDom = $(self.detailContainerId);
+        self.detailDom = $(self.detailId);
+        self.detailContainerDom = self.detailDom.find(`[name=${self.opt.detailContainerName}]`);
         self.detailTemp = $(self.detailTempId).html();
 
         self.opt.init(self);

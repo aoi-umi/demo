@@ -11,7 +11,8 @@ moduleMainContentType = {
             queryItemTempId: 'mainContentTypeItem',
             queryContainerId: 'list',
 
-            detailContainerId: 'detailContainer',
+            detailId: 'detail',
+            detailContainerName: 'detailContainer',
             detailTempId: 'mainContentTypeSaveTemp',
 
             saveClass: 'save',
@@ -113,27 +114,26 @@ moduleMainContentType = {
                 if (!data.level) data.level = null;
             },
             editAfterRender: function (item, self) {
-                $('#mainContentTypeSave [name=title]').html(item.id ? ('修改:' + item.id) : '新增');
-                self.opt.updateView(['mainContentTypeDetail'], {mainContentTypeDetail: item});
-                $('#mainContentTypeSave').modal('show');
+                self.opt.updateView(['mainContentTypeDetail'], {mainContentTypeDetail: item}, self);
+                self.detailDom.modal('show');
             },
-            beforeSave: function () {
+            beforeSave: function (dom, self) {
                 var list = [{
                     name: 'id',
-                    dom: $('#mainContentTypeSave [name=id]'),
+                    dom: self.detailContainerDom.find('[name=id]'),
                 }, {
                     name: 'type',
-                    dom: $('#mainContentTypeSave [name=type]'),
+                    dom: self.detailContainerDom.find('[name=type]'),
                     canNotNull: true,
                 }, {
                     name: 'typeName',
-                    dom: $('#mainContentTypeSave [name=typeName]'),
+                    dom: self.detailContainerDom.find('[name=typeName]'),
                 }, {
                     name: 'parentType',
-                    dom: $('#mainContentTypeSave [name=parentType]'),
+                    dom: self.detailContainerDom.find('[name=parentType]'),
                 }, {
                     name: 'level',
-                    dom: $('#mainContentTypeSave [name=level]'),
+                    dom: self.detailContainerDom.find('[name=level]'),
                 }];
                 var checkRes = common.dataCheck({list: list});
                 return checkRes;
@@ -145,7 +145,7 @@ moduleMainContentType = {
                         content: '继续'
                     }, {
                         content: '关闭', cb: function () {
-                            $('#mainContentTypeSave').modal('hide');
+                            self.detailDom.modal('hide');
                             self.pager.refresh();
                         }
                     }]
@@ -153,16 +153,17 @@ moduleMainContentType = {
             },
             onDetailQuerySuccess: function (t, self) {
                 self.detailRender(t);
-                self.opt.updateView(['mainContentTypeDetail'], {mainContentTypeDetail: t});
-                $('#mainContentTypeSave').modal('show');
+                self.opt.updateView(['mainContentTypeDetail'], {mainContentTypeDetail: t}, self);
+                self.detailDom.modal('show');
             },
             updateView: function (list, opt, self) {
                 if (!list || common.isInArray('mainContentTypeDetail', list)) {
                     if (opt.mainContentTypeDetail) {
+                        self.detailDom.find('[name=title]').html(opt.mainContentTypeDetail.id ? ('修改:' + opt.mainContentTypeDetail.id) : '新增');
                         if (common.isInArray('save', opt.mainContentTypeDetail.operation)) {
-                            $('#mainContentTypeSave [name=footer]').show();
+                            self.detailDom.find('[name=footer]').show();
                         } else {
-                            $('#mainContentTypeSave [name=footer]').hide();
+                            self.detailDom.find('[name=footer]').hide();
                         }
                     }
                 }

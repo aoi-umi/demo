@@ -342,7 +342,7 @@ common = {
 
             //type 1 参数
             noClose: false,
-            btnTemplate: `<button class="btn btn-content" type="button" style="margin: 0 5px"></button>`,
+            btnTemplate: `<button class="btn btn-content" type="button" ></button>`,
             btnOptList: null,
             createNew: true
         };

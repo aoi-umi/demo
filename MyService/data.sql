@@ -35,4 +35,4 @@ values('default', 'mainContentQuery'),
 ('admin', 'mainContentTypeQuery'),
 ('admin', 'mainContentTypeSave'),
 ('admin', 'mainContentTypeDel'),
-('admin', 'mainContentTypeQuery');
+('admin', 'mainContentTypeDetailQuery');
