@@ -11,7 +11,7 @@ exports.isAccountExist = function (account) {
     return common.promise().then(function () {
         if (!account)
             throw common.error(null, 'ARGS_ERROR');
-        return autoBll.query('user_info', {account: account}).then(function (t) {
+        return autoBll.query('userInfo', {account: account}).then(function (t) {
             if (t.list.length > 1)
                 throw common.error('数据库中存在重复账号');
             return t.list.length ? true : false;
@@ -25,7 +25,7 @@ exports.save = function (opt, exOpt) {
     var userInfoLog = userInfo.createLog();
     userInfoLog.userInfoId = user.id;
     return common.promise().then(function () {
-        return autoBll.detailQuery('user_info', {id: user.id}).then(function (t) {
+        return autoBll.detailQuery('userInfo', {id: user.id}).then(function (t) {
             if (!t || !t.id)
                 throw common.error('查询用户信息为空');
             var isChanged = false;
@@ -58,8 +58,8 @@ exports.save = function (opt, exOpt) {
             editDate: now,
         };
         return autoBll.tran(function (conn) {
-            return autoBll.save('user_info', saveOpt, conn).then(function () {
-                return autoBll.save('user_info_log', userInfoLog, conn);
+            return autoBll.save('userInfo', saveOpt, conn).then(function () {
+                return autoBll.save('userInfoLog', userInfoLog, conn);
             });
         });
     }).then(function () {
@@ -76,7 +76,7 @@ exports.save = function (opt, exOpt) {
 };
 
 exports.detailQuery = function (opt) {
-    return autoBll.customDal('user_info', 'detailQuery', {id: opt.id}).then(function (t) {
+    return autoBll.customDal('userInfo', 'detailQuery', {id: opt.id}).then(function (t) {
         var detail = {
             userInfo: t[0][0],
             userInfoLog: t[1],
@@ -91,7 +91,7 @@ exports.detailQuery = function (opt) {
 };
 
 exports.query = function (opt) {
-    return autoBll.customDal('user_info', 'query', opt).then(function (t) {
+    return autoBll.customDal('userInfo', 'query', opt).then(function (t) {
         var data = {
             list: t[0],
             count: t[1][0].count
@@ -157,7 +157,7 @@ exports.adminSave = function (opt, exOpt) {
     return common.promise().then(function () {
         if (!id)
             throw common.error('id为空', 'CAN_NOT_BE_EMPTY');
-        return autoBll.query('user_info_with_authority', {userInfoId: id});
+        return autoBll.query('userInfoWithAuthority', {userInfoId: id});
     }).then(function (t) {
         var diffOpt = {
             list: t.list,
@@ -172,7 +172,7 @@ exports.adminSave = function (opt, exOpt) {
         var diffRes = common.getListDiff(diffOpt);
         userAuthIdList = diffRes.addList;
         delUserAuthIdList = diffRes.delList;
-        return autoBll.query('user_info_with_role', {userInfoId: id});
+        return autoBll.query('userInfoWithRole', {userInfoId: id});
     }).then(function (t) {
         var diffOpt = {
             list: t.list,
@@ -203,38 +203,38 @@ exports.adminSave = function (opt, exOpt) {
         if (!isChanged)
             throw common.error('没有变更的信息');
         return autoBll.tran(function (conn) {
-            return autoBll.save('user_info', {id: id, editDate: now}, conn).then(function (t) {
+            return autoBll.save('userInfo', {id: id, editDate: now}, conn).then(function (t) {
                 var list = [];
                 //删除权限
                 if (delUserAuthIdList.length) {
                     delUserAuthIdList.forEach(function (item) {
-                        list.push(autoBll.del('user_info_with_authority', {id: item}, conn));
+                        list.push(autoBll.del('userInfoWithAuthority', {id: item}, conn));
                     })
                 }
                 //保存权限
                 if (userAuthIdList.length) {
                     userAuthIdList.forEach(function (item) {
-                        list.push(autoBll.save('user_info_with_authority', {userInfoId: id, authorityCode: item}));
+                        list.push(autoBll.save('userInfoWithAuthority', {userInfoId: id, authorityCode: item}));
                     });
                 }
 
                 //删除角色
                 if (delUserRoleIdList.length) {
                     delUserRoleIdList.forEach(function (item) {
-                        list.push(autoBll.del('user_info_with_role', {id: item}, conn));
+                        list.push(autoBll.del('userInfoWithRole', {id: item}, conn));
                     })
                 }
                 //保存角色
                 if (userRoleIdList.length) {
                     userRoleIdList.forEach(function (item) {
-                        list.push(autoBll.save('user_info_with_role', {userInfoId: id, roleCode: item}));
+                        list.push(autoBll.save('userInfoWithRole', {userInfoId: id, roleCode: item}));
                     });
                 }
 
                 return q.all(list);
             }).then(function () {
                 //日志
-                autoBll.save('user_info_log', userInfoLog, conn);
+                autoBll.save('userInfoLog', userInfoLog, conn);
             });
         });
     }).then(function (t) {

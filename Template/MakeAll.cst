@@ -9,6 +9,8 @@
 Description="移除数据表前缀"%>
 <%@ Property Name="DataBaseType" Type="Make.Tools.DatabaseTypeEnum" Default="" DeepLoad="True" Optional="True" Category="数据库类型" 
 Description="数据库类型"%>
+<%@ Property Name="FileNameType" Type="Tools.FilenameTypeEnum" Default="" DeepLoad="True" Optional="True" Category="文件名类型" 
+Description="文件名类型"%>
 <%
 
 if(SourceDatabase.Count > 0){
@@ -36,6 +38,17 @@ if(SourceDatabase.Count > 0){
                             outputFormat = "./Output/{0}/sql/{1}.sql";
                             break;
                         case Make.MakeTypeEnum.Js:
+                            switch(FileNameType){
+                                case Tools.FilenameTypeEnum.Origin:
+                                default:
+                                    break;
+                                case Tools.FilenameTypeEnum.CamelCase:
+                                    fileName = Tools.ToCamelCase(fileName);
+                                    break;
+                                case Tools.FilenameTypeEnum.Pascal:
+                                    fileName = Tools.ToPascalCase(fileName);
+                                    break;
+                            }
                             outputFormat = "./Output/{0}/js/{1}.js";
                             break;
                     }

@@ -5,12 +5,20 @@
 <%@ Import Namespace="System.Collections.Generic" %>
 <%@ Import Namespace="System.Linq" %>
 <%@ Import Namespace="System.IO" %>
+<%@ Import Namespace="System.Text.RegularExpressions" %>
 <script runat="template">
 
 public enum DatabaseTypeEnum
 {
     MySql,
     SqlServer,
+}
+
+public enum FilenameTypeEnum
+{
+    Origin,
+    CamelCase,
+    Pascal,
 }
 
 public class DatabaseColModel
@@ -153,6 +161,33 @@ private static string GetRepeatStr(string str, int count)
 private static string Tabs(int count)
 {
     return GetRepeatStr("\t", count);
+}
+
+public static string ToCamelCase(string str){
+    var reg = new Regex("_([a-zA-Z])");
+    str = reg.Replace(str, new MatchEvaluator((m)=>{
+        var match = m as Match;
+        var s = match.Groups[1].ToString();
+        if(char.IsLower(s[0]))
+            return char.ToUpper(s[0]) + s.Substring(1);
+        return s;
+    }));
+    
+    return char.ToLower(str[0]) + str.Substring(1);
+}
+
+
+public static string ToPascalCase(string str){
+    var reg = new Regex("_([a-zA-Z])");
+    str = reg.Replace(str, new MatchEvaluator((m)=>{
+        var match = m as Match;
+        var s = match.Groups[1].ToString();
+        if(char.IsLower(s[0]))
+            return char.ToUpper(s[0]) + s.Substring(1);
+        return s;
+    }));
+    
+    return char.ToUpper(str[0]) + str.Substring(1);
 }
 
 #region 存储过程

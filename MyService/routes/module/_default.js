@@ -40,7 +40,7 @@ function getBll(req, res, next) {
 
     var reqModule = module;
     //转换为小写下划线;
-    module = common.stringToLowerCaseWithUnderscore(module);
+    //module = common.stringToLowerCaseWithUnderscore(module);
     return common.promise().then(function () {
         if (opt.isCustom) {
             var exOpt = {
@@ -138,7 +138,7 @@ exports.view = function (req, res, next) {
                     auth.isHadAuthority(user, 'admin', {throwError: true});
                     userInfoId = query.id;
                 }
-                return autoBll.custom('user_info', 'detailQuery', {id: userInfoId}).then(function (t) {
+                return autoBll.custom('userInfo', 'detailQuery', {id: userInfoId}).then(function (t) {
                     opt.userInfoDetail = t;
                 });
                 break;

@@ -22,7 +22,7 @@ exports.save = function (opt) {
                 if (t)
                     throw common.error(`code[${dataRole.code}]已存在`);
 
-                return autoBll.query('role_with_authority', {roleCode: dataRole.code});
+                return autoBll.query('roleWithAuthority', {roleCode: dataRole.code});
             }).then(function (t) {
                 var roleAuthList = [];
                 var delRoleAuthList = [];
@@ -48,13 +48,13 @@ exports.save = function (opt) {
                         //删除权限
                         if (delRoleAuthList.length) {
                             delRoleAuthList.forEach(function (item) {
-                                list.push(autoBll.del('role_with_authority', {id: item}, conn));
+                                list.push(autoBll.del('roleWithAuthority', {id: item}, conn));
                             })
                         }
                         //保存权限
                         if (roleAuthList.length) {
                             roleAuthList.forEach(function (item) {
-                                list.push(autoBll.save('role_with_authority', {
+                                list.push(autoBll.save('roleWithAuthority', {
                                     roleCode: dataRole.code,
                                     authorityCode: item
                                 }, conn));
