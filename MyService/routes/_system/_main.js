@@ -57,7 +57,7 @@ exports.restConfig = [
     },
 
     {
-        url: '/interface/:module/:method',
+        url: /\/interface\/([\s\S]+)\/([\s\S]+)/,
         method: 'post',
         functionName: 'default',
         methodName: 'module-method',

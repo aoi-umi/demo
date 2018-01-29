@@ -3,7 +3,7 @@
  */
 var q = require('q');
 var _ = require('underscore');
-var autoBll = require('./auto');
+var autoBll = require('./_auto');
 var common = require('../_system/common');
 var cache = require('../_system/cache');
 var userInfo = exports;

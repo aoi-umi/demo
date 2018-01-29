@@ -3,7 +3,7 @@
  */
 var common = require('../_system/common');
 var myEnum = require('./../_system/enum');
-var autoBll = require('../bll/auto');
+var autoBll = require('../bll/_auto');
 
 exports.detailQuery = function (opt, viewOpt) {
     return autoBll.custom('mainContent', 'detailQuery', opt, viewOpt).then(function (t) {

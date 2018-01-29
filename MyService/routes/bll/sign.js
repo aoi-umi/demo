@@ -2,7 +2,7 @@ var common = require('../_system/common');
 var cache = require('../_system/cache');
 var config = require('../../config');
 var errorConfig = require('../_system/errorConfig');
-var autoBll = require('./auto');
+var autoBll = require('./_auto');
 var userInfoBll = require('./userInfo');
 var signBll = exports;
 

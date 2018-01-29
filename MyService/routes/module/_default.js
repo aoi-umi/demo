@@ -7,12 +7,16 @@ var common = require('../_system/common');
 var auth = require('../_system/auth');
 var myEnum = require('../_system/enum');
 var main = require('../_system/_main');
-var autoBll = require('../bll/auto');
+var autoBll = require('../bll/_auto');
 var errorConfig = require('../_system/errorConfig');
 
 //module post 接口
 exports.default = function (req, res, next) {
     common.promise().then(function () {
+        req.params = {
+            module: req.params[0],
+            method: req.params[1]
+        };
         return getBll(req, res, next);
     }).then(function (t) {
         res.mySend(null, t);

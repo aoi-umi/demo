@@ -1,4 +1,4 @@
-﻿var autoBll = require('./auto');
+﻿var autoBll = require('./_auto');
 var common = require('../_system/common');
 var authority = exports;
 
