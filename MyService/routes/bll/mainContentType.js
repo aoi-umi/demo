@@ -1,7 +1,7 @@
 /**
  * Created by bang on 2017-9-5.
  */
-var autoBll = require('./auto');
+var autoBll = require('./_auto');
 var common = require('../_system/common');
 var auth = require('../_system/auth');
 var mainContentTypeBll = exports;

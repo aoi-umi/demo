@@ -3,7 +3,7 @@
  */
 var q = require('q');
 var _ = require('underscore');
-var autoBll = require('./auto');
+var autoBll = require('./_auto');
 var common = require('../_system/common');
 var myEnum = require('../_system/enum');
 var auth = require('../_system/auth');
