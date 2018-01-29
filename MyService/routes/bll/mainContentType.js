@@ -10,7 +10,7 @@ exports.save = function (opt) {
         if (t.isExist && t.detail.id != opt.id) {
             throw common.error('type [' + opt.type + '] is exist');
         }
-        return autoBll.save('main_content_type', opt);
+        return autoBll.save('mainContentType', opt);
     });
 };
 
@@ -18,7 +18,7 @@ exports.isExist = function (opt) {
     return common.promise().then(function () {
         if (!opt || (opt.id != 0 && !opt.id) || !opt.type)
             throw common.error(null, 'ARGS_ERROR');
-        return autoBll.query('main_content_type', {type: opt.type}).then(function (t) {
+        return autoBll.query('mainContentType', {type: opt.type}).then(function (t) {
             var res = {
                 isExist: false,
                 detail: null,

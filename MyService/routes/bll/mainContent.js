@@ -12,7 +12,7 @@ var mainContentBll = exports;
 exports.query = function (opt, exOpt) {
     var user = exOpt.user;
     return common.promise().then(function () {
-        return autoBll.customDal('main_content', 'query', opt).then(function (t) {
+        return autoBll.customDal('mainContent', 'query', opt).then(function (t) {
             var detail = {
                 list: t[0],
                 count: t[1][0].count,
@@ -45,7 +45,7 @@ exports.detailQuery = function (opt, exOpt) {
         } else if (!opt.id) {
             throw common.error('', 'ARGS_ERROR');
         }
-        return autoBll.customDal('main_content', 'detailQuery', opt).then(function (t) {
+        return autoBll.customDal('mainContent', 'detailQuery', opt).then(function (t) {
             var detail = {};
             detail.mainContent = t[0][0];
             detail.mainContentTypeList = t[1];
@@ -109,13 +109,13 @@ exports.save = function (opt, exOpt) {
             mainContent.operator = `${user.account}(${user.nickname}#${user.id})`;
             mainContent.createDate =
                 mainContent.operateDate = now;
-            return autoBll.save('main_content', mainContent, conn).then(function (t) {
+            return autoBll.save('mainContent', mainContent, conn).then(function (t) {
                 var mainContentId = t;
                 var list = [];
                 //删除child
                 if (delChildList && delChildList.length) {
                     delChildList.forEach(function (item) {
-                        list.push(autoBll.del('main_content_child', {id: item.id}, conn));
+                        list.push(autoBll.del('mainContentChild', {id: item.id}, conn));
                     });
                 }
 
@@ -123,7 +123,7 @@ exports.save = function (opt, exOpt) {
                 opt.mainContentChildList.forEach(function (item, index) {
                     item.mainContentId = mainContentId;
                     item.num = index + 1;
-                    list.push(autoBll.save('main_content_child', item, conn));
+                    list.push(autoBll.save('mainContentChild', item, conn));
                 });
                 //日志
                 var srcStatus = 0;
@@ -136,7 +136,7 @@ exports.save = function (opt, exOpt) {
                     content: opt.remark,
                     user: user
                 });
-                list.push(autoBll.save('main_content_log', mainContentLog, conn));
+                list.push(autoBll.save('mainContentLog', mainContentLog, conn));
                 return q.all(list).then(function () {
                     return mainContentId;
                 });
@@ -196,7 +196,7 @@ exports.statusUpdate = function (opt, exOpt) {
                     operator: user.account + `(${user.nickname}#${user.id})`,
                     operateDate: now
                 };
-                return autoBll.save('main_content', updateStatusOpt, conn).then(function (t) {
+                return autoBll.save('mainContent', updateStatusOpt, conn).then(function (t) {
                     var mainContentId = t;
                     var list = [];
                     //日志
@@ -207,7 +207,7 @@ exports.statusUpdate = function (opt, exOpt) {
                         content: opt.remark,
                         user: user,
                     });
-                    list.push(autoBll.save('main_content_log', mainContentLog, conn));
+                    list.push(autoBll.save('mainContentLog', mainContentLog, conn));
                     return q.all(list).then(function () {
                         return mainContentId;
                     });

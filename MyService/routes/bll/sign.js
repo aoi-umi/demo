@@ -3,7 +3,7 @@ var cache = require('../_system/cache');
 var config = require('../../config');
 var errorConfig = require('../_system/errorConfig');
 var autoBll = require('./auto');
-var userInfo = require('./user_info');
+var userInfoBll = require('./userInfo');
 var signBll = exports;
 
 exports.up = function (opt, exOpt) {
@@ -15,12 +15,12 @@ exports.up = function (opt, exOpt) {
                     return common.stringFormat(msg, '用户名');
                 }
             });
-        return autoBll.custom('user_info', 'isAccountExist', opt.account)
+        return autoBll.custom('userInfo', 'isAccountExist', opt.account)
     }).then(function (t) {
         if (t)
             throw common.error('account is exist!');
         return autoBll.tran(function (conn) {
-            return autoBll.save('user_info', {
+            return autoBll.save('userInfo', {
                 account: opt.account,
                 password: opt.password,
                 nickname: opt.nickname,
@@ -28,17 +28,16 @@ exports.up = function (opt, exOpt) {
             }, conn).then(function (t) {
                 userInfoId = t;
                 //默认角色
-                return autoBll.save('user_info_with_role', {
+                return autoBll.save('userInfoWithRole', {
                     userInfoId: userInfoId,
                     roleCode: 'default'
                 }, conn);
             }).then(function () {
                 //日志
-                var userInfoLog = userInfo.createLog();
+                var userInfoLog = userInfoBll.createLog();
                 userInfoLog.userInfoId = userInfoId;
                 userInfoLog.content = '[创建账号]';
-                return autoBll.save('user_info_log', userInfoLog, conn);
-                return userInfoId;
+                return autoBll.save('userInfoLog', userInfoLog, conn);
             });
         });
     }).then(function (t) {
@@ -88,7 +87,7 @@ exports.inInside = function (req) {
             reqBody = '';
         if (typeof reqBody != 'string')
             reqBody = JSON.stringify(reqBody);
-        return autoBll.query('user_info', {account: account});
+        return autoBll.query('userInfo', {account: account});
     }).then(function (t) {
         if (!t.count)
             throw common.error('no account!');
@@ -99,7 +98,7 @@ exports.inInside = function (req) {
         var checkToken = common.createToken(account + pwd + reqBody);
         if (token != checkToken)
             throw common.error(null, errorConfig.TOKEN_WRONG.code);
-        return autoBll.custom('user_info', 'detailQuery', {id: userInfo.id});
+        return autoBll.custom('userInfo', 'detailQuery', {id: userInfo.id});
     }).then(function (t) {
         //console.log(t);
         var userInfo = t.userInfo;

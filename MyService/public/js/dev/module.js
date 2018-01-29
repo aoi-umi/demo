@@ -216,7 +216,7 @@ module.prototype = {
                         var params = common.getUrlParamsFromArgs(args);
                         var data = {
                             id: self.opt.interfacePrefix + 'Detail' + args.id,
-                            name: self.opt.interfacePrefix + (args.id == 0 ? '新增' : '详细:') + args.id,
+                            name: self.opt.interfacePrefix + (args.id == 0 ? '新增' : '详细:' + args.id),
                             content: url + params
                         };
                         parent.my.tab.addOrOpenTab(data);
