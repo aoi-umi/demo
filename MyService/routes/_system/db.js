@@ -38,6 +38,7 @@ exports.tranConnect = function (queryFunction) {
     }).then(function (t) {
         return commit(connection);
     }).fail(function (e) {
+        common.writeError(e);
         if (connection)
             rollback(connection);
         throw e;
@@ -116,7 +117,6 @@ function query(conn, sql, params){
 }
 
 function beginTransaction(conn){
-    var res = q.defer();
     return common.promise(conn, 'beginTransaction');
 }
 
