@@ -26,6 +26,7 @@ public class DatabaseColModel
     public string Name;
     public string Type;
     public string NativeType;
+    public bool IsString;
 }
 
 public class DatabaseModel
@@ -66,6 +67,7 @@ public static DatabaseModel CreateDatabaseModel(TableSchema table, DatabaseTypeE
     var colModel = new DatabaseColModel();
         colModel.Name = col.Name;
         colModel.NativeType = GetTypeWithSize(col, databaseType); 
+        colModel.IsString = IsString(col.DataType);
         //第一个主键为id
         if(string.IsNullOrEmpty(id) && col.IsPrimaryKeyMember){
             dbModel.IdCol = colModel;
@@ -93,18 +95,22 @@ public static string GetTypeWithSize(ColumnSchema col, DatabaseTypeEnum database
     sizeStr = size.ToString();
     if(size == -1)
         sizeStr = "max";
-    switch(col.DataType)
-    {
-        //string
+    if(IsString(col.DataType)){
+        if(col.NativeType != "text" && col.NativeType != "longtext")
+                returnType += "(" + sizeStr + ")";
+    }
+    return returnType;
+}
+
+public static bool IsString(DbType type){
+    switch(type){
         case DbType.AnsiString: 
         case DbType.AnsiStringFixedLength: 
         case DbType.String: 
         case DbType.StringFixedLength: 
-            if(col.NativeType != "text" && col.NativeType != "longtext")
-                returnType += "(" + sizeStr + ")";
-            break;
+            return true;
     }
-    return returnType;
+    return false;    
 }
 
 public static string GetCSharpDataTypeByDBColumn(ColumnSchema column)
@@ -321,10 +327,10 @@ private static List<string> CreateMySqlSaveProcedure(DatabaseModel databaseModel
         var x = cols[i];
         if(x.Name == databaseModel.IdCol.Name)
             continue;
-        procStrList.Add(string.Format(tabStr + "IF " + paraPerfix + "{0} IS NOT NULL THEN", x.Name));
-        procStrList.Add(string.Format(tabStr + "\tSET @Sql = CONCAT(@Sql,' `{0}` = ''', replace_special_char(" + paraPerfix + "{0}), ''',');", x.Name));
+        procStrList.Add(string.Format(tabStr + "IF " + paraPerfix + "{0} IS NOT NULL THEN", x.Name));        
+        procStrList.Add(string.Format(tabStr + "\tSET @Sql = CONCAT(@Sql,' `{0}` = ''', " + (x.IsString ? "replace_special_char(" + paraPerfix + "{0})" : paraPerfix + "{0}") + ", ''',');", x.Name));
         procStrList.Add(string.Format(tabStr + "ELSEIF LOCATE('," + x.Name +",', " + nullListName + ")>0 THEN"));
-        procStrList.Add(string.Format(tabStr + "\tSET @Sql = CONCAT(@Sql,' `{0}` = null,');", x.Name));
+        procStrList.Add(string.Format(tabStr + "\tSET @Sql = CONCAT(@Sql,' `{0}` IS NULL,');", x.Name));
         procStrList.Add(string.Format(tabStr + "END IF;" + Environment.NewLine));
     };    
 
@@ -471,7 +477,7 @@ private static List<string> CreateMySqlQueryProcedure(DatabaseModel databaseMode
     
     cols.ForEach(x=>{
         procStrList.Add(string.Format(tabStr + "IF {0} IS NOT NULL AND length({0}) > 0 THEN", paraPerfix + x.Name));
-        procStrList.Add(string.Format(tabStr + "\tSET @Sql = CONCAT(@Sql, ' AND t1.`{0}` = ''',replace_special_char(" + paraPerfix +"{0}), '''');", x.Name)); 
+        procStrList.Add(string.Format(tabStr + "\tSET @Sql = CONCAT(@Sql, ' AND t1.`{0}` = ''', " + (x.IsString ? "replace_special_char(" + paraPerfix + "{0})" : paraPerfix + "{0}") + ", '''');", x.Name)); 
         procStrList.Add(string.Format(tabStr + "ELSEIF LOCATE(',{0},', {1}) > 0 THEN", x.Name, nullListName));  
         procStrList.Add(string.Format(tabStr + "\tSET @Sql = CONCAT(@Sql, ' AND t1.`{0}` IS NULL');", x.Name)); 
         procStrList.Add(tabStr + "END IF;" + Environment.NewLine);  
@@ -625,7 +631,7 @@ private static List<string> CreateSqlServerSaveProcedure(DatabaseModel databaseM
         procStrList.Add(string.Format(tabStr + "\tSET @Sql = @Sql + ' {0} = ''' + dbo.replace_special_char(cast(" + paraPerfix + "{0} as varchar)) + ''',';", x.Name));
         procStrList.Add(string.Format(tabStr + "END"));
         procStrList.Add(string.Format(tabStr + "ELSE IF CHARINDEX('," + x.Name +",', " + nullListName + ")>0 BEGIN"));
-        procStrList.Add(string.Format(tabStr + "\tSET @Sql = @Sql + ' {0} = null,';", x.Name));
+        procStrList.Add(string.Format(tabStr + "\tSET @Sql = @Sql + ' {0} IS NULL,';", x.Name));
         procStrList.Add(string.Format(tabStr + "END" + Environment.NewLine));
     };    
 
