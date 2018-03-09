@@ -54,8 +54,7 @@ my.tab = {
                 var closeTarget = '#' + tabHeader + ',' + '#' + panel;
                 var tabDom = $('#' + tab);
                 if (tabDom.length == 0) {
-                    var tabData =
-                    {
+                    var tabData = {
                         id: tab,
                         headerId: tabHeader,
                         targetId: panel,
@@ -94,18 +93,28 @@ my.tab = {
         });
         tabContainer.on('click', '[data-toggle=tab]', function () {
             var id = $(this).attr('id');
-            self.clickTabIdList.push(id);
+            if (self.clickTabIdList[self.clickTabIdList.length - 1] != id) {
+                for (let i = 0; i < self.clickTabIdList.length; i++) {
+                    if (self.clickTabIdList[i] == id) {
+                        self.clickTabIdList.splice(i, 1);
+                        break;
+                    }
+                }
+                self.clickTabIdList.push(id);
+            }
         });
         //关闭
-        tabContainer.on('click', '.close', function () {
+        tabContainer.on('click', '.close', function (event) {
             $($(this).data('close-target')).remove();
+            self.clickTabIdList.pop();
             if (tabContainer.find('> .active').length == 0) {
-                var lastId = self.clickTabIdList[self.clickTabIdList.length - 2];
+                var lastId = self.clickTabIdList[self.clickTabIdList.length - 1];
                 if (!$('#' + lastId).length)
                     tabContainer.find('a:eq(0)').click();
                 else
                     $('#' + lastId).click();
             }
+            event.stopPropagation();
         });
         //tab header右键
         tabContainer.on('contextmenu', '.tab-header', function (e) {
@@ -160,7 +169,7 @@ my.tab = {
             if (currTab) {
                 var url = currTab.data('url');
                 var type = $(this).data('menu-type');
-                if(url && type){
+                if (url && type) {
                     window.open(url, type);
                 }
             }
