@@ -11,9 +11,6 @@ var common = require('./routes/_system/common');
 var main = require('./routes/_system/_main');
 var auth = require('./routes/_system/auth');
 var errorConfig = require('./routes/_system/errorConfig');
-var cache = require('./routes/_system/cache');
-
-var sign = require('./routes/bll/sign');
 
 var app = express();
 console.log(config.name, 'run at port ', config.port, ',version:', config.version);
@@ -29,126 +26,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 //初始化
-main.init();
-
-var myRender = function (req, res, view, options) {
-    var opt = {
-        user: req.myData.user,
-        noNav: req.myData.noNav,
-        isHadAuthority: function (authData) {
-            return auth.isHadAuthority(req.myData.user, authData);
-        },
-        accessableUrl: req.myData.accessableUrl,
-    };
-    opt = common.extend(opt, options);
-    res.render(view, common.formatViewtRes(opt));
-};
-var mySend = function (req, res, err, detail, option) {
-    var url = req.header('host') + req.originalUrl;
-    var opt = {
-        url: url,
-    };
-    opt = common.extend(opt, option);
-    var formatRes = common.formatRes(err, detail, opt);
-    if (req.myData.useStatus && err && err.status)
-        res.status(err.status);
-    res.send(formatRes);
-    var result = formatRes.result;
-    var logReq = req.method == 'POST' ? req.body : '';
-    var logRes = formatRes.detail;
-    var logMethod = '[' + (config.name + '][' + (req.myData.method.methodName || req.originalUrl)) + ']';
-
-    if (!req.myData.noLog) {
-        var log = common.logModle();
-        log.url = url;
-        log.result = result;
-        log.code = formatRes.code;
-        log.method = logMethod
-        log.req = logReq;
-        log.res = logRes;
-        log.ip = req.myData.ip;
-        log.remark = formatRes.desc + `[account:${req.myData.user.account}]`;
-        log.guid = formatRes.guid;
-        log.duration = new Date().getTime() - req.myData.startTime;
-        common.logSave(log);
-    }
-};
-app.use(function (req, res, next) {
-    //req.query  /?params1=1&params2=2
-    //req.body  post的参数
-    //req.params /:params1/:params2
-    //console.log(require('./routes/_system/common').getClientIp(req));
-
-    // console.log(__dirname);
-    // console.log(__filename);
-    // console.log(process.cwd());
-    // console.log(path.resolve('./'));
-    req.myData = {
-        method: {},
-        user: {
-            id: 0,
-            nickname: 'guest',
-            account: '#guest',
-            authority: {}
-        },
-        viewPath: app.get('views'),
-        startTime: new Date().getTime(),
-        accessableUrl: [],
-        ip: common.getClientIp(req),
-    };
-    var user = req.myData.user;
-    req.myData.noNav = common.parseBool(req.query.noNav);
-    req.myData.useStatus = common.parseBool(req.query.useStatus);
-
-    if (req.myData.ip == '::ffff:127.0.0.1')
-        user.authority['local'] = true;
-
-    if (req._parsedUrl.pathname == '/interface/log/save') {
-        req.myData.noLog = true;
-    }
-    if (config.env == 'dev')
-        user.authority['dev'] = true;
-
-    res.myRender = function (view, options) {
-        myRender(req, res, view, options);
-    };
-
-    res.mySend = function (err, detail, opt) {
-        mySend(req, res, err, detail, opt)
-    };
-
-    var userInfoKey = req.cookies[config.cacheKey.userInfo];
-    if (userInfoKey) {
-        userInfoKey = config.cacheKey.userInfo + userInfoKey;
-        cache.get(userInfoKey).then(function (t) {
-                if (t) {
-                    t.key = userInfoKey;
-                    req.myData.user = t;
-                    //自动重新登录获取信息
-                    if (!t.cacheDatetime || new Date() - new Date(t.cacheDatetime) > 12 * 3600 * 1000) {
-                        req.myData.autoSignIn = true;
-                        return common.promise().then(function (promiseRes) {
-                            sign.inInside(req).then(promiseRes.resolve).fail(function (e) {
-                                //console.log(e);
-                                cache.del(userInfoKey).then(function () {
-                                    throw common.error('请重新登录！');
-                                }).fail(promiseRes.reject);
-                            });
-                            return promiseRes.promise;
-                        });
-                    }
-                }
-            }
-        ).then(function () {
-            req.myData.autoSignIn = false;
-            next();
-        }).fail(function (e) {
-            next(e);
-        });
-    } else {
-        next();
-    }
-});
+app.use(main.init({viewPath: app.get('views')}));
 
 //按restConfig 注册路由
 var restList = [];
