@@ -40,11 +40,12 @@ exports.isExist = function (opt) {
 };
 
 exports.query = function (opt) {
+    opt.orderBy = 'code';
     return autoBll.customDal('authority', 'query', opt).then(function (t) {
         return {
             list: t[0],
             count: t[1][0].count,
         };
     })
-}
+};
 
