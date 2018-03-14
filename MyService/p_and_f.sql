@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50720
 File Encoding         : 65001
 
-Date: 2018-01-26 11:12:41
+Date: 2018-03-14 15:04:17
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -24,6 +24,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `p_authority_query`(pr_id int,
 	pr_code varchar(256),
 	pr_name varchar(256),
 	pr_status int,
+	pr_orderBy varchar(1000),
 	pr_nullList varchar(1000),
 	pr_pageIndex int,
 	pr_pageSize int)
@@ -57,6 +58,10 @@ BEGIN
 		SET @Sql = CONCAT(@Sql, ' AND t1.`status` = ''',replace_special_char(pr_status), '''');
 	ELSEIF LOCATE(',status,', pr_nullList) > 0 THEN
 		SET @Sql = CONCAT(@Sql, ' AND t1.`status` IS NULL');
+	END IF;
+
+	IF pr_orderBy IS NOT NULL AND length(pr_orderBy) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' ORDER BY ', replace_special_char(pr_orderBy));
 	END IF;
 
 	IF pr_pageIndex IS NOT NULL AND pr_pageSize IS NOT NULL THEN
@@ -360,6 +365,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `p_role_query`(pr_id int,
 	pr_code varchar(256),
 	pr_name varchar(256),
 	pr_status int,
+	pr_orderBy varchar(1000),
 	pr_nullList varchar(1000),
 	pr_pageIndex int,
 	pr_pageSize int)
@@ -395,16 +401,17 @@ BEGIN
 		SET @Sql = CONCAT(@Sql, ' AND t1.`status` IS NULL');
 	END IF;
 
+	IF pr_orderBy IS NOT NULL AND length(pr_orderBy) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' ORDER BY ', replace_special_char(pr_orderBy));
+	END IF;
 
+	IF pr_pageIndex IS NOT NULL AND pr_pageSize IS NOT NULL THEN
+		SET @Sql = CONCAT(@Sql, ' limit ', (pr_pageIndex - 1) * pr_pageSize, ',', pr_pageSize);
+	END IF;
+	SET @Sql = CONCAT(@Sql, ';');
 -- 匹配数据
 	SET @dataSql = CONCAT('SELECT * ',@Sql);
 	SET @tempSql = CONCAT('CREATE TEMPORARY TABLE temp_p_role_query00 SELECT code ',@Sql);
-	IF pr_pageIndex IS NOT NULL AND pr_pageSize IS NOT NULL THEN
-		SET @dataSql = CONCAT(@dataSql, ' limit ', (pr_pageIndex - 1) * pr_pageSize, ',', pr_pageSize);
-		SET @tempSql = CONCAT(@tempSql, ' limit ', (pr_pageIndex - 1) * pr_pageSize, ',', pr_pageSize);
-	END IF;
-	SET @dataSql = CONCAT(@dataSql, ';');
-	SET @tempSql = CONCAT(@tempSql, ';');
 	-- SELECT @Sql;
 	PREPARE stmt1 FROM @dataSql;
 	EXECUTE stmt1;

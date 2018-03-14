@@ -81,6 +81,7 @@ exports.detailQuery = function (opt) {
 };
 
 exports.query = function (opt) {
+    opt.orderBy = 'code';
     return autoBll.customDal('role', 'query', opt).then(function (t) {
         var data = {
             list: t[0],
