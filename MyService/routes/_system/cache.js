@@ -3,7 +3,7 @@ var config = require('../../config');
 var common = require('./common');
 
 var client = redis.createClient(config.redis.port, config.redis.host);
-var cachePrefix = config.cachePrefix ? config.cachePrefix + '_' : '';
+var cachePrefix = config.cachePrefix ? config.cachePrefix + ':' : '';
 
 function writeCacheErr(err) {
     console.error(common.dateFormat(null, 'yyyy-MM-dd HH:mm:ss'), 'Cache Error [' + err + ']');
