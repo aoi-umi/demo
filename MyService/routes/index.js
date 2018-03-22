@@ -43,7 +43,3 @@ exports.onlineUserDetailQuery = function (req, res, next) {
         res.mySend(null, t);
     });
 };
-
-exports.requirejs = function (req, res) {
-    res.myRender('requirejs');
-};

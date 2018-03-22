@@ -4,6 +4,20 @@
             location.href = '/msg?notSupportedBrowser=true';
     })();
 </script>
+<% if(!requirejs){ %>
+<script type="text/javascript">
+    let require;
+    (function () {
+        require = function (key) {
+            switch (key) {
+                case 'jquery':
+                    key = 'jQuery';
+                    break;
+            }
+            return eval('window.' + key);
+        };
+    })();
+</script>
 <script type="text/javascript" src="/js/plugins/jquery-2.1.1.min.js"></script>
 <script type="text/javascript" src="/js/plugins/jquery.cookie.js"></script>
 <script type="text/javascript" src="/js/plugins/jquery-ui.min.js"></script>
@@ -28,3 +42,55 @@
         main.init();
     });
 </script>
+<% }else{ %>
+<script type="text/javascript" src="/js/plugins/require.js"></script>
+<script>
+    require.config({
+        baseUrl: 'js/<%= env %>',
+        shim: {
+            'bootstrap': {
+                deps: ['jquery']
+            },
+            'WdatePicker': {
+                exports: 'WdatePicker'
+            },
+            'ejs': {
+                exports: 'ejs'
+            },
+            'my.vaild': {
+                exports: 'my.vaild'
+            },
+            'my.tab': {
+                exports: 'my.tab'
+            },
+            'sign': {
+                exports: 'sign'
+            },
+        },
+        paths: {
+            'jquery': ['/js/plugins/jquery-2.1.1.min'],
+            'jquery.cookie': ['/js/plugins/jquery.cookie'],
+            'jquery-ui': ['/js/plugins/jquery-ui.min'],
+            'bootstrap': ['/js/plugins/bootstrap.min'],
+            'ejs': ['/js/plugins/ejs.min'],
+            'SparkMD5': ['/js/plugins/spark-md5.min'],
+            'io': ['/js/plugins/socket.io/socket.io'],
+            'WdatePicker': ['/js/plugins/My97DatePicker/WdatePicker'],
+            'underscore': ['/js/plugins/underscore-min'],
+            'fileinput': ['/js/plugins/fileinput.min'],
+
+            'config': ['/js/config'],
+            'common': ['./common'],
+            'sign': ['./sign'],
+            'socket': ['./socket'],
+            'my': ['./my'],
+            'my.enum': ['./my.enum'],
+            'my.interface': ['./my.interface'],
+            'my.vaild': ['./my.vaild'],
+            'my.tab': ['./my.tab'],
+            'main': ['./_main'],
+            'index': ['./index'],
+        }
+    });
+</script>
+<% } %>

@@ -43,13 +43,31 @@ function getBrowserType() {
     }
 }
 
-namespace('main');
-main = {
-    variable: {
+(function (factory) {
+    if (typeof module === "object" && typeof module.exports === "object") {
+        var v = factory(require, exports);
+        if (v !== undefined) module.exports = v;
+    }
+    else if (typeof define === "function" && define.amd) {
+        define(["require", "exports", 'jquery', 'jquery.cookie', 'jquery-ui', 'ejs', , 'bootstrap',
+            'config', 'socket', 'common', 'sign', 'my.enum', 'my.interface'], factory);
+    } else {
+        let exports = {};
+        window.main = factory(require, exports);
+    }
+})(function (require, exports) {
+    let $ = require('jquery');
+    let config = require('config');
+    let common = require('common');
+    let my = require('my');
+
+    exports.variable = {
         frameDom: null,
         frameDefaultHeight: 0,
-    },
-    init: function () {
+    };
+
+    exports.init = function () {
+        let socket = require('socket');
         var self = this;
         ejs.open = '{%';
         ejs.close = '%}';
@@ -103,8 +121,9 @@ main = {
         self.bindEvent();
 
         my.enum.enumDict = {};
-    },
-    bindEvent: function () {
+    };
+
+    exports.bindEvent = function () {
         var self = this;
         //导航
         $('.nav.navbar-nav').on('click', 'li', function () {
@@ -168,8 +187,9 @@ main = {
                 });
             }
         }
-    },
-    updateView: function (list) {
+    };
+
+    exports.updateView = function (list) {
         var self = this;
         if (!list || common.isInArray('scroll', list)) {
             var height = $('body').outerHeight(true);
@@ -188,5 +208,6 @@ main = {
             if (isChanged)
                 console.log('change', isChanged);
         }
-    },
-};
+    };
+    return exports;
+});

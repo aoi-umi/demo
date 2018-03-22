@@ -28,12 +28,6 @@ exports.restConfig = [
         path: 'index',
     },
     {
-        url: '/requirejs',
-        method: 'get',
-        functionName: 'requirejs',
-        path: 'index',
-    },
-    {
         url: '/interface/onlineUser/query',
         method: 'post',
         functionName: 'onlineUserQuery',
@@ -167,6 +161,7 @@ exports.init = function (opt) {
         var opt = {
             user: req.myData.user,
             noNav: req.myData.noNav,
+            requirejs: req.myData.requirejs,
             isHadAuthority: function (authData) {
                 return auth.isHadAuthority(req.myData.user, authData);
             },
@@ -231,6 +226,7 @@ exports.init = function (opt) {
         var user = req.myData.user;
         req.myData.noNav = common.parseBool(req.query.noNav);
         req.myData.useStatus = common.parseBool(req.query.useStatus);
+        req.myData.requirejs = common.parseBool(req.query.requirejs);
 
         if (req.myData.ip == '::ffff:127.0.0.1')
             user.authority['local'] = true;

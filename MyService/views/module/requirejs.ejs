@@ -233,7 +233,6 @@
         </div>
     </div>
 </div>
-<script src="/js/<%= env %>/my.tab.js?v=<%= version %>"></script>
 <script type="text/template" id="testTemplate">
     <div>
         test
@@ -243,10 +242,9 @@
 <script type="text/template" id="msgItem">
     <% include ../_template_web/msgItem %>
 </script>
-<script src="js/plugins/fileinput.min.js"></script>
-<script src="js/<%= env %>/index.js?v=<%= version %>"></script>
 <script type="text/javascript">
-    $(function () {
+    require(['main', 'index'], function (main, index) {
+        main.init();
         index.init();
     });
 </script>
