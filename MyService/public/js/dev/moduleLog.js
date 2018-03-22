@@ -1,9 +1,10 @@
 /**
  * Created by bang on 2017-9-11.
  */
-namespace('moduleLog');
-moduleLog = {
-    init: function (option) {
+(function (factory) {
+    namespace('moduleLog', factory(require, {}));
+})(function (require, exports) {
+    exports.init = function (option) {
         var self = this;
         var opt = {
             operation: ['query'],
@@ -104,5 +105,6 @@ moduleLog = {
         };
         opt = $.extend(opt, option);
         return new module(opt);
-    },
-}
+    };
+    return exports;
+});

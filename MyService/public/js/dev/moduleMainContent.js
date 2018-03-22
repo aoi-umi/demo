@@ -1,9 +1,11 @@
 /**
  * Created by bang on 2017-9-11.
  */
-namespace('moduleMainContent');
-moduleMainContent = {
-    init: function (option) {
+
+(function (factory) {
+    namespace('moduleMainContent', factory(require, {}));
+})(function (require, exports) {
+    exports.init = function (option) {
         var self = this;
         var opt = {
             operation: [],
@@ -372,5 +374,6 @@ moduleMainContent = {
         };
         opt = $.extend(opt, option);
         return new module(opt);
-    }
-};
+    };
+    return exports;
+});

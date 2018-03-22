@@ -1,19 +1,6 @@
 (function (factory) {
-    if (typeof module === "object" && typeof module.exports === "object") {
-        var v = factory(require, exports);
-        if (v !== undefined) module.exports = v;
-    }
-    else if (typeof define === "function" && define.amd) {
-        define(["require", "exports", 'jquery', 'fileinput', 'my.tab', 'socket', 'common'], factory);
-    } else {
-        let exports = {};
-        window.index = factory(require, exports);
-    }
+    namespace('index', factory(require, {}));
 })(function (require, exports) {
-    let $ = require('jquery');
-    let socket = require('socket');
-    let common = require('common');
-
     exports.init = function () {
         var self = this;
         //socket

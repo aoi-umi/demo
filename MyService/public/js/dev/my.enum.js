@@ -2,19 +2,8 @@
  * Created by bang on 2017-9-11.
  */
 (function (factory) {
-    if (typeof module === "object" && typeof module.exports === "object") {
-        var v = factory(require, exports);
-        if (v !== undefined) module.exports = v;
-    }
-    else if (typeof define === "function" && define.amd) {
-        define(["require", "exports", 'jquery', 'common', 'my'], factory);
-    } else {
-        let exports = {};
-        namespace('my.enum');
-        my.enum = factory(require, exports);
-    }
+    namespace('my.enum', factory(require, {}));
 })(function (require, exports) {
-    let my = require('my');
     exports.getEnum = function (enumName, notThrowError) {
         var enumType = exports.enumDict[enumName];
         if (!enumType && !notThrowError) throw common.error('enum "' + enumName + '" not exist!', 'CODE_ERROR');
@@ -35,5 +24,5 @@
     };
 
     exports.enumDict = {};
-    return my.enum = exports;
+    return exports;
 });

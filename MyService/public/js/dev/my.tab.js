@@ -1,18 +1,21 @@
 /**
  * Created by bang on 2017-9-21.
  */
-namespace('my.tab')
-my.tab = {
-    opt: {
+
+
+(function (factory) {
+    namespace('my.tab', factory(require, {}));
+})(function (require, exports) {
+    exports.opt = {
         tabContainer: 'myTab',
         panelContainer: 'myPanel',
         closeBtnTemplate: '<button name="tab-close-btn" type="button" class="close hidden" data-close-target="" aria-hidden="true" style="margin-left: 5px;float: none">&times;</button>'
-    },
-    tabContainer: null,
-    panelContainer: null,
-    tabHeaderContextMenu: null,
-    clickTabIdList: [],
-    init: function (option) {
+    };
+    exports.tabContainer = null;
+    exports.panelContainer = null;
+    exports.tabHeaderContextMenu = null;
+    exports.clickTabIdList = [];
+    exports.init = function (option) {
         var self = this;
         self.opt = $.extend(self.opt, option);
         self.tabContainer = $('#' + self.opt.tabContainer);
@@ -36,8 +39,8 @@ my.tab = {
         $('body').append(tabContextMenu);
 
         self.bindEvent();
-    },
-    bindEvent: function () {
+    };
+    exports.bindEvent = function () {
         var self = this;
         var tabContainer = self.tabContainer;
         var panelContainer = self.panelContainer;
@@ -174,9 +177,9 @@ my.tab = {
                 }
             }
         });
-    },
+    };
     //tabData {type:'', id:'', name:'', targetId:'', closeTarget:''}
-    tab: function (data) {
+    exports.tab = function (data) {
         var self = this;
         var dom = null;
         var t = data;
@@ -199,8 +202,8 @@ my.tab = {
                 break;
         }
         return dom;
-    },
-    tabs: function (data) {
+    };
+    exports.tabs = function (data) {
         var self = this;
         var list = [];
         for (var i = 0; i < data.length; i++) {
@@ -209,9 +212,9 @@ my.tab = {
                 list.push(dom);
         }
         return list;
-    },
+    };
     //panelData {type:'', id:'', content:''}
-    panel: function (data) {
+    exports.panel = function (data) {
         var self = this;
         var dom = null;
         var t = data;
@@ -235,8 +238,8 @@ my.tab = {
 
         dom = $(`<div style="height: 512px" id="${t.id || ''}" class="tab-pane fade">${content}</div>`);
         return dom;
-    },
-    panels: function (data) {
+    };
+    exports.panels = function (data) {
         var self = this;
         var list = [];
         for (var i = 0; i < data.length; i++) {
@@ -245,8 +248,8 @@ my.tab = {
                 list.push(dom);
         }
         return list;
-    },
-    addOrOpenTab: function (data) {
+    };
+    exports.addOrOpenTab = function (data) {
         var self = this;
         var tabContainer = self.tabContainer;
         var panelContainer = self.panelContainer;
@@ -271,5 +274,6 @@ my.tab = {
         if (!$('#' + panelId).length)
             panelContainer.append(self.panel(tabPanelData));
         $('#' + tabId).click();
-    }
-}
+    };
+    return exports;
+});

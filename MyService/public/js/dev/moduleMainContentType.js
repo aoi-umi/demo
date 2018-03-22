@@ -1,9 +1,11 @@
 /**
  * Created by bang on 2017-9-11.
  */
-namespace('moduleMainContentType');
-moduleMainContentType = {
-    init: function (option) {
+
+(function (factory) {
+    namespace('moduleMainContentType', factory(require, {}));
+})(function (require, exports) {
+    exports.init = function (option) {
         var self = this;
         var opt = {
             operation: ['query', 'save', 'del', 'detailQuery'],
@@ -171,5 +173,6 @@ moduleMainContentType = {
         };
         opt = $.extend(opt, option);
         return new module(opt);
-    }
-};
+    };
+    return exports;
+});

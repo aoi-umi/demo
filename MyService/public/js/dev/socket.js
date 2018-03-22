@@ -2,20 +2,8 @@
  * Created by umi on 2017-8-30.
  */
 (function (factory) {
-    if (typeof module === "object" && typeof module.exports === "object") {
-        var v = factory(require, exports);
-        if (v !== undefined) module.exports = v;
-    }
-    else if (typeof define === "function" && define.amd) {
-        define(["require", "exports", 'jquery', 'jquery.cookie', 'config', 'io'], factory);
-    } else {
-        let exports = {};
-        window.socket = factory(require, exports);
-    }
+    namespace('socket', factory(require, {}));
 })(function (require, exports) {
-    let $ = require('jquery');
-    let config = require('config');
-    let io = require('io');
     exports.connection = null;
     exports.init = function () {
         var self = this;

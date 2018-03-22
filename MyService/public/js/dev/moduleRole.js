@@ -1,9 +1,10 @@
 /**
  * Created by bang on 2017-9-11.
  */
-namespace('moduleRole');
-moduleRole = {
-    init: function (option) {
+(function (factory) {
+    namespace('moduleRole', factory(require, {}));
+})(function (require, exports) {
+    exports.init = function (option) {
         var self = this;
         var opt = {
             operation: ['query', 'save', 'detailQuery'],
@@ -197,5 +198,6 @@ moduleRole = {
         };
         opt = $.extend(opt, option);
         return new module(opt);
-    },
-}
+    };
+    return exports;
+});
