@@ -28,6 +28,12 @@ exports.restConfig = [
         path: 'index',
     },
     {
+        url: '/requirejs',
+        method: 'get',
+        functionName: 'requirejs',
+        path: 'index',
+    },
+    {
         url: '/interface/onlineUser/query',
         method: 'post',
         functionName: 'onlineUserQuery',
@@ -66,6 +72,7 @@ exports.restConfig = [
 exports.accessableUrlConfig = [
     {url: '/'},
     {url: '/msg'},
+    {url: '/requirejs'},
     {url: '/onlineUser', auth: ['admin']},
     {url: '/interface/onlineUser/query', auth: ['admin']},
     {url: '/interface/onlineUser/detailQuery', auth: ['admin']},
