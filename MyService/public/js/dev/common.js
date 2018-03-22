@@ -1,15 +1,26 @@
 /**
  * Created by bang on 2017-7-26.
  */
-namespace('common');
-common = {
-    stringToBase64: function (str) {
+(function (factory) {
+    if (typeof module === "object" && typeof module.exports === "object") {
+        var v = factory(require, exports);
+        if (v !== undefined) module.exports = v;
+    }
+    else if (typeof define === "function" && define.amd) {
+        define(["require", "exports", 'jquery', 'fileinput', 'my.tab', 'socket'], factory);
+    } else {
+        let exports = {};
+        window.common = factory(require, exports);
+    }
+})(function (require, exports) {
+    let common = exports;
+    exports.stringToBase64 = function (str) {
         return btoa(encodeURIComponent(str));
-    },
-    base64ToString: function (base64Str) {
+    };
+    exports.base64ToString = function (base64Str) {
         return decodeURIComponent(atob(base64Str));
-    },
-    s4: function (count) {
+    };
+    exports.s4 = function (count) {
         var str = '';
         if (typeof count == 'undefined')
             count = 1;
@@ -21,16 +32,16 @@ common = {
             }
         }
         return str;
-    },
-    guid: function () {
+    };
+    exports.guid = function () {
         var self = this;
         var s4 = self.s4;
         return (s4(2) + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4(3));
-    },
-    md5: function (str) {
+    };
+    exports.md5 = function (str) {
         return SparkMD5.hash(str);
-    },
-    md5File: function (file) {
+    };
+    exports.md5File = function (file) {
         return common.promise().then(function (res) {
             var blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice,
                 chunkSize = 2097152,                             // Read in chunks of 2MB
@@ -66,11 +77,11 @@ common = {
             loadNext();
             return res;
         });
-    },
-    createToken: function (str) {
+    };
+    exports.createToken = function (str) {
         return common.md5(str);
-    },
-    ajax: function (option) {
+    };
+    exports.ajax = function (option) {
         var opt = {
             type: 'POST',
             contentType: 'application/json; charset=utf-8',
@@ -128,8 +139,8 @@ common = {
 
         def.resolve();
         return res;
-    },
-    parseJSON: function (str) {
+    };
+    exports.parseJSON = function (str) {
         try {
             return JSON.parse(str)
         } catch (e) {
@@ -156,8 +167,8 @@ common = {
             }
             throw e;
         }
-    },
-    dataCheck: function (option) {
+    };
+    exports.dataCheck = function (option) {
         var self = this;
         var data = {
             success: false,
@@ -238,9 +249,9 @@ common = {
         data.dom = null;
         data.success = true;
         return data;
-    },
+    };
     //时间
-    dateParse: function (date) {
+    exports.dateParse = function (date) {
         if (typeof date == 'string')
             date = date.replace(/-/g, '/');
         if (!isNaN(date) && !isNaN(parseInt(date)))
@@ -248,8 +259,8 @@ common = {
         if (!(date instanceof Date))
             date = new Date(date);
         return date;
-    },
-    dateFormat: function (date, format) {
+    };
+    exports.dateFormat = function (date, format) {
         try {
             if (!format) format = 'yyyy-MM-dd';
             if (!date)
@@ -278,8 +289,8 @@ common = {
             console.log(e);
             return '';
         }
-    },
-    getDateDiff: function (date1, date2) {
+    };
+    exports.getDateDiff = function (date1, date2) {
         date1 = common.dateParse(date1);
         date2 = common.dateParse(date2);
 
@@ -302,10 +313,10 @@ common = {
         if (isMinus)
             diff = '-' + diff;
         return diff;
-    },
+    };
 
     //字符串
-    stringFormat: function () {
+    exports.stringFormat = function () {
         var args = arguments;
         var reg = /(\{\d\})/g
         var res = args[0] || '';
@@ -319,15 +330,15 @@ common = {
         }
         res = split.join('');
         return res;
-    },
-    stringToPascal: function (str) {
+    };
+    exports.stringToPascal = function (str) {
         str = str.replace(/_([a-zA-Z])/g, function () {
             return arguments[1].toUpperCase();
         });
         return str[0].toUpperCase() + str.substr(1);
-    },
+    };
 
-    msgNotice: function (option) {
+    exports.msgNotice = function (option) {
         var opt = {
             type: 0,
             msg: '',
@@ -488,18 +499,18 @@ common = {
                 break;
         }
         return dom;
-    },
-    isInArray: function (obj, list, startIndex) {
+    };
+    exports.isInArray = function (obj, list, startIndex) {
         return $.inArray(obj, list, startIndex) >= 0;
-    },
-    promise: function () {
+    };
+    exports.promise = function () {
         var def = $.Deferred();
         var res = $.Deferred();
         def.resolve(res);
         return def;
-    },
+    };
 
-    getArgsFromUrlParams: function () {
+    exports.getArgsFromUrlParams = function () {
         var args = new Object();
         var query = location.search.substring(1);//获取查询串
         var params = query.split('&');
@@ -511,16 +522,16 @@ common = {
             args[argname] = unescape(value);
         }
         return args;
-    },
-    getUrlParamsFromArgs: function (args) {
+    };
+    exports.getUrlParamsFromArgs = function (args) {
         var list = [];
         for (var i in args) {
             list.push(i + '=' + escape(args[i]));
         }
         return list.join('&');
-    },
+    };
 
-    autoComplete: function (opt) {
+    exports.autoComplete = function (opt) {
         var option = {
             maxLength: 10,
             source: [],
@@ -594,8 +605,8 @@ common = {
                 return false;
             }
         }).data('ui-autocomplete')._renderItem = opt.renderItem;
-    },
-    setCountdown: function (option) {
+    };
+    exports.setCountdown = function (option) {
         //seconds
         var opt = {
             countdown: 10,
@@ -626,11 +637,12 @@ common = {
                 opt.onCountdown(dom, date);
             }
         }, opt.interval * 1000);
-    },
+    };
 
-    error: function (msg, errCode) {
+    exports.error = function (msg, errCode) {
         var err = new Error(msg);
         err.code = errCode;
         return err;
-    },
-};
+    };
+    return exports;
+});

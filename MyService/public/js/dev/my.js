@@ -1,5 +1,5 @@
 /**
- * Created by bang on 2017-7-28.
+ * Created by bang on 2017-9-11.
  */
 (function (factory) {
     if (typeof module === "object" && typeof module.exports === "object") {
@@ -7,18 +7,12 @@
         if (v !== undefined) module.exports = v;
     }
     else if (typeof define === "function" && define.amd) {
-        define(["require", "exports"], factory);
+        define(["require", "exports", 'jquery', 'common'], factory);
     } else {
-        let require = function (key) {
-            return window[key];
-        };
         let exports = {};
-        window['config'] = factory(require, exports);
+        namespace('my');
+        my = factory(require, exports);
     }
 })(function (require, exports) {
-    return {
-        cacheKey: {
-            userInfo: 'userInfoCacheKey'
-        }
-    }
+    return exports;
 });

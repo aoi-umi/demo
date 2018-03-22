@@ -1,6 +1,20 @@
-namespace('index');
-index = {
-    init: function () {
+(function (factory) {
+    if (typeof module === "object" && typeof module.exports === "object") {
+        var v = factory(require, exports);
+        if (v !== undefined) module.exports = v;
+    }
+    else if (typeof define === "function" && define.amd) {
+        define(["require", "exports", 'jquery', 'fileinput', 'my.tab', 'socket', 'common'], factory);
+    } else {
+        let exports = {};
+        window.index = factory(require, exports);
+    }
+})(function (require, exports) {
+    let $ = require('jquery');
+    let socket = require('socket');
+    let common = require('common');
+
+    exports.init = function () {
         var self = this;
         //socket
         var socketData = {
@@ -60,10 +74,10 @@ index = {
             //],
         }).on('fileuploaded', function (event, data) {
             var res = data.response;
-        }).on('fileuploaderror', function(event, data, msg) {
+        }).on('fileuploaderror', function (event, data, msg) {
             var args = arguments;
             var res = data.response;
-            if(!res.result) {
+            if (!res.result) {
                 return {
                     message: res.desc,
                     data: res.detail
@@ -153,8 +167,8 @@ index = {
         }, 1000);
 
         self.bindEvent();
-    },
-    bindEvent: function () {
+    };
+    exports.bindEvent = function () {
         var self = this;
 
         var connection = socket.connection;
@@ -205,8 +219,8 @@ index = {
                 interval: 1
             });
         });
-    },
-    appendMsg: function (opt) {
+    };
+    exports.appendMsg = function (opt) {
         //status
         //0  发送中 1 发送成功
         //-1 发送失败
@@ -231,5 +245,6 @@ index = {
         var msgItemTemp = $('#msgItem').html();
 
         $('#msgBox').append(ejs.render(msgItemTemp, opt));
-    }
-};
+    };
+    return exports;
+});
