@@ -2,21 +2,8 @@
  * Created by bang on 2017-9-11.
  */
 (function (factory) {
-    if (typeof module === "object" && typeof module.exports === "object") {
-        var v = factory(require, exports);
-        if (v !== undefined) module.exports = v;
-    }
-    else if (typeof define === "function" && define.amd) {
-        define(["require", "exports", 'jquery', 'common', 'my'], factory);
-    } else {
-        let exports = {};
-        namespace('my.interface');
-        my.interface = factory(require, exports);
-    }
+    namespace('my.interface', factory(require, {}));
 })(function (require, exports) {
-    let $ = require('jquery');
-    let common = require('common');
-    let my = require('my');
     exports.opt = {
         interfaceConfig: {},
         moduleList: [],
@@ -61,5 +48,5 @@
         }
         return fun;
     };
-    return my.interface = exports;
+    return exports;
 });

@@ -1,9 +1,10 @@
 /**
  * Created by bang on 2017-9-21.
  */
-namespace('my.vaild');
-my.vaild = {
-    isInt: function (val, type) {
+(function (factory) {
+    namespace('my.vaild', factory(require, {}));
+})(function (require, exports) {
+    exports.isInt = function (val, type) {
         //- 0 +
         //1 1 1 -> 0-7
         var reg = /^-?[\d]+$/;
@@ -37,14 +38,15 @@ my.vaild = {
                 break;
         }
         return reg.test(val);
-    },
-    isAccount: function (val) {
+    };
+    exports.isAccount = function (val) {
         return /^[a-zA-Z][a-zA-Z\d_]{5,}$/.test(val);
-    },
-    isAuthority: function (val) {
+    };
+    exports.isAuthority = function (val) {
         return /^[a-zA-Z\d_]+$/.test(val);
-    },
-    isRole: function (val) {
+    };
+    exports.isRole = function (val) {
         return /^[a-zA-Z\d_]+$/.test(val);
-    }
-};
+    };
+    return exports;
+});

@@ -2,16 +2,7 @@
  * Created by bang on 2017-7-26.
  */
 (function (factory) {
-    if (typeof module === "object" && typeof module.exports === "object") {
-        var v = factory(require, exports);
-        if (v !== undefined) module.exports = v;
-    }
-    else if (typeof define === "function" && define.amd) {
-        define(["require", "exports", 'jquery', 'fileinput', 'my.tab', 'socket'], factory);
-    } else {
-        let exports = {};
-        window.common = factory(require, exports);
-    }
+    namespace('common', factory(require, {}));
 })(function (require, exports) {
     let common = exports;
     exports.stringToBase64 = function (str) {
@@ -144,7 +135,7 @@
         try {
             return JSON.parse(str)
         } catch (e) {
-            var browserType = getBrowserType();
+            var browserType = common.getBrowserType();
             var reg = null;
             switch (browserType) {
                 case 'Firefox':
@@ -643,6 +634,29 @@
         var err = new Error(msg);
         err.code = errCode;
         return err;
+    };
+    exports.getBrowserType = function () {
+        var userAgent = navigator.userAgent; //取得浏览器的userAgent字符串
+
+        var isOpera = userAgent.indexOf('Opera') > -1;
+        if (isOpera) {
+            return 'Opera'
+        }
+
+        if (userAgent.indexOf('Firefox') > -1) {
+            return 'Firefox';
+        }
+        if (userAgent.indexOf('Chrome') > -1) {
+            return 'Chrome';
+        }
+
+        if (userAgent.indexOf('Safari') > -1) {
+            return 'Safari';
+        }
+
+        if (userAgent.indexOf('compatible') > -1 && userAgent.indexOf('MSIE') > -1 && !isOpera) {
+            return 'IE';
+        }
     };
     return exports;
 });

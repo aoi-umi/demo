@@ -1,10 +1,11 @@
-namespace('sign');
-sign = {
-    init: function () {
+(function (factory) {
+    namespace('sign', factory(require, {}));
+})(function (require, exports) {
+    exports.init = function () {
         var self = this;
         self.bindEvent();
-    },
-    bindEvent: function () {
+    };
+    exports.bindEvent = function () {
         var self = this;
         //登录框
         $(document).on('click', '.sign-in', function () {
@@ -29,8 +30,8 @@ sign = {
         $('#signUp').on('click', function () {
             self.signUp();
         });
-    },
-    signIn: function (dom) {
+    };
+    exports.signIn = function (dom) {
         var form = dom.closest('.sign-in-form');
         var signInArgsOpt = [{
             name: 'account',
@@ -81,8 +82,8 @@ sign = {
             if (e)
                 common.msgNotice({type: 1, msg: e.message});
         });
-    },
-    signUp: function () {
+    };
+    exports.signUp = function () {
 
         var signUpArgsOpt = [{
             name: 'account',
@@ -137,5 +138,6 @@ sign = {
             if (e)
                 common.msgNotice({type: 1, msg: e.message});
         });
-    }
-};
+    };
+    return exports;
+});

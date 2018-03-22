@@ -1,73 +1,47 @@
 /**
  * Created by bang on 2017-9-11.
  */
-function namespace(namespace) {
+var _namespace = {};
+
+function namespace(namespace, factory) {
     var list = namespace.split('.');
     var ns = window[list[0]];
-    if (ns && list.length == 1)
-        throw new Error('namespace [' + namespace + '] is exist!');
+    if (ns && list.length == 1) {
+        if (factory)
+            throw new Error('namespace [' + namespace + '] is exist!');
+    }
     if (!ns)
-        ns = window[list[0]] = {};
+        ns = window[list[0]] = _namespace[list[0]] = factory || {};
     for (var i = 1; i < list.length; i++) {
         var ns_next = ns[list[i]];
-        if (!ns_next)
-            ns[list[i]] = {};
-        else if (i == list.length - 1)
-            throw new Error('namespace [' + namespace + '] is exist!');
+        if (!ns_next) {
+            if (i == list.length - 1)
+                ns[list[i]] = factory;
+            else
+                ns[list[i]] = {};
+        }
+        else if (i == list.length - 1) {
+            if (factory)
+                throw new Error('namespace [' + namespace + '] is exist!');
+        }
         ns = ns[list[i]];
     }
     return ns;
 }
 
-function getBrowserType() {
-    var userAgent = navigator.userAgent; //取得浏览器的userAgent字符串
+function require() {
 
-    var isOpera = userAgent.indexOf('Opera') > -1;
-    if (isOpera) {
-        return 'Opera'
-    }
-
-    if (userAgent.indexOf('Firefox') > -1) {
-        return 'Firefox';
-    }
-    if (userAgent.indexOf('Chrome') > -1) {
-        return 'Chrome';
-    }
-
-    if (userAgent.indexOf('Safari') > -1) {
-        return 'Safari';
-    }
-
-    if (userAgent.indexOf('compatible') > -1 && userAgent.indexOf('MSIE') > -1 && !isOpera) {
-        return 'IE';
-    }
 }
 
 (function (factory) {
-    if (typeof module === "object" && typeof module.exports === "object") {
-        var v = factory(require, exports);
-        if (v !== undefined) module.exports = v;
-    }
-    else if (typeof define === "function" && define.amd) {
-        define(["require", "exports", 'jquery', 'jquery.cookie', 'jquery-ui', 'ejs', , 'bootstrap',
-            'config', 'socket', 'common', 'sign', 'my.enum', 'my.interface'], factory);
-    } else {
-        let exports = {};
-        window.main = factory(require, exports);
-    }
+    namespace('main', factory(require, {}));
 })(function (require, exports) {
-    let $ = require('jquery');
-    let config = require('config');
-    let common = require('common');
-    let my = require('my');
-
     exports.variable = {
         frameDom: null,
         frameDefaultHeight: 0,
     };
 
     exports.init = function () {
-        let socket = require('socket');
         var self = this;
         ejs.open = '{%';
         ejs.close = '%}';
