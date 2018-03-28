@@ -2,7 +2,10 @@ var common = require('./common');
 var myEnum = require('./enum');
 var auth = require('./auth');
 var cache = require('./cache');
+var errorConfig = require('./errorConfig');
+
 var sign = require('../bll/sign');
+
 var config = require('../../config');
 
 var main = exports;
@@ -277,4 +280,31 @@ exports.init = function (opt) {
             next();
         }
     };
+};
+
+exports.errorHandler = function (err, req, res, next) {
+    common.writeError(err);
+    if (config.env !== 'dev') {
+        err.stack = '';
+    }
+    err.status = err.status || 500;
+    err.code = err.code || err.status;
+    var xRequestedWith = req.header('x-requested-with');
+    if (xRequestedWith && xRequestedWith.toLowerCase() == 'xmlhttprequest') {
+        res.mySend(err, err, {code: err.code});
+    } else {
+        if (errorConfig.NO_LOGIN.code == err.code) {
+            var signIn = '/sign/in?noNav=' + req.myData.noNav;
+            res.redirect(signIn);
+        }
+        else {
+            res.status(err.status);
+            res.myRender('view', {
+                view: 'error',
+                title: '出错了',
+                message: err.message,
+                error: err
+            });
+        }
+    }
 };

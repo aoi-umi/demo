@@ -97,33 +97,7 @@ app.use(function (req, res, next) {
 });
 
 /// error handlers
-
-app.use(function (err, req, res, next) {
-    common.writeError(err);
-    if (config.env !== 'dev') {
-        err.stack = '';
-    }
-    err.status = err.status || 500;
-    err.code = err.code || err.status;
-    var xRequestedWith = req.header('x-requested-with');
-    if (xRequestedWith && xRequestedWith.toLowerCase() == 'xmlhttprequest') {
-        res.mySend(err, err, {code: err.code});
-    } else {
-        if (errorConfig.NO_LOGIN.code == err.code) {
-            var signIn = '/sign/in?noNav=' + req.myData.noNav;
-            res.redirect(signIn);
-        }
-        else {
-            res.status(err.status);
-            res.myRender('view', {
-                view: 'error',
-                title: '出错了',
-                message: err.message,
-                error: err
-            });
-        }
-    }
-});
+app.use(main.errorHandler);
 
 process.on('unhandledRejection', function (e) {
     console.error('unhandledRejection');
