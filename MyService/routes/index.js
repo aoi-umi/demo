@@ -1,8 +1,5 @@
 var fs = require('fs');
 var common = require('./_system/common');
-var cache = require('./_system/cache');
-var config = require('../config');
-var socket = require('./socket');
 
 exports.msg = function (req, res) {
     var notSupportedBrowser = common.parseBool(req.query.notSupportedBrowser);
@@ -31,15 +28,3 @@ exports.upload = [require('./_system/multer').any(), function (req, res) {
     };
     res.mySend(null, opt);
 }];
-
-exports.onlineUserQuery = function (req, res, next) {
-    var onlineUser = socket.onlineUser;
-    res.mySend(null, onlineUser);
-};
-
-exports.onlineUserDetailQuery = function (req, res, next) {
-    var key = config.cacheKey.userInfo + req.body.key;
-    cache.get(key).then(function (t) {
-        res.mySend(null, t);
-    });
-};

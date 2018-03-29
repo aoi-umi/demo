@@ -14,9 +14,9 @@ exports.restConfig = [
     {
         url: '/',
         method: 'get',
-        functionName: 'view',//为空时按method
+        functionName: '',//为空时按method
         methodName: 'index',//用于记录日志
-        path: '/module/_default',//为空时则按url
+        path: '/module/_view',//为空时则按url
     },
     {
         url: '/help',
@@ -31,18 +31,6 @@ exports.restConfig = [
         path: 'index',
     },
     {
-        url: '/interface/onlineUser/query',
-        method: 'post',
-        functionName: 'onlineUserQuery',
-        path: 'index',
-    },
-    {
-        url: '/interface/onlineUser/detailQuery',
-        method: 'post',
-        functionName: 'onlineUserDetailQuery',
-        path: 'index',
-    },
-    {
         url: '/interface/upload',
         method: 'post',
         functionName: 'upload',
@@ -52,16 +40,14 @@ exports.restConfig = [
     {
         url: /\/interface\/([\s\S]+)\/([\s\S]+)/,
         method: 'post',
-        functionName: 'default',
         methodName: 'module-method',
-        path: '/module/_default',
+        path: '/module/_interface',
     },
     {
         url: '*',
         method: 'get',
-        functionName: 'view',
         methodName: 'module-view',
-        path: '/module/_default',
+        path: '/module/_view',
     }
 ];
 
