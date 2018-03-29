@@ -69,7 +69,10 @@ exports.restConfig = [
 exports.accessableUrlConfig = [
     {url: '/'},
     {url: '/msg'},
+
     {url: '/requirejs'},
+    {url: '/textDiff'},
+
     {url: '/onlineUser', auth: ['admin']},
     {url: '/interface/onlineUser/query', auth: ['admin']},
     {url: '/interface/onlineUser/detailQuery', auth: ['admin']},
