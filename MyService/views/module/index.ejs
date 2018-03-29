@@ -1,5 +1,15 @@
-<link href="css/fileinput.min.css" rel="stylesheet"/>
+<link rel="stylesheet" href="css/fileinput.min.css"/>
+<link rel='stylesheet' href='/css/sidebar-nav.css'/>
 <style>
+    .hamburger {
+        top: auto
+    }
+
+    .hamburger.is-open .hamb-top, .hamburger.is-open .hamb-middle, .hamburger.is-open .hamb-bottom,
+    .hamburger.is-closed .hamb-top, .hamburger.is-closed .hamb-middle, .hamburger.is-closed .hamb-bottom {
+        background-color: rgba(0, 0, 0, 0.7);
+    }
+
     .content {
         background-color: #ffffff;
         border: 1px solid #47a8ef;
@@ -8,128 +18,130 @@
     }
 </style>
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-xs-2 col-sm-2 col-md-2 sidebar">
-            <div class="panel panel-primary">
-                <a id="menuSearchBtn" class="list-group-item active" data-toggle="collapse" href="#searchResult">
-                    search
-                </a>
-                <input id="menuSearch" type="text" class="form-control" placeholder="search"/>
-
-
-                <div class="panel-body my-panel-body collapse in" id="searchResult">
-                </div>
-            </div>
-
-            <br>
-            <% var menuList = [{
-                text: 'main content menu',
-                listId: '',
-                childs: [{
-                    text: 'main content',
-                    tab: {
-                        target: 'mainContent',
-                        name: 'main content list'
-                    },
-                    tabUrl: '/mainContent/list',
-                }, {
-                    text: 'main content type',
-                    tab: {
-                        target: 'mainContentType',
-                        name: 'main content type list'
-                    },
-                    tabUrl: '/mainContentType/list',
-                },]
+    <div class="row" id="wrapper">
+        <% var menuList = [{
+            text: 'main content menu',
+            listId: '',
+            childs: [{
+                text: 'main content',
+                tab: {
+                    target: 'mainContent',
+                    name: 'main content list'
+                },
+                tabUrl: '/mainContent/list',
             }, {
-                text: 'user',
-                listId: '',
-                auth: ['login'],
-                childs: [{
-                    text: 'user info',
-                    tab: {
-                        target: 'userInfoDetail',
-                        name: 'userInfo detail'
-                    },
-                    tabUrl: '/userInfo/detail',
-                }, {
-                    text: 'user info list',
-                    tab: {
-                        target: 'userInfoList',
-                        name: 'userInfo list'
-                    },
-                    tabUrl: '/userInfo/list',
-                },]
+                text: 'main content type',
+                tab: {
+                    target: 'mainContentType',
+                    name: 'main content type list'
+                },
+                tabUrl: '/mainContentType/list',
+            },]
+        }, {
+            text: 'user',
+            listId: '',
+            auth: ['login'],
+            childs: [{
+                text: 'user info',
+                tab: {
+                    target: 'userInfoDetail',
+                    name: 'userInfo detail'
+                },
+                tabUrl: '/userInfo/detail',
             }, {
-                text: 'admin',
-                listId: '',
-                auth: ['admin'],
-                childs: [{
-                    text: 'role',
-                    tab: {
-                        target: 'role',
-                        name: 'role list'
-                    },
-                    tabUrl: '/role/list',
-                }, {
-                    text: 'authority',
-                    tab: {
-                        target: 'authority',
-                        name: 'authority list'
-                    },
-                    tabUrl: '/authority/list',
-                },]
+                text: 'user info list',
+                tab: {
+                    target: 'userInfoList',
+                    name: 'userInfo list'
+                },
+                tabUrl: '/userInfo/list',
+            },]
+        }, {
+            text: 'admin',
+            listId: '',
+            auth: ['admin'],
+            childs: [{
+                text: 'role',
+                tab: {
+                    target: 'role',
+                    name: 'role list'
+                },
+                tabUrl: '/role/list',
             }, {
-                text: '菜单Test',
-                listId: 'menuItemListTest',
-                auth: ['dev'],
-                childs: [{
-                    text: 'Help',
-                    tab: {
-                        target: 'help',
-                    },
-                    tabUrl: '/help',
-                }, {
-                    text: 'Log',
-                    tab: {
-                        target: 'log',
-                    },
-                    tabUrl: '/log',
-                }, {
-                    text: '在线用户',
-                    tab: {
-                        target: 'onlineUser',
-                    },
-                    tabUrl: '/onlineUser',
-                }, {
-                    text: 'Status',
-                    tab: {
-                        target: 'status',
-                    },
-                    tabUrl: '/status',
-                }, {
-                    text: 'Color',
-                    tab: {
-                        target: 'color',
-                    },
-                    tabUrl: '/color',
-                }, {
-                    text: '比较文本',
-                    tab: {
-                        target: 'textDiff',
-                    },
-                    tabUrl: '/textDiff',
-                }, {
-                    text: 'test',
-                    tab: {
-                        target: 'test',
-                        content: 'testTemplate',
-                        type: 'template'
-                    },
-                    auth: ['dev', 'login']
-                },]
-            },];
-            %>
-            <div id="menu" class="panel panel-primary">
+                text: 'authority',
+                tab: {
+                    target: 'authority',
+                    name: 'authority list'
+                },
+                tabUrl: '/authority/list',
+            },]
+        }, {
+            text: '菜单Test',
+            listId: 'menuItemListTest',
+            auth: ['dev'],
+            childs: [{
+                text: 'Help',
+                tab: {
+                    target: 'help',
+                },
+                tabUrl: '/help',
+            }, {
+                text: 'Log',
+                tab: {
+                    target: 'log',
+                },
+                tabUrl: '/log',
+            }, {
+                text: '在线用户',
+                tab: {
+                    target: 'onlineUser',
+                },
+                tabUrl: '/onlineUser',
+            }, {
+                text: 'Status',
+                tab: {
+                    target: 'status',
+                },
+                tabUrl: '/status',
+            }, {
+                text: 'Color',
+                tab: {
+                    target: 'color',
+                },
+                tabUrl: '/color',
+            }, {
+                text: '比较文本',
+                tab: {
+                    target: 'textDiff',
+                },
+                tabUrl: '/textDiff',
+            }, {
+                text: 'test',
+                tab: {
+                    target: 'test',
+                    content: 'testTemplate',
+                    type: 'template'
+                },
+                auth: ['dev', 'login']
+            },]
+        },];
+        %>
+
+        <!-- Sidebar -->
+        <nav class="navbar navbar-inverse navbar-fixed-top" id="sidebar-wrapper" role="navigation">
+            <ul id="menu" class="nav sidebar-nav">
+                <li class="sidebar-brand">
+                    <a href="#">
+                    </a>
+                </li>
+                <li class="dropdown">
+                    <a id="menuSearchBtn" href="#searchResult" class="dropdown-toggle" data-toggle="collapse">
+                        search
+                    </a>
+                    <input id="menuSearch" class="form-control" placeholder="search"/>
+                    <ul id="searchResult" class="dropdown-toggle menu collapse in" role="menu">
+                    </ul>
+                </li>
                 <%
                 menuList.forEach(function(t){
                     if (t.auth && !isHadAuthority(t.auth))
@@ -137,37 +149,44 @@
                     if (!t.listId)
                         t.listId = 'menuId' + new Date().getTime() + '_' + parseInt(Math.random() * 100);
                 %>
-                <a class="list-group-item active" data-toggle="collapse" href="#<%= t.listId %>">
-                    <%= t.text %>
-                </a>
-
-                <div class="panel-body my-panel-body collapse in" id="<%= t.listId %>">
-                    <% t.childs.forEach(function(child){
-                        if (child.auth && !isHadAuthority(child.auth))
-                            return;
-                        if (child.tabUrl && !accessableUrl[child.tabUrl])
-                            return;
-                        if (!child.tab)
-                            child.tab = {}; %>
-                    <a class="list-group-item tab menuItem" href="javascript:;"
-                            <% if(child.tabUrl){ %>
-                       data-tab-content="<%= child.tabUrl + (child.tabUrlArgs || '?noNav=true') %>"
-                       data-url="<%= child.tabUrl + (child.tabUrlArgs || '') %>"
-                            <% } %>
-                            <% for(var key in child.tab){
-                            if(child.tab[key]){ %>
-                       data-tab-<%= key %>="<%= child.tab[key] %>"
-                            <% }
-                            } %>
-                            <%- child.attr || '' %>><%= child.text %>
+                <hr>
+                <li class="dropdown">
+                    <a href="#<%= t.listId %>" class="dropdown-toggle" data-toggle="collapse">
+                        <i class="fa fa-fw fa-plus"></i><%= t.text %>
                     </a>
-                    <% }) %>
-                </div>
+                    <ul id="<%= t.listId %>" class="dropdown-toggle menu collapse in" role="menu">
+                        <% t.childs.forEach(function(child){
+                            if (child.auth && !isHadAuthority(child.auth))
+                                return;
+                            if (child.tabUrl && !accessableUrl[child.tabUrl])
+                                return;
+                            if (!child.tab)
+                                child.tab = {}; %>
+                        <li><a class="tab menuItem" href="javascript:;"
+                                    <% if(child.tabUrl){ %>
+                               data-tab-content="<%= child.tabUrl + (child.tabUrlArgs || '?noNav=true') %>"
+                               data-url="<%= child.tabUrl + (child.tabUrlArgs || '') %>"
+                                    <% } %>
+                                    <% for(var key in child.tab){
+                                    if(child.tab[key]){ %>
+                               data-tab-<%= key %>="<%= child.tab[key] %>"
+                                    <% }
+                                    } %>
+                                    <%- child.attr || '' %>><%= child.text %>
+                            </a></li>
+                        <% }) %>
+                    </ul>
+                </li>
                 <% }); %>
-            </div>
-        </div>
-
-        <div class="col-xs-10 col-sm-10 col-md-10 main">
+            </ul>
+        </nav>
+        <!-- /#sidebar-wrapper -->
+        <button type="button" class="hamburger animated fadeInLeft is-closed" data-toggle="offcanvas">
+            <span class="hamb-top"></span>
+            <span class="hamb-middle"></span>
+            <span class="hamb-bottom"></span>
+        </button>
+        <div class="col-xs-push-1 col-xs-10 main">
             <ul class="nav nav-tabs" id="myTab"></ul>
             <div class="tab-content" id="myPanel">
                 <div style="height: 712px" id="panel-home" class="tab-pane fade">
