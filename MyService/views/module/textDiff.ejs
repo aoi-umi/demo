@@ -1,6 +1,5 @@
-<% include ./header.ejs %>
 <link rel="stylesheet" type="text/css" href="/css/diffview.css">
-<div class="container theme-showcase" style="margin-top:-40px" role="main">
+<div class="container theme-showcase" role="main">
     <div align="center">
         <table id="table1" border="0" width="900">
             <tbody>
@@ -37,12 +36,9 @@
             </tbody>
         </table>
     </div>
-</div> <!-- /container -->
-<% include ./footer.ejs %>
-
-<script type="text/javascript" src="/js/memcache.js"></script>
-<script type="text/javascript" src="/js/diffview.js"></script>
-<script type="text/javascript" src="/js/difflib.js"></script>
+</div>
+<script type="text/javascript" src="/js/plugins/diffview.js"></script>
+<script type="text/javascript" src="/js/plugins/difflib.js"></script>
 <script type="text/javascript">
     function diffUsingJS() {
         var base = difflib.stringAsLines($("#baseText").val());
