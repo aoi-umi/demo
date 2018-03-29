@@ -1,8 +1,6 @@
 /**
  * Created by bang on 2017-9-7.
  */
-var common = require('../_system/common');
-var myEnum = require('./../_system/enum');
 var autoBll = require('../bll/_auto');
 
 exports.detailQuery = function (opt, viewOpt) {
