@@ -1,38 +1,6 @@
 /**
  * Created by bang on 2017-9-11.
  */
-var _namespace = {};
-
-function namespace(namespace, factory) {
-    var list = namespace.split('.');
-    var ns = window[list[0]];
-    if (ns && list.length == 1) {
-        if (factory)
-            throw new Error('namespace [' + namespace + '] is exist!');
-    }
-    if (!ns)
-        ns = window[list[0]] = _namespace[list[0]] = factory || {};
-    for (var i = 1; i < list.length; i++) {
-        var ns_next = ns[list[i]];
-        if (!ns_next) {
-            if (i == list.length - 1)
-                ns[list[i]] = factory;
-            else
-                ns[list[i]] = {};
-        }
-        else if (i == list.length - 1) {
-            if (factory)
-                throw new Error('namespace [' + namespace + '] is exist!');
-        }
-        ns = ns[list[i]];
-    }
-    return ns;
-}
-
-function require() {
-
-}
-
 (function (factory) {
     namespace('main', factory(require, {}));
 })(function (require, exports) {

@@ -15,6 +15,41 @@
 <script type="text/javascript" src="/js/plugins/My97DatePicker/WdatePicker.js"></script>
 <script type="text/javascript" src="/js/plugins/underscore-min.js"></script>
 
+<script type="text/javascript">
+    $(function () {
+        window._namespace = {};
+
+        window.namespace = function (namespace, factory) {
+            var list = namespace.split('.');
+            var ns = window[list[0]];
+            if (ns && list.length == 1) {
+                if (factory)
+                    throw new Error('namespace [' + namespace + '] is exist!');
+            }
+            if (!ns)
+                ns = window[list[0]] = _namespace[list[0]] = factory || {};
+            for (var i = 1; i < list.length; i++) {
+                var ns_next = ns[list[i]];
+                if (!ns_next) {
+                    if (i == list.length - 1)
+                        ns[list[i]] = factory;
+                    else
+                        ns[list[i]] = {};
+                }
+                else if (i == list.length - 1) {
+                    if (factory)
+                        throw new Error('namespace [' + namespace + '] is exist!');
+                }
+                ns = ns[list[i]];
+            }
+            return ns;
+        };
+
+        window.require = function () {
+
+        };
+    });
+</script>
 <script type="text/javascript" src="/js/config.js?v=<%= version %>"></script>
 <script type="text/javascript" src="/js/<%= env %>/_main.js?v=<%= version %>"></script>
 
