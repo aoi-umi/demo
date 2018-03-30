@@ -16,6 +16,10 @@
         width: 100px;
         height: 100px;
     }
+
+    .main {
+        margin-top: 35px;
+    }
 </style>
 <div class="container-fluid">
     <div class="row" id="wrapper">
@@ -146,6 +150,16 @@
                 menuList.forEach(function(t){
                     if (t.auth && !isHadAuthority(t.auth))
                         return;
+                    var childs = [];
+                    t.childs.forEach(function (child) {
+                        if (child.auth && !isHadAuthority(child.auth))
+                            return;
+                        if (child.tabUrl && !accessableUrl[child.tabUrl])
+                            return;
+                        childs.push(child);
+                    });
+                    if (!childs.length)
+                        return;
                     if (!t.listId)
                         t.listId = 'menuId' + new Date().getTime() + '_' + parseInt(Math.random() * 100);
                 %>
@@ -155,11 +169,7 @@
                         <i class="fa fa-fw fa-plus"></i><%= t.text %>
                     </a>
                     <ul id="<%= t.listId %>" class="dropdown-toggle menu collapse in" role="menu">
-                        <% t.childs.forEach(function(child){
-                            if (child.auth && !isHadAuthority(child.auth))
-                                return;
-                            if (child.tabUrl && !accessableUrl[child.tabUrl])
-                                return;
+                        <% childs.forEach(function(child){
                             if (!child.tab)
                                 child.tab = {}; %>
                         <li><a class="tab menuItem" href="javascript:;"
@@ -186,7 +196,7 @@
             <span class="hamb-middle"></span>
             <span class="hamb-bottom"></span>
         </button>
-        <div class="col-xs-push-1 col-xs-10 main">
+        <div class="main">
             <ul class="nav nav-tabs" id="myTab"></ul>
             <div class="tab-content" id="myPanel">
                 <div style="height: 712px" id="panel-home" class="tab-pane fade">
