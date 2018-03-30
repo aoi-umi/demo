@@ -4,17 +4,6 @@
             location.href = '/msg?notSupportedBrowser=true';
     })();
 </script>
-
-<script type="text/javascript" src="/js/plugins/jquery-2.1.1.min.js"></script>
-<script type="text/javascript" src="/js/plugins/jquery.cookie.js"></script>
-<script type="text/javascript" src="/js/plugins/jquery-ui.min.js"></script>
-<script type="text/javascript" src="/js/plugins/bootstrap.min.js"></script>
-<script type="text/javascript" src="/js/plugins/ejs.min.js"></script>
-<script type="text/javascript" src="/js/plugins/spark-md5.min.js"></script>
-<script type="text/javascript" src="/js/plugins/socket.io/socket.io.js"></script>
-<script type="text/javascript" src="/js/plugins/My97DatePicker/WdatePicker.js"></script>
-<script type="text/javascript" src="/js/plugins/underscore-min.js"></script>
-
 <script type="text/javascript">
     window._namespace = {};
 
@@ -43,7 +32,82 @@
         }
         return ns;
     };
+</script>
+<% if(requirejs){ %>
+<script type="text/javascript" src="/js/plugins/require.js"></script>
+<script type="text/javascript">
+    requirejs.config({
+        baseUrl: '/js',
+        paths: {
+            'jquery': 'plugins/jquery-2.1.1.min',
+            'jquery.cookie': 'plugins/jquery.cookie',
+            'jquery-ui': 'jquery-ui.min',
+            'bootstrap': 'plugins/bootstrap.min',
+            'ejs': 'plugins/ejs.min',
+            'spark-md5': 'plugins/spark-md5.min',
+            'socket.io': 'plugins/socket.io/socket.io',
+            'WdatePicker': 'plugins/My97DatePicker/WdatePicker.io',
+            'underscore': 'plugins/underscore-min',
 
+            'config': 'config',
+            'main': '<%= env %>/_main',
+            'common': '<%= env %>/common',
+            'my.enum': '<%= env %>/my.enum',
+            'sign': '<%= env %>/sign',
+            'socket': '<%= env %>/socket',
+            'my.interface': '<%= env %>/my.interface',
+            'my.vaild': '<%= env %>/my.vaild',
+        },
+        shim: {
+            'bootstrap': {
+                deps: ['jquery'],
+                exports: 'bootstrap'
+            },
+            'config': {
+                exports: 'config'
+            },
+            'main': {
+                exports: 'main'
+            },
+            'common': {
+                exports: 'common'
+            },
+            'my.enum': {
+                exports: 'my.enum'
+            },
+            'sign': {
+                exports: 'sign'
+            },
+            'socket': {
+                exports: 'socket'
+            },
+            'my.interface': {
+                exports: 'my.interface'
+            },
+            'my.vaild': {
+                exports: 'my.vaild'
+            }
+        }
+    });
+    require(['jquery', 'underscore', 'my.enum'], function ($, _) {
+        $(function () {
+            var myEnum = require('my.enum');
+            console.log(myEnum)
+        })
+    })
+</script>
+<% }else{ %>
+<script type="text/javascript" src="/js/plugins/jquery-2.1.1.min.js"></script>
+<script type="text/javascript" src="/js/plugins/jquery.cookie.js"></script>
+<script type="text/javascript" src="/js/plugins/jquery-ui.min.js"></script>
+<script type="text/javascript" src="/js/plugins/bootstrap.min.js"></script>
+<script type="text/javascript" src="/js/plugins/ejs.min.js"></script>
+<script type="text/javascript" src="/js/plugins/spark-md5.min.js"></script>
+<script type="text/javascript" src="/js/plugins/socket.io/socket.io.js"></script>
+<script type="text/javascript" src="/js/plugins/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript" src="/js/plugins/underscore-min.js"></script>
+
+<script type="text/javascript">
     //临时
     window.require = function () {
 
@@ -63,3 +127,4 @@
         main.init();
     });
 </script>
+<% } %>
