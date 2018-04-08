@@ -20,6 +20,15 @@
     .main {
         margin-top: 35px;
     }
+    .dropdown-toggle{
+        padding-left: 0;
+    }
+    li.dropdown{
+        background: black;
+    }
+    .sidebar-nav li:nth-child(odd){
+        background: #1a1a1a;
+    }
 </style>
 <div class="container-fluid">
     <div class="row" id="wrapper">
@@ -143,7 +152,7 @@
                         search
                     </a>
                     <input id="menuSearch" class="form-control" placeholder="search"/>
-                    <ul id="searchResult" class="dropdown-toggle menu collapse in" role="menu">
+                    <ul id="searchResult" class="dropdown-toggle collapse in" role="menu">
                     </ul>
                 </li>
                 <%
@@ -168,7 +177,7 @@
                     <a href="#<%= t.listId %>" class="dropdown-toggle" data-toggle="collapse">
                         <i class="fa fa-fw fa-plus"></i><%= t.text %>
                     </a>
-                    <ul id="<%= t.listId %>" class="dropdown-toggle menu collapse in" role="menu">
+                    <ul id="<%= t.listId %>" class="dropdown-toggle collapse in" role="menu">
                         <% childs.forEach(function(child){
                             if (!child.tab)
                                 child.tab = {}; %>
