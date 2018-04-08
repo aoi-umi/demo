@@ -1,20 +1,32 @@
 <div class="my-row">
-    <div class="input-group">
-        <label class="control-label">启用
-            <input type="checkbox" name="status" <%= status == 1 ? 'checked':'' %>/>
-        </label>
+    <div class="row">
+        <div class="col-xs-6">
+            <div class="input-group">
+                <span class="input-group-addon">id</span>
+                <input type="text" class="form-control" disabled name="id" value="<%= id %>"/>
+            </div>
+        </div>
+        <div class="col-xs-6">
+            <div class="input-group">
+                <label class="control-label">启用
+                    <input type="checkbox" name="status" <%= status == 1 ? 'checked' : '' %>/>
+                </label>
+            </div>
+        </div>
     </div>
-    <div class="input-group">
-        <span class="input-group-addon">id</span>
-        <input type="text" class="form-control" disabled name="id" value="<%= id %>"/>
-    </div>
-    <div class="input-group">
-        <span class="input-group-addon">code</span>
-        <input type="text" class="form-control" name="code" value="<%= code %>"/>
-    </div>
-    <div class="input-group">
-        <span class="input-group-addon">name</span>
-        <input type="text" class="form-control" name="name" value="<%= name %>"/>
+    <div class="row">
+        <div class="col-xs-6">
+            <div class="input-group">
+                <span class="input-group-addon">code</span>
+                <input type="text" class="form-control" name="code" value="<%= code %>"/>
+            </div>
+        </div>
+        <div class="col-xs-6">
+            <div class="input-group">
+                <span class="input-group-addon">name</span>
+                <input type="text" class="form-control" name="name" value="<%= name %>"/>
+            </div>
+        </div>
     </div>
     <div class="input-group">
         <span class="input-group-addon">权限</span>
