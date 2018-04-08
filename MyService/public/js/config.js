@@ -9,11 +9,7 @@
     else if (typeof define === "function" && define.amd) {
         define(["require", "exports"], factory);
     } else {
-        let require = function (key) {
-            return window[key];
-        };
-        let exports = {};
-        window['config'] = factory(require, exports);
+        namespace('config', factory(require, {}));
     }
 })(function (require, exports) {
     return {
