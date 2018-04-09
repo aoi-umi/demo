@@ -15,6 +15,7 @@
             rowClass: 'itemRow',
             interfacePrefix: 'userInfo',
             detailUrl: '/userInfo/detail',
+            currUserId: null,
 
             queryArgsOpt: [{
                 name: 'account',
@@ -153,15 +154,14 @@
                 }
             },
             beforeQuery: function (data) {
-                if (!data.id) data.id = null;
-                if (!data.account) data.account = null;
-                if (!data.nickname) data.nickname = null;
-                if (!data.role) data.role = null;
-                if (!data.authority) data.authority = null;
-                if (!data.createDateStart) data.createDateStart = null;
-                if (!data.createDateEnd) data.createDateEnd = null;
-                if (!data.editDateStart) data.editDateStart = null;
-                if (!data.editDateEnd) data.editDateEnd = null;
+                let deleteIfNullList = [
+                    'id', 'account', 'nickname', 'role', 'authority',
+                    'createDateStart', 'createDateEnd', 'editDateStart', 'editDateEnd'
+                ];
+                deleteIfNullList.forEach(key => {
+                    if (!data[key])
+                        delete data[key];
+                });
             },
 
             editAfterRender: function (item, self) {
@@ -217,6 +217,7 @@
             },
             onDetailQuerySuccess: function (t, self) {
                 self.detailRender(t.userInfo);
+                self.opt.currUserId = t.userInfo.id;
                 self.opt.updateView(['userInfoDetail'], {userInfoAllDetail: t}, self);
                 self.detailDom.modal('show');
             },
@@ -300,7 +301,10 @@
                 });
             },
             getAuthority: function (opt, self) {
-                var queryOpt = {status: 1};
+                var queryOpt = {
+                    status: 1,
+                    //excludeByUserId: self.opt.currUserId
+                };
                 if (opt) queryOpt.code = opt.code;
                 return my.interface.authorityQuery(queryOpt).then(function (t) {
                     return t.list;
@@ -340,7 +344,10 @@
                 });
             },
             getRole: function (opt, self) {
-                var queryOpt = {status: 1};
+                var queryOpt = {
+                    status: 1,
+                    //excludeByUserId: self.opt.currUserId
+                };
                 if (opt) queryOpt.code = opt.code;
                 return my.interface.roleQuery(queryOpt).then(function (t) {
                     return t.list;
