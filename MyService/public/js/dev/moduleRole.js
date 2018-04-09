@@ -18,6 +18,7 @@
 
             rowClass: 'itemRow',
             interfacePrefix: 'role',
+            currRoleCode: null,
 
             saveDefaultModel: {
                 id: 0,
@@ -55,11 +56,13 @@
             bindEvent: function (self) {
             },
             beforeQuery: function (data) {
-                if (!data.id) data.id = null;
-                if (!data.code) data.code = null;
-                if (!data.name) data.name = null;
-                if (!data.status) data.status = null;
-                if (!data.anyKey) data.anyKey = null;
+                let deleteIfNullList = [
+                    'id', 'code', 'name', 'status', 'anyKey',
+                ];
+                deleteIfNullList.forEach(key => {
+                    if (!data[key])
+                        delete data[key];
+                });
             },
 
             editAfterRender: function (item, self) {
@@ -136,6 +139,7 @@
             },
             onDetailQuerySuccess: function (t, self) {
                 self.detailRender(t.role);
+                self.opt.currRoleCode = t.role.code;
                 self.opt.updateView(['roleDetail'], {roleAllDetail: t}, self);
                 self.detailDom.modal('show');
             },
@@ -186,7 +190,10 @@
                 });
             },
             getAuthority: function (opt, self) {
-                var queryOpt = {status: 1};
+                var queryOpt = {
+                    status: 1,
+                    //excludeByRoleCode: self.opt.currRoleCode
+                };
                 if (opt) queryOpt.code = opt.code;
                 return my.interface.authorityQuery(queryOpt).then(function (t) {
                     return t.list;

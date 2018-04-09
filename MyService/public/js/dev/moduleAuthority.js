@@ -52,11 +52,13 @@
 
             },
             beforeQuery: function (data) {
-                if (!data.id) data.id = null;
-                if (!data.code) data.code = null;
-                if (!data.name) data.name = null;
-                if (!data.status) data.status = null;
-                if (!data.anyKey) data.anyKey = null;
+                let deleteIfNullList = [
+                    'id', 'code', 'name', 'status', 'anyKey',
+                ];
+                deleteIfNullList.forEach(key => {
+                    if (!data[key])
+                        delete data[key];
+                });
             },
 
             editAfterRender: function (item, self) {

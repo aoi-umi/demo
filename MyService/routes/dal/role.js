@@ -5,7 +5,7 @@ exports.detailQuery = function(params, conn) {
 };
 
 exports.query = function(params, conn) {
-    var sql = 'call p_role_query(:id, :code, :name, :status, :anyKey, :orderBy, :nullList, :pageIndex, :pageSize)';
+    var sql = 'call p_role_query(:id, :code, :name, :status, :anyKey, :excludeByUserId, :orderBy, :nullList, :pageIndex, :pageSize)';
     return db.query(sql, params, conn);
 };
 
