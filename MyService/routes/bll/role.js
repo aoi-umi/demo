@@ -24,23 +24,18 @@ exports.save = function (opt) {
 
                 return autoBll.query('roleWithAuthority', {roleCode: dataRole.code});
             }).then(function (t) {
-                var roleAuthList = [];
-                var delRoleAuthList = [];
-                var diffOpt = {
-                    list: t.list,
-                    newList: opt.authorityList,
-                    compare: function (item, item2) {
-                        return item.authorityCode == item2;
-                    },
-                    delReturnValue: function (item) {
-                        return item.id;
-                    }
-                };
-                var diffRes = common.getListDiff(diffOpt);
-                roleAuthList = diffRes.addList;
-                delRoleAuthList = diffRes.delList;
-                //console.log(diffOpt);
-                //console.log(diffRes);
+                var delRoleAuthList = _.filter(t.list, (dbAuth) => {
+                    return _.findIndex(opt.delAuthorityList, (delAuth) => {
+                        return dbAuth.authorityCode == delAuth;
+                    }) >= 0;
+                });
+                var addRoleAuthList = _.filter(opt.addAuthorityList, (addAuth) => {
+                    return _.findIndex(t.list, (dbAuth) => {
+                        return dbAuth.authorityCode == addAuth;
+                    }) < 0;
+                });
+                // console.log(delRoleAuthList);
+                // console.log(addRoleAuthList);
                 return autoBll.tran(function (conn) {
                     return autoBll.save('role', dataRole, conn).then(function (t) {
                         id = t;
@@ -48,12 +43,12 @@ exports.save = function (opt) {
                         //删除权限
                         if (delRoleAuthList.length) {
                             delRoleAuthList.forEach(function (item) {
-                                list.push(autoBll.del('roleWithAuthority', {id: item}, conn));
+                                list.push(autoBll.del('roleWithAuthority', {id: item.id}, conn));
                             })
                         }
                         //保存权限
-                        if (roleAuthList.length) {
-                            roleAuthList.forEach(function (item) {
+                        if (addRoleAuthList.length) {
+                            addRoleAuthList.forEach(function (item) {
                                 list.push(autoBll.save('roleWithAuthority', {
                                     roleCode: dataRole.code,
                                     authorityCode: item

@@ -54,6 +54,37 @@
             init: function (self) {
             },
             bindEvent: function (self) {
+                if (self.operation.detailQuery) {
+                    self.detailContainerDom.on('click', '[name=roleAuthority]', function () {
+                        var dom = $(this);
+                        var changeDom = dom.find('[name=change]');
+                        var changeStatus = dom.data('changeStatus');
+                        var newStatus = changeStatus;
+                        switch (changeStatus) {
+                            case 0:
+                                newStatus = -2;
+                                break;
+                            case -2:
+                                newStatus = 0;
+                                break;
+                            case 1:
+                                newStatus = -1;
+                                break;
+                            case -1:
+                                newStatus = 1;
+                                break;
+                        }
+                        if (newStatus >= 0) {
+                            changeDom.addClass('glyphicon-remove');
+                            dom.removeClass('label-warning');
+                        }
+                        else {
+                            changeDom.removeClass('glyphicon-remove');
+                            dom.addClass('label-warning');
+                        }
+                        dom.data('changeStatus', newStatus);
+                    });
+                }
             },
             beforeQuery: function (data) {
                 let deleteIfNullList = [
@@ -111,10 +142,17 @@
                     if (checkRes.success) {
                         var data = {
                             role: checkRes.model,
-                            authorityList: []
+                            addAuthorityList: [],
+                            delAuthorityList: [],
                         };
                         self.detailContainerDom.find('[name=roleAuthority]').each(function () {
-                            data.authorityList.push($(this).data('code'));
+                            var dom = $(this);
+                            var code = dom.data('code');
+                            var changeStatus = dom.data('changeStatus');
+                            if (changeStatus == 1)
+                                data.addAuthorityList.push(code);
+                            else if (changeStatus == -2)
+                                data.delAuthorityList.push(code);
                         });
                         checkRes.model = data;
                     }
@@ -168,39 +206,45 @@
             setAuthorityAutoComplete: function (self) {
                 common.autoComplete({
                     source: function () {
-                        return self.opt.getAuthority({code: this.dom.val()}, self)
+                        return self.opt.getAuthority({anyKey: this.dom.val()}, self)
                     },
                     dom: self.detailContainerDom.find('[name=authority]'),
                     select: function (dom, item) {
                         //dom.data('item', item).val(item.code);
                         var match = self.detailContainerDom.find('[name=authorityBox]').find(`[name=roleAuthority][data-code=${item.code}]`);
                         if (!match.length) {
+                            item.changeStatus = 1;
                             self.opt.setAuthority(item, self);
                         }
+                        this.dom.blur();
                     },
                     renderItem: function (ul, item) {
                         return $('<li>')
-                            .append('<div>' + item.code + '</div>')
+                            .append(`<div>${item.code}${item.name ? '(' + item.name + ')' : ''}</div>`)
                             .appendTo(ul);
                     },
                     match: function (input, item) {
-                        var matcher = new RegExp($.ui.autocomplete.escapeRegex(input), 'i');
-                        return matcher.test(item.code);
+                        return true;
+                        // var matcher = new RegExp($.ui.autocomplete.escapeRegex(input), 'i');
+                        // return matcher.test(item.code) || matcher.test(item.name);
                     }
                 });
             },
             getAuthority: function (opt, self) {
                 var queryOpt = {
-                    status: 1,
-                    //excludeByRoleCode: self.opt.currRoleCode
+                    //status: 1,
+                    excludeByRoleCode: self.opt.currRoleCode
                 };
-                if (opt) queryOpt.code = opt.code;
+                if (opt) queryOpt.anyKey = opt.anyKey;
                 return my.interface.authorityQuery(queryOpt).then(function (t) {
                     return t.list;
                 });
             },
             setAuthority: function (item, self) {
                 item.labelName = 'roleAuthority';
+                // 0原有 1新增 -1 取消新增 -2删除
+                if (!item.changeStatus)
+                    item.changeStatus = 0;
                 var temp = $('#authorityLabelTemp').html();
                 var dom = $(ejs.render(temp, item));
                 dom.data('item', item);

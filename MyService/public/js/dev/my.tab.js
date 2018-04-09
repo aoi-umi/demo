@@ -9,7 +9,7 @@
     exports.opt = {
         tabContainer: 'myTab',
         panelContainer: 'myPanel',
-        closeBtnTemplate: '<button name="tab-close-btn" type="button" class="close hidden" data-close-target="" aria-hidden="true" style="margin-left: 5px;float: none">&times;</button>'
+        closeBtnTemplate: '<button name="tab-close-btn" type="button" class="close hidden" data-close-target="" aria-hidden="true" style="margin-left: 5px;float: none"><span class="glyphicon glyphicon-remove"></span></button>'
     };
     exports.tabContainer = null;
     exports.panelContainer = null;
