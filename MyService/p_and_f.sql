@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50720
 File Encoding         : 65001
 
-Date: 2018-03-14 15:04:17
+Date: 2018-04-09 10:45:05
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -24,12 +24,13 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `p_authority_query`(pr_id int,
 	pr_code varchar(256),
 	pr_name varchar(256),
 	pr_status int,
+	pr_anyKey varchar(256),
 	pr_orderBy varchar(1000),
 	pr_nullList varchar(1000),
 	pr_pageIndex int,
 	pr_pageSize int)
     SQL SECURITY INVOKER
-BEGIN  
+BEGIN   
 	IF pr_nullList IS NULL THEN
 		SET pr_nullList = '';
 	END IF;
@@ -58,6 +59,11 @@ BEGIN
 		SET @Sql = CONCAT(@Sql, ' AND t1.`status` = ''',replace_special_char(pr_status), '''');
 	ELSEIF LOCATE(',status,', pr_nullList) > 0 THEN
 		SET @Sql = CONCAT(@Sql, ' AND t1.`status` IS NULL');
+	END IF;
+
+	IF pr_anyKey IS NOT NULL AND length(pr_anyKey) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND (t1.`code` like ''%',replace_special_char(pr_anyKey), '%''');
+		SET @Sql = CONCAT(@Sql, ' OR t1.`name` like ''%',replace_special_char(pr_anyKey), '%'')');
 	END IF;
 
 	IF pr_orderBy IS NOT NULL AND length(pr_orderBy) > 0 THEN
@@ -365,12 +371,13 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `p_role_query`(pr_id int,
 	pr_code varchar(256),
 	pr_name varchar(256),
 	pr_status int,
+	pr_anyKey varchar(256),
 	pr_orderBy varchar(1000),
 	pr_nullList varchar(1000),
 	pr_pageIndex int,
 	pr_pageSize int)
     SQL SECURITY INVOKER
-BEGIN 
+BEGIN  
 	IF pr_nullList IS NULL THEN
 		SET pr_nullList = '';
 	END IF;
@@ -399,6 +406,11 @@ BEGIN
 		SET @Sql = CONCAT(@Sql, ' AND t1.`status` = ''',replace_special_char(pr_status), '''');
 	ELSEIF LOCATE(',status,', pr_nullList) > 0 THEN
 		SET @Sql = CONCAT(@Sql, ' AND t1.`status` IS NULL');
+	END IF;
+	
+	IF pr_anyKey IS NOT NULL AND length(pr_anyKey) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND (t1.`code` like ''%',replace_special_char(pr_anyKey), '%''');
+		SET @Sql = CONCAT(@Sql, ' OR t1.`name` like ''%',replace_special_char(pr_anyKey), '%'')');
 	END IF;
 
 	IF pr_orderBy IS NOT NULL AND length(pr_orderBy) > 0 THEN

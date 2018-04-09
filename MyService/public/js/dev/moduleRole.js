@@ -46,6 +46,9 @@
                 getValue: function () {
                     return this.dom.find('[name=status]:checked').val();
                 }
+            }, {
+                name: 'anyKey',
+                dom: $('#anyKey'),
             },],
             init: function (self) {
             },
@@ -56,6 +59,7 @@
                 if (!data.code) data.code = null;
                 if (!data.name) data.name = null;
                 if (!data.status) data.status = null;
+                if (!data.anyKey) data.anyKey = null;
             },
 
             editAfterRender: function (item, self) {

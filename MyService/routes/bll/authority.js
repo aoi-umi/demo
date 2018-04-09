@@ -13,7 +13,7 @@ exports.save = function (opt) {
             };
         } else {
             return authority.isExist(opt).then(function (t) {
-                if(t)
+                if (t)
                     throw common.error(`code[${opt.code}]已存在`);
             });
         }
@@ -40,6 +40,13 @@ exports.isExist = function (opt) {
 };
 
 exports.query = function (opt) {
+    if (opt.id || opt.anyKey) {
+        delete opt.code;
+        delete opt.name;
+        if (opt.id) {
+            delete opt.anyKey;
+        }
+    }
     opt.orderBy = 'code';
     return autoBll.customDal('authority', 'query', opt).then(function (t) {
         return {
