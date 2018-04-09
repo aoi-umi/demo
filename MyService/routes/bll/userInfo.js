@@ -143,10 +143,8 @@ exports.query = function (opt) {
 };
 
 exports.adminSave = function (opt, exOpt) {
-    var delUserRoleIdList = [];
-    var userRoleIdList = [];
-    var delUserAuthIdList = [];
-    var userAuthIdList = [];
+    var delUserRoleList, addUserRoleList;
+    var delUserAuthList, addUserAuthList;
     var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
     var id = opt.id;
     var user = exOpt.user;
@@ -159,44 +157,40 @@ exports.adminSave = function (opt, exOpt) {
             throw common.error('id为空', 'CAN_NOT_BE_EMPTY');
         return autoBll.query('userInfoWithAuthority', {userInfoId: id});
     }).then(function (t) {
-        var diffOpt = {
-            list: t.list,
-            newList: opt.authorityList,
-            compare: function (item, item2) {
-                return item.authorityCode == item2;
-            },
-            delReturnValue: function (item) {
-                return item.id;
-            }
-        };
-        var diffRes = common.getListDiff(diffOpt);
-        userAuthIdList = diffRes.addList;
-        delUserAuthIdList = diffRes.delList;
+        delUserAuthList = _.filter(t.list, (dbAuth) => {
+            return _.findIndex(opt.delAuthorityList, (delAuth) => {
+                return dbAuth.authorityCode == delAuth;
+            }) >= 0;
+        });
+        addUserAuthList = _.filter(opt.addAuthorityList, (addAuth) => {
+            return _.findIndex(t.list, (dbAuth) => {
+                return dbAuth.authorityCode == addAuth;
+            }) < 0;
+        });
         return autoBll.query('userInfoWithRole', {userInfoId: id});
     }).then(function (t) {
-        var diffOpt = {
-            list: t.list,
-            newList: opt.roleList,
-            compare: function (item, item2) {
-                return item.roleCode == item2;
-            },
-            delReturnValue: function (item) {
-                return item.id;
-            }
-        };
-        var diffRes = common.getListDiff(diffOpt);
-        userRoleIdList = diffRes.addList;
-        delUserRoleIdList = diffRes.delList;
-        // console.log(delUserRoleIdList)
-        // console.log(userRoleIdList)
-        // console.log(delUserAuthIdList)
-        // console.log(userAuthIdList)
+        delUserRoleList = _.filter(t.list, (dbAuth) => {
+            return _.findIndex(opt.delRoleList, (delAuth) => {
+                return dbAuth.roleCode == delAuth;
+            }) >= 0;
+        });
+        addUserRoleList = _.filter(opt.addRoleList, (addAuth) => {
+            return _.findIndex(t.list, (dbAuth) => {
+                return dbAuth.roleCode == addAuth;
+            }) < 0;
+        });
+
+        // console.log(delUserRoleList)
+        // console.log(addUserRoleList)
+        // console.log(delUserAuthList)
+        // console.log(addUserAuthList)
+        // throw 'debug'
         var isChanged = false;
-        if (delUserRoleIdList.length || userRoleIdList.length) {
+        if (delUserRoleList.length || addUserRoleList.length) {
             userInfoLog.content += '[修改了角色]';
             isChanged = true;
         }
-        if (delUserAuthIdList.length || userAuthIdList.length) {
+        if (delUserAuthList.length || addUserAuthList.length) {
             userInfoLog.content += '[修改了权限]';
             isChanged = true;
         }
@@ -206,27 +200,27 @@ exports.adminSave = function (opt, exOpt) {
             return autoBll.save('userInfo', {id: id, editDate: now}, conn).then(function (t) {
                 var list = [];
                 //删除权限
-                if (delUserAuthIdList.length) {
-                    delUserAuthIdList.forEach(function (item) {
-                        list.push(autoBll.del('userInfoWithAuthority', {id: item}, conn));
+                if (delUserAuthList.length) {
+                    delUserAuthList.forEach(function (item) {
+                        list.push(autoBll.del('userInfoWithAuthority', {id: item.id}, conn));
                     })
                 }
                 //保存权限
-                if (userAuthIdList.length) {
-                    userAuthIdList.forEach(function (item) {
+                if (addUserAuthList.length) {
+                    addUserAuthList.forEach(function (item) {
                         list.push(autoBll.save('userInfoWithAuthority', {userInfoId: id, authorityCode: item}));
                     });
                 }
 
                 //删除角色
-                if (delUserRoleIdList.length) {
-                    delUserRoleIdList.forEach(function (item) {
-                        list.push(autoBll.del('userInfoWithRole', {id: item}, conn));
+                if (delUserRoleList.length) {
+                    delUserRoleList.forEach(function (item) {
+                        list.push(autoBll.del('userInfoWithRole', {id: item.id}, conn));
                     })
                 }
                 //保存角色
-                if (userRoleIdList.length) {
-                    userRoleIdList.forEach(function (item) {
+                if (addUserRoleList.length) {
+                    addUserRoleList.forEach(function (item) {
                         list.push(autoBll.save('userInfoWithRole', {userInfoId: id, roleCode: item}));
                     });
                 }

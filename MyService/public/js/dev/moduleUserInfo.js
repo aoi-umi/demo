@@ -152,6 +152,37 @@
                         }
                     });
                 }
+                if (self.operation.detailQuery) {
+                    self.detailContainerDom.on('click', '[name=userAuthority],[name=userRole]', function () {
+                        var dom = $(this);
+                        var changeDom = dom.find('[name=change]');
+                        var changeStatus = dom.data('changeStatus');
+                        var newStatus = changeStatus;
+                        switch (changeStatus) {
+                            case 0:
+                                newStatus = -2;
+                                break;
+                            case -2:
+                                newStatus = 0;
+                                break;
+                            case 1:
+                                newStatus = -1;
+                                break;
+                            case -1:
+                                newStatus = 1;
+                                break;
+                        }
+                        if (newStatus >= 0) {
+                            changeDom.addClass('glyphicon-remove');
+                            dom.removeClass('label-warning');
+                        }
+                        else {
+                            changeDom.removeClass('glyphicon-remove');
+                            dom.addClass('label-warning');
+                        }
+                        dom.data('changeStatus', newStatus);
+                    });
+                }
             },
             beforeQuery: function (data) {
                 let deleteIfNullList = [
@@ -247,15 +278,29 @@
             adminSave: function (self) {
                 var data = {
                     id: self.detailContainerDom.find('[name=id]').val(),
-                    authorityList: [],
-                    roleList: []
+                    addAuthorityList: [],
+                    delAuthorityList: [],
+                    addRoleList: [],
+                    delRoleList: []
                 };
                 self.detailContainerDom.find('[name=userAuthority]').each(function () {
-                    data.authorityList.push($(this).data('code'));
+                    var dom = $(this);
+                    var code = dom.data('code');
+                    var changeStatus = dom.data('changeStatus');
+                    if (changeStatus == 1)
+                        data.addAuthorityList.push(code);
+                    else if (changeStatus == -2)
+                        data.delAuthorityList.push(code);
                 });
 
                 self.detailContainerDom.find('[name=userRole]').each(function () {
-                    data.roleList.push($(this).data('code'));
+                    var dom = $(this);
+                    var code = dom.data('code');
+                    var changeStatus = dom.data('changeStatus');
+                    if (changeStatus == 1)
+                        data.addRoleList.push(code);
+                    else if (changeStatus == -2)
+                        data.delRoleList.push(code);
                 });
                 common.promise().then(function () {
                     if (!data.id || data.id == 0)
@@ -283,11 +328,12 @@
                     },
                     dom: self.detailContainerDom.find('[name=authority]'),
                     select: function (dom, item) {
-                        //dom.data('item', item).val(item.code);
                         var match = self.detailContainerDom.find('[name=authorityBox]').find(`[name=userAuthority][data-code=${item.code}]`);
                         if (!match.length) {
+                            item.changeStatus = 1;
                             self.opt.setAuthority(item, self);
                         }
+                        this.dom.blur();
                     },
                     renderItem: function (ul, item) {
                         return $('<li>')
@@ -295,15 +341,16 @@
                             .appendTo(ul);
                     },
                     match: function (input, item) {
-                        var matcher = new RegExp($.ui.autocomplete.escapeRegex(input), 'i');
-                        return matcher.test(item.code);
+                        // var matcher = new RegExp($.ui.autocomplete.escapeRegex(input), 'i');
+                        // return matcher.test(item.code);
+                        return true;
                     }
                 });
             },
             getAuthority: function (opt, self) {
                 var queryOpt = {
-                    status: 1,
-                    //excludeByUserId: self.opt.currUserId
+                    //status: 1,
+                    excludeByUserId: self.opt.currUserId
                 };
                 if (opt) queryOpt.code = opt.code;
                 return my.interface.authorityQuery(queryOpt).then(function (t) {
@@ -312,6 +359,8 @@
             },
             setAuthority: function (item, self) {
                 item.labelName = 'userAuthority';
+                if (!item.changeStatus)
+                    item.changeStatus = 0;
                 var temp = $('#authorityLabelTemp').html();
                 var dom = $(ejs.render(temp, item));
                 dom.data('item', item);
@@ -329,8 +378,10 @@
                         //dom.data('item', item).val(item.code);
                         var match = self.detailContainerDom.find('[name=roleBox]').find(`[name=userRole][data-code=${item.code}]`);
                         if (!match.length) {
+                            item.changeStatus = 1;
                             self.opt.setRole(item, self);
                         }
+                        this.dom.blur();
                     },
                     renderItem: function (ul, item) {
                         return $('<li>')
@@ -338,15 +389,16 @@
                             .appendTo(ul);
                     },
                     match: function (input, item) {
-                        var matcher = new RegExp($.ui.autocomplete.escapeRegex(input), 'i');
-                        return matcher.test(item.code);
+                        // var matcher = new RegExp($.ui.autocomplete.escapeRegex(input), 'i');
+                        // return matcher.test(item.code);
+                        return true;
                     }
                 });
             },
             getRole: function (opt, self) {
                 var queryOpt = {
-                    status: 1,
-                    //excludeByUserId: self.opt.currUserId
+                    //status: 1,
+                    excludeByUserId: self.opt.currUserId
                 };
                 if (opt) queryOpt.code = opt.code;
                 return my.interface.roleQuery(queryOpt).then(function (t) {
@@ -355,6 +407,8 @@
             },
             setRole: function (item, self) {
                 item.labelName = 'userRole';
+                if (!item.changeStatus)
+                    item.changeStatus = 0;
                 var temp = $('#roleLabelTemp').html();
                 var dom = $(ejs.render(temp, item));
                 dom.data('item', item);

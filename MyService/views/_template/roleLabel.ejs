@@ -4,9 +4,12 @@
 </div>
 <% } else{ %>
 <div name="<%= labelName %>" data-code="<%= code %>"
+     data-change-status="<%= changeStatus %>"
      class="label <%= status == 1 ? 'label-info' : 'label-default' %> my-label">
     <label><%= code %>
-        <button class="close" type="button" data-close-target="[name=<%= labelName %>][data-code=<%= code %>]">×</button>
+        <button class="close" type="button">
+            <span name="change" class="glyphicon glyphicon-ok glyphicon-remove"></span>
+        </button>
     </label>
 </div>
 <% } %>

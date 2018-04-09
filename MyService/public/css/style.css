@@ -156,3 +156,7 @@ a.hover {
 .btn {
     margin: 0 5px 0 0;
 }
+
+.glyphicon{
+    font-size: 14px;
+}

@@ -66,6 +66,7 @@
                 self.detailDom.modal('show');
             },
             beforeSave: function (dom, self) {
+                //启用/禁用
                 if (dom.hasClass('itemStatusUpdate')) {
                     var row = dom.closest(self.rowClass);
                     var item = row.data('item');
