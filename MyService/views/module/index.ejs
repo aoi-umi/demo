@@ -181,7 +181,7 @@
                         <% childs.forEach(function(child){
                             if (!child.tab)
                                 child.tab = {}; %>
-                        <li><a class="tab menuItem" href="javascript:;"
+                        <li class="menuItem"><a class="tab" href="javascript:;"
                                     <% if(child.tabUrl){ %>
                                data-tab-content="<%= child.tabUrl + (child.tabUrlArgs || '?noNav=true') %>"
                                data-url="<%= child.tabUrl + (child.tabUrlArgs || '') %>"
