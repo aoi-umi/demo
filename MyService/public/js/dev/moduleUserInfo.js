@@ -324,7 +324,7 @@
             setAuthorityAutoComplete: function (self) {
                 common.autoComplete({
                     source: function () {
-                        return self.opt.getAuthority({code: this.dom.val()}, self)
+                        return self.opt.getAuthority({anyKey: this.dom.val()}, self)
                     },
                     dom: self.detailContainerDom.find('[name=authority]'),
                     select: function (dom, item) {
@@ -337,7 +337,7 @@
                     },
                     renderItem: function (ul, item) {
                         return $('<li>')
-                            .append('<div>' + item.code + '</div>')
+                            .append(`<div>${item.code}${item.name ? '(' + item.name + ')' : ''}</div>`)
                             .appendTo(ul);
                     },
                     match: function (input, item) {
@@ -352,7 +352,7 @@
                     //status: 1,
                     excludeByUserId: self.opt.currUserId
                 };
-                if (opt) queryOpt.code = opt.code;
+                if (opt) queryOpt.anyKey = opt.anyKey;
                 return my.interface.authorityQuery(queryOpt).then(function (t) {
                     return t.list;
                 });
@@ -371,7 +371,7 @@
             setRoleAutoComplete: function (self) {
                 common.autoComplete({
                     source: function () {
-                        return self.opt.getRole({code: this.dom.val()}, self)
+                        return self.opt.getRole({anyKey: this.dom.val()}, self)
                     },
                     dom: self.detailContainerDom.find('[name=role]'),
                     select: function (dom, item) {
@@ -385,7 +385,7 @@
                     },
                     renderItem: function (ul, item) {
                         return $('<li>')
-                            .append('<div>' + item.code + '</div>')
+                            .append(`<div>${item.code}${item.name ? '(' + item.name + ')' : ''}</div>`)
                             .appendTo(ul);
                     },
                     match: function (input, item) {
@@ -400,7 +400,7 @@
                     //status: 1,
                     excludeByUserId: self.opt.currUserId
                 };
-                if (opt) queryOpt.code = opt.code;
+                if (opt) queryOpt.anyKey = opt.anyKey;
                 return my.interface.roleQuery(queryOpt).then(function (t) {
                     return t.list;
                 });
