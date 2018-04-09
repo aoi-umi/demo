@@ -13,6 +13,9 @@
             }, {
                 text: 'name',
                 id: 'name',
+            }, {
+                text: 'anyKey',
+                id: 'anyKey',
             },];
             for(var i = 0;i < searchItemList.length;i++){
                 var item = searchItemList[i];
@@ -76,7 +79,7 @@
 </div>
 
 <div id="detail" data-backdrop="false" role="dialog" tabindex="-1" class="modal fade pop-up-box">
-    <% include ../../_template/detailModal%>
+    <% include ../../_template/detailModal %>
 </div>
 <script type="text/template" id="itemTemp">
     <% include ../../_template_web/role/listItem %>

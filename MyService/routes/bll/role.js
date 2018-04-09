@@ -81,6 +81,13 @@ exports.detailQuery = function (opt) {
 };
 
 exports.query = function (opt) {
+    if (opt.id || opt.anyKey) {
+        delete opt.code;
+        delete opt.name;
+        if (opt.id) {
+            delete opt.anyKey;
+        }
+    }
     opt.orderBy = 'code';
     return autoBll.customDal('role', 'query', opt).then(function (t) {
         var data = {
