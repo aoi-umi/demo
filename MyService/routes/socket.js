@@ -1,7 +1,7 @@
 /**
  * Created by umi on 2017-8-31.
  */
-var config = require('../config');
+var main = require('./_system/_main');
 var common = require('./_system/common');
 var cache = require('./_system/cache');
 var mySocket = exports;
@@ -32,7 +32,7 @@ exports.bindEvent = function () {
 
         socket.on('postMsg', function (opt) {
             tryFn(socket, function () {
-                var userInfoKey = config.cacheKey.userInfo + opt.user;
+                var userInfoKey = main.cacheKey.userInfo + opt.user;
                 var userName = '';
                 cache.get(userInfoKey).then(function (t) {
                     if (t && t.nickname)

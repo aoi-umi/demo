@@ -14,11 +14,11 @@
         ejs.open = '{%';
         ejs.close = '%}';
 
-        var userInfo = $.cookie(config.cacheKey.userInfo);
+        var userInfo = $.cookie(main.cacheKey.userInfo);
         if (!userInfo) {
             userInfo = common.guid();
         }
-        $.cookie(config.cacheKey.userInfo, userInfo, {expires: 30});
+        $.cookie(main.cacheKey.userInfo, userInfo, {expires: 30});
 
         if (parent == window)
             socket.init();
@@ -150,6 +150,10 @@
             if (isChanged)
                 console.log('change', isChanged);
         }
+    };
+
+    exports.cacheKey = {
+        userInfo: 'userInfoCacheKey'
     };
     return exports;
 });
