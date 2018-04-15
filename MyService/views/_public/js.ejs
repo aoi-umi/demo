@@ -68,7 +68,6 @@
             'WdatePicker': 'plugins/My97DatePicker/WdatePicker.io',
             'underscore': 'plugins/underscore-min',
 
-            'config': 'config',
             'main': '<%= env %>/_main',
             'common': '<%= env %>/common',
             'my.enum': '<%= env %>/my.enum',
@@ -81,9 +80,6 @@
             'bootstrap': {
                 deps: ['jquery'],
                 exports: 'bootstrap'
-            },
-            'config': {
-                exports: 'config'
             },
             'main': {
                 exports: 'main'
@@ -131,7 +127,6 @@
     window.require = function () {
     };
 </script>
-<script type="text/javascript" src="/js/config.js?v=<%= version %>"></script>
 <script type="text/javascript" src="/js/<%= env %>/_main.js?v=<%= version %>"></script>
 
 <script type="text/javascript" src="/js/<%= env %>/common.js?v=<%= version %>"></script>

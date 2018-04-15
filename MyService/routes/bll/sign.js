@@ -1,6 +1,6 @@
 var common = require('../_system/common');
 var cache = require('../_system/cache');
-var config = require('../../config');
+var main = require('../_system/_main');
 var errorConfig = require('../_system/errorConfig');
 var autoBll = require('./_auto');
 var userInfoBll = require('./userInfo');
@@ -113,9 +113,9 @@ exports.inInside = function (req) {
         }
         user.cacheDatetime = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
 
-        var userInfoKey = req.cookies[config.cacheKey.userInfo];
+        var userInfoKey = req.cookies[main.cacheKey.userInfo];
         if (userInfoKey) {
-            userInfoKey = config.cacheKey.userInfo + userInfoKey;
+            userInfoKey = main.cacheKey.userInfo + userInfoKey;
             user.key = userInfoKey;
             var seconds = 7 * 24 * 3600;
             cache.set(userInfoKey, user, seconds);

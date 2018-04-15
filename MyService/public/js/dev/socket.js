@@ -14,7 +14,7 @@
         var self = this;
         var connection = self.connection;
         connection.on('connect', function () {
-            var userInfo = $.cookie(config.cacheKey.userInfo);
+            var userInfo = $.cookie(main.cacheKey.userInfo);
             connection.emit('init', {
                 user: userInfo,
             });

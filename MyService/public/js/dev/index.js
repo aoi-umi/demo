@@ -163,7 +163,7 @@
             $('#postMsg').on('click', function () {
                 var msg = $('#msg').val();
                 if (msg) {
-                    var userInfo = $.cookie(config.cacheKey.userInfo);
+                    var userInfo = $.cookie(main.cacheKey.userInfo);
                     var msgId = common.s4();
                     connection.emit('postMsg', {
                         user: userInfo,
@@ -240,7 +240,7 @@
                 className.push('fail');
                 break;
         }
-        var userInfo = $.cookie(config.cacheKey.userInfo);
+        var userInfo = $.cookie(main.cacheKey.userInfo);
         if (opt.self || userInfo == opt.user) {
             opt.userName = '';
             className.push('self');

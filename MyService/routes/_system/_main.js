@@ -237,9 +237,9 @@ exports.init = function (opt) {
             mySend(req, res, err, detail, opt)
         };
 
-        var userInfoKey = req.cookies[config.cacheKey.userInfo];
+        var userInfoKey = req.cookies[main.cacheKey.userInfo];
         if (userInfoKey) {
-            userInfoKey = config.cacheKey.userInfo + userInfoKey;
+            userInfoKey = main.cacheKey.userInfo + userInfoKey;
             cache.get(userInfoKey).then(function (t) {
                     if (t) {
                         t.key = userInfoKey;
@@ -296,4 +296,9 @@ exports.errorHandler = function (err, req, res, next) {
             });
         }
     }
+};
+
+exports.cacheKey = {
+    onlineCount: 'onlineCount',
+    userInfo: 'userInfoCacheKey'
 };

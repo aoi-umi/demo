@@ -1,4 +1,4 @@
-var config = require('../../config');
+var main = require('../_system/_main');
 var cache = require('../_system/cache');
 var socket = require('../socket');
 
@@ -8,7 +8,7 @@ exports.query = function (opt, exOpt) {
 };
 
 exports.detailQuery = function (opt, exOpt) {
-    var key = config.cacheKey.userInfo + opt.key;
+    var key = main.cacheKey.userInfo + opt.key;
     return cache.get(key).then(function (t) {
         return t;
     });

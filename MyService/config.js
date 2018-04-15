@@ -38,10 +38,6 @@ module.exports = {
         database: 'myweb',
     },
     cachePrefix: 'testService',
-    cacheKey: {
-        onlineCount: 'onlineCount',
-        userInfo: 'userInfoCacheKey'
-    }
 };
 
 //npm install --production
