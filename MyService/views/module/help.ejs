@@ -6,8 +6,8 @@
                 for(var restIndex = 0;restIndex < restList.length;restIndex++){
                     var t = restList[restIndex];
                 %>
-                <option data-item="<%= JSON.stringify(t)%>"><%=t.url%>(<%=t.method%>)</option>
-                <%}%>
+                <option data-item="<%= JSON.stringify(t) %>"><%= t.url %>(<%= t.method %>)</option>
+                <% } %>
             </select>
         </div>
         <div class="col-xs-2">
@@ -25,24 +25,24 @@
 </div>
 <script type="text/javascript">
     $(function () {
-        function setInterfaceOption(){
+        function setInterfaceOption() {
             var dom = $('#config option:selected');
             var item = dom.data('item');
-            if(item){
+            if (item) {
                 $('#req').val(item.exampleRequest);
                 $('#url').val(item.url);
                 $('#method').val(item.method);
             }
         }
 
-        $('#config').on('change blur', function(){
+        $('#config').on('change blur', function () {
             setInterfaceOption();
         });
-        $('#request').on('click', function(){
+        $('#request').on('click', function () {
             var method = $('#method').val();
             var req = $('#req').val();
             var url = $('#url').val();
-            if(method == 'post') {
+            if (method == 'post') {
                 if (!req) req = {};
                 if (typeof req == 'string')
                     req = JSON.parse(req);
@@ -51,20 +51,20 @@
                     req.pwd = common.md5(req.pwd);
                 }
                 var reqStr = req;
-                if (typeof reqStr != 'string');
+                if (typeof reqStr != 'string') ;
                 reqStr = JSON.stringify(reqStr);
                 common.ajax({
                     url: url,
                     data: reqStr,
                     headers: headers,
                 }).then(function (t) {
-                    $('#res').html(t);
+                    $('#res').val(JSON.stringify(t, null, '\t'));
                     console.log(t);
                 }).fail(function (e) {
-                    $('#res').html(e);
+                    $('#res').val(JSON.stringify(e, null, '\t'));
                     console.log(e);
                 });
-            }else if(method == 'get') {
+            } else if (method == 'get') {
                 url = req || url;
                 window.open(url);
             }

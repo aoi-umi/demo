@@ -577,7 +577,7 @@
             source: function (request, response) {
                 var source = opt.source;
                 if (typeof opt.source == 'function') {
-                    request.sourceList = source = opt.source();
+                    source = opt.source();
                 }
                 if (source.then) {
                     source.then(function (t) {
@@ -585,6 +585,7 @@
                         match(request, response);
                     });
                 } else {
+                    request.sourceList = source;
                     match(request, response);
                 }
             },
