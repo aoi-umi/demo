@@ -494,11 +494,17 @@
     exports.isInArray = function (obj, list, startIndex) {
         return $.inArray(obj, list, startIndex) >= 0;
     };
-    exports.promise = function () {
+    exports.promise = function (fn) {
         var def = $.Deferred();
         var res = $.Deferred();
-        def.resolve(res);
-        return def;
+        def.resolve();
+        return def.then(function () {
+            if (fn) {
+                return fn(res);
+            }
+            else
+                return $.Deferred().resolve(res);
+        });
     };
 
     exports.getArgsFromUrlParams = function () {
