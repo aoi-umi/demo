@@ -114,6 +114,11 @@
                     break;
             }
         });
+        //更多
+        $(document).on('click', '.more-toggle', function (e) {
+            var dom = $(this);
+            dom.next('.more').toggle();
+        });
 
         var args = common.getArgsFromUrlParams();
         if (args.iframeId) {

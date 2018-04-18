@@ -328,6 +328,12 @@
         });
         return str[0].toUpperCase() + str.substr(1);
     };
+    exports.stringToPascal = function (str) {
+        str = str.replace(/_([a-zA-Z])/g, function () {
+            return arguments[1].toUpperCase();
+        });
+        return str[0].toUpperCase() + str.substr(1);
+    };
 
     exports.msgNotice = function (option) {
         var opt = {
