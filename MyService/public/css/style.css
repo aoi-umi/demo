@@ -160,3 +160,7 @@ a.hover {
 .glyphicon{
     font-size: 14px;
 }
+
+.more {
+    display: none;
+}
