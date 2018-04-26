@@ -3,10 +3,10 @@
  */
 var q = require('q');
 var _ = require('underscore');
-var autoBll = require('./_auto');
 var common = require('../_system/common');
 var cache = require('../_system/cache');
-var userInfo = exports;
+var autoBll = require('./_auto');
+var userInfoBll = exports;
 exports.isAccountExist = function (account) {
     return common.promise().then(function () {
         if (!account)
@@ -22,7 +22,7 @@ exports.isAccountExist = function (account) {
 exports.save = function (opt, exOpt) {
     var user = exOpt.user;
     var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
-    var userInfoLog = userInfo.createLog();
+    var userInfoLog = userInfoBll.createLog();
     userInfoLog.userInfoId = user.id;
     return common.promise().then(function () {
         return autoBll.detailQuery('userInfo', {id: user.id}).then(function (t) {
@@ -148,7 +148,7 @@ exports.adminSave = function (opt, exOpt) {
     var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
     var id = opt.id;
     var user = exOpt.user;
-    var userInfoLog = userInfo.createLog();
+    var userInfoLog = userInfoBll.createLog();
     userInfoLog.userInfoId = id;
     userInfoLog.type = 1;
     userInfoLog.content = `${user.account}(${user.nickname}#${user.id})`;

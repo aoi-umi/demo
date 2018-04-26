@@ -15,7 +15,7 @@ exports.up = function (opt, exOpt) {
                     return common.stringFormat(msg, '用户名');
                 }
             });
-        return autoBll.custom('userInfo', 'isAccountExist', opt.account)
+        return userInfoBll.isAccountExist(opt.account);
     }).then(function (t) {
         if (t)
             throw common.error('account is exist!');

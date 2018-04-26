@@ -51,7 +51,7 @@ var setViewOption = function (req, opt) {
                 auth.isHadAuthority(user, 'admin', {throwError: true});
                 userInfoId = query.id;
             }
-            return autoBll.custom('userInfo', 'detailQuery', {id: userInfoId}).then(function (t) {
+            return require('../bll/userInfo').detailQuery({id: userInfoId}).then(function (t) {
                 opt.userInfoDetail = t;
             });
             break;
