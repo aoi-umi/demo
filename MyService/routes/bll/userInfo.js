@@ -4,13 +4,14 @@
 var q = require('q');
 var _ = require('underscore');
 var common = require('../_system/common');
+var errorConfig = require('../_system/errorConfig');
 var cache = require('../_system/cache');
 var autoBll = require('./_auto');
 var userInfoBll = exports;
 exports.isAccountExist = function (account) {
     return common.promise().then(function () {
         if (!account)
-            throw common.error(null, 'ARGS_ERROR');
+            throw common.error(null, errorConfig.ARGS_ERROR);
         return autoBll.query('userInfo', {account: account}).then(function (t) {
             if (t.list.length > 1)
                 throw common.error('数据库中存在重复账号');
@@ -31,7 +32,7 @@ exports.save = function (opt, exOpt) {
             var isChanged = false;
             if (opt.newPassword && opt.newPassword != t.password) {
                 if (!opt.password)
-                    throw common.error('原密码不能为空', 'ARGS_ERROR');
+                    throw common.error('原密码不能为空', errorConfig.ARGS_ERROR);
                 if (t.password != opt.password)
                     throw common.error('密码不正确');
                 isChanged = true;
@@ -154,7 +155,7 @@ exports.adminSave = function (opt, exOpt) {
     userInfoLog.content = `${user.account}(${user.nickname}#${user.id})`;
     return common.promise().then(function () {
         if (!id)
-            throw common.error('id为空', 'CAN_NOT_BE_EMPTY');
+            throw common.error('id为空', errorConfig.CAN_NOT_BE_EMPTY);
         return autoBll.query('userInfoWithAuthority', {userInfoId: id});
     }).then(function (t) {
         delUserAuthList = _.filter(t.list, (dbAuth) => {

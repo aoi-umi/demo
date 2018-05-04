@@ -16,13 +16,13 @@ function getRequire(name, custom) {
             filepath = './' + name;
     }
     if (!filepath)
-        throw common.error('path is null', errorConfig.CODE_ERROR.code);
+        throw common.error('path is null', errorConfig.CODE_ERROR);
 
     var resolvePath = path.resolve(__dirname + '/' + filepath + '.js');
     var isExist = fs.existsSync(resolvePath);
     if (!isExist) {
         console.error(resolvePath);
-        throw common.error('file is not exist', errorConfig.CODE_ERROR.code);
+        throw common.error('file is not exist', errorConfig.CODE_ERROR);
     }
 
     return require(filepath);
@@ -65,12 +65,12 @@ exports.tran = function (fn) {
 exports.custom = function (name, method, params, exOpt, conn) {
     var bll = getRequire(name, 'bll');
     if (!bll[method])
-        throw common.error(`method[${method}] is not exist`, errorConfig.CODE_ERROR.code);
+        throw common.error(`method[${method}] is not exist`, errorConfig.CODE_ERROR);
     return bll[method](params, exOpt, conn);
 };
 exports.customDal = function (name, method, params, conn) {
     var dal = getRequire(name, 'dal');
     if (!dal[method])
-        throw common.error(`method[${method}] is not exist`, errorConfig.CODE_ERROR.code);
+        throw common.error(`method[${method}] is not exist`, errorConfig.CODE_ERROR);
     return dal[method](params, conn);
 };

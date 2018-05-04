@@ -1,7 +1,7 @@
 /**
  * Created by umi on 2017-8-31.
  */
-var main = require('./_system/_main');
+var main = require('./_main');
 var common = require('./_system/common');
 var cache = require('./_system/cache');
 var mySocket = exports;

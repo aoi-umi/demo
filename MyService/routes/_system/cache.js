@@ -1,6 +1,7 @@
 var redis = require('redis');
 var config = require('../../config');
 var common = require('./common');
+var errorConfig = require('./errorConfig');
 
 var client = redis.createClient(config.redis.port, config.redis.host);
 var cachePrefix = config.cachePrefix ? config.cachePrefix + ':' : '';
@@ -8,6 +9,7 @@ var cachePrefix = config.cachePrefix ? config.cachePrefix + ':' : '';
 function writeCacheErr(err) {
     console.error(common.dateFormat(null, 'yyyy-MM-dd HH:mm:ss'), 'Cache Error [' + err + ']');
 }
+
 var connectErrorTimes = 0;
 client.on('error', function (err) {
     if (err.code == 'ECONNREFUSED') {
@@ -39,7 +41,7 @@ _module.get = function (key, cb) {
     });
     setTimeout(function () {
         if (!isCallback) {
-            cb(common.error('Cache Get Timeout', 'CACHE_TIMEOUT'));
+            cb(common.error('Cache Get Timeout', errorConfig.CACHE_TIMEOUT));
             isCallback = true;
         }
     }, 10 * 1000);

@@ -1,6 +1,6 @@
 var common = require('../_system/common');
 var cache = require('../_system/cache');
-var main = require('../_system/_main');
+var main = require('../_main');
 var errorConfig = require('../_system/errorConfig');
 var autoBll = require('./_auto');
 var userInfoBll = require('./userInfo');
@@ -78,7 +78,7 @@ exports.inInside = function (req) {
     }
     return common.promise(function () {
         if (!account)
-            throw common.error(null, errorConfig.CAN_NOT_BE_EMPTY.code, {
+            throw common.error(null, errorConfig.CAN_NOT_BE_EMPTY, {
                 format: function (msg) {
                     return common.stringFormat(msg, 'account');
                 }
@@ -97,7 +97,7 @@ exports.inInside = function (req) {
         var pwd = userInfo.password;
         var checkToken = common.createToken(account + pwd + reqBody);
         if (token != checkToken)
-            throw common.error(null, errorConfig.TOKEN_WRONG.code);
+            throw common.error(null, errorConfig.TOKEN_WRONG);
         return autoBll.custom('userInfo', 'detailQuery', {id: userInfo.id});
     }).then(function (t) {
         //console.log(t);

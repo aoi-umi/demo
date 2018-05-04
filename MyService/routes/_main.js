@@ -1,12 +1,12 @@
-var common = require('./common');
-var myEnum = require('./enum');
-var auth = require('./auth');
-var cache = require('./cache');
-var errorConfig = require('./errorConfig');
+var common = require('./_system/common');
+var myEnum = require('./_system/enum');
+var auth = require('./_system/auth');
+var cache = require('./_system/cache');
+var errorConfig = require('./_system/errorConfig');
 
-var sign = require('../bll/sign');
+var sign = require('./bll/sign');
 
-var config = require('../../config');
+var config = require('../config');
 
 var main = exports;
 //路由配置 文件必须在routes目录下
@@ -278,7 +278,7 @@ exports.register = function (app, restConfig) {
         var path = rest.path || rest.url;
         if (path && path.substr(0, 1) !== '/')
             path = '/' + path;
-        path = '../' + path;
+        path = '.' + path;
         var isRouter = true;
         if (!method)
             method = 'post';
@@ -294,7 +294,7 @@ exports.register = function (app, restConfig) {
         var reqfile = require(path);
         var reqFun = reqfile[functionName];
         if (!reqFun)
-            throw common.error(`[${path}] is not exist function [${functionName}]`, errorConfig.CODE_ERROR.code);
+            throw common.error(`[${path}] is not exist function [${functionName}]`, errorConfig.CODE_ERROR);
 
         var createFun = function (fun) {
             return function (req, res, next) {

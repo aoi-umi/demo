@@ -6,7 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var common = require('./routes/_system/common');
-var main = require('./routes/_system/_main');
+var main = require('./routes/_main');
 
 var app = express();
 // view engine setup

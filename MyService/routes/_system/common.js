@@ -286,6 +286,7 @@ exports.formatViewtRes = function (option) {
     return opt;
 };
 
+//code: string || errorConfig
 exports.error = function (msg, code, option) {
     var opt = {
         sourceName: '',
@@ -297,10 +298,15 @@ exports.error = function (msg, code, option) {
         opt = common.extend(opt, option);
     if (!code)
         code = '';
-
-    if (code && errorConfig[code]) {
-        var error = errorConfig[code];
+    var error;
+    if (typeof code !== 'string') {
+        error = code;
         code = error.code;
+    }
+    else {
+        error = errorConfig[code];
+    }
+    if (error) {
         status = error.status;
         if (!msg) {
             msg = error.desc[opt.lang];

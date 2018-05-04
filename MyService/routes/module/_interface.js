@@ -55,9 +55,9 @@ function getBll(req, res, next) {
             var modulePath = path.resolve(__dirname + '/../dal/_auto/' + module + '.js');
             var isExist = fs.existsSync(modulePath);
             if (!isExist)
-                throw common.error('file is not exist', errorConfig.BAD_REQUEST.code);
+                throw common.error('file is not exist', errorConfig.BAD_REQUEST);
             if (!autoBll[method])
-                throw common.error(`method[${method}] is not exist`, errorConfig.BAD_REQUEST.code);
+                throw common.error(`method[${method}] is not exist`, errorConfig.BAD_REQUEST);
             return autoBll[method](module, args);
         }
     }).then(function (t) {

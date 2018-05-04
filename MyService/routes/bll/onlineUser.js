@@ -1,4 +1,4 @@
-var main = require('../_system/_main');
+var main = require('../_main');
 var cache = require('../_system/cache');
 var socket = require('../socket');
 

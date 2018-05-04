@@ -5,6 +5,7 @@ var q = require('q');
 var _ = require('underscore');
 var autoBll = require('./_auto');
 var common = require('../_system/common');
+var errorConfig = require('../_system/errorConfig');
 var myEnum = require('../_system/enum');
 var auth = require('../_system/auth');
 var mainContentBll = exports;
@@ -43,7 +44,7 @@ exports.detailQuery = function (opt, exOpt) {
             detail.mainContentLogList = [];
             return detail;
         } else if (!opt.id) {
-            throw common.error('', 'ARGS_ERROR');
+            throw common.error('', errorConfig.ARGS_ERROR);
         }
         return autoBll.customDal('mainContent', 'detailQuery', opt).then(function (t) {
             var detail = {};
@@ -52,7 +53,7 @@ exports.detailQuery = function (opt, exOpt) {
             detail.mainContentChildList = t[2];
             detail.mainContentLogList = t[3];
             if (!detail.mainContent)
-                throw common.error('', 'DB_NO_DATA');
+                throw common.error('', errorConfig.DB_NO_DATA);
             return detail;
         });
     }).then(function (t) {
@@ -153,7 +154,7 @@ exports.statusUpdate = function (opt, exOpt) {
     var necessaryAuth;
     return common.promise().then(function () {
         if (!mainContent.id) {
-            throw common.error('', 'ARGS_ERROR');
+            throw common.error('', errorConfig.ARGS_ERROR);
         }
         var operate = mainContent.operate;
         if (operate == 'audit')
