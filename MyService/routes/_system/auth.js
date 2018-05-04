@@ -63,6 +63,7 @@ var authConfig = {
 
 exports.accessableUrlConfig = [];
 
+//获取可访问的url，如传入pathname，该路径不可访问时抛出错误
 exports.getAccessableUrl = function (user, pathname) {
     var url = {};
     var accessable = false;
@@ -83,10 +84,12 @@ exports.getAccessableUrl = function (user, pathname) {
             throw common.error('', errCode);
         }
     });
-    if (!isUrlExist)
-        throw common.error('', errorConfig.NOT_FOUND.code);
-    if (!accessable)
-        throw common.error('', authConfig.accessable.errCode);
+    if (pathname) {
+        if (!isUrlExist)
+            throw common.error('', errorConfig.NOT_FOUND.code);
+        if (!accessable)
+            throw common.error('', authConfig.accessable.errCode);
+    }
     return url;
 };
 
