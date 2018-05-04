@@ -4,7 +4,7 @@
 var common = require('./common');
 var errorConfig = require('./errorConfig');
 var auth = exports;
-exports.auth = function (req, res, next) {
+exports.check = function (req, res, next) {
     //url权限认证
     var user = req.myData.user;
     var pathname = req._parsedUrl.pathname;
@@ -61,13 +61,13 @@ var authConfig = {
     },
 };
 
-exports.accessableUrlConfig = {};
+exports.accessableUrlConfig = [];
 
 exports.getAccessableUrl = function (user, pathname) {
     var url = {};
     var accessable = false;
     var isUrlExist = false;
-    exports.accessableUrlConfig.forEach(function (item) {
+    auth.accessableUrlConfig.forEach(function (item) {
         var opt = {notExistAuthority: null};
         var isHadAuthority = !item.auth || !item.auth.length || auth.isHadAuthority(user, item.auth, opt);
         var isExist = item.url == pathname;
