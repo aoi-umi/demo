@@ -2,37 +2,45 @@ var gulp = require('gulp'),
     del = require('del'), //删除文件
     replace = require('gulp-replace-path'), //替换文件内容
     babel = require('gulp-babel'),
-    gulpSequence = require('gulp-sequence');
+    gulpSequence = require('gulp-sequence'),
+    watch = require('gulp-watch');
 
+let templateDestDir = 'views/_template_web/';
+let templateSrc = 'views/_template/**';
 gulp.task('clear-template', function () {
     return del([
-        'views/_template_web/*'
+        templateDestDir + '*'
     ]);
 });
 
 gulp.task('make-template', function () {
-    gulp.src('views/_template/**')
+    gulp.src(templateSrc)
         .pipe(replace('<%', '{%'))
         .pipe(replace('%>', '%}'))
-        .pipe(gulp.dest('views/_template_web'));
+        .pipe(gulp.dest(templateDestDir));
 });
 
-gulp.task('template', gulpSequence('clear-template', 'make-template'));
-
+let webJsDestDir = 'public/js/prd/';
+let webJsSrc = 'public/js/dev/**';
 gulp.task('clear-web-js', function () {
     return del([
-        'public/js/prd/*'
+        webJsDestDir + '*'
     ]);
 });
 
 gulp.task('make-web-js', function () {
-    gulp.src('public/js/dev/**')
+    gulp.src(webJsSrc)
         .pipe(babel({
             presets: ['es2015']
         }))
-        .pipe(gulp.dest('public/js/prd/'));
+        .pipe(gulp.dest(webJsDestDir));
 });
 
-gulp.task('web-js', gulpSequence('clear-web-js', 'make-web-js'));
+gulp.task('clear', ['clear-web-js', 'clear-template']);
 
-gulp.task('default', ['template', 'web-js'])
+gulp.task('default', gulpSequence('clear', ['make-template', 'make-web-js']));
+
+gulp.task('watch', function () {
+    gulp.watch(templateSrc, ['make-template']);
+    gulp.watch(webJsSrc, ['make-web-js']);
+});

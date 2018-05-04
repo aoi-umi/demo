@@ -241,25 +241,24 @@ exports.init = function (opt) {
         if (userInfoKey) {
             userInfoKey = main.cacheKey.userInfo + userInfoKey;
             cache.get(userInfoKey).then(function (t) {
-                    if (t) {
-                        t.key = userInfoKey;
-                        req.myData.user = t;
-                        //自动重新登录获取信息
-                        if (!t.cacheDatetime || new Date() - new Date(t.cacheDatetime) > 12 * 3600) {
-                            req.myData.autoSignIn = true;
-                            return common.promise().then(function (promiseRes) {
-                                sign.inInside(req).then(promiseRes.resolve).fail(function (e) {
-                                    //console.log(e);
-                                    cache.del(userInfoKey).then(function () {
-                                        throw common.error('请重新登录！');
-                                    }).fail(promiseRes.reject);
-                                });
-                                return promiseRes.promise;
+                if (t) {
+                    t.key = userInfoKey;
+                    req.myData.user = t;
+                    //自动重新登录获取信息
+                    if (!t.cacheDatetime || new Date() - new Date(t.cacheDatetime) > 12 * 3600) {
+                        req.myData.autoSignIn = true;
+                        return common.promise().then(function (promiseRes) {
+                            sign.inInside(req).then(promiseRes.resolve).fail(function (e) {
+                                //console.log(e);
+                                cache.del(userInfoKey).then(function () {
+                                    throw common.error('请重新登录！');
+                                }).fail(promiseRes.reject);
                             });
-                        }
+                            return promiseRes.promise;
+                        });
                     }
                 }
-            ).then(function () {
+            }).then(function () {
                 req.myData.autoSignIn = false;
                 next();
             }).fail(function (e) {
