@@ -3,6 +3,7 @@
  */
 var config = require('../../config');
 var common = require('./common');
+var errorConfig = require('./errorConfig');
 var myEnum = exports;
 
 exports.enumDict = {};
@@ -10,7 +11,7 @@ exports.enumChangeDict = {};
 
 exports.getEnum = function (enumName, notThrowError) {
     var enumType = exports.enumDict[enumName];
-    if (!enumType && !notThrowError) throw common.error('enum "' + enumName + '" not exist!', 'CODE_ERROR');
+    if (!enumType && !notThrowError) throw common.error('enum "' + enumName + '" not exist!', errorConfig.CODE_ERROR);
     return enumType;
 };
 
@@ -44,17 +45,17 @@ exports.enumChangeCheck = function (enumType, srcEnum, destEnum) {
     if (common.isInArray(matchEnum[srcEnum], undefinedOrNull)
         && (!operateEnum && common.isInArray(operateEnum[srcEnum], undefinedOrNull))
     )
-        throw common.error(common.stringFormat('no match src enum [{0}] in [{1}]!', srcEnum, enumType), 'CODE_ERROR');
+        throw common.error(common.stringFormat('no match src enum [{0}] in [{1}]!', srcEnum, enumType), errorConfig.CODE_ERROR);
 
     if (common.isInArray(matchEnum[destEnum], undefinedOrNull)
         && (!operateEnum && common.isInArray(operateEnum[destEnum], undefinedOrNull))
     )
-        throw common.error(common.stringFormat('no match dest enum [{0}] in [{1}]!', destEnum, enumType), 'CODE_ERROR');
+        throw common.error(common.stringFormat('no match dest enum [{0}] in [{1}]!', destEnum, enumType), errorConfig.CODE_ERROR);
 
     if (!changeDict[srcEnum] || !changeDict[srcEnum][destEnum]) {
         var srcEnumName = myEnum.getValue(enumType, srcEnum) || myEnum.getValue(enumOperateType, srcEnum);
         var destEnumName = myEnum.getValue(enumType, destEnum) || myEnum.getValue(enumOperateType, destEnum);
-        throw common.error(null, 'ENUM_CHANGED_INVALID', {
+        throw common.error(null, errorConfig.ENUM_CHANGED_INVALID, {
             //lang:'en',
             format: function (msg) {
                 if (config.env == 'dev') {

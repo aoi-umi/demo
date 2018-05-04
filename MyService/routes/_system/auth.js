@@ -86,7 +86,7 @@ exports.getAccessableUrl = function (user, pathname) {
     });
     if (pathname) {
         if (!isUrlExist)
-            throw common.error('', errorConfig.NOT_FOUND.code);
+            throw common.error('', errorConfig.NOT_FOUND);
         if (!accessable)
             throw common.error('', authConfig.accessable.errCode);
     }

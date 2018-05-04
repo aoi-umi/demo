@@ -6,7 +6,7 @@ var fs = require('fs');
 var common = require('../_system/common');
 var auth = require('../_system/auth');
 var myEnum = require('../_system/enum');
-var main = require('../_system/_main');
+var main = require('../_main');
 var autoBll = require('../bll/_auto');
 
 exports.get = function (req, res, next) {

@@ -3,6 +3,7 @@
  */
 var autoBll = require('./_auto');
 var common = require('../_system/common');
+var errorConfig = require('../_system/errorConfig');
 var auth = require('../_system/auth');
 var mainContentTypeBll = exports;
 exports.save = function (opt) {
@@ -17,7 +18,7 @@ exports.save = function (opt) {
 exports.isExist = function (opt) {
     return common.promise().then(function () {
         if (!opt || (opt.id != 0 && !opt.id) || !opt.type)
-            throw common.error(null, 'ARGS_ERROR');
+            throw common.error(null, errorConfig.ARGS_ERROR);
         return autoBll.query('mainContentType', {type: opt.type}).then(function (t) {
             var res = {
                 isExist: false,
