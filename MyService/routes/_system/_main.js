@@ -9,7 +9,7 @@ var sign = require('../bll/sign');
 var config = require('../../config');
 
 var main = exports;
-//路由配置
+//路由配置 文件必须在routes目录下
 exports.restConfig = [
     {
         url: '/',
@@ -118,7 +118,7 @@ exports.enumDict = {
     //添加 Operate 后缀
     mainContentStatusEnumOperate: {'recovery': '恢复'},
     mainContentLogTypeEnum: {
-        //main_conetnt
+        //mainConetnt
         '0': '主内容保存', '1': '主内容提交', '2': '主内容审核', '3': '主内容审核通过', '4': '主内容审核不通过', '5': '主内容删除', '6': '主内容恢复',
     },
 };
@@ -269,6 +269,69 @@ exports.init = function (opt) {
             next();
         }
     };
+};
+
+//注册路由
+exports.register = function (app, restConfig) {
+    var restList = [];
+    restConfig.forEach(function (rest) {
+        var method = rest.method;
+        var path = rest.path || rest.url;
+        if (path && path.substr(0, 1) !== '/')
+            path = '/' + path;
+        path = '../' + path;
+        var isRouter = true;
+        if (!method)
+            method = 'post';
+        var functionName = rest.functionName || method;
+        var routerMethodList = [];
+
+        function init(req, res, next) {
+            auth.auth(req, res, next);
+        }
+
+        routerMethodList.push(init);
+
+        var reqfile = require(path);
+        var reqFun = reqfile[functionName];
+        if (!reqFun)
+            throw common.error(`[${path}] is not exist function [${functionName}]`, errorConfig.CODE_ERROR.code);
+
+        var createFun = function (fun) {
+            return function (req, res, next) {
+                req.myData.method = {methodName: rest.methodName};
+                try {
+                    fun(req, res, next);
+                } catch (e) {
+                    next(e);
+                }
+            };
+        };
+        if (reqFun instanceof Array) {
+            reqFun.forEach(function (fun) {
+                var methodFun = createFun(fun);
+                routerMethodList.push(methodFun);
+            });
+        } else {
+            var methodFun = createFun(reqFun);
+            routerMethodList.push(methodFun);
+        }
+
+        var methodName = method.toLowerCase();
+        switch (methodName) {
+            case 'get':
+            case 'post':
+                app[methodName](rest.url, routerMethodList);
+                break;
+            default:
+                isRouter = false;
+                break;
+        }
+        if (isRouter) {
+            restList.push({url: rest.url, functionName: functionName, path: path});
+        }
+    });
+    //console.log(restList);
 };
 
 exports.errorHandler = function (err, req, res, next) {

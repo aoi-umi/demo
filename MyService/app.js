@@ -29,65 +29,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(main.init({viewPath: app.get('views')}));
 
 //按restConfig 注册路由
-var restList = [];
-main.restConfig.forEach(function (rest) {
-    var method = rest.method;
-    var path = rest.path || rest.url;
-    if (path && path.substr(0, 1) !== '/')
-        path = '/' + path;
-    path = './routes' + path;
-    var isRouter = true;
-    if (!method)
-        method = 'post';
-    var functionName = rest.functionName || method;
-    var routerMethodList = [];
-
-    function init(req, res, next) {
-        auth.auth(req, res, next);
-    }
-
-    routerMethodList.push(init);
-
-    var reqfile = require(path);
-    var reqFun = reqfile[functionName];
-    if (!reqFun)
-        throw common.error(`[${path}] is not exist function [${functionName}]`, errorConfig.CODE_ERROR.code);
-
-    var createFun = function (fun) {
-        return function (req, res, next) {
-            req.myData.method = {methodName: rest.methodName};
-            try {
-                fun(req, res, next);
-            } catch (e) {
-                next(e);
-            }
-        };
-    };
-    if (reqFun instanceof Array) {
-        reqFun.forEach(function (fun) {
-            var methodFun = createFun(fun);
-            routerMethodList.push(methodFun);
-        });
-    } else {
-        var methodFun = createFun(reqFun);
-        routerMethodList.push(methodFun);
-    }
-
-    var methodName = method.toLowerCase();
-    switch (methodName) {
-        case 'get':
-        case 'post':
-            app[methodName](rest.url, routerMethodList);
-            break;
-        default:
-            isRouter = false;
-            break;
-    }
-    if (isRouter) {
-        restList.push({url: rest.url, functionName: functionName, path: path});
-    }
-});
-//console.log(restList);
+main.register(app, main.restConfig);
 
 /// catch 404 and forwarding to error handler
 app.use(function (req, res, next) {
