@@ -5,15 +5,10 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var config = require('./config');
-
 var common = require('./routes/_system/common');
 var main = require('./routes/_system/_main');
-var auth = require('./routes/_system/auth');
-var errorConfig = require('./routes/_system/errorConfig');
 
 var app = express();
-console.log(config.name, 'run at port ', config.port, ',version:', config.version);
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
