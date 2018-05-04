@@ -286,7 +286,7 @@ exports.register = function (app, restConfig) {
         var routerMethodList = [];
 
         function init(req, res, next) {
-            auth.auth(req, res, next);
+            auth.check(req, res, next);
         }
 
         routerMethodList.push(init);
