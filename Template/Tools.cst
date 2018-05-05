@@ -823,23 +823,23 @@ private static List<string> CreateSqlServerQueryProcedure(DatabaseModel database
 
 #endregion
 
-#region js
+#region js/ts
 
-public static List<string> CreateJs(DatabaseModel databaseModel, DatabaseTypeEnum databaseType)
+public static List<string> CreateScript(DatabaseModel databaseModel, DatabaseTypeEnum databaseType, int scriptType)
 {
     var list = new List<string>();
     switch(databaseType)
     {
         case DatabaseTypeEnum.MySql:
-            list = CreateMySqlJs(databaseModel);
+            list = CreateMySqlScript(databaseModel, scriptType);
             break;
         
     }
     return list;
 }
 
-#region mysql js
-public static List<string> CreateMySqlJs(DatabaseModel databaseModel)
+#region mysql js/ts
+public static List<string> CreateMySqlScript(DatabaseModel databaseModel, int scriptType)
 {
     var list = new List<string>();
     var operateTypeList = new List<OperateTypeEnum>(){OperateTypeEnum.Save, OperateTypeEnum.Del, OperateTypeEnum.DetailQuery, OperateTypeEnum.Query};
@@ -850,8 +850,11 @@ public static List<string> CreateMySqlJs(DatabaseModel databaseModel)
             procTableName = procTableName.Substring(databaseModel.RemoveTablePrefix.Length);
     }
     
-    var jsStrList = new List<string>();
-    jsStrList.Add("var db = require('../../_system/db');");
+    var scriptStrList = new List<string>();
+    if(scriptType == 0)
+        scriptStrList.Add("var db = require('../../_system/db');");
+    else
+        scriptStrList.Add("import * as db from '../../_system/db';");
     
     operateTypeList.ForEach(operateType=>{
         var level = 1;
@@ -889,15 +892,19 @@ public static List<string> CreateMySqlJs(DatabaseModel databaseModel)
         if(!string.IsNullOrEmpty(functionName))
         {
             sqlStr = string.Format(sqlStr, procName, string.Join(", ", paramsList.Select(x=> ":" + x)));  
-            jsStrList.Add("exports." + functionName + " = function(params, conn) {");
-            jsStrList.Add(Tabs(1) + sqlStr);
-            jsStrList.Add(Tabs(1) + "return db.query(sql, params, conn);");
-            jsStrList.Add("};" + Environment.NewLine);
+            if(scriptType == 0){
+                scriptStrList.Add("exports." + functionName + " = function(params, conn) {");
+            }else{                
+                scriptStrList.Add("export let " + functionName + " = function(params, conn) {");
+            }
+            scriptStrList.Add(Tabs(1) + sqlStr);
+            scriptStrList.Add(Tabs(1) + "return db.query(sql, params, conn);");
+            scriptStrList.Add("};" + Environment.NewLine);
         }
         
     });
     
-    list.Add(string.Join(Environment.NewLine, jsStrList.ToArray()));
+    list.Add(string.Join(Environment.NewLine, scriptStrList.ToArray()));
     return list;
 }
 #endregion

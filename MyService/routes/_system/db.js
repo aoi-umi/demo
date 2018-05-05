@@ -2,7 +2,6 @@
  * Created by bang on 2017-8-1.
  */
 
-var q = require('q');
 var common = require('./common');
 var config = require('../../config');
 
@@ -24,17 +23,18 @@ exports.query = function (sql, params, conn) {
 //事务连接
 exports.tranConnect = function (queryFunction) {
     var connection = null;
-    return common.promise().then(function () {
+    return common.promise(function () {
         return getConnection();
     }).then(function (t) {
         connection = t;
         return beginTransaction(connection);
     }).then(function (t) {
-        var res = q.defer();
-        queryFunction(connection)
-            .then(res.resolve)
-            .fail(res.reject);
-        return res.promise;
+        return common.promise((def) => {
+            queryFunction(connection)
+                .then(def.resolve)
+                .fail(def.reject);
+            return def.promise;
+        });
     }).then(function (t) {
         return commit(connection);
     }).fail(function (e) {
@@ -53,7 +53,7 @@ function myQuery(sql, params) {
         params = [];
 
     var connection = null;
-    return common.promise().then(function () {
+    return common.promise(function () {
         return getConnection();
     }).then(function (t) {
         connection = t;
@@ -77,7 +77,7 @@ function myTranQuery(sql, params, conn) {
         params = [];
 
     var connection = conn;
-    return common.promise().then(function (t) {
+    return common.promise(function (t) {
         return query(connection, sql, params);
     }).then(function (t) {
         return (t);
@@ -91,7 +91,7 @@ function queryFormat(query, values) {
     return query.replace(/\:(\w+)/g, function (txt, key) {
         if (values.hasOwnProperty(key)) {
             var val = values[key];
-            if(val && typeof val == 'object') val = JSON.stringify(val);
+            if (val && typeof val == 'object') val = JSON.stringify(val);
             return this.escape(values[key]);
         }
         else {
@@ -101,31 +101,31 @@ function queryFormat(query, values) {
     }.bind(this));
 }
 
-function getConnection(){
+function getConnection() {
     return common.promise(pool, 'getConnection');
 }
 
-function release(conn){
-    if(conn && pool._freeConnections.indexOf(conn) == -1) {
+function release(conn) {
+    if (conn && pool._freeConnections.indexOf(conn) == -1) {
         conn.release();
     }
 }
 
-function query(conn, sql, params){
+function query(conn, sql, params) {
     conn.config.queryFormat = queryFormat;
     return common.promise(conn, 'query', sql, params);
 }
 
-function beginTransaction(conn){
+function beginTransaction(conn) {
     return common.promise(conn, 'beginTransaction');
 }
 
-function commit(conn){
+function commit(conn) {
     console.log('commit');
     return common.promise(conn, 'commit');
 }
 
-function rollback(conn){
+function rollback(conn) {
     console.log('rollback');
     return common.promise(conn, 'rollback');
 }

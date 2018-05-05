@@ -22,7 +22,8 @@ Description="数据库类型"%>
 <script runat="template">
 public enum MakeTypeEnum{
     Procedure,
-    Js
+    Js,
+    Ts
 }
 </script>
 <%
@@ -35,7 +36,10 @@ switch(MakeType){
         list = Tools.CreateProcedure(dbModel, databaseType);        
         break;
     case MakeTypeEnum.Js:
-        list = Tools.CreateJs(dbModel, databaseType);
+        list = Tools.CreateScript(dbModel, databaseType, 0);
+        break;        
+    case MakeTypeEnum.Ts:
+        list = Tools.CreateScript(dbModel, databaseType, 1);
         break;
 }
 list.ForEach(x=>{

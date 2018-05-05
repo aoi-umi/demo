@@ -38,6 +38,7 @@ if(SourceDatabase.Count > 0){
                             outputFormat = "./Output/{0}/sql/{1}.sql";
                             break;
                         case Make.MakeTypeEnum.Js:
+                        case Make.MakeTypeEnum.Ts:
                             switch(FileNameType){
                                 case Tools.FilenameTypeEnum.Origin:
                                 default:
@@ -49,7 +50,7 @@ if(SourceDatabase.Count > 0){
                                     fileName = Tools.ToPascalCase(fileName);
                                     break;
                             }
-                            outputFormat = "./Output/{0}/js/{1}.js";
+                            outputFormat = "./Output/{0}/" + (makeType == Make.MakeTypeEnum.Js ? "js/{1}.js" : "ts/{1}.ts");
                             break;
                     }
                     temp.MakeType = makeType;
