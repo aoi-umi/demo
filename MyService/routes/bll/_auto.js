@@ -50,17 +50,18 @@ exports.query = function (name, params, conn) {
     });
 };
 exports.tran = function (fn) {
-    var res = common.defer();
-    db.tranConnect(function (conn) {
-        return common.promise().then(function () {
-            return fn(conn);
-        }).then(res.resolve).fail(function (e) {
-            throw e;
-        });
-    }).then(function () {
-        //console.log(arguments)
-    }).fail(res.reject);
-    return res.promise;
+    return common.promise((def) => {
+        db.tranConnect(function (conn) {
+            return common.promise().then(function () {
+                return fn(conn);
+            }).then(def.resolve).fail(function (e) {
+                throw e;
+            });
+        }).then(function () {
+            //console.log(arguments)
+        }).fail(def.reject);
+        return def.promise;
+    });
 };
 exports.custom = function (name, method, params, exOpt, conn) {
     var bll = getRequire(name, 'bll');
