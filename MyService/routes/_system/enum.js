@@ -10,7 +10,7 @@ exports.enumDict = {};
 exports.enumChangeDict = {};
 
 exports.getEnum = function (enumName, notThrowError) {
-    var enumType = exports.enumDict[enumName];
+    var enumType = myEnum.enumDict[enumName];
     if (!enumType && !notThrowError) throw common.error('enum "' + enumName + '" not exist!', errorConfig.CODE_ERROR);
     return enumType;
 };
@@ -36,7 +36,7 @@ exports.enumChangeCheck = function (enumType, srcEnum, destEnum) {
     var enumOperateType = enumType + 'Operate';
     var matchEnum = myEnum.getEnum(enumType);
     var operateEnum = myEnum.getEnum(enumOperateType, true);
-    var changeDict = exports.enumChangeDict[enumType];
+    var changeDict = myEnum.enumChangeDict[enumType];
     if (srcEnum == undefined || srcEnum == null || destEnum == undefined || destEnum == null)
         throw common.error('', 'ARGS_ERROR');
     srcEnum = srcEnum.toString();
