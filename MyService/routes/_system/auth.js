@@ -4,6 +4,31 @@
 var common = require('./common');
 var errorConfig = require('./errorConfig');
 var auth = exports;
+
+var authConfig = {
+    'dev': {
+        errCode: 'DEV',
+    },
+    'local': {
+        errCode: 'NO_PERMISSIONS',
+    },
+    'login': {
+        errCode: 'NO_LOGIN',
+    },
+    'accessable': {
+        errCode: 'NO_PERMISSIONS',
+    },
+    'admin': {
+        errCode: 'NO_PERMISSIONS',
+    },
+};
+
+exports.accessableUrlConfig = [];
+
+exports.init = function (opt) {
+    auth.accessableUrlConfig = opt.accessableUrlConfig;
+};
+
 exports.check = function (req, res, next) {
     //url权限认证
     var user = req.myData.user;
@@ -42,26 +67,6 @@ exports.isExistAuthority = function (user, authData, opt) {
     }
     return false;
 };
-
-var authConfig = {
-    'dev': {
-        errCode: 'DEV',
-    },
-    'local': {
-        errCode: 'NO_PERMISSIONS',
-    },
-    'login': {
-        errCode: 'NO_LOGIN',
-    },
-    'accessable': {
-        errCode: 'NO_PERMISSIONS',
-    },
-    'admin': {
-        errCode: 'NO_PERMISSIONS',
-    },
-};
-
-exports.accessableUrlConfig = [];
 
 //获取可访问的url，如传入pathname，该路径不可访问时抛出错误
 exports.getAccessableUrl = function (user, pathname) {
