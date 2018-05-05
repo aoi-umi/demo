@@ -144,10 +144,13 @@ exports.init = function (opt) {
         return common.dateFormat(this, 'yyyy-MM-dd HH:mm:ss');
     };
 
-    auth.accessableUrlConfig = main.accessableUrlConfig;
-
-    myEnum.enumDict = main.enumDict;
-    myEnum.enumChangeDict = main.enumChangeDict;
+    auth.init({
+        accessableUrlConfig: main.accessableUrlConfig
+    });
+    myEnum.init({
+        enumDict: main.enumDict,
+        enumChangeDict: main.enumChangeDict,
+    });
 
     let myRender = function (req, res, view, options) {
         var opt = {

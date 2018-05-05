@@ -9,6 +9,11 @@ var myEnum = exports;
 exports.enumDict = {};
 exports.enumChangeDict = {};
 
+exports.init = function (opt) {
+    myEnum.enumDict = opt.enumDict;
+    myEnum.enumChangeDict = opt.enumChangeDict;
+};
+
 exports.getEnum = function (enumName, notThrowError) {
     var enumType = myEnum.enumDict[enumName];
     if (!enumType && !notThrowError) throw common.error('enum "' + enumName + '" not exist!', errorConfig.CODE_ERROR);
