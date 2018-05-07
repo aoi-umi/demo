@@ -301,7 +301,7 @@ exports.error = function (msg, code, option) {
         code = error.code;
     }
     else {
-        error = errorConfig[code];
+        error = common.getErrorConfigByCode(code);
     }
     if (error) {
         status = error.status;
@@ -317,6 +317,13 @@ exports.error = function (msg, code, option) {
     err.code = code;
     err.status = status;
     return err;
+};
+
+exports.getErrorConfigByCode = function (code) {
+    for (let key in errorConfig) {
+        if (errorConfig[key].code == code)
+            return errorConfig[key];
+    }
 };
 
 exports.writeError = function (err, opt) {
