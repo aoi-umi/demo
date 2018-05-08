@@ -222,67 +222,6 @@ exports.requestServicePromise = function (option) {
 
 exports.unzipPromise = common.promisify(zlib.unzip);
 
-exports.formatRes = function (err, detail, opt) {
-    //result    是否成功
-    //detail    成功 返回的内容
-    //          失败 错误详细
-    //code      成功/失败代码
-    //desc      描述
-    var res = {
-        result: null,
-        detail: null,
-        code: null,
-        desc: null,
-        guid: common.guid()
-    };
-    var url = '';
-    if (opt) {
-        if (opt.code)
-            res.code = opt.code;
-        if (opt.desc)
-            res.desc = opt.desc;
-        if (opt.url)
-            url = opt.url;
-    }
-    if (err) {
-        if (err.code)
-            res.code = err.code;
-        var writeOpt = {
-            guid: res.guid
-        };
-        if (url)
-            writeOpt.url = url;
-        common.writeError(err, writeOpt);
-        var errMsg = err;
-        if (err.message) errMsg = err.message;
-        res.result = false;
-        res.desc = errMsg;
-    } else {
-        res.result = true;
-        if (!res.desc)
-            res.desc = 'success';
-    }
-    if (detail)
-        res.detail = detail;
-    return res;
-};
-
-exports.formatViewtRes = function (option) {
-    var opt = {
-        env: config.env,
-        title: config.name,
-        siteName: config.name,
-        version: config.version,
-        user: null,
-        noNav: false,
-    };
-    opt = common.extend(opt, option);
-    if (opt.env == 'dev') {
-        opt.title += '[开发版]';
-    }
-    return opt;
-};
-
 //code: string || errorConfig
 exports.error = function (msg, code, option) {
     var opt = {

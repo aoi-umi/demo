@@ -136,6 +136,67 @@ exports.enumChangeDict = {
     }
 };
 
+exports.formatRes = function (err, detail, opt) {
+    //result    是否成功
+    //detail    成功 返回的内容
+    //          失败 错误详细
+    //code      成功/失败代码
+    //desc      描述
+    var res = {
+        result: null,
+        detail: null,
+        code: null,
+        desc: null,
+        guid: common.guid()
+    };
+    var url = '';
+    if (opt) {
+        if (opt.code)
+            res.code = opt.code;
+        if (opt.desc)
+            res.desc = opt.desc;
+        if (opt.url)
+            url = opt.url;
+    }
+    if (err) {
+        if (err.code)
+            res.code = err.code;
+        var writeOpt = {
+            guid: res.guid
+        };
+        if (url)
+            writeOpt.url = url;
+        common.writeError(err, writeOpt);
+        var errMsg = err;
+        if (err.message) errMsg = err.message;
+        res.result = false;
+        res.desc = errMsg;
+    } else {
+        res.result = true;
+        if (!res.desc)
+            res.desc = 'success';
+    }
+    if (detail)
+        res.detail = detail;
+    return res;
+};
+
+exports.formatViewtRes = function (option) {
+    var opt = {
+        env: config.env,
+        title: config.name,
+        siteName: config.name,
+        version: config.version,
+        user: null,
+        noNav: false,
+    };
+    opt = common.extend(opt, option);
+    if (opt.env == 'dev') {
+        opt.title += '[开发版]';
+    }
+    return opt;
+};
+
 exports.init = function (opt) {
     Date.prototype.toJSON = function () {
         return common.dateFormat(this, 'yyyy-MM-dd HH:mm:ss');
@@ -163,7 +224,7 @@ exports.init = function (opt) {
             accessableUrl: req.myData.accessableUrl,
         };
         opt = common.extend(opt, options);
-        res.render(view, common.formatViewtRes(opt));
+        res.render(view, main.formatViewtRes(opt));
     };
     let mySend = function (req, res, err, detail, option) {
         var url = req.header('host') + req.originalUrl;
@@ -171,7 +232,7 @@ exports.init = function (opt) {
             url: url,
         };
         opt = common.extend(opt, option);
-        var formatRes = common.formatRes(err, detail, opt);
+        var formatRes = main.formatRes(err, detail, opt);
         if (req.myData.useStatus && err && err.status)
             res.status(err.status);
         res.send(formatRes);
