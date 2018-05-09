@@ -8,7 +8,6 @@ var net = require('net');
 var crypto = require('crypto');
 var q = require('q');
 var zlib = require('zlib');
-var _ = require('underscore');
 var config = require('../../config');
 var errorConfig = require('./errorConfig');
 var logService = require('../service/logService');
@@ -570,14 +569,14 @@ exports.getListDiff = function (option) {
     var addList = [];
     if (newList && newList.length) {
         list.forEach(function (item) {
-            var match = _.find(newList, function (item2) {
+            var match = newList.find(function (item2) {
                 return compare(item, item2);
             });
             if (!match)
                 delList.push(delReturnValue(item));
         });
         newList.forEach(function (item2) {
-            var match = _.find(list, function (item) {
+            var match = list.find(function (item) {
                 return compare(item, item2);
             });
             if (!match)

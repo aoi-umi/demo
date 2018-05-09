@@ -2,7 +2,6 @@
  * Created by bang on 2017-9-5.
  */
 var q = require('q');
-var _ = require('underscore');
 var autoBll = require('./_auto');
 var common = require('../_system/common');
 var errorConfig = require('../_system/errorConfig');
@@ -82,17 +81,17 @@ exports.save = function (opt, exOpt) {
                 throw common.error('没有权限处理此记录');
             myEnum.enumChangeCheck('mainContentStatusEnum', mainContentDetail.mainContent.status, mainContent.status);
             //要删除的child
-            var delChildList = _.filter(mainContentDetail.mainContentChildList, function (child) {
+            var delChildList = mainContentDetail.mainContentChildList.filter(function (child) {
                 //查找删除列表中的项
                 var match = null;
                 if (opt.delMainContentChildList) {
-                    match = _.find(opt.delMainContentChildList, function (childId) {
+                    match = opt.delMainContentChildList.find(function (childId) {
                         return childId == child.id
                     });
                 }
                 if (!match) {
                     //查找不存在于保存列表中的项
-                    var match2 = _.find(opt.mainContentChildList, function (saveChild) {
+                    var match2 = opt.mainContentChildList.find(function (saveChild) {
                         return saveChild.id == child.id
                     });
                     match = !match2;
