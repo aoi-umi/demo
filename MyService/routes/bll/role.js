@@ -2,7 +2,6 @@
  * Created by umi on 2017-8-7.
  */
 var q = require('q');
-var _ = require('underscore');
 var autoBll = require('./_auto');
 var common = require('../_system/common');
 var roleBll = exports;
@@ -24,13 +23,13 @@ exports.save = function (opt) {
 
                 return autoBll.query('roleWithAuthority', {roleCode: dataRole.code});
             }).then(function (t) {
-                var delRoleAuthList = _.filter(t.list, (dbAuth) => {
-                    return _.findIndex(opt.delAuthorityList, (delAuth) => {
+                var delRoleAuthList = t.list.filter((dbAuth) => {
+                    return opt.delAuthorityList.findIndex((delAuth) => {
                         return dbAuth.authorityCode == delAuth;
                     }) >= 0;
                 });
-                var addRoleAuthList = _.filter(opt.addAuthorityList, (addAuth) => {
-                    return _.findIndex(t.list, (dbAuth) => {
+                var addRoleAuthList = opt.addAuthorityList.filter((addAuth) => {
+                    return t.list.findIndex((dbAuth) => {
                         return dbAuth.authorityCode == addAuth;
                     }) < 0;
                 });
@@ -95,7 +94,7 @@ exports.query = function (opt) {
             item.authorityList = [];
             roleWithAuthorityList.forEach(function (roleWithAuthority) {
                 if (item.code == roleWithAuthority.roleCode) {
-                    var match = _.find(authorityList, function (authority) {
+                    var match = authorityList.find(function (authority) {
                         return authority.code == roleWithAuthority.authorityCode;
                     });
                     if (match) item.authorityList.push(match);

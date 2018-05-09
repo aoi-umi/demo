@@ -112,7 +112,7 @@ exports.query = function (opt) {
             };
             userInfoWithAuthorityList.forEach(function (uWithAuth) {
                 if (uWithAuth.userInfoId == item.id) {
-                    var matchAuth = _.filter(authorityList, function (auth) {
+                    var matchAuth = authorityList.filter(function (auth) {
                         return uWithAuth.authorityCode == auth.code;
                     });
                     if (matchAuth)
@@ -122,12 +122,12 @@ exports.query = function (opt) {
 
             userInfoWithRoleList.forEach(function (uWithRole) {
                 if (uWithRole.userInfoId == item.id) {
-                    var matchAuth = _.filter(roleAuthorityList, function (roleAuth) {
+                    var matchAuth = roleAuthorityList.filter(function (roleAuth) {
                         return uWithRole.roleCode == roleAuth.roleCode;
                     });
                     if (matchAuth)
                         detail.roleAuthorityList = detail.roleAuthorityList.concat(matchAuth);
-                    var matchRole = _.filter(roleList, function (role) {
+                    var matchRole = roleList.filter(function (role) {
                         return uWithRole.roleCode == role.code;
                     });
                     if (matchRole)
@@ -158,25 +158,25 @@ exports.adminSave = function (opt, exOpt) {
             throw common.error('id为空', errorConfig.CAN_NOT_BE_EMPTY);
         return autoBll.query('userInfoWithAuthority', {userInfoId: id});
     }).then(function (t) {
-        delUserAuthList = _.filter(t.list, (dbAuth) => {
-            return _.findIndex(opt.delAuthorityList, (delAuth) => {
+        delUserAuthList = t.list.filter((dbAuth) => {
+            return opt.delAuthorityList.findIndex((delAuth) => {
                 return dbAuth.authorityCode == delAuth;
             }) >= 0;
         });
-        addUserAuthList = _.filter(opt.addAuthorityList, (addAuth) => {
-            return _.findIndex(t.list, (dbAuth) => {
+        addUserAuthList = opt.addAuthorityList.filter((addAuth) => {
+            return t.list.findIndex((dbAuth) => {
                 return dbAuth.authorityCode == addAuth;
             }) < 0;
         });
         return autoBll.query('userInfoWithRole', {userInfoId: id});
     }).then(function (t) {
-        delUserRoleList = _.filter(t.list, (dbAuth) => {
-            return _.findIndex(opt.delRoleList, (delAuth) => {
+        delUserRoleList = t.list.filter((dbAuth) => {
+            return opt.delRoleList.findIndex((delAuth) => {
                 return dbAuth.roleCode == delAuth;
             }) >= 0;
         });
-        addUserRoleList = _.filter(opt.addRoleList, (addAuth) => {
-            return _.findIndex(t.list, (dbAuth) => {
+        addUserRoleList = opt.addRoleList.filter((addAuth) => {
+            return t.list.findIndex((dbAuth) => {
                 return dbAuth.roleCode == addAuth;
             }) < 0;
         });
@@ -254,7 +254,7 @@ var updateUserInfo = function (detail) {
     });
 
     detail.roleList.forEach(function (role) {
-        role.authorityList = _.filter(detail.roleAuthorityList, function (roleAuthority) {
+        role.authorityList = detail.roleAuthorityList.filter(function (roleAuthority) {
             return roleAuthority.roleCode == role.code;
         }) || [];
         role.authorityList = _.sortBy(role.authorityList, function (t) {
