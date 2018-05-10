@@ -404,8 +404,8 @@ exports.errorHandler = function (err, req, res, next) {
     }
     err.status = err.status || 500;
     err.code = err.code || err.status;
-    var xRequestedWith = req.header('x-requested-with');
-    if (xRequestedWith && xRequestedWith.toLowerCase() == 'xmlhttprequest') {
+    var method = req.method;
+    if (method && method.toLowerCase() == 'post') {
         res.mySend(err, err, {code: err.code});
     } else {
         if (errorConfig.NO_LOGIN.code == err.code) {
