@@ -895,7 +895,7 @@ public static List<string> CreateMySqlScript(DatabaseModel databaseModel, int sc
             if(scriptType == 0){
                 scriptStrList.Add("exports." + functionName + " = function(params, conn) {");
             }else{                
-                scriptStrList.Add("export let " + functionName + " = function(params, conn) {");
+                scriptStrList.Add("export let " + functionName + " = function(params?, conn?) {");
             }
             scriptStrList.Add(Tabs(1) + sqlStr);
             scriptStrList.Add(Tabs(1) + "return db.query(sql, params, conn);");
