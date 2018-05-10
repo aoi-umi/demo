@@ -471,13 +471,13 @@ exports.createToken = function (str) {
 
 exports.md5 = function (data, option) {
     var opt = {
-        method: 'hex',
+        encoding: 'hex',
     };
     opt = common.extend(opt, option);
     var md5 = crypto.createHash('md5');
     if (typeof(data) == 'string')
         data = new Buffer(data, 'utf8');
-    var code = md5.update(data).digest(opt.method);
+    var code = md5.update(data).digest(opt.encoding);
     return code;
 };
 
