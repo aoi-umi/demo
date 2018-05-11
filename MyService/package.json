@@ -3,8 +3,8 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www",
-    "start-dev": "supervisor -n error -w ./bin/www,./config.js,./app.js,./routes ./bin/www"
+    "start": "node ./app",
+    "start-dev": "supervisor -n error -w ./config.js,./app.js,./routes ./app"
   },
   "dependencies": {
     "body-parser": "~1.0.0",
