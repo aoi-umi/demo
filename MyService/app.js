@@ -1,3 +1,4 @@
+var debug = require('debug')('my-application');
 var express = require('express');
 var path = require('path');
 var favicon = require('static-favicon');
@@ -6,6 +7,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var cors = require('cors');
 
+var config = require('./config');
 var common = require('./routes/_system/common');
 var main = require('./routes/_main');
 
@@ -43,4 +45,14 @@ process.on('unhandledRejection', function (e) {
     common.writeError(e);
 });
 
-module.exports = app;
+app.set('port', process.env.PORT || config.port);
+
+var server = app.listen(app.get('port'), function () {
+    debug('Express server listening on port ' + server.address().port);
+});
+
+console.log(config.name, 'run at port ', server.address().port, ',version:', config.version);
+
+var io = require('socket.io')(server);
+var socket = require('./routes/socket');
+socket.init(io);
