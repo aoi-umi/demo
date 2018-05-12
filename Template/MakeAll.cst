@@ -5,6 +5,7 @@
 <%@ Register Name="Make" Template="Make.cst"MergeProperties="Flase" ExcludeProperties=""%>
 <%@ Property Name="SourceDatabase" Type="SchemaExplorer.TableSchemaCollection" Category="数据源"   Description="需要生成的表" %>
 <%@ Property Name="MakeTypeList" Type="List<Make.MakeTypeEnum>" Category="生成类型"   Description="生成类型" %>
+<%@ Property Name="TsModelNamespace" Type="String" Default="" Optional="True" Category="生成类型" Description="d.ts命名空间名字" %>
 <%@ Property Name="RemoveTablePrefix" Type="String" Default="t_" DeepLoad="True" Optional="True" Category="移除数据表前缀" 
 Description="移除数据表前缀"%>
 <%@ Property Name="DataBaseType" Type="Make.Tools.DatabaseTypeEnum" Default="" DeepLoad="True" Optional="True" Category="数据库类型" 
@@ -30,28 +31,34 @@ if(SourceDatabase.Count > 0){
                     fileName = fileName.Substring(RemoveTablePrefix.Length);
             }
             temp.Table = x;
+            temp.TsModelNamespace = TsModelNamespace;
             MakeTypeList.ForEach(makeType=>{
                 try{
-                    var outputFormat = "./Output/{0}/{1}";
+                    var outputFormat = "./Output/{0}/";
                     switch(makeType){
                         case Make.MakeTypeEnum.Procedure:
-                            outputFormat = "./Output/{0}/sql/{1}.sql";
+                            outputFormat = "sql/{1}.sql";
                             break;
                         case Make.MakeTypeEnum.Js:
-                        case Make.MakeTypeEnum.Ts:
-                            switch(FileNameType){
-                                case Tools.FilenameTypeEnum.Origin:
-                                default:
-                                    break;
-                                case Tools.FilenameTypeEnum.CamelCase:
-                                    fileName = Tools.ToCamelCase(fileName);
-                                    break;
-                                case Tools.FilenameTypeEnum.Pascal:
-                                    fileName = Tools.ToPascalCase(fileName);
-                                    break;
-                            }
-                            outputFormat = "./Output/{0}/" + (makeType == Make.MakeTypeEnum.Js ? "js/{1}.js" : "ts/{1}.ts");
+                            outputFormat = "js/{1}.js";
                             break;
+                        case Make.MakeTypeEnum.Ts:
+                            outputFormat = "ts/{1}.ts";
+                            break;
+                        case Make.MakeTypeEnum.Dts:
+                            outputFormat = "dts/{1}.d.ts";
+                            break;
+                    }
+                    outputFormat = "./Output/{0}/" + outputFormat;
+                    var list = new List<Make.MakeTypeEnum>(){
+                        Make.MakeTypeEnum.Js,
+                        Make.MakeTypeEnum.Ts,
+                    };                    
+                    if(list.Contains(makeType)){
+                        fileName = Tools.ConvertString(fileName, FileNameType);                        
+                    }else if(makeType == Make.MakeTypeEnum.Dts){                        
+                        //类名用pascal
+                        fileName = Tools.ConvertString(fileName, Tools.FilenameTypeEnum.Pascal);  
                     }
                     temp.MakeType = makeType;
                     temp.RenderToFile(string.Format(outputFormat, dbName, fileName), true);

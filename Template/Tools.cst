@@ -196,6 +196,21 @@ public static string ToPascalCase(string str){
     return char.ToUpper(str[0]) + str.Substring(1);
 }
 
+public static string ConvertString(string str, FilenameTypeEnum type){
+    switch(type){
+        case FilenameTypeEnum.Origin:
+        default:
+            break;
+        case FilenameTypeEnum.CamelCase:
+            str = ToCamelCase(str);
+            break;
+        case FilenameTypeEnum.Pascal:
+            str = ToPascalCase(str);
+            break;
+    }
+    return str;
+}
+
 #region 存储过程
 public static List<string> CreateProcedure(DatabaseModel databaseModel, DatabaseTypeEnum databaseType)
 {
@@ -900,8 +915,7 @@ public static List<string> CreateMySqlScript(DatabaseModel databaseModel, int sc
             scriptStrList.Add(Tabs(1) + sqlStr);
             scriptStrList.Add(Tabs(1) + "return db.query(sql, params, conn);");
             scriptStrList.Add("};" + Environment.NewLine);
-        }
-        
+        }        
     });
     
     list.Add(string.Join(Environment.NewLine, scriptStrList.ToArray()));
@@ -909,6 +923,39 @@ public static List<string> CreateMySqlScript(DatabaseModel databaseModel, int sc
 }
 #endregion
 
+#endregion
+
+
+#region d.ts
+public static List<string> CreateDts(DatabaseModel databaseModel, string ns)
+{
+    var list = new List<string>();
+    var tableName = databaseModel.TableName;
+    if(!string.IsNullOrEmpty(databaseModel.RemoveTablePrefix)){
+        if(tableName.StartsWith(databaseModel.RemoveTablePrefix))
+            tableName = tableName.Substring(databaseModel.RemoveTablePrefix.Length);
+    }
+    tableName = ConvertString(tableName, FilenameTypeEnum.Pascal);
+    
+    var level = 1;
+    var tabStr = GetRepeatStr("\t", level);
+    if(string.IsNullOrWhiteSpace(ns))
+        ns = "model";
+    var scriptStrList = new List<string>();    
+    scriptStrList.Add("declare namespace " + ns + " {");
+    scriptStrList.Add(tabStr + "interface " + tableName + " {");
+    level = 2;
+    tabStr = GetRepeatStr("\t", level);
+    databaseModel.Cols.Select(x=>x.Name).ToList().ForEach(ele=>{        
+        scriptStrList.Add(tabStr + ele + ": any;");
+    });
+    level = 1;
+    tabStr = GetRepeatStr("\t", level);
+    scriptStrList.Add(tabStr + "}");    
+    scriptStrList.Add("}");     
+    list.Add(string.Join(Environment.NewLine, scriptStrList.ToArray()));      
+    return list;
+}
 #endregion
 </script>
 
