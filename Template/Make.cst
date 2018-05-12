@@ -17,13 +17,16 @@ Description="数据表"%>
 Description="移除数据表前缀"%>
 <%@ Property Name="MakeType" Type="MakeTypeEnum" Default="" DeepLoad="True" Optional="True" Category="生成类型" 
 Description="生成类型"%>
+<%@ Property Name="TsModelNamespace" Type="String" Default="" DeepLoad="True" Optional="True" Category="生成类型" 
+Description="d.ts命名空间名字"%>
 <%@ Property Name="DataBaseType" Type="Tools.DatabaseTypeEnum" Default="" DeepLoad="True" Optional="True" Category="数据库类型" 
 Description="数据库类型"%>
 <script runat="template">
 public enum MakeTypeEnum{
     Procedure,
     Js,
-    Ts
+    Ts,
+    Dts,
 }
 </script>
 <%
@@ -40,6 +43,9 @@ switch(MakeType){
         break;        
     case MakeTypeEnum.Ts:
         list = Tools.CreateScript(dbModel, databaseType, 1);
+        break;    
+    case MakeTypeEnum.Dts:
+        list = Tools.CreateDts(dbModel, TsModelNamespace);
         break;
 }
 list.ForEach(x=>{

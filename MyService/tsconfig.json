@@ -8,7 +8,10 @@
       "dom",
     ],
     "sourceMap": true,
-    "outDir": "./bin"
+    "outDir": "./bin",
+    "typeRoots": [
+      "./typings"
+    ]
   },
   "exclude": [
     "node_modules",
