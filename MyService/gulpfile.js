@@ -19,7 +19,7 @@ gulp.task('clear-template', function () {
 });
 
 gulp.task('make-template', function () {
-    gulp.src(templateSrc)
+    return gulp.src(templateSrc)
         .pipe(replace('<%', '{%'))
         .pipe(replace('%>', '%}'))
         .pipe(gulp.dest(templateDestDir));
@@ -32,8 +32,6 @@ gulp.task('clearBin', function () {
         destDir
     ]);
 });
-
-gulp.task('clear', ['clearBin', 'clear-template']);
 
 gulp.task('ts', function () {
     return tsProject.src()
@@ -63,6 +61,10 @@ gulp.task('watch', function () {
     //gulp.watch(["**/*.ts", "!**/node_modules/**"], ['ts']);
 });
 
-gulp.task('dev', gulpSequence('copy', ['ts']));
+gulp.task('make', ['make-template']);
 
-gulp.task('default', gulpSequence('clearBin', 'copy', ['ts']));
+gulp.task('clear', ['clearBin', 'clear-template']);
+
+gulp.task('dev', gulpSequence('make', 'copy', ['ts']));
+
+gulp.task('default', gulpSequence('clear', 'make', 'copy', ['ts']));
