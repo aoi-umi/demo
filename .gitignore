@@ -2,8 +2,7 @@ node_modules
 .idea
 package-lock.json
 Template/Output
-MyService/error
+MyService/bin
 MyService/public/js/prd
-MyService/file
 MyService/views/_template_web
-MyService/routes/dal/_auto/*.js
+MyService/routes/dal/_auto/*.ts
