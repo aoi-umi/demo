@@ -53,20 +53,20 @@
     };
 </script>
 <% if(requirejs){ %>
-<script type="text/javascript" src="/js/plugins/require.js"></script>
+<script type="text/javascript" src="/js/libs/require.js"></script>
 <script type="text/javascript">
     requirejs.config({
         baseUrl: '/js',
         paths: {
-            'jquery': 'plugins/jquery-2.1.1.min',
-            'jquery.cookie': 'plugins/jquery.cookie',
+            'jquery': 'libs/jquery-2.1.1.min',
+            'jquery.cookie': 'libs/jquery.cookie',
             'jquery-ui': 'jquery-ui.min',
-            'bootstrap': 'plugins/bootstrap.min',
-            'ejs': 'plugins/ejs.min',
-            'spark-md5': 'plugins/spark-md5.min',
-            'socket.io': 'plugins/socket.io/socket.io',
-            'WdatePicker': 'plugins/My97DatePicker/WdatePicker.io',
-            'underscore': 'plugins/underscore-min',
+            'bootstrap': 'libs/bootstrap.min',
+            'ejs': 'libs/ejs.min',
+            'spark-md5': 'libs/spark-md5.min',
+            'socket.io': 'libs/socket.io/socket.io',
+            'WdatePicker': 'libs/My97DatePicker/WdatePicker.io',
+            'underscore': 'libs/underscore-min',
 
             'main': '<%= env %>/_main',
             'common': '<%= env %>/common',
@@ -112,15 +112,15 @@
     })
 </script>
 <% }else{ %>
-<script type="text/javascript" src="/js/plugins/jquery-2.1.1.min.js"></script>
-<script type="text/javascript" src="/js/plugins/jquery.cookie.js"></script>
-<script type="text/javascript" src="/js/plugins/jquery-ui.min.js"></script>
-<script type="text/javascript" src="/js/plugins/bootstrap.min.js"></script>
-<script type="text/javascript" src="/js/plugins/ejs.min.js"></script>
-<script type="text/javascript" src="/js/plugins/spark-md5.min.js"></script>
-<script type="text/javascript" src="/js/plugins/socket.io/socket.io.js"></script>
-<script type="text/javascript" src="/js/plugins/My97DatePicker/WdatePicker.js"></script>
-<script type="text/javascript" src="/js/plugins/underscore-min.js"></script>
+<script type="text/javascript" src="/js/libs/jquery-2.1.1.min.js"></script>
+<script type="text/javascript" src="/js/libs/jquery.cookie.js"></script>
+<script type="text/javascript" src="/js/libs/jquery-ui.min.js"></script>
+<script type="text/javascript" src="/js/libs/bootstrap.min.js"></script>
+<script type="text/javascript" src="/js/libs/ejs.min.js"></script>
+<script type="text/javascript" src="/js/libs/spark-md5.min.js"></script>
+<script type="text/javascript" src="/js/libs/socket.io/socket.io.js"></script>
+<script type="text/javascript" src="/js/libs/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript" src="/js/libs/underscore-min.js"></script>
 
 <script type="text/javascript">
     //临时
