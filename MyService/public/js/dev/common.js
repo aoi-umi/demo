@@ -33,7 +33,7 @@
         return SparkMD5.hash(str);
     };
     exports.md5File = function (file) {
-        return common.promise().then(function (res) {
+        return common.promise(function (defer) {
             var blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice,
                 chunkSize = 2097152,                             // Read in chunks of 2MB
                 chunks = Math.ceil(file.size / chunkSize),
@@ -51,12 +51,12 @@
                 } else {
                     // console.log('finished loading');
                     // console.info('computed hash', spark.end());  // Compute hash
-                    return res.resolve(spark.end());
+                    return defer.resolve(spark.end());
                 }
             };
 
             fileReader.onerror = function (e) {
-                return res.reject(e);
+                return defer.reject(e);
             };
 
             function loadNext() {
@@ -66,7 +66,7 @@
             }
 
             loadNext();
-            return res;
+            return defer;
         });
     };
     exports.createToken = function (str) {
@@ -409,7 +409,7 @@
                             y = targetDom.offset().top + (targetDom.outerHeight() - dom.outerHeight()) / 2;
                             break;
                     }
-                    dom.css({'left': x, 'top': y})
+                    dom.css({ 'left': x, 'top': y })
                         .show();
                     dom.close = function () {
                         dom.remove();
@@ -502,14 +502,16 @@
     };
     exports.promise = function (fn) {
         var def = $.Deferred();
-        var res = $.Deferred();
+        var defer = $.Deferred();
         def.resolve();
         return def.then(function () {
-            if (fn) {
-                return fn(res);
+            let result;
+            try {
+                result = fn(defer);
+            } catch (e) {
+                return $.Deferred().reject(e);
             }
-            else
-                return $.Deferred().resolve(res);
+            return result;
         });
     };
 

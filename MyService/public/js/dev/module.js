@@ -267,7 +267,7 @@
         },
         query: function (pageIndex) {
             var self = this;
-            return common.promise().then(function (res) {
+            return common.promise(function (defer) {
                 var errorDom = self.queryContainerDom.find('.error').hide();
                 var data = null;
                 var checkRes = self.opt.beforeQueryDataCheck(self);
@@ -280,7 +280,7 @@
                         } else {
                             err = new Error(checkRes.desc);
                         }
-                        return $.Deferred().reject(err);
+                        throw err;
                     }
                     data = checkRes.model;
                 }
@@ -298,7 +298,7 @@
                         item.colNum = i + 1;
                         self.queryContainerDom.append($(ejs.render(temp, item)).data('item', item));
                     });
-                    return res.resolve(t);
+                    return defer.resolve(t);
                 }).fail(function (e) {
                     self.queryContainerDom.find(self.rowClass).remove();
                     if (errorDom.length) {
@@ -308,11 +308,11 @@
                         errorDom.show();
                         e = null;
                     }
-                    return res.reject(e);
+                    return defer.reject(e);
                 }).always(function () {
                     notice.close();
                 });
-                return res;
+                return defer;
             }).fail(function (e) {
                 if (e) {
                     console.log(e);
@@ -331,37 +331,32 @@
         },
         save: function (dom) {
             var self = this;
-            return common.promise().then(function (res) {
+            return common.promise(function () {
                 var data = null;
-                try {
-                    var checkRes = self.opt.beforeSave(dom, self);
-                    if (checkRes) {
-                        console.log(checkRes)
-                        if (!checkRes.success) {
-                            var err = null;
-                            if (checkRes.dom) {
-                                common.msgNotice({ dom: checkRes.dom, msg: checkRes.desc });
-                            } else {
-                                err = new Error(checkRes.desc);
-                            }
-                            throw err;
+                var checkRes = self.opt.beforeSave(dom, self);
+                if (checkRes) {
+                    console.log(checkRes)
+                    if (!checkRes.success) {
+                        var err = null;
+                        if (checkRes.dom) {
+                            common.msgNotice({ dom: checkRes.dom, msg: checkRes.desc });
+                        } else {
+                            err = new Error(checkRes.desc);
                         }
-                        var notice = common.msgNotice({ type: 1, msg: '保存中...', noClose: true });
-                        data = checkRes.model;
-                        var method = self.opt.interfacePrefix + 'Save';
-                        myInterface[method](data).then(function (t) {
-                            self.opt.onSaveSuccess(t, self);
-                            return res.resolve(t);
-                        }).fail(function (e) {
-                            self.opt.onSaveFail(e, self);
-                            return res.reject();
-                        }).always(function () {
-                            notice.close();
-                        });
-                        return res;
+                        throw err;
                     }
-                } catch (e) {
-                    return $.Deferred().reject(e);
+                    var notice = common.msgNotice({ type: 1, msg: '保存中...', noClose: true });
+                    data = checkRes.model;
+                    var method = self.opt.interfacePrefix + 'Save';
+                    return myInterface[method](data).then(function (t) {
+                        self.opt.onSaveSuccess(t, self);
+                        return t;
+                    }).fail(function (e) {
+                        self.opt.onSaveFail(e, self);
+                        throw e;
+                    }).always(function () {
+                        notice.close();
+                    });
                 }
             }).fail(function (e) {
                 if (e)
@@ -370,13 +365,13 @@
         },
         del: function (item) {
             var self = this;
-            return common.promise().then(function (res) {
+            return common.promise(function (defer) {
                 common.msgNotice({
                     type: 1, msg: '是否删除?',
                     btnOptList: [{
                         content: '确认',
                         cb: function () {
-                            res.resolve();
+                            defer.resolve();
                         }
                     }, {
                         content: '取消',
@@ -384,7 +379,7 @@
                         }
                     }]
                 });
-                return res;
+                return defer;
             }).then(function () {
                 var notice = common.msgNotice({ type: 1, msg: '删除中...', noClose: true });
                 var data = {};
@@ -403,7 +398,7 @@
         },
         detailQuery: function (item) {
             var self = this;
-            return common.promise().then(function (res) {
+            return common.promise(function () {
                 var notice = common.msgNotice({ type: 1, msg: '查询中...', noClose: true });
                 var data = self.opt.beforeDetailQuery(item, self);
                 var method = self.opt.interfacePrefix + 'DetailQuery';

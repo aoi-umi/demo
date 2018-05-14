@@ -189,7 +189,7 @@
                             dom: mainContentChildDetailDom.find('[name=content]'),
                             canNotNull: true
                         }];
-                        var checkRes = common.dataCheck({list: argsOpt});
+                        var checkRes = common.dataCheck({ list: argsOpt });
                         if (!checkRes.success) {
                             common.msgNotice({
                                 type: checkRes.dom ? 0 : 1,
@@ -259,7 +259,7 @@
                     canNotNull: true,
                 }];
                 var detail = {};
-                var checkRes = common.dataCheck({list: saveArgsOpt});
+                var checkRes = common.dataCheck({ list: saveArgsOpt });
                 if (checkRes.success) {
                     var mainContent =
                         detail.mainContent = checkRes.model;
@@ -302,7 +302,7 @@
             setMainContentChildDetail: function (item, self) {
                 var mainContentChildDetailDom = $('#mainContentChildDetail');
                 if (!item) {
-                    mainContentChildDetailDom.data('item', {num: $(`#mainContentChildList ${self.rowClass}`).length + 1});
+                    mainContentChildDetailDom.data('item', { num: $(`#mainContentChildList ${self.rowClass}`).length + 1 });
                     mainContentChildDetailDom.find(':input').val('');
                     mainContentChildDetailDom.find('option:eq(0)').prop('selected', true);
                 } else {
@@ -324,35 +324,30 @@
             },
 
             statusUpdate: function (dom, self) {
-                var mainContent = {id: dom.data('id')};
-                return common.promise().then(function () {
-                    try {
-                        var operate = dom.data('operate');
-                        mainContent.operate = operate;
-                        var operateList = ['audit', 'pass', 'notPass', 'del', 'recovery'];
-                        if (!common.isInArray(operate, operateList))
-                            throw new Error(`错误的操作类型[${operate}]`);
-                        var detail = {
-                            mainContent: mainContent,
-                            remark: $('#remark').val()
-                        };
-                        var notice = common.msgNotice({type: 1, msg: '处理中', noClose: true});
-                        return myInterface['mainContentStatusUpdate'](detail).then(function () {
-                            common.msgNotice({
-                                type: 1, msg: '处理成功!', btnOptList: {
-                                    content: '确认',
-                                    cb: function () {
-                                        self.opt.onStatusUpdateSuccess(self);
-                                    }
+                var mainContent = { id: dom.data('id') };
+                return common.promise(function () {
+                    var operate = dom.data('operate');
+                    mainContent.operate = operate;
+                    var operateList = ['audit', 'pass', 'notPass', 'del', 'recovery'];
+                    if (!common.isInArray(operate, operateList))
+                        throw new Error(`错误的操作类型[${operate}]`);
+                    var detail = {
+                        mainContent: mainContent,
+                        remark: $('#remark').val()
+                    };
+                    var notice = common.msgNotice({ type: 1, msg: '处理中', noClose: true });
+                    return myInterface['mainContentStatusUpdate'](detail).then(function () {
+                        common.msgNotice({
+                            type: 1, msg: '处理成功!', btnOptList: {
+                                content: '确认',
+                                cb: function () {
+                                    self.opt.onStatusUpdateSuccess(self);
                                 }
-                            });
-                        }).always(function () {
-                            notice.close();
+                            }
                         });
-                    }
-                    catch (e) {
-                        return $.Deferred().reject(e);
-                    }
+                    }).always(function () {
+                        notice.close();
+                    });
                 }).fail(function (e) {
                     if (e && e.message)
                         e = e.message;
