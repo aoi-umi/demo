@@ -2,7 +2,7 @@
  * Created by bang on 2017-9-21.
  */
 (function (factory) {
-    namespace('my.vaild', factory(require, {}));
+    namespace('myVaild', factory(require, {}));
 })(function (require, exports) {
     exports.isInt = function (val, type) {
         //- 0 +

@@ -31,7 +31,7 @@
                 name: 'id',
                 dom: $('#id'),
                 checkValue: function (val) {
-                    if (val && !my.vaild.isInt(val, '001'))
+                    if (val && !myVaild.isInt(val, '001'))
                         return '请输入正确的正整数';
                 }
             }, {
@@ -125,7 +125,7 @@
                         dom: self.detailContainerDom.find('[name=code]'),
                         canNotNull: true,
                         checkValue: function (val) {
-                            if (!my.vaild.isRole(val))
+                            if (!myVaild.isRole(val))
                                 return '{0}只能由字母、数字、下划线组成';
                         }
                     }, {
@@ -236,7 +236,7 @@
                     excludeByRoleCode: self.opt.currRoleCode
                 };
                 if (opt) queryOpt.anyKey = opt.anyKey;
-                return my.interface.authorityQuery(queryOpt).then(function (t) {
+                return myInterface.authorityQuery(queryOpt).then(function (t) {
                     return t.list;
                 });
             },

@@ -35,7 +35,7 @@
                 name: 'id',
                 dom: $('#id'),
                 checkValue: function (val) {
-                    if (val && !my.vaild.isInt(val, '001'))
+                    if (val && !myVaild.isInt(val, '001'))
                         return '请输入正确的正整数';
                 }
             }, {
@@ -51,7 +51,7 @@
                 name: 'level',
                 dom: $('#level'),
                 checkValue: function (val) {
-                    if (val && !my.vaild.isInt(val, '001'))
+                    if (val && !myVaild.isInt(val, '001'))
                         return '请输入正确的正整数';
                 }
             }],
@@ -59,7 +59,7 @@
                 $('#tree').on('click', function () {
                     var data = {};
                     var method = 'mainContentTypeQuery';
-                    my.interface[method](data).then(function (t) {
+                    myInterface[method](data).then(function (t) {
                         var rootTree = {};
                         var itemTree = {};
                         $('.tree').empty();

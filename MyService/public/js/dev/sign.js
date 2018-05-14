@@ -20,7 +20,7 @@
             self.signIn($(this));
         });
         $(document).on('click', '.sign-out', function () {
-            my.interface.signOut().then(function () {
+            myInterface.signOut().then(function () {
                 $('.nav-sign').removeClass('in');
             }).fail(function (e) {
                 common.msgNotice({type: 1, msg: e.message});
@@ -67,7 +67,7 @@
             var req = {
                 headers: headers,
             };
-            return my.interface.signIn(data, req);
+            return myInterface.signIn(data, req);
         }).then(function (t) {
             if (location.pathname == '/sign/in') {
                 var args = common.getArgsFromUrlParams();
@@ -91,7 +91,7 @@
             dom: $('#account'),
             canNotNull: true,
             checkValue: function (val) {
-                if (!my.vaild.isAccount(val))
+                if (!myVaild.isAccount(val))
                     return '请输入正确的{0}';
             }
         }, {
@@ -131,7 +131,7 @@
                 return $.Deferred().reject(err);
             }
             checkRes.model.password = common.md5(checkRes.model.password);
-            return my.interface.signUp(checkRes.model);
+            return myInterface.signUp(checkRes.model);
         }).then(function (t) {
             location.href = '/';
         }).fail(function (e) {

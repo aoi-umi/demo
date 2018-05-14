@@ -4,11 +4,11 @@
 
 
 (function (factory) {
-    namespace('my.tab', factory(require, {}));
+    namespace('myTab', factory(require, {}));
 })(function (require, exports) {
     exports.opt = {
-        tabContainer: 'myTab',
-        panelContainer: 'myPanel',
+        tabContainer: 'tab',
+        panelContainer: 'panel',
         closeBtnTemplate: '<button name="tab-close-btn" type="button" class="close hidden" data-close-target="" aria-hidden="true" style="margin-left: 5px;float: none"><span class="glyphicon glyphicon-remove"></span></button>'
     };
     exports.tabContainer = null;

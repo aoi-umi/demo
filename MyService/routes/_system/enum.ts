@@ -1,21 +1,17 @@
-/**
- * Created by bang on 2017-7-29.
- */
 import config from '../../config';
 import * as common from './common';
 import errorConfig from './errorConfig';
-var myEnum = exports;
 
 export let enumDict = {};
 export let enumChangeDict = {};
 
 export let init = function (opt) {
-    myEnum.enumDict = opt.enumDict;
-    myEnum.enumChangeDict = opt.enumChangeDict;
+    enumDict = opt.enumDict;
+    enumChangeDict = opt.enumChangeDict;
 };
 
 export let getEnum = function (enumName, notThrowError?) {
-    var enumType = myEnum.enumDict[enumName];
+    var enumType = enumDict[enumName];
     if (!enumType && !notThrowError) throw common.error('enum "' + enumName + '" not exist!', errorConfig.CODE_ERROR);
     return enumType;
 };
@@ -39,9 +35,9 @@ export let enumChangeCheck = function (enumType, srcEnum, destEnum) {
         throw common.error('enumType can not be empty!');
 
     var enumOperateType = enumType + 'Operate';
-    var matchEnum = myEnum.getEnum(enumType);
-    var operateEnum = myEnum.getEnum(enumOperateType, true);
-    var changeDict = myEnum.enumChangeDict[enumType];
+    var matchEnum = getEnum(enumType);
+    var operateEnum = getEnum(enumOperateType, true);
+    var changeDict = enumChangeDict[enumType];
     if (srcEnum == undefined || srcEnum == null || destEnum == undefined || destEnum == null)
         throw common.error('', 'ARGS_ERROR');
     srcEnum = srcEnum.toString();
@@ -58,8 +54,8 @@ export let enumChangeCheck = function (enumType, srcEnum, destEnum) {
         throw common.error(common.stringFormat('no match dest enum [{0}] in [{1}]!', destEnum, enumType), errorConfig.CODE_ERROR);
 
     if (!changeDict[srcEnum] || !changeDict[srcEnum][destEnum]) {
-        var srcEnumName = myEnum.getValue(enumType, srcEnum) || myEnum.getValue(enumOperateType, srcEnum);
-        var destEnumName = myEnum.getValue(enumType, destEnum) || myEnum.getValue(enumOperateType, destEnum);
+        var srcEnumName = getValue(enumType, srcEnum) || getValue(enumOperateType, srcEnum);
+        var destEnumName = getValue(enumType, destEnum) || getValue(enumOperateType, destEnum);
         throw common.error(null, errorConfig.ENUM_CHANGED_INVALID, {
             //lang:'en',
             format: function (msg) {

@@ -32,7 +32,7 @@
             $('#list [name=errorContent]').empty();
             $('#list .row').remove();
 
-            my.interface.onlineUserQuery().then(function (t) {
+            myInterface.onlineUserQuery().then(function (t) {
                 for (var key in t) {
                     $('#list').append(ejs.render(temp, {key: key, count: t[key]}));
                 }
@@ -43,7 +43,7 @@
 
         $('#list').on('click', '.onlineUserKey', function () {
             var key = $(this).data('key');
-            my.interface.onlineUserDetailQuery({key: key}).then(function (t) {
+            myInterface.onlineUserDetailQuery({key: key}).then(function (t) {
                 var msg = t;
                 if (!msg)
                     msg = '未登录的用户';

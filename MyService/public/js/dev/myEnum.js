@@ -2,7 +2,7 @@
  * Created by bang on 2017-9-11.
  */
 (function (factory) {
-    namespace('my.enum', factory(require, {}));
+    namespace('myEnum', factory(require, {}));
 })(function (require, exports) {
     exports.getEnum = function (enumName, notThrowError) {
         var enumType = exports.enumDict[enumName];
