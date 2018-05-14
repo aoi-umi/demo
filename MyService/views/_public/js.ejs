@@ -70,11 +70,11 @@
 
             'main': '<%= env %>/_main',
             'common': '<%= env %>/common',
-            'my.enum': '<%= env %>/my.enum',
+            'myEnum': '<%= env %>/myEnum',
             'sign': '<%= env %>/sign',
             'socket': '<%= env %>/socket',
-            'my.interface': '<%= env %>/my.interface',
-            'my.vaild': '<%= env %>/my.vaild',
+            'myInterface': '<%= env %>/myInterface',
+            'myVaild': '<%= env %>/myVaild',
         },
         shim: {
             'bootstrap': {
@@ -87,8 +87,8 @@
             'common': {
                 exports: 'common'
             },
-            'my.enum': {
-                exports: 'my.enum'
+            'myEnum': {
+                exports: 'myEnum'
             },
             'sign': {
                 exports: 'sign'
@@ -96,17 +96,17 @@
             'socket': {
                 exports: 'socket'
             },
-            'my.interface': {
-                exports: 'my.interface'
+            'myInterface': {
+                exports: 'myInterface'
             },
-            'my.vaild': {
-                exports: 'my.vaild'
+            'myVaild': {
+                exports: 'myVaild'
             }
         }
     });
-    require(['jquery', 'underscore', 'my.enum'], function ($, _) {
+    require(['jquery', 'underscore', 'myEnum'], function ($, _) {
         $(function () {
-            var myEnum = require('my.enum');
+            var myEnum = require('myEnum');
             console.log(myEnum)
         })
     })
@@ -130,11 +130,11 @@
 <script type="text/javascript" src="/js/<%= env %>/_main.js?v=<%= version %>"></script>
 
 <script type="text/javascript" src="/js/<%= env %>/common.js?v=<%= version %>"></script>
-<script type="text/javascript" src="/js/<%= env %>/my.enum.js?v=<%= version %>"></script>
+<script type="text/javascript" src="/js/<%= env %>/myEnum.js?v=<%= version %>"></script>
 <script type="text/javascript" src="/js/<%= env %>/sign.js?v=<%= version %>"></script>
 <script type="text/javascript" src="/js/<%= env %>/socket.js?v=<%= version %>"></script>
-<script type="text/javascript" src="/js/<%= env %>/my.interface.js?v=<%= version %>"></script>
-<script type="text/javascript" src="/js/<%= env %>/my.vaild.js?v=<%= version %>"></script>
+<script type="text/javascript" src="/js/<%= env %>/myInterface.js?v=<%= version %>"></script>
+<script type="text/javascript" src="/js/<%= env %>/myVaild.js?v=<%= version %>"></script>
 <script type="text/javascript">
     $(function () {
         main.init();

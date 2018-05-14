@@ -73,20 +73,23 @@
         });
 
         //tab
-        my.tab.init();
+        myTab.init({
+            tabContainer: 'myTab1',
+            panelContainer: 'myPanel1',
+        });
         var tabData = [{
             id: 'tab-home',
             name: 'Home',
             targetId: 'panel-home',
         }];
-        $('#myTab').append(my.tab.tabs(tabData));
+        $('#myTab1').append(myTab.tabs(tabData));
 
         var tabPanelData = [{
             type: 'template',
             id: 'panel-test',
             content: 'testTemplate'
         }];
-        $('#myPanel').append(my.tab.panels(tabPanelData));
+        $('#myPanel1').append(myTab.panels(tabPanelData));
 
         $('#tab-home').click();
         var notice0;
@@ -97,7 +100,7 @@
                 if (notice0)
                     notice0.toggle();
                 else
-                    notice0 = common.msgNotice({msg: '12333', target: '.msgNotice[data-type=0]'});
+                    notice0 = common.msgNotice({ msg: '12333', target: '.msgNotice[data-type=0]' });
             } else if (type == 1) {
                 var msgNoticeBtnCount = parseInt($('#msgNoticeBtnCount').val());
                 var btnOptList = [];

@@ -45,7 +45,7 @@
                 name: 'id',
                 dom: $('#id'),
                 checkValue: function (val) {
-                    if (val && !my.vaild.isInt(val, '001'))
+                    if (val && !myVaild.isInt(val, '001'))
                         return '请输入正确的正整数';
                 }
             },],
@@ -305,7 +305,7 @@
                 common.promise().then(function () {
                     if (!data.id || data.id == 0)
                         return $.Deferred().reject(new Error('id为空！'));
-                    return my.interface.userInfoAdminSave(data);
+                    return myInterface.userInfoAdminSave(data);
                 }).then(function (t) {
                     common.msgNotice({
                         type: 1, msg: '保存成功:' + t,
@@ -353,7 +353,7 @@
                     excludeByUserId: self.opt.currUserId
                 };
                 if (opt) queryOpt.anyKey = opt.anyKey;
-                return my.interface.authorityQuery(queryOpt).then(function (t) {
+                return myInterface.authorityQuery(queryOpt).then(function (t) {
                     return t.list;
                 });
             },
@@ -401,7 +401,7 @@
                     excludeByUserId: self.opt.currUserId
                 };
                 if (opt) queryOpt.anyKey = opt.anyKey;
-                return my.interface.roleQuery(queryOpt).then(function (t) {
+                return myInterface.roleQuery(queryOpt).then(function (t) {
                     return t.list;
                 });
             },

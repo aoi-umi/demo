@@ -2,7 +2,7 @@
  * Created by bang on 2017-9-11.
  */
 (function (factory) {
-    namespace('my.interface', factory(require, {}));
+    namespace('myInterface', factory(require, {}));
 })(function (require, exports) {
     exports.opt = {
         interfaceConfig: {},

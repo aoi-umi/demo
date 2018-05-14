@@ -22,7 +22,7 @@
 
         if (parent == window)
             socket.init();
-        my.interface.init({
+        myInterface.init({
             interfaceConfig: {
                 signUp: {
                     url: '/interface/sign/up'
@@ -62,7 +62,7 @@
 
         self.bindEvent();
 
-        my.enum.enumDict = {};
+        myEnum.enumDict = {};
     };
 
     exports.bindEvent = function () {

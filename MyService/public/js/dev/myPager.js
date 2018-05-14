@@ -2,7 +2,7 @@
  * Created by umi on 2017-9-10.
  */
 (function (factory) {
-    namespace('my.pager', factory(require, {}));
+    namespace('myPager', factory(require, {}));
 })(function (require, exports) {
     exports = function (option) {
         this.init(option);

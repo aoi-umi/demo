@@ -19,7 +19,7 @@
                 name: 'id',
                 dom: $('#id'),
                 checkValue: function (val) {
-                    if (val && !my.vaild.isInt(val, '001'))
+                    if (val && !myVaild.isInt(val, '001'))
                         return '请输入正确的正整数';
                 }
             }, {

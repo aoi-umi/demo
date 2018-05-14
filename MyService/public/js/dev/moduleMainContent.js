@@ -66,7 +66,7 @@
                 name: 'id',
                 dom: $('#id'),
                 checkValue: function (val) {
-                    if (val && !my.vaild.isInt(val, '001'))
+                    if (val && !myVaild.isInt(val, '001'))
                         return '请输入正确的正整数';
                 }
             },],
@@ -337,7 +337,7 @@
                             remark: $('#remark').val()
                         };
                         var notice = common.msgNotice({type: 1, msg: '处理中', noClose: true});
-                        return my.interface['mainContentStatusUpdate'](detail).then(function () {
+                        return myInterface['mainContentStatusUpdate'](detail).then(function () {
                             common.msgNotice({
                                 type: 1, msg: '处理成功!', btnOptList: {
                                     content: '确认',
