@@ -10,6 +10,7 @@
     "sourceMap": true,
     "outDir": "./bin",
     "typeRoots": [
+      "./node_modules/@types",
       "./typings"
     ]
   },
