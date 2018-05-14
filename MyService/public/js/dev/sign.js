@@ -44,7 +44,7 @@
             dom: form.find('[name=password]'),
             canNotNull: true,
         }];
-        common.promise().then(function () {
+        common.promise(function () {
             var opt = {list: signInArgsOpt};
             var checkRes = common.dataCheck(opt);
             var err = null;
@@ -118,7 +118,7 @@
                     return '密码不一致';
             }
         }];
-        common.promise().then(function () {
+        common.promise(function () {
             var opt = {list: signUpArgsOpt};
             var checkRes = common.dataCheck(opt);
             var err = null;

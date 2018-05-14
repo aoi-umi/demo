@@ -302,9 +302,9 @@
                     else if (changeStatus == -2)
                         data.delRoleList.push(code);
                 });
-                common.promise().then(function () {
+                common.promise(function () {
                     if (!data.id || data.id == 0)
-                        return $.Deferred().reject(new Error('id为空！'));
+                        throw new Error('id为空！');
                     return myInterface.userInfoAdminSave(data);
                 }).then(function (t) {
                     common.msgNotice({
