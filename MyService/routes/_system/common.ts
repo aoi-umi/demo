@@ -35,7 +35,6 @@ export let extend = function (...args) {
  * @param fn 带nodeCallback参数的方法
  * @param caller 调用对象 如果等于 'noCallback'，通过defer控制
  * @param args 
- * 示例
  */
 export let promise = function (fn: Function, caller: any = 'noCallback', ...args): Q.Promise<any> {
     var defer = q.defer();
@@ -45,8 +44,8 @@ export let promise = function (fn: Function, caller: any = 'noCallback', ...args
     if (!args)
         args = [];
     if (caller === 'noCallback') {
-        var res = q.defer();
-        args.push(res);
+        var def = q.defer();
+        args.push(def);
         defer.resolve(fn.apply(void 0, args));
     } else {
         args.push(function (err, ...cbArgs) {

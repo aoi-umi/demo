@@ -40,14 +40,29 @@ gulp.task('ts', function () {
 });
 
 //前端
-gulp.task('ts-front', function () {
-    return gulp.src('public/ts/**/*.ts')
-        .pipe(ts({
-            noImplicitAny: true,
-            sourceMap: true,
-            "module": "umd",
-            "target": "es5",
-        })).pipe(gulp.dest(destDir + '/public/js'));
+// gulp.task('ts-front', function () {
+//     return gulp.src('public/ts/**/*.ts')
+//         .pipe(ts({
+//             noImplicitAny: true,
+//             sourceMap: true,
+//             "module": "umd",
+//             "target": "es5",
+//         })).pipe(gulp.dest(destDir + '/public/js'));
+// });
+let webJsDestDir = 'public/js/prd/';
+let webJsSrc = 'public/js/dev/**';
+gulp.task('clear-web-js', function () {
+    return del([
+        webJsDestDir + '*'
+    ]);
+});
+
+gulp.task('make-web-js', function () {
+    return gulp.src(webJsSrc)
+        .pipe(babel({
+            presets: ['es2015']
+        }))
+        .pipe(gulp.dest(webJsDestDir));
 });
 
 let copySrc = ['public/!(ts)/**/*', 'views/**/*'];
@@ -61,9 +76,9 @@ gulp.task('watch', function () {
     //gulp.watch(["**/*.ts", "!**/node_modules/**"], ['ts']);
 });
 
-gulp.task('make', ['make-template']);
+gulp.task('make', ['make-template', 'make-web-js']);
 
-gulp.task('clear', ['clearBin', 'clear-template']);
+gulp.task('clear', ['clearBin', 'clear-template', 'clear-web-js']);
 
 gulp.task('dev', gulpSequence('make', 'copy', ['ts']));
 
