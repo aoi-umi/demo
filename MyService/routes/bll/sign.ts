@@ -4,7 +4,6 @@ import * as main from '../_main';
 import errorConfig from '../_system/errorConfig';
 import * as autoBll from './_auto';
 import * as userInfoBll from './userInfo';
-var signBll = exports;
 
 export let up = function (opt, exOpt) {
     var userInfoId = 0;
@@ -59,7 +58,7 @@ export let out = function (opt, exOpt) {
 
 //与关键字冲突
 exports.in = function (opt, exOpt) {
-    return signBll.inInside(exOpt.req).then(function (t) {
+    return inInside(exOpt.req).then(function (t) {
         return {
             id: t.userInfo.id,
             nickname: t.userInfo.nickname

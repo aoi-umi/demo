@@ -3,7 +3,6 @@
  */
 import * as common from './common';
 import errorConfig from './errorConfig';
-var auth = exports;
 
 var authConfig = {
     'dev': {
@@ -26,14 +25,14 @@ var authConfig = {
 export let accessableUrlConfig = [];
 
 export let init = function (opt) {
-    auth.accessableUrlConfig = opt.accessableUrlConfig;
+    accessableUrlConfig = opt.accessableUrlConfig;
 };
 
 export let check = function (req, res, next) {
     //url权限认证
     var user = req.myData.user;
     var pathname = req._parsedUrl.pathname;
-    req.myData.accessableUrl = auth.getAccessableUrl(user, pathname);
+    req.myData.accessableUrl = getAccessableUrl(user, pathname);
     next();
 };
 
@@ -42,7 +41,7 @@ export let isHadAuthority = function (user, authData, opt?) {
         authData = [authData];
     for (var i = 0; i < authData.length; i++) {
         var item = authData[i];
-        if (!auth.isExistAuthority(user, item, opt)) {
+        if (!isExistAuthority(user, item, opt)) {
             return false;
         }
     }
@@ -63,7 +62,7 @@ export let isExistAuthority = function (user, authData, opt) {
         }
     }
     if (opt && opt.throwError) {
-        throw common.error('', auth.getErrorCode(opt.notExistAuthority));
+        throw common.error('', getErrorCode(opt.notExistAuthority));
     }
     return false;
 };
@@ -73,19 +72,19 @@ export let getAccessableUrl = function (user, pathname) {
     var url = {};
     var accessable = false;
     var isUrlExist = false;
-    auth.accessableUrlConfig.forEach(function (item) {
+    accessableUrlConfig.forEach(function (item) {
         var opt = { notExistAuthority: null };
-        var isHadAuthority = !item.auth || !item.auth.length || auth.isHadAuthority(user, item.auth, opt);
+        var result = !item.auth || !item.auth.length || isHadAuthority(user, item.auth, opt);
         var isExist = item.url == pathname;
         if (isExist) isUrlExist = true;
-        if (isHadAuthority) {
+        if (result) {
             url[item.url] = true;
             if (isExist)
                 accessable = true;
         } else if (isExist) {
             var errCode = authConfig.accessable.errCode;
             if (opt.notExistAuthority)
-                errCode = auth.getErrorCode(opt.notExistAuthority);
+                errCode = getErrorCode(opt.notExistAuthority);
             throw common.error('', errCode);
         }
     });

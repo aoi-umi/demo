@@ -7,7 +7,6 @@ import * as common from '../_system/common';
 import errorConfig from '../_system/errorConfig';
 import * as myEnum from '../_system/enum';
 import * as auth from '../_system/auth';
-var mainContentBll = exports;
 
 export let query = function (opt, exOpt) {
     var user = exOpt.user;
@@ -72,7 +71,7 @@ export let save = function (opt, exOpt) {
     var user = exOpt.user;
     return common.promise(function () {
         mainContent = opt.mainContent;
-        return mainContentBll.detailQuery({ id: mainContent.id }, exOpt);
+        return detailQuery({ id: mainContent.id }, exOpt);
     }).then(function (mainContentDetail) {
         var delChildList;
         if (mainContent.id != 0) {
@@ -172,7 +171,7 @@ export let statusUpdate = function (opt, exOpt) {
         necessaryAuth = 'mainContent' + common.stringToPascal(operate);
         if (!auth.isHadAuthority(user, necessaryAuth))
             throw common.error(`没有[${necessaryAuth}]权限`);
-        return mainContentBll.detailQuery({ id: mainContent.id }, { user: exOpt.user });
+        return detailQuery({ id: mainContent.id }, { user: exOpt.user });
     }).then(function (mainContentDetail) {
         if (necessaryAuth == 'mainContentDel' && !mainContentDetail.canDelete) {
             throw common.error(`没有权限`);

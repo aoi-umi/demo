@@ -11,7 +11,6 @@ import * as zlib from 'zlib';
 import config from '../../config';
 import errorConfig from './errorConfig';
 import * as logService from '../service/logService';
-var common = exports;
 
 export let extend = function (...args) {
     var res;
@@ -91,19 +90,19 @@ export let promisify = function (fun) {
 export let promisifyAll = function (obj) {
     for (var key in obj) {
         if (typeof obj[key] == 'function')
-            obj[key + 'Promise'] = common.promisify(obj[key]);
+            obj[key + 'Promise'] = promisify(obj[key]);
     }
 };
 
 export let requestServiceByConfigPromise = function (option) {
     var method = '';
     var url = '';
-    var log = common.logModle();
+    var log: any = logModle();
     var startTime = new Date().getTime();
     return promise(function () {
         var errStr = 'service "' + option.serviceName + '"';
         var service = config.api[option.serviceName];
-        if (!service) throw common.error(errStr + ' is not exist!');
+        if (!service) throw error(errStr + ' is not exist!');
         var serviceArgs = null;
 
         var defaultMethodArgs = {
@@ -111,7 +110,7 @@ export let requestServiceByConfigPromise = function (option) {
             method: 'POST',
         }
         var methodArgs = service.method[option.methodName];
-        methodArgs = common.extend(defaultMethodArgs, methodArgs);
+        methodArgs = extend(defaultMethodArgs, methodArgs);
         //console.log(methodArgs);
         if (methodArgs.isUseDefault) {
             serviceArgs = service.defaultArgs;
@@ -119,14 +118,14 @@ export let requestServiceByConfigPromise = function (option) {
         else {
             serviceArgs = methodArgs.args;
         }
-        if (!serviceArgs) throw common.error(errStr + ' args is empty!');
+        if (!serviceArgs) throw error(errStr + ' args is empty!');
 
         var host = serviceArgs.host;
-        if (!host) throw common.error(errStr + ' host is empty!');
+        if (!host) throw error(errStr + ' host is empty!');
 
         method = methodArgs.method;
         url = methodArgs.url;
-        if (!url) throw common.error(errStr + ' method "' + option.methodName + '" url is empty!');
+        if (!url) throw error(errStr + ' method "' + option.methodName + '" url is empty!');
         url = host + url;
         var opt = {
             url: url,
@@ -137,12 +136,12 @@ export let requestServiceByConfigPromise = function (option) {
             //发送的参数 当前所用参数
             option.beforeRequest(opt, serviceArgs);
         }
-        log.guid = common.guid();
+        log.guid = guid();
         log.url = url;
         log.req = opt.body;
         log.method = '[' + option.serviceName + '][' + option.methodName + ']';
         log.duration = startTime - new Date().getTime();
-        return common.requestServicePromise(opt);
+        return requestServicePromise(opt);
     }).then(function (t) {
         log.result = true;
         log.res = t;
@@ -158,7 +157,7 @@ export let requestServiceByConfigPromise = function (option) {
         throw e;
     }).finally(function () {
         if (!option.noLog) {
-            common.logSave(log);
+            logSave(log);
         }
     });
 };
@@ -169,11 +168,11 @@ export let requestServicePromise = function (option) {
         json: true,
         encoding: null,
     };
-    opt = common.extend(opt, option);
+    opt = extend(opt, option);
     if (!opt.headers) opt.headers = {};
     opt.headers['x-requested-with'] = 'xmlhttprequest';
     //console.log(opt)
-    return common.promise(function (res) {
+    return promise(function (res) {
         request(opt, function (err, response, data) {
             try {
                 if (err)
@@ -182,7 +181,7 @@ export let requestServicePromise = function (option) {
                 if (encoding) {
                     switch (encoding) {
                         case 'gzip':
-                            return common.unzipPromise(data).then(function (buffer) {
+                            return unzipPromise(data).then(function (buffer) {
                                 data = buffer.toString();
                                 if (data && typeof data == 'string')
                                     data = JSON.parse(data);
@@ -191,7 +190,7 @@ export let requestServicePromise = function (option) {
                                 return res.reject(e);
                             });
                         default:
-                            throw common.error('Not Accept Encoding');
+                            throw error('Not Accept Encoding');
                     }
                 }
                 if (Buffer.isBuffer(data)) {
@@ -209,7 +208,7 @@ export let requestServicePromise = function (option) {
     });
 };
 
-export let unzipPromise = common.promisify(zlib.unzip);
+export let unzipPromise = promisify(zlib.unzip);
 
 //code: string || errorConfig
 export let error = function (msg, code?, option?) {
@@ -220,7 +219,7 @@ export let error = function (msg, code?, option?) {
     };
     var status = null;
     if (option)
-        opt = common.extend(opt, option);
+        opt = extend(opt, option);
     if (!code)
         code = '';
     var error;
@@ -229,7 +228,7 @@ export let error = function (msg, code?, option?) {
         code = error.code;
     }
     else {
-        error = common.getErrorConfigByCode(code);
+        error = getErrorConfigByCode(code);
     }
     if (error) {
         status = error.status;
@@ -258,8 +257,8 @@ export let writeError = function (err, opt?) {
     console.error(err);
 
     var list = [];
-    var createDate = common.dateFormat(new Date(), 'yyyy-MM-dd');
-    var createDateTime = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
+    var createDate = dateFormat(new Date(), 'yyyy-MM-dd');
+    var createDateTime = dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
     list.push(createDateTime);
     if (opt)
         list.push(JSON.stringify(opt));
@@ -267,16 +266,16 @@ export let writeError = function (err, opt?) {
     //用于查找上一级调用
     var stack = new Error().stack;
     var stackList = ['stack:']
-        .concat(common.getStack(err.stack))
+        .concat(getStack(err.stack))
         .concat(['help stack:'])
-        .concat(common.getStack(stack));
+        .concat(getStack(stack));
     for (var i = 0; i < stackList.length; i++) {
         console.error(stackList[i]);
         list.push(stackList[i]);
     }
 
     //write file
-    common.mkdirsSync(config.errorDir);
+    mkdirsSync(config.errorDir);
     var fileName = config.errorDir + '/' + createDate + '.txt';
     fs.appendFile(fileName, list.join('\r\n') + '\r\n\r\n', function () {
     });
@@ -305,11 +304,11 @@ export let getStack = function (stack) {
     return list;
 };
 
-export let mkdirsSync = function (dirname, mode) {
+export let mkdirsSync = function (dirname, mode?) {
     if (fs.existsSync(dirname)) {
         return true;
     } else {
-        if (common.mkdirsSync(path.dirname(dirname), mode)) {
+        if (mkdirsSync(path.dirname(dirname), mode)) {
             fs.mkdirSync(dirname, mode);
             return true;
         } else {
@@ -455,7 +454,7 @@ export let isInArray = function (obj, list) {
 };
 
 export let createToken = function (str) {
-    var code = common.md5(str);
+    var code = md5(str);
     return code;
 };
 
@@ -463,7 +462,7 @@ export let md5 = function (data, option?) {
     var opt = {
         encoding: 'hex',
     };
-    opt = common.extend(opt, option);
+    opt = extend(opt, option);
     var md5 = crypto.createHash('md5');
     if (typeof (data) == 'string')
         data = new Buffer(data, 'utf8');
@@ -488,7 +487,7 @@ export let logModle = function () {
         code: null,
         req: null,
         res: null,
-        createDate: common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss'),
+        createDate: dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss'),
         remark: null,
     };
 };
@@ -553,7 +552,7 @@ export let getListDiff = function (option) {
             return item;
         }
     };
-    opt = common.extend(opt, option);
+    opt = extend(opt, option);
     var list = opt.list, newList = opt.newList,
         compare = opt.compare, delReturnValue = opt.delReturnValue, addReturnValue = opt.addReturnValue;
     var delList = [];
