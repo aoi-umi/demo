@@ -7,7 +7,7 @@ import * as common from '../_system/common';
 import errorConfig from '../_system/errorConfig';
 import * as cache from '../_system/cache';
 import * as autoBll from './_auto';
-var userInfoBll = exports;
+
 export let isAccountExist = function (account) {
     return common.promise(function () {
         if (!account)
@@ -23,7 +23,7 @@ export let isAccountExist = function (account) {
 export let save = function (opt, exOpt) {
     var user = exOpt.user;
     var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
-    var userInfoLog = userInfoBll.createLog();
+    var userInfoLog = createLog();
     userInfoLog.userInfoId = user.id;
     return common.promise(function () {
         return autoBll.detailQuery('userInfo', { id: user.id }).then(function (t) {
@@ -149,7 +149,7 @@ export let adminSave = function (opt, exOpt) {
     var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
     var id = opt.id;
     var user = exOpt.user;
-    var userInfoLog = userInfoBll.createLog();
+    var userInfoLog = createLog();
     userInfoLog.userInfoId = id;
     userInfoLog.type = 1;
     userInfoLog.content = `${user.account}(${user.nickname}#${user.id})`;

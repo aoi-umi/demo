@@ -5,9 +5,9 @@ import * as autoBll from './_auto';
 import * as common from '../_system/common';
 import errorConfig from '../_system/errorConfig';
 import * as auth from '../_system/auth';
-var mainContentTypeBll = exports;
-exports.save = function (opt) {
-    return mainContentTypeBll.isExist(opt).then(function (t) {
+
+export let save = function (opt) {
+    return isExist(opt).then(function (t) {
         if (t.isExist && t.detail.id != opt.id) {
             throw common.error('type [' + opt.type + '] is exist');
         }
@@ -15,7 +15,7 @@ exports.save = function (opt) {
     });
 };
 
-exports.isExist = function (opt) {
+export let isExist = function (opt) {
     return common.promise(function () {
         if (!opt || (opt.id != 0 && !opt.id) || !opt.type)
             throw common.error(null, errorConfig.ARGS_ERROR);

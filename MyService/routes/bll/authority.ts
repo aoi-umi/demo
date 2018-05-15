@@ -1,9 +1,8 @@
 ﻿
 import * as  autoBll from './_auto';
 import * as  common from '../_system/common';
-var authority = exports;
 
-exports.save = function (opt) {
+export let save = function (opt) {
     return common.promise(function () {
         if (opt.statusUpdateOnly) {
             if (!opt.id || opt.id == 0)
@@ -13,7 +12,7 @@ exports.save = function (opt) {
                 status: opt.status
             };
         } else {
-            return authority.isExist(opt).then(function (t) {
+            return isExist(opt).then(function (t) {
                 if (t)
                     throw common.error(`code[${opt.code}]已存在`);
             });
@@ -23,7 +22,7 @@ exports.save = function (opt) {
     });
 };
 
-exports.isExist = function (opt) {
+export let isExist = function (opt) {
     var code = opt.code;
     return common.promise(function () {
         if (!code)
@@ -40,7 +39,7 @@ exports.isExist = function (opt) {
     });
 };
 
-exports.query = function (opt) {
+export let query = function (opt) {
     if (opt.id || opt.anyKey) {
         delete opt.code;
         delete opt.name;

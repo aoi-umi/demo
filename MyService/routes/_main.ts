@@ -8,7 +8,6 @@ import * as sign from './bll/sign';
 
 import config from '../config';
 
-var main = exports;
 //路由配置 文件必须在routes目录下
 export let restConfig = [
     {
@@ -206,11 +205,11 @@ export let init = function (opt) {
     };
 
     auth.init({
-        accessableUrlConfig: main.accessableUrlConfig
+        accessableUrlConfig: accessableUrlConfig
     });
     myEnum.init({
-        enumDict: main.enumDict,
-        enumChangeDict: main.enumChangeDict,
+        enumDict: enumDict,
+        enumChangeDict: enumChangeDict,
     });
 
     let myRender = function (req, res, view, options) {
@@ -224,7 +223,7 @@ export let init = function (opt) {
             accessableUrl: req.myData.accessableUrl,
         };
         opt = common.extend(opt, options);
-        res.render(view, main.formatViewtRes(opt));
+        res.render(view, formatViewtRes(opt));
     };
     let mySend = function (req, res, err, detail, option) {
         var url = req.header('host') + req.originalUrl;
@@ -232,26 +231,26 @@ export let init = function (opt) {
             url: url,
         };
         opt = common.extend(opt, option);
-        var formatRes = main.formatRes(err, detail, opt);
+        var formatResResult = formatRes(err, detail, opt);
         if (req.myData.useStatus && err && err.status)
             res.status(err.status);
-        res.send(formatRes);
-        var result = formatRes.result;
+        res.send(formatResResult);
+        var result = formatResResult.result;
         var logReq = req.method == 'POST' ? req.body : '';
-        var logRes = formatRes.detail;
+        var logRes = formatResResult.detail;
         var logMethod = '[' + (config.name + '][' + (req.myData.method.methodName || req.originalUrl)) + ']';
 
         if (!req.myData.noLog) {
             var log: any = common.logModle();
             log.url = url;
             log.result = result;
-            log.code = formatRes.code;
+            log.code = formatResResult.code;
             log.method = logMethod
             log.req = logReq;
             log.res = logRes;
             log.ip = req.myData.ip;
-            log.remark = formatRes.desc + `[account:${req.myData.user.account}]`;
-            log.guid = formatRes.guid;
+            log.remark = formatResResult.desc + `[account:${req.myData.user.account}]`;
+            log.guid = formatResResult.guid;
             log.duration = new Date().getTime() - req.myData.startTime;
             common.logSave(log);
         }
@@ -301,9 +300,9 @@ export let init = function (opt) {
             mySend(req, res, err, detail, opt)
         };
 
-        var userInfoKey = req.cookies[main.cacheKey.userInfo];
+        var userInfoKey = req.cookies[cacheKey.userInfo];
         if (userInfoKey) {
-            userInfoKey = main.cacheKey.userInfo + userInfoKey;
+            userInfoKey = cacheKey.userInfo + userInfoKey;
             cache.get(userInfoKey).then(function (t) {
                 if (t) {
                     t.key = userInfoKey;

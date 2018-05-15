@@ -4,7 +4,6 @@
 import * as q from 'q';
 import * as autoBll from './_auto';
 import * as common from '../_system/common';
-var roleBll = exports;
 
 export let save = function (opt) {
     var id;
@@ -17,7 +16,7 @@ export let save = function (opt) {
                 id = t;
             });
         } else {
-            return roleBll.isExist(dataRole).then(function (t) {
+            return isExist(dataRole).then(function (t) {
                 if (t)
                     throw common.error(`code[${dataRole.code}]已存在`);
 

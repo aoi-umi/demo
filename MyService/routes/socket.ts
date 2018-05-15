@@ -4,29 +4,27 @@
 import * as main from './_main';
 import * as common from './_system/common';
 import * as cache from './_system/cache';
-var mySocket = exports;
 
 export let onlineCount = 0;
 export let onlineUser = {};
 export let io = null;
-export let init = function (io) {
-    mySocket.io = io;
-    mySocket.bindEvent();
+export let init = function (optIO) {
+    io = optIO;
+    bindEvent();
 };
 export let bindEvent = function () {
-    var io = mySocket.io;
     io.on('connection', function (socket) {
         socket.myData = {};
         socket.on('init', function (opt) {
             tryFn(socket, function () {
                 socket.myData.user = opt.user;
-                if (!mySocket.onlineUser[opt.user]) {
-                    mySocket.onlineUser[opt.user] = 1;
-                    mySocket.onlineCount++;
+                if (!onlineUser[opt.user]) {
+                    onlineUser[opt.user] = 1;
+                    onlineCount++;
                 }
                 else
-                    mySocket.onlineUser[opt.user]++;
-                io.sockets.emit('onlineCount', mySocket.onlineCount);
+                    onlineUser[opt.user]++;
+                io.sockets.emit('onlineCount', onlineCount);
             });
         });
 
@@ -56,12 +54,12 @@ export let bindEvent = function () {
 
         socket.on('disconnect', function () {
             tryFn(socket, function () {
-                var userLinks = mySocket.onlineUser[socket.myData.user];
+                var userLinks = onlineUser[socket.myData.user];
                 if (userLinks && userLinks > 0)
-                    userLinks = --mySocket.onlineUser[socket.myData.user];
-                if (userLinks <= 0 && mySocket.onlineCount > 0) {
-                    mySocket.onlineCount--;
-                    io.sockets.emit('onlineCount', mySocket.onlineCount);
+                    userLinks = --onlineUser[socket.myData.user];
+                if (userLinks <= 0 && onlineCount > 0) {
+                    onlineCount--;
+                    io.sockets.emit('onlineCount', onlineCount);
                 }
             });
         });
