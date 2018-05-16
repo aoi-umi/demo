@@ -17,20 +17,14 @@ export let get = function (req, res, next) {
         req: req,
     }
     //console.log(req.originalUrl, req._parsedUrl.pathname)
-    switch (pathname) {
-        case '/':
-            opt.view = '/index';
-            break;
-    }
-
-    var moduleViewPath = path.join(req.myData.viewPath, 'module', opt.view + '.ejs');
-    var isExist = fs.existsSync(moduleViewPath);
-    if (!isExist)
-        return next();
 
     common.promise(function () {
         return setViewOption(opt);
     }).then(function () {
+        var moduleViewPath = path.join(req.myData.viewPath, 'module', opt.view + '.ejs');
+        var isExist = fs.existsSync(moduleViewPath);
+        if (!isExist)
+            return next();
         res.myRender('view', opt);
     }).fail(function (e) {
         next(e);
@@ -40,27 +34,30 @@ export let get = function (req, res, next) {
 var setViewOption = function (opt) {
     let req = opt.req;
     var query = req.query;
-    var user = req.myData.user;
+    var user = opt.user;
     switch (opt.view) {
+        case '/':
+            opt.view = '/index';
+            break;
+
         case '/status':
             opt.enumDict = main.enumDict;
             opt.enumChangeDict = main.enumChangeDict;
             break;
 
         case '/userInfo/detail':
-            var userInfoId = user.id;
-            if (query.id && query.id != userInfoId) {
-                auth.isHadAuthority(user, 'admin', { throwError: true });
-                userInfoId = query.id;
-            }
-            return require('../viewBll/userInfo').detailQuery({ id: userInfoId }, opt);
+            return require('../viewBll/userInfo').detailQuery({ id: query.id || user.id }, opt);
 
         case '/mainContent/list':
             opt.mainContentStatusEnum = myEnum.getEnum('mainContentStatusEnum');
             opt.mainContentTypeEnum = myEnum.getEnum('mainContentTypeEnum');
             break;
+
         case '/mainContent/detail':
             return require('../viewBll/mainContent').detailQuery({ id: query.id }, opt);
+
+        case '/help':
+            return require('../viewBll/help').get(null, opt);
 
     }
 };

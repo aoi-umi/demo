@@ -1,6 +1,6 @@
-import * as common from './_system/common';
-import * as main from './_main';
-export let get = function (req, res) {
+import * as common from '../_system/common';
+import * as main from '../_main';
+export let get = function (opt, viewOpt) {
     var restList = [];
     var restConfig = main.routeConfig;
     for (var i = 0; i < restConfig.length; i++) {
@@ -23,11 +23,6 @@ export let get = function (req, res) {
             restList.push({ url: rest.url, method: rest.method, exampleRequest: exampleRequest });
         }
     }
-
-    var opt = {
-        view: 'help',
-        title: 'help',
-        restList: restList
-    };
-    res.myRender('view', opt);
+    viewOpt.title = 'help';
+    viewOpt.restList = restList;
 };
