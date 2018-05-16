@@ -94,7 +94,7 @@ export let promisifyAll = function (obj) {
     }
 };
 
-export let requestServiceByConfigPromise = function (option) {
+export let requestServiceByConfig = function (option) {
     var method = '';
     var url = '';
     var log: any = logModle();
@@ -141,7 +141,7 @@ export let requestServiceByConfigPromise = function (option) {
         log.req = opt.body;
         log.method = '[' + option.serviceName + '][' + option.methodName + ']';
         log.duration = startTime - new Date().getTime();
-        return requestServicePromise(opt);
+        return requestService(opt);
     }).then(function (t) {
         log.result = true;
         log.res = t;
@@ -162,7 +162,7 @@ export let requestServiceByConfigPromise = function (option) {
     });
 };
 
-export let requestServicePromise = function (option) {
+export let requestService = function (option) {
     var opt: any = {
         method: 'POST',
         json: true,
@@ -174,7 +174,7 @@ export let requestServicePromise = function (option) {
     //console.log(opt)
     return promise(function (res) {
         request(opt, function (err, response, data) {
-            try {
+            return promise(() => {
                 if (err)
                     throw err;
                 var encoding = response.headers['content-encoding'];
@@ -185,9 +185,7 @@ export let requestServicePromise = function (option) {
                                 data = buffer.toString();
                                 if (data && typeof data == 'string')
                                     data = JSON.parse(data);
-                                return res.resolve(data);
-                            }).fail(function (e) {
-                                return res.reject(e);
+                                return data;
                             });
                         default:
                             throw error('Not Accept Encoding');
@@ -196,11 +194,12 @@ export let requestServicePromise = function (option) {
                 if (Buffer.isBuffer(data)) {
                     data = data.toString();
                 }
-                return res.resolve(data);
-            } catch (e) {
+                return data;
+            }).then(t => {
+                return res.resolve(t);
+            }).catch(e => {
                 return res.reject(e);
-                //console.error(opt);
-            }
+            });
         });
         return res.promise;
     }).fail(function (e) {
@@ -441,16 +440,15 @@ export let dateFormat = function (date, format) {
 //console.log(export let dateFormat(null,'yyyy-MM-dd H:mm:ss'))
 
 export let isInArray = function (obj, list) {
-    var result = false;
     if (list) {
-        list.forEach(function (t) {
+        for (var i = 0; i < list.length; i++) {
+            var t = list[i];
             if (t === obj) {
-                result = true;
-                return false;
+                return true;
             }
-        });
+        }
     }
-    return result;
+    return false;
 };
 
 export let createToken = function (str) {
