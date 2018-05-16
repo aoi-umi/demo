@@ -7,6 +7,7 @@ import * as common from '../_system/common';
 import errorConfig from '../_system/errorConfig';
 import * as cache from '../_system/cache';
 import * as autoBll from './_auto';
+import * as userInfoDal from '../dal/userInfo';
 
 export let isAccountExist = function (account) {
     return common.promise(function () {
@@ -77,7 +78,7 @@ export let save = function (opt, exOpt) {
 };
 
 export let detailQuery = function (opt) {
-    return autoBll.customDal('userInfo', 'detailQuery', { id: opt.id }).then(function (t) {
+    return userInfoDal.detailQuery({ id: opt.id }).then(function (t) {
         var detail = {
             userInfo: t[0][0],
             userInfoLog: t[1],
@@ -94,7 +95,7 @@ export let detailQuery = function (opt) {
 };
 
 export let query = function (opt) {
-    return autoBll.customDal('userInfo', 'query', opt).then(function (t) {
+    return userInfoDal.query(opt).then(function (t) {
         var data = {
             list: t[0],
             count: t[1][0].count

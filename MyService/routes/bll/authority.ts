@@ -1,6 +1,7 @@
 ﻿
-import * as  autoBll from './_auto';
-import * as  common from '../_system/common';
+import * as autoBll from './_auto';
+import * as common from '../_system/common';
+import * as authorityDal from '../dal/authority';
 
 export let save = function (opt) {
     return common.promise(function () {
@@ -48,7 +49,7 @@ export let query = function (opt) {
         }
     }
     opt.orderBy = 'code';
-    return autoBll.customDal('authority', 'query', opt).then(function (t) {
+    return authorityDal.query(opt).then(function (t) {
         return {
             list: t[0],
             count: t[1][0].count,

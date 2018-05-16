@@ -13,7 +13,7 @@ let pool = mysql.createPool({
     port: config.datebase.port
 });
 
-export let query = function (sql, params, conn) {
+export let query = function (sql, params, conn?) {
     if (!conn)
         return myQuery(sql, params);
     else
