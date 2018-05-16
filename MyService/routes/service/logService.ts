@@ -24,5 +24,5 @@ export let save = function (data) {
     var opt = getOption();
     opt.methodName = 'save';
     opt.data = data;
-    return common.requestServiceByConfigPromise(opt);
+    return common.requestServiceByConfig(opt);
 };
