@@ -5,11 +5,20 @@ import * as cache from './_system/cache';
 import errorConfig from './_system/errorConfig';
 
 import * as sign from './bll/sign';
+import multer from './_system/myMulter';
 
 import config from '../config';
 
+type RouteConfig = {
+    url: string | RegExp
+    method: string,
+    functionName?: string,
+    methodName?: string,
+    path?: string,
+    middleware?: any[]
+}
 //路由配置 文件必须在routes目录下
-export let restConfig = [
+export let routeConfig: RouteConfig[] = [
     {
         url: '/',
         method: 'get',
@@ -34,6 +43,7 @@ export let restConfig = [
         method: 'post',
         functionName: 'upload',
         path: 'index',
+        middleware: [multer.any()]
     },
 
     {
@@ -334,25 +344,25 @@ export let init = function (opt) {
 };
 
 //注册路由
-export let register = function (app, restConfig) {
-    var restList = [];
-    restConfig.forEach(function (rest) {
-        var method = rest.method;
-        var path = rest.path || rest.url;
+export let register = function (app, routeConfig: RouteConfig[]) {
+    var routeList = [];
+    routeConfig.forEach(function (route) {
+        var method = route.method;
+        var path = (route.path || route.url) as string;
         if (path && path.substr(0, 1) !== '/')
             path = '/' + path;
         path = '.' + path;
         var isRouter = true;
         if (!method)
             method = 'post';
-        var functionName = rest.functionName || method;
+        var functionName = route.functionName || method;
         var routerMethodList = [];
 
-        function init(req, res, next) {
-            auth.check(req, res, next);
-        }
-
-        routerMethodList.push(init);
+        //检查权限
+        routerMethodList.push(auth.check);
+        //中间件
+        if (route.middleware)
+            routerMethodList = routerMethodList.concat(route.middleware);
 
         let reqfile = require(path);
         var reqFun = reqfile[functionName];
@@ -361,7 +371,7 @@ export let register = function (app, restConfig) {
 
         var createFun = function (fun) {
             return function (req, res, next) {
-                req.myData.method = { methodName: rest.methodName };
+                req.myData.method = { methodName: route.methodName };
                 try {
                     fun(req, res, next);
                 } catch (e) {
@@ -383,14 +393,14 @@ export let register = function (app, restConfig) {
         switch (methodName) {
             case 'get':
             case 'post':
-                app[methodName](rest.url, routerMethodList);
+                app[methodName](route.url, routerMethodList);
                 break;
             default:
                 isRouter = false;
                 break;
         }
         if (isRouter) {
-            restList.push({ url: rest.url, functionName: functionName, path: path });
+            routeList.push({ url: route.url, functionName: functionName, path: path });
         }
     });
     //console.log(restList);

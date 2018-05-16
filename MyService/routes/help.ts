@@ -2,7 +2,7 @@ import * as common from './_system/common';
 import * as main from './_main';
 export let get = function (req, res) {
     var restList = [];
-    var restConfig = main.restConfig;
+    var restConfig = main.routeConfig;
     for (var i = 0; i < restConfig.length; i++) {
         var rest: any = restConfig[i];
         var isRouter = true;
