@@ -947,7 +947,7 @@ public static List<string> CreateDts(DatabaseModel databaseModel, string ns)
     level = 2;
     tabStr = GetRepeatStr("\t", level);
     databaseModel.Cols.Select(x=>x.Name).ToList().ForEach(ele=>{        
-        scriptStrList.Add(tabStr + ele + ": any;");
+        scriptStrList.Add(tabStr + ele + "?: any;");
     });
     level = 1;
     tabStr = GetRepeatStr("\t", level);
