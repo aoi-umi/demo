@@ -12,26 +12,13 @@ import config from '../config';
 type RouteConfig = {
     url: string | RegExp
     method: string,
-    functionName?: string,
-    methodName?: string,
-    path?: string,
+    functionName?: string,//为空时按method
+    methodName?: string,//用于记录日志
+    path?: string,//为空时则按url
     middleware?: any[]
 }
 //路由配置 文件必须在routes目录下
-export let routeConfig: RouteConfig[] = [
-    {
-        url: '/',
-        method: 'get',
-        functionName: '',//为空时按method
-        methodName: 'index',//用于记录日志
-        path: '/module/_view',//为空时则按url
-    },
-    {
-        url: '/help',
-        method: 'get',
-        functionName: '',
-        path: '',
-    },
+export let routeConfig: RouteConfig[] = [        
     {
         url: '/msg',
         method: 'get',

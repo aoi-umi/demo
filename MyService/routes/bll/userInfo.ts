@@ -86,6 +86,8 @@ export let detailQuery = function (opt) {
             roleAuthorityList: t[4],
             auth: {}
         };
+        if (!detail.userInfo)
+            return null;
         updateUserInfo(detail);
         return detail;
     });
