@@ -91,8 +91,9 @@ function queryFormat(query, values) {
     return query.replace(/\:(\w+)/g, function (txt, key) {
         if (values.hasOwnProperty(key)) {
             var val = values[key];
-            if (val && typeof val == 'object') val = JSON.stringify(val);
-            return this.escape(values[key]);
+            if (val && typeof val == 'object')
+                val = JSON.stringify(val);
+            return this.escape(val);
         }
         else {
             return this.escape(null);
