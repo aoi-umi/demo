@@ -37,24 +37,28 @@ export let extend = function (...args) {
  */
 export let promise = function (fn: Function, caller: any = 'noCallback', ...args): Q.Promise<any> {
     var defer = q.defer();
-    if (!fn) {
-        throw error('fn can not be null');
-    }
-    if (!args)
-        args = [];
-    if (caller === 'noCallback') {
-        var def = q.defer();
-        args.push(def);
-        defer.resolve(fn.apply(void 0, args));
-    } else {
-        args.push(function (err, ...cbArgs) {
-            if (err)
-                defer.reject(err);
-            else {
-                defer.resolve.apply(void 0, cbArgs);
-            }
-        });
-        fn.apply(caller, args);
+    try {
+        if (!fn) {
+            throw error('fn can not be null');
+        }
+        if (!args)
+            args = [];
+        if (caller === 'noCallback') {
+            var def = q.defer();
+            args.push(def);
+            defer.resolve(fn.apply(void 0, args));
+        } else {
+            args.push(function (err, ...cbArgs) {
+                if (err)
+                    defer.reject(err);
+                else {
+                    defer.resolve.apply(void 0, cbArgs);
+                }
+            });
+            fn.apply(caller, args);
+        }
+    } catch (e) {
+        defer.reject(e);
     }
     return defer.promise;
 };

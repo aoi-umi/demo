@@ -87,12 +87,11 @@
             opt.data = {};
         if (typeof opt.data != 'string')
             opt.data = JSON.stringify(opt.data);
-        var res = $.Deferred();
         var resOpt = {
             req: originReq
         };
-        var def = $.Deferred();
-        def.then(function () {
+        var res = $.Deferred();
+        common.promise(function () {
             if (typeof opt.myDataCheck == 'function') {
                 try {
                     opt.myDataCheck();
@@ -127,8 +126,6 @@
             }
             res.reject(e, resOpt);
         });
-
-        def.resolve();
         return res;
     };
     exports.parseJSON = function (str) {
