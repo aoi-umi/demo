@@ -14,6 +14,7 @@ export let get = function (req, res, next) {
     var opt = {
         view: pathname,
         user: req.myData.user,
+        req: req,
     }
     //console.log(req.originalUrl, req._parsedUrl.pathname)
     switch (pathname) {
@@ -28,7 +29,7 @@ export let get = function (req, res, next) {
         return next();
 
     common.promise(function () {
-        return setViewOption(req, opt);
+        return setViewOption(opt);
     }).then(function () {
         res.myRender('view', opt);
     }).fail(function (e) {
@@ -36,7 +37,8 @@ export let get = function (req, res, next) {
     });
 };
 
-var setViewOption = function (req, opt) {
+var setViewOption = function (opt) {
+    let req = opt.req;
     var query = req.query;
     var user = req.myData.user;
     switch (opt.view) {
@@ -51,16 +53,14 @@ var setViewOption = function (req, opt) {
                 auth.isHadAuthority(user, 'admin', { throwError: true });
                 userInfoId = query.id;
             }
-            return require('../bll/userInfo').detailQuery({ id: userInfoId }).then(function (t) {
-                opt.userInfoDetail = t;
-            });
+            return require('../viewBll/userInfo').detailQuery({ id: userInfoId }, opt);
 
         case '/mainContent/list':
             opt.mainContentStatusEnum = myEnum.getEnum('mainContentStatusEnum');
             opt.mainContentTypeEnum = myEnum.getEnum('mainContentTypeEnum');
             break;
         case '/mainContent/detail':
-            return require('./mainContent').detailQuery({ id: query.id }, opt);
+            return require('../viewBll/mainContent').detailQuery({ id: query.id }, opt);
 
     }
 };
