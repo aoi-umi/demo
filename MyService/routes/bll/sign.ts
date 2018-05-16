@@ -99,7 +99,7 @@ export let inInside = function (req) {
         var checkToken = common.createToken(account + pwd + reqBody);
         if (token != checkToken)
             throw common.error(null, errorConfig.TOKEN_WRONG);
-        return autoBll.custom('userInfo', 'detailQuery', { id: userInfo.id });
+        return userInfoBll.detailQuery({ id: userInfo.id });
     }).then(function (t) {
         //console.log(t);
         var userInfo = t.userInfo;

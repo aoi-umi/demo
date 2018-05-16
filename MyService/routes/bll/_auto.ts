@@ -63,15 +63,15 @@ export let tran = function (fn) {
         return def.promise;
     });
 };
-export let custom = function (name, method, params, exOpt?, conn?) {
+export let custom = function (name, method, ...args) {
     var bll = getRequire(name, 'bll');
     if (!bll[method])
         throw common.error(`method[${method}] is not exist`, errorConfig.CODE_ERROR);
-    return bll[method](params, exOpt, conn);
+    return bll[method].apply(void 0, args);
 };
-export let customDal = function (name, method, params?, conn?) {
+export let customDal = function (name, method, ...args) {
     var dal = getRequire(name, 'dal');
     if (!dal[method])
         throw common.error(`method[${method}] is not exist`, errorConfig.CODE_ERROR);
-    return dal[method](params, conn);
+    return dal[method].apply(void 0, args);
 };

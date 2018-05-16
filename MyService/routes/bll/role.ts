@@ -4,6 +4,7 @@
 import * as q from 'q';
 import * as autoBll from './_auto';
 import * as common from '../_system/common';
+import * as roleDal from '../dal/role';
 
 export let save = function (opt) {
     var id;
@@ -12,7 +13,7 @@ export let save = function (opt) {
         if (opt.statusUpdateOnly) {
             if (!dataRole.id || dataRole.id == 0)
                 throw common.error('id不能为空');
-            return autoBll.save('role', {id: dataRole.id, status: dataRole.status}).then(function (t) {
+            return autoBll.save('role', { id: dataRole.id, status: dataRole.status }).then(function (t) {
                 id = t;
             });
         } else {
@@ -20,7 +21,7 @@ export let save = function (opt) {
                 if (t)
                     throw common.error(`code[${dataRole.code}]已存在`);
 
-                return autoBll.query('roleWithAuthority', {roleCode: dataRole.code});
+                return autoBll.query('roleWithAuthority', { roleCode: dataRole.code });
             }).then(function (t) {
                 var delRoleAuthList = t.list.filter((dbAuth) => {
                     return opt.delAuthorityList.findIndex((delAuth) => {
@@ -41,7 +42,7 @@ export let save = function (opt) {
                         //删除权限
                         if (delRoleAuthList.length) {
                             delRoleAuthList.forEach(function (item) {
-                                list.push(autoBll.del('roleWithAuthority', {id: item.id}, conn));
+                                list.push(autoBll.del('roleWithAuthority', { id: item.id }, conn));
                             })
                         }
                         //保存权限
@@ -64,7 +65,7 @@ export let save = function (opt) {
 };
 
 export let detailQuery = function (opt) {
-    return autoBll.customDal('role', 'detailQuery', opt).then(function (t) {
+    return roleDal.detailQuery(opt).then(function (t) {
         var data = {
             role: t[0][0],
             authorityList: t[1],
@@ -82,7 +83,7 @@ export let query = function (opt) {
         }
     }
     opt.orderBy = 'code';
-    return autoBll.customDal('role', 'query', opt).then(function (t) {
+    return roleDal.query(opt).then(function (t) {
         var data = {
             list: t[0],
             count: t[1][0].count,
@@ -109,7 +110,7 @@ export let isExist = function (opt) {
     return common.promise(function () {
         if (!code)
             throw common.error('code不能为空');
-        return autoBll.query('role', {code: code});
+        return autoBll.query('role', { code: code });
     }).then(function (t) {
         var result = false;
         if (t.list.length > 1)

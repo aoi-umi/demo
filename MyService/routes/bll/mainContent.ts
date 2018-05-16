@@ -7,11 +7,12 @@ import * as common from '../_system/common';
 import errorConfig from '../_system/errorConfig';
 import * as myEnum from '../_system/enum';
 import * as auth from '../_system/auth';
+import * as mainContentDal from '../dal/mainContent';
 
 export let query = function (opt, exOpt) {
     var user = exOpt.user;
     return common.promise(function () {
-        return autoBll.customDal('mainContent', 'query', opt).then(function (t) {
+        return mainContentDal.query(opt).then(function (t) {
             var detail = {
                 list: t[0],
                 count: t[1][0].count,
@@ -44,7 +45,7 @@ export let detailQuery = function (opt, exOpt) {
         } else if (!opt.id) {
             throw common.error('', errorConfig.ARGS_ERROR);
         }
-        return autoBll.customDal('mainContent', 'detailQuery', opt).then(function (t) {
+        return mainContentDal.detailQuery(opt).then(function (t) {
             var detail: any = {};
             detail.mainContent = t[0][0];
             detail.mainContentTypeList = t[1];
