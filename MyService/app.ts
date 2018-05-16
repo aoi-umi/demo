@@ -29,8 +29,8 @@ app.use(cors());
 //初始化
 app.use(main.init({ viewPath: app.get('views') }));
 
-//按restConfig 注册路由
-main.register(app, main.restConfig);
+//按routeConfig 注册路由
+main.register(app, main.routeConfig);
 
 /// catch 404 and forwarding to error handler
 app.use(function (req, res, next) {

@@ -42,8 +42,6 @@ function getBll(req, res, next) {
     }
 
     var reqModule = module;
-    //转换为小写下划线;
-    //module = common.stringToLowerCaseWithUnderscore(module);
     return common.promise(function () {
         if (opt.isCustom) {
             var exOpt = {
