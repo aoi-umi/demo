@@ -6,7 +6,7 @@ import * as path from 'path';
 import * as request from 'request';
 import * as net from 'net';
 import * as crypto from 'crypto';
-import * as q from 'q';
+import * as Q from 'q';
 import * as zlib from 'zlib';
 import config from '../../config';
 import errorConfig from './errorConfig';
@@ -36,7 +36,7 @@ export let extend = function (...args) {
  * @param args 
  */
 export let promise = function (fn: Function, caller: any = 'noCallback', ...args): Q.Promise<any> {
-    var defer = q.defer();
+    var defer = Q.defer();
     try {
         if (!fn) {
             throw error('fn can not be null');
@@ -44,7 +44,7 @@ export let promise = function (fn: Function, caller: any = 'noCallback', ...args
         if (!args)
             args = [];
         if (caller === 'noCallback') {
-            var def = q.defer();
+            var def = Q.defer();
             args.push(def);
             defer.resolve(fn.apply(void 0, args));
         } else {

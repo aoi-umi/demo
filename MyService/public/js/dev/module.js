@@ -290,7 +290,7 @@
                 self.opt.beforeQuery(data);
                 var method = self.opt.interfacePrefix + 'Query';
                 var notice = common.msgNotice({ type: 1, msg: '查询中...', noClose: true });
-                myInterface[method](data).then(function (t) {
+                return myInterface[method](data).then(function (t) {
                     self.queryContainerDom.find(self.rowClass).remove();
                     var temp = self.queryItemTemp;
                     $(t.list).each(function (i) {
@@ -298,7 +298,7 @@
                         item.colNum = i + 1;
                         self.queryContainerDom.append($(ejs.render(temp, item)).data('item', item));
                     });
-                    return defer.resolve(t);
+                    return t;
                 }).fail(function (e) {
                     self.queryContainerDom.find(self.rowClass).remove();
                     if (errorDom.length) {
@@ -308,11 +308,10 @@
                         errorDom.show();
                         e = null;
                     }
-                    return defer.reject(e);
-                }).always(function () {
+                    throw e;
+                }).finally(function () {
                     notice.close();
                 });
-                return defer;
             }).fail(function (e) {
                 if (e) {
                     console.log(e);
@@ -354,7 +353,7 @@
                     }).fail(function (e) {
                         self.opt.onSaveFail(e, self);
                         throw e;
-                    }).always(function () {
+                    }).finally(function () {
                         notice.close();
                     });
                 }
@@ -379,7 +378,7 @@
                         }
                     }]
                 });
-                return defer;
+                return defer.promise;
             }).then(function () {
                 var notice = common.msgNotice({ type: 1, msg: '删除中...', noClose: true });
                 var data = {};
@@ -391,7 +390,7 @@
                     self.opt.onDelSuccess(t, self);
                 }).fail(function (e) {
                     self.opt.onDelFail(e, self);
-                }).always(function () {
+                }).finally(function () {
                     notice.close();
                 });
             });
@@ -406,7 +405,7 @@
                     self.opt.onDetailQuerySuccess(t, self);
                 }).fail(function (e) {
                     self.opt.onDetailQueryFail(e, self);
-                }).always(function () {
+                }).finally(function () {
                     notice.close();
                 });
             });
