@@ -66,7 +66,7 @@
             }
 
             loadNext();
-            return defer;
+            return defer.promise;
         });
     };
     exports.createToken = function (str) {
@@ -90,28 +90,24 @@
         var resOpt = {
             req: originReq
         };
-        var res = $.Deferred();
-        common.promise(function () {
+        return common.promise(function (defer) {
             if (typeof opt.myDataCheck == 'function') {
-                try {
-                    opt.myDataCheck();
-                } catch (e) {
-                    return $.Deferred().reject(e);
-                }
+                opt.myDataCheck();
             }
-            return $.ajax(opt);
+            $.ajax(opt).then(defer.resolve).fail(defer.reject);
+            return defer.promise;
         }).then(function (t) {
             if (!t.result) {
                 if (typeof t.desc == 'object')
                     t.desc = JSON.stringify(t.desc);
                 var err = new Error();
                 err.responseJSON = t;
-                return $.Deferred().reject(err);
+                throw err;
             }
             else
-                return $.Deferred().resolve(t.detail);
-        }).then(function (t) {
-            res.resolve(t, resOpt);
+                return t.detail;
+        // }).then(function (t) {
+        //     res.resolve(t, resOpt);
         }).fail(function (e) {
             if (!e)
                 e = new Error();
@@ -124,9 +120,8 @@
                 e = new Error(e.statusText);
                 e.code = e.status;
             }
-            res.reject(e, resOpt);
+            throw e;
         });
-        return res;
     };
     exports.parseJSON = function (str) {
         try {
@@ -491,19 +486,32 @@
     exports.isInArray = function (obj, list, startIndex) {
         return $.inArray(obj, list, startIndex) >= 0;
     };
-    exports.promise = function (fn) {
-        var def = $.Deferred();
-        var defer = $.Deferred();
-        def.resolve();
-        return def.then(function () {
-            let result;
-            try {
-                result = fn(defer);
-            } catch (e) {
-                return $.Deferred().reject(e);
+    exports.promise = function (fn, caller = 'noCallback', ...args) {
+        var defer = Q.defer();
+        try {
+            if (!fn) {
+                throw error('fn can not be null');
             }
-            return result;
-        });
+            if (!args)
+                args = [];
+            if (caller === 'noCallback') {
+                var def = Q.defer();
+                args.push(def);
+                defer.resolve(fn.apply(void 0, args));
+            } else {
+                args.push(function (err, ...cbArgs) {
+                    if (err)
+                        defer.reject(err);
+                    else {
+                        defer.resolve.apply(void 0, cbArgs);
+                    }
+                });
+                fn.apply(caller, args);
+            }
+        } catch (e) {
+            defer.reject(e);
+        }
+        return defer.promise;
     };
 
     exports.getArgsFromUrlParams = function () {

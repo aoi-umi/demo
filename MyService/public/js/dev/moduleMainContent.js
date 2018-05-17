@@ -336,7 +336,7 @@
                         remark: $('#remark').val()
                     };
                     var notice = common.msgNotice({ type: 1, msg: '处理中', noClose: true });
-                    return myInterface['mainContentStatusUpdate'](detail).then(function () {
+                    return myInterface.mainContentStatusUpdate(detail).then(function () {
                         common.msgNotice({
                             type: 1, msg: '处理成功!', btnOptList: {
                                 content: '确认',
@@ -345,7 +345,7 @@
                                 }
                             }
                         });
-                    }).always(function () {
+                    }).finally(function () {
                         notice.close();
                     });
                 }).fail(function (e) {
