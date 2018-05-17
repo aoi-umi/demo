@@ -29,12 +29,7 @@ export let tranConnect = function (queryFunction) {
         connection = t;
         return beginTransactionPromise(connection);
     }).then(function (t) {
-        return common.promise((def) => {
-            queryFunction(connection)
-                .then(def.resolve)
-                .fail(def.reject);
-            return def.promise;
-        });
+        return queryFunction(connection);
     }).then(function (t) {
         return commitPromise(connection);
     }).fail(function (e) {
