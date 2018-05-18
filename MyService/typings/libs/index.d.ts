@@ -14,11 +14,7 @@ interface File {
 	webkitSlice: any;
 }
 
-
-declare const SparkMD5: SparkMD5;
-interface SparkMD5 {
-	hash: any;
-	ArrayBuffer: any;
-}
-
 declare const ejs: any;
+declare const _: any;
+declare const io: any;
+declare const WdatePicker: any;

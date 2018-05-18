@@ -53,92 +53,59 @@
     };
 </script>
 <% if(requirejs){ %>
-<script type="text/javascript" src="/js/libs/require.js"></script>
-<script type="text/javascript">
-    requirejs.config({
-        baseUrl: '/js',
-        paths: {
-            'jquery': 'libs/jquery-2.1.1.min',
-            'jquery.cookie': 'libs/jquery.cookie',
-            'jquery-ui': 'jquery-ui.min',
-            'bootstrap': 'libs/bootstrap.min',
-            'ejs': 'libs/ejs.min',
-            'spark-md5': 'libs/spark-md5.min',
-            'socket.io': 'libs/socket.io/socket.io',
-            'WdatePicker': 'libs/My97DatePicker/WdatePicker.io',
-            'underscore': 'libs/underscore-min',
-
-            'main': '<%= env %>/_main',
-            'common': '<%= env %>/common',
-            'myEnum': '<%= env %>/myEnum',
-            'sign': '<%= env %>/sign',
-            'socket': '<%= env %>/socket',
-            'myInterface': '<%= env %>/myInterface',
-            'myVaild': '<%= env %>/myVaild',
-        },
-        shim: {
-            'bootstrap': {
-                deps: ['jquery'],
-                exports: 'bootstrap'
+    <script type="text/javascript" src="/js/libs/require.js"></script>
+    <script type="text/javascript">
+        requirejs.config({
+            baseUrl: '/js',
+            paths: {
+                'jquery': 'libs/jquery-2.1.1.min',
+                'jquery.cookie': 'libs/jquery.cookie',
+                'jquery-ui': 'jquery-ui.min',
+                'bootstrap': 'libs/bootstrap.min',
+                'ejs': 'libs/ejs.min',
+                'spark-md5': 'libs/spark-md5.min',
+                'socket.io': 'libs/socket.io/socket.io',
+                'WdatePicker': 'libs/My97DatePicker/WdatePicker.io',
+                'underscore': 'libs/underscore-min',
+                'q': 'libs/q',
             },
-            'main': {
-                exports: 'main'
-            },
-            'common': {
-                exports: 'common'
-            },
-            'myEnum': {
-                exports: 'myEnum'
-            },
-            'sign': {
-                exports: 'sign'
-            },
-            'socket': {
-                exports: 'socket'
-            },
-            'myInterface': {
-                exports: 'myInterface'
-            },
-            'myVaild': {
-                exports: 'myVaild'
+            shim: {
             }
-        }
-    });
-    require(['jquery', 'underscore', 'myEnum'], function ($, _) {
-        $(function () {
-            var myEnum = require('myEnum');
-            console.log(myEnum)
+        });
+        require(['./common'], function (common) {
+            $(function () {
+                console.log(common)
+            })
         })
-    })
-</script>
-<% }else{ %>
-<script type="text/javascript" src="/js/libs/jquery-2.1.1.min.js"></script>
-<script type="text/javascript" src="/js/libs/jquery.cookie.js"></script>
-<script type="text/javascript" src="/js/libs/jquery-ui.min.js"></script>
-<script type="text/javascript" src="/js/libs/bootstrap.min.js"></script>
-<script type="text/javascript" src="/js/libs/ejs.min.js"></script>
-<script type="text/javascript" src="/js/libs/spark-md5.min.js"></script>
-<script type="text/javascript" src="/js/libs/socket.io/socket.io.js"></script>
-<script type="text/javascript" src="/js/libs/My97DatePicker/WdatePicker.js"></script>
-<script type="text/javascript" src="/js/libs/underscore-min.js"></script>
-<script type="text/javascript" src="/js/libs/q.js"></script>
+    </script>
+    <% }else{ %>
+        <script type="text/javascript" src="/js/libs/jquery-2.1.1.min.js"></script>
+        <script type="text/javascript" src="/js/libs/jquery.cookie.js"></script>
+        <script type="text/javascript" src="/js/libs/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="/js/libs/bootstrap.min.js"></script>
+        <script type="text/javascript" src="/js/libs/ejs.min.js"></script>
+        <script type="text/javascript" src="/js/libs/spark-md5.min.js"></script>
+        <script type="text/javascript" src="/js/libs/socket.io/socket.io.js"></script>
+        <script type="text/javascript" src="/js/libs/My97DatePicker/WdatePicker.js"></script>
+        <script type="text/javascript" src="/js/libs/underscore-min.js"></script>
+        <script type="text/javascript" src="/js/libs/q.js"></script>
 
-<script type="text/javascript">
-    //临时
-    window.require = function () {
-    };
-</script>
-<script type="text/javascript" src="/js/<%= env %>/_main.js?v=<%= version %>"></script>
+        <script type="text/javascript">
+            //临时
+            window.require = function () {
+            };
+        </script>
+        <script type="text/javascript" src="/js/<%= env %>/_main.js?v=<%= version %>"></script>
 
-<script type="text/javascript" src="/js/<%= env %>/common.js?v=<%= version %>"></script>
-<script type="text/javascript" src="/js/<%= env %>/myEnum.js?v=<%= version %>"></script>
-<script type="text/javascript" src="/js/<%= env %>/sign.js?v=<%= version %>"></script>
-<script type="text/javascript" src="/js/<%= env %>/socket.js?v=<%= version %>"></script>
-<script type="text/javascript" src="/js/<%= env %>/myInterface.js?v=<%= version %>"></script>
-<script type="text/javascript" src="/js/<%= env %>/myVaild.js?v=<%= version %>"></script>
-<script type="text/javascript">
-    $(function () {
-        main.init();
-    });
-</script>
-<% } %>
+        <script type="text/javascript" src="/js/<%= env %>/common.js?v=<%= version %>"></script>
+        <script type="text/javascript" src="/js/<%= env %>/myEnum.js?v=<%= version %>"></script>
+        <script type="text/javascript" src="/js/<%= env %>/sign.js?v=<%= version %>"></script>
+        <script type="text/javascript" src="/js/<%= env %>/socket.js?v=<%= version %>"></script>
+        <script type="text/javascript" src="/js/<%= env %>/myInterface.js?v=<%= version %>"></script>
+        <script type="text/javascript" src="/js/<%= env %>/myVaild.js?v=<%= version %>"></script>
+        <script type="text/javascript">
+            $(function () {
+                main.init();
+            });
+        </script>
+        <% } %>

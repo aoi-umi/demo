@@ -7,4 +7,4 @@ MyService/bin
 MyService/public/js/prd
 MyService/views/_template_web
 MyService/routes/dal/_auto/*.ts
-MyService/typings/model
+MyService/typings/model/dbModel
