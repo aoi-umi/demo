@@ -14,7 +14,5 @@ interface File {
 	webkitSlice: any;
 }
 
-declare const ejs: any;
 declare const _: any;
-declare const io: any;
 declare const WdatePicker: any;

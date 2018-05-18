@@ -1,11 +1,12 @@
 /**
  * Created by umi on 2017-8-30.
  */
+import * as io from 'socket.io';
 import * as main from './_main';
 export let connection = null;
 export let init = function () {
     var self = this;
-    self.connection = io.connect(location.host);
+    self.connection = io(location.host);
     self.bindEvent();
 };
 export let bindEvent = function () {

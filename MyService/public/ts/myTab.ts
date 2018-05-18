@@ -8,16 +8,17 @@ export let opt: any = {
     panelContainer: 'panel',
     closeBtnTemplate: '<button name="tab-close-btn" type="button" class="close hidden" data-close-target="" aria-hidden="true" style="margin-left: 5px;float: none"><span class="glyphicon glyphicon-remove"></span></button>'
 };
-export let tabContainer = null;
-export let panelContainer = null;
-export let tabHeaderContextMenu = null;
+export let tabContainer;
+export let panelContainer;
+export let tabHeaderContextMenu;
+export let tabContextMenu;
 export let clickTabIdList = [];
 export let init = function (option) {
-    
+
     opt = $.extend(opt, option);
     tabContainer = $('#' + opt.tabContainer);
     panelContainer = $('#' + opt.panelContainer);
-    var tabHeaderContextMenu = tabHeaderContextMenu =
+    tabHeaderContextMenu =
         $(`<ul class="dropdown-menu" id="tab-header-context-menu">
                 <li><a href="javascript:;" class="menu-item" data-menu-type="refresh">刷新</a></li>
                 <li class="divider"></li>
@@ -28,7 +29,7 @@ export let init = function (option) {
                 <li><a href="javascript:;" class="menu-item" data-menu-type="closeRightAll">关闭右侧全部</a></li>
             </ul>`);
     $('body').append(tabHeaderContextMenu);
-    var tabContextMenu = tabContextMenu =
+    tabContextMenu =
         $(`<ul class="dropdown-menu" id="tab-header-context-menu">
                 <li><a href="javascript:;" class="menu-item" data-menu-type="_blank">在新标签打开</a></li>
                 <li><a href="javascript:;" class="menu-item" data-menu-type="_self">在本页打开</a></li>
@@ -38,11 +39,6 @@ export let init = function (option) {
     bindEvent();
 };
 export let bindEvent = function () {
-    
-    var tabContainer = tabContainer;
-    var panelContainer = panelContainer;
-    var tabHeaderContextMenu = tabHeaderContextMenu;
-    var tabContextMenu = tabContextMenu;
     $(document).on('click', '.tab', function (event) {
         var clickTab = $(this);
         var targetId = clickTab.attr('data-tab-target');
@@ -177,7 +173,7 @@ export let bindEvent = function () {
 };
 //tabData {type:'', id:'', name:'', targetId:'', closeTarget:''}
 export let tab = function (data) {
-    
+
     var dom = null;
     var t = data;
     switch (t.type) {
@@ -201,7 +197,7 @@ export let tab = function (data) {
     return dom;
 };
 export let tabs = function (data) {
-    
+
     var list = [];
     for (var i = 0; i < data.length; i++) {
         var dom = tab(data[i]);
@@ -212,7 +208,7 @@ export let tabs = function (data) {
 };
 //panelData {type:'', id:'', content:''}
 export let panel = function (data) {
-    
+
     var dom = null;
     var t = data;
     var content = 'no content';
@@ -237,7 +233,6 @@ export let panel = function (data) {
     return dom;
 };
 export let panels = function (data) {
-    
     var list = [];
     for (var i = 0; i < data.length; i++) {
         var dom = panel(data[i]);
@@ -247,9 +242,6 @@ export let panels = function (data) {
     return list;
 };
 export let addOrOpenTab = function (data) {
-    
-    var tabContainer = tabContainer;
-    var panelContainer = panelContainer;
     var tabId = 'tab-' + data.id;
     var headerId = 'tab-header-' + data.id;
     var panelId = 'panel-' + data.id;

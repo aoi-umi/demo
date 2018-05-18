@@ -5,8 +5,12 @@
         top: auto
     }
 
-    .hamburger.is-open .hamb-top, .hamburger.is-open .hamb-middle, .hamburger.is-open .hamb-bottom,
-    .hamburger.is-closed .hamb-top, .hamburger.is-closed .hamb-middle, .hamburger.is-closed .hamb-bottom {
+    .hamburger.is-open .hamb-top,
+    .hamburger.is-open .hamb-middle,
+    .hamburger.is-open .hamb-bottom,
+    .hamburger.is-closed .hamb-top,
+    .hamburger.is-closed .hamb-middle,
+    .hamburger.is-closed .hamb-bottom {
         background-color: rgba(0, 0, 0, 0.7);
     }
 
@@ -20,13 +24,16 @@
     .main {
         margin-top: 35px;
     }
-    .dropdown-toggle{
+
+    .dropdown-toggle {
         padding-left: 0;
     }
-    li.dropdown{
+
+    li.dropdown {
         background: black;
     }
-    .sidebar-nav li:nth-child(odd){
+
+    .sidebar-nav li:nth-child(odd) {
         background: #1a1a1a;
     }
 </style>
@@ -175,13 +182,15 @@
                 <hr>
                 <li class="dropdown">
                     <a href="#<%= t.listId %>" class="dropdown-toggle" data-toggle="collapse">
-                        <i class="fa fa-fw fa-plus"></i><%= t.text %>
+                        <i class="fa fa-fw fa-plus"></i>
+                        <%= t.text %>
                     </a>
                     <ul id="<%= t.listId %>" class="dropdown-toggle collapse in" role="menu">
                         <% childs.forEach(function(child){
                             if (!child.tab)
                                 child.tab = {}; %>
-                        <li class="menuItem"><a class="tab" href="javascript:;"
+                        <li class="menuItem">
+                            <a class="tab" href="javascript:;"
                                     <% if(child.tabUrl){ %>
                                data-tab-content="<%= child.tabUrl + (child.tabUrlArgs || '?noNav=true') %>"
                                data-url="<%= child.tabUrl + (child.tabUrlArgs || '') %>"
@@ -191,8 +200,10 @@
                                data-tab-<%= key %>="<%= child.tab[key] %>"
                                     <% }
                                     } %>
-                                    <%- child.attr || '' %>><%= child.text %>
-                            </a></li>
+                                    <%- child.attr || '' %>>
+                                <%= child.text %>
+                            </a>
+                        </li>
                         <% }) %>
                     </ul>
                 </li>
@@ -211,7 +222,9 @@
                 <div style="height: 712px" id="panel-home" class="tab-pane fade">
                     Home Page
                     <div class="my-row">
-                        <p>Welcome to <%= title %></p>
+                        <p>Welcome to
+                            <%= title %>
+                        </p>
                         <a class="hover hover-source" href="#hoverTest">hover</a>
 
                         <div class="hover hover-target" id="hoverTest">
@@ -231,10 +244,14 @@
                                 </div>
                                 <div>
                                     <button class="btn btn-default msgNotice" data-type="1">弹出提示</button>
-                                    <label>no close<input type="checkbox" id="msgNoticeNoClose"/></label>
+                                    <label>no close
+                                        <input type="checkbox" id="msgNoticeNoClose"/>
+                                    </label>
                                     <select id="msgNoticeBtnCount">
                                         <% for(var i = 1;i <= 10;i++){ %>
-                                        <option value="<%= i %>"><%= i %></option>
+                                        <option value="<%= i %>">
+                                            <%= i %>
+                                        </option>
                                         <% } %>
                                     </select>
                                 </div>
@@ -274,7 +291,6 @@
         </div>
     </div>
 </div>
-<script src="/js/<%= env %>/myTab.js?v=<%= version %>"></script>
 <script type="text/template" id="testTemplate">
     <div>
         template tab test
@@ -284,6 +300,15 @@
 <script type="text/template" id="msgItem">
     <% include ../_template_web/msgItem %>
 </script>
+<% if(requirejs){ %>
+<script type="text/javascript">
+    require(['./_main', './index'], function () {
+        require('./_main').init();
+        require('./index').init();
+    })
+</script>
+<% }else{ %>
+<script src="/js/<%= env %>/myTab.js?v=<%= version %>"></script>
 <script src="js/libs/fileinput.min.js"></script>
 <script src="js/<%= env %>/index.js?v=<%= version %>"></script>
 <script type="text/javascript">
@@ -291,3 +316,4 @@
         index.init();
     });
 </script>
+<% } %>

@@ -1,3 +1,4 @@
+import * as ejs from 'ejs';
 
 import * as common from './common';
 import * as myInterface from './myInterface';

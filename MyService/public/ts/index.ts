@@ -1,8 +1,11 @@
+import 'fileinput';
+import * as ejs from 'ejs';
 
 import * as socket from './socket';
 import * as myTab from './myTab';
 import * as common from './common';
 import * as main from './_main';
+
 export let init = function () {
     var self = this;
     //socket
@@ -102,7 +105,7 @@ export let init = function () {
             if (notice0)
                 notice0.toggle();
             else
-                notice0 = common.msgNotice({ msg: '12333', target: '.msgNotice[data-type=0]' });
+                notice0 = common.msgNotice({msg: '12333', target: '.msgNotice[data-type=0]'});
         } else if (type == 1) {
             var msgNoticeBtnCount = parseInt($('#msgNoticeBtnCount').val() as string);
             var btnOptList = [];

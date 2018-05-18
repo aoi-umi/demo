@@ -1,6 +1,8 @@
 /**
  * Created by bang on 2017-9-11.
  */
+import * as ejs from 'ejs';
+
 import * as common from './common';
 import * as myInterface from './myInterface';
 import * as myVaild from './myVaild';
