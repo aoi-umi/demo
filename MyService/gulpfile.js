@@ -6,9 +6,7 @@ var gulp = require('gulp'),
     ts = require('gulp-typescript'),
     watch = require('gulp-watch');
 
-var tsProject = ts.createProject('tsconfig.json', {
-    typescript: require('typescript'),
-});
+var tsProject = ts.createProject('tsconfig.json');
 
 let templateDestDir = 'views/_template_web/';
 let templateSrc = 'views/_template/**';
@@ -34,21 +32,19 @@ gulp.task('clearBin', function () {
 });
 
 gulp.task('ts', function () {
-    return tsProject.src()
-        .pipe(tsProject())
+    return gulp.src([
+        'app.ts',
+        'config.ts',
+        'routes/**/*'
+    ], { base: './' }).pipe(tsProject())
         .pipe(gulp.dest(destDir));
 });
-
 //前端
-// gulp.task('ts-front', function () {
-//     return gulp.src('public/ts/**/*.ts')
-//         .pipe(ts({
-//             noImplicitAny: true,
-//             sourceMap: true,
-//             "module": "umd",
-//             "target": "es5",
-//         })).pipe(gulp.dest(destDir + '/public/js'));
-// });
+gulp.task('ts-front', function () {
+    return gulp.src('public/ts/common.ts')
+        .pipe(tsProject())
+        .pipe(gulp.dest(destDir + '/public/js'));
+});
 let webJsDestDir = 'public/js/prd/';
 let webJsSrc = 'public/js/dev/**';
 gulp.task('clear-web-js', function () {

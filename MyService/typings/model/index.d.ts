@@ -1,0 +1,14 @@
+import './dbModel/Authority';
+import './dbModel/Log';
+import './dbModel/MainContent';
+import './dbModel/MainContentChild';
+import './dbModel/MainContentLog';
+import './dbModel/MainContentTag';
+import './dbModel/MainContentType';
+import './dbModel/MainContentTypeId';
+import './dbModel/Role';
+import './dbModel/RoleWithAuthority';
+import './dbModel/UserInfo';
+import './dbModel/UserInfoLog';
+import './dbModel/UserInfoWithAuthority';
+import './dbModel/UserInfoWithRole';
