@@ -1,5 +1,6 @@
 
 
+import 'jquery-ui';
 import * as $ from 'jquery';
 import * as Q from 'q';
 //@ts-ignore

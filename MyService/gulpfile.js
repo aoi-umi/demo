@@ -41,7 +41,7 @@ gulp.task('ts', function () {
 });
 //前端
 gulp.task('ts-front', function () {
-    return gulp.src('public/ts/common.ts')
+    return gulp.src('public/ts/**/*.ts')
         .pipe(tsProject())
         .pipe(gulp.dest(destDir + '/public/js'));
 });
@@ -72,10 +72,13 @@ gulp.task('watch', function () {
     //gulp.watch(["**/*.ts", "!**/node_modules/**"], ['ts']);
 });
 
+
+gulp.task('front', gulpSequence('ts-front', 'copy'));
+
 gulp.task('make', ['make-template', 'make-web-js']);
 
 gulp.task('clear', ['clearBin', 'clear-template', 'clear-web-js']);
 
-gulp.task('dev', gulpSequence('make', 'copy', ['ts']));
+gulp.task('dev', gulpSequence('make', ['front', 'ts']));
 
-gulp.task('default', gulpSequence('clear', 'make', 'copy', ['ts']));
+gulp.task('default', gulpSequence('clear', 'make', ['front', 'ts']));
