@@ -242,14 +242,14 @@ export class MyModule extends ModuleBase {
                     }
                     var url = self.opt.detailUrl + '?';
 
-                    if (parent && parent['require'] && parent['require'].specified('./myTab')) {
+                    if (parent && parent['myTab']) {
                         var params = common.getUrlParamsFromArgs(args);
                         var data = {
                             id: self.opt.interfacePrefix + 'Detail' + args.id,
                             name: self.opt.interfacePrefix + (args.id == 0 ? '新增' : '详细:' + args.id),
                             content: url + params
                         };
-                        parent['require']('./myTab').addOrOpenTab(data);
+                        parent['myTab'].addOrOpenTab(data);
                     }
                     else {
                         args.noNav = false;
