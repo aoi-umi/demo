@@ -86,11 +86,10 @@
 <script type="text/template" id="logItemTemp">
     <% include ../_template_web/logItem%>
 </script>
-<script type="text/javascript" src="/js/<%=env%>/myPager.js?v=<%=version%>"></script>
-<script type="text/javascript" src="/js/<%=env%>/module.js?v=<%=version%>"></script>
-<script type="text/javascript" src="/js/<%=env%>/moduleLog.js?v=<%=version%>"></script>
 <script type="text/javascript">
-    $(function () {
-        var log = moduleLog.init();
-    });
+    require(['./_main', './moduleLog'], function () {
+        var moduleLog = require('./moduleLog');
+        require('./_main').init();        
+        new moduleLog.ModuleLog();
+    })
 </script>

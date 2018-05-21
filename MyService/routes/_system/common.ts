@@ -35,7 +35,7 @@ export let extend = function (...args) {
  * @param caller 调用对象 如果等于 'noCallback'，通过defer控制
  * @param args 
  */
-export let promise = function (fn: Function, caller: any = 'noCallback', ...args): Q.Promise<any> {
+export let promise = function (fn: Function, caller?: any, nodeCallback?: boolean, ...args): Q.Promise<any> {
     var defer = Q.defer();
     try {
         if (!fn) {
@@ -43,10 +43,10 @@ export let promise = function (fn: Function, caller: any = 'noCallback', ...args
         }
         if (!args)
             args = [];
-        if (caller === 'noCallback') {
+        if (!nodeCallback) {
             var def = Q.defer();
             args.push(def);
-            defer.resolve(fn.apply(void 0, args));
+            defer.resolve(fn.apply(caller, args));
         } else {
             args.push(function (err, ...cbArgs) {
                 if (err)
@@ -87,7 +87,7 @@ export let promise = function (fn: Function, caller: any = 'noCallback', ...args
 
 export let promisify = function (fun) {
     return function (...args) {
-        return promise.apply(void 0, [fun, null, ...args]);
+        return promise.apply(void 0, [fun, void 0, true, ...args]);
     };
 };
 

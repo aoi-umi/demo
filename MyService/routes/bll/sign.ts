@@ -9,7 +9,7 @@ export let up = function (opt, exOpt) {
     var userInfoId = 0;
     return common.promise(function (e) {
         if (!opt.account)
-            throw common.error('', 'CAN_NOT_BE_EMPTY', {
+            throw common.error('', errorConfig.CAN_NOT_BE_EMPTY, {
                 format: function (msg) {
                     return common.stringFormat(msg, '用户名');
                 }

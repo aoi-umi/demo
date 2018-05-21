@@ -79,9 +79,12 @@
     <div id="rgba"></div>
     <label id="colorText"></label><label>颜色</label>
 </div>
-<script src="/js/libs/bootstrap-slider.min.js"></script>
 <script type="text/javascript">
-    $(function(){
+    require(['jquery', 'bootstrap-slider', './_main'], function(){    
+        var main = require('./_main');
+        var $ = require('jquery');
+
+        main.init();
         var rgba = {
             r:null,
             g:null,

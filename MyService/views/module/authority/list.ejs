@@ -86,12 +86,10 @@
 <script type="text/template" id="detailTemp">
     <% include ../../_template_web/authority/detail %>
 </script>
-<script type="text/javascript" src="/js/<%= env %>/myPager.js?v=<%= version %>"></script>
-<script type="text/javascript" src="/js/<%= env %>/module.js?v=<%= version %>"></script>
-<script type="text/javascript" src="/js/<%= env %>/moduleAuthority.js?v=<%= version %>"></script>
 <script type="text/javascript">
-    $(function () {
-        //module init
-        moduleAuthority.init();
+    require(['./_main', './moduleAuthority'], function () {
+        var moduleAuthority = require('./moduleAuthority');
+        require('./_main').init();        
+        new moduleAuthority.ModuleAuthority();
     });
 </script>

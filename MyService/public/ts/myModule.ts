@@ -24,7 +24,7 @@ class ModuleBase {
     itemToDetailClass?: string;
 }
 
-export default class Module extends ModuleBase {
+export class MyModule extends ModuleBase {
     constructor(option) {
         super();
         this.init(option);
@@ -129,14 +129,14 @@ export default class Module extends ModuleBase {
         }
     };
 
-    init(option) {
+    private init(option) {
         var self = this;
         self.opt = $.extend(self.opt, option);
 
         if (self.opt.operation && self.opt.operation.length) {
             $(self.opt.operation).each(function () {
-                //@ts-ignore
-                self.operation[this] = true;
+                let ele: any = this;
+                self.operation[ele] = true;
             });
         }
 
@@ -199,7 +199,7 @@ export default class Module extends ModuleBase {
         }
     }
 
-    bindEvent() {
+    private bindEvent() {
         var self = this;
 
         if (self.operation.query) {
@@ -317,7 +317,7 @@ export default class Module extends ModuleBase {
             self.opt.beforeQuery(data);
             var method = self.opt.interfacePrefix + 'Query';
             var notice = common.msgNotice({ type: 1, msg: '查询中...', noClose: true });
-            myInterface[method](data).then(function (t) {
+            myInterface.api[method](data).then(function (t) {
                 self.queryContainerDom.find(self.rowClass).remove();
                 var temp = self.queryItemTemp;
                 $(t.list).each(function (i) {
@@ -336,7 +336,7 @@ export default class Module extends ModuleBase {
                     e = null;
                 }
                 defer.reject(e);
-            }).always(function () {
+            }).finally(function () {
                 notice.close();
             });
             return defer.promise;
@@ -376,13 +376,13 @@ export default class Module extends ModuleBase {
                 var notice = common.msgNotice({ type: 1, msg: '保存中...', noClose: true });
                 data = checkRes.model;
                 var method = self.opt.interfacePrefix + 'Save';
-                return myInterface[method](data).then(function (t) {
+                return myInterface.api[method](data).then(function (t) {
                     self.opt.onSaveSuccess(t, self);
                     return t;
                 }).fail(function (e) {
                     self.opt.onSaveFail(e, self);
                     throw e;
-                }).always(function () {
+                }).finally(function () {
                     notice.close();
                 });
             }
@@ -416,11 +416,11 @@ export default class Module extends ModuleBase {
                 data.id = item.id;
             self.opt.beforeDel(data);
             var method = self.opt.interfacePrefix + 'Del';
-            return myInterface[method](data).then(function (t) {
+            return myInterface.api[method](data).then(function (t) {
                 self.opt.onDelSuccess(t, self);
             }).fail(function (e) {
                 self.opt.onDelFail(e, self);
-            }).always(function () {
+            }).finally(function () {
                 notice.close();
             });
         });
@@ -431,12 +431,12 @@ export default class Module extends ModuleBase {
             var notice = common.msgNotice({ type: 1, msg: '查询中...', noClose: true });
             var data = self.opt.beforeDetailQuery(item, self);
             var method = self.opt.interfacePrefix + 'DetailQuery';
-            return myInterface[method](data).then(function (t) {
+            return myInterface.api[method](data).then(function (t) {
                 self.opt.onDetailQuerySuccess(t, self);
             }).fail(function (e) {
                 self.opt.onDetailQueryFail(e, self);
                 throw e;
-            }).always(function () {
+            }).finally(function () {
                 notice.close();
             });
         });

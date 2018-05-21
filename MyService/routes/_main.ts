@@ -52,7 +52,6 @@ export let accessableUrlConfig = [
     { url: '/' },
     { url: '/msg' },
 
-    { url: '/requirejs' },
     { url: '/textDiff' },
 
     { url: '/onlineUser', auth: ['admin'] },
@@ -213,7 +212,6 @@ export let init = function (opt) {
         var opt = {
             user: req.myData.user,
             noNav: req.myData.noNav,
-            requirejs: req.myData.requirejs,
             isHadAuthority: function (authData) {
                 return auth.isHadAuthority(req.myData.user, authData);
             },
@@ -278,7 +276,6 @@ export let init = function (opt) {
         var user = req.myData.user;
         req.myData.noNav = common.parseBool(req.query.noNav);
         req.myData.useStatus = common.parseBool(req.query.useStatus);
-        req.myData.requirejs = common.parseBool(req.query.requirejs);
 
         if (req.myData.ip == '::ffff:127.0.0.1')
             user.authority['local'] = true;
@@ -307,14 +304,14 @@ export let init = function (opt) {
                     //自动重新登录获取信息
                     if (!t.cacheDatetime || new Date().getTime() - new Date(t.cacheDatetime).getTime() > 12 * 3600) {
                         req.myData.autoSignIn = true;
-                        return common.promise(function (promiseRes) {
-                            sign.inInside(req).then(promiseRes.resolve).fail(function (e) {
+                        return common.promise(function (defer) {
+                            sign.inInside(req).then(defer.resolve).fail(function (e) {
                                 //console.log(e);
                                 cache.del(userInfoKey).then(function () {
                                     throw common.error('请重新登录！');
-                                }).fail(promiseRes.reject);
+                                }).fail(defer.reject);
                             });
-                            return promiseRes.promise;
+                            return defer.promise;
                         });
                     }
                 }

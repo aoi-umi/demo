@@ -14,22 +14,22 @@ export default class MyPager {
         pageSize: 10,
         totalPage: 0,
         template:
-            `<form class="form-inline pull-right">
-            <ul class="pagination pull-left">
-                <li class="my-pager-prev"><a name="myPagerFirst" href="javascript:;">first</a></li>
-                <li class="my-pager-prev"><a name="myPagerPrev" href="javascript:;">&laquo;</a></li>
-                <li class="my-pager-next"><a name="myPagerNext" href="javascript:;">&raquo;</a></li>
-                <li class="my-pager-next"><a name="myPagerLast" href="javascript:;">last</a></li>
-                <li><span style="margin-left:5px" name="count">0</span></li>
-                <li><span style="margin-right:5px" name="currPage">1/1</span></li>                    
-            </ul>
-            <div class="input-group pull-left" style="width:100px;margin:20px;">
-                <input name="myPagerGotoInput" class="form-control" type="text"/>
-                <span class="input-group-btn">
-                    <button name="myPagerGotoBtn" class="btn btn-default" type="button">go</button>
-                </span>
-            </div>
-        </form>`,
+            `<div class="form-inline pull-right">
+                <ul class="pagination pull-left">
+                    <li class="my-pager-prev"><a name="myPagerFirst" href="javascript:;">first</a></li>
+                    <li class="my-pager-prev"><a name="myPagerPrev" href="javascript:;">&laquo;</a></li>
+                    <li class="my-pager-next"><a name="myPagerNext" href="javascript:;">&raquo;</a></li>
+                    <li class="my-pager-next"><a name="myPagerLast" href="javascript:;">last</a></li>
+                    <li><span style="margin-left:5px" name="count">0</span></li>
+                    <li><span style="margin-right:5px" name="currPage">1/1</span></li>                    
+                </ul>
+                <div class="input-group pull-left" style="width:100px;margin:20px;">
+                    <input name="myPagerGotoInput" class="form-control" type="text"/>
+                    <span class="input-group-btn">
+                        <button name="myPagerGotoBtn" class="btn btn-default" type="button">go</button>
+                    </span>
+                </div>
+            </div>`,
         changeHandle: null
     };
     pageIndex;
