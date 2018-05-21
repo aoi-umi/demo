@@ -2,7 +2,7 @@
  * Created by bang on 2017-9-21.
  */
 
-
+window['myTab'] = exports;
 export let opt: any = {
     tabContainer: 'tab',
     panelContainer: 'panel',
