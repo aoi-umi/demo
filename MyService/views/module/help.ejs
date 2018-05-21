@@ -24,7 +24,10 @@
     </div>
 </div>
 <script type="text/javascript">
-    $(function () {
+    require(['./_main', './common'], function(){
+        var main = require('./_main');
+        var common = require('./common');
+        main.init();
         function setInterfaceOption() {
             var dom = $('#config option:selected');
             var item = dom.data('item');

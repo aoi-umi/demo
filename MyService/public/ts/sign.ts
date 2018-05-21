@@ -133,7 +133,13 @@ export let signUp = function () {
         checkRes.model.password = common.md5(checkRes.model.password);
         return myInterface.api.signUp(checkRes.model);
     }).then(function (t) {
-        location.href = '/';
+        common.msgNotice({
+            type: 1, msg: 'success', btnOptList: [{
+                cb: function () {
+                    location.href = '/';
+                }
+            }]
+        });
     }).fail(function (e: any) {
         if (e)
             common.msgNotice({ type: 1, msg: e.message });

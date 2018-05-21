@@ -7,6 +7,7 @@ var gulp = require('gulp'),
     watch = require('gulp-watch');
 
 var tsProject = ts.createProject('tsconfig.json');
+var tsFrontProject = ts.createProject('tsconfig.json');
 
 let templateDestDir = 'views/_template_web/';
 let templateSrc = 'views/_template/**';
@@ -42,23 +43,8 @@ gulp.task('ts', function () {
 //前端
 gulp.task('ts-front', function () {
     return gulp.src('public/ts/**/*.ts')
-        .pipe(tsProject())
+        .pipe(tsFrontProject())
         .pipe(gulp.dest(destDir + '/public/js'));
-});
-let webJsDestDir = 'public/js/prd/';
-let webJsSrc = 'public/js/dev/**';
-gulp.task('clear-web-js', function () {
-    return del([
-        webJsDestDir + '*'
-    ]);
-});
-
-gulp.task('make-web-js', function () {
-    return gulp.src(webJsSrc)
-        .pipe(babel({
-            presets: ['es2015']
-        }))
-        .pipe(gulp.dest(webJsDestDir));
 });
 
 let copySrc = ['public/!(ts)/**/*', 'views/**/*'];
@@ -75,9 +61,9 @@ gulp.task('watch', function () {
 
 gulp.task('front', gulpSequence('ts-front', 'copy'));
 
-gulp.task('make', ['make-template', 'make-web-js']);
+gulp.task('make', ['make-template']);
 
-gulp.task('clear', ['clearBin', 'clear-template', 'clear-web-js']);
+gulp.task('clear', ['clearBin', 'clear-template']);
 
 gulp.task('dev', gulpSequence('make', ['front', 'ts']));
 

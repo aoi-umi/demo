@@ -52,7 +52,6 @@
         return ns;
     };
 </script>
-<% if(requirejs){ %>
 <script type="text/javascript" src="/js/libs/require.js"></script>
 <script type="text/javascript">
     requirejs.config({
@@ -62,6 +61,7 @@
             'jquery.cookie': 'libs/jquery.cookie',
             'jquery-ui': 'libs/jquery-ui.min',
             'bootstrap': 'libs/bootstrap.min',
+            'bootstrap-slider': 'libs/bootstrap-slider.min',
             'fileinput': 'libs/fileinput.min',
             'ejs': 'libs/ejs.min',
             'spark-md5': 'libs/spark-md5.min',
@@ -69,6 +69,8 @@
             'WdatePicker': 'libs/My97DatePicker/WdatePicker.io',
             'underscore': 'libs/underscore-min',
             'q': 'libs/q',
+            'diffview': 'libs/diffview',
+            'difflib': 'libs/difflib',
         },
         shim: {
             'ejs': {
@@ -76,38 +78,13 @@
             },
             'bootstrap': {
                 deps: ['jquery']
-            }
+            },            
+            'diffview': {
+                exports: 'diffview'
+            },            
+            'difflib': {
+                exports: 'difflib'
+            },
         }
     });
 </script>
-<% }else{ %>
-<script type="text/javascript" src="/js/libs/jquery-2.1.1.min.js"></script>
-<script type="text/javascript" src="/js/libs/jquery.cookie.js"></script>
-<script type="text/javascript" src="/js/libs/jquery-ui.min.js"></script>
-<script type="text/javascript" src="/js/libs/bootstrap.min.js"></script>
-<script type="text/javascript" src="/js/libs/ejs.min.js"></script>
-<script type="text/javascript" src="/js/libs/spark-md5.min.js"></script>
-<script type="text/javascript" src="/js/libs/socket.io/socket.io.js"></script>
-<script type="text/javascript" src="/js/libs/My97DatePicker/WdatePicker.js"></script>
-<script type="text/javascript" src="/js/libs/underscore-min.js"></script>
-<script type="text/javascript" src="/js/libs/q.js"></script>
-
-<script type="text/javascript">
-    //临时
-    window.require = function () {
-    };
-</script>
-<script type="text/javascript" src="/js/<%= env %>/_main.js?v=<%= version %>"></script>
-
-<script type="text/javascript" src="/js/<%= env %>/common.js?v=<%= version %>"></script>
-<script type="text/javascript" src="/js/<%= env %>/myEnum.js?v=<%= version %>"></script>
-<script type="text/javascript" src="/js/<%= env %>/sign.js?v=<%= version %>"></script>
-<script type="text/javascript" src="/js/<%= env %>/socket.js?v=<%= version %>"></script>
-<script type="text/javascript" src="/js/<%= env %>/myInterface.js?v=<%= version %>"></script>
-<script type="text/javascript" src="/js/<%= env %>/myVaild.js?v=<%= version %>"></script>
-<script type="text/javascript">
-    $(function () {
-        main.init();
-    });
-</script>
-<% } %>

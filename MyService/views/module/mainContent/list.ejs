@@ -115,14 +115,13 @@
 <script type="text/template" id="mainContentItem">
     <% include ../../_template_web/mainContent/listItem %>
 </script>
-<script type="text/javascript" src="/js/<%= env %>/myPager.js?v=<%= version %>"></script>
-<script type="text/javascript" src="/js/<%= env %>/module.js?v=<%= version %>"></script>
-<script type="text/javascript" src="/js/<%= env %>/moduleMainContent.js?v=<%= version %>"></script>
 <script type="text/javascript">
-    $(function () {
+    require(['./_main', './moduleMainContent'], function () {
+        var moduleMainContent = require('./moduleMainContent');
+        require('./_main').init();   
         var opt = {
             operation: ['query']
-        };
-        var mainContent = moduleMainContent.init(opt);
+        };     
+        new moduleMainContent.ModuleMainContent(opt);
     });
 </script>

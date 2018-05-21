@@ -262,15 +262,13 @@
 <script type="text/template" id="mainContentChildItem">
     <% include ../../_template_web/mainContent/childItem %>
 </script>
-<script type="text/javascript" src="/js/<%= env %>/myPager.js?v=<%= version %>"></script>
-<script type="text/javascript" src="/js/<%= env %>/module.js?v=<%= version %>"></script>
-<script type="text/javascript" src="/js/<%= env %>/moduleMainContent.js?v=<%= version %>"></script>
 <script type="text/javascript">
-    var mainContentDetail;
-    $(function () {
+    require(['./_main', './moduleMainContent'], function () {
+        var moduleMainContent = require('./moduleMainContent');
+        require('./_main').init();   
         var opt = {
             operation: ['detailQuery', 'save']
-        };
-        mainContentDetail = moduleMainContent.init(opt);
+        };     
+        new moduleMainContent.ModuleMainContent(opt);
     });
 </script>

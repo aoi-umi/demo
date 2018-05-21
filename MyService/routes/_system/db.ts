@@ -86,8 +86,12 @@ function queryFormat(query, values) {
     return query.replace(/\:(\w+)/g, function (txt, key) {
         if (values.hasOwnProperty(key)) {
             var val = values[key];
-            if (val && typeof val == 'object')
-                val = JSON.stringify(val);
+            if (val) {
+                if (val instanceof Date)
+                    val = common.dateFormat(val, 'yyyy-MM-dd HH:mm:ss');
+                if (typeof val == 'object')
+                    val = JSON.stringify(val);
+            }
             return this.escape(val);
         }
         else {
@@ -97,7 +101,7 @@ function queryFormat(query, values) {
 }
 
 function getConnectionPromise() {
-    return common.promise(pool.getConnection, pool);
+    return common.promise(pool.getConnection, pool, true);
 }
 
 function releasePromise(conn: mysql.PoolConnection) {
@@ -108,19 +112,19 @@ function releasePromise(conn: mysql.PoolConnection) {
 
 function queryPromise(conn: mysql.PoolConnection, sql, params) {
     conn.config.queryFormat = queryFormat;
-    return common.promise(conn.query, conn, sql, params);
+    return common.promise(conn.query, conn, true, sql, params);
 }
 
 function beginTransactionPromise(conn: mysql.PoolConnection) {
-    return common.promise(conn.beginTransaction, conn);
+    return common.promise(conn.beginTransaction, conn, true);
 }
 
 function commitPromise(conn: mysql.PoolConnection) {
     console.log('commit');
-    return common.promise(conn.commit, conn);
+    return common.promise(conn.commit, conn, true);
 }
 
 function rollbackPromise(conn: mysql.PoolConnection) {
     console.log('rollback');
-    return common.promise(conn.rollback, conn);
+    return common.promise(conn.rollback, conn, true);
 }

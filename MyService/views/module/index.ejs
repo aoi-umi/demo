@@ -300,20 +300,10 @@
 <script type="text/template" id="msgItem">
     <% include ../_template_web/msgItem %>
 </script>
-<% if(requirejs){ %>
+
 <script type="text/javascript">
     require(['./_main', './index'], function () {
         require('./_main').init();
         require('./index').init();
     })
 </script>
-<% }else{ %>
-<script src="/js/<%= env %>/myTab.js?v=<%= version %>"></script>
-<script src="js/libs/fileinput.min.js"></script>
-<script src="js/<%= env %>/index.js?v=<%= version %>"></script>
-<script type="text/javascript">
-    $(function () {
-        index.init();
-    });
-</script>
-<% } %>

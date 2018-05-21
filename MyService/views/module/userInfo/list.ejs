@@ -94,11 +94,10 @@
 <script type="text/template" id="roleLabelTemp">
     <% include ../../_template_web/roleLabel %>
 </script>
-<script type="text/javascript" src="/js/<%= env %>/myPager.js?v=<%= version %>"></script>
-<script type="text/javascript" src="/js/<%= env %>/module.js?v=<%= version %>"></script>
-<script type="text/javascript" src="/js/<%= env %>/moduleUserInfo.js?v=<%= version %>"></script>
 <script type="text/javascript">
-    $(function () {
-        moduleUserInfo.init();
+    require(['./_main', './moduleUserInfo'], function () {
+        var moduleUserInfo = require('./moduleUserInfo');
+        require('./_main').init();        
+        new moduleUserInfo.ModuleUserInfo();
     });
 </script>

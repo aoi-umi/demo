@@ -26,13 +26,21 @@
     </tbody>
 </table>
 <script type="text/javascript">
-    $(function () {
+    require(['jquery', 'ejs', './_main', './myInterface', './common'], function () {
+        var $ = require('jquery'),
+            ejs = require('ejs'),
+            main = require('./_main'),
+            myInterface = require('./myInterface'),
+            common = require('./common');
+
+        main.init();
+
         var temp = '<tbody class="row"><td><a href="javascript:;" class="onlineUserKey" data-key="{%=key%}">{%=key%}</a></td><td>{%=count%}</td></tbody>'
         $('#search').on('click', function () {
             $('#list [name=errorContent]').empty();
             $('#list .row').remove();
 
-            myInterface.onlineUserQuery().then(function (t) {
+            myInterface.api.onlineUserQuery().then(function (t) {
                 for (var key in t) {
                     $('#list').append(ejs.render(temp, {key: key, count: t[key]}));
                 }
@@ -43,7 +51,7 @@
 
         $('#list').on('click', '.onlineUserKey', function () {
             var key = $(this).data('key');
-            myInterface.onlineUserDetailQuery({key: key}).then(function (t) {
+            myInterface.api.onlineUserDetailQuery({key: key}).then(function (t) {
                 var msg = t;
                 if (!msg)
                     msg = '未登录的用户';

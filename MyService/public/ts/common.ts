@@ -1,10 +1,13 @@
 
 
 import 'jquery-ui';
+import 'underscore';
 import * as $ from 'jquery';
 import * as Q from 'q';
 //@ts-ignore
 import * as SparkMD5 from 'spark-md5';
+
+window['common'] = exports;
 
 export let stringToBase64 = function (str) {
     return btoa(encodeURIComponent(str));
@@ -67,7 +70,7 @@ export let md5File = function (file) {
         }
 
         loadNext();
-        return defer;
+        return defer.promise;
     });
 };
 export let createToken = function (str) {
@@ -97,7 +100,7 @@ export let ajax = function (option) {
             opt.myDataCheck();
         }
         $.ajax(opt).then(defer.resolve).fail(defer.reject);
-        return defer;
+        return defer.promise;
     }).then(function (t) {
         if (!t.result) {
             if (typeof t.desc == 'object')
@@ -461,11 +464,12 @@ export let msgNotice = function (option) {
                         var item: any = this;
                         var btn = $(opt.btnTemplate);
                         var btnClass = item.class || 'btn-default';
+                        let content = item.content || '确认';
                         btn.addClass(btnClass);
                         if (btn.hasClass('btn-content'))
-                            btn.html(item.content);
+                            btn.html(content);
                         else
-                            btn.find('.btn-content').html(item.content);
+                            btn.find('.btn-content').html(content);
                         btn.on('click', function () {
                             dom.close();
                             if (item.cb)
@@ -486,7 +490,7 @@ export let msgNotice = function (option) {
 export let isInArray = function (obj, list, startIndex?) {
     return $.inArray(obj, list, startIndex) >= 0;
 };
-export let promise = function (fn: Function, caller: any = 'noCallback', ...args): Q.Promise<any> {
+export let promise = function (fn: Function, caller?: any, nodeCallback?: boolean, ...args): Q.Promise<any> {
     var defer = Q.defer();
     try {
         if (!fn) {
@@ -494,10 +498,10 @@ export let promise = function (fn: Function, caller: any = 'noCallback', ...args
         }
         if (!args)
             args = [];
-        if (caller === 'noCallback') {
+        if (!nodeCallback) {
             var def = Q.defer();
             args.push(def);
-            defer.resolve(fn.apply(void 0, args));
+            defer.resolve(fn.apply(caller, args));
         } else {
             args.push(function (err, ...cbArgs) {
                 if (err)
