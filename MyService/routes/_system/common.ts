@@ -32,7 +32,8 @@ export let extend = function (...args) {
 /**
  * 
  * @param fn 带nodeCallback参数的方法
- * @param caller 调用对象 如果等于 'noCallback'，通过defer控制
+ * @param caller 调用对象
+ * @param nodeCallback false通过defer控制,true cb参数控制
  * @param args 
  */
 export let promise = function (fn: Function, caller?: any, nodeCallback?: boolean, ...args): Q.Promise<any> {
@@ -77,24 +78,24 @@ export let promise = function (fn: Function, caller?: any, nodeCallback?: boolea
 //         }, 1000);
 //     }
 // }
-// promise(fun, void 0, 1).then((t) => {
+// promise(fun, void 0, false, 1).then((t) => {
 //     console.log(t);
 // });
 
-// promise(fun, null, 2).then((t) => {
+// promise(fun, void 0, true, 2).then((t) => {
 //     console.log(t);
 // });
 
-export let promisify = function (fun) {
+export let promisify = function (fun, caller?) {
     return function (...args) {
-        return promise.apply(void 0, [fun, void 0, true, ...args]);
+        return promise.apply(void 0, [fun, caller, true, ...args]);
     };
 };
 
 export let promisifyAll = function (obj) {
     for (var key in obj) {
         if (typeof obj[key] == 'function')
-            obj[key + 'Promise'] = promisify(obj[key]);
+            obj[key + 'Promise'] = promisify(obj[key], obj);
     }
 };
 
