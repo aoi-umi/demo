@@ -1,6 +1,5 @@
 import 'jquery.cookie';
 import 'bootstrap';
-import * as ejs from 'ejs';
 
 import * as common from './common';
 import * as socket from './socket';
@@ -14,8 +13,6 @@ export let variable = {
 
 export let init = function () {
     var self = this;
-    ejs['open'] = '{%';
-    ejs['close'] = '%}';
 
     var userInfo = $.cookie(cacheKey.userInfo);
     if (!userInfo) {

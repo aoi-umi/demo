@@ -2,6 +2,8 @@
  * Created by bang on 2017-9-11.
  */
 import * as $ from 'jquery';
+//@ts-ignore
+import * as WdatePicker from 'WdatePicker';
 import * as common from './common';
 import * as myInterface from './myInterface';
 import * as myVaild from './myVaild';

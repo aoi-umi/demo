@@ -8,6 +8,12 @@
   "ignore": [],
   "dependencies": {
     "bootstrap": "3",
-    "font-awesome": "4"
+    "font-awesome": "4",
+    "jquery-ui": "1",
+    "seiyria-bootstrap-slider": "9",
+    "jquery": "2",
+    "jquery.cookie": "jquery-cookie#^1.4.1",
+    "SparkMD5": "spark-md5#^3.0.0",
+    "bootstrap-fileinput": "^4.4.8"
   }
 }

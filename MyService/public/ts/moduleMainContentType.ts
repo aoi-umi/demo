@@ -63,7 +63,7 @@ export class ModuleMainContentType extends MyModule {
                 $('#tree').on('click', function () {
                     var data = {};
                     var method = 'mainContentTypeQuery';
-                    myInterface[method](data).then(function (t) {
+                    myInterface.api[method](data).then(function (t) {
                         var rootTree = {};
                         var itemTree = {};
                         $('.tree').empty();

@@ -15,4 +15,3 @@ interface File {
 }
 
 declare const _: any;
-declare const WdatePicker: any;
