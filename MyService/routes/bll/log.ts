@@ -7,9 +7,9 @@ import * as logDal from '../dal/log';
 
 export let query = function (opt) {
     return logDal.query(opt).then(function (t) {
-        var resData: any = {};
-        resData.list = t[0];
-        resData.count = t[1][0].count;
-        return resData;
+        return {
+            list: t[0],
+            count: t[1][0].count
+        };
     });
 };

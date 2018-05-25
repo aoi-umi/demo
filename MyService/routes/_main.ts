@@ -185,7 +185,7 @@ export let formatRes = function (err, detail, opt) {
     return res;
 };
 
-export let formatViewtRes = function (option) {
+export let formatViewRes = function (option) {
     var opt = {
         env: config.env,
         title: config.name,
@@ -227,7 +227,7 @@ export let init = function (opt) {
             accessableUrl: req.myData.accessableUrl,
         };
         opt = common.extend(opt, options);
-        res.render(view, formatViewtRes(opt));
+        res.render(view, formatViewRes(opt));
     };
     let mySend = function (req, res, err, detail, option) {
         var url = req.header('host') + req.originalUrl;
@@ -300,7 +300,7 @@ export let init = function (opt) {
         };
 
         res.mySend = function (err, detail, opt) {
-            mySend(req, res, err, detail, opt)
+            mySend(req, res, err, detail, opt);
         };
 
         var userInfoKey = req.cookies[cacheKey.userInfo];
