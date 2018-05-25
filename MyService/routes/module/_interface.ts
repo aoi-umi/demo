@@ -16,8 +16,6 @@ export let post = function (req, res, next) {
             method: req.params[1]
         };
         return getBll(req, res, next);
-    }).then(function (t) {
-        res.mySend(null, t);
     }).fail(function (e) {
         res.mySend(e);
     });
@@ -34,7 +32,7 @@ function getBll(req, res, next) {
     };
 
     if (!opt.isCustom)
-        checkArgs({ method: method, module: module, args: args });
+        checkArgs({method: method, module: module, args: args});
 
     //不记录日志
     if (common.isInArray(module, ['log'])) {
@@ -42,30 +40,45 @@ function getBll(req, res, next) {
     }
 
     var reqModule = module;
+    let toNext = false;
     return common.promise(function () {
         if (opt.isCustom) {
             var exOpt = {
                 user: req.myData.user,
                 req: req
             };
-            return autoBll.custom(module, method, args, exOpt);
+            let bll = autoBll.getRequire(module, {type: 'bll', notThrowError: true});
+            if (!bll || !bll[method]) {
+                toNext = true;
+                return;
+            }
+            return bll[method](args, exOpt);
         } else {
-            var modulePath = path.resolve(__dirname + '/../dal/_auto/' + module + '.js');
-            var isExist = fs.existsSync(modulePath);
-            if (!isExist)
-                throw common.error('file is not exist', errorConfig.BAD_REQUEST);
-            if (!autoBll[method])
-                throw common.error(`method[${method}] is not exist`, errorConfig.BAD_REQUEST);
+            let bll = autoBll.getRequire(module, {notThrowError: true});
+            if (!bll || !bll[method]) {
+                toNext = true;
+                return;
+            }
+            // var modulePath = path.resolve(__dirname + '/../dal/_auto/' + module + '.js');
+            // var isExist = fs.existsSync(modulePath);            
+            // if (!isExist)
+            //     throw common.error('file is not exist', errorConfig.BAD_REQUEST);
+            // if (!autoBll[method])
+            //     throw common.error(`method[${method}] is not exist`, errorConfig.BAD_REQUEST);
             return autoBll[method](module, args);
         }
     }).then(function (t) {
-        updateValue({
-            t: t,
-            module: reqModule,
-            method: method,
-            user: req.myData.user
-        });
-        return t;
+        if (!toNext) {
+            updateValue({
+                t: t,
+                module: reqModule,
+                method: method,
+                user: req.myData.user
+            });
+            res.mySend(null, t);
+        } else {
+            next();
+        }
     });
 }
 
@@ -118,10 +131,10 @@ var updateValue = function (opt) {
     if (setDefault) {
         if (common.isInArray(method, ['query']) && t.list) {
             t.list.forEach(function (item) {
-                setOperationDefault({ item: item, user: opt.user });
+                setOperationDefault({item: item, user: opt.user});
             });
         } else if (common.isInArray(method, ['detailQuery']) && t) {
-            setOperationDefault({ item: t, user: opt.user });
+            setOperationDefault({item: t, user: opt.user});
         }
     }
 };

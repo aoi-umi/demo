@@ -12,24 +12,24 @@ import * as mainContentDal from '../dal/mainContent';
 export let query = function (opt, exOpt) {
     var user = exOpt.user;
     return common.promise(function () {
-        return mainContentDal.query(opt).then(function (t) {
-            var detail = {
-                list: t[0],
-                count: t[1][0].count,
-                statusList: t[2]
-            };
-            return detail;
-        }).then(function (t) {
-            if (t.list && t.list.length) {
-                t.list.forEach(function (item) {
-                    item.operation = ['detailQuery'];
-                    if (canDelete(item, user))
-                        item.operation.push('del');
-                    updateMainContent(item);
-                });
-            }
-            return t;
-        });
+        return mainContentDal.query(opt);
+    }).then(function (t) {
+        var detail = {
+            list: t[0],
+            count: t[1][0].count,
+            statusList: t[2]
+        };
+        return detail;
+    }).then(function (t) {
+        if (t.list && t.list.length) {
+            t.list.forEach(function (item) {
+                item.operation = ['detailQuery'];
+                if (canDelete(item, user))
+                    item.operation.push('del');
+                updateMainContent(item);
+            });
+        }
+        return t;
     });
 };
 
@@ -109,8 +109,9 @@ export let save = function (opt, exOpt) {
             mainContent.operator = `${user.account}(${user.nickname}#${user.id})`;
             mainContent.createDate =
                 mainContent.operateDate = now;
+            var mainContentId;
             return autoBll.save('mainContent', mainContent, conn).then(function (t) {
-                var mainContentId = t;
+                mainContentId = t;
                 var list = [];
                 //删除child
                 if (delChildList && delChildList.length) {
@@ -137,9 +138,9 @@ export let save = function (opt, exOpt) {
                     user: user
                 });
                 list.push(autoBll.save('mainContentLog', mainContentLog, conn));
-                return q.all(list).then(function () {
-                    return mainContentId;
-                });
+                return q.all(list);
+            }).then(function () {
+                return mainContentId;
             });
         }).then(function (t) {
             return t;
@@ -196,8 +197,9 @@ export let statusUpdate = function (opt, exOpt) {
                 operator: user.account + `(${user.nickname}#${user.id})`,
                 operateDate: now
             };
+            var mainContentId;
             return autoBll.save('mainContent', updateStatusOpt, conn).then(function (t) {
-                var mainContentId = t;
+                mainContentId = t;
                 var list = [];
                 //日志
                 var mainContentLog = createLog({
@@ -208,13 +210,12 @@ export let statusUpdate = function (opt, exOpt) {
                     user: user,
                 });
                 list.push(autoBll.save('mainContentLog', mainContentLog, conn));
-                return q.all(list).then(function () {
-                    return mainContentId;
-                });
+                return q.all(list)
+            }).then(function () {
+                return mainContentId;
             });
         });
-    }
-    );
+    });
 };
 
 function createLog(opt) {

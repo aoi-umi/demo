@@ -5,14 +5,20 @@ import * as db from '../_system/db';
 import * as common from '../_system/common';
 import errorConfig from '../_system/errorConfig';
 
-function getRequire(name, custom?) {
+export let getRequire = function (name, option?) {
     var filepath = '';
-    if (!custom)
+    let opt = {
+        notThrowError: false,
+        type: null
+    };
+    if (option)
+        opt = common.extend(opt, option);
+    if (!opt.type)
         filepath = '../dal/_auto/' + name;
     else {
-        if (custom == 'dal')
+        if (opt.type == 'dal')
             filepath = '../dal/' + name;
-        else if (custom == 'bll')
+        else if (opt.type == 'bll')
             filepath = './' + name;
     }
     if (!filepath)
@@ -21,6 +27,8 @@ function getRequire(name, custom?) {
     var resolvePath = path.resolve(__dirname + '/' + filepath + '.js');
     var isExist = fs.existsSync(resolvePath);
     if (!isExist) {
+        if (opt.notThrowError)
+            return;
         console.error(resolvePath);
         throw common.error('file is not exist', errorConfig.CODE_ERROR);
     }
@@ -64,13 +72,13 @@ export let tran = function (fn) {
     });
 };
 export let custom = function (name, method, ...args) {
-    var bll = getRequire(name, 'bll');
+    var bll = getRequire(name, {type: 'bll'});
     if (!bll[method])
         throw common.error(`method[${method}] is not exist`, errorConfig.CODE_ERROR);
     return bll[method].apply(void 0, args);
 };
 export let customDal = function (name, method, ...args) {
-    var dal = getRequire(name, 'dal');
+    var dal = getRequire(name, {type: 'dal'});
     if (!dal[method])
         throw common.error(`method[${method}] is not exist`, errorConfig.CODE_ERROR);
     return dal[method].apply(void 0, args);
