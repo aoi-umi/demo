@@ -10,7 +10,7 @@ import multer from './_system/myMulter';
 import config from '../config';
 
 type RouteConfig = {
-    url: string | RegExp
+    url: string | RegExp,
     method: string,
     functionName?: string,//为空时按method
     methodName?: string,//用于记录日志
@@ -129,6 +129,15 @@ export let enumChangeDict = {
         '4': { '0': '保存', '1': '提交', '-1': '删除' },
         '-1': { 'recovery': '恢复' },
     }
+};
+
+export let cacheKey = {
+    userInfo: 'userInfoCacheKey'
+};
+
+/**缓存时间 秒 */
+export let cacheTime = {
+    userInfo: 7 * 24 * 3600
 };
 
 export let formatRes = function (err, detail, opt) {
@@ -415,9 +424,4 @@ export let errorHandler = function (err, req, res, next) {
             });
         }
     }
-};
-
-export let cacheKey = {
-    onlineCount: 'onlineCount',
-    userInfo: 'userInfoCacheKey'
 };

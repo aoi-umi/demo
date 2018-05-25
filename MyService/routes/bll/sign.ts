@@ -118,7 +118,7 @@ export let inInside = function (req) {
         if (userInfoKey) {
             userInfoKey = main.cacheKey.userInfo + userInfoKey;
             user.key = userInfoKey;
-            var seconds = 7 * 24 * 3600;
+            var seconds = main.cacheTime.userInfo;
             cache.set(userInfoKey, user, seconds);
         }
         return t;
