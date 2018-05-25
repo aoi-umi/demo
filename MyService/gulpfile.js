@@ -10,21 +10,6 @@ var gulp = require('gulp'),
 var tsProject = ts.createProject('tsconfig.json');
 var tsFrontProject = ts.createProject('tsconfig.json');
 
-let templateDestDir = 'views/_template_web/';
-let templateSrc = 'views/_template/**';
-gulp.task('clear-template', function () {
-    return del([
-        templateDestDir + '*'
-    ]);
-});
-
-gulp.task('make-template', function () {
-    return gulp.src(templateSrc)
-        .pipe(replace('<%', '{%'))
-        .pipe(replace('%>', '%}'))
-        .pipe(gulp.dest(templateDestDir));
-});
-
 let destDir = './bin';
 
 gulp.task('clearBin', function () {
@@ -33,11 +18,22 @@ gulp.task('clearBin', function () {
     ]);
 });
 
+
+let templateDestDir = '/views/_template_front/';
+let templateSrc = 'views/_template/**';
+
+gulp.task('make-template', function () {
+    return gulp.src(templateSrc)
+        .pipe(replace('<%', '<%%'))
+        .pipe(replace('%>', '%%>'))
+        .pipe(gulp.dest(destDir + templateDestDir));
+});
+
 gulp.task('ts', function () {
     return gulp.src([
             'app.ts',
             'config.ts',
-            'routes/**/*'
+            'routes/**'
         ], {
             base: './'
         }).pipe(tsProject())
@@ -62,13 +58,37 @@ gulp.task('copyDep', function () {
     };
     task = task.concat([
         gulp.src(['bower_components/bootstrap/dist/@(css|fonts)/**',
-            'bower_components/font-awesome/@(css|fonts)/**'
+            'bower_components/font-awesome/@(css|fonts)/**',
+            'bower_components/seiyria-bootstrap-slider/dist/@(css)/**',
+            'bower_components/bootstrap-fileinput/@(css|img)/**',
         ])
         .pipe(gulp.dest(destDir + '/public'))
         .on('end', onFinished),
 
-        gulp.src(['bower_components/bootstrap/dist/js/bootstrap.min.js'])
-        .pipe(gulp.dest(destDir + '/public/libs'))
+        gulp.src(['bower_components/jquery-ui/themes/base/jquery-ui.min.css', ])
+        .pipe(gulp.dest(destDir + '/public/css'))
+        .on('end', onFinished),
+
+        gulp.src([
+            'bower_components/bootstrap/dist/js/bootstrap.min.js',
+            'bower_components/bootstrap-fileinput/js/fileinput.min.js',
+            'bower_components/jquery-ui/jquery-ui.min.js',
+            'bower_components/seiyria-bootstrap-slider/dist/bootstrap-slider.min.js',
+            'bower_components/jquery/dist/jquery.min.js',
+            'bower_components/jquery.cookie/jquery.cookie.js',
+            'bower_components/SparkMD5/spark-md5.min.js',
+
+            'node_modules/q/q.js',
+            'node_modules/ejs/ejs.min.js',
+            'node_modules/underscore/underscore-min.js',
+        ])
+        .pipe(gulp.dest(destDir + '/public/js/libs'))
+        .on('end', onFinished),
+
+        gulp.src([
+            'node_modules/socket.io-client/dist/**',
+        ])
+        .pipe(gulp.dest(destDir + '/public/js/libs/socket.io'))
         .on('end', onFinished)
     ]);
     return defer.promise;
@@ -93,7 +113,7 @@ gulp.task('front', gulpSequence('ts-front', 'copy'));
 
 gulp.task('make', ['make-template']);
 
-gulp.task('clear', ['clearBin', 'clear-template']);
+gulp.task('clear', ['clearBin']);
 
 gulp.task('dev', gulpSequence(['make', 'copyDep'], ['front', 'ts']));
 

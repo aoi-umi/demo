@@ -3,6 +3,8 @@
  */
 import * as ejs from 'ejs';
 import * as $ from 'jquery';
+//@ts-ignore
+import * as WdatePicker from 'WdatePicker';
 
 import * as common from './common';
 import * as myInterface from './myInterface';

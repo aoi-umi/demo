@@ -57,7 +57,7 @@
     requirejs.config({
         baseUrl: '/js',
         paths: {
-            'jquery': 'libs/jquery-2.1.1.min',
+            'jquery': 'libs/jquery.min',
             'jquery.cookie': 'libs/jquery.cookie',
             'jquery-ui': 'libs/jquery-ui.min',
             'bootstrap': 'libs/bootstrap.min',
@@ -71,6 +71,7 @@
             'q': 'libs/q',
             'diffview': 'libs/diffview',
             'difflib': 'libs/difflib',
+            'WdatePicker': 'libs/My97DatePicker/WdatePicker'
         },
         shim: {
             'ejs': {
@@ -84,6 +85,9 @@
             },            
             'difflib': {
                 exports: 'difflib'
+            },            
+            'WdatePicker': {
+                exports: 'WdatePicker'
             },
         }
     });

@@ -25,6 +25,10 @@
     </tr>
     </tbody>
 </table>
+
+<script type="text/template" id="onlineUserItemTemp">
+    <% include ../_template_front/onlineUserItem%>
+</script>
 <script type="text/javascript">
     require(['jquery', 'ejs', './_main', './myInterface', './common'], function () {
         var $ = require('jquery'),
@@ -35,7 +39,7 @@
 
         main.init();
 
-        var temp = '<tbody class="row"><td><a href="javascript:;" class="onlineUserKey" data-key="{%=key%}">{%=key%}</a></td><td>{%=count%}</td></tbody>'
+        var temp = $('#onlineUserItemTemp').html();
         $('#search').on('click', function () {
             $('#list [name=errorContent]').empty();
             $('#list .row').remove();
