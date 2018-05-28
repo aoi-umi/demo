@@ -52,6 +52,8 @@
     "del": "~3.0.0",
     "gulp": "^3.9.1",
     "gulp-babel": "^7.0.0",
+    "gulp-changed": "^3.2.0",
+    "gulp-debug": "^4.0.0",
     "gulp-replace-path": "~0.4.0",
     "gulp-sequence": "^1.0.0",
     "gulp-typescript": "^4.0.2",
