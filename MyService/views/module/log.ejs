@@ -89,7 +89,8 @@
 <script type="text/javascript">
     require(['./_main', './moduleLog'], function () {
         var moduleLog = require('./moduleLog');
-        require('./_main').init();        
+        var main = require('./_main');
+        main.init();
         new moduleLog.ModuleLog();
     })
 </script>

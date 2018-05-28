@@ -83,6 +83,7 @@ gulp.task('copyDep', function () {
 			'node_modules/q/q.js',
 			'node_modules/ejs/ejs.min.js',
 			'node_modules/underscore/underscore-min.js',
+			'node_modules/underscore/underscore-min.map',
 		])
 			.pipe(gulp.dest(destDir + '/public/js/libs'))
 			.on('end', onFinished),

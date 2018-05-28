@@ -303,7 +303,9 @@
 
 <script type="text/javascript">
     require(['./_main', './index'], function () {
-        require('./_main').init();
-        require('./index').init();
+        var main = require('./_main'),
+            index = require('./index');
+        main.init();
+        index.init();
     })
 </script>
