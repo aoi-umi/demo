@@ -7,11 +7,11 @@ import * as WdatePicker from 'WdatePicker';
 import * as common from './common';
 import * as myInterface from './myInterface';
 import * as myVaild from './myVaild';
-import { MyModule } from './myModule';
+import {MyModule, ModuleOption} from './myModule';
 
 export class ModuleLog extends MyModule {
-    constructor(option?) {
-        var opt = {
+    constructor(option?: ModuleOption) {
+        var opt: ModuleOption = {
             operation: ['query'],
             queryId: 'search',
             queryItemTempId: 'logItemTemp',

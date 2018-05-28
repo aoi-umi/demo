@@ -9,10 +9,23 @@ import * as WdatePicker from 'WdatePicker';
 import * as common from './common';
 import * as myInterface from './myInterface';
 import * as myVaild from './myVaild';
-import { MyModule } from './myModule';
+import {MyModule, ModuleOption} from './myModule';
+
+class ModuleMainContentOption extends ModuleOption {
+    statusUpdate?(dom, self: MyModule);
+
+    updateView?(list: string[], self: MyModule);
+
+    getDefaultMainCotentChild?(self: MyModule);
+
+    setMainContentChildDetail?(item: any, self: MyModule);
+
+    onStatusUpdateSuccess?(self: MyModule);
+}
+
 export class ModuleMainContent extends MyModule {
-    constructor(option?) {
-        var opt = {
+    constructor(option?: ModuleMainContentOption) {
+        var opt: ModuleMainContentOption = {
             operation: [],
             queryId: 'search',
             queryItemTempId: 'mainContentItem',
@@ -87,6 +100,7 @@ export class ModuleMainContent extends MyModule {
                 }
             },
             bindEvent: function (self) {
+                let selfOpt = self.opt as ModuleMainContentOption;
                 if (self.operation.query) {
                     $('#createDateStart').on('click', function () {
                         var datePickerArgs = {
@@ -145,7 +159,7 @@ export class ModuleMainContent extends MyModule {
                 }
 
                 $(document).on('click', '.statusUpdate', function () {
-                    self.opt.statusUpdate($(this), self);
+                    selfOpt.statusUpdate($(this), self);
                 });
 
                 if (self.operation.detailQuery) {
@@ -155,11 +169,11 @@ export class ModuleMainContent extends MyModule {
                         if (item.id)
                             self.variable.delMainContentChildList.push(item.id);
                         row.remove();
-                        self.opt.updateView(['mainContentChild'], self);
+                        selfOpt.updateView(['mainContentChild'], self);
                     });
 
                     $(document).on('click', '#mainContentChildList .itemEdit', function () {
-                        self.opt.setMainContentChildDetail($(this).closest(self.rowClass).data('item'), self);
+                        selfOpt.setMainContentChildDetail($(this).closest(self.rowClass).data('item'), self);
                         $('#mainContentChild').modal('show');
                     });
                     $('#mainContentChildList').on('click', '.moveUp, .moveDown', function () {
@@ -176,12 +190,12 @@ export class ModuleMainContent extends MyModule {
                         }
                         if (row.length && secondRow.length) {
                             row.after(secondRow);
-                            self.opt.updateView(['mainContentChild'], self);
+                            selfOpt.updateView(['mainContentChild'], self);
                         }
                     });
 
                     $('#showMainContentChild').on('click', function () {
-                        self.opt.setMainContentChildDetail(null, self);
+                        selfOpt.setMainContentChildDetail(null, self);
                         $('#mainContentChild').modal('show');
                     });
                     $('#addMainContentChild').on('click', function () {
@@ -194,7 +208,7 @@ export class ModuleMainContent extends MyModule {
                             dom: mainContentChildDetailDom.find('[name=content]'),
                             canNotNull: true
                         }];
-                        var checkRes = common.dataCheck({ list: argsOpt });
+                        var checkRes = common.dataCheck({list: argsOpt});
                         if (!checkRes.success) {
                             common.msgNotice({
                                 type: checkRes.dom ? 0 : 1,
@@ -264,7 +278,7 @@ export class ModuleMainContent extends MyModule {
                     canNotNull: true,
                 }];
                 var detail: any = {};
-                var checkRes = common.dataCheck({ list: saveArgsOpt });
+                var checkRes = common.dataCheck({list: saveArgsOpt});
                 if (checkRes.success) {
                     var mainContent =
                         detail.mainContent = checkRes.model;
@@ -307,7 +321,7 @@ export class ModuleMainContent extends MyModule {
             setMainContentChildDetail: function (item, self) {
                 var mainContentChildDetailDom = $('#mainContentChildDetail');
                 if (!item) {
-                    mainContentChildDetailDom.data('item', { num: $(`#mainContentChildList ${self.rowClass}`).length + 1 });
+                    mainContentChildDetailDom.data('item', {num: $(`#mainContentChildList ${self.rowClass}`).length + 1});
                     mainContentChildDetailDom.find(':input').val('');
                     mainContentChildDetailDom.find('option:eq(0)').prop('selected', true);
                 } else {
@@ -329,7 +343,8 @@ export class ModuleMainContent extends MyModule {
             },
 
             statusUpdate: function (dom, self) {
-                var mainContent: any = { id: dom.data('id') };
+                let selfOpt = self.opt as ModuleMainContentOption;
+                var mainContent: any = {id: dom.data('id')};
                 return common.promise(function () {
                     var operate = dom.data('operate');
                     mainContent.operate = operate;
@@ -340,13 +355,13 @@ export class ModuleMainContent extends MyModule {
                         mainContent: mainContent,
                         remark: $('#remark').val()
                     };
-                    var notice = common.msgNotice({ type: 1, msg: '处理中', noClose: true });
+                    var notice = common.msgNotice({type: 1, msg: '处理中', noClose: true});
                     return myInterface.api.mainContentStatusUpdate(detail).then(function () {
                         common.msgNotice({
                             type: 1, msg: '处理成功!', btnOptList: {
                                 content: '确认',
                                 cb: function () {
-                                    self.opt.onStatusUpdateSuccess(self);
+                                    selfOpt.onStatusUpdateSuccess(self);
                                 }
                             }
                         });

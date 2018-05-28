@@ -7,10 +7,23 @@ import * as $ from 'jquery';
 import * as common from './common';
 import * as myInterface from './myInterface';
 import * as myVaild from './myVaild';
-import { MyModule } from './myModule';
+import {MyModule, ModuleOption} from './myModule';
+
+class ModuleRoleOption extends ModuleOption {
+    currRoleCode: string;
+
+    updateView?(list: string[], opt, self: MyModule);
+
+    setAuthorityAutoComplete?(self: MyModule);
+
+    getAuthority?(opt, self: MyModule);
+
+    setAuthority?(opt, self: MyModule);
+}
+
 export class ModuleRole extends MyModule {
-    constructor(option?) {
-        var opt = {
+    constructor(option?: ModuleRoleOption) {
+        var opt: ModuleRoleOption = {
             operation: ['query', 'save', 'detailQuery'],
             queryId: 'query',
             queryItemTempId: 'itemTemp',
@@ -101,7 +114,8 @@ export class ModuleRole extends MyModule {
             },
 
             editAfterRender: function (item, self) {
-                self.opt.updateView(['roleDetail'], { roleDetail: item }, self);
+                let selfOpt = self.opt as ModuleRoleOption;
+                selfOpt.updateView(['roleDetail'], {roleDetail: item}, self);
                 self.detailDom.modal('show');
             },
             beforeSave: function (dom, self) {
@@ -142,7 +156,7 @@ export class ModuleRole extends MyModule {
                             return this.dom.prop('checked');
                         }
                     },];
-                    let checkRes = common.dataCheck({ list: list });
+                    let checkRes = common.dataCheck({list: list});
                     if (checkRes.success) {
                         var data = {
                             role: checkRes.model,
@@ -177,24 +191,26 @@ export class ModuleRole extends MyModule {
                 });
             },
             beforeDetailQuery: function (t, self) {
-                return { code: t.code };
+                return {code: t.code};
             },
             onDetailQuerySuccess: function (t, self) {
+                let selfOpt = self.opt as ModuleRoleOption;
                 self.detailRender(t.role);
-                self.opt.currRoleCode = t.role.code;
-                self.opt.updateView(['roleDetail'], { roleAllDetail: t }, self);
+                selfOpt.currRoleCode = t.role.code;
+                selfOpt.updateView(['roleDetail'], {roleAllDetail: t}, self);
                 self.detailDom.modal('show');
             },
 
             updateView: function (list, opt, self) {
+                let selfOpt = self.opt as ModuleRoleOption;
                 if (!list || common.isInArray('roleDetail', list)) {
-                    self.opt.setAuthorityAutoComplete(self);
+                    selfOpt.setAuthorityAutoComplete(self);
 
                     if (opt.roleAllDetail) {
                         opt.roleDetail = opt.roleAllDetail.role;
                         opt.roleDetail.operation = opt.roleAllDetail.operation;
                         $(opt.roleAllDetail.authorityList).each(function (i, item) {
-                            self.opt.setAuthority(item, self);
+                            selfOpt.setAuthority(item, self);
                         });
                     }
                     if (opt.roleDetail) {
@@ -208,9 +224,10 @@ export class ModuleRole extends MyModule {
                 }
             },
             setAuthorityAutoComplete: function (self) {
+                let selfOpt = self.opt as ModuleRoleOption;
                 common.autoComplete({
                     source: function () {
-                        return self.opt.getAuthority({ anyKey: this.dom.val() }, self)
+                        return selfOpt.getAuthority({anyKey: this.dom.val()}, self)
                     },
                     dom: self.detailContainerDom.find('[name=authority]'),
                     select: function (dom, item) {
@@ -218,7 +235,7 @@ export class ModuleRole extends MyModule {
                         var match = self.detailContainerDom.find('[name=authorityBox]').find(`[name=roleAuthority][data-code=${item.code}]`);
                         if (!match.length) {
                             item.changeStatus = 1;
-                            self.opt.setAuthority(item, self);
+                            selfOpt.setAuthority(item, self);
                         }
                         this.dom.blur();
                     },
@@ -235,9 +252,10 @@ export class ModuleRole extends MyModule {
                 });
             },
             getAuthority: function (opt, self) {
+                let selfOpt = self.opt as ModuleRoleOption;
                 var queryOpt: any = {
                     //status: 1,
-                    excludeByRoleCode: self.opt.currRoleCode
+                    excludeByRoleCode: selfOpt.currRoleCode
                 };
                 if (opt) queryOpt.anyKey = opt.anyKey;
                 return myInterface.api.authorityQuery(queryOpt).then(function (t) {
