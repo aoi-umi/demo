@@ -6,10 +6,15 @@ import * as $ from 'jquery';
 import * as common from './common';
 import * as myInterface from './myInterface';
 import * as myVaild from './myVaild';
-import { MyModule } from './myModule';
+import {MyModule, ModuleOption} from './myModule';
+
+class ModuleAuthorityOption extends ModuleOption {
+    updateView?(list: string[], opt, self: MyModule);
+}
+
 export class ModuleAuthority extends MyModule {
-    constructor(option?) {
-        var opt = {
+    constructor(option?: ModuleAuthorityOption) {
+        var opt: ModuleAuthorityOption = {
             operation: ['query', 'save', 'detailQuery'],
             queryId: 'query',
             queryItemTempId: 'itemTemp',
@@ -66,7 +71,8 @@ export class ModuleAuthority extends MyModule {
             },
 
             editAfterRender: function (item, self) {
-                self.opt.updateView(['authorityDetail'], { authorityDetail: item }, self);
+                let selfOpt = self.opt as ModuleAuthorityOption;
+                selfOpt.updateView(['authorityDetail'], {authorityDetail: item}, self);
                 self.detailDom.modal('show');
             },
             beforeSave: function (dom, self) {
@@ -106,7 +112,7 @@ export class ModuleAuthority extends MyModule {
                             return this.dom.prop('checked');
                         }
                     },];
-                    let checkRes = common.dataCheck({ list: list });
+                    let checkRes = common.dataCheck({list: list});
                     return checkRes;
                 }
             },
@@ -124,8 +130,9 @@ export class ModuleAuthority extends MyModule {
                 });
             },
             onDetailQuerySuccess: function (t, self) {
+                let selfOpt = self.opt as ModuleAuthorityOption;
                 self.detailRender(t);
-                self.opt.updateView(['authorityDetail'], { authorityDetail: t }, self);
+                selfOpt.updateView(['authorityDetail'], {authorityDetail: t}, self);
                 self.detailDom.modal('show');
             },
 

@@ -8,10 +8,15 @@ import * as $ from 'jquery';
 import * as common from './common';
 import * as myInterface from './myInterface';
 import * as myVaild from './myVaild';
-import { MyModule } from './myModule';
+import {MyModule, ModuleOption} from './myModule';
+
+class ModuleMainContentTypeOption extends ModuleOption {
+    updateView?(list: string[], opt, self: MyModule);
+}
+
 export class ModuleMainContentType extends MyModule {
-    constructor(option?) {
-        var opt = {
+    constructor(option?: ModuleMainContentTypeOption) {
+        var opt: ModuleMainContentTypeOption = {
             operation: ['query', 'save', 'del', 'detailQuery'],
             queryId: 'search',
             queryItemTempId: 'mainContentTypeItem',
@@ -75,7 +80,7 @@ export class ModuleMainContentType extends MyModule {
                             $(list).each(function (i) {
                                 let item: any = this;
                                 if (!itemTree[item.type])
-                                    itemTree[item.type] = { item: item, inRoot: false };
+                                    itemTree[item.type] = {item: item, inRoot: false};
                                 if (item.parentType == parentType) {
                                     itemTree[item.type].inRoot = true;
                                     if (!tree[item.type]) {
@@ -121,7 +126,8 @@ export class ModuleMainContentType extends MyModule {
                 if (!data.level) data.level = null;
             },
             editAfterRender: function (item, self) {
-                self.opt.updateView(['mainContentTypeDetail'], { mainContentTypeDetail: item }, self);
+                let selfOpt = self.opt as ModuleMainContentTypeOption;
+                selfOpt.updateView(['mainContentTypeDetail'], {mainContentTypeDetail: item}, self);
                 self.detailDom.modal('show');
             },
             beforeSave: function (dom, self) {
@@ -142,7 +148,7 @@ export class ModuleMainContentType extends MyModule {
                     name: 'level',
                     dom: self.detailContainerDom.find('[name=level]'),
                 }];
-                var checkRes = common.dataCheck({ list: list });
+                var checkRes = common.dataCheck({list: list});
                 return checkRes;
             },
             onSaveSuccess: function (t, self) {
@@ -159,8 +165,9 @@ export class ModuleMainContentType extends MyModule {
                 });
             },
             onDetailQuerySuccess: function (t, self) {
+                let selfOpt = self.opt as ModuleMainContentTypeOption;
                 self.detailRender(t);
-                self.opt.updateView(['mainContentTypeDetail'], { mainContentTypeDetail: t }, self);
+                selfOpt.updateView(['mainContentTypeDetail'], {mainContentTypeDetail: t}, self);
                 self.detailDom.modal('show');
             },
             updateView: function (list, opt, self) {

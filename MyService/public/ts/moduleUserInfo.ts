@@ -9,11 +9,31 @@ import * as WdatePicker from 'WdatePicker';
 import * as common from './common';
 import * as myInterface from './myInterface';
 import * as myVaild from './myVaild';
-import { MyModule } from './myModule';
+import {MyModule, ModuleOption} from './myModule';
+
+class ModuleUserInfoOption extends ModuleOption {
+    currUserId: number;
+
+    adminSave?(self: MyModule);
+
+    updateView?(list: string[], opt, self: MyModule);
+
+    setAuthorityAutoComplete?(self: MyModule);
+
+    setRoleAutoComplete?(self: MyModule);
+
+    setAuthority?(opt, self: MyModule);
+
+    getAuthority?(opt, self: MyModule);
+
+    setRole?(opt, self: MyModule);
+
+    getRole?(opt, self: MyModule);
+}
 
 export class ModuleUserInfo extends MyModule {
-    constructor(option?) {
-        var opt = {
+    constructor(option?: ModuleUserInfoOption) {
+        var opt: ModuleUserInfoOption = {
             operation: ['query', 'save', 'detailQuery'],
             queryId: 'search',
             queryItemTempId: 'itemTemp',
@@ -62,6 +82,7 @@ export class ModuleUserInfo extends MyModule {
                 }
             },
             bindEvent: function (self) {
+                let selfOpt = self.opt as ModuleUserInfoOption;
                 if (self.operation.query) {
                     $('#createDateStart').on('click', function () {
                         var datePickerArgs = {
@@ -110,7 +131,7 @@ export class ModuleUserInfo extends MyModule {
                     });
 
                     $(document).on('click', '.admin-save', function () {
-                        self.opt.adminSave(self);
+                        selfOpt.adminSave(self);
                     });
                     self.queryContainerDom.on('click', '.toggle-auth', function () {
                         var authBox = $(this).siblings('.auth-box');
@@ -123,7 +144,7 @@ export class ModuleUserInfo extends MyModule {
                     //角色
                     common.autoComplete({
                         source: function () {
-                            return self.opt.getRole({ code: this.dom.val() }, self)
+                            return selfOpt.getRole({code: this.dom.val()}, self)
                         },
                         dom: $('#role'),
                         select: function (dom, item) {
@@ -142,7 +163,7 @@ export class ModuleUserInfo extends MyModule {
                     //权限
                     common.autoComplete({
                         source: function () {
-                            return self.opt.getAuthority({ code: this.dom.val() }, self)
+                            return selfOpt.getAuthority({code: this.dom.val()}, self)
                         },
                         dom: $('#authority'),
                         select: function (dom, item) {
@@ -233,7 +254,7 @@ export class ModuleUserInfo extends MyModule {
                             return '密码不一致';
                     }
                 }];
-                var checkRes = common.dataCheck({ list: list });
+                var checkRes = common.dataCheck({list: list});
                 if (checkRes.success) {
                     var data = checkRes.model;
                     if (data.newPassword) {
@@ -254,24 +275,26 @@ export class ModuleUserInfo extends MyModule {
                 });
             },
             onDetailQuerySuccess: function (t, self) {
+                let selfOpt = self.opt as ModuleUserInfoOption;
                 self.detailRender(t.userInfo);
-                self.opt.currUserId = t.userInfo.id;
-                self.opt.updateView(['userInfoDetail'], { userInfoAllDetail: t }, self);
+                selfOpt.currUserId = t.userInfo.id;
+                selfOpt.updateView(['userInfoDetail'], {userInfoAllDetail: t}, self);
                 self.detailDom.modal('show');
             },
 
             updateView: function (list, opt, self) {
+                let selfOpt = self.opt as ModuleUserInfoOption;
                 if (!list || common.isInArray('userInfoDetail', list)) {
-                    self.opt.setAuthorityAutoComplete(self);
-                    self.opt.setRoleAutoComplete(self);
+                    selfOpt.setAuthorityAutoComplete(self);
+                    selfOpt.setRoleAutoComplete(self);
                     if (opt.userInfoAllDetail) {
                         opt.userInfoDetail = opt.userInfoAllDetail.userInfo;
                         opt.userInfoDetail.operation = opt.userInfoAllDetail.operation;
                         $(opt.userInfoAllDetail.authorityList).each(function (i, item) {
-                            self.opt.setAuthority(item, self);
+                            selfOpt.setAuthority(item, self);
                         });
                         $(opt.userInfoAllDetail.roleList).each(function (i, item) {
-                            self.opt.setRole(item, self);
+                            selfOpt.setRole(item, self);
                         });
                     }
                     if (opt.userInfoDetail) {
@@ -324,21 +347,22 @@ export class ModuleUserInfo extends MyModule {
                         }]
                     });
                 }).fail(function (e) {
-                    common.msgNotice({ type: 1, msg: e.message });
+                    common.msgNotice({type: 1, msg: e.message});
                 });
             },
             //权限
             setAuthorityAutoComplete: function (self) {
+                let selfOpt = self.opt as ModuleUserInfoOption;
                 common.autoComplete({
                     source: function () {
-                        return self.opt.getAuthority({ anyKey: this.dom.val() }, self)
+                        return selfOpt.getAuthority({anyKey: this.dom.val()}, self)
                     },
                     dom: self.detailContainerDom.find('[name=authority]'),
                     select: function (dom, item) {
                         var match = self.detailContainerDom.find('[name=authorityBox]').find(`[name=userAuthority][data-code=${item.code}]`);
                         if (!match.length) {
                             item.changeStatus = 1;
-                            self.opt.setAuthority(item, self);
+                            selfOpt.setAuthority(item, self);
                         }
                         this.dom.blur();
                     },
@@ -355,9 +379,10 @@ export class ModuleUserInfo extends MyModule {
                 });
             },
             getAuthority: function (opt, self) {
+                let selfOpt = self.opt as ModuleUserInfoOption;
                 var queryOpt: any = {
                     //status: 1,
-                    excludeByUserId: self.opt.currUserId
+                    excludeByUserId: selfOpt.currUserId
                 };
                 if (opt) queryOpt.anyKey = opt.anyKey;
                 return myInterface.api.authorityQuery(queryOpt).then(function (t) {
@@ -376,9 +401,10 @@ export class ModuleUserInfo extends MyModule {
 
             //角色
             setRoleAutoComplete: function (self) {
+                let selfOpt = self.opt as ModuleUserInfoOption;
                 common.autoComplete({
                     source: function () {
-                        return self.opt.getRole({ anyKey: this.dom.val() }, self)
+                        return selfOpt.getRole({anyKey: this.dom.val()}, self)
                     },
                     dom: self.detailContainerDom.find('[name=role]'),
                     select: function (dom, item) {
@@ -386,7 +412,7 @@ export class ModuleUserInfo extends MyModule {
                         var match = self.detailContainerDom.find('[name=roleBox]').find(`[name=userRole][data-code=${item.code}]`);
                         if (!match.length) {
                             item.changeStatus = 1;
-                            self.opt.setRole(item, self);
+                            selfOpt.setRole(item, self);
                         }
                         this.dom.blur();
                     },
@@ -403,9 +429,10 @@ export class ModuleUserInfo extends MyModule {
                 });
             },
             getRole: function (opt, self) {
+                let selfOpt = self.opt as ModuleUserInfoOption;
                 var queryOpt: any = {
                     //status: 1,
-                    excludeByUserId: self.opt.currUserId
+                    excludeByUserId: selfOpt.currUserId
                 };
                 if (opt) queryOpt.anyKey = opt.anyKey;
                 return myInterface.api.roleQuery(queryOpt).then(function (t) {
