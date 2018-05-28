@@ -9,14 +9,22 @@
     <link rel='stylesheet' href='/css/bootstrap-theme.min.css'/>
     <link rel='stylesheet' href='/css/jquery-ui.min.css'/>
     <link rel='stylesheet' href='/css/style.css'/>
+
+    <script type="text/javascript">
+        <%
+        var showKeyList = ['id', 'nickname', 'account', 'authority'];
+        var showUser = {};
+        for (var key in user) {
+            if (showKeyList.includes(key))
+                showUser[key] = user[key];
+        }
+        %>
+		var global = {};
+		var user = global.user = <%- JSON.stringify(showUser, null, '\t') %>;
+    </script>
     <% include ./js %>
 </head>
 <body class="<%= noNav ? 'no-nav' : '' %>">
 <% if(!noNav){ %>
 <% include ./header_nav %>
 <% } %>
-<div class="hidden">
-    <% for(var key in user.authority){ %>
-    <%= key %>;
-    <% } %>
-</div>

@@ -124,28 +124,24 @@ var updateValue = function (opt) {
     var method = opt.method;
     var t = opt.t;
 
-    var setDefault = true;
-    if ((module == 'mainContent' && common.isInArray(method, ['query']))) {
-        setDefault = false;
-    }
-    if (setDefault) {
-        if (common.isInArray(method, ['query']) && t.list) {
-            t.list.forEach(function (item) {
-                setOperationDefault({item: item, user: opt.user});
-            });
-        } else if (common.isInArray(method, ['detailQuery']) && t) {
-            setOperationDefault({item: t, user: opt.user});
-        }
+    if (common.isInArray(method, ['query']) && t.list) {
+        t.list.forEach(function (item) {
+            setOperationDefault({item: item, user: opt.user});
+        });
+    } else if (common.isInArray(method, ['detailQuery']) && t) {
+        setOperationDefault({item: t, user: opt.user});
     }
 };
 
 var setOperationDefault = function (opt) {
     var item = opt.item;
-    item.operation = [];
-    if (auth.isHadAuthority(opt.user, 'login')) {
-        item.operation.push('save');
+    if (!item.operation) {
+        item.operation = [];
+        if (auth.isHadAuthority(opt.user, 'login')) {
+            item.operation.push('save');
+        }
+        if (auth.isHadAuthority(opt.user, 'admin')) {
+            item.operation.push('del');
+        }
     }
-    if (auth.isHadAuthority(opt.user, 'admin')) {
-        item.operation.push('del');
-    }
-}
+};
