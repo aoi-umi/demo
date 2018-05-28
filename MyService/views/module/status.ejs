@@ -1,9 +1,15 @@
 <div class="container">
-<div>
-    <%for(var key in enumDict){
-        var value = enumDict[key];
-    %>
-    <% include ../_template/status%>
-    <%}%>
+    <div>
+        <%for(var key in enumDict){
+            var value = enumDict[key];
+        %>
+        <% include ../_template/status%>
+        <%}%>
+    </div>
 </div>
-</div>
+<script type="text/javascript">
+require(['./_main'], function () {
+        var main = require('./_main');
+        main.init();
+});
+</script>
