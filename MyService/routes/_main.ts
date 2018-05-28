@@ -18,7 +18,7 @@ type RouteConfig = {
     middleware?: any[]
 }
 //路由配置 文件必须在routes目录下
-export let routeConfig: RouteConfig[] = [        
+export let routeConfig: RouteConfig[] = [
     {
         url: '/msg',
         method: 'get',
@@ -49,69 +49,69 @@ export let routeConfig: RouteConfig[] = [
 
 //访问权限配置
 export let accessableUrlConfig = [
-    { url: '/' },
-    { url: '/msg' },
+    {url: '/'},
+    {url: '/msg'},
 
-    { url: '/textDiff' },
+    {url: '/textDiff'},
 
-    { url: '/onlineUser', auth: ['admin'] },
-    { url: '/interface/onlineUser/query', auth: ['admin'] },
-    { url: '/interface/onlineUser/detailQuery', auth: ['admin'] },
-    { url: '/interface/upload', auth: ['login'] },
-    { url: '/help', auth: ['dev'] },
-    { url: '/status', auth: ['dev'] },
-    { url: '/color', auth: ['dev'] },
+    {url: '/onlineUser', auth: ['admin']},
+    {url: '/interface/onlineUser/query', auth: ['admin']},
+    {url: '/interface/onlineUser/detailQuery', auth: ['admin']},
+    {url: '/interface/upload', auth: ['login']},
+    {url: '/help', auth: ['dev']},
+    {url: '/status', auth: ['dev']},
+    {url: '/color', auth: ['dev']},
 
-    { url: '/log', auth: ['dev'] },
-    { url: '/interface/log/query', auth: ['dev'] },
-    { url: '/interface/log/save', auth: ['local'] },
+    {url: '/log', auth: ['dev']},
+    {url: '/interface/log/query', auth: ['dev']},
+    {url: '/interface/log/save', auth: ['local']},
 
-    { url: '/sign/up' },
-    { url: '/sign/in' },
-    { url: '/interface/sign/up' },
-    { url: '/interface/sign/in' },
-    { url: '/interface/sign/out' },
+    {url: '/sign/up'},
+    {url: '/sign/in'},
+    {url: '/interface/sign/up'},
+    {url: '/interface/sign/in'},
+    {url: '/interface/sign/out'},
 
     //角色
-    { url: '/role/list', auth: ['admin'] },
-    { url: '/interface/role/query', auth: ['admin'] },
-    { url: '/interface/role/save', auth: ['admin'] },
-    { url: '/interface/role/detailQuery', auth: ['admin'] },
+    {url: '/role/list', auth: ['admin']},
+    {url: '/interface/role/query', auth: ['admin']},
+    {url: '/interface/role/save', auth: ['admin']},
+    {url: '/interface/role/detailQuery', auth: ['admin']},
 
     //权限
-    { url: '/authority/list', auth: ['admin'] },
-    { url: '/interface/authority/query', auth: ['admin'] },
-    { url: '/interface/authority/save', auth: ['admin'] },
-    { url: '/interface/authority/detailQuery', auth: ['admin'] },
+    {url: '/authority/list', auth: ['admin']},
+    {url: '/interface/authority/query', auth: ['admin']},
+    {url: '/interface/authority/save', auth: ['admin']},
+    {url: '/interface/authority/detailQuery', auth: ['admin']},
 
     //用户信息
-    { url: '/userInfo/detail', auth: ['login'] },
-    { url: '/userInfo/list', auth: ['admin'] },
-    { url: '/interface/userInfo/query', auth: ['admin'] },
-    { url: '/interface/userInfo/detailQuery', auth: ['admin'] },
-    { url: '/interface/userInfo/save', auth: ['login'] },
-    { url: '/interface/userInfo/adminSave', auth: ['admin'] },
+    {url: '/userInfo/detail', auth: ['login']},
+    {url: '/userInfo/list', auth: ['admin']},
+    {url: '/interface/userInfo/query', auth: ['admin']},
+    {url: '/interface/userInfo/detailQuery', auth: ['admin']},
+    {url: '/interface/userInfo/save', auth: ['login']},
+    {url: '/interface/userInfo/adminSave', auth: ['admin']},
 
-    { url: '/mainContent/list', auth: ['mainContentQuery'] },
-    { url: '/mainContent/detail', auth: ['mainContentQuery'] },
-    { url: '/interface/mainContent/query', auth: ['mainContentQuery'] },
-    { url: '/interface/mainContent/save', auth: ['mainContentSave'] },
-    { url: '/interface/mainContent/statusUpdate', auth: ['mainContentSave'] },
+    {url: '/mainContent/list', auth: ['mainContentQuery']},
+    {url: '/mainContent/detail', auth: ['mainContentQuery']},
+    {url: '/interface/mainContent/query', auth: ['mainContentQuery']},
+    {url: '/interface/mainContent/save', auth: ['mainContentSave']},
+    {url: '/interface/mainContent/statusUpdate', auth: ['mainContentSave']},
     //{url: '/interface/mainContent/del', auth: ['admin']},
 
-    { url: '/mainContentType/list', auth: ['mainContentTypeQuery'] },
-    { url: '/interface/mainContentType/query', auth: ['mainContentTypeQuery'] },
-    { url: '/interface/mainContentType/detailQuery', auth: ['mainContentTypeDetailQuery'] },
-    { url: '/interface/mainContentType/save', auth: ['mainContentTypeSave'] },
-    { url: '/interface/mainContentType/del', auth: ['mainContentTypeDel'] },
+    {url: '/mainContentType/list', auth: ['mainContentTypeQuery']},
+    {url: '/interface/mainContentType/query', auth: ['mainContentTypeQuery']},
+    {url: '/interface/mainContentType/detailQuery', auth: ['mainContentTypeDetailQuery']},
+    {url: '/interface/mainContentType/save', auth: ['mainContentTypeSave']},
+    {url: '/interface/mainContentType/del', auth: ['mainContentTypeDel']},
 ];
 
 //枚举
 export let enumDict = {
-    mainContentTypeEnum: { '0': '文章', },
-    mainContentStatusEnum: { '-1': '已删除', '0': '草稿', '1': '待审核', '2': '审核中', '3': '通过', '4': '退回' },
+    mainContentTypeEnum: {'0': '文章',},
+    mainContentStatusEnum: {'-1': '已删除', '0': '草稿', '1': '待审核', '2': '审核中', '3': '通过', '4': '退回'},
     //添加 Operate 后缀
-    mainContentStatusEnumOperate: { 'recovery': '恢复' },
+    mainContentStatusEnumOperate: {'recovery': '恢复'},
     mainContentLogTypeEnum: {
         //mainConetnt
         '0': '主内容保存', '1': '主内容提交', '2': '主内容审核', '3': '主内容审核通过', '4': '主内容审核不通过', '5': '主内容删除', '6': '主内容恢复',
@@ -122,12 +122,12 @@ export let enumDict = {
 export let enumChangeDict = {
     mainContentStatusEnum: {
         //初始状态
-        '0': { '0': '保存', '1': '提交', '-1': '删除' },
-        '1': { '2': '审核', '3': '审核通过', '4': '审核不通过', '-1': '删除' },
-        '2': { '2': '审核', '3': '审核通过', '4': '审核不通过', '-1': '删除' },
-        '3': { '-1': '删除' },
-        '4': { '0': '保存', '1': '提交', '-1': '删除' },
-        '-1': { 'recovery': '恢复' },
+        '0': {'0': '保存', '1': '提交', '-1': '删除'},
+        '1': {'2': '审核', '3': '审核通过', '4': '审核不通过', '-1': '删除'},
+        '2': {'2': '审核', '3': '审核通过', '4': '审核不通过', '-1': '删除'},
+        '3': {'-1': '删除'},
+        '4': {'0': '保存', '1': '提交', '-1': '删除'},
+        '-1': {'recovery': '恢复'},
     }
 };
 
@@ -273,7 +273,7 @@ export let init = function (opt) {
             method: {},
             user: {
                 id: 0,
-                nickname: 'guest',
+                nickname: '',
                 account: '#guest',
                 authority: {}
             },
@@ -364,7 +364,7 @@ export let register = function (app, routeConfig: RouteConfig[]) {
 
         var createFun = function (fun) {
             return function (req, res, next) {
-                req.myData.method = { methodName: route.methodName };
+                req.myData.method = {methodName: route.methodName};
                 try {
                     fun(req, res, next);
                 } catch (e) {
@@ -393,7 +393,7 @@ export let register = function (app, routeConfig: RouteConfig[]) {
                 break;
         }
         if (isRouter) {
-            routeList.push({ url: route.url, functionName: functionName, path: path });
+            routeList.push({url: route.url, functionName: functionName, path: path});
         }
     });
     //console.log(restList);
@@ -408,7 +408,7 @@ export let errorHandler = function (err, req, res, next) {
     err.code = err.code || err.status;
     var method = req.method;
     if (method && method.toLowerCase() == 'post') {
-        res.mySend(err, err, { code: err.code });
+        res.mySend(err, err, {code: err.code});
     } else {
         if (errorConfig.NO_LOGIN.code == err.code) {
             var signIn = '/sign/in?noNav=' + req.myData.noNav;
