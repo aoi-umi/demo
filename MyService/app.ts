@@ -10,6 +10,7 @@ import * as cors from 'cors';
 import config from './config';
 import * as common from './routes/_system/common';
 import * as main from './routes/_main';
+import * as auth from './routes/_system/auth';
 
 debug('my-application');
 
@@ -28,6 +29,11 @@ app.use(cors());
 
 //初始化
 app.use(main.init({ viewPath: app.get('views') }));
+//检查路由权限
+app.use(auth.check);
+
+//注册路由
+app.use(main.routes);
 
 //按routeConfig 注册路由
 main.register(app, main.routeConfig);

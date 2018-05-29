@@ -1,3 +1,4 @@
+import * as express from 'express';
 import * as common from './_system/common';
 import * as myEnum from './_system/enum';
 import * as auth from './_system/auth';
@@ -5,7 +6,7 @@ import * as cache from './_system/cache';
 import errorConfig from './_system/errorConfig';
 
 import * as sign from './bll/sign';
-import multer from './_system/myMulter';
+import myMulter from './_system/myMulter';
 
 import config from '../config';
 
@@ -19,20 +20,6 @@ type RouteConfig = {
 }
 //路由配置 文件必须在routes目录下
 export let routeConfig: RouteConfig[] = [
-    {
-        url: '/msg',
-        method: 'get',
-        functionName: 'msg',
-        path: 'index',
-    },
-    {
-        url: '/interface/upload',
-        method: 'post',
-        functionName: 'upload',
-        path: 'index',
-        middleware: [multer.any()]
-    },
-
     {
         url: /\/interface\/([\s\S]+)\/([\s\S]+)/,
         method: 'post',
@@ -51,7 +38,6 @@ export let routeConfig: RouteConfig[] = [
 export let accessableUrlConfig = [
     {url: '/'},
     {url: '/msg'},
-
     {url: '/textDiff'},
 
     {url: '/onlineUser', auth: ['admin']},
@@ -337,6 +323,11 @@ export let init = function (opt) {
 };
 
 //注册路由
+export let routes = express();
+routes.get('/msg', require('./index').msg);
+routes.post('/interface/upload', myMulter.any(), require('./index').upload);
+
+//按配置注册路由
 export let register = function (app, routeConfig: RouteConfig[]) {
     var routeList = [];
     routeConfig.forEach(function (route) {
@@ -351,8 +342,6 @@ export let register = function (app, routeConfig: RouteConfig[]) {
         var functionName = route.functionName || method;
         var routerMethodList = [];
 
-        //检查权限
-        routerMethodList.push(auth.check);
         //中间件
         if (route.middleware)
             routerMethodList = routerMethodList.concat(route.middleware);
@@ -396,7 +385,7 @@ export let register = function (app, routeConfig: RouteConfig[]) {
             routeList.push({url: route.url, functionName: functionName, path: path});
         }
     });
-    //console.log(restList);
+    //console.log(routeList);
 };
 
 export let errorHandler = function (err, req, res, next) {
