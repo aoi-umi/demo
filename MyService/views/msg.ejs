@@ -13,5 +13,11 @@
 <h1 style="text-align: center">
     <%= message %>
 </h1>
+<script type="text/javascript">
+	require(['./_main'], function () {
+		var main = require('./_main');
+		main.init();
+	});
+</script>
 <% include _public/footer %>
 <% } %>

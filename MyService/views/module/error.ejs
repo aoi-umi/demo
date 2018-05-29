@@ -3,3 +3,9 @@
     <h2><%= error.status %></h2>
     <pre><%= error.stack %></pre>
 </div>
+<script type="text/javascript">
+	require(['./_main'], function () {
+		var main = require('./_main');
+		main.init();
+	});
+</script>

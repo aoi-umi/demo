@@ -390,6 +390,8 @@ export let register = function (app, routeConfig: RouteConfig[]) {
 
 export let errorHandler = function (err, req, res, next) {
     common.writeError(err);
+    if (typeof err !== 'object')
+        err = new Error(err);
     if (config.env !== 'dev') {
         err.stack = '';
     }
