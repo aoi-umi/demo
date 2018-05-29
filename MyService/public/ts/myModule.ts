@@ -338,7 +338,7 @@ export class MyModule extends ModuleBase {
 
     query(pageIndex?) {
         var self = this;
-        return common.promise(function (defer) {
+        return common.promise(function () {
             var errorDom = self.queryContainerDom.find('.error').hide();
             var data = null;
             var checkRes = self.opt.beforeQueryDataCheck(self);
@@ -361,7 +361,7 @@ export class MyModule extends ModuleBase {
             self.opt.beforeQuery(data);
             var method = self.opt.interfacePrefix + 'Query';
             var notice = common.msgNotice({type: 1, msg: '查询中...', noClose: true});
-            myInterface.api[method](data).then(function (t) {
+            return myInterface.api[method](data).then(function (t) {
                 self.queryContainerDom.find(self.rowClass).remove();
                 var temp = self.queryItemTemp;
                 $(t.list).each(function (i) {
@@ -369,7 +369,7 @@ export class MyModule extends ModuleBase {
                     item.colNum = i + 1;
                     self.queryContainerDom.append($(ejs.render(temp, item)).data('item', item));
                 });
-                defer.resolve(t);
+                return t;
             }).fail(function (e) {
                 self.queryContainerDom.find(self.rowClass).remove();
                 if (errorDom.length) {
@@ -379,11 +379,10 @@ export class MyModule extends ModuleBase {
                     errorDom.show();
                     e = null;
                 }
-                defer.reject(e);
+                throw e;
             }).finally(function () {
                 notice.close();
             });
-            return defer.promise;
         }).fail(function (e) {
             if (e) {
                 console.log(e);
@@ -425,16 +424,13 @@ export class MyModule extends ModuleBase {
                 return myInterface.api[method](data).then(function (t) {
                     self.opt.onSaveSuccess(t, self);
                     return t;
-                }).fail(function (e) {
-                    self.opt.onSaveFail(e, self);
-                    throw e;
                 }).finally(function () {
                     notice.close();
                 });
             }
         }).fail(function (e: any) {
             if (e)
-                common.msgNotice({type: 1, msg: e.message});
+                self.opt.onSaveFail(e, self);
             throw e;
         });
     }
@@ -483,7 +479,6 @@ export class MyModule extends ModuleBase {
                 self.opt.onDetailQuerySuccess(t, self);
             }).fail(function (e) {
                 self.opt.onDetailQueryFail(e, self);
-                throw e;
             }).finally(function () {
                 notice.close();
             });
