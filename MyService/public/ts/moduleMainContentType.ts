@@ -64,8 +64,11 @@ export class ModuleMainContentType extends MyModule {
                         return '请输入正确的正整数';
                 }
             }],
-            bindEvent: function () {
-                $('#tree').on('click', function () {
+            bindEvent: function (self) {
+                $('#tree, #treeRefresh').on('click', function () {
+                    if ($(this).attr('id') == 'tree') {
+                        $('#treeModal').modal('show');
+                    }
                     var data = {};
                     var method = 'mainContentTypeQuery';
                     myInterface.api[method](data).then(function (t) {
@@ -86,7 +89,8 @@ export class ModuleMainContentType extends MyModule {
                                     if (!tree[item.type]) {
                                         tree[item.type] = {
                                             item: item,
-                                            child: {}
+                                            child: {},
+                                            inRoot: true,
                                         }
                                     }
                                     setTree(tree[item.type].child, item.type, list);
@@ -98,6 +102,7 @@ export class ModuleMainContentType extends MyModule {
                         var temp = $('#mainContentTypeTreeItem').html();
 
                         function renderTree(leave, treeDom) {
+                            leave.item.inRoot = leave.inRoot;
                             var leaveDom = $(ejs.render(temp, leave.item));
                             leaveDom.data('item', leave.item);
                             treeDom.append(leaveDom);
@@ -114,11 +119,27 @@ export class ModuleMainContentType extends MyModule {
                         for (var key in itemTree) {
                             var val = itemTree[key];
                             if (!val.inRoot) {
-                                val.item.type += '(' + val.item.parentType + ')';
                                 renderTree(val, $('#notInRootTreeList'));
                             }
                         }
                     })
+                });
+
+                $('#treeModal').on('click', '.itemDetailQuery', function () {
+                    var row = $(this).closest(self.rowClass);
+                    self.detailQuery(row.data('item'));
+                });
+
+                $('#treeModal').on('click', '.itemDel', function () {
+                    var row = $(this).closest(self.rowClass);
+                    self.del(row.data('item'));
+                });
+
+                $('#treeModal').on('click', '.itemAdd', function () {
+                    var row = $(this).closest(self.rowClass);
+                    let item = row.data('item');
+                    item = $.extend(null, self.opt.saveDefaultModel, item ? {parentType: item.type} : null);
+                    self.edit(item);
                 });
             },
             beforeQuery: function (data) {

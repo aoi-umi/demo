@@ -88,8 +88,9 @@
 </script>
 <script type="text/javascript">
     require(['./_main', './moduleAuthority'], function () {
-        var moduleAuthority = require('./moduleAuthority');
-        require('./_main').init();        
+        var main = require('./_main'),
+	        moduleAuthority = require('./moduleAuthority');
+        main.init();
         new moduleAuthority.ModuleAuthority();
     });
 </script>

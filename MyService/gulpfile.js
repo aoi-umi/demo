@@ -20,15 +20,14 @@ gulp.task('clearBin', function () {
 	]);
 });
 
-
-let templateDestDir = '/views/_template_front/';
 let templateSrc = 'views/_template/**';
-
 gulp.task('make-template', function () {
+	let dest = destDir + '/views/_template_front/';
 	return gulp.src(templateSrc)
+		.pipe(changed(dest))
 		.pipe(replace('<%', '<%%'))
 		.pipe(replace('%>', '%%>'))
-		.pipe(gulp.dest(destDir + templateDestDir));
+		.pipe(gulp.dest(dest));
 });
 
 gulp.task('ts', function () {
@@ -41,11 +40,15 @@ gulp.task('ts', function () {
 	}).pipe(tsProject())
 		.pipe(gulp.dest(destDir));
 });
+
 //前端
+let tsFrontSrc = ['public/ts/**/*.ts'];
 gulp.task('ts-front', function () {
-	return gulp.src('public/ts/**/*.ts')
+	let dest = destDir + '/public/js';
+	return gulp.src(tsFrontSrc)
+		.pipe(changed(dest, {extension: '.js'}))
 		.pipe(tsFrontProject())
-		.pipe(gulp.dest(destDir + '/public/js'));
+		.pipe(gulp.dest(dest));
 });
 
 //前端依赖
@@ -108,6 +111,8 @@ gulp.task('copy', function () {
 
 gulp.task('watch', function () {
 	gulp.watch(copySrc, ['copy']);
+	gulp.watch(tsFrontSrc, ['ts-front']);
+	gulp.watch(templateSrc, ['make-template']);
 	//gulp.watch(["**/*.ts", "!**/node_modules/**"], ['ts']);
 });
 

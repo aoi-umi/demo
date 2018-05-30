@@ -13,16 +13,13 @@ import errorConfig from './errorConfig';
 import * as logService from '../service/logService';
 
 export let extend = function (...args) {
-    var res;
-    for (var i in args) {
+    var res = args[0] || {};
+    for (let i = 1; i < args.length; i++) {
         var arg = args[i];
         if (typeof (arg) == 'object') {
-            if (!res) res = arg;
-            else {
-                for (var key in arg) {
-                    if (arg[key] != undefined)
-                        res[key] = arg[key];
-                }
+            for (var key in arg) {
+                if (arg[key] !== undefined)
+                    res[key] = arg[key];
             }
         }
     }
@@ -30,11 +27,11 @@ export let extend = function (...args) {
 };
 
 /**
- * 
+ *
  * @param fn 带nodeCallback参数的方法
  * @param caller 调用对象
  * @param nodeCallback false通过defer控制,true cb参数控制
- * @param args 
+ * @param args
  */
 export let promise = function (fn: Function, caller?: any, nodeCallback?: boolean, ...args): Q.Promise<any> {
     var defer = Q.defer();
@@ -416,7 +413,7 @@ export let dateFormat = function (date, format) {
         if (!date)
             date = new Date();
         else if (typeof date == 'number' || typeof date == 'string')
-            //@ts-ignore
+        //@ts-ignore
             date = new Date(date);
 
         var o = {

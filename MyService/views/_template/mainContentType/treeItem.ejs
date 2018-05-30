@@ -1,5 +1,17 @@
-<li>
-    <a data-toggle="collapse" href=".child_<%= type %>"><%=type%></a>
+<li class="itemRow">
+    <a class="glyphicon glyphicon-plus itemAdd" href="javascript:;"></a>
+    <a class="glyphicon glyphicon-pencil itemDetailQuery" href="javascript:;"></a>
+    <% if(common.isInArray('del', operation)){ %>
+    <a class="glyphicon glyphicon-remove itemDel" href="javascript:;"></a>
+    <% } %>
+    <a data-toggle="collapse" href=".child_<%= type %>"><%= type %>
+        <% if(typeName){ %>
+        (<%= typeName %>)
+        <% }
+        if(!inRoot){ %>
+        [<%= parentType %>]
+        <% } %>
+    </a>
     <ul class="child child_<%= type %> collapse in">
     </ul>
 </li>

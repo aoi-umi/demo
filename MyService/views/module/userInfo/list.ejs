@@ -78,7 +78,7 @@
 </div>
 
 <div id="detail" data-backdrop="false" role="dialog" tabindex="-1" class="modal fade pop-up-box">
-    <% include ../../_template/detailModal%>
+    <% include ../../_template/detailModal %>
 </div>
 <script type="text/template" id="itemTemp">
     <% include ../../_template_front/userInfo/listItem %>
@@ -95,9 +95,10 @@
     <% include ../../_template_front/roleLabel %>
 </script>
 <script type="text/javascript">
-    require(['./_main', './moduleUserInfo'], function () {
-        var moduleUserInfo = require('./moduleUserInfo');
-        require('./_main').init();        
-        new moduleUserInfo.ModuleUserInfo();
-    });
+	require(['./_main', './moduleUserInfo'], function () {
+		var main = require('./_main'),
+			moduleUserInfo = require('./moduleUserInfo');
+		main.init();
+		new moduleUserInfo.ModuleUserInfo();
+	});
 </script>
