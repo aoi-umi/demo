@@ -3,11 +3,9 @@ import * as myInterface from './myInterface';
 import * as myVaild from './myVaild';
 
 export let init = function () {
-    var self = this;
-    self.bindEvent();
+    bindEvent();
 };
 export let bindEvent = function () {
-    var self = this;
     //登录框
     $(document).on('click', '.sign-in', function () {
         $('#signInBox').modal('show');
@@ -15,10 +13,10 @@ export let bindEvent = function () {
     //登录
     $(document).on('keyup', '.sign-in-input', function (event) {
         if (event.which == 13)
-            self.signIn($(this));
+            signIn($(this));
     });
     $(document).on('click', '[name=signIn]', function () {
-        self.signIn($(this));
+        signIn($(this));
     });
     $(document).on('click', '.sign-out', function () {
         myInterface.api.signOut().then(function () {
@@ -29,7 +27,7 @@ export let bindEvent = function () {
     });
 
     $('#signUp').on('click', function () {
-        self.signUp();
+        signUp();
     });
 };
 export let signIn = function (dom) {
@@ -131,6 +129,7 @@ export let signUp = function () {
             throw err;
         }
         checkRes.model.password = common.md5(checkRes.model.password);
+        delete checkRes.model.passwordRepeat;
         return myInterface.api.signUp(checkRes.model);
     }).then(function (t) {
         common.msgNotice({

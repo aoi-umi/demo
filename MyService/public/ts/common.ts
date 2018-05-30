@@ -29,8 +29,6 @@ export let s4 = function (count?) {
     return str;
 };
 export let guid = function () {
-    var self = this;
-    var s4 = self.s4;
     return (s4(2) + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4(3));
 };
 export let md5 = function (str) {
@@ -155,7 +153,6 @@ export let parseJSON = function (str) {
     }
 };
 export let dataCheck = function (option) {
-    var self = this;
     var data = {
         success: false,
         model: {} as any,
@@ -214,13 +211,13 @@ export let dataCheck = function (option) {
             data.model[t.name] = value;
             if (t.canNotNull && (value === '' || value == null || typeof value == 'undefined')) {
                 noName = true;
-                throw self.stringFormat(t.canNotNullDesc, name);
+                throw stringFormat(t.canNotNullDesc, name);
             }
             if (t.checkValue) {
                 var err = t.checkValue(value, data.model, checkOpt);
                 if (err) {
                     noName = true;
-                    throw self.stringFormat(err, name);
+                    throw stringFormat(err, name);
                 }
             }
         } catch (e) {
@@ -302,8 +299,7 @@ export let getDateDiff = function (date1, date2) {
 };
 
 //字符串
-export let stringFormat = function () {
-    var args = arguments;
+export let stringFormat = function (...args) {
     var reg = /(\{\d\})/g
     var res = args[0] || '';
     var split = res.split(reg);

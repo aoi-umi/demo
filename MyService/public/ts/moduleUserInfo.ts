@@ -261,6 +261,7 @@ export class ModuleUserInfo extends MyModule {
                         data.newPassword = common.md5(data.newPassword);
                         data.password = common.md5(data.password);
                     }
+                    delete data.newPasswordRepeat;
                 }
                 return checkRes;
             },
