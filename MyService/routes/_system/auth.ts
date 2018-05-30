@@ -6,19 +6,19 @@ import errorConfig from './errorConfig';
 
 var authConfig = {
     'dev': {
-        errCode: 'DEV',
+        errCode: errorConfig.DEV,
     },
     'local': {
-        errCode: 'NO_PERMISSIONS',
+        errCode: errorConfig.NO_PERMISSIONS,
     },
     'login': {
-        errCode: 'NO_LOGIN',
+        errCode: errorConfig.NO_LOGIN,
     },
     'accessable': {
-        errCode: 'NO_PERMISSIONS',
+        errCode: errorConfig.NO_PERMISSIONS,
     },
     'admin': {
-        errCode: 'NO_PERMISSIONS',
+        errCode: errorConfig.NO_PERMISSIONS,
     },
 };
 
@@ -82,9 +82,7 @@ export let getAccessableUrl = function (user, pathname) {
             if (isExist)
                 accessable = true;
         } else if (isExist) {
-            var errCode = authConfig.accessable.errCode;
-            if (opt.notExistAuthority)
-                errCode = getErrorCode(opt.notExistAuthority);
+            var errCode = getErrorCode(opt.notExistAuthority);
             throw common.error('', errCode);
         }
     });
@@ -98,7 +96,7 @@ export let getAccessableUrl = function (user, pathname) {
 };
 
 export let getErrorCode = function (authData) {
-    if (authConfig[authData] && authConfig[authData].errCode)
+    if (authData && authConfig[authData] && authConfig[authData].errCode)
         return authConfig[authData].errCode;
-    return 'NO_PERMISSIONS';
+    return errorConfig.NO_PERMISSIONS;
 };
