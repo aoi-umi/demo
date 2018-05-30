@@ -5,24 +5,24 @@
         top: auto
     }
 
-    .hamburger.is-open .hamb-top,
-    .hamburger.is-open .hamb-middle,
-    .hamburger.is-open .hamb-bottom,
-    .hamburger.is-closed .hamb-top,
-    .hamburger.is-closed .hamb-middle,
-    .hamburger.is-closed .hamb-bottom {
-        background-color: rgba(0, 0, 0, 0.7);
+    #sidebar-wrapper {
+        z-index: 1039;
     }
+
+    /*.hamburger.is-open .hamb-top,*/
+    /*.hamburger.is-open .hamb-middle,*/
+    /*.hamburger.is-open .hamb-bottom,*/
+    /*.hamburger.is-closed .hamb-top,*/
+    /*.hamburger.is-closed .hamb-middle,*/
+    /*.hamburger.is-closed .hamb-bottom {*/
+    /*background-color: rgba(0, 0, 0, 0.7);*/
+    /*}*/
 
     .content {
         background-color: #ffffff;
         border: 1px solid #47a8ef;
         width: 100px;
         height: 100px;
-    }
-
-    .main {
-        margin-top: 35px;
     }
 
     .dropdown-toggle {
@@ -38,6 +38,12 @@
     }
 </style>
 <div class="container-fluid">
+    <button type="button" class="hamburger animated fadeInLeft is-closed" data-toggle="offcanvas"
+            style="position: fixed; top: 10px;left:-5px;z-index: 1040;">
+        <span class="hamb-top"></span>
+        <span class="hamb-middle"></span>
+        <span class="hamb-bottom"></span>
+    </button>
     <div class="row" id="wrapper">
         <% var menuList = [{
             text: 'main content menu',
@@ -211,11 +217,6 @@
             </ul>
         </nav>
         <!-- /#sidebar-wrapper -->
-        <button type="button" class="hamburger animated fadeInLeft is-closed" data-toggle="offcanvas">
-            <span class="hamb-top"></span>
-            <span class="hamb-middle"></span>
-            <span class="hamb-bottom"></span>
-        </button>
         <div class="main">
             <ul class="nav nav-tabs" id="myTab1"></ul>
             <div class="tab-content" id="myPanel1">
@@ -302,10 +303,10 @@
 </script>
 
 <script type="text/javascript">
-    require(['./_main', './index'], function () {
-        var main = require('./_main'),
-            index = require('./index');
-        main.init();
-        index.init();
-    })
+	require(['./_main', './index'], function () {
+		var main = require('./_main'),
+			index = require('./index');
+		main.init();
+		index.init();
+	})
 </script>
