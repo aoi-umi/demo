@@ -5,13 +5,10 @@ import * as io from 'socket.io';
 import * as main from './_main';
 export let connection = null;
 export let init = function () {
-    var self = this;
-    self.connection = io(location.host);
-    self.bindEvent();
+    connection = io(location.host);
+    bindEvent();
 };
 export let bindEvent = function () {
-    var self = this;
-    var connection = self.connection;
     connection.on('connect', function () {
         var userInfo = $.cookie(main.cacheKey.userInfo);
         connection.emit('init', {

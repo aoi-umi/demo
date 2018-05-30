@@ -12,8 +12,6 @@ export let variable = {
 };
 
 export let init = function () {
-    var self = this;
-
     var userInfo = $.cookie(cacheKey.userInfo);
     if (!userInfo) {
         userInfo = common.guid();
@@ -60,14 +58,13 @@ export let init = function () {
     sign.init();
     $(`.nav.navbar-nav a[href="${location.pathname}"]`).closest('li').addClass('active');
 
-    self.bindEvent();
+    bindEvent();
     myEnum.init({
         enumDict: {}
     });
 };
 
 export let bindEvent = function () {
-    var self = this;
     //导航
     $('.nav.navbar-nav').on('click', 'li', function () {
         $(this).addClass('active').siblings().removeClass('active');
@@ -128,29 +125,28 @@ export let bindEvent = function () {
         if (iframe.closest('.tab-pane').length)
             dom = iframe.closest('.tab-pane');
         if (dom.length) {
-            self.variable.frameDom = dom;
-            self.variable.frameDefaultHeight = args.height || 512;
+            variable.frameDom = dom;
+            variable.frameDefaultHeight = args.height || 512;
             $(window).on('load resize mousemove', function (e) {
-                self.updateView(['scroll']);
+                updateView(['scroll']);
             });
         }
     }
 };
 
 export let updateView = function (list) {
-    var self = this;
     if (!list || common.isInArray('scroll', list)) {
         var height = $('body').outerHeight(true);
         var isChanged = '';
-        var frameHeight = self.variable.frameDom.height();
-        if (height < self.variable.frameDefaultHeight) {
-            if (frameHeight != self.variable.frameDefaultHeight) {
-                self.variable.frameDom.height(self.variable.frameDefaultHeight);
+        var frameHeight = variable.frameDom.height();
+        if (height < variable.frameDefaultHeight) {
+            if (frameHeight != variable.frameDefaultHeight) {
+                variable.frameDom.height(variable.frameDefaultHeight);
                 isChanged = 'smaller than defaultHeight';
             }
         }
         else if (height != frameHeight) {
-            self.variable.frameDom.height(height);
+            variable.frameDom.height(height);
             isChanged = 'not equal ' + height + ' ' + frameHeight;
         }
         if (isChanged)

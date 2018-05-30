@@ -7,7 +7,6 @@ import * as common from './common';
 import * as main from './_main';
 
 export let init = function () {
-    var self = this;
     //socket
     var socketData = {
         postSuccess: {}
@@ -30,7 +29,7 @@ export let init = function () {
 
         connection.on('newMsg', function (data) {
             data.status = 1;
-            self.appendMsg(data);
+            appendMsg(data);
         });
 
         connection.on('postSuccess', function (data) {
@@ -161,11 +160,9 @@ export let init = function () {
         $('#countdown2').html(common.getDateDiff(new Date(), common.dateFormat(new Date()) + ' 23:59'));
     }, 1000);
 
-    self.bindEvent();
+    bindEvent();
 };
 export let bindEvent = function () {
-    var self = this;
-
     var connection = socket.connection;
     if (connection) {
         $('#postMsg').on('click', function () {
@@ -178,7 +175,7 @@ export let bindEvent = function () {
                     content: msg,
                     msgId: msgId,
                 });
-                self.appendMsg({
+                appendMsg({
                     datetime: common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss'),
                     user: userInfo,
                     content: msg,
