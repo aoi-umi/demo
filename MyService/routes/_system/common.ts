@@ -489,6 +489,9 @@ export let logModle = function () {
         res: null,
         createDate: dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss'),
         remark: null,
+        guid: null,
+        ip: null,
+        duration: null
     };
 };
 
