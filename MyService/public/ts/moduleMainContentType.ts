@@ -75,8 +75,8 @@ export class ModuleMainContentType extends MyModule {
                         var rootTree = {};
                         var itemTree = {};
                         $('.tree').empty();
-                        var list = _.sortBy(t.list, function (n) {
-                            return -n.level;
+                        var list = t.list.sort(function(a, b){
+                            return b.level - a.level;
                         });
 
                         function setTree(tree, parentType, list) {

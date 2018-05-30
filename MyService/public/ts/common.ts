@@ -1,7 +1,4 @@
-
-
 import 'jquery-ui';
-import 'underscore';
 import * as $ from 'jquery';
 import * as Q from 'q';
 //@ts-ignore
@@ -567,7 +564,7 @@ export let autoComplete = function (opt) {
     }
 
     function match(request, response) {
-        var match = _.filter(request.sourceList, function (t) {
+        var match = request.sourceList.filter(function (t) {
             return opt.match(request.term, t);
         });
         if (opt.maxLength)

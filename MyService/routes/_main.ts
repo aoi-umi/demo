@@ -203,7 +203,7 @@ export let init = function (opt) {
         enumChangeDict: enumChangeDict,
     });
 
-    let myRender = function (req, res, view, options) {
+    let myRender = function (req: express.Request, res: express.Response, view, options) {
         var opt = {
             user: req.myData.user,
             noNav: req.myData.noNav,
@@ -215,7 +215,7 @@ export let init = function (opt) {
         opt = common.extend(opt, options);
         res.render(view, formatViewRes(opt));
     };
-    let mySend = function (req, res, err, detail, option) {
+    let mySend = function (req: express.Request, res: express.Response, err, detail, option) {
         var url = req.header('host') + req.originalUrl;
         var opt = {
             url: url,
@@ -231,7 +231,7 @@ export let init = function (opt) {
         var logMethod = '[' + (config.name + '][' + (req.myData.method.methodName || req.originalUrl)) + ']';
 
         if (!req.myData.noLog) {
-            var log: any = common.logModle();
+            var log = common.logModle();
             log.url = url;
             log.result = result;
             log.code = formatResResult.code;
@@ -245,7 +245,7 @@ export let init = function (opt) {
             common.logSave(log);
         }
     };
-    return function (req, res, next) {
+    return function (req: express.Request, res: express.Response, next) {
         //req.query  /?params1=1&params2=2
         //req.body  post的参数
         //req.params /:params1/:params2
@@ -265,7 +265,7 @@ export let init = function (opt) {
             },
             viewPath: opt.viewPath,
             startTime: new Date().getTime(),
-            accessableUrl: [],
+            accessableUrl: {},
             ip: common.getClientIp(req),
         };
         var user = req.myData.user;
@@ -275,7 +275,7 @@ export let init = function (opt) {
         if (req.myData.ip == '::ffff:127.0.0.1')
             user.authority['local'] = true;
 
-        if (req._parsedUrl.pathname == '/interface/log/save') {
+        if (req['_parsedUrl'].pathname == '/interface/log/save') {
             req.myData.noLog = true;
         }
         if (config.env == 'dev')
@@ -352,7 +352,7 @@ export let register = function (app, routeConfig: RouteConfig[]) {
             throw common.error(`[${path}] is not exist function [${functionName}]`, errorConfig.CODE_ERROR);
 
         var createFun = function (fun) {
-            return function (req, res, next) {
+            return function (req: express.Request, res: express.Response, next) {
                 req.myData.method = {methodName: route.methodName};
                 try {
                     fun(req, res, next);
@@ -388,7 +388,7 @@ export let register = function (app, routeConfig: RouteConfig[]) {
     //console.log(routeList);
 };
 
-export let errorHandler = function (err, req, res, next) {
+export let errorHandler = function (err, req: express.Request, res: express.Response, next) {
     common.writeError(err);
     if (typeof err !== 'object')
         err = new Error(err);
