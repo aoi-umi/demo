@@ -117,8 +117,9 @@
 </script>
 <script type="text/javascript">
     require(['./_main', './moduleMainContent'], function () {
-        var moduleMainContent = require('./moduleMainContent');
-        require('./_main').init();   
+        var main = require('./_main'),
+	        moduleMainContent = require('./moduleMainContent');
+        main.init();
         var opt = {
             operation: ['query']
         };     

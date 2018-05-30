@@ -91,9 +91,10 @@
     <% include ../../_template_front/authorityLabel %>
 </script>
 <script type="text/javascript">
-    require(['./_main', './moduleRole'], function () {
-        var moduleRole = require('./moduleRole');
-        require('./_main').init();        
-        new moduleRole.ModuleRole();
-    });
+	require(['./_main', './moduleRole'], function () {
+		var main = require('./_main'),
+			moduleRole = require('./moduleRole');
+		main.init();
+		new moduleRole.ModuleRole();
+	});
 </script>

@@ -31,7 +31,8 @@
     </form>
 </div>
 <script type="text/javascript">
-    require(['./_main'], function () {
-        require('./_main').init();                
-    });
+	require(['./_main'], function () {
+		var main = require('./_main');
+		main.init();
+	});
 </script>

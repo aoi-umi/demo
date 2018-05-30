@@ -263,12 +263,13 @@
     <% include ../../_template_front/mainContent/childItem %>
 </script>
 <script type="text/javascript">
-    require(['./_main', './moduleMainContent'], function () {
-        var moduleMainContent = require('./moduleMainContent');
-        require('./_main').init();   
-        var opt = {
-            operation: ['detailQuery', 'save']
-        };     
-        new moduleMainContent.ModuleMainContent(opt);
-    });
+	require(['./_main', './moduleMainContent'], function () {
+		var main = require('./_main'),
+			moduleMainContent = require('./moduleMainContent');
+		main.init();
+		var opt = {
+			operation: ['detailQuery', 'save']
+		};
+		new moduleMainContent.ModuleMainContent(opt);
+	});
 </script>
