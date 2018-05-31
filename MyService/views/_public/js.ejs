@@ -88,6 +88,9 @@
             'WdatePicker': {
                 exports: 'WdatePicker'
             },
-        }
+        },
+	    urlArgs: function(id, url) {
+		    return this.paths[id] ? '' : '?v=<%=version%>&deploy=<%=deploy%>';
+	    }
     });
 </script>

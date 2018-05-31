@@ -177,6 +177,7 @@ export let formatViewRes = function (option) {
         title: config.name,
         siteName: config.name,
         version: config.version,
+        deploy: config.deploy,
         user: null,
         noNav: false,
     };

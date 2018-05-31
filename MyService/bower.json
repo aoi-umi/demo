@@ -8,7 +8,6 @@
   "ignore": [],
   "dependencies": {
     "bootstrap": "3",
-    "font-awesome": "4",
     "jquery-ui": "1",
     "seiyria-bootstrap-slider": "9",
     "jquery": "2",

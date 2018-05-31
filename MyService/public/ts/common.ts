@@ -391,7 +391,7 @@ export let msgNotice = function (option) {
                         y = targetDom.offset().top + (targetDom.outerHeight() - dom.outerHeight()) / 2;
                         break;
                 }
-                dom.css({ 'left': x, 'top': y })
+                dom.css({'left': x, 'top': y})
                     .show();
                 dom.close = function () {
                     dom.remove();
