@@ -1,7 +1,6 @@
-
+/// <reference types="jquery"/>
 interface JQueryStatic {
-    ui: any;
-    cookie: any;
+    ui: any; 
 }
 
 interface JQuery {
