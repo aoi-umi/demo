@@ -112,7 +112,7 @@ function releasePromise(conn: mysql.PoolConnection) {
 
 function queryPromise(conn: mysql.PoolConnection, sql, params) {
     conn.config.queryFormat = queryFormat;
-    return common.promise(conn.query, conn, true, sql, params);
+    return common.promise(conn.query, conn, true, [sql, params]);
 }
 
 function beginTransactionPromise(conn: mysql.PoolConnection) {

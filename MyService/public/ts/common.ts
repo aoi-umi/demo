@@ -483,7 +483,7 @@ export let msgNotice = function (option) {
 export let isInArray = function (obj, list, startIndex?) {
     return $.inArray(obj, list, startIndex) >= 0;
 };
-export let promise = function (fn: Function, caller?: any, nodeCallback?: boolean, ...args): Q.Promise<any> {
+export let promise = function (fn: Function, caller?: any, nodeCallback?: boolean, args?: any[]): Q.Promise<any> {
     var defer = Q.defer();
     try {
         if (!fn) {

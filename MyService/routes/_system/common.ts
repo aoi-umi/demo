@@ -33,7 +33,7 @@ export let extend = function (...args) {
  * @param nodeCallback false通过defer控制,true cb参数控制
  * @param args
  */
-export let promise = function (fn: Function, caller?: any, nodeCallback?: boolean, ...args): Q.Promise<any> {
+export let promise = function (fn: Function, caller?: any, nodeCallback?: boolean, args?: any[]): Q.Promise<any> {
     var defer = Q.defer();
     try {
         if (!fn) {
@@ -85,7 +85,7 @@ export let promise = function (fn: Function, caller?: any, nodeCallback?: boolea
 
 export let promisify = function (fun, caller?) {
     return function (...args) {
-        return promise.apply(void 0, [fun, caller, true, ...args]);
+        return promise.apply(void 0, [fun, caller, true, args]);
     };
 };
 
