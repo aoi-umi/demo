@@ -1,5 +1,5 @@
 <link rel="stylesheet" href="css/fileinput.min.css"/>
-<link rel='stylesheet' href='/css/sidebar-nav.css'/>
+<link rel="stylesheet" href="/css/sidebar-nav.css"/>
 <style>
     .hamburger {
         top: auto
@@ -7,6 +7,14 @@
 
     #sidebar-wrapper {
         z-index: 1039;
+    }
+
+    #menu .toggle-icon:before {
+        content: "\2212";
+    }
+
+    #menu .collapsed .toggle-icon:before {
+        content: "\002b";
     }
 
     /*.hamburger.is-open .hamb-top,*/
@@ -188,7 +196,7 @@
                 <hr>
                 <li class="dropdown">
                     <a href="#<%= t.listId %>" class="dropdown-toggle" data-toggle="collapse">
-                        <i class="fa fa-fw fa-plus"></i>
+                        <i class="glyphicon toggle-icon"></i>
                         <%= t.text %>
                     </a>
                     <ul id="<%= t.listId %>" class="dropdown-toggle collapse in" role="menu">

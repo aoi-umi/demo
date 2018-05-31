@@ -28,7 +28,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
 
 //初始化
-app.use(main.init({ viewPath: app.get('views') }));
+app.use(main.init({viewPath: app.get('views')}));
 //检查路由权限
 app.use(auth.check);
 
@@ -55,14 +55,13 @@ process.on('unhandledRejection', function (e) {
 
 app.set('port', process.env.PORT || config.port);
 
-var server = app.listen(app.get('port'), function () {
-    debug('Express server listening on port ' + server.address().port);
+var server = app.listen(app.get('port'), '0.0.0.0', function () {
+    console.log(`${config.name} run at ${server.address().address}:${server.address().port},version:${config.version}`);
 });
-
-console.log(config.name, 'run at port ', server.address().port, ',version:', config.version);
 
 import * as socketIO from 'socket.io';
 import * as socket from './routes/socket';
+
 let io = socketIO(server);
 socket.init(io);
 //test

@@ -63,7 +63,6 @@ gulp.task('copyDep', function () {
 	};
 	task = task.concat([
 		gulp.src(['bower_components/bootstrap/dist/@(css|fonts)/**',
-			'bower_components/font-awesome/@(css|fonts)/**',
 			'bower_components/seiyria-bootstrap-slider/dist/@(css)/**',
 			'bower_components/bootstrap-fileinput/@(css|img)/**',
 		])
