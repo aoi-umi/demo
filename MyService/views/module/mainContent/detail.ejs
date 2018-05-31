@@ -13,7 +13,7 @@
 </style>
 <div class="container">
     <%
-    var rowItemClass = 'col-xs-12 col-md-6';
+    var rowItemClass = 'col-xs-12';
     var mainContent = mainContentDetail.mainContent;
     var isEditable = false;
     if (mainContent.status == 0 || mainContent.status == 4)
@@ -65,9 +65,9 @@
             <div class="<%= rowItemClass %>">
                 <div class="form-horizontal">
                     <div class="form-group">
-                        <label class="col-sm-2 control-label">标题</label>
+                        <label class="col-xs-2 col-sm-1 control-label">标题</label>
 
-                        <div class="col-sm-10">
+                        <div class="col-xs-10 col-sm-11">
                             <% if(isEditable){ %>
                             <input class="form-control" id="title" placeholder="请输入标题"
                                    value="<%= mainContent.title || '' %>"/>
@@ -77,9 +77,9 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-sm-2 control-label">描述</label>
+                        <label class="col-xs-2 col-sm-1 control-label">描述</label>
 
-                        <div class="col-sm-10">
+                        <div class="col-xs-10 col-sm-11">
                             <% if(isEditable){ %>
                             <textarea class="form-control no-resize" id="description"
                                       placeholder="请输入描述"><%= mainContent.description || '' %></textarea>
@@ -235,18 +235,18 @@
                 </div>
                 <div class="form-horizontal">
                     <div class="form-group">
-                        <label class="col-sm-2 control-label">type</label>
+                        <label class="col-xs-2 control-label">type</label>
 
-                        <div class="col-sm-10">
+                        <div class="col-xs-10">
                             <select class="form-control" name="type">
                                 <option value="0">0</option>
                             </select>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-sm-2 control-label">content</label>
+                        <label class="col-xs-2 control-label">content</label>
 
-                        <div class="col-sm-10">
+                        <div class="col-xs-10">
                             <textarea class="form-control no-resize" name="content"></textarea>
                         </div>
                     </div>
