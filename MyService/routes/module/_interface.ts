@@ -103,8 +103,12 @@ var checkArgs = function (opt) {
     var module = opt.module;
     var args = opt.args;
     if (common.isInArray(method, ['query']) && !common.isInArray(module, ['mainContentType'])) {
-        if (!args.pageIndex) args.pageIndex = 1;
-        if (!args.pageSize) args.pageSize = 10;
+        if (!args.pageIndex)
+            args.pageIndex = 1;
+        if (!args.pageSize)
+            args.pageSize = 10;
+        if (args.pageSize > 100)
+            args.pageSize = 100;
     }
     if (common.isInArray(method, ['detailQuery'])) {
         var argsError = false;

@@ -2,15 +2,15 @@
 Navicat MySQL Data Transfer
 
 Source Server         : localhost
-Source Server Version : 50720
+Source Server Version : 50722
 Source Host           : localhost:3306
 Source Database       : myweb
 
 Target Server Type    : MYSQL
-Target Server Version : 50720
+Target Server Version : 50722
 File Encoding         : 65001
 
-Date: 2018-04-09 15:52:05
+Date: 2018-06-01 15:47:47
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -367,7 +367,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `p_role_detail_query`(pr_code varcha
 BEGIN 
 	SELECT * FROM t_role WHERE `code` = pr_code;
 	SELECT * FROM t_authority WHERE 
-		`code` in (SELECT authorityCode from  t_role_with_authority where`roleCode` = pr_code);
+		`code` in (SELECT authorityCode from  t_role_with_authority where`roleCode` = pr_code)
+		ORDER BY `code`;
 END
 ;;
 DELIMITER ;
@@ -457,7 +458,8 @@ BEGIN
 	-- 权限关联信息
 	SELECT * FROM t_role_with_authority where`roleCode` in (select `code` from temp_p_role_query00);
 	SELECT * FROM t_authority WHERE 
-		`code` in (SELECT authorityCode from  t_role_with_authority where`roleCode` in (select `code` from temp_p_role_query00));
+		`code` in (SELECT authorityCode from  t_role_with_authority where`roleCode` in (select `code` from temp_p_role_query00)) 
+		ORDER BY `code`;
 
 END
 ;;

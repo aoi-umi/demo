@@ -200,6 +200,11 @@ export class ModuleRole extends MyModule {
                 selfOpt.updateView(['roleDetail'], {roleAllDetail: t}, self);
                 self.detailDom.modal('show');
             },
+            editBeforeRender: function (data, self) {
+                let selfOpt = self.opt as ModuleRoleOption;
+                selfOpt.currRoleCode = null;
+                return data;
+            },
 
             updateView: function (list, opt, self) {
                 let selfOpt = self.opt as ModuleRoleOption;

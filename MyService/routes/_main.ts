@@ -273,7 +273,7 @@ export let init = function (opt) {
         req.myData.noNav = common.parseBool(req.query.noNav);
         req.myData.useStatus = common.parseBool(req.query.useStatus);
 
-        if (req.myData.ip == '::ffff:127.0.0.1')
+        if (/^(::ffff:)?(127\.0\.0\.1)$/.test(req.myData.ip))
             user.authority['local'] = true;
 
         if (req['_parsedUrl'].pathname == '/interface/log/save') {

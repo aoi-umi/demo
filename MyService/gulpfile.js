@@ -37,7 +37,9 @@ gulp.task('ts', function () {
 		'routes/**'
 	], {
 		base: './'
-	}).pipe(tsProject())
+	})
+		.pipe(changed(destDir, {extension: '.js'}))
+		.pipe(tsProject())
 		.pipe(gulp.dest(destDir));
 });
 
