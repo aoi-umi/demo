@@ -79,7 +79,7 @@ export let accessableUrlConfig = [
     {url: '/interface/userInfo/adminSave', auth: ['admin']},
 
     {url: '/mainContent/list', auth: ['mainContentQuery']},
-    {url: '/mainContent/detail', auth: ['mainContentQuery']},
+    {url: '/mainContent/detail', auth: ['mainContentTypeDetailQuery']},
     {url: '/interface/mainContent/query', auth: ['mainContentQuery']},
     {url: '/interface/mainContent/save', auth: ['mainContentSave']},
     {url: '/interface/mainContent/statusUpdate', auth: ['mainContentSave']},

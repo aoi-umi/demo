@@ -1,6 +1,8 @@
 insert into t_authority(code, name, status) 
-values('admin','',1),
+values
+('admin','',1),
 ('mainContentQuery','',1),
+('mainContentDetailQuery','',1),
 ('mainContentSave','',1),
 ('mainContentDel','',1),
 ('mainContentAudit','',1),
@@ -14,16 +16,20 @@ values('admin','',1),
 ('mainContentTypeDel','',1);
 
 insert into t_role(code, name, status) 
-values('admin','',1),('default','',1);
+values
+('admin','',1),('default','',1);
 
 insert into t_role_with_authority(roleCode, authorityCode) 
-values('default', 'mainContentQuery'),
+values
+('default', 'mainContentQuery'),
+('default', 'mainContentDetailQuery'),
 ('default', 'mainContentSave'),
 ('default', 'mainContentDel'),
 ('default', 'mainContentRecovery'),
 
 ('admin', 'admin'),
 ('admin', 'mainContentQuery'),
+('admin', 'mainContentDetailQuery'),
 ('admin', 'mainContentSave'),
 ('admin', 'mainContentDel'),
 ('admin', 'mainContentAudit'),
