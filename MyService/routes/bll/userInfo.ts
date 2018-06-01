@@ -2,7 +2,6 @@
  * Created by umi on 2017-8-7.
  */
 import * as q from 'q';
-import * as _ from 'underscore';
 import * as common from '../_system/common';
 import errorConfig from '../_system/errorConfig';
 import * as cache from '../_system/cache';
@@ -13,7 +12,7 @@ export let isAccountExist = function (account) {
     return common.promise(function () {
         if (!account)
             throw common.error(null, errorConfig.ARGS_ERROR);
-        return autoBll.query('userInfo', { account: account }).then(function (t) {
+        return autoBll.query('userInfo', {account: account}).then(function (t) {
             if (t.list.length > 1)
                 throw common.error('数据库中存在重复账号');
             return t.list.length ? true : false;
@@ -27,7 +26,7 @@ export let save = function (opt, exOpt) {
     var userInfoLog = createLog();
     userInfoLog.userInfoId = user.id;
     return common.promise(function () {
-        return autoBll.detailQuery('userInfo', { id: user.id }).then(function (t) {
+        return autoBll.detailQuery('userInfo', {id: user.id}).then(function (t) {
             if (!t || !t.id)
                 throw common.error('查询用户信息为空');
             var isChanged = false;
@@ -78,7 +77,7 @@ export let save = function (opt, exOpt) {
 };
 
 export let detailQuery = function (opt) {
-    return userInfoDal.detailQuery({ id: opt.id }).then(function (t) {
+    return userInfoDal.detailQuery({id: opt.id}).then(function (t) {
         var detail = {
             userInfo: t[0][0],
             userInfoLog: t[1],
@@ -159,7 +158,7 @@ export let adminSave = function (opt, exOpt) {
     return common.promise(function () {
         if (!id)
             throw common.error('id为空', errorConfig.CAN_NOT_BE_EMPTY);
-        return autoBll.query('userInfoWithAuthority', { userInfoId: id });
+        return autoBll.query('userInfoWithAuthority', {userInfoId: id});
     }).then(function (t) {
         delUserAuthList = t.list.filter((dbAuth) => {
             return opt.delAuthorityList.findIndex((delAuth) => {
@@ -171,7 +170,7 @@ export let adminSave = function (opt, exOpt) {
                 return dbAuth.authorityCode == addAuth;
             }) < 0;
         });
-        return autoBll.query('userInfoWithRole', { userInfoId: id });
+        return autoBll.query('userInfoWithRole', {userInfoId: id});
     }).then(function (t) {
         delUserRoleList = t.list.filter((dbAuth) => {
             return opt.delRoleList.findIndex((delAuth) => {
@@ -201,31 +200,31 @@ export let adminSave = function (opt, exOpt) {
         if (!isChanged)
             throw common.error('没有变更的信息');
         return autoBll.tran(function (conn) {
-            return autoBll.save('userInfo', { id: id, editDate: now }, conn).then(function (t) {
+            return autoBll.save('userInfo', {id: id, editDate: now}, conn).then(function (t) {
                 var list = [];
                 //删除权限
                 if (delUserAuthList.length) {
                     delUserAuthList.forEach(function (item) {
-                        list.push(autoBll.del('userInfoWithAuthority', { id: item.id }, conn));
+                        list.push(autoBll.del('userInfoWithAuthority', {id: item.id}, conn));
                     })
                 }
                 //保存权限
                 if (addUserAuthList.length) {
                     addUserAuthList.forEach(function (item) {
-                        list.push(autoBll.save('userInfoWithAuthority', { userInfoId: id, authorityCode: item }));
+                        list.push(autoBll.save('userInfoWithAuthority', {userInfoId: id, authorityCode: item}));
                     });
                 }
 
                 //删除角色
                 if (delUserRoleList.length) {
                     delUserRoleList.forEach(function (item) {
-                        list.push(autoBll.del('userInfoWithRole', { id: item.id }, conn));
+                        list.push(autoBll.del('userInfoWithRole', {id: item.id}, conn));
                     })
                 }
                 //保存角色
                 if (addUserRoleList.length) {
                     addUserRoleList.forEach(function (item) {
-                        list.push(autoBll.save('userInfoWithRole', { userInfoId: id, roleCode: item }));
+                        list.push(autoBll.save('userInfoWithRole', {userInfoId: id, roleCode: item}));
                     });
                 }
 
@@ -255,24 +254,22 @@ var updateUserInfo = function (detail) {
             auth[t.code] = true;
         }
     });
-
+    let compare = function (a, b) {
+        if (a.code < b.code)
+            return -1;
+        if (a.code > b.code)
+            return 1;
+        return 0;
+    };
     detail.roleList.forEach(function (role) {
         role.authorityList = detail.roleAuthorityList.filter(function (roleAuthority) {
             return roleAuthority.roleCode == role.code;
-        }) || [];
-        role.authorityList = _.sortBy<any, any>(role.authorityList, function (t) {
-            return t.code;
         });
+        role.authorityList = role.authorityList.sort(compare);
     });
-    detail.authorityList = _.sortBy<any, any>(detail.authorityList, function (t) {
-        return t.code;
-    });
-    detail.roleList = _.sortBy<any, any>(detail.roleList, function (t) {
-        return t.code;
-    });
-    authorityList = _.sortBy<any, any>(authorityList, function (t) {
-        return t.code;
-    });
+    detail.authorityList = detail.authorityList.sort(compare);
+    detail.roleList = detail.roleList.sort(compare);
+    authorityList = authorityList.sort(compare);
     if (!detail.auth)
         detail.auth = {};
     authorityList.forEach(function (t) {
