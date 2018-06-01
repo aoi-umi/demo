@@ -1,0 +1,11 @@
+declare namespace model {
+    <%models.forEach(model=>{
+    with(model){%>
+    interface <%= name %> {
+        <% cols.forEach(ele=>{ %>
+            <%=ele.name%>?: <%=ele.type||'any'%>;
+        <%}) %>
+    }
+    <%}
+    })%>
+}
