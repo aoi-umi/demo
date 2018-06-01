@@ -565,7 +565,7 @@ export let autoComplete = function (opt) {
 
     function match(request, response) {
         var match = request.sourceList.filter(function (t) {
-            return opt.match(request.term, t);
+            return opt.match === undefined ? true : opt.match(request.term, t);
         });
         if (opt.maxLength)
             match = match.slice(0, opt.maxLength);
