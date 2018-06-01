@@ -231,7 +231,6 @@ export class MyModule extends ModuleBase {
                 pagerId: self.opt.pagerId,
                 changeHandle: function (cb) {
                     self.query().then(function (t: any) {
-                        self.opt.onQuerySuccess(t);
                         cb({count: t.count});
                     }).fail(function () {
                         cb();
@@ -362,6 +361,7 @@ export class MyModule extends ModuleBase {
             var method = self.opt.interfacePrefix + 'Query';
             var notice = common.msgNotice({type: 1, msg: '查询中...', noClose: true});
             return myInterface.api[method](data).then(function (t) {
+                self.opt.onQuerySuccess(t);
                 self.queryContainerDom.find(self.rowClass).remove();
                 var temp = self.queryItemTemp;
                 $(t.list).each(function (i) {
