@@ -10,9 +10,9 @@ import * as common from './common';
 import * as myInterface from './myInterface';
 import * as myVaild from './myVaild';
 import {MyModule, ModuleOption} from './myModule';
+import {AuthorityAutoComplete, RoleAutoComplete} from './autoComplete';
 
 class ModuleUserInfoOption extends ModuleOption {
-    currUserId: number;
 
     adminSave?(self: MyModule);
 
@@ -21,17 +21,13 @@ class ModuleUserInfoOption extends ModuleOption {
     setAuthorityAutoComplete?(self: MyModule);
 
     setRoleAutoComplete?(self: MyModule);
-
-    setAuthority?(opt, self: MyModule);
-
-    getAuthority?(opt, self: MyModule);
-
-    setRole?(opt, self: MyModule);
-
-    getRole?(opt, self: MyModule);
 }
 
 export class ModuleUserInfo extends MyModule {
+    currUserId: number;
+    authorityAutoComplete: AuthorityAutoComplete;
+    roleAutoComplete: RoleAutoComplete;
+
     constructor(option?: ModuleUserInfoOption) {
         var opt: ModuleUserInfoOption = {
             operation: ['query', 'save', 'detailQuery'],
@@ -42,7 +38,6 @@ export class ModuleUserInfo extends MyModule {
             rowClass: 'itemRow',
             interfacePrefix: 'userInfo',
             detailUrl: '/userInfo/detail',
-            currUserId: null,
 
             queryArgsOpt: [{
                 name: 'account',
@@ -142,41 +137,18 @@ export class ModuleUserInfo extends MyModule {
                     });
 
                     //角色
-                    common.autoComplete({
-                        source: function () {
-                            return selfOpt.getRole({code: this.dom.val()}, self)
-                        },
+                    new RoleAutoComplete({
                         dom: $('#role'),
                         select: function (dom, item) {
                             dom.data('item', item).val(item.code);
-                        },
-                        renderItem: function (ul, item) {
-                            return $('<li>')
-                                .append('<div>' + item.code + '</div>')
-                                .appendTo(ul);
-                        },
-                        match: function (input, item) {
-                            var matcher = new RegExp($.ui.autocomplete.escapeRegex(input), 'i');
-                            return matcher.test(item.code);
                         }
                     });
-                    //权限
-                    common.autoComplete({
-                        source: function () {
-                            return selfOpt.getAuthority({code: this.dom.val()}, self)
-                        },
+
+                    //权限                    
+                    new AuthorityAutoComplete({
                         dom: $('#authority'),
                         select: function (dom, item) {
                             dom.data('item', item).val(item.code);
-                        },
-                        renderItem: function (ul, item) {
-                            return $('<li>')
-                                .append('<div>' + item.code + '</div>')
-                                .appendTo(ul);
-                        },
-                        match: function (input, item) {
-                            var matcher = new RegExp($.ui.autocomplete.escapeRegex(input), 'i');
-                            return matcher.test(item.code);
                         }
                     });
                 }
@@ -275,15 +247,15 @@ export class ModuleUserInfo extends MyModule {
                     }]
                 });
             },
-            onDetailQuerySuccess: function (t, self) {
+            onDetailQuerySuccess: function (t, self: ModuleUserInfo) {
                 let selfOpt = self.opt as ModuleUserInfoOption;
                 self.detailRender(t.userInfo);
-                selfOpt.currUserId = t.userInfo.id;
+                self.currUserId = t.userInfo.id;
                 selfOpt.updateView(['userInfoDetail'], {userInfoAllDetail: t}, self);
                 self.detailDom.modal('show');
             },
 
-            updateView: function (list, opt, self) {
+            updateView: function (list, opt, self: ModuleUserInfo) {
                 let selfOpt = self.opt as ModuleUserInfoOption;
                 if (!list || common.isInArray('userInfoDetail', list)) {
                     selfOpt.setAuthorityAutoComplete(self);
@@ -292,10 +264,10 @@ export class ModuleUserInfo extends MyModule {
                         opt.userInfoDetail = opt.userInfoAllDetail.userInfo;
                         opt.userInfoDetail.operation = opt.userInfoAllDetail.operation;
                         $(opt.userInfoAllDetail.authorityList).each(function (i, item) {
-                            selfOpt.setAuthority(item, self);
+                            self.authorityAutoComplete.setAuthority(item);
                         });
                         $(opt.userInfoAllDetail.roleList).each(function (i, item) {
-                            selfOpt.setRole(item, self);
+                            self.roleAutoComplete.setRole(item);
                         });
                     }
                     if (opt.userInfoDetail) {
@@ -352,102 +324,27 @@ export class ModuleUserInfo extends MyModule {
                 });
             },
             //权限
-            setAuthorityAutoComplete: function (self) {
+            setAuthorityAutoComplete: function (self: ModuleUserInfo) {
                 let selfOpt = self.opt as ModuleUserInfoOption;
-                common.autoComplete({
-                    source: function () {
-                        return selfOpt.getAuthority({anyKey: this.dom.val()}, self)
-                    },
+                self.authorityAutoComplete = new AuthorityAutoComplete({
                     dom: self.detailContainerDom.find('[name=authority]'),
-                    select: function (dom, item) {
-                        var match = self.detailContainerDom.find('[name=authorityBox]').find(`[name=userAuthority][data-code=${item.code}]`);
-                        if (!match.length) {
-                            item.changeStatus = 1;
-                            selfOpt.setAuthority(item, self);
-                        }
-                        this.dom.blur();
-                    },
-                    renderItem: function (ul, item) {
-                        return $('<li>')
-                            .append(`<div>${item.code}${item.name ? '(' + item.name + ')' : ''}</div>`)
-                            .appendTo(ul);
-                    },
-                    match: function (input, item) {
-                        // var matcher = new RegExp($.ui.autocomplete.escapeRegex(input), 'i');
-                        // return matcher.test(item.code);
-                        return true;
-                    }
+                    renderDom: self.detailContainerDom.find('[name=authorityBox]'),
+                    labelName: 'userAuthority'
                 });
-            },
-            getAuthority: function (opt, self) {
-                let selfOpt = self.opt as ModuleUserInfoOption;
-                var queryOpt: any = {
-                    //status: 1,
-                    excludeByUserId: selfOpt.currUserId
-                };
-                if (opt) queryOpt.anyKey = opt.anyKey;
-                return myInterface.api.authorityQuery(queryOpt).then(function (t) {
-                    return t.list;
-                });
-            },
-            setAuthority: function (item, self) {
-                item.labelName = 'userAuthority';
-                if (!item.changeStatus)
-                    item.changeStatus = 0;
-                var temp = $('#authorityLabelTemp').html();
-                var dom = $(ejs.render(temp, item));
-                dom.data('item', item);
-                self.detailContainerDom.find('[name=authorityBox]').append(dom);
+
+                self.authorityAutoComplete.excludeByUserId = self.currUserId;
             },
 
             //角色
-            setRoleAutoComplete: function (self) {
+            setRoleAutoComplete: function (self: ModuleUserInfo) {
                 let selfOpt = self.opt as ModuleUserInfoOption;
-                common.autoComplete({
-                    source: function () {
-                        return selfOpt.getRole({anyKey: this.dom.val()}, self)
-                    },
+                self.roleAutoComplete = new RoleAutoComplete({
                     dom: self.detailContainerDom.find('[name=role]'),
-                    select: function (dom, item) {
-                        //dom.data('item', item).val(item.code);
-                        var match = self.detailContainerDom.find('[name=roleBox]').find(`[name=userRole][data-code=${item.code}]`);
-                        if (!match.length) {
-                            item.changeStatus = 1;
-                            selfOpt.setRole(item, self);
-                        }
-                        this.dom.blur();
-                    },
-                    renderItem: function (ul, item) {
-                        return $('<li>')
-                            .append(`<div>${item.code}${item.name ? '(' + item.name + ')' : ''}</div>`)
-                            .appendTo(ul);
-                    },
-                    match: function (input, item) {
-                        // var matcher = new RegExp($.ui.autocomplete.escapeRegex(input), 'i');
-                        // return matcher.test(item.code);
-                        return true;
-                    }
+                    renderDom: self.detailContainerDom.find('[name=roleBox]'),
+                    labelName: 'userRole'
                 });
-            },
-            getRole: function (opt, self) {
-                let selfOpt = self.opt as ModuleUserInfoOption;
-                var queryOpt: any = {
-                    //status: 1,
-                    excludeByUserId: selfOpt.currUserId
-                };
-                if (opt) queryOpt.anyKey = opt.anyKey;
-                return myInterface.api.roleQuery(queryOpt).then(function (t) {
-                    return t.list;
-                });
-            },
-            setRole: function (item, self) {
-                item.labelName = 'userRole';
-                if (!item.changeStatus)
-                    item.changeStatus = 0;
-                var temp = $('#roleLabelTemp').html();
-                var dom = $(ejs.render(temp, item));
-                dom.data('item', item);
-                self.detailContainerDom.find('[name=roleBox]').append(dom);
+
+                self.roleAutoComplete.excludeByUserId = self.currUserId;
             },
         };
         opt = $.extend(opt, option);

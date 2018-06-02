@@ -1,27 +1,23 @@
 /**
  * Created by bang on 2017-9-11.
  */
-import * as ejs from 'ejs';
 import * as $ from 'jquery';
 
 import * as common from './common';
-import * as myInterface from './myInterface';
 import * as myVaild from './myVaild';
 import {MyModule, ModuleOption} from './myModule';
 import {AuthorityAutoComplete} from './autoComplete';
 
 class ModuleRoleOption extends ModuleOption {
-    currRoleCode: string;
-    authorityAutoComplete?: AuthorityAutoComplete;
-
     updateView?(list: string[], opt, self: MyModule);
 
     setAuthorityAutoComplete?(self: MyModule);
-
-    setAuthority?(opt, self: MyModule);
 }
 
 export class ModuleRole extends MyModule {
+    currRoleCode: string;
+    authorityAutoComplete: AuthorityAutoComplete;
+
     constructor(option?: ModuleRoleOption) {
         var opt: ModuleRoleOption = {
             operation: ['query', 'save', 'detailQuery'],
@@ -35,7 +31,6 @@ export class ModuleRole extends MyModule {
 
             rowClass: 'itemRow',
             interfacePrefix: 'role',
-            currRoleCode: null,
 
             saveDefaultModel: {
                 id: 0,
@@ -193,20 +188,20 @@ export class ModuleRole extends MyModule {
             beforeDetailQuery: function (t, self) {
                 return {code: t.code};
             },
-            onDetailQuerySuccess: function (t, self) {
+            onDetailQuerySuccess: function (t, self: ModuleRole) {
                 let selfOpt = self.opt as ModuleRoleOption;
                 self.detailRender(t.role);
-                selfOpt.currRoleCode = t.role.code;
+                self.currRoleCode = t.role.code;
                 selfOpt.updateView(['roleDetail'], {roleAllDetail: t}, self);
                 self.detailDom.modal('show');
             },
-            editBeforeRender: function (data, self) {
+            editBeforeRender: function (data, self: ModuleRole) {
                 let selfOpt = self.opt as ModuleRoleOption;
-                selfOpt.currRoleCode = null;
+                self.currRoleCode = null;
                 return data;
             },
 
-            updateView: function (list, opt, self) {
+            updateView: function (list, opt, self: ModuleRole) {
                 let selfOpt = self.opt as ModuleRoleOption;
                 if (!list || common.isInArray('roleDetail', list)) {
                     selfOpt.setAuthorityAutoComplete(self);
@@ -215,7 +210,7 @@ export class ModuleRole extends MyModule {
                         opt.roleDetail = opt.roleAllDetail.role;
                         opt.roleDetail.operation = opt.roleAllDetail.operation;
                         $(opt.roleAllDetail.authorityList).each(function (i, item) {
-                            selfOpt.setAuthority(item, self);
+                            self.authorityAutoComplete.setAuthority(item);
                         });
                     }
                     if (opt.roleDetail) {
@@ -228,24 +223,15 @@ export class ModuleRole extends MyModule {
                     }
                 }
             },
-            setAuthorityAutoComplete: function (self) {
+            setAuthorityAutoComplete: function (self: ModuleRole) {
                 let selfOpt = self.opt as ModuleRoleOption;
-                selfOpt.authorityAutoComplete = new AuthorityAutoComplete({
-                    dom: () => {
-                        return self.detailContainerDom.find('[name=authority]')
-                    },
-                    renderDom: () => {
-                        return self.detailContainerDom.find('[name=authorityBox]')
-                    },
+                self.authorityAutoComplete = new AuthorityAutoComplete({
+                    dom: self.detailContainerDom.find('[name=authority]'),
+                    renderDom: self.detailContainerDom.find('[name=authorityBox]'),
                     labelName: 'roleAuthority'
                 });
-                
-                selfOpt.authorityAutoComplete.excludeByRoleCode = selfOpt.currRoleCode;
-                return selfOpt.authorityAutoComplete;
-            },
-            setAuthority(item, self) {
-                // let selfOpt = self.opt as ModuleRoleOption;
-                // selfOpt.setAuthorityAutoComplete(self).setAuthority(item);
+
+                self.authorityAutoComplete.excludeByRoleCode = self.currRoleCode;
             }
         };
 
