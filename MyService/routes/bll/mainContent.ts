@@ -98,17 +98,17 @@ export let save = function (opt, exOpt) {
                 }
                 return match;
             });
-            //要保存的child
-            saveChildList = opt.mainContentChildList.filter(function (item) {
-                let match = !item.id || mainContentDetail.mainContentChildList.find(function (child) {
-                    return item.id == child.id;
-                });
-                return match;
-            });
         } else {
             mainContent.userInfoId = user.id;
             mainContent.userInfo = user.account + `(${user.nickname}#${user.id})`;
         }
+        //要保存的child
+        saveChildList = opt.mainContentChildList.filter(function (item) {
+            let match = !item.id || mainContentDetail.mainContentChildList.find(function (child) {
+                return item.id == child.id;
+            });
+            return match;
+        });
 
         return autoBll.tran(function (conn) {
             var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
