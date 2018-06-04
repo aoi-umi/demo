@@ -90,6 +90,12 @@ export let accessableUrlConfig = [
     {url: '/interface/mainContentType/detailQuery', auth: ['mainContentTypeDetailQuery']},
     {url: '/interface/mainContentType/save', auth: ['mainContentTypeSave']},
     {url: '/interface/mainContentType/del', auth: ['mainContentTypeDel']},
+
+    {url: '/struct/list', auth: ['admin']},
+    {url: '/interface/struct/query', auth: ['admin']},
+    {url: '/interface/struct/detailQuery', auth: ['admin']},
+    {url: '/interface/struct/save', auth: ['admin']},
+    {url: '/interface/struct/del', auth: ['admin']},
 ];
 
 //枚举
@@ -102,6 +108,10 @@ export let enumDict = {
         //mainConetnt
         '0': '主内容保存', '1': '主内容提交', '2': '主内容审核', '3': '主内容审核通过', '4': '主内容审核不通过', '5': '主内容删除', '6': '主内容恢复',
     },
+
+    structTypeEnum: {
+        'company': '公司', 'department': '部门', 'group': '小组',
+    }
 };
 
 //枚举变更权限

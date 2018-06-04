@@ -6,6 +6,7 @@ import * as socket from './socket';
 import * as myInterface from './myInterface';
 import * as myEnum from './myEnum';
 import * as sign from './sign';
+
 export let variable = {
     frameDom: null,
     frameDefaultHeight: 0,
@@ -16,7 +17,7 @@ export let init = function () {
     if (!userInfo) {
         userInfo = common.guid();
     }
-    $.cookie(cacheKey.userInfo, userInfo, { expires: 30 });
+    $.cookie(cacheKey.userInfo, userInfo, {expires: 30});
 
     if (parent == window)
         socket.init();
@@ -53,6 +54,7 @@ export let init = function () {
             'userInfo',
             'authority',
             'role',
+            'struct',
         ]
     });
     sign.init();
@@ -60,7 +62,11 @@ export let init = function () {
 
     bindEvent();
     myEnum.init({
-        enumDict: {}
+        enumDict: {
+            structTypeEnum: {
+                'company': '公司', 'department': '部门', 'group': '小组',
+            }
+        }
     });
 };
 
@@ -98,7 +104,7 @@ export let bindEvent = function () {
         var dom = $(this);
         var target = $(dom.attr('href'));
         if (target.length && dom.hasClass('hover-source')) {
-            target.css({ 'left': dom.position().left, 'margin-top': '0px' });
+            target.css({'left': dom.position().left, 'margin-top': '0px'});
         } else if (dom.hasClass('hover-target'))
             target = dom;
         if (!target.length)
