@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50722
 File Encoding         : 65001
 
-Date: 2018-06-01 15:47:47
+Date: 2018-06-04 10:20:18
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -482,7 +482,7 @@ BEGIN
 	SELECT * FROM t_role WHERE 
 		`code` in (select `roleCode` from t_user_info_with_role where `userInfoId` = pr_id);
 	-- 角色权限
-	SELECT DISTINCT t4.*, t1.code AS role_code, t1.`status` AS roleStatus FROM t_role t1 
+	SELECT DISTINCT t4.*, t1.code AS roleCode, t1.`status` AS roleStatus FROM t_role t1 
 		LEFT JOIN t_user_info_with_role t2 ON t1.`code` = t2.roleCode
 		LEFT JOIN t_role_with_authority t3 ON t2.roleCode = t3.roleCode 
 		LEFT JOIN t_authority t4 ON t3.authorityCode = t4.`code`
