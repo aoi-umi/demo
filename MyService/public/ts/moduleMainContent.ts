@@ -24,6 +24,8 @@ class ModuleMainContentOption extends ModuleOption {
 }
 
 export class ModuleMainContent extends MyModule {
+    mainContentTypeList: Array<any>;
+
     constructor(option?: ModuleMainContentOption) {
         var opt: ModuleMainContentOption = {
             operation: [],
@@ -99,7 +101,7 @@ export class ModuleMainContent extends MyModule {
                 if (self.operation.detailQuery) {
                 }
             },
-            bindEvent: function (self) {
+            bindEvent: function (self: ModuleMainContent) {
                 let selfOpt = self.opt as ModuleMainContentOption;
                 if (self.operation.query) {
                     $('#createDateStart').on('click', function () {
@@ -230,6 +232,52 @@ export class ModuleMainContent extends MyModule {
                             $('#mainContentChild').modal('hide');
                         }
                     });
+                    //
+                    let template = $('.mainContentType:eq(0)').prop('outerHTML');
+                    if (template) {
+                        let setOption = function (parentType?, index?) {
+                            let optionHtml = [];
+                            if (!index)
+                                index = 0;
+                            self.mainContentTypeList.forEach(ele => {
+                                if ((!index && !ele.parentType) || (index && ele.parentType && parentType == ele.parentType))
+                                    optionHtml.push(`<option value="${ele.type}" data-id="${ele.id}">${ele.type}${ele.typeName
+                                        ? '(' + ele.typeName + ')' : ''}</option>`);
+                            });
+
+                            let dom = $(`.mainContentType:eq(${index})`);
+                            if (optionHtml.length && !dom.length) {
+                                dom = $(template);
+                                $(`.mainContentType:eq(${index - 1})`).after(dom);
+                            }
+                            if (dom.length) {
+                                if (optionHtml.length)
+                                    optionHtml.unshift('<option value=""></option>');
+                                dom.find('select').html(optionHtml.join(''));
+                            }
+
+                            //移除空的select
+                            if (!optionHtml.length && index - 1 >= 0)
+                                index--;
+                            $(`.mainContentType:gt(${index})`).remove();
+                        }
+                        $('#refreshMainContentType').on('click', function () {
+                            $('#mainContentType .msg').text('');
+                            myInterface.api.mainContentTypeQuery({status: 1}).then((t) => {
+                                self.mainContentTypeList = t.list;
+                                setOption();
+                            }).catch(e => {
+                                $('#mainContentType .msg').text(e.message);
+                            });
+                        });
+                        $('#refreshMainContentType').trigger('click');
+
+                        $('#mainContentType').on('change', '.mainContentType select', function () {
+                            let dom = $(this);
+                            let box = dom.closest('.mainContentType');
+                            setOption(dom.val(), box.index() + 1);
+                        });
+                    }
                 }
             },
             beforeQuery: function (data) {
@@ -289,6 +337,16 @@ export class ModuleMainContent extends MyModule {
                         mainContent.status = 1;
                     else
                         throw new Error(`错误的操作类型[${operate}]`);
+
+                    if (mainContent.id == 0) {
+                        let valList = [];
+                        $('#mainContentType .mainContentType option:selected').each(function () {
+                            let id = $(this).data('id');
+                            id && valList.push(id);
+                        });
+                        detail.mainContentTypeList = valList;
+                    }
+
                     detail.mainContentChildList = [];
                     $(`#mainContentChildList>${self.rowClass}`).each(function () {
                         detail.mainContentChildList.push($(this).data('item'));

@@ -37,7 +37,7 @@ export let detailQuery = function (opt, exOpt) {
     return common.promise(function () {
         if (opt.id == 0) {
             var detail: any = {};
-            detail.mainContent = { id: 0, status: 0, type: 0 };
+            detail.mainContent = {id: 0, status: 0, type: 0};
             detail.mainContentTypeList = [];
             detail.mainContentChildList = [];
             detail.mainContentLogList = [];
@@ -72,7 +72,7 @@ export let save = function (opt, exOpt) {
     var user = exOpt.user;
     return common.promise(function () {
         mainContent = opt.mainContent;
-        return detailQuery({ id: mainContent.id }, exOpt);
+        return detailQuery({id: mainContent.id}, exOpt);
     }).then(function (mainContentDetail) {
         var delChildList;
         if (mainContent.id != 0) {
@@ -113,10 +113,18 @@ export let save = function (opt, exOpt) {
             return autoBll.save('mainContent', mainContent, conn).then(function (t) {
                 mainContentId = t;
                 var list = [];
+                if (mainContent.id == 0 && opt.mainContentTypeList) {
+                    opt.mainContentTypeList.forEach(ele => {
+                        list.push(autoBll.save('mainContentTypeId', {
+                            mainContentId: mainContentId,
+                            mainContentTypeId: ele
+                        }, conn));
+                    });
+                }
                 //删除child
                 if (delChildList && delChildList.length) {
                     delChildList.forEach(function (item) {
-                        list.push(autoBll.del('mainContentChild', { id: item.id }, conn));
+                        list.push(autoBll.del('mainContentChild', {id: item.id}, conn));
                     });
                 }
 
@@ -173,7 +181,7 @@ export let statusUpdate = function (opt, exOpt) {
         necessaryAuth = 'mainContent' + common.stringToPascal(operate);
         if (!auth.isHadAuthority(user, necessaryAuth))
             throw common.error(`没有[${necessaryAuth}]权限`);
-        return detailQuery({ id: mainContent.id }, { user: exOpt.user });
+        return detailQuery({id: mainContent.id}, {user: exOpt.user});
     }).then(function (mainContentDetail) {
         if (necessaryAuth == 'mainContentDel' && !mainContentDetail.canDelete) {
             throw common.error(`没有权限`);

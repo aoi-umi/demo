@@ -44,30 +44,44 @@
                 <span>状态:</span><span><%= mainContent.statusName || '' %></span>
             </p>
 
+            <% if(mainContent.id){ %>
             <p>
                 <span>创建时间:</span><span><%= mainContent.createDate || '' %></span>
                 <span>修改时间:</span><span><%= mainContent.operateDate || '' %></span>
                 <span>修改人:</span><span><%= mainContent.operator || '' %></span>
             </p>
-
-            <p>
-                <%
-                var mainContentTypeList = mainContentDetail.mainContentTypeList;
-                mainContentTypeList.forEach(function(item, index){ %>
-                <a href="javascript:;"><%= item.typeName %></a>
-                <% if(index < mainContentTypeList.length - 1){ %>
-                >>
-                <% } %>
-                <% }) %>
-            </p>
+            <% } %>
         </div>
+        <% var col1Class = 'col-xs-2 col-sm-1', col2Class = 'col-xs-10 col-sm-11' %>
         <div class="row my-row">
             <div class="<%= rowItemClass %>">
                 <div class="form-horizontal">
                     <div class="form-group">
-                        <label class="col-xs-2 col-sm-1 control-label">标题</label>
+                        <label class="<%= col1Class %> control-label">类型</label>
 
-                        <div class="col-xs-10 col-sm-11">
+                        <div class="<%= col2Class %>">
+                            <% if(!mainContent.id){ %>
+                            <div id="mainContentType" class="row my-row">
+                                <div class="col-xs-2 mainContentType"><select class="form-control"></select></div>
+                                <a id="refreshMainContentType" href="javascript:;">刷新</a>
+                                <span class="text-danger msg"></span>
+                            </div>
+                            <% }else{ %>
+                            <%
+                                var mainContentTypeList = mainContentDetail.mainContentTypeList;
+                            mainContentTypeList.forEach(function(item, index){ %>
+                            <a href="javascript:;"><%= item.type %><%= item.typeName?'(' + item.typeName + ')':'' %></a>
+                            <% if(index < mainContentTypeList.length - 1){ %>
+                            >>
+                            <% } %>
+                            <% }) %>
+                            <% } %>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="<%= col1Class %> control-label">标题</label>
+
+                        <div class="<%= col2Class %>">
                             <% if(isEditable){ %>
                             <input class="form-control" id="title" placeholder="请输入标题"
                                    value="<%= mainContent.title || '' %>"/>
@@ -77,9 +91,9 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-xs-2 col-sm-1 control-label">描述</label>
+                        <label class="<%= col1Class %> control-label">描述</label>
 
-                        <div class="col-xs-10 col-sm-11">
+                        <div class="<%= col2Class %>">
                             <% if(isEditable){ %>
                             <textarea class="form-control no-resize" id="description"
                                       placeholder="请输入描述"><%= mainContent.description || '' %></textarea>
@@ -119,7 +133,7 @@
             </table>
         </div>
 
-        <div>
+        <div class="my-row">
             <label class="control-label">备注</label>
             <textarea class="form-control no-resize" id="remark" placeholder=""></textarea>
         </div>
