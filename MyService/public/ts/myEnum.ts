@@ -9,7 +9,7 @@ export let init = function (opt) {
         enumDict = opt.enumDict;
 }
 
-export let getEnum = function (enumName, notThrowError) {
+export let getEnum = function (enumName, notThrowError?) {
     var enumType = enumDict[enumName];
     if (!enumType && !notThrowError) throw common.error('enum "' + enumName + '" not exist!', 'CODE_ERROR');
     return enumType;

@@ -8,30 +8,32 @@ import * as $ from 'jquery';
 import * as common from './common';
 import * as myInterface from './myInterface';
 import * as myVaild from './myVaild';
+import * as myEnum from './myEnum';
 import {MyModule, ModuleOption} from './myModule';
 
-class ModuleMainContentTypeOption extends ModuleOption {
+class ModuleStructOption extends ModuleOption {
     updateView?(list: string[], opt, self: MyModule);
 }
 
-export class ModuleMainContentType extends MyModule {
-    constructor(option?: ModuleMainContentTypeOption) {
-        var opt: ModuleMainContentTypeOption = {
+export class ModuleStruct extends MyModule {
+    constructor(option?: ModuleStructOption) {
+        var opt: ModuleStructOption = {
             operation: ['query', 'save', 'del', 'detailQuery'],
             queryId: 'search',
-            queryItemTempId: 'mainContentTypeItem',
+            queryItemTempId: 'structItem',
             queryContainerId: 'list',
 
             detailId: 'detail',
             detailContainerName: 'detailContainer',
-            detailTempId: 'mainContentTypeSaveTemp',
+            detailTempId: 'structSaveTemp',
 
             saveClass: 'save',
             saveDefaultModel: {
                 id: 0,
                 type: '',
-                typeName: '',
-                parentType: '',
+                struct: '',
+                structName: '',
+                parentStruct: '',
                 level: 0,
                 operation: ['save']
             },
@@ -39,7 +41,7 @@ export class ModuleMainContentType extends MyModule {
 
             //            rowClass: 'itemRow',
             //            editClass: 'itemEdit',
-            interfacePrefix: 'mainContentType',
+            interfacePrefix: 'struct',
             queryArgsOpt: [{
                 name: 'id',
                 dom: $('#id'),
@@ -51,11 +53,14 @@ export class ModuleMainContentType extends MyModule {
                 name: 'type',
                 dom: $('#type'),
             }, {
-                name: 'typeName',
-                dom: $('#typeName'),
+                name: 'struct',
+                dom: $('#struct'),
             }, {
-                name: 'parentType',
-                dom: $('#parentType'),
+                name: 'structName',
+                dom: $('#structName'),
+            }, {
+                name: 'parentStruct',
+                dom: $('#parentStruct'),
             }, {
                 name: 'level',
                 dom: $('#level'),
@@ -70,35 +75,35 @@ export class ModuleMainContentType extends MyModule {
                         $('#treeModal').modal('show');
                     }
                     var data = {};
-                    myInterface.api.mainContentTypeQuery(data).then(function (t) {
+                    myInterface.api.structQuery(data).then(function (t) {
                         var rootTree = {};
                         var itemTree = {};
                         $('.tree').empty();
-                        var list = t.list.sort(function(a, b){
+                        var list = t.list.sort(function (a, b) {
                             return b.level - a.level;
                         });
 
-                        function setTree(tree, parentType, list) {
+                        function setTree(tree, parentStruct, list) {
                             $(list).each(function (i) {
                                 let item: any = this;
-                                if (!itemTree[item.type])
-                                    itemTree[item.type] = {item: item, inRoot: false};
-                                if (item.parentType == parentType) {
-                                    itemTree[item.type].inRoot = true;
-                                    if (!tree[item.type]) {
-                                        tree[item.type] = {
+                                if (!itemTree[item.struct])
+                                    itemTree[item.struct] = {item: item, inRoot: false};
+                                if (item.parentStruct == parentStruct) {
+                                    itemTree[item.struct].inRoot = true;
+                                    if (!tree[item.struct]) {
+                                        tree[item.struct] = {
                                             item: item,
                                             child: {},
                                             inRoot: true,
                                         }
                                     }
-                                    setTree(tree[item.type].child, item.type, list);
+                                    setTree(tree[item.struct].child, item.struct, list);
                                 }
                             });
                         }
 
                         setTree(rootTree, '', list);
-                        var temp = $('#mainContentTypeTreeItem').html();
+                        var temp = $('#structTreeItem').html();
 
                         function renderTree(leave, treeDom) {
                             leave.item.inRoot = leave.inRoot;
@@ -137,7 +142,7 @@ export class ModuleMainContentType extends MyModule {
                 $('#treeModal').on('click', '.itemAdd', function () {
                     var row = $(this).closest(self.rowClass);
                     let item = row.data('item');
-                    item = $.extend(null, self.opt.saveDefaultModel, item ? {parentType: item.type} : null);
+                    item = $.extend(null, self.opt.saveDefaultModel, item ? {parentStruct: item.struct} : null);
                     self.edit(item);
                 });
             },
@@ -145,9 +150,13 @@ export class ModuleMainContentType extends MyModule {
                 if (!data.id) data.id = null;
                 if (!data.level) data.level = null;
             },
+            editBeforeRender: function (item) {
+                item.structTypeEnum = myEnum.getEnum('structTypeEnum');
+                return item;
+            },
             editAfterRender: function (item, self) {
-                let selfOpt = self.opt as ModuleMainContentTypeOption;
-                selfOpt.updateView(['mainContentTypeDetail'], {mainContentTypeDetail: item}, self);
+                let selfOpt = self.opt as ModuleStructOption;
+                selfOpt.updateView(['structDetail'], {structDetail: item}, self);
                 self.detailDom.modal('show');
             },
             beforeSave: function (dom, self) {
@@ -159,11 +168,16 @@ export class ModuleMainContentType extends MyModule {
                     dom: self.detailContainerDom.find('[name=type]'),
                     canNotNull: true,
                 }, {
-                    name: 'typeName',
-                    dom: self.detailContainerDom.find('[name=typeName]'),
+                    name: 'struct',
+                    dom: self.detailContainerDom.find('[name=struct]'),
+                    canNotNull: true,
                 }, {
-                    name: 'parentType',
-                    dom: self.detailContainerDom.find('[name=parentType]'),
+                    name: 'structName',
+                    dom: self.detailContainerDom.find('[name=structName]'),
+                    canNotNull: true,
+                }, {
+                    name: 'parentStruct',
+                    dom: self.detailContainerDom.find('[name=parentStruct]'),
                 }, {
                     name: 'level',
                     dom: self.detailContainerDom.find('[name=level]'),
@@ -185,16 +199,17 @@ export class ModuleMainContentType extends MyModule {
                 });
             },
             onDetailQuerySuccess: function (t, self) {
-                let selfOpt = self.opt as ModuleMainContentTypeOption;
+                let selfOpt = self.opt as ModuleStructOption;
+                t.structTypeEnum = myEnum.getEnum('structTypeEnum');
                 self.detailRender(t);
-                selfOpt.updateView(['mainContentTypeDetail'], {mainContentTypeDetail: t}, self);
+                selfOpt.updateView(['structDetail'], {structDetail: t}, self);
                 self.detailDom.modal('show');
             },
             updateView: function (list, opt, self) {
-                if (!list || common.isInArray('mainContentTypeDetail', list)) {
-                    if (opt.mainContentTypeDetail) {
-                        self.detailDom.find('.title').html(opt.mainContentTypeDetail.id ? ('修改:' + opt.mainContentTypeDetail.id) : '新增');
-                        if (common.isInArray('save', opt.mainContentTypeDetail.operation)) {
+                if (!list || common.isInArray('structDetail', list)) {
+                    if (opt.structDetail) {
+                        self.detailDom.find('.title').html(opt.structDetail.id ? ('修改:' + opt.structDetail.id) : '新增');
+                        if (common.isInArray('save', opt.structDetail.operation)) {
                             self.detailDom.find('.footer').show();
                         } else {
                             self.detailDom.find('.footer').hide();

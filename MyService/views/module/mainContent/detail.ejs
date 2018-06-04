@@ -70,7 +70,7 @@
                             <%
                                 var mainContentTypeList = mainContentDetail.mainContentTypeList;
                             mainContentTypeList.forEach(function(item, index){ %>
-                            <a href="javascript:;"><%= item.type %><%= item.typeName?'(' + item.typeName + ')':'' %></a>
+                            <a href="javascript:;"><%= item.type %><%= item.typeName ? '(' + item.typeName + ')' : '' %></a>
                             <% if(index < mainContentTypeList.length - 1){ %>
                             >>
                             <% } %>

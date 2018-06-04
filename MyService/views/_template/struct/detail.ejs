@@ -1,0 +1,30 @@
+<div class="my-row">
+    <div class="input-group">
+        <span class="input-group-addon">id</span>
+        <input type="text" class="form-control" disabled name="id" value="<%= id %>"/>
+    </div>
+    <div class="input-group">
+        <span class="input-group-addon">type</span>
+        <select type="text" class="form-control" name="type" value="<%= type %>">
+            <% for(let key in structTypeEnum){ %>
+            <option value="<%= key %>"><%= structTypeEnum[key] %></option>
+            <% } %>
+        </select>
+    </div>
+    <div class="input-group">
+        <span class="input-group-addon">struct</span>
+        <input type="text" class="form-control" name="struct" value="<%= struct %>"/>
+    </div>
+    <div class="input-group">
+        <span class="input-group-addon">structName</span>
+        <input type="text" class="form-control" name="structName" value="<%= structName %>"/>
+    </div>
+    <div class="input-group">
+        <span class="input-group-addon">parentStruct</span>
+        <input type="text" class="form-control" name="parentStruct" value="<%= parentStruct %>"/>
+    </div>
+    <div class="input-group">
+        <span class="input-group-addon">level</span>
+        <input type="text" class="form-control" name="level" value="<%= level %>"/>
+    </div>
+</div>

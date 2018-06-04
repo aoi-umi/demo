@@ -8,17 +8,17 @@ import errorConfig from '../_system/errorConfig';
 export let save = function (opt) {
     return isExist(opt).then(function (t) {
         if (t.isExist && t.detail.id != opt.id) {
-            throw common.error('type [' + opt.type + '] is exist');
+            throw common.error('struct [' + opt.struct + '] is exist');
         }
-        return autoBll.save('mainContentType', opt);
+        return autoBll.save('struct', opt);
     });
 };
 
 export let isExist = function (opt) {
     return common.promise(function () {
-        if (!opt || !opt.type)
+        if (!opt || !opt.struct)
             throw common.error(null, errorConfig.ARGS_ERROR);
-        return autoBll.query('mainContentType', {type: opt.type});
+        return autoBll.query('struct', {struct: opt.struct});
     }).then(function (t) {
         var res = {
             isExist: false,

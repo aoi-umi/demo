@@ -74,14 +74,14 @@ export let save = function (opt, exOpt) {
         mainContent = opt.mainContent;
         return detailQuery({id: mainContent.id}, exOpt);
     }).then(function (mainContentDetail) {
-        var delChildList;
+        var delChildList, saveChildList;
         if (mainContent.id != 0) {
             //权限检查
             if (user.id != mainContentDetail.mainContent.userInfoId)
                 throw common.error('没有权限处理此记录');
             myEnum.enumChangeCheck('mainContentStatusEnum', mainContentDetail.mainContent.status, mainContent.status);
             //要删除的child
-            var delChildList = mainContentDetail.mainContentChildList.filter(function (child) {
+            delChildList = mainContentDetail.mainContentChildList.filter(function (child) {
                 //查找删除列表中的项
                 var match = null;
                 if (opt.delMainContentChildList) {
@@ -96,6 +96,13 @@ export let save = function (opt, exOpt) {
                     });
                     match = !match2;
                 }
+                return match;
+            });
+            //要保存的child
+            saveChildList = opt.mainContentChildList.filter(function (item) {
+                let match = !item.id || mainContentDetail.mainContentChildList.find(function (child) {
+                    return item.id == child.id;
+                });
                 return match;
             });
         } else {
@@ -129,7 +136,7 @@ export let save = function (opt, exOpt) {
                 }
 
                 //保存child
-                opt.mainContentChildList.forEach(function (item, index) {
+                saveChildList.forEach(function (item, index) {
                     item.mainContentId = mainContentId;
                     item.num = index + 1;
                     list.push(autoBll.save('mainContentChild', item, conn));
