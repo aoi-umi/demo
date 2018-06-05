@@ -6,13 +6,77 @@ import * as SparkMD5 from 'spark-md5';
 
 window['common'] = exports;
 
-export let stringToBase64 = function (str) {
-    return btoa(encodeURIComponent(str));
+/***********************前后通用***********************/
+/**
+ *
+ * @param fn 带nodeCallback参数的方法
+ * @param caller 调用对象
+ * @param nodeCallback false通过defer控制,true cb参数控制
+ * @param args
+ */
+export let promise = function (fn: Function, caller?: any, nodeCallback?: boolean, args?: any[]): Q.Promise<any> {
+    var defer = Q.defer();
+    try {
+        if (!fn) {
+            throw error('fn can not be null');
+        }
+        if (!args)
+            args = [];
+        if (!nodeCallback) {
+            var def = Q.defer();
+            args.push(def);
+            defer.resolve(fn.apply(caller, args));
+        } else {
+            args.push(function (err, ...cbArgs) {
+                if (err)
+                    defer.reject(err);
+                else {
+                    defer.resolve.apply(void 0, cbArgs);
+                }
+            });
+            fn.apply(caller, args);
+        }
+    } catch (e) {
+        defer.reject(e);
+    }
+    return defer.promise;
 };
-export let base64ToString = function (base64Str) {
-    return decodeURIComponent(atob(base64Str));
+
+//示例
+// let fun = function (type, def) {
+//     if (type == 1) {
+//         setTimeout(() => {
+//             def.resolve('promise_' + type);
+//         }, 1000);
+//         return def.promise;
+//     } else if (type == 2) {
+//         setTimeout(() => {
+//             let cb = def;
+//             cb(null, 'promise_' + type)
+//         }, 1000);
+//     }
+// }
+// promise(fun, void 0, false, 1).then((t) => {
+//     console.log(t);
+// });
+
+// promise(fun, void 0, true, 2).then((t) => {
+//     console.log(t);
+// });
+
+export let promisify = function (fun, caller?) {
+    return function (...args) {
+        return promise.apply(void 0, [fun, caller, true, args]);
+    };
 };
-export let s4 = function (count?) {
+
+export let promisifyAll = function (obj) {
+    for (var key in obj) {
+        if (typeof obj[key] == 'function')
+            obj[key + 'Promise'] = promisify(obj[key], obj);
+    }
+};
+export let s4 = function (count?: number) {
     var str = '';
     if (typeof count == 'undefined')
         count = 1;
@@ -28,8 +92,102 @@ export let s4 = function (count?) {
 export let guid = function () {
     return (s4(2) + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4(3));
 };
+export let createToken = function (str) {
+    var code = md5(str);
+    return code;
+};
+export let dateFormat = function (date, format) {
+    try {
+        if (!format) format = 'yyyy-MM-dd';
+        if (!date)
+            date = new Date();
+        else if (typeof date == 'number' || typeof date == 'string')       
+            date = new Date(date);
+
+        var o = {
+            y: date.getFullYear(),
+            M: date.getMonth() + 1,
+            d: date.getDate(),
+            h: date.getHours() % 12,
+            H: date.getHours(),
+            m: date.getMinutes(),
+            s: date.getSeconds(),
+            S: date.getMilliseconds()
+        };
+
+        var formatStr = format.replace(/(y+|M+|d+|h+|H+|m+|s+|S+)/g, function (e) {
+            if (e.match(/S+/))
+                return ('' + o[e.slice(-1)]).slice(0, e.length);
+            else
+                return ((e.length > 1 ? '0' : '') + o[e.slice(-1)]).slice(-(e.length > 2 ? e.length : 2));
+        });
+        return formatStr;
+    } catch (e) {
+        console.log(e);
+        return '';
+    }
+};
+//字符串
+export let stringFormat = function (...args) {
+    var reg = /(\{\d\})/g
+    var res = args[0] || '';
+    var split = res.split(reg);
+    for (var i = 0; i < split.length; i++) {
+        var m = split[i].length >= 3 && split[i].match(/\{(\d)\}/);
+        if (m) {
+            var index = parseInt(m[1]);
+            split[i] = split[i].replace('{' + index + '}', args[index + 1] || '');
+        }
+    }
+    res = split.join('');
+    return res;
+};
+//小写下划线
+export let stringToLowerCaseWithUnderscore = function (str) {
+    str = str.replace(/^[A-Z]+/, function () {
+        return arguments[0].toLowerCase();
+    });
+    str = str.replace(/_/g, '');
+    str = str.replace(/[A-Z]/g, function () {
+        return '_' + arguments[0].toLowerCase();
+    });
+    str = str.toLowerCase();
+    return str;
+};
+//驼峰（小驼峰）
+export let stringToCamelCase = function (str) {
+    str = str.replace(/_([a-zA-Z])/g, function () {
+        return arguments[1].toUpperCase();
+    });
+    return str[0].toLowerCase() + str.substr(1);
+};
+//帕斯卡（大驼峰）
+export let stringToPascal = function (str) {
+    str = str.replace(/_([a-zA-Z])/g, function () {
+        return arguments[1].toUpperCase();
+    });
+    return str[0].toUpperCase() + str.substr(1);
+};
+
+/***********************同名但实现不同***********************/
 export let md5 = function (str) {
     return SparkMD5.hash(str);
+};
+export let isInArray = function (obj, list, startIndex?) {
+    return $.inArray(obj, list, startIndex) >= 0;
+};
+export let error = function (msg, errCode?) {
+    var err: any = new Error(msg);
+    err.code = errCode;
+    return err;
+};
+
+/***********************only***********************/
+export let stringToBase64 = function (str) {
+    return btoa(encodeURIComponent(str));
+};
+export let base64ToString = function (base64Str) {
+    return decodeURIComponent(atob(base64Str));
 };
 export let md5File = function (file) {
     return promise(function (defer) {
@@ -68,18 +226,16 @@ export let md5File = function (file) {
         return defer.promise;
     });
 };
-export let createToken = function (str) {
-    return md5(str);
-};
-export let ajax = function (option) {
-    var opt = {
+
+interface ajaxOption extends JQuery.AjaxSettings {    
+    myDataCheck?: Function,
+}
+
+export let ajax = function (option: ajaxOption) {
+    var opt: ajaxOption = {
         type: 'POST',
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
-
-        //自定义参数
-        myDataCheck: null,
-        data: null
     };
     opt = $.extend(opt, option);
     var originReq = opt.data;
@@ -87,11 +243,9 @@ export let ajax = function (option) {
         opt.data = {};
     if (typeof opt.data != 'string')
         opt.data = JSON.stringify(opt.data);
-    var resOpt = {
-        req: originReq
-    };
+    
     return promise(function (defer) {
-        if (typeof opt.myDataCheck == 'function') {
+        if (opt.myDataCheck) {
             opt.myDataCheck();
         }
         $.ajax(opt).then(defer.resolve).fail(defer.reject);
@@ -240,36 +394,6 @@ export let dateParse = function (date) {
         date = new Date(date);
     return date;
 };
-export let dateFormat = function (date, format?) {
-    try {
-        if (!format) format = 'yyyy-MM-dd';
-        if (!date)
-            date = new Date();
-        else if (typeof date == 'number' || typeof date == 'string')
-            date = new Date(date);
-
-        var o = {
-            y: date.getFullYear(),
-            M: date.getMonth() + 1,
-            d: date.getDate(),
-            h: date.getHours() % 12,
-            H: date.getHours(),
-            m: date.getMinutes(),
-            s: date.getSeconds(),
-            S: date.getMilliseconds()
-        };
-        var formatStr = format.replace(/(y+|M+|d+|h+|H+|m+|s+|S+)/g, function (e) {
-            if (e.match(/S+/))
-                return ('' + o[e.slice(-1)]).slice(0, e.length);
-            else
-                return ((e.length > 1 ? '0' : '') + o[e.slice(-1)]).slice(-(e.length > 2 ? e.length : 2));
-        });
-        return formatStr;
-    } catch (e) {
-        console.log(e);
-        return '';
-    }
-};
 export let getDateDiff = function (date1, date2) {
     date1 = dateParse(date1);
     date2 = dateParse(date2);
@@ -293,28 +417,6 @@ export let getDateDiff = function (date1, date2) {
     if (isMinus)
         diff = '-' + diff;
     return diff;
-};
-
-//字符串
-export let stringFormat = function (...args) {
-    var reg = /(\{\d\})/g
-    var res = args[0] || '';
-    var split = res.split(reg);
-    for (var i = 0; i < split.length; i++) {
-        var m = split[i].length >= 3 && split[i].match(/\{(\d)\}/);
-        if (m) {
-            var index = parseInt(m[1]);
-            split[i] = split[i].replace('{' + index + '}', args[index + 1] || '');
-        }
-    }
-    res = split.join('');
-    return res;
-};
-export let stringToPascal = function (str) {
-    str = str.replace(/_([a-zA-Z])/g, function () {
-        return arguments[1].toUpperCase();
-    });
-    return str[0].toUpperCase() + str.substr(1);
 };
 
 export let msgNotice = function (option) {
@@ -480,36 +582,6 @@ export let msgNotice = function (option) {
     }
     return dom;
 };
-export let isInArray = function (obj, list, startIndex?) {
-    return $.inArray(obj, list, startIndex) >= 0;
-};
-export let promise = function (fn: Function, caller?: any, nodeCallback?: boolean, args?: any[]): Q.Promise<any> {
-    var defer = Q.defer();
-    try {
-        if (!fn) {
-            throw error('fn can not be null');
-        }
-        if (!args)
-            args = [];
-        if (!nodeCallback) {
-            var def = Q.defer();
-            args.push(def);
-            defer.resolve(fn.apply(caller, args));
-        } else {
-            args.push(function (err, ...cbArgs) {
-                if (err)
-                    defer.reject(err);
-                else {
-                    defer.resolve.apply(void 0, cbArgs);
-                }
-            });
-            fn.apply(caller, args);
-        }
-    } catch (e) {
-        defer.reject(e);
-    }
-    return defer.promise;
-};
 
 export let getArgsFromUrlParams = function () {
     var args: any = {};
@@ -640,12 +712,6 @@ export let setCountdown = function (option) {
             opt.onCountdown(dom, date);
         }
     }, opt.interval * 1000);
-};
-
-export let error = function (msg, errCode?) {
-    var err: any = new Error(msg);
-    err.code = errCode;
-    return err;
 };
 export let getBrowserType = function () {
     var userAgent = navigator.userAgent; //取得浏览器的userAgent字符串

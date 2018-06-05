@@ -12,20 +12,8 @@ import config from '../../config';
 import errorConfig from './errorConfig';
 import * as logService from '../service/logService';
 
-export let extend = function (...args) {
-    var res = args[0] || {};
-    for (let i = 1; i < args.length; i++) {
-        var arg = args[i];
-        if (typeof (arg) == 'object') {
-            for (var key in arg) {
-                if (arg[key] !== undefined)
-                    res[key] = arg[key];
-            }
-        }
-    }
-    return res;
-};
 
+/***********************前后通用***********************/
 /**
  *
  * @param fn 带nodeCallback参数的方法
@@ -94,6 +82,173 @@ export let promisifyAll = function (obj) {
         if (typeof obj[key] == 'function')
             obj[key + 'Promise'] = promisify(obj[key], obj);
     }
+};
+export let s4 = function (count?: number) {
+    var str = '';
+    if (typeof count == 'undefined')
+        count = 1;
+    if (count <= 0) {
+
+    } else {
+        for (var i = 0; i < count; i++) {
+            str += (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+        }
+    }
+    return str;
+};
+export let guid = function () {
+    return (s4(2) + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4(3));
+};
+export let createToken = function (str) {
+    var code = md5(str);
+    return code;
+};
+export let dateFormat = function (date, format) {
+    try {
+        if (!format) format = 'yyyy-MM-dd';
+        if (!date)
+            date = new Date();
+        else if (typeof date == 'number' || typeof date == 'string')       
+            date = new Date(date);
+
+        var o = {
+            y: date.getFullYear(),
+            M: date.getMonth() + 1,
+            d: date.getDate(),
+            h: date.getHours() % 12,
+            H: date.getHours(),
+            m: date.getMinutes(),
+            s: date.getSeconds(),
+            S: date.getMilliseconds()
+        };
+
+        var formatStr = format.replace(/(y+|M+|d+|h+|H+|m+|s+|S+)/g, function (e) {
+            if (e.match(/S+/))
+                return ('' + o[e.slice(-1)]).slice(0, e.length);
+            else
+                return ((e.length > 1 ? '0' : '') + o[e.slice(-1)]).slice(-(e.length > 2 ? e.length : 2));
+        });
+        return formatStr;
+    } catch (e) {
+        console.log(e);
+        return '';
+    }
+};
+//字符串
+export let stringFormat = function (...args) {
+    var reg = /(\{\d\})/g
+    var res = args[0] || '';
+    var split = res.split(reg);
+    for (var i = 0; i < split.length; i++) {
+        var m = split[i].length >= 3 && split[i].match(/\{(\d)\}/);
+        if (m) {
+            var index = parseInt(m[1]);
+            split[i] = split[i].replace('{' + index + '}', args[index + 1] || '');
+        }
+    }
+    res = split.join('');
+    return res;
+};
+//小写下划线
+export let stringToLowerCaseWithUnderscore = function (str) {
+    str = str.replace(/^[A-Z]+/, function () {
+        return arguments[0].toLowerCase();
+    });
+    str = str.replace(/_/g, '');
+    str = str.replace(/[A-Z]/g, function () {
+        return '_' + arguments[0].toLowerCase();
+    });
+    str = str.toLowerCase();
+    return str;
+};
+//驼峰（小驼峰）
+export let stringToCamelCase = function (str) {
+    str = str.replace(/_([a-zA-Z])/g, function () {
+        return arguments[1].toUpperCase();
+    });
+    return str[0].toLowerCase() + str.substr(1);
+};
+//帕斯卡（大驼峰）
+export let stringToPascal = function (str) {
+    str = str.replace(/_([a-zA-Z])/g, function () {
+        return arguments[1].toUpperCase();
+    });
+    return str[0].toUpperCase() + str.substr(1);
+};
+
+/***********************同名但实现不同***********************/
+export let md5 = function (data, option?) {
+    var opt = {
+        encoding: 'hex',
+    };
+    opt = extend(opt, option);
+    var md5 = crypto.createHash('md5');
+    if (typeof (data) == 'string')
+        data = new Buffer(data, 'utf8');
+    //@ts-ignore
+    var code = md5.update(data).digest(opt.encoding);
+    return code;
+};
+export let isInArray = function (obj, list) {
+    if (list) {
+        for (var i = 0; i < list.length; i++) {
+            var t = list[i];
+            if (t === obj) {
+                return true;
+            }
+        }
+    }
+    return false;
+};
+//code: string || errorConfig
+export let error = function (msg, code?, option?) {
+    var opt = {
+        sourceName: '',
+        lang: 'zh',
+        format: null,
+    };
+    var status = null;
+    if (option)
+        opt = extend(opt, option);
+    if (!code)
+        code = '';
+    var error;
+    if (typeof code !== 'string') {
+        error = code;
+        code = error.code;
+    }
+    else {
+        error = getErrorConfigByCode(code);
+    }
+    if (error) {
+        status = error.status;
+        if (!msg) {
+            msg = error.desc[opt.lang];
+            if (typeof opt.format == 'function')
+                msg = opt.format(msg);
+        }
+    }
+    if (!msg) msg = '';
+    if (typeof msg == 'object') msg = JSON.stringify(msg);
+    var err: any = new Error(msg);
+    err.code = code;
+    err.status = status;
+    return err;
+};
+
+/***********************only***********************/
+export let extend = function (...args) {
+    var res = args[0] || {};
+    for (let i = 1; i < args.length; i++) {
+        var arg = args[i];
+        if (typeof (arg) == 'object') {
+            for (var key in arg) {
+                if (arg[key] !== undefined)
+                    res[key] = arg[key];
+            }
+        }
+    }
+    return res;
 };
 
 export let requestServiceByConfig = function (option) {
@@ -211,42 +366,6 @@ export let requestService = function (option) {
 
 export let unzipPromise = promisify(zlib.unzip);
 
-//code: string || errorConfig
-export let error = function (msg, code?, option?) {
-    var opt = {
-        sourceName: '',
-        lang: 'zh',
-        format: null,
-    };
-    var status = null;
-    if (option)
-        opt = extend(opt, option);
-    if (!code)
-        code = '';
-    var error;
-    if (typeof code !== 'string') {
-        error = code;
-        code = error.code;
-    }
-    else {
-        error = getErrorConfigByCode(code);
-    }
-    if (error) {
-        status = error.status;
-        if (!msg) {
-            msg = error.desc[opt.lang];
-            if (typeof opt.format == 'function')
-                msg = opt.format(msg);
-        }
-    }
-    if (!msg) msg = '';
-    if (typeof msg == 'object') msg = JSON.stringify(msg);
-    var err: any = new Error(msg);
-    err.code = code;
-    err.status = status;
-    return err;
-};
-
 export let getErrorConfigByCode = function (code) {
     for (let key in errorConfig) {
         if (errorConfig[key].code == code)
@@ -360,123 +479,6 @@ export let IPv4ToIPv6 = function (ip, convert) {
         }
     }
     return ip;
-};
-// console.log(export let IPv4ToIPv6('192.168.1.1'))
-// console.log(export let IPv4ToIPv6('192.168.1.1', true))
-
-//字符串
-export let stringFormat = function (...args) {
-    var reg = /(\{\d\})/g
-    var res = args[0] || '';
-    var split = res.split(reg);
-    for (var i = 0; i < split.length; i++) {
-        var m = split[i].length >= 3 && split[i].match(/\{(\d)\}/);
-        if (m) {
-            var index = parseInt(m[1]);
-            split[i] = split[i].replace('{' + index + '}', args[index + 1] || '');
-        }
-    }
-    res = split.join('');
-    return res;
-};
-
-//小写下划线
-export let stringToLowerCaseWithUnderscore = function (str) {
-    str = str.replace(/^[A-Z]+/, function () {
-        return arguments[0].toLowerCase();
-    });
-    str = str.replace(/_/g, '');
-    str = str.replace(/[A-Z]/g, function () {
-        return '_' + arguments[0].toLowerCase();
-    });
-    str = str.toLowerCase();
-    return str;
-};
-//驼峰（小驼峰）
-export let stringToCamelCase = function (str) {
-    str = str.replace(/_([a-zA-Z])/g, function () {
-        return arguments[1].toUpperCase();
-    });
-    return str[0].toLowerCase() + str.substr(1);
-};
-//帕斯卡（大驼峰）
-export let stringToPascal = function (str) {
-    str = str.replace(/_([a-zA-Z])/g, function () {
-        return arguments[1].toUpperCase();
-    });
-    return str[0].toUpperCase() + str.substr(1);
-};
-
-export let dateFormat = function (date, format) {
-    try {
-        if (!format) format = 'yyyy-MM-dd';
-        if (!date)
-            date = new Date();
-        else if (typeof date == 'number' || typeof date == 'string')
-        //@ts-ignore
-            date = new Date(date);
-
-        var o = {
-            y: date.getFullYear(),
-            M: date.getMonth() + 1,
-            d: date.getDate(),
-            h: date.getHours() % 12,
-            H: date.getHours(),
-            m: date.getMinutes(),
-            s: date.getSeconds(),
-            S: date.getMilliseconds()
-        };
-
-        var formatStr = format.replace(/(y+|M+|d+|h+|H+|m+|s+|S+)/g, function (e) {
-            if (e.match(/S+/))
-                return ('' + o[e.slice(-1)]).slice(0, e.length);
-            else
-                return ((e.length > 1 ? '0' : '') + o[e.slice(-1)]).slice(-(e.length > 2 ? e.length : 2));
-        });
-        return formatStr;
-    } catch (ex) {
-        return '';
-    }
-};
-//console.log(export let dateFormat(null,'yyyy-MM-dd hh:mm:ss'))
-//console.log(export let dateFormat(null,'yyyy-MM-dd H:mm:ss'))
-
-export let isInArray = function (obj, list) {
-    if (list) {
-        for (var i = 0; i < list.length; i++) {
-            var t = list[i];
-            if (t === obj) {
-                return true;
-            }
-        }
-    }
-    return false;
-};
-
-export let createToken = function (str) {
-    var code = md5(str);
-    return code;
-};
-
-export let md5 = function (data, option?) {
-    var opt = {
-        encoding: 'hex',
-    };
-    opt = extend(opt, option);
-    var md5 = crypto.createHash('md5');
-    if (typeof (data) == 'string')
-        data = new Buffer(data, 'utf8');
-    //@ts-ignore
-    var code = md5.update(data).digest(opt.encoding);
-    return code;
-};
-
-function s4() {
-    return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
-};
-
-export let guid = function () {
-    return (s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4());
 };
 
 export let logModle = function () {

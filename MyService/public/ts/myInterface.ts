@@ -16,7 +16,17 @@ let opt = {
         }
     }
 };
-export let init = function (option) {
+
+interface myInterfaceOption {
+    interfaceConfig?: {
+        [key: string]: {
+            url: string
+        }
+    },
+    moduleList?: string[]
+}
+
+export let init = function (option: myInterfaceOption) {
     opt = $.extend(opt, option);
     var interfaceConfig = opt.interfaceConfig;
     var moduleList = opt.moduleList;
@@ -35,9 +45,9 @@ export let init = function (option) {
     }
 };
 
-export let api: { [key: string]: (data, option?) => Q.Promise<any> } = {};
+export let api: MyInterfaceApi = {};
 let createFunction = function (interfaceConfig) {
-    var fun = function (data, option?) {
+    var fun = function (data, option) {
         var url = interfaceConfig.url;
         var opt = {
             url: url,
