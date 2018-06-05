@@ -90,6 +90,10 @@ export let detailQuery = function (opt) {
         };
         if (!detail.userInfo)
             return null;
+        let weight = {company: 9, department: 8, group: 7};
+        detail.structList.sort(function (a, b) {
+            return (weight[b.type] || 0) - (weight[a.type] || 0);
+        });
         updateUserInfo(detail);
         return detail;
     });
