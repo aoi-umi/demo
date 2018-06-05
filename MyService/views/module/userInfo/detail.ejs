@@ -25,7 +25,7 @@
             attr: 'id="nickname" placeholder="请输昵称"'
         },];
         var col1Class = 'col-xs-3 col-sm-2',
-            col2Class = 'col-xs-9 col-sm-8';
+                col2Class = 'col-xs-9 col-sm-8';
         if (!isReadOnly) {
             list = list.concat([{
                 content: '密码',
@@ -41,9 +41,9 @@
         list.forEach(function (item) {
         %>
         <div class="form-group">
-            <label class="<%=col1Class%> control-label"><%= item.content %></label>
+            <label class="<%= col1Class %> control-label"><%= item.content %></label>
 
-            <div class="<%=col2Class%>">
+            <div class="<%= col2Class %>">
                 <% if(item.readOnly){ %>
                 <label class="control-label">
                     <%= item.value %>
@@ -56,16 +56,27 @@
         <% }); %>
         <div class="form-group">
             <% if(!isReadOnly){ %>
-            <div class="<%=col2Class%> col-xs-push-3 col-sm-push-2">
+            <div class="<%= col2Class %> col-xs-push-3 col-sm-push-2">
                 <button type="button" class="btn btn-default btn-block save">修改</button>
             </div>
             <% } %>
         </div>
     </form>
 
-    <%var rowClass='col-sm-9 col-sm-push-1 my-row'%>
+    <% var rowClass = 'col-sm-9 col-sm-push-1 my-row' %>
     <div class="row">
-        <div class="<%=rowClass%>">
+        <div class="<%= rowClass %>">
+            <label class="control-label">架构</label>
+            <% userInfoDetail.structList.forEach(function(item, idx){ %>
+            <%= item.structName %>
+            <% if(idx != userInfoDetail.structList.length - 1){ %>
+            >
+            <% }
+            }); %>
+        </div>
+    </div>
+    <div class="row">
+        <div class="<%= rowClass %>">
             <label class="control-label">角色</label>
             <% userInfoDetail.roleList.forEach(function(item){
                 item.id = 0;
@@ -91,7 +102,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="<%=rowClass%>">
+        <div class="<%= rowClass %>">
             <label class="control-label">权限</label>
             <% userInfoDetail.authorityList.forEach(function(item){
                 item.id = 0;
@@ -103,7 +114,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="<%=rowClass%>">
+        <div class="<%= rowClass %>">
             <label class="control-label">可用权限</label>
             <% for(var key in userInfoDetail.auth){
                 var item = {
@@ -119,7 +130,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="<%=rowClass%>">
+        <div class="<%= rowClass %>">
             <label class="control-label">日志</label>
             <table class="table table-bordered">
                 <thead>
@@ -143,13 +154,13 @@
     </div>
 </div>
 <script type="text/javascript">
-    require(['./_main', './moduleUserInfo'], function () {
-        var main = require('./_main'),
-	        moduleUserInfo = require('./moduleUserInfo');
-        main.init();
-        var opt = {
-            operation: ['save']
-        }
-        new moduleUserInfo.ModuleUserInfo(opt);
-    })
+	require(['./_main', './moduleUserInfo'], function () {
+		var main = require('./_main'),
+			moduleUserInfo = require('./moduleUserInfo');
+		main.init();
+		var opt = {
+			operation: ['save']
+		}
+		new moduleUserInfo.ModuleUserInfo(opt);
+	})
 </script>

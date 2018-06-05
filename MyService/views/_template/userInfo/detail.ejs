@@ -23,7 +23,10 @@
         <label class="control-label">架构</label><a name="refreshStruct" href="javascript:;">刷新</a>
     </div>
     <div name="structBox" class="row my-row">
-        <div class="col-xs-2 struct"><select class="form-control"></select></div>
+        <% var structTypeList = ['company', 'department', 'group'];
+        structTypeList.forEach(ele=>{ %>
+        <div class="col-xs-2"><select class="form-control" name="<%= ele %>"></select></div>
+        <% }) ; %>
         <span class="text-danger msg"></span>
     </div>
 </div>

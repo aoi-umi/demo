@@ -71,33 +71,13 @@ export class ModuleMainContentType extends MyModule {
                     }
                     var data = {};
                     myInterface.api.mainContentTypeQuery(data).then(function (t) {
-                        var rootTree = {};
-                        var itemTree = {};
                         $('.tree').empty();
                         var list = t.list.sort(function(a, b){
                             return b.level - a.level;
                         });
-
-                        function setTree(tree, parentType, list) {
-                            $(list).each(function (i) {
-                                let item: any = this;
-                                if (!itemTree[item.type])
-                                    itemTree[item.type] = {item: item, inRoot: false};
-                                if (item.parentType == parentType) {
-                                    itemTree[item.type].inRoot = true;
-                                    if (!tree[item.type]) {
-                                        tree[item.type] = {
-                                            item: item,
-                                            child: {},
-                                            inRoot: true,
-                                        }
-                                    }
-                                    setTree(tree[item.type].child, item.type, list);
-                                }
-                            });
-                        }
-
-                        setTree(rootTree, '', list);
+                        let tree = common.getTree(list, '', null, 'type', 'parentType');
+                        let itemTree = tree.itemTree;
+                        var rootTree = tree.rootTree;
                         var temp = $('#mainContentTypeTreeItem').html();
 
                         function renderTree(leave, treeDom) {
