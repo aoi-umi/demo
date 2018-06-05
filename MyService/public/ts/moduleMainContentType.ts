@@ -10,13 +10,9 @@ import * as myInterface from './myInterface';
 import * as myVaild from './myVaild';
 import {MyModule, ModuleOption} from './myModule';
 
-class ModuleMainContentTypeOption extends ModuleOption {
-    updateView?(list: string[], opt, self: MyModule);
-}
-
 export class ModuleMainContentType extends MyModule {
-    constructor(option?: ModuleMainContentTypeOption) {
-        var opt: ModuleMainContentTypeOption = {
+    constructor(option?: ModuleOption) {
+        var opt: ModuleOption = {
             operation: ['query', 'save', 'del', 'detailQuery'],
             queryId: 'search',
             queryItemTempId: 'mainContentTypeItem',
@@ -72,7 +68,7 @@ export class ModuleMainContentType extends MyModule {
                     var data = {};
                     myInterface.api.mainContentTypeQuery(data).then(function (t) {
                         $('.tree').empty();
-                        var list = t.list.sort(function(a, b){
+                        var list = t.list.sort(function (a, b) {
                             return b.level - a.level;
                         });
                         let tree = common.getTree(list, '', null, 'type', 'parentType');
@@ -125,9 +121,8 @@ export class ModuleMainContentType extends MyModule {
                 if (!data.id) data.id = null;
                 if (!data.level) data.level = null;
             },
-            editAfterRender: function (item, self) {
-                let selfOpt = self.opt as ModuleMainContentTypeOption;
-                selfOpt.updateView(['mainContentTypeDetail'], {mainContentTypeDetail: item}, self);
+            editAfterRender: function (item, self: ModuleMainContentType) {
+                self.updateView(['mainContentTypeDetail'], {mainContentTypeDetail: item});
                 self.detailDom.modal('show');
             },
             beforeSave: function (dom, self) {
@@ -164,26 +159,27 @@ export class ModuleMainContentType extends MyModule {
                     }]
                 });
             },
-            onDetailQuerySuccess: function (t, self) {
-                let selfOpt = self.opt as ModuleMainContentTypeOption;
+            onDetailQuerySuccess: function (t, self: ModuleMainContentType) {
                 self.detailRender(t);
-                selfOpt.updateView(['mainContentTypeDetail'], {mainContentTypeDetail: t}, self);
+                self.updateView(['mainContentTypeDetail'], {mainContentTypeDetail: t});
                 self.detailDom.modal('show');
             },
-            updateView: function (list, opt, self) {
-                if (!list || common.isInArray('mainContentTypeDetail', list)) {
-                    if (opt.mainContentTypeDetail) {
-                        self.detailDom.find('.title').html(opt.mainContentTypeDetail.id ? ('修改:' + opt.mainContentTypeDetail.id) : '新增');
-                        if (common.isInArray('save', opt.mainContentTypeDetail.operation)) {
-                            self.detailDom.find('.footer').show();
-                        } else {
-                            self.detailDom.find('.footer').hide();
-                        }
-                    }
-                }
-            }
         };
         opt = $.extend(opt, option);
         super(opt);
+    }
+
+    updateView(list, opt) {
+        let self = this;
+        if (!list || common.isInArray('mainContentTypeDetail', list)) {
+            if (opt.mainContentTypeDetail) {
+                self.detailDom.find('.title').html(opt.mainContentTypeDetail.id ? ('修改:' + opt.mainContentTypeDetail.id) : '新增');
+                if (common.isInArray('save', opt.mainContentTypeDetail.operation)) {
+                    self.detailDom.find('.footer').show();
+                } else {
+                    self.detailDom.find('.footer').hide();
+                }
+            }
+        }
     }
 }

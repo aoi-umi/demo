@@ -8,13 +8,9 @@ import * as myInterface from './myInterface';
 import * as myVaild from './myVaild';
 import {MyModule, ModuleOption} from './myModule';
 
-class ModuleAuthorityOption extends ModuleOption {
-    updateView?(list: string[], opt, self: MyModule);
-}
-
 export class ModuleAuthority extends MyModule {
-    constructor(option?: ModuleAuthorityOption) {
-        var opt: ModuleAuthorityOption = {
+    constructor(option?: ModuleOption) {
+        var opt: ModuleOption = {
             operation: ['query', 'save', 'detailQuery'],
             queryId: 'query',
             queryItemTempId: 'itemTemp',
@@ -70,9 +66,8 @@ export class ModuleAuthority extends MyModule {
                 });
             },
 
-            editAfterRender: function (item, self) {
-                let selfOpt = self.opt as ModuleAuthorityOption;
-                selfOpt.updateView(['authorityDetail'], {authorityDetail: item}, self);
+            editAfterRender: function (item, self: ModuleAuthority) {
+                self.updateView(['authorityDetail'], {authorityDetail: item});
                 self.detailDom.modal('show');
             },
             beforeSave: function (dom, self) {
@@ -129,29 +124,29 @@ export class ModuleAuthority extends MyModule {
                     }]
                 });
             },
-            onDetailQuerySuccess: function (t, self) {
-                let selfOpt = self.opt as ModuleAuthorityOption;
+            onDetailQuerySuccess: function (t, self: ModuleAuthority) {
                 self.detailRender(t);
-                selfOpt.updateView(['authorityDetail'], {authorityDetail: t}, self);
+                self.updateView(['authorityDetail'], {authorityDetail: t});
                 self.detailDom.modal('show');
             },
-
-            updateView: function (list, opt, self) {
-                if (!list || common.isInArray('authorityDetail', list)) {
-                    if (opt.authorityDetail) {
-                        var authority = opt.authorityDetail;
-                        self.detailDom.find('.title').html(authority.id ? ('修改:' + authority.id) : '新增');
-                        if (common.isInArray('save', opt.authorityDetail.operation)) {
-                            self.detailDom.find('.footer').show();
-                        } else {
-                            self.detailDom.find('.footer').hide();
-                        }
-                    }
-                }
-            }
         };
 
         opt = $.extend(opt, option);
         super(opt);
+    }
+
+    updateView(list, opt) {
+        let self = this;
+        if (!list || common.isInArray('authorityDetail', list)) {
+            if (opt.authorityDetail) {
+                var authority = opt.authorityDetail;
+                self.detailDom.find('.title').html(authority.id ? ('修改:' + authority.id) : '新增');
+                if (common.isInArray('save', opt.authorityDetail.operation)) {
+                    self.detailDom.find('.footer').show();
+                } else {
+                    self.detailDom.find('.footer').hide();
+                }
+            }
+        }
     }
 }

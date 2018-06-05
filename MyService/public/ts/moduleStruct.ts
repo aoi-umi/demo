@@ -11,13 +11,9 @@ import * as myVaild from './myVaild';
 import * as myEnum from './myEnum';
 import {MyModule, ModuleOption} from './myModule';
 
-class ModuleStructOption extends ModuleOption {
-    updateView?(list: string[], opt, self: MyModule);
-}
-
 export class ModuleStruct extends MyModule {
-    constructor(option?: ModuleStructOption) {
-        var opt: ModuleStructOption = {
+    constructor(option?: ModuleOption) {
+        var opt: ModuleOption = {
             operation: ['query', 'save', 'del', 'detailQuery'],
             queryId: 'search',
             queryItemTempId: 'structItem',
@@ -154,9 +150,8 @@ export class ModuleStruct extends MyModule {
                 item.structTypeEnum = myEnum.getEnum('structTypeEnum');
                 return item;
             },
-            editAfterRender: function (item, self) {
-                let selfOpt = self.opt as ModuleStructOption;
-                selfOpt.updateView(['structDetail'], {structDetail: item}, self);
+            editAfterRender: function (item, self: ModuleStruct) {
+                self.updateView(['structDetail'], {structDetail: item});
                 self.detailDom.modal('show');
             },
             beforeSave: function (dom, self) {
@@ -198,27 +193,28 @@ export class ModuleStruct extends MyModule {
                     }]
                 });
             },
-            onDetailQuerySuccess: function (t, self) {
-                let selfOpt = self.opt as ModuleStructOption;
+            onDetailQuerySuccess: function (t, self: ModuleStruct) {
                 t.structTypeEnum = myEnum.getEnum('structTypeEnum');
                 self.detailRender(t);
-                selfOpt.updateView(['structDetail'], {structDetail: t}, self);
+                self.updateView(['structDetail'], {structDetail: t});
                 self.detailDom.modal('show');
             },
-            updateView: function (list, opt, self) {
-                if (!list || common.isInArray('structDetail', list)) {
-                    if (opt.structDetail) {
-                        self.detailDom.find('.title').html(opt.structDetail.id ? ('修改:' + opt.structDetail.id) : '新增');
-                        if (common.isInArray('save', opt.structDetail.operation)) {
-                            self.detailDom.find('.footer').show();
-                        } else {
-                            self.detailDom.find('.footer').hide();
-                        }
-                    }
-                }
-            }
         };
         opt = $.extend(opt, option);
         super(opt);
+    }
+
+    updateView(list, opt) {
+        let self = this;
+        if (!list || common.isInArray('structDetail', list)) {
+            if (opt.structDetail) {
+                self.detailDom.find('.title').html(opt.structDetail.id ? ('修改:' + opt.structDetail.id) : '新增');
+                if (common.isInArray('save', opt.structDetail.operation)) {
+                    self.detailDom.find('.footer').show();
+                } else {
+                    self.detailDom.find('.footer').hide();
+                }
+            }
+        }
     }
 }
