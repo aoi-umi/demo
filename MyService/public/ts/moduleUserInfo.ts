@@ -12,9 +12,6 @@ import * as myVaild from './myVaild';
 import {MyModule, ModuleOption} from './myModule';
 import {AuthorityAutoComplete, RoleAutoComplete} from './autoComplete';
 
-class ModuleUserInfoOption extends ModuleOption {
-}
-
 export class ModuleUserInfo extends MyModule {
     currUserId: number;
     currUserDetail: any;
@@ -22,8 +19,8 @@ export class ModuleUserInfo extends MyModule {
     roleAutoComplete: RoleAutoComplete;
     structTree: any;
 
-    constructor(option?: ModuleUserInfoOption) {
-        var opt: ModuleUserInfoOption = {
+    constructor(option?: ModuleOption) {
+        var opt: ModuleOption = {
             operation: ['query', 'save', 'detailQuery'],
             queryId: 'search',
             queryItemTempId: 'itemTemp',

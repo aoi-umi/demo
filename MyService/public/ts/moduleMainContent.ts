@@ -11,23 +11,11 @@ import * as myInterface from './myInterface';
 import * as myVaild from './myVaild';
 import {MyModule, ModuleOption} from './myModule';
 
-class ModuleMainContentOption extends ModuleOption {
-    statusUpdate?(dom, self: MyModule);
-
-    updateView?(list: string[], self: MyModule);
-
-    getDefaultMainCotentChild?(self: MyModule);
-
-    setMainContentChildDetail?(item: any, self: MyModule);
-
-    onStatusUpdateSuccess?(self: MyModule);
-}
-
 export class ModuleMainContent extends MyModule {
     mainContentTypeList: Array<any>;
 
-    constructor(option?: ModuleMainContentOption) {
-        var opt: ModuleMainContentOption = {
+    constructor(option?: ModuleOption) {
+        var opt: ModuleOption = {
             operation: [],
             queryId: 'search',
             queryItemTempId: 'mainContentItem',
@@ -102,7 +90,6 @@ export class ModuleMainContent extends MyModule {
                 }
             },
             bindEvent: function (self: ModuleMainContent) {
-                let selfOpt = self.opt as ModuleMainContentOption;
                 if (self.operation.query) {
                     $('#createDateStart').on('click', function () {
                         var datePickerArgs = {
@@ -161,7 +148,7 @@ export class ModuleMainContent extends MyModule {
                 }
 
                 $(document).on('click', '.statusUpdate', function () {
-                    selfOpt.statusUpdate($(this), self);
+                    self.statusUpdate($(this));
                 });
 
                 if (self.operation.detailQuery) {
@@ -171,11 +158,11 @@ export class ModuleMainContent extends MyModule {
                         if (item.id)
                             self.variable.delMainContentChildList.push(item.id);
                         row.remove();
-                        selfOpt.updateView(['mainContentChild'], self);
+                        self.updateView(['mainContentChild']);
                     });
 
                     $(document).on('click', '#mainContentChildList .itemEdit', function () {
-                        selfOpt.setMainContentChildDetail($(this).closest(self.rowClass).data('item'), self);
+                        self.setMainContentChildDetail($(this).closest(self.rowClass).data('item'));
                         $('#mainContentChild').modal('show');
                     });
                     $('#mainContentChildList').on('click', '.moveUp, .moveDown', function () {
@@ -192,12 +179,12 @@ export class ModuleMainContent extends MyModule {
                         }
                         if (row.length && secondRow.length) {
                             row.after(secondRow);
-                            selfOpt.updateView(['mainContentChild'], self);
+                            self.updateView(['mainContentChild']);
                         }
                     });
 
                     $('#showMainContentChild').on('click', function () {
-                        selfOpt.setMainContentChildDetail(null, self);
+                        self.setMainContentChildDetail(null);
                         $('#mainContentChild').modal('show');
                     });
                     $('#addMainContentChild').on('click', function () {
@@ -372,81 +359,88 @@ export class ModuleMainContent extends MyModule {
             },
             onDetailQuerySuccess: function (t, self) {
             },
-
-            getDefaultMainCotentChild: function (self) {
-                return self.variable.defaultMainCotentChild;
-            },
-            setMainContentChildDetail: function (item, self) {
-                var mainContentChildDetailDom = $('#mainContentChildDetail');
-                if (!item) {
-                    mainContentChildDetailDom.data('item', {num: $(`#mainContentChildList ${self.rowClass}`).length + 1});
-                    mainContentChildDetailDom.find(':input').val('');
-                    mainContentChildDetailDom.find('option:eq(0)').prop('selected', true);
-                } else {
-                    mainContentChildDetailDom.data('item', item);
-                    mainContentChildDetailDom.find('[name=content]').val(item.content);
-                    mainContentChildDetailDom.find(`[name=type] option[value=${item.type}]`).prop('selected', true);
-                }
-            },
-            updateView: function (updateList, self) {
-                if (!updateList || common.isInArray('mainContentChild', updateList)) {
-                    $(`#mainContentChildList ${self.rowClass}`).each(function (index) {
-                        var row = $(this);
-                        var val = index + 1;
-                        row.attr('data-num', val);
-                        row.data('item').num = val;
-                        row.find('[name=num]').text(val);
-                    });
-                }
-            },
-
-            statusUpdate: function (dom, self) {
-                let selfOpt = self.opt as ModuleMainContentOption;
-                var mainContent: any = {id: dom.data('id')};
-                return common.promise(function () {
-                    var operate = dom.data('operate');
-                    mainContent.operate = operate;
-                    var operateList = ['audit', 'pass', 'notPass', 'del', 'recovery'];
-                    if (!common.isInArray(operate, operateList))
-                        throw new Error(`错误的操作类型[${operate}]`);
-                    var detail = {
-                        mainContent: mainContent,
-                        remark: $('#remark').val()
-                    };
-                    var notice = common.msgNotice({type: 1, msg: '处理中', noClose: true});
-                    return myInterface.api.mainContentStatusUpdate(detail).then(function () {
-                        common.msgNotice({
-                            type: 1, msg: '处理成功!', btnOptList: {
-                                content: '确认',
-                                cb: function () {
-                                    selfOpt.onStatusUpdateSuccess(self);
-                                }
-                            }
-                        });
-                    }).finally(function () {
-                        notice.close();
-                    });
-                }).fail(function (e) {
-                    if (e && e.message)
-                        e = e.message;
-                    common.msgNotice({
-                        type: 1, msg: '处理失败:' + e, btnOptList: {
-                            content: '确认',
-                            cb: function () {
-                            }
-                        }
-                    });
-                    throw e;
-                });
-            },
-            onStatusUpdateSuccess: function (self) {
-                if (self.operation.query)
-                    self.queryDom.click();
-                else
-                    location.reload(true);
-            }
         };
         opt = $.extend(opt, option);
         super(opt);
+    }
+
+    getDefaultMainCotentChild() {
+        let self = this;
+        return self.variable.defaultMainCotentChild;
+    }
+
+    setMainContentChildDetail(item) {
+        let self = this;
+        var mainContentChildDetailDom = $('#mainContentChildDetail');
+        if (!item) {
+            mainContentChildDetailDom.data('item', {num: $(`#mainContentChildList ${self.rowClass}`).length + 1});
+            mainContentChildDetailDom.find(':input').val('');
+            mainContentChildDetailDom.find('option:eq(0)').prop('selected', true);
+        } else {
+            mainContentChildDetailDom.data('item', item);
+            mainContentChildDetailDom.find('[name=content]').val(item.content);
+            mainContentChildDetailDom.find(`[name=type] option[value=${item.type}]`).prop('selected', true);
+        }
+    }
+
+    updateView(updateList) {
+        let self = this;
+        if (!updateList || common.isInArray('mainContentChild', updateList)) {
+            $(`#mainContentChildList ${self.rowClass}`).each(function (index) {
+                var row = $(this);
+                var val = index + 1;
+                row.attr('data-num', val);
+                row.data('item').num = val;
+                row.find('[name=num]').text(val);
+            });
+        }
+    }
+
+    statusUpdate(dom) {
+        let self = this;
+        var mainContent: any = {id: dom.data('id')};
+        return common.promise(function () {
+            var operate = dom.data('operate');
+            mainContent.operate = operate;
+            var operateList = ['audit', 'pass', 'notPass', 'del', 'recovery'];
+            if (!common.isInArray(operate, operateList))
+                throw new Error(`错误的操作类型[${operate}]`);
+            var detail = {
+                mainContent: mainContent,
+                remark: $('#remark').val()
+            };
+            var notice = common.msgNotice({type: 1, msg: '处理中', noClose: true});
+            return myInterface.api.mainContentStatusUpdate(detail).then(function () {
+                common.msgNotice({
+                    type: 1, msg: '处理成功!', btnOptList: {
+                        content: '确认',
+                        cb: function () {
+                            self.onStatusUpdateSuccess();
+                        }
+                    }
+                });
+            }).finally(function () {
+                notice.close();
+            });
+        }).fail(function (e) {
+            if (e && e.message)
+                e = e.message;
+            common.msgNotice({
+                type: 1, msg: '处理失败:' + e, btnOptList: {
+                    content: '确认',
+                    cb: function () {
+                    }
+                }
+            });
+            throw e;
+        });
+    }
+
+    onStatusUpdateSuccess() {
+        let self = this;
+        if (self.operation.query)
+            self.queryDom.click();
+        else
+            location.reload(true);
     }
 }

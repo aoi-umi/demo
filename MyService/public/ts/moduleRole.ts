@@ -8,18 +8,12 @@ import * as myVaild from './myVaild';
 import {MyModule, ModuleOption} from './myModule';
 import {AuthorityAutoComplete} from './autoComplete';
 
-class ModuleRoleOption extends ModuleOption {
-    updateView?(list: string[], opt, self: MyModule);
-
-    setAuthorityAutoComplete?(self: MyModule);
-}
-
 export class ModuleRole extends MyModule {
     currRoleCode: string;
     authorityAutoComplete: AuthorityAutoComplete;
 
-    constructor(option?: ModuleRoleOption) {
-        var opt: ModuleRoleOption = {
+    constructor(option?: ModuleOption) {
+        var opt: ModuleOption = {
             operation: ['query', 'save', 'detailQuery'],
             queryId: 'query',
             queryItemTempId: 'itemTemp',
@@ -108,9 +102,8 @@ export class ModuleRole extends MyModule {
                 });
             },
 
-            editAfterRender: function (item, self) {
-                let selfOpt = self.opt as ModuleRoleOption;
-                selfOpt.updateView(['roleDetail'], {roleDetail: item}, self);
+            editAfterRender: function (item, self: ModuleRole) {
+                self.updateView(['roleDetail'], {roleDetail: item});
                 self.detailDom.modal('show');
             },
             beforeSave: function (dom, self) {
@@ -189,53 +182,52 @@ export class ModuleRole extends MyModule {
                 return {code: t.code};
             },
             onDetailQuerySuccess: function (t, self: ModuleRole) {
-                let selfOpt = self.opt as ModuleRoleOption;
                 self.detailRender(t.role);
                 self.currRoleCode = t.role.code;
-                selfOpt.updateView(['roleDetail'], {roleAllDetail: t}, self);
+                self.updateView(['roleDetail'], {roleAllDetail: t});
                 self.detailDom.modal('show');
             },
             editBeforeRender: function (data, self: ModuleRole) {
-                let selfOpt = self.opt as ModuleRoleOption;
                 self.currRoleCode = null;
                 return data;
             },
-
-            updateView: function (list, opt, self: ModuleRole) {
-                let selfOpt = self.opt as ModuleRoleOption;
-                if (!list || common.isInArray('roleDetail', list)) {
-                    selfOpt.setAuthorityAutoComplete(self);
-
-                    if (opt.roleAllDetail) {
-                        opt.roleDetail = opt.roleAllDetail.role;
-                        opt.roleDetail.operation = opt.roleAllDetail.operation;
-                        $(opt.roleAllDetail.authorityList).each(function (i, item) {
-                            self.authorityAutoComplete.setAuthority(item);
-                        });
-                    }
-                    if (opt.roleDetail) {
-                        self.detailDom.find('.footer').hide();
-                        var role = opt.roleDetail;
-                        self.detailDom.find('.title').html(role.id ? ('修改:' + role.id) : '新增');
-                        if (common.isInArray('save', opt.roleDetail.operation)) {
-                            self.detailDom.find('.footer').show();
-                        }
-                    }
-                }
-            },
-            setAuthorityAutoComplete: function (self: ModuleRole) {
-                let selfOpt = self.opt as ModuleRoleOption;
-                self.authorityAutoComplete = new AuthorityAutoComplete({
-                    dom: self.detailContainerDom.find('[name=authority]'),
-                    renderDom: self.detailContainerDom.find('[name=authorityBox]'),
-                    labelName: 'roleAuthority'
-                });
-
-                self.authorityAutoComplete.excludeByRoleCode = self.currRoleCode;
-            }
         };
 
         opt = $.extend(opt, option);
         super(opt);
+    }
+
+    updateView(list, opt) {
+        let self = this;
+        if (!list || common.isInArray('roleDetail', list)) {
+            self.setAuthorityAutoComplete();
+
+            if (opt.roleAllDetail) {
+                opt.roleDetail = opt.roleAllDetail.role;
+                opt.roleDetail.operation = opt.roleAllDetail.operation;
+                $(opt.roleAllDetail.authorityList).each(function (i, item) {
+                    self.authorityAutoComplete.setAuthority(item);
+                });
+            }
+            if (opt.roleDetail) {
+                self.detailDom.find('.footer').hide();
+                var role = opt.roleDetail;
+                self.detailDom.find('.title').html(role.id ? ('修改:' + role.id) : '新增');
+                if (common.isInArray('save', opt.roleDetail.operation)) {
+                    self.detailDom.find('.footer').show();
+                }
+            }
+        }
+    }
+
+    setAuthorityAutoComplete() {
+        let self = this;
+        self.authorityAutoComplete = new AuthorityAutoComplete({
+            dom: self.detailContainerDom.find('[name=authority]'),
+            renderDom: self.detailContainerDom.find('[name=authorityBox]'),
+            labelName: 'roleAuthority'
+        });
+
+        self.authorityAutoComplete.excludeByRoleCode = self.currRoleCode;
     }
 }
