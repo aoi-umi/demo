@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50722
 File Encoding         : 65001
 
-Date: 2018-06-04 10:20:18
+Date: 2018-06-05 15:59:10
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -487,6 +487,8 @@ BEGIN
 		LEFT JOIN t_role_with_authority t3 ON t2.roleCode = t3.roleCode 
 		LEFT JOIN t_authority t4 ON t3.authorityCode = t4.`code`
 		WHERE t2.userInfoId = pr_id;
+	-- 架构
+	SELECT * FROM t_struct t1 WHERE t1.struct in (SELECT t2.struct FROM t_user_info_with_struct t2 WHERE t2.userInfoId = pr_id);
 END
 ;;
 DELIMITER ;
@@ -642,6 +644,59 @@ BEGIN
 		LEFT JOIN t_role_with_authority t3 ON t2.roleCode = t3.roleCode 
 		LEFT JOIN t_authority t4 ON t3.authorityCode = t4.`code`
 		WHERE t2.userInfoId in (SELECT id FROM temp_p_user_info_query00);
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for p_user_info_with_struct_query
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `p_user_info_with_struct_query`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p_user_info_with_struct_query`(pr_id int,
+	pr_userInfoId int,
+	pr_struct varchar(50),
+	pr_orderBy varchar(1000),
+	pr_nullList varchar(1000),
+	pr_pageIndex int,
+	pr_pageSize int)
+    SQL SECURITY INVOKER
+BEGIN 
+	IF pr_nullList IS NULL THEN
+		SET pr_nullList = '';
+	END IF;
+	SET pr_nullList = CONCAT(',', pr_nullList, ',');
+
+	SET @Sql ='SELECT SQL_CALC_FOUND_ROWS t1.*, t2.type FROM t_user_info_with_struct t1 LEFT JOIN t_struct t2 ON t1.struct = t2.struct WHERE 1 = 1 ';
+	IF pr_id IS NOT NULL AND length(pr_id) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND t1.`id` = ''', pr_id, '''');
+	ELSEIF LOCATE(',id,', pr_nullList) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND t1.`id` IS NULL');
+	END IF;
+
+	IF pr_userInfoId IS NOT NULL AND length(pr_userInfoId) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND t1.`userInfoId` = ''', pr_userInfoId, '''');
+	ELSEIF LOCATE(',userInfoId,', pr_nullList) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND t1.`userInfoId` IS NULL');
+	END IF;
+
+	IF pr_struct IS NOT NULL AND length(pr_struct) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND t1.`struct` = ''', replace_special_char(pr_struct), '''');
+	ELSEIF LOCATE(',struct,', pr_nullList) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND t1.`struct` IS NULL');
+	END IF;
+
+	IF pr_orderBy IS NOT NULL AND length(pr_orderBy) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' ORDER BY ', replace_special_char(pr_orderBy));
+	END IF;
+	IF pr_pageIndex IS NOT NULL AND pr_pageSize IS NOT NULL THEN
+		SET @Sql = CONCAT(@Sql, ' limit ', (pr_pageIndex - 1) * pr_pageSize, ',', pr_pageSize);
+	END IF;
+	SET @Sql = CONCAT(@Sql, ';');
+	-- SELECT @Sql;
+	PREPARE stmt1 FROM @Sql;
+	EXECUTE stmt1;
+	SELECT FOUND_ROWS() AS 'count';
 END
 ;;
 DELIMITER ;

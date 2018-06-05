@@ -6,6 +6,7 @@ import * as common from '../_system/common';
 import errorConfig from '../_system/errorConfig';
 import * as cache from '../_system/cache';
 import * as autoBll from './_auto';
+import * as userInfoWithStructBll from './userInfoWithStruct';
 import * as userInfoDal from '../dal/userInfo';
 
 export let isAccountExist = function (account) {
@@ -84,7 +85,8 @@ export let detailQuery = function (opt) {
             authorityList: t[2],
             roleList: t[3],
             roleAuthorityList: t[4],
-            auth: {}
+            auth: {},
+            structList: t[5]
         };
         if (!detail.userInfo)
             return null;
@@ -160,6 +162,7 @@ export let adminSave = function (opt, exOpt) {
             throw common.error('id为空', errorConfig.CAN_NOT_BE_EMPTY);
         return autoBll.query('userInfoWithAuthority', {userInfoId: id});
     }).then(function (t) {
+        //权限
         delUserAuthList = t.list.filter((dbAuth) => {
             return opt.delAuthorityList.findIndex((delAuth) => {
                 return dbAuth.authorityCode == delAuth;
@@ -172,6 +175,7 @@ export let adminSave = function (opt, exOpt) {
         });
         return autoBll.query('userInfoWithRole', {userInfoId: id});
     }).then(function (t) {
+        //角色
         delUserRoleList = t.list.filter((dbAuth) => {
             return opt.delRoleList.findIndex((delAuth) => {
                 return dbAuth.roleCode == delAuth;
@@ -183,6 +187,22 @@ export let adminSave = function (opt, exOpt) {
             }) < 0;
         });
 
+        return userInfoWithStructBll.query({userInfoId: id});
+    }).then(function (t) {
+        let structList = [];
+        let structTypeList = ['company', 'department', 'group'];
+        structTypeList.forEach(structType => {
+            let matchStruct = opt.structList.find(ele => ele.type == structType);
+            let dbMatchStruct = t.list.find(ele => ele.type == structType);
+            if (matchStruct) {
+                structList.push({
+                    id: dbMatchStruct ? dbMatchStruct.id : 0,
+                    userInfoId: id,
+                    struct: matchStruct.struct
+                })
+            }
+        });
+        // console.log(structList);
         // console.log(delUserRoleList)
         // console.log(addUserRoleList)
         // console.log(delUserAuthList)
@@ -195,6 +215,10 @@ export let adminSave = function (opt, exOpt) {
         }
         if (delUserAuthList.length || addUserAuthList.length) {
             userInfoLog.content += '[修改了权限]';
+            isChanged = true;
+        }
+        if (structList.length) {
+            userInfoLog.content += '[修改了架构]';
             isChanged = true;
         }
         if (!isChanged)
@@ -225,6 +249,13 @@ export let adminSave = function (opt, exOpt) {
                 if (addUserRoleList.length) {
                     addUserRoleList.forEach(function (item) {
                         list.push(autoBll.save('userInfoWithRole', {userInfoId: id, roleCode: item}));
+                    });
+                }
+
+                //修改架构
+                if (structList.length) {
+                    structList.forEach(function (item) {
+                        list.push(autoBll.save('userInfoWithStruct', item));
                     });
                 }
 

@@ -74,13 +74,13 @@ export class MyModule extends ModuleBase {
 
     pager = null;
 
-    queryDom = null;
-    queryContainerDom = null;
+    queryDom: JQuery<HTMLElement> = null;
+    queryContainerDom: JQuery<HTMLElement> = null;
     queryItemTemp = null;
 
-    detailDom = null;
-    detailQueryDom = null;
-    detailContainerDom = null;
+    detailDom: JQuery<HTMLElement> = null;
+    detailQueryDom: JQuery<HTMLElement> = null;
+    detailContainerDom: JQuery<HTMLElement> = null;
     detailTemp = null;
 
     operation = {

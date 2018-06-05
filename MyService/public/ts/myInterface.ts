@@ -2,6 +2,7 @@
  * Created by bang on 2017-9-11.
  */
 import * as common from './common';
+
 let opt = {
     interfaceConfig: {},
     moduleList: [],
@@ -34,9 +35,9 @@ export let init = function (option) {
     }
 };
 
-export let api: any = {};
+export let api: { [key: string]: (data, option?) => Q.Promise<any> } = {};
 let createFunction = function (interfaceConfig) {
-    var fun = function (data, option) {
+    var fun = function (data, option?) {
         var url = interfaceConfig.url;
         var opt = {
             url: url,

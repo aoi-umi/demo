@@ -670,3 +670,42 @@ export let getBrowserType = function () {
         return 'IE';
     }
 };
+
+export let getTree = function (list: any[], parent, tree?, key = 'key', parentKey = 'parentKey') {
+    var rootTree = tree || {};
+    var itemTree = {};
+
+    function setTree(list, parent, tree, key, parentKey) {
+        $(list).each(function (i) {
+            let item: any = this;
+            if (!itemTree[item[key]])
+                itemTree[item[key]] = {item: item, inRoot: false};
+            if (item[parentKey] == parent) {
+                itemTree[item[key]].inRoot = true;
+                if (!tree[item[key]]) {
+                    tree[item[key]] = itemTree[item[key]];
+                    tree[item[key]].child = {};
+                }
+                setTree(list, item[key], tree[item[key]].child, key, parentKey);
+            }
+        });
+    }
+
+    setTree(list, '', rootTree, key, parentKey);
+    return {
+        rootTree,
+        itemTree
+    }
+}
+
+export let findInTree = function (tree, key) {
+    if (tree) {
+        if (tree[key])
+            return tree[key];
+        for (let k in tree) {
+            let match = findInTree(tree[k].child, key);
+            if (match)
+                return match;
+        }
+    }
+}

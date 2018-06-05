@@ -5,9 +5,9 @@
     </div>
     <div class="input-group">
         <span class="input-group-addon">type</span>
-        <select type="text" class="form-control" name="type" value="<%= type %>">
+        <select type="text" class="form-control" name="type">
             <% for(let key in structTypeEnum){ %>
-            <option value="<%= key %>"><%= structTypeEnum[key] %></option>
+            <option value="<%= key %>" <%= type == key ? 'selected' : '' %>><%= structTypeEnum[key] %></option>
             <% } %>
         </select>
     </div>
