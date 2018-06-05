@@ -72,7 +72,7 @@ export class MyModule extends ModuleBase {
         this.init(option);
     }
 
-    pager = null;
+    pager: MyPager = null;
 
     queryDom: JQuery<HTMLElement> = null;
     queryContainerDom: JQuery<HTMLElement> = null;
