@@ -13,7 +13,12 @@ interface TabContextMenu extends JQuery<HTMLElement> {
     currTab?: JQuery<HTMLElement>;
 }
 
-export let opt: any = {
+interface MyTabInitOption {
+    tabContainer?: string;
+    panelContainer?: string;
+    closeBtnTemplate? :string;
+}
+export let opt: MyTabInitOption = {
     tabContainer: 'tab',
     panelContainer: 'panel',
     closeBtnTemplate: '<button name="tab-close-btn" type="button" class="close hidden" data-close-target="" aria-hidden="true" style="margin-left: 5px;float: none"><span class="glyphicon glyphicon-remove"></span></button>'
@@ -23,7 +28,8 @@ export let panelContainer: JQuery<HTMLElement>;
 export let tabHeaderContextMenu: TabHeaderContextMenu;
 export let tabContextMenu: TabContextMenu;
 export let clickTabIdList = [];
-export let init = function (option) {
+
+export let init = function (option: MyTabInitOption) {
 
     opt = $.extend(opt, option);
     tabContainer = $('#' + opt.tabContainer);

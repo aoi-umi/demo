@@ -33,10 +33,7 @@ app.use(main.init({viewPath: app.get('views')}));
 app.use(auth.check);
 
 //注册路由
-app.use(main.routes);
-
-//按routeConfig 注册路由
-main.register(app, main.routeConfig);
+main.register(app);
 
 /// catch 404 and forwarding to error handler
 app.use(function (req, res, next) {

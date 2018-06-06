@@ -10,10 +10,10 @@ declare global {
                     methodName?: string
                 };
                 user: {
-                    id: number,
-                    nickname: string,
-                    account: string,
-                    authority: { [key: string]: boolean }
+                    id: number;
+                    nickname: string;
+                    account: string;
+                    authority: { [key: string]: boolean };
                 };
                 viewPath: string;
                 noNav?: boolean;

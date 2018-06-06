@@ -10,30 +10,6 @@ import myMulter from './_system/myMulter';
 
 import config from '../config';
 
-type RouteConfig = {
-    url: string | RegExp,
-    method: string,
-    functionName?: string,//为空时按method
-    methodName?: string,//用于记录日志
-    path?: string,//为空时则按url
-    middleware?: any[]
-}
-//路由配置 文件必须在routes目录下
-export let routeConfig: RouteConfig[] = [
-    {
-        url: /\/interface\/([\s\S]+)\/([\s\S]+)/,
-        method: 'post',
-        methodName: 'module-method',
-        path: '/module/_interface',
-    },
-    {
-        url: '*',
-        method: 'get',
-        methodName: 'module-view',
-        path: '/module/_view',
-    }
-];
-
 //访问权限配置
 export let accessableUrlConfig = [
     {url: '/'},
@@ -333,71 +309,23 @@ export let init = function (opt) {
     };
 };
 
+import * as _interface from './module/_interface';
+import * as view from './module/_view';
 //注册路由
-export let routes = express();
-routes.get('/msg', require('./index').msg);
-routes.post('/interface/upload', myMulter.any(), require('./index').upload);
+export let register = function (app) {
+    app.get('/msg', require('./index').msg);
+    app.post('/interface/upload', myMulter.any(), require('./index').upload);
 
-//按配置注册路由
-export let register = function (app, routeConfig: RouteConfig[]) {
-    var routeList = [];
-    routeConfig.forEach(function (route) {
-        var method = route.method;
-        var path = (route.path || route.url) as string;
-        if (path && path.substr(0, 1) !== '/')
-            path = '/' + path;
-        path = '.' + path;
-        var isRouter = true;
-        if (!method)
-            method = 'post';
-        var functionName = route.functionName || method;
-        var routerMethodList = [];
+    app.post(/\/interface\/([\s\S]+)\/([\s\S]+)/, (req, res, next) => {
+        req.myData.method.methodName = 'module-interface';
+        next();
+    }, _interface.post);
 
-        //中间件
-        if (route.middleware)
-            routerMethodList = routerMethodList.concat(route.middleware);
-
-        let reqfile = require(path);
-        var reqFun = reqfile[functionName];
-        if (!reqFun)
-            throw common.error(`[${path}] is not exist function [${functionName}]`, errorConfig.CODE_ERROR);
-
-        var createFun = function (fun) {
-            return function (req: express.Request, res: express.Response, next) {
-                req.myData.method = {methodName: route.methodName};
-                try {
-                    fun(req, res, next);
-                } catch (e) {
-                    next(e);
-                }
-            };
-        };
-        if (reqFun instanceof Array) {
-            reqFun.forEach(function (fun) {
-                var methodFun = createFun(fun);
-                routerMethodList.push(methodFun);
-            });
-        } else {
-            var methodFun = createFun(reqFun);
-            routerMethodList.push(methodFun);
-        }
-
-        var methodName = method.toLowerCase();
-        switch (methodName) {
-            case 'get':
-            case 'post':
-                app[methodName](route.url, routerMethodList);
-                break;
-            default:
-                isRouter = false;
-                break;
-        }
-        if (isRouter) {
-            routeList.push({url: route.url, functionName: functionName, path: path});
-        }
-    });
-    //console.log(routeList);
-};
+    app.get('*', (req, res, next) => {
+        req.myData.method.methodName = 'module-view';
+        next();
+    }, view.get);
+}
 
 export let errorHandler = function (err, req: express.Request, res: express.Response, next) {
     common.writeError(err);
