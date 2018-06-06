@@ -10,6 +10,7 @@ import * as main from '../_main';
 import * as autoBll from '../bll/_auto';
 
 export let get = function (req, res, next) {
+    req.myData.method.methodName = 'module-view';
     var pathname = req._parsedUrl.pathname;
     var opt = {
         view: pathname,
