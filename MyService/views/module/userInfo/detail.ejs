@@ -1,3 +1,8 @@
+<style>
+    .struct + .struct:before {
+        content: '>'
+    }
+</style>
 <div class="container">
     <form class="form-horizontal">
         <%
@@ -62,17 +67,15 @@
             <% } %>
         </div>
     </form>
+    <hr>
 
     <% var rowClass = 'col-sm-9 col-sm-push-1 my-row' %>
     <div class="row">
         <div class="<%= rowClass %>">
             <label class="control-label">架构</label>
             <% userInfoDetail.structList.forEach(function(item, idx){ %>
-            <%= item.structName %>
-            <% if(idx != userInfoDetail.structList.length - 1){ %>
-            >
-            <% }
-            }); %>
+            <span class="struct"><%= item.structName %></span>
+            <% }); %>
         </div>
     </div>
     <div class="row">
@@ -129,6 +132,8 @@
             } %>
         </div>
     </div>
+
+    <hr>
     <div class="row">
         <div class="<%= rowClass %>">
             <label class="control-label">日志</label>

@@ -72,16 +72,16 @@ export class MyModule extends ModuleBase {
         this.init(option);
     }
 
-    pager: MyPager = null;
+    pager: MyPager;
 
-    queryDom: JQuery<HTMLElement> = null;
-    queryContainerDom: JQuery<HTMLElement> = null;
-    queryItemTemp = null;
+    queryDom: JQuery<HTMLElement>;
+    queryContainerDom: JQuery<HTMLElement>;
+    queryItemTemp: string;
 
-    detailDom: JQuery<HTMLElement> = null;
-    detailQueryDom: JQuery<HTMLElement> = null;
-    detailContainerDom: JQuery<HTMLElement> = null;
-    detailTemp = null;
+    detailDom: JQuery<HTMLElement>;
+    detailQueryDom: JQuery<HTMLElement>;
+    detailContainerDom: JQuery<HTMLElement>;
+    detailTemp: string;
 
     operation = {
         query: false,
@@ -286,12 +286,13 @@ export class MyModule extends ModuleBase {
 
                     if (parent && parent['myTab']) {
                         var params = common.getUrlParamsFromArgs(args);
-                        var data = {
+                        let data: TabAndPanelOption = {
                             id: self.opt.interfacePrefix + 'Detail' + args.id,
                             name: self.opt.interfacePrefix + (args.id == 0 ? '新增' : '详细:' + args.id),
                             content: url + params
                         };
-                        parent['myTab'].addOrOpenTab(data);
+                        let myTab = parent['myTab'] as MyTab;
+                        myTab.addOrOpenTab(data);
                     }
                     else {
                         args.noNav = false;

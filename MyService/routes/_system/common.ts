@@ -103,7 +103,7 @@ export let createToken = function (str) {
     var code = md5(str);
     return code;
 };
-export let dateFormat = function (date, format) {
+export let dateFormat = function (date, format?) {
     try {
         if (!format) format = 'yyyy-MM-dd';
         if (!date)

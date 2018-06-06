@@ -1,7 +1,7 @@
 ﻿import * as db from '../_system/db';
 
 export let detailQuery = function (params, conn?) {
-    var sql = 'call p_main_content_detail_query(:id)';
+    var sql = 'call p_main_content_detail_query(:id, :noLog)';
     return db.query(sql, params, conn);
 };
 

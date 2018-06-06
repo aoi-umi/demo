@@ -3,15 +3,25 @@
  */
 
 window['myTab'] = exports;
+
+interface TabHeaderContextMenu extends JQuery<HTMLElement> {
+    currTab?: JQuery<HTMLElement>;
+    currTabHeader?: JQuery<HTMLElement>;
+}
+
+interface TabContextMenu extends JQuery<HTMLElement> {
+    currTab?: JQuery<HTMLElement>;
+}
+
 export let opt: any = {
     tabContainer: 'tab',
     panelContainer: 'panel',
     closeBtnTemplate: '<button name="tab-close-btn" type="button" class="close hidden" data-close-target="" aria-hidden="true" style="margin-left: 5px;float: none"><span class="glyphicon glyphicon-remove"></span></button>'
 };
-export let tabContainer;
-export let panelContainer;
-export let tabHeaderContextMenu;
-export let tabContextMenu;
+export let tabContainer: JQuery<HTMLElement>;
+export let panelContainer: JQuery<HTMLElement>;
+export let tabHeaderContextMenu: TabHeaderContextMenu;
+export let tabContextMenu: TabContextMenu;
 export let clickTabIdList = [];
 export let init = function (option) {
 
@@ -171,11 +181,9 @@ export let bindEvent = function () {
         }
     });
 };
-//tabData {type:'', id:'', name:'', targetId:'', closeTarget:''}
-export let tab = function (data) {
 
+export let tab = function (t: TabOption) {
     var dom = null;
-    var t = data;
     switch (t.type) {
         default:
             dom =
@@ -196,8 +204,7 @@ export let tab = function (data) {
     }
     return dom;
 };
-export let tabs = function (data) {
-
+export let tabs = function (data: Array<TabOption>) {
     var list = [];
     for (var i = 0; i < data.length; i++) {
         var dom = tab(data[i]);
@@ -206,11 +213,9 @@ export let tabs = function (data) {
     }
     return list;
 };
-//panelData {type:'', id:'', content:''}
-export let panel = function (data) {
 
+export let panel = function (t: PanelOption) {
     var dom = null;
-    var t = data;
     var content = 'no content';
     switch (t.type) {
         case 'iframe':
@@ -232,7 +237,7 @@ export let panel = function (data) {
     dom = $(`<div style="height: 512px" id="${t.id || ''}" class="tab-pane fade">${content}</div>`);
     return dom;
 };
-export let panels = function (data) {
+export let panels = function (data: Array<PanelOption>) {
     var list = [];
     for (var i = 0; i < data.length; i++) {
         var dom = panel(data[i]);
@@ -241,7 +246,8 @@ export let panels = function (data) {
     }
     return list;
 };
-export let addOrOpenTab = function (data) {
+
+export let addOrOpenTab = function (data: TabAndPanelOption) {
     var tabId = 'tab-' + data.id;
     var headerId = 'tab-header-' + data.id;
     var panelId = 'panel-' + data.id;

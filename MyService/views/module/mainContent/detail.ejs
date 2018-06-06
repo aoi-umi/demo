@@ -10,6 +10,10 @@
     .not-editable .editable {
         display: none;
     }
+
+    .mainContentType + .mainContentType:before {
+        content: '>>'
+    }
 </style>
 <div class="container">
     <%
@@ -59,7 +63,7 @@
                     <div class="form-group">
                         <label class="<%= col1Class %> control-label">类型</label>
 
-                        <div class="<%= col2Class %>">
+                        <div class="<%= col2Class %>" style="padding-top: 7px">
                             <% if(!mainContent.id){ %>
                             <div id="mainContentType" class="row my-row">
                                 <div class="col-xs-2 mainContentType"><select class="form-control"></select></div>
@@ -70,10 +74,9 @@
                             <%
                                 var mainContentTypeList = mainContentDetail.mainContentTypeList;
                             mainContentTypeList.forEach(function(item, index){ %>
-                            <a href="javascript:;"><%= item.type %><%= item.typeName ? '(' + item.typeName + ')' : '' %></a>
-                            <% if(index < mainContentTypeList.length - 1){ %>
-                            >>
-                            <% } %>
+                            <span class="mainContentType">
+                                <a href="javascript:;"><%= item.type %><%= item.typeName ? '(' + item.typeName + ')' : '' %></a>
+                            </span>
                             <% }) %>
                             <% } %>
                         </div>

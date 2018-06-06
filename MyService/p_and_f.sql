@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50722
 File Encoding         : 65001
 
-Date: 2018-06-05 15:59:10
+Date: 2018-06-06 10:52:41
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -210,7 +210,7 @@ DELIMITER ;
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `p_main_content_detail_query`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `p_main_content_detail_query`(pr_id int)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p_main_content_detail_query`(pr_id int, pr_noLog bit)
     SQL SECURITY INVOKER
 BEGIN
 	-- 主表
@@ -226,7 +226,11 @@ BEGIN
 	select * from t_main_content_child where mainContentId = pr_id order by num;
 
 	-- 日志
-	select * from t_main_content_log where mainContentId = pr_id order by id desc;
+	IF pr_noLog = 1 THEN
+		SELECT 1 FROM (SELECT 1) t WHERE 1=0;
+	ELSE
+		select * from t_main_content_log where mainContentId = pr_id order by id desc;
+	END IF;
 END
 ;;
 DELIMITER ;
@@ -470,11 +474,17 @@ DELIMITER ;
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `p_user_info_detail_query`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `p_user_info_detail_query`(pr_id int)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p_user_info_detail_query`(pr_id int, pr_noLog bit)
     SQL SECURITY INVOKER
 BEGIN
+	-- 主表
 	SELECT * FROM t_user_info WHERE `id` = pr_id;
-	SELECT * FROM t_user_info_log WHERE `userInfoId` = pr_id ORDER BY id DESC;
+	-- 日志
+	IF pr_noLog = 1 THEN
+		SELECT 1 FROM (SELECT 1) t WHERE 1=0;
+	ELSE
+		SELECT * FROM t_user_info_log WHERE `userInfoId` = pr_id ORDER BY id DESC;
+	END IF;
 	-- 用户权限
 	SELECT * FROM t_authority WHERE 
 		`code` in (select `authorityCode` from t_user_info_with_authority where `userInfoId` = pr_id);

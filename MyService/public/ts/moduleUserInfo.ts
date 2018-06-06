@@ -251,6 +251,9 @@ export class ModuleUserInfo extends MyModule {
                     }]
                 });
             },
+            beforeDetailQuery: function (item) {
+                return {id: item.id, noLog: true};
+            },
             onDetailQuerySuccess: function (t, self: ModuleUserInfo) {
                 self.detailRender(t.userInfo);
                 self.currUserId = t.userInfo.id;
