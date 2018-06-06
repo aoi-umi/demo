@@ -64,8 +64,34 @@ export let promise = function (fn: Function, caller?: any, nodeCallback?: boolea
 //     console.log(t);
 // });
 
+export let promiseAll = function (list: Array<Q.Promise<any>>) {
+    let returnData = {
+        count: list.length,
+        successCount: 0,
+        failCount: 0,
+        resultList: []
+    };
+    let d: Q.Deferred<any>;
+    promise((defer) => {
+        d = defer;
+        list.forEach((ele, idx) => {
+            ele.then(t => {
+                returnData.successCount++;
+                returnData.resultList[idx] = {success: true, detail: t};
+            }).fail(e => {
+                returnData.failCount++;
+                returnData.resultList[idx] = {success: false, detail: e};
+            }).finally(() => {
+                if (returnData.successCount + returnData.failCount == returnData.count)
+                    defer.resolve(returnData);
+            });
+        });
+    }).catch(d.reject);
+    return d.promise;
+}
+
 export let promisify = function (fun, caller?) {
-    return function (...args) {
+    return function (...args): Q.Promise<any> {
         return promise.apply(void 0, [fun, caller, true, args]);
     };
 };
