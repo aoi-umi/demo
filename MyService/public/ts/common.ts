@@ -445,8 +445,34 @@ export let getDateDiff = function (date1, date2) {
     return diff;
 };
 
-export let msgNotice = function (option) {
-    var opt = {
+interface msgNoticeOption {
+    type?: 0 | 1;
+    msg?: string;
+    template?: string;
+    dom?: JQuery<HTMLElement>,
+
+    //type 0 参数
+    target?: string;
+    position?: string;
+    autoHide?: boolean;
+    focus?: boolean;
+
+    //type 1 参数
+    noClose?: boolean
+    btnTemplate?: string;
+    btnOptList?: msgNoticeBtnOption[],
+    createNew?: boolean
+}
+
+interface msgNoticeBtnOption {
+    class?: string,
+    content?: any,
+    cbOpt?: any,
+    cb?: Function
+}
+
+export let msgNotice = function (option: msgNoticeOption) {
+    var opt: msgNoticeOption = {
         type: 0,
         msg: '',
         template: '',
@@ -464,12 +490,6 @@ export let msgNotice = function (option) {
         btnOptList: null,
         createNew: true
     };
-    //btnOpt = {
-    // class:'btn-default'
-    // content:123,
-    // cbOpt:123,
-    // cb:function(opt){}
-    // }
 
     //type 0
     //在target四周显示
@@ -481,7 +501,7 @@ export let msgNotice = function (option) {
     switch (opt.type) {
         case 0:
             if (!opt.target && opt.dom)
-                opt.target = opt.dom.selector;
+                opt.target = opt.dom['selector'];
             if (!opt.target)
                 throw new Error('target can not be null');
             if (!opt.msg)
@@ -518,8 +538,7 @@ export let msgNotice = function (option) {
                     y = targetDom.offset().top + (targetDom.outerHeight() - dom.outerHeight()) / 2;
                     break;
             }
-            dom.css({'left': x, 'top': y})
-                .show();
+            dom.css({'left': x, 'top': y}).show();
             dom.close = function () {
                 dom.remove();
             };
@@ -533,7 +552,7 @@ export let msgNotice = function (option) {
             break;
         case 1:
             if (!opt.template) {
-                opt.template = `<div data-backdrop="static" role="dialog" tabindex="-1" class="modal fade msg-notice-1">
+                opt.template = `<div data-backdrop="false" role="dialog" tabindex="-1" class="modal fade msg-notice-1">
                             <div class="modal-dialog" >
                                 <div class="modal-content">
                                     <div class="modal-body">
@@ -579,7 +598,7 @@ export let msgNotice = function (option) {
             if (opt.btnOptList) {
                 var btnList = [];
                 $(opt.btnOptList).each(function () {
-                    var item: any = this;
+                    var item = this as msgNoticeBtnOption;
                     var btn = $(opt.btnTemplate);
                     var btnClass = item.class || 'btn-default';
                     let content = item.content || '确认';
@@ -626,7 +645,16 @@ export let getUrlParamsFromArgs = function (args) {
     return list.join('&');
 };
 
-export let autoComplete = function (opt) {
+interface autoCompleteOption {
+    dom?: JQuery<HTMLElement>;
+    maxLength?: number;
+    source?: any;
+    select?: (dom: JQuery<HTMLElement>, item) => void;
+    renderItem?: (ul, item) => any;
+    match?: (input, item) => boolean;
+}
+
+export let autoComplete = function (opt: autoCompleteOption) {
     var option = {
         maxLength: 10,
         source: [],
@@ -680,8 +708,8 @@ export let autoComplete = function (opt) {
         minLength: 0,
         source: function (request, response) {
             var source = opt.source;
-            if (typeof opt.source == 'function') {
-                source = opt.source();
+            if (typeof source == 'function') {
+                source = source();
             }
             if (source.then) {
                 source.then(function (t) {
@@ -702,9 +730,18 @@ export let autoComplete = function (opt) {
         }
     }).data('ui-autocomplete')._renderItem = opt.renderItem;
 };
-export let setCountdown = function (option) {
+
+interface setCountdownOption {
+    countdown?: number;
+    interval?: number;//秒
+    onCountdown?: (dom, endDate) => void;
+    onCountdownEnd?: (dom, content) => void;
+    dom: JQuery<HTMLElement>
+}
+
+export let setCountdown = function (option: setCountdownOption) {
     //seconds
-    var opt = {
+    var opt: setCountdownOption = {
         countdown: 10,
         interval: 1,
         onCountdown: function (dom, endDate) {
@@ -720,20 +757,24 @@ export let setCountdown = function (option) {
     if (dom.hasClass('disabled'))
         return;
     dom.addClass('disabled');
-    if (this.countDownInterval) {
-        clearInterval(this.countDownInterval);
-    }
+    
     var content = dom.html();
     var date = new Date(new Date().getTime() + opt.countdown * 1000);
-    dom.countDownInterval = this.countDownInterval = setInterval(function () {
-        if (new Date() >= date && dom.countDownInterval) {
-            clearInterval(dom.countDownInterval);
+    let countDownInterval = dom.data('countDownInterval');
+    if(countDownInterval){
+        clearInterval(countDownInterval);
+        dom.data('countDownInterval', null);
+    }
+    countDownInterval = setInterval(function () {
+        if (new Date() >= date && countDownInterval) {
+            clearInterval(countDownInterval);
             dom.removeClass('disabled');
             opt.onCountdownEnd(dom, content);
         } else {
             opt.onCountdown(dom, date);
         }
     }, opt.interval * 1000);
+    dom.data('countDownInterval', countDownInterval);
 };
 export let getBrowserType = function () {
     var userAgent = navigator.userAgent; //取得浏览器的userAgent字符串

@@ -96,15 +96,11 @@ export let init = function () {
     $('#myPanel1').append(myTab.panels(tabPanelData));
 
     $('#tab-home').click();
-    var notice0;
     $('.msgNotice').on('click', function () {
         var dom = $(this);
         var type = dom.data('type');
         if (type == 0) {
-            if (notice0)
-                notice0.toggle();
-            else
-                notice0 = common.msgNotice({msg: '12333', target: '.msgNotice[data-type=0]'});
+            common.msgNotice({msg: '12333', target: '.msgNotice[data-type=0]'});
         } else if (type == 1) {
             var msgNoticeBtnCount = parseInt($('#msgNoticeBtnCount').val() as string);
             var btnOptList = [];
