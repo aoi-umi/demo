@@ -110,7 +110,7 @@ gulp.task('copy', function () {
 
 gulp.task('watch', function () {
 	gulp.watch(copySrc, ['copy']);
-	gulp.watch(tsFrontSrc, ['ts-front']);
+	//gulp.watch(tsFrontSrc, ['ts-front']);
 	gulp.watch(templateSrc, ['make-template']);
 	//gulp.watch(["**/*.ts", "!**/node_modules/**"], ['ts']);
 });

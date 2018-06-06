@@ -17,7 +17,7 @@ let opt = {
     }
 };
 
-interface myInterfaceOption {
+interface MyInterfaceOption {
     interfaceConfig?: {
         [key: string]: {
             url: string
@@ -26,7 +26,7 @@ interface myInterfaceOption {
     moduleList?: string[]
 }
 
-export let init = function (option: myInterfaceOption) {
+export let init = function (option: MyInterfaceOption) {
     opt = $.extend(opt, option);
     var interfaceConfig = opt.interfaceConfig;
     var moduleList = opt.moduleList;

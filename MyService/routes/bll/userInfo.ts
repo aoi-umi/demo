@@ -78,7 +78,7 @@ export let save = function (opt, exOpt) {
 };
 
 export let detailQuery = function (opt) {
-    return userInfoDal.detailQuery({id: opt.id}).then(function (t) {
+    return userInfoDal.detailQuery({id: opt.id, noLog: opt.noLog}).then(function (t) {
         var detail = {
             userInfo: t[0][0],
             userInfoLog: t[1],

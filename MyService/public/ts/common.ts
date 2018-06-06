@@ -96,12 +96,12 @@ export let createToken = function (str) {
     var code = md5(str);
     return code;
 };
-export let dateFormat = function (date, format) {
+export let dateFormat = function (date, format?) {
     try {
         if (!format) format = 'yyyy-MM-dd';
         if (!date)
             date = new Date();
-        else if (typeof date == 'number' || typeof date == 'string')       
+        else if (typeof date == 'number' || typeof date == 'string')
             date = new Date(date);
 
         var o = {
@@ -227,7 +227,7 @@ export let md5File = function (file) {
     });
 };
 
-interface ajaxOption extends JQuery.AjaxSettings {    
+interface ajaxOption extends JQuery.AjaxSettings {
     myDataCheck?: Function,
 }
 
@@ -243,7 +243,7 @@ export let ajax = function (option: ajaxOption) {
         opt.data = {};
     if (typeof opt.data != 'string')
         opt.data = JSON.stringify(opt.data);
-    
+
     return promise(function (defer) {
         if (opt.myDataCheck) {
             opt.myDataCheck();
@@ -401,8 +401,8 @@ export let getDateDiff = function (date1, date2) {
     var isMinus = false;
     //date1 开始日期 ，date2 结束日期
     var timestamp = date2.getTime() - date1.getTime(); //时间差的毫秒数
-    if (date1 > date2) {
-        timestamp = date1.getTime() - date2.getTime();
+    if (timestamp < 0) {
+        timestamp = -timestamp;
         isMinus = true;
     }
     timestamp /= 1000;
@@ -454,63 +454,60 @@ export let msgNotice = function (option) {
     opt = $.extend(opt, option);
     switch (opt.type) {
         case 0:
-            if (true) {
-                if (!opt.target && opt.dom)
-                    opt.target = opt.dom.selector;
-                if (!opt.target)
-                    throw new Error('target can not be null');
-                if (!opt.msg)
-                    throw new Error('msg can not be null');
-                if (!opt.template) {
-                    opt.template = '<div class="popover right" role="tooltip"><div class="arrow"></div><div class="popover-content"></div></div>';
-                }
-                dom = $('[data-target="' + opt.target + '"]');
-                if (!dom.length) {
-                    dom = $(opt.template);
-                    $('body').append(dom);
-                }
-                dom.attr('data-target', opt.target).find('.popover-content').html(opt.msg);
-                dom.removeClass('top bottom left right').addClass(opt.position);
-                var x = 0, y = 0;
-                var targetDom = opt.dom || $(opt.target);
-                switch (opt.position) {
-                    case 'top':
-                        x = targetDom.offset().left;
-                        y = targetDom.offset().top - dom.outerHeight() - 3;
-                        break;
-                    case 'bottom':
-                        x = targetDom.offset().left;
-                        y = targetDom.offset().top + targetDom.outerHeight() + 3;
-                        break;
-                    case 'left':
-                        x = targetDom.offset().left - dom.outerWidth() - 3;
-                        y = targetDom.offset().top + (targetDom.outerHeight() - dom.outerHeight()) / 2;
-                        break;
-                    default:
-                    case 'right':
-                        opt.position = 'right';
-                        x = targetDom.offset().left + targetDom.outerWidth() + 3;
-                        y = targetDom.offset().top + (targetDom.outerHeight() - dom.outerHeight()) / 2;
-                        break;
-                }
-                dom.css({'left': x, 'top': y})
-                    .show();
-                dom.close = function () {
+            if (!opt.target && opt.dom)
+                opt.target = opt.dom.selector;
+            if (!opt.target)
+                throw new Error('target can not be null');
+            if (!opt.msg)
+                throw new Error('msg can not be null');
+            if (!opt.template) {
+                opt.template = '<div class="popover right" role="tooltip"><div class="arrow"></div><div class="popover-content"></div></div>';
+            }
+            dom = $('[data-target="' + opt.target + '"]');
+            if (!dom.length) {
+                dom = $(opt.template);
+                $('body').append(dom);
+            }
+            dom.attr('data-target', opt.target).find('.popover-content').html(opt.msg);
+            dom.removeClass('top bottom left right').addClass(opt.position);
+            var x = 0, y = 0;
+            var targetDom = opt.dom || $(opt.target);
+            switch (opt.position) {
+                case 'top':
+                    x = targetDom.offset().left;
+                    y = targetDom.offset().top - dom.outerHeight() - 3;
+                    break;
+                case 'bottom':
+                    x = targetDom.offset().left;
+                    y = targetDom.offset().top + targetDom.outerHeight() + 3;
+                    break;
+                case 'left':
+                    x = targetDom.offset().left - dom.outerWidth() - 3;
+                    y = targetDom.offset().top + (targetDom.outerHeight() - dom.outerHeight()) / 2;
+                    break;
+                default:
+                case 'right':
+                    opt.position = 'right';
+                    x = targetDom.offset().left + targetDom.outerWidth() + 3;
+                    y = targetDom.offset().top + (targetDom.outerHeight() - dom.outerHeight()) / 2;
+                    break;
+            }
+            dom.css({'left': x, 'top': y})
+                .show();
+            dom.close = function () {
+                dom.remove();
+            };
+            if (opt.focus)
+                targetDom.focus();
+            if (opt.autoHide) {
+                targetDom.on('blur', function () {
                     dom.remove();
-                };
-                if (opt.focus)
-                    targetDom.focus();
-                if (opt.autoHide) {
-                    targetDom.on('blur', function () {
-                        dom.remove();
-                    });
-                }
+                });
             }
             break;
         case 1:
-            if (true) {
-                if (!opt.template) {
-                    opt.template = `<div data-backdrop="static" role="dialog" tabindex="-1" class="modal fade msg-notice-1">
+            if (!opt.template) {
+                opt.template = `<div data-backdrop="static" role="dialog" tabindex="-1" class="modal fade msg-notice-1">
                             <div class="modal-dialog" >
                                 <div class="modal-content">
                                     <div class="modal-body">
@@ -528,56 +525,55 @@ export let msgNotice = function (option) {
                                 </div>
                             </div>
                         </div>`;
-                }
-                dom = opt.dom;
-                if (!opt.createNew && !dom) {
-                    dom = $('.msg-notice-1:eq(0)');
-                }
-                if (!dom || !dom.length) {
-                    dom = $(opt.template).attr('id', 'msgNoticeBox_' + new Date().getTime());
-                    dom.find('[name=closeBtn]').on('click', function () {
-                        dom.close();
-                    });
-                    dom.close = function () {
-                        dom.modal('hide');
-                    }
-                }
-                if (opt.noClose)
-                    dom.find('[name=closeBtn]').addClass('hidden');
-                else
-                    dom.find('[name=closeBtn]').removeClass('hidden');
-                dom.find('[name=content]').html(opt.msg);
-                dom.find('[name=footer]').empty();
-                if (!opt.btnOptList && !opt.noClose) {
-                    opt.btnOptList = [{
-                        content: '确认'
-                    }];
-                }
-                if (opt.btnOptList) {
-                    var btnList = [];
-                    $(opt.btnOptList).each(function () {
-                        var item: any = this;
-                        var btn = $(opt.btnTemplate);
-                        var btnClass = item.class || 'btn-default';
-                        let content = item.content || '确认';
-                        btn.addClass(btnClass);
-                        if (btn.hasClass('btn-content'))
-                            btn.html(content);
-                        else
-                            btn.find('.btn-content').html(content);
-                        btn.on('click', function () {
-                            dom.close();
-                            if (item.cb)
-                                item.cb(item.cbOpt);
-                        });
-                        btnList.push(btn);
-                    });
-                    dom.find('[name=footer]').append(btnList);
-                }
-                $('.popover').hide();
-                if (dom.is(':hidden'))
-                    dom.modal('show');
             }
+            dom = opt.dom;
+            if (!opt.createNew && !dom) {
+                dom = $('.msg-notice-1:eq(0)');
+            }
+            if (!dom || !dom.length) {
+                dom = $(opt.template).attr('id', 'msgNoticeBox_' + new Date().getTime());
+                dom.find('[name=closeBtn]').on('click', function () {
+                    dom.close();
+                });
+                dom.close = function () {
+                    dom.modal('hide');
+                }
+            }
+            if (opt.noClose)
+                dom.find('[name=closeBtn]').addClass('hidden');
+            else
+                dom.find('[name=closeBtn]').removeClass('hidden');
+            dom.find('[name=content]').html(opt.msg);
+            dom.find('[name=footer]').empty();
+            if (!opt.btnOptList && !opt.noClose) {
+                opt.btnOptList = [{
+                    content: '确认'
+                }];
+            }
+            if (opt.btnOptList) {
+                var btnList = [];
+                $(opt.btnOptList).each(function () {
+                    var item: any = this;
+                    var btn = $(opt.btnTemplate);
+                    var btnClass = item.class || 'btn-default';
+                    let content = item.content || '确认';
+                    btn.addClass(btnClass);
+                    if (btn.hasClass('btn-content'))
+                        btn.html(content);
+                    else
+                        btn.find('.btn-content').html(content);
+                    btn.on('click', function () {
+                        dom.close();
+                        if (item.cb)
+                            item.cb(item.cbOpt);
+                    });
+                    btnList.push(btn);
+                });
+                dom.find('[name=footer]').append(btnList);
+            }
+            $('.popover').hide();
+            if (dom.is(':hidden'))
+                dom.modal('show');
             break;
     }
     return dom;

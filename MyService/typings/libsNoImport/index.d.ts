@@ -12,6 +12,7 @@ interface File {
     webkitSlice: any;
 }
 
+//myInterface
 type Api = (data?, option?) => Q.Promise<any>;
 
 interface MyInterfaceApi {
@@ -57,4 +58,28 @@ interface MyInterfaceApi {
     structDetailQuery?: Api;
     structSave?: Api;
     structDel?: Api;
+}
+
+//myTab
+interface TabOption {
+    type?: string;
+    headerId?: string;
+    id?: string;
+    name?: string;
+    targetId?: string;
+    closeTarget?: string;
+}
+interface PanelOption {
+    type?: string;
+    id?: string;
+    content?: string;
+}
+interface TabAndPanelOption {
+    type?: string;
+    id?: string;
+    name?: string;
+    content?: string;
+}
+interface MyTab {
+    addOrOpenTab:(opt: TabAndPanelOption) => void;
 }
