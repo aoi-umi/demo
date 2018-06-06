@@ -10,6 +10,7 @@ import errorConfig from '../_system/errorConfig';
 
 //接口
 export let post = function (req, res, next) {
+    req.myData.method.methodName = 'module-interface';
     common.promise(function () {
         req.params = {
             module: req.params[0],

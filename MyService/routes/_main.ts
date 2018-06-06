@@ -309,22 +309,12 @@ export let init = function (opt) {
     };
 };
 
-import * as _interface from './module/_interface';
-import * as view from './module/_view';
 //注册路由
-export let register = function (app) {
+export let register = function (app: express.Express) {
     app.get('/msg', require('./index').msg);
     app.post('/interface/upload', myMulter.any(), require('./index').upload);
-
-    app.post(/\/interface\/([\s\S]+)\/([\s\S]+)/, (req, res, next) => {
-        req.myData.method.methodName = 'module-interface';
-        next();
-    }, _interface.post);
-
-    app.get('*', (req, res, next) => {
-        req.myData.method.methodName = 'module-view';
-        next();
-    }, view.get);
+    app.post(/\/interface\/([\s\S]+)\/([\s\S]+)/, require('./module/_interface').post);
+    app.get('*', require('./module/_view').get);
 }
 
 export let errorHandler = function (err, req: express.Request, res: express.Response, next) {
