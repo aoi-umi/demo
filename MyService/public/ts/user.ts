@@ -67,7 +67,7 @@ export let signIn = function (dom) {
         };
         return myInterface.api.signIn(data, req);
     }).then(function (t) {
-        if (location.pathname == '/sign/in') {
+        if (location.pathname == '/user/signIn') {
             var args = common.getArgsFromUrlParams();
             location.href = '/?noNav=' + (args.noNav || '');
         }

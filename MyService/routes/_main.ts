@@ -1,11 +1,12 @@
 import * as express from 'express';
+import { Request, Response, Express } from 'express';
 import * as common from './_system/common';
 import * as myEnum from './_system/enum';
 import * as auth from './_system/auth';
 import * as cache from './_system/cache';
 import errorConfig from './_system/errorConfig';
 
-import * as sign from './bll/sign';
+import * as userBll from './bll/user';
 import myMulter from './_system/myMulter';
 
 import config from '../config';
@@ -28,11 +29,11 @@ export let accessableUrlConfig = [
     {url: '/interface/log/query', auth: ['dev']},
     {url: '/interface/log/save', auth: ['local']},
 
-    {url: '/sign/up'},
-    {url: '/sign/in'},
-    {url: '/interface/sign/up'},
-    {url: '/interface/sign/in'},
-    {url: '/interface/sign/out'},
+    {url: '/user/signUp'},
+    {url: '/user/signIn'},
+    {url: '/interface/user/signUp'},
+    {url: '/interface/user/signIn'},
+    {url: '/interface/user/signOut'},
 
     //角色
     {url: '/role/list', auth: ['admin']},
@@ -190,7 +191,7 @@ export let init = function (opt) {
         enumChangeDict: enumChangeDict,
     });
 
-    let myRender = function (req: express.Request, res: express.Response, view, options) {
+    let myRender = function (req: Request, res: Response, view, options) {
         var opt = {
             user: req.myData.user,
             noNav: req.myData.noNav,
@@ -202,7 +203,7 @@ export let init = function (opt) {
         opt = common.extend(opt, options);
         res.render(view, formatViewRes(opt));
     };
-    let mySend = function (req: express.Request, res: express.Response, err, detail, option) {
+    let mySend = function (req: Request, res: Response, err, detail, option) {
         var url = req.header('host') + req.originalUrl;
         var opt = {
             url: url,
@@ -232,7 +233,7 @@ export let init = function (opt) {
             common.logSave(log);
         }
     };
-    return function (req: express.Request, res: express.Response, next) {
+    return function (req: Request, res: Response, next) {
         //req.query  /?params1=1&params2=2
         //req.body  post的参数
         //req.params /:params1/:params2
@@ -262,7 +263,7 @@ export let init = function (opt) {
         if (/^(::ffff:)?(127\.0\.0\.1)$/.test(req.myData.ip))
             user.authority['local'] = true;
 
-        if (req['_parsedUrl'].pathname == '/interface/log/save') {
+        if (req._parsedUrl.pathname == '/interface/log/save') {
             req.myData.noLog = true;
         }
         if (config.env == 'dev')
@@ -287,7 +288,7 @@ export let init = function (opt) {
                     if (!t.cacheDatetime || new Date().getTime() - new Date(t.cacheDatetime).getTime() > 12 * 3600) {
                         req.myData.autoSignIn = true;
                         return common.promise(function (defer) {
-                            sign.inInside(req).then(defer.resolve).fail(function (e) {
+                            userBll.signInInside(req).then(defer.resolve).fail(function (e) {
                                 //console.log(e);
                                 cache.del(userInfoKey).then(function () {
                                     throw common.error('请重新登录！');
@@ -310,14 +311,14 @@ export let init = function (opt) {
 };
 
 //注册路由
-export let register = function (app: express.Express) {
+export let register = function (app: Express) {
     app.get('/msg', require('./index').msg);
     app.post('/interface/upload', myMulter.any(), require('./index').upload);
     app.post(/\/interface\/([\s\S]+)\/([\s\S]+)/, require('./module/_interface').post);
     app.get('*', require('./module/_view').get);
 }
 
-export let errorHandler = function (err, req: express.Request, res: express.Response, next) {
+export let errorHandler = function (err, req: Request, res: Response, next) {
     common.writeError(err);
     if (typeof err !== 'object')
         err = new Error(err);
@@ -331,7 +332,7 @@ export let errorHandler = function (err, req: express.Request, res: express.Resp
         res.mySend(err, err, {code: err.code});
     } else {
         if (errorConfig.NO_LOGIN.code == err.code) {
-            var signIn = '/sign/in?noNav=' + req.myData.noNav;
+            var signIn = '/user/signIn?noNav=' + req.myData.noNav;
             res.redirect(signIn);
         }
         else {
