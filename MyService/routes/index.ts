@@ -1,7 +1,10 @@
 import * as fs from 'fs';
+import { Request, Response, Express } from 'express';
+import * as Multer from 'multer';
+
 import * as common from './_system/common';
 
-export let msg = function (req, res) {
+export let msg = function (req: Request, res: Response) {
     var notSupportedBrowser = common.parseBool(req.query.notSupportedBrowser);
 
     var opt = {
@@ -11,10 +14,11 @@ export let msg = function (req, res) {
     res.myRender('msg', opt);
 };
 
-export let upload = function (req, res) {
-    var success = req.files && req.files.length ? 'upload ' + req.files.length + ' file(s) success' : 'upload failed';
-    if (req.files) {
-        req.files.forEach(function (file) {
+export let upload = function (req: Request, res: Response) {
+    let flies = req.files as Express.Multer.File[];
+    var success = flies && flies.length ? 'upload ' + flies.length + ' file(s) success' : 'upload failed';
+    if (flies) {
+        flies.forEach(function (file) {
             var readStream = fs.createReadStream(file.path);
             common.streamToBuffer(readStream).then(function (buffer) {
                 return common.md5(buffer);

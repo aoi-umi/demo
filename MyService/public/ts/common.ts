@@ -449,7 +449,7 @@ interface msgNoticeOption {
     type?: 0 | 1;
     msg?: string;
     template?: string;
-    dom?: JQuery<HTMLElement>,
+    dom?: JQuery<HTMLElement>;
 
     //type 0 参数
     target?: string;
@@ -458,17 +458,17 @@ interface msgNoticeOption {
     focus?: boolean;
 
     //type 1 参数
-    noClose?: boolean
+    noClose?: boolean;
     btnTemplate?: string;
-    btnOptList?: msgNoticeBtnOption[],
-    createNew?: boolean
+    btnOptList?: msgNoticeBtnOption | msgNoticeBtnOption[];
+    createNew?: boolean;
 }
 
 interface msgNoticeBtnOption {
-    class?: string,
-    content?: any,
-    cbOpt?: any,
-    cb?: Function
+    class?: string;
+    content?: any;
+    cbOpt?: any;
+    cb?: Function;
 }
 
 export let msgNotice = function (option: msgNoticeOption) {

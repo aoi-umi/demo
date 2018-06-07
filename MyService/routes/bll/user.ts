@@ -5,7 +5,7 @@ import errorConfig from '../_system/errorConfig';
 import * as autoBll from './_auto';
 import * as userInfoBll from './userInfo';
 
-export let up = function (opt, exOpt) {
+export let signUp = function (opt, exOpt) {
     var userInfoId = 0;
     return common.promise(function (e) {
         if (!opt.account)
@@ -44,7 +44,7 @@ export let up = function (opt, exOpt) {
     });
 };
 
-export let out = function (opt, exOpt) {
+export let signOut = function (opt, exOpt) {
     var user = exOpt.user;
     return common.promise(function () {
         if (user.key) {
@@ -55,10 +55,8 @@ export let out = function (opt, exOpt) {
     });
 };
 
-
-//与关键字冲突
-exports.in = function (opt, exOpt) {
-    return inInside(exOpt.req).then(function (t) {
+export let signIn = function (opt, exOpt) {
+    return signInInside(exOpt.req).then(function (t) {
         return {
             id: t.userInfo.id,
             nickname: t.userInfo.nickname
@@ -67,7 +65,7 @@ exports.in = function (opt, exOpt) {
 };
 
 //内部调用
-export let inInside = function (req) {
+export let signInInside = function (req) {
     var account = req.header('account');
     var token = req.header('token');
     var reqBody = req.body;

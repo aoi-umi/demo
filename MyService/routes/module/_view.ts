@@ -3,13 +3,15 @@
  */
 import * as path from 'path';
 import * as fs from 'fs';
+import { Request, Response } from 'express';
+
 import * as common from '../_system/common';
 import * as auth from '../_system/auth';
 import * as myEnum from '../_system/enum';
 import * as main from '../_main';
 import * as autoBll from '../bll/_auto';
 
-export let get = function (req, res, next) {
+export let get = function (req: Request, res: Response, next) {
     req.myData.method.methodName = 'module-view';
     var pathname = req._parsedUrl.pathname;
     var opt = {

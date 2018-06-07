@@ -24,10 +24,13 @@ declare global {
                 accessableUrl: { [url: string]: boolean };
                 ip: string;
             };
+            _parsedUrl: {
+                pathname: string;
+            }
         }
 
         interface Response {
-            mySend(err, detail, opt?);
+            mySend(err, detail?, opt?);
 
             myRender(view: string, options?: Object): void;
         }

@@ -5,7 +5,7 @@ import * as common from './common';
 import * as socket from './socket';
 import * as myInterface from './myInterface';
 import * as myEnum from './myEnum';
-import * as sign from './sign';
+import * as user from './user';
 
 export let variable = {
     frameDom: null,
@@ -24,13 +24,13 @@ export let init = function () {
     myInterface.init({
         interfaceConfig: {
             signUp: {
-                url: '/interface/sign/up'
+                url: '/interface/user/signUp'
             },
             signIn: {
-                url: '/interface/sign/in'
+                url: '/interface/user/signIn'
             },
             signOut: {
-                url: '/interface/sign/out'
+                url: '/interface/user/signOut'
             },
             logQuery: {
                 url: '/interface/log/query'
@@ -57,7 +57,7 @@ export let init = function () {
             'struct',
         ]
     });
-    sign.init();
+    user.init();
     $(`.nav.navbar-nav a[href="${location.pathname}"]`).closest('li').addClass('active');
 
     bindEvent();

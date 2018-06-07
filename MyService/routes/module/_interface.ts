@@ -6,10 +6,11 @@ import * as fs from 'fs';
 import * as common from '../_system/common';
 import * as auth from '../_system/auth';
 import * as autoBll from '../bll/_auto';
+import { Request, Response } from 'express';
 import errorConfig from '../_system/errorConfig';
 
 //接口
-export let post = function (req, res, next) {
+export let post = function (req: Request, res: Response, next) {
     req.myData.method.methodName = 'module-interface';
     common.promise(function () {
         req.params = {
@@ -22,7 +23,7 @@ export let post = function (req, res, next) {
     });
 };
 
-function getBll(req, res, next) {
+function getBll(req: Request, res: Response, next) {
     var params = req.params;
     var args = req.body;
     var module = params.module;
