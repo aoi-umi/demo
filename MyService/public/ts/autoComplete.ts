@@ -8,7 +8,7 @@ import * as myInterface from './myInterface';
 export class AuthorityAutoComplete {
     excludeByUserId: number;
     excludeByRoleCode: string;
-    templateId: string = "authorityLabelTemp";
+    templateId: string = 'authorityLabelTemp';
     readonly labelName: string;
     private dom: JQuery<HTMLElement>;
     private renderDom: JQuery<HTMLElement>;
@@ -43,7 +43,7 @@ export class AuthorityAutoComplete {
         let self = this;
         common.autoComplete({
             source: function () {
-                return self.getAuthority({anyKey: this.dom.val()});
+                return self.getAuthority({anyKey: self.dom.val()});
             },
             dom: self.dom,
             select: self.select.bind(self),
@@ -119,7 +119,7 @@ export class RoleAutoComplete {
         let self = this;
         common.autoComplete({
             source: function () {
-                return self.getRole({anyKey: this.dom.val()});
+                return self.getRole({anyKey: self.dom.val()});
             },
             dom: self.dom,
             select: self.select.bind(self),
