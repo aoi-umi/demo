@@ -312,8 +312,8 @@ export let init = function (opt) {
 
 //注册路由
 export let register = function (app: Express) {
-    app.get('/msg', require('./index').msg);
-    app.post('/interface/upload', myMulter.any(), require('./index').upload);
+    app.get('/msg', require('./module/index').msg);
+    app.post('/interface/upload', myMulter.any(), require('./module/index').upload);
     app.post(/\/interface\/([\s\S]+)\/([\s\S]+)/, require('./module/_interface').post);
     app.get('*', require('./module/_view').get);
 }
