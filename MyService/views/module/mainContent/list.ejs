@@ -25,10 +25,10 @@
             }, {
                 text: '操作人',
                 id: 'operator',
-            },{
+            }, {
                 text: 'id',
                 id: 'id',
-            }, ];
+            },];
             for(var i = 0;i < searchItemList.length;i++){
                 var item = searchItemList[i];
             %>
@@ -72,13 +72,13 @@
         <ul class="nav nav-pills" role="tablist">
             <li class="active">
                 <a class="statusSearch" href="javascript:;">全部
-                    (<span class="statusCount" data-status="">0</span>)
+                    <span class="badge statusCount" data-status="">0</span>
                 </a>
             </li>
             <% for(var key in mainContentStatusEnum){ %>
             <li>
                 <a class="statusSearch" href="javascript:;"><%= mainContentStatusEnum[key] %>
-                    (<span class="statusCount" data-status="<%= key %>">0</span>)
+                    <span class="badge statusCount" data-status="<%= key %>">0</span>
                 </a>
             </li>
             <% } %>
@@ -116,13 +116,13 @@
     <% include ../../_template_front/mainContent/listItem %>
 </script>
 <script type="text/javascript">
-    require(['./_main', './moduleMainContent'], function () {
-        var main = require('./_main'),
-	        moduleMainContent = require('./moduleMainContent');
-        main.init();
-        var opt = {
-            operation: ['query']
-        };     
-        new moduleMainContent.ModuleMainContent(opt);
-    });
+	require(['./_main', './moduleMainContent'], function () {
+		var main = require('./_main'),
+			moduleMainContent = require('./moduleMainContent');
+		main.init();
+		var opt = {
+			operation: ['query']
+		};
+		new moduleMainContent.ModuleMainContent(opt);
+	});
 </script>
