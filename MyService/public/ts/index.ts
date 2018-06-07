@@ -16,7 +16,7 @@ export let init = function () {
     if (connection) {
         setInterval(function () {
             for (var id in socketData.postSuccess) {
-                var existMsg = $('[data-id="' + id + '"]');
+                var existMsg = $(`[data-id="${id}"]`);
                 if (existMsg.length) {
                     existMsg.removeClass('loading').addClass('success');
                 } else {
@@ -34,7 +34,7 @@ export let init = function () {
 
         connection.on('postSuccess', function (data) {
             var id = data.user + data.msgId;
-            var existMsg = $('[data-id="' + id + '"]');
+            var existMsg = $(`[data-id="${id}"]`);
             if (existMsg.length) {
                 existMsg.removeClass('loading').addClass('success');
             } else {
@@ -153,7 +153,7 @@ export let init = function () {
 
     var timer1 = setInterval(function () {
         $('#countdown').html(common.getDateDiff(new Date(), '9999-01-01'));
-        $('#countdown2').html(common.getDateDiff(new Date(), common.dateFormat(new Date()) + ' 23:59'));
+        $('#countdown2').html(common.getDateDiff(new Date(), `${common.dateFormat(new Date())} 23:59`));
     }, 1000);
 
     bindEvent();

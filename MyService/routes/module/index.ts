@@ -1,8 +1,7 @@
 import * as fs from 'fs';
 import { Request, Response, Express } from 'express';
-import * as Multer from 'multer';
 
-import * as common from './_system/common';
+import * as common from '../_system/common';
 
 export let msg = function (req: Request, res: Response) {
     var notSupportedBrowser = common.parseBool(req.query.notSupportedBrowser);

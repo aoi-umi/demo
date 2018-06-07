@@ -1,6 +1,7 @@
 /**
  * Created by umi on 2017-5-29.
  */
+import {Request, Response} from 'express';
 import * as common from './common';
 import errorConfig from './errorConfig';
 
@@ -28,7 +29,7 @@ export let init = function (opt) {
     accessableUrlConfig = opt.accessableUrlConfig;
 };
 
-export let check = function (req, res, next) {
+export let check = function (req: Request, res: Response, next) {
     //url权限认证
     var user = req.myData.user;
     var pathname = req._parsedUrl.pathname;
@@ -68,7 +69,7 @@ export let isExistAuthority = function (user, authData, opt) {
 };
 
 //获取可访问的url，如传入pathname，该路径不可访问时抛出错误
-export let getAccessableUrl = function (user, pathname) {
+export let getAccessableUrl = function (user, pathname?) {
     var url = {};
     var accessable = false;
     var isUrlExist = false;
