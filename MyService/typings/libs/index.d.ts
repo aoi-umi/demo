@@ -14,6 +14,10 @@ declare global {
                     nickname: string;
                     account: string;
                     authority: { [key: string]: boolean };
+                    key?: string;
+                    cacheDatetime?: string;
+                    token?: string;
+                    reqBody?: any;
                 };
                 viewPath: string;
                 noNav?: boolean;

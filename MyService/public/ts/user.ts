@@ -22,7 +22,7 @@ export let bindEvent = function () {
         myInterface.api.signOut().then(function () {
             $('.nav-sign').removeClass('in');
         }).fail(function (e) {
-            common.msgNotice({ type: 1, msg: e.message });
+            common.msgNotice({type: 1, msg: e.message});
         });
     });
 
@@ -44,19 +44,19 @@ export let signIn = function (dom) {
         canNotNull: true,
     }];
     common.promise(function () {
-        var opt = { list: signInArgsOpt };
+        var opt = {list: signInArgsOpt};
         var checkRes = common.dataCheck(opt);
         var err = null;
         if (!checkRes.success) {
             if (checkRes.dom) {
-                common.msgNotice({ dom: checkRes.dom, msg: checkRes.desc });
+                common.msgNotice({dom: checkRes.dom, msg: checkRes.desc});
             } else {
                 err = new Error(checkRes.desc);
             }
             throw err;
         }
         var model: any = checkRes.model;
-        var data = { random: common.s4(2) };
+        var data = {random: common.s4(2)};
         var token = common.createToken(model.account + common.md5(model.password) + JSON.stringify(data));
         var headers = {
             'account': model.account,
@@ -69,7 +69,7 @@ export let signIn = function (dom) {
     }).then(function (t) {
         if (location.pathname == '/user/signIn') {
             var args = common.getArgsFromUrlParams();
-            location.href = '/?noNav=' + (args.noNav || '');
+            location.href = args.toUrl || ('/?noNav=' + (args.noNav || ''));
         }
         else {
             $('#signInBox').modal('hide');
@@ -78,7 +78,7 @@ export let signIn = function (dom) {
         }
     }).fail(function (e: any) {
         if (e)
-            common.msgNotice({ type: 1, msg: e.message });
+            common.msgNotice({type: 1, msg: e.message});
     });
 };
 export let signUp = function () {
@@ -117,12 +117,12 @@ export let signUp = function () {
         }
     }];
     common.promise(function () {
-        var opt = { list: signUpArgsOpt };
+        var opt = {list: signUpArgsOpt};
         var checkRes = common.dataCheck(opt);
         var err = null;
         if (!checkRes.success) {
             if (checkRes.dom) {
-                common.msgNotice({ target: checkRes.dom.selector, msg: checkRes.desc });
+                common.msgNotice({target: checkRes.dom.selector, msg: checkRes.desc});
             } else {
                 err = new Error(checkRes.desc);
             }
@@ -141,6 +141,6 @@ export let signUp = function () {
         });
     }).fail(function (e: any) {
         if (e)
-            common.msgNotice({ type: 1, msg: e.message });
+            common.msgNotice({type: 1, msg: e.message});
     });
 };

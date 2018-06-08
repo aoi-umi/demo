@@ -1,5 +1,5 @@
 import * as express from 'express';
-import { Request, Response, Express } from 'express';
+import {Request, Response, Express} from 'express';
 import * as common from './_system/common';
 import * as myEnum from './_system/enum';
 import * as auth from './_system/auth';
@@ -278,35 +278,33 @@ export let init = function (opt) {
         };
 
         var userInfoKey = req.cookies[cacheKey.userInfo];
-        if (userInfoKey) {
-            userInfoKey = cacheKey.userInfo + userInfoKey;
-            cache.get(userInfoKey).then(function (t) {
-                if (t) {
-                    t.key = userInfoKey;
-                    req.myData.user = t;
-                    //自动重新登录获取信息
-                    if (!t.cacheDatetime || new Date().getTime() - new Date(t.cacheDatetime).getTime() > 12 * 3600) {
-                        req.myData.autoSignIn = true;
-                        return common.promise(function (defer) {
-                            userBll.signInInside(req).then(defer.resolve).fail(function (e) {
-                                //console.log(e);
-                                cache.del(userInfoKey).then(function () {
-                                    throw common.error('请重新登录！');
-                                }).fail(defer.reject);
-                            });
-                            return defer.promise;
-                        });
-                    }
-                }
-            }).then(function () {
+
+        if (!userInfoKey)
+            return next();
+
+        userInfoKey = cacheKey.userInfo + userInfoKey;
+        cache.get(userInfoKey).then(function (t) {
+            if (!t)
+                return;
+            t.key = userInfoKey;
+            req.myData.user = t;
+            if (t.cacheDatetime && new Date().getTime() - new Date(t.cacheDatetime).getTime() < 12 * 3600)
+                return;
+            //自动重新登录获取信息
+            req.myData.autoSignIn = true;
+            return userBll.signInInside(req).then(() => {
                 req.myData.autoSignIn = false;
-                next();
             }).fail(function (e) {
-                next(e);
+                //console.log(e);
+                return cache.del(userInfoKey).then(function () {
+                    throw common.error('请重新登录！');
+                });
             });
-        } else {
+        }).then(function () {
             next();
-        }
+        }).fail(function (e) {
+            next(e);
+        });
     };
 };
 
@@ -329,20 +327,17 @@ export let errorHandler = function (err, req: Request, res: Response, next) {
     err.code = err.code || err.status;
     var method = req.method;
     if (method && method.toLowerCase() == 'post') {
-        res.mySend(err, err, {code: err.code});
-    } else {
-        if (errorConfig.NO_LOGIN.code == err.code) {
-            var signIn = '/user/signIn?noNav=' + req.myData.noNav;
-            res.redirect(signIn);
-        }
-        else {
-            res.status(err.status);
-            res.myRender('view', {
-                view: 'error',
-                title: '出错了',
-                message: err.message,
-                error: err
-            });
-        }
+        return res.mySend(err, err, {code: err.code});
     }
+    if (errorConfig.NO_LOGIN.code == err.code) {
+        var signIn = `/user/signIn?noNav=${req.myData.noNav}&toUrl=${encodeURIComponent(req.url)}`;
+        return res.redirect(signIn);
+    }
+    res.status(err.status);
+    res.myRender('view', {
+        view: 'error',
+        title: '出错了',
+        message: err.message,
+        error: err
+    });
 };

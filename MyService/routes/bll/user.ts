@@ -1,3 +1,4 @@
+import { Request } from 'express'
 import * as common from '../_system/common';
 import * as cache from '../_system/cache';
 import * as main from '../_main';
@@ -65,7 +66,7 @@ export let signIn = function (opt, exOpt) {
 };
 
 //内部调用
-export let signInInside = function (req) {
+export let signInInside = function (req: Request) {
     var account = req.header('account');
     var token = req.header('token');
     var reqBody = req.body;

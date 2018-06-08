@@ -633,14 +633,14 @@ export let getArgsFromUrlParams = function () {
         if (pos == -1) continue;
         var argname = params[i].substring(0, pos);
         var value = params[i].substring(pos + 1);
-        args[argname] = unescape(value);
+        args[argname] = decodeURIComponent(value);
     }
     return args;
 };
 export let getUrlParamsFromArgs = function (args) {
     var list = [];
     for (var i in args) {
-        list.push(i + '=' + escape(args[i]));
+        list.push(i + '=' + encodeURIComponent(args[i]));
     }
     return list.join('&');
 };
