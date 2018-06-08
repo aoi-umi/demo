@@ -3,6 +3,7 @@
  */
 import * as common from '../_system/common';
 import config from '../../config';
+
 var getOption = function (): any {
     var opt = {
         noLog: true,
