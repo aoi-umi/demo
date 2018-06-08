@@ -13,7 +13,7 @@ import errorConfig from './errorConfig';
 import * as logService from '../service/logService';
 
 
-/***********************前后通用***********************/
+//region 前后通用
 /**
  *
  * @param fn 带nodeCallback参数的方法
@@ -134,7 +134,7 @@ export let dateFormat = function (date, format?) {
         if (!format) format = 'yyyy-MM-dd';
         if (!date)
             date = new Date();
-        else if (typeof date == 'number' || typeof date == 'string')       
+        else if (typeof date == 'number' || typeof date == 'string')
             date = new Date(date);
 
         var o = {
@@ -202,7 +202,12 @@ export let stringToPascal = function (str) {
     return str[0].toUpperCase() + str.substr(1);
 };
 
-/***********************同名但实现不同***********************/
+export let clone = function (obj) {
+    return JSON.parse(JSON.stringify(obj));
+};
+//endregion
+
+//region 同名但实现不同
 export let md5 = function (data, option?) {
     var opt = {
         encoding: 'hex',
@@ -261,8 +266,9 @@ export let error = function (msg, code?, option?) {
     err.status = status;
     return err;
 };
+//endregion
 
-/***********************only***********************/
+//region only
 export let extend = function (...args) {
     var res = args[0] || {};
     for (let i = 1; i < args.length; i++) {
@@ -280,34 +286,30 @@ export let extend = function (...args) {
 export let requestServiceByConfig = function (option) {
     var method = '';
     var url = '';
-    var log: any = logModle();
+    var log = logModle();
     var startTime = new Date().getTime();
     return promise(function () {
         var errStr = 'service "' + option.serviceName + '"';
         var service = config.api[option.serviceName];
         if (!service) throw error(errStr + ' is not exist!');
-        var serviceArgs = null;
+        var serviceArgs = clone(service.defaultArgs);
 
         var defaultMethodArgs = {
             isUseDefault: true,
             method: 'POST',
         }
-        var methodArgs = service.method[option.methodName];
-        methodArgs = extend(defaultMethodArgs, methodArgs);
-        //console.log(methodArgs);
-        if (methodArgs.isUseDefault) {
-            serviceArgs = service.defaultArgs;
+        var methodConfig = service.method[option.methodName];
+        methodConfig = extend(defaultMethodArgs, methodConfig);
+
+        if (!methodConfig.isUseDefault) {
+            serviceArgs = extend(serviceArgs, methodConfig.args);
         }
-        else {
-            serviceArgs = methodArgs.args;
-        }
-        if (!serviceArgs) throw error(errStr + ' args is empty!');
 
         var host = serviceArgs.host;
         if (!host) throw error(errStr + ' host is empty!');
 
-        method = methodArgs.method;
-        url = methodArgs.url;
+        method = methodConfig.method;
+        url = methodConfig.url;
         if (!url) throw error(errStr + ' method "' + option.methodName + '" url is empty!');
         url = host + url;
         var opt = {
@@ -548,14 +550,6 @@ export let logSave = function (log) {
 //     });
 // });
 
-//删除require
-//delete require.cache[require.resolve('./configData')];
-
-//.prototype
-//.prototype.constructor
-//[] instanceof Array
-//[].constructor == Array
-
 export let streamToBuffer = function (stream) {
     return promise(function (res) {
         var buffers = [];
@@ -619,4 +613,13 @@ export let parseBool = function (b) {
     if (b && b.toLocaleString() == 'true')
         result = true;
     return result;
-}
+};
+//endregion
+
+//删除require
+//delete require.cache[require.resolve('./configData')];
+
+//.prototype
+//.prototype.constructor
+//[] instanceof Array
+//[].constructor == Array

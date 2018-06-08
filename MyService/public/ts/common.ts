@@ -6,7 +6,7 @@ import * as SparkMD5 from 'spark-md5';
 
 window['common'] = exports;
 
-/***********************前后通用***********************/
+//region 前后通用
 /**
  *
  * @param fn 带nodeCallback参数的方法
@@ -195,7 +195,12 @@ export let stringToPascal = function (str) {
     return str[0].toUpperCase() + str.substr(1);
 };
 
-/***********************同名但实现不同***********************/
+export let clone = function (obj) {
+    return JSON.parse(JSON.stringify(obj));
+};
+//endregion
+
+//region 同名但实现不同
 export let md5 = function (str) {
     return SparkMD5.hash(str);
 };
@@ -207,8 +212,9 @@ export let error = function (msg, errCode?) {
     err.code = errCode;
     return err;
 };
+//endregion
 
-/***********************only***********************/
+//region only
 export let stringToBase64 = function (str) {
     return btoa(encodeURIComponent(str));
 };
@@ -825,7 +831,7 @@ export let getTree = function (list: any[], parent, tree?, key = 'key', parentKe
         rootTree,
         itemTree
     }
-}
+};
 
 export let findInTree = function (tree, key) {
     if (tree) {
@@ -837,4 +843,5 @@ export let findInTree = function (tree, key) {
                 return match;
         }
     }
-}
+};
+//endregion
