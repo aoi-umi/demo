@@ -1,7 +1,6 @@
 var gulp = require('gulp'),
 	del = require('del'), //删除文件
 	replace = require('gulp-replace-path'), //替换文件内容
-	babel = require('gulp-babel'),
 	gulpSequence = require('gulp-sequence'),
 	ts = require('gulp-typescript'),
 	watch = require('gulp-watch'),
