@@ -27,6 +27,7 @@ interface MyInterfaceApi {
     mainContentStatusUpdate?: Api;
 
     userInfoAdminSave?: Api;
+    captchaGet?: Api;
 
     //模块
     mainContentQuery?: Api;

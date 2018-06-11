@@ -47,6 +47,9 @@ export let init = function () {
             userInfoAdminSave: {
                 url: '/interface/userInfo/adminSave'
             },
+            captchaGet: {
+                url: '/interface/captcha/get'
+            },
         },
         moduleList: [
             'mainContent',

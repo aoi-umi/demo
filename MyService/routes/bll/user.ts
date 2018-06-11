@@ -1,4 +1,4 @@
-import { Request } from 'express'
+import {Request} from 'express'
 import * as common from '../_system/common';
 import * as cache from '../_system/cache';
 import * as main from '../_main';
@@ -57,7 +57,20 @@ export let signOut = function (opt, exOpt) {
 };
 
 export let signIn = function (opt, exOpt) {
-    return signInInside(exOpt.req).then(function (t) {
+    let captcha = opt.captcha;
+    let cacheKey = main.cacheKey.captcha + opt.captchaKey;
+    return common.promise(() => {
+        if (!captcha)
+            throw common.error('请输入验证码');
+        return cache.get(cacheKey)
+    }).then(t => {
+        if (!t)
+            throw common.error('验证码已失效');
+        if (t.toLowerCase() != captcha.toLowerCase())
+            throw common.error('验证码不正确');
+        cache.del(cacheKey);
+        return signInInside(exOpt.req);
+    }).then(function (t) {
         return {
             id: t.userInfo.id,
             nickname: t.userInfo.nickname
@@ -87,7 +100,7 @@ export let signInInside = function (req: Request) {
             reqBody = '';
         if (typeof reqBody != 'string')
             reqBody = JSON.stringify(reqBody);
-        return autoBll.query('userInfo', { account: account });
+        return autoBll.query('userInfo', {account: account});
     }).then(function (t) {
         if (!t.count)
             throw common.error('no account!');
@@ -98,7 +111,7 @@ export let signInInside = function (req: Request) {
         var checkToken = common.createToken(account + pwd + reqBody);
         if (token != checkToken)
             throw common.error(null, errorConfig.TOKEN_WRONG);
-        return userInfoBll.detailQuery({ id: userInfo.id });
+        return userInfoBll.detailQuery({id: userInfo.id});
     }).then(function (t) {
         //console.log(t);
         var userInfo = t.userInfo;

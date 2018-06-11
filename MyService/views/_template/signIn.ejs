@@ -11,7 +11,19 @@
 
         <div class="col-sm-10">
             <input class="form-control sign-in-input" name="password" placeholder="请输入密码" value=""
-                   type="password">
+                   type="password"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">验证码</label>
+
+        <div class="col-sm-6">
+            <input class="form-control sign-in-input" name="captcha" placeholder="请输入验证码" value=""/>
+        </div>
+        <div class="col-sm-4">
+            <span name="captchaBox"></span>
+            <a href="javascript:;" name="changeCaptcha">换一张</a>
+            <span name="captchaErr" class="text-danger"></span>
         </div>
     </div>
     <div class="form-group">

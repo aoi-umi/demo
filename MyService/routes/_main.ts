@@ -21,6 +21,7 @@ export let accessableUrlConfig = [
     {url: '/interface/onlineUser/query', auth: ['admin']},
     {url: '/interface/onlineUser/detailQuery', auth: ['admin']},
     {url: '/interface/upload', auth: ['login']},
+
     {url: '/help', auth: ['dev']},
     {url: '/status', auth: ['dev']},
     {url: '/color', auth: ['dev']},
@@ -34,6 +35,8 @@ export let accessableUrlConfig = [
     {url: '/interface/user/signUp'},
     {url: '/interface/user/signIn'},
     {url: '/interface/user/signOut'},
+
+    {url: '/interface/captcha/get'},
 
     //角色
     {url: '/role/list', auth: ['admin']},
@@ -105,12 +108,14 @@ export let enumChangeDict = {
 };
 
 export let cacheKey = {
-    userInfo: 'userInfoCacheKey'
+    userInfo: 'userInfoCacheKey',
+    captcha: 'captchaKey'
 };
 
 /**缓存时间 秒 */
 export let cacheTime = {
-    userInfo: 7 * 24 * 3600
+    userInfo: 7 * 24 * 3600,
+    captcha: 10 * 60
 };
 
 export let formatRes = function (err, detail, opt) {
@@ -312,6 +317,7 @@ export let init = function (opt) {
 export let register = function (app: Express) {
     app.get('/msg', require('./module/index').msg);
     app.post('/interface/upload', myMulter.any(), require('./module/index').upload);
+    app.post('/interface/captcha/get', require('./module/index').captchaGet);
     app.post(/\/interface\/([\s\S]+)\/([\s\S]+)/, require('./module/_interface').post);
     app.get('*', require('./module/_view').get);
 }
