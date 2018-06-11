@@ -9,6 +9,7 @@ export let bindEvent = function () {
     //登录框
     $(document).on('click', '.sign-in', function () {
         $('#signInBox').modal('show');
+        $('#signInBox').find('[name=changeCaptcha]').trigger('click');
     });
     //登录
     $(document).on('keyup', '.sign-in-input', function (event) {
@@ -25,10 +26,20 @@ export let bindEvent = function () {
             common.msgNotice({type: 1, msg: e.message});
         });
     });
+    $(document).on('click', '[name=changeCaptcha]', function () {
+        $('[name=captchaBox]').data('captchaKey', '').empty();
+        $('[name=captchaErr]').text('');
+        myInterface.api.captchaGet().then(t => {
+            $('[name=captchaBox]').data('captchaKey', t.key).html(t.svg);
+        }).catch(e => {
+            $('[name=captchaErr]').text(e.message);
+        });
+    });
 
     $('#signUp').on('click', function () {
         signUp();
     });
+    $('[name=changeCaptcha]:visible').trigger('click');
 };
 export let signIn = function (dom) {
     var form = dom.closest('.sign-in-form');
@@ -41,6 +52,11 @@ export let signIn = function (dom) {
         name: 'password',
         desc: '密码',
         dom: form.find('[name=password]'),
+        canNotNull: true,
+    }, {
+        name: 'captcha',
+        desc: '验证码',
+        dom: form.find('[name=captcha]'),
         canNotNull: true,
     }];
     common.promise(function () {
@@ -56,7 +72,11 @@ export let signIn = function (dom) {
             throw err;
         }
         var model: any = checkRes.model;
-        var data = {random: common.s4(2)};
+        var data = {
+            random: common.s4(2),
+            captcha: model.captcha,
+            captchaKey: $('[name=captchaBox]').data('captchaKey')
+        };
         var token = common.createToken(model.account + common.md5(model.password) + JSON.stringify(data));
         var headers = {
             'account': model.account,
