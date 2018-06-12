@@ -120,7 +120,7 @@ export default class MyPager {
                             let html = [];
                             $(opt.pageSizeList).each(function () {
                                 let pageSize = this as any;
-                                html.push(`<option value="${pageSize}" ${self.pageSize == pageSize ? "selected": ""}>${pageSize}</option>`);
+                                html.push(`<option value="${pageSize}" ${self.pageSize == pageSize ? "selected" : ""}>${pageSize}</option>`);
                             });
                             dom.find('[name=myPagerPageSize]').html(html.join(''));
                         }
