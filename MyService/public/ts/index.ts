@@ -1,5 +1,7 @@
 import 'fileinput';
+import 'jquery.cookie';
 import * as ejs from 'ejs';
+import * as $ from 'jquery';
 
 import * as socket from './socket';
 import * as myTab from './myTab';
@@ -67,12 +69,14 @@ export let init = function () {
         var res = data.response;
     }).on('fileuploaderror', function (event, data, msg) {
         var args = arguments;
-        var res = data.response;
-        if (!res.result) {
-            return {
-                message: res.desc,
-                data: res.detail
-            };
+        if(data && data.response){
+            var res = data.response;
+            if (!res.result) {
+                return {
+                    message: res.desc,
+                    data: res.detail
+                };
+            }
         }
     });
 
