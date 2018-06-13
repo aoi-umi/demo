@@ -25,6 +25,7 @@ export let accessableUrlConfig = [
     {url: '/help', auth: ['dev']},
     {url: '/status', auth: ['dev']},
     {url: '/color', auth: ['dev']},
+    {url: '/systemInfo', auth: ['admin']},
 
     {url: '/log', auth: ['dev']},
     {url: '/interface/log/query', auth: ['dev']},
