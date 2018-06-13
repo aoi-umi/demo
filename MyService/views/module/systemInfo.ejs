@@ -1,0 +1,9 @@
+<div class="container">
+    <pre><%=JSON.stringify(config, null, '  ')%></pre>
+</div>
+<script type="text/javascript">
+	require(['./_main'], function () {
+		var main = require('./_main');
+		main.init();
+	});
+</script>

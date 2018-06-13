@@ -3,13 +3,14 @@
  */
 import * as path from 'path';
 import * as fs from 'fs';
-import { Request, Response } from 'express';
+import {Request, Response} from 'express';
 
 import * as common from '../_system/common';
 import * as auth from '../_system/auth';
 import * as myEnum from '../_system/enum';
 import * as main from '../_main';
 import * as autoBll from '../bll/_auto';
+import config from "../../config";
 
 export let get = function (req: Request, res: Response, next) {
     req.myData.method.methodName = 'module-view';
@@ -49,7 +50,7 @@ var setViewOption = function (opt) {
             break;
 
         case '/userInfo/detail':
-            return require('../viewBll/userInfo').detailQuery({ id: query.id || user.id }, opt);
+            return require('../viewBll/userInfo').detailQuery({id: query.id || user.id}, opt);
 
         case '/mainContent/list':
             opt.mainContentStatusEnum = myEnum.getEnum('mainContentStatusEnum');
@@ -57,10 +58,33 @@ var setViewOption = function (opt) {
             break;
 
         case '/mainContent/detail':
-            return require('../viewBll/mainContent').detailQuery({ id: query.id }, opt);
+            return require('../viewBll/mainContent').detailQuery({id: query.id}, opt);
 
         case '/help':
             return require('../viewBll/help').get(null, opt);
+
+        case '/systemInfo':
+            opt.config = {};
+            for (let key in config) {
+                if (common.isInArray(key, ['name', 'port', 'deploy', 'version', 'env',
+                        'errorDir', 'fileDir', 'cachePrefix',])) {
+                    opt.config[key] = config[key];
+                }
+                opt.config.redis = `${config.redis.host}:${config.redis.port}`;
+                opt.config.database = `${config.datebase.host}:${config.datebase.port}`;
+                opt.config.api = {};
+                for (let serviceName in config.api) {
+                    opt.config.api[serviceName] = {};
+                    for (let methodKey in config.api[serviceName].method) {
+                        let methodConfig = config.api[serviceName].method[methodKey];
+                        let methodArgs = common.clone(config.api[serviceName].defaultArgs);
+                        if (!methodConfig.isUseDefault)
+                            methodArgs = common.extend(methodArgs, methodConfig.args);
+                        opt.config.api[serviceName][methodKey] = `${methodArgs.host}${methodConfig.url}`;
+                    }
+                }
+            }
+            break;
 
     }
 };

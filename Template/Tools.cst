@@ -24,9 +24,9 @@ public enum FilenameTypeEnum
 public class DatabaseColModel
 {
     public string Name;
-    public string Type;
     public string NativeType;
     public bool IsString;
+    public ColumnSchema column;
 }
 
 public class DatabaseModel
@@ -68,6 +68,7 @@ public static DatabaseModel CreateDatabaseModel(TableSchema table, DatabaseTypeE
         colModel.Name = col.Name;
         colModel.NativeType = GetTypeWithSize(col, databaseType); 
         colModel.IsString = IsString(col.DataType);
+        colModel.column = col;
         //第一个主键为id
         if(string.IsNullOrEmpty(id) && col.IsPrimaryKeyMember){
             dbModel.IdCol = colModel;
@@ -925,7 +926,6 @@ public static List<string> CreateMySqlScript(DatabaseModel databaseModel, int sc
 
 #endregion
 
-
 #region d.ts
 public static List<string> CreateDts(DatabaseModel databaseModel, string ns)
 {
@@ -948,6 +948,47 @@ public static List<string> CreateDts(DatabaseModel databaseModel, string ns)
     tabStr = GetRepeatStr("\t", level);
     databaseModel.Cols.Select(x=>x.Name).ToList().ForEach(ele=>{        
         scriptStrList.Add(tabStr + ele + "?: any;");
+    });
+    level = 1;
+    tabStr = GetRepeatStr("\t", level);
+    scriptStrList.Add(tabStr + "}");    
+    scriptStrList.Add("}");     
+    list.Add(string.Join(Environment.NewLine, scriptStrList.ToArray()));      
+    return list;
+}
+#endregion
+
+#region cs
+public static List<string> CreateCs(DatabaseModel databaseModel, string ns)
+{
+    var list = new List<string>();
+    var tableName = databaseModel.TableName;
+    if(!string.IsNullOrEmpty(databaseModel.RemoveTablePrefix)){
+        if(tableName.StartsWith(databaseModel.RemoveTablePrefix))
+            tableName = tableName.Substring(databaseModel.RemoveTablePrefix.Length);
+    }
+    tableName = ConvertString(tableName, FilenameTypeEnum.Pascal);
+    
+    var level = 1;
+    var tabStr = GetRepeatStr("\t", level);
+    if(string.IsNullOrWhiteSpace(ns))
+        ns = "model";
+    var scriptStrList = new List<string>();    
+    scriptStrList.Add("namespace " + ns + " {");
+    scriptStrList.Add(tabStr + "[Serializable]");
+    scriptStrList.Add(tabStr + "[DataContract]");
+    scriptStrList.Add(tabStr + "public class " + tableName + " {");
+    level = 2;
+    tabStr = GetRepeatStr("\t", level);
+    databaseModel.Cols.ToList().ForEach(ele=>{            
+        scriptStrList.Add(tabStr + "/// <summary>");
+        scriptStrList.Add(tabStr + "///" + (!string.IsNullOrEmpty(ele.column.Description) ? ele.column.Description : ele.Name));
+        scriptStrList.Add(tabStr + "/// </summary>");
+        scriptStrList.Add(tabStr + "[DataMember]");
+        var type = GetCSharpDataTypeByDBColumn(ele.column);
+        if(type != "string")
+            type += "?";
+        scriptStrList.Add(tabStr + "public " + type + " " +  ele.Name + " { get; set; };\r\n");
     });
     level = 1;
     tabStr = GetRepeatStr("\t", level);

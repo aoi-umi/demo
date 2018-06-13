@@ -92,6 +92,7 @@ export let signIn = function (dom) {
             location.href = args.toUrl || ('/?noNav=' + (args.noNav || ''));
         }
         else {
+            form.find('[name=captcha]').val('');
             $('#signInBox').modal('hide');
             $('.nav-nickname').text(t.nickname);
             $('.nav-sign').addClass('in');

@@ -27,6 +27,7 @@ public enum MakeTypeEnum{
     Js,
     Ts,
     Dts,
+    Cs,
 }
 </script>
 <%
@@ -46,6 +47,9 @@ switch(MakeType){
         break;    
     case MakeTypeEnum.Dts:
         list = Tools.CreateDts(dbModel, TsModelNamespace);
+        break;
+    case MakeTypeEnum.Cs:
+        list = Tools.CreateCs(dbModel, TsModelNamespace);
         break;
 }
 list.ForEach(x=>{
