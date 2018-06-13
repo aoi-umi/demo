@@ -27,13 +27,14 @@ export let promise = function (fn: Function, caller?: any, nodeCallback?: boolea
             args.push(def);
             defer.resolve(fn.apply(caller, args));
         } else {
-            args.push(function (err, ...cbArgs) {
-                if (err)
-                    defer.reject(err);
-                else {
-                    defer.resolve.apply(void 0, cbArgs);
-                }
-            });
+            args.push(defer.makeNodeResolver());
+            // args.push(function (err, ...cbArgs) {
+            //     if (err)
+            //         defer.reject(err);
+            //     else {
+            //         defer.resolve.apply(void 0, cbArgs);
+            //     }
+            // });
             fn.apply(caller, args);
         }
     } catch (e) {
