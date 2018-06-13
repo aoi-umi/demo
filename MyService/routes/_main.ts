@@ -295,16 +295,18 @@ export let init = function (opt) {
             req.myData.user = t;
             if (t.cacheDatetime && new Date().getTime() - new Date(t.cacheDatetime).getTime() < 12 * 3600)
                 return;
-            //自动重新登录获取信息
+            //region 自动重新登录获取信息
             req.myData.autoSignIn = true;
             return userBll.signInInside(req).then(() => {
                 req.myData.autoSignIn = false;
             }).fail(function (e) {
-                //console.log(e);
+                if (e && common.isInArray(e.code, [errorConfig.DB_ERROR.code]))
+                    throw e;
                 return cache.del(userInfoKey).then(function () {
                     throw common.error('请重新登录！');
                 });
             });
+            //endregion
         }).then(function () {
             next();
         }).fail(function (e) {

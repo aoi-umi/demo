@@ -3,6 +3,7 @@
  */
 import * as mysql from 'mysql';
 import * as common from './common';
+import errorConfig from './errorConfig';
 import config from '../../config';
 
 let pool = mysql.createPool({
@@ -14,10 +15,15 @@ let pool = mysql.createPool({
 });
 
 export let query = function (sql, params, conn?) {
-    if (!conn)
-        return myQuery(sql, params);
-    else
-        return myTranQuery(sql, params, conn);
+    return common.promise(() => {
+        if (!conn)
+            return myQuery(sql, params);
+        else
+            return myTranQuery(sql, params, conn);
+    }).fail(e => {
+        common.writeError(e);
+        throw common.error(null, errorConfig.DB_ERROR);
+    });
 };
 
 //事务连接
@@ -56,7 +62,6 @@ function myQuery(sql, params) {
     }).then(function (t) {
         return (t);
     }).fail(function (e) {
-        common.writeError(e);
         throw e;
     }).finally(function () {
         releasePromise(connection);
@@ -112,7 +117,9 @@ function releasePromise(conn: mysql.PoolConnection) {
 
 function queryPromise(conn: mysql.PoolConnection, sql, params) {
     conn.config.queryFormat = queryFormat;
-    return common.promise(conn.query, conn, true, [sql, params]);
+    return common.promise(conn.query, conn, true, [sql, params]).spread(t => {
+        return t;
+    });
 }
 
 function beginTransactionPromise(conn: mysql.PoolConnection) {

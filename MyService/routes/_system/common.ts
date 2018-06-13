@@ -34,13 +34,14 @@ export let promise = function (fn: Function, caller?: any, nodeCallback?: boolea
             args.push(def);
             defer.resolve(fn.apply(caller, args));
         } else {
-            args.push(function (err, ...cbArgs) {
-                if (err)
-                    defer.reject(err);
-                else {
-                    defer.resolve.apply(void 0, cbArgs);
-                }
-            });
+            args.push(defer.makeNodeResolver());
+            // args.push(function (err, ...cbArgs) {
+            //     if (err)
+            //         defer.reject(err);
+            //     else {
+            //         defer.resolve.apply(void 0, cbArgs);
+            //     }
+            // });
             fn.apply(caller, args);
         }
     } catch (e) {
@@ -357,7 +358,7 @@ export let requestService = function (option) {
     if (!opt.headers) opt.headers = {};
     opt.headers['x-requested-with'] = 'xmlhttprequest';
     //console.log(opt)
-    return promise(function (res) {
+    return promise(function (def) {
         request(opt, function (err, response, data) {
             return promise(() => {
                 if (err)
@@ -380,13 +381,11 @@ export let requestService = function (option) {
                     data = data.toString();
                 }
                 return data;
-            }).then(t => {
-                return res.resolve(t);
-            }).catch(e => {
-                return res.reject(e);
-            });
+            })
+                .then(def.resolve)
+                .catch(def.reject);
         });
-        return res.promise;
+        return def.promise;
     }).fail(function (e) {
         throw e;
     });

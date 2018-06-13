@@ -86,6 +86,13 @@ export default {
             'en': 'No Data',
         }
     },
+    DB_ERROR: {
+        code: 'DB_ERROR',
+        desc: {
+            'zh': '数据库出错',
+            'en': 'db error',
+        }
+    },
     //缓存
     CACHE_TIMEOUT: {
         code: 'CACHE_TIMEOUT',
