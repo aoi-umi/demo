@@ -196,50 +196,61 @@ export let init = function (opt) {
         enumDict: enumDict,
         enumChangeDict: enumChangeDict,
     });
+    let logSave = function (req: Request, res: Response, responseData: any) {
+        var url = req.header('host') + req.originalUrl;
+        var result = responseData.result;
+        var logReq = req.method == 'POST' ? req.body : req.query;
+        var logRes = responseData.detail;
 
+        if (!req.myData.noLog) {
+            var log = common.logModle();
+            log.url = url;
+            log.result = result;
+            log.code = responseData.code;
+            log.application = config.name;
+            log.method = req._parsedUrl.pathname;
+            log.methodName = req.myData.method.methodName || log.method;
+            log.req = logReq;
+            log.res = logRes;
+            log.ip = req.myData.ip;
+            log.remark = responseData.desc + `[${req.method}][account:${req.myData.user.account}]`;
+            log.guid = responseData.guid;
+            log.duration = new Date().getTime() - req.myData.startTime;
+            common.logSave(log);
+        }
+    }
     let myRender = function (req: Request, res: Response, view, options) {
-        var opt = {
+        let opt = {
             user: req.myData.user,
             noNav: req.myData.noNav,
             isHadAuthority: function (authData) {
                 return auth.isHadAuthority(req.myData.user, authData);
             },
             accessableUrl: req.myData.accessableUrl,
+            guid: common.guid(),
         };
         opt = common.extend(opt, options);
-        res.render(view, formatViewRes(opt));
+        let formatResResult = formatViewRes(opt) as any;
+        res.render(view, formatResResult);
+        let error = formatResResult.error;
+        logSave(req, res, {
+            result: error ? true : false,
+            detail: error || (`${view}${formatResResult.view ? '[' + formatResResult.view + ']' : ''}`),
+            code: (error ? error.code : '') || '',
+            desc: '',
+            guid: formatResResult.guid
+        });
     };
     let mySend = function (req: Request, res: Response, err, detail, option) {
-        var url = req.header('host') + req.originalUrl;
-        var opt = {
-            url: url,
+        let opt = {
+            url: req.header('host') + req.originalUrl
         };
         opt = common.extend(opt, option);
-        var formatResResult = formatRes(err, detail, opt);
+        let formatResResult = formatRes(err, detail, opt);
         if (req.myData.useStatus && err && err.status)
             res.status(err.status);
         res.send(formatResResult);
-        var result = formatResResult.result;
-        var logReq = req.method == 'POST' ? req.body : '';
-        var logRes = formatResResult.detail;
-        var logMethod = req.myData.method.methodName || req.originalUrl;
-
-        if (!req.myData.noLog) {
-            var log = common.logModle();
-            log.url = url;
-            log.result = result;
-            log.code = formatResResult.code;
-            log.application = config.name;
-            log.method = req.originalUrl;
-            log.methodName = logMethod;
-            log.req = logReq;
-            log.res = logRes;
-            log.ip = req.myData.ip;
-            log.remark = formatResResult.desc + `[account:${req.myData.user.account}]`;
-            log.guid = formatResResult.guid;
-            log.duration = new Date().getTime() - req.myData.startTime;
-            common.logSave(log);
-        }
+        logSave(req, res, formatResResult);
     };
     return function (req: Request, res: Response, next) {
         //req.query  /?params1=1&params2=2
