@@ -222,14 +222,16 @@ export let init = function (opt) {
         var result = formatResResult.result;
         var logReq = req.method == 'POST' ? req.body : '';
         var logRes = formatResResult.detail;
-        var logMethod = '[' + (config.name + '][' + (req.myData.method.methodName || req.originalUrl)) + ']';
+        var logMethod = req.myData.method.methodName || req.originalUrl;
 
         if (!req.myData.noLog) {
             var log = common.logModle();
             log.url = url;
             log.result = result;
             log.code = formatResResult.code;
-            log.method = logMethod
+            log.application = config.name;
+            log.method = req.originalUrl;
+            log.methodName = logMethod;
             log.req = logReq;
             log.res = logRes;
             log.ip = req.myData.ip;
@@ -271,6 +273,7 @@ export let init = function (opt) {
 
         if (req._parsedUrl.pathname == '/interface/log/save') {
             req.myData.noLog = true;
+            req.body.requestIp = req.myData.ip;
         }
         if (config.env == 'dev')
             user.authority['dev'] = true;

@@ -38,8 +38,14 @@ export class ModuleLog extends MyModule {
                     return this.dom.find('[name=result]:checked').val();
                 }
             }, {
+                name: 'application',
+                dom: $('#application'),
+            }, {
                 name: 'method',
                 dom: $('#method'),
+            }, {
+                name: 'methodName',
+                dom: $('#methodName'),
             }, {
                 name: 'code',
                 dom: $('#code'),

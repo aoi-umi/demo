@@ -91,7 +91,7 @@ export default class MyPager {
             if (opt.changeHandle) {
                 self.pageIndex = page;
                 opt.changeHandle(function (t) {
-                    if (t && t.count) {
+                    if (t) {
                         pagerDom.empty();
                         var dom = $(opt.template);
                         var totalPage = self.totalPage = Math.ceil(t.count / self.pageSize);

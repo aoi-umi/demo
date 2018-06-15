@@ -511,7 +511,9 @@ export let IPv4ToIPv6 = function (ip, convert) {
 export let logModle = function () {
     return {
         url: null,
+        application: null,
         method: null,
+        methodName: null,
         result: null,
         code: null,
         req: null,
@@ -520,7 +522,8 @@ export let logModle = function () {
         remark: null,
         guid: null,
         ip: null,
-        duration: null
+        duration: null,
+        requestIp: null,
     };
 };
 

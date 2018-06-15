@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50722
 File Encoding         : 65001
 
-Date: 2018-06-06 10:52:41
+Date: 2018-06-15 17:44:03
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -99,7 +99,9 @@ DROP PROCEDURE IF EXISTS `p_log_query`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `p_log_query`(pr_id int,
 	pr_url varchar(50),
+	pr_application varchar(50),
 	pr_method varchar(50),
+	pr_methodName varchar(50),
 	pr_result tinyint,
 	pr_code varchar(50),
 	pr_req text,
@@ -109,11 +111,12 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `p_log_query`(pr_id int,
 	pr_createDateEnd datetime,
 	pr_remark text,
 	pr_guid varchar(50),
+	pr_requestIp varchar(50),
 	pr_nullList varchar(1000),
 	pr_pageIndex int,
 	pr_pageSize int)
     SQL SECURITY INVOKER
-BEGIN 
+BEGIN  
 	IF pr_nullList IS NULL THEN
 		SET pr_nullList = '';
 	END IF;
@@ -132,10 +135,22 @@ BEGIN
 		SET @Sql = CONCAT(@Sql, ' AND `url` IS NULL');
 	END IF;
 
+	IF pr_application IS NOT NULL AND length(pr_application) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND `application` like ''%',replace_special_char(pr_application), '%''');
+	ELSEIF LOCATE(',application,', pr_nullList) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND `application` IS NULL');
+	END IF;
+
 	IF pr_method IS NOT NULL AND length(pr_method) > 0 THEN
 		SET @Sql = CONCAT(@Sql, ' AND `method` like ''%',replace_special_char(pr_method), '%''');
 	ELSEIF LOCATE(',method,', pr_nullList) > 0 THEN
 		SET @Sql = CONCAT(@Sql, ' AND `method` IS NULL');
+	END IF;
+
+	IF pr_methodName IS NOT NULL AND length(pr_methodName) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND `methodName` like ''%',replace_special_char(pr_methodName), '%''');
+	ELSEIF LOCATE(',methodName,', pr_nullList) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND `methodName` IS NULL');
 	END IF;
 
 	IF pr_result IS NOT NULL AND length(pr_result) > 0 THEN
@@ -191,6 +206,14 @@ BEGIN
 	ELSEIF LOCATE(',guid,', pr_nullList) > 0 THEN
 		SET @Sql = CONCAT(@Sql, ' AND `guid` IS NULL');
 	END IF;
+
+
+	IF pr_requestIp IS NOT NULL AND length(pr_requestIp) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND `requestIp` like ''%',replace_special_char(pr_requestIp), '%''');
+	ELSEIF LOCATE(',requestIp,', pr_nullList) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND `requestIp` IS NULL');
+	END IF;
+
 	SET @Sql = CONCAT(@Sql, ' ORDER BY id desc ');
 
 	IF pr_pageIndex IS NOT NULL AND pr_pageSize IS NOT NULL THEN
