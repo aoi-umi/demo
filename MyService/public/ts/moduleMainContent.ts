@@ -80,12 +80,6 @@ export class ModuleMainContent extends MyModule {
             },],
             init: function (self) {
                 self.variable.delMainContentChildList = [];
-                self.variable.defaultMainCotentChild = {
-                    id: 0,
-                    num: 0,
-                    type: 0,
-                    content: ''
-                };
                 if (self.operation.detailQuery) {
                 }
             },
@@ -362,11 +356,6 @@ export class ModuleMainContent extends MyModule {
         };
         opt = $.extend(opt, option);
         super(opt);
-    }
-
-    getDefaultMainCotentChild() {
-        let self = this;
-        return self.variable.defaultMainCotentChild;
     }
 
     setMainContentChildDetail(item) {
