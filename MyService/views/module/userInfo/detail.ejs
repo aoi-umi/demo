@@ -136,25 +136,31 @@
     <hr>
     <div class="row">
         <div class="<%= rowClass %>">
-            <label class="control-label">日志</label>
-            <table class="table table-bordered">
-                <thead>
-                <tr>
-                    <th>内容</th>
-                    <th>创建时间</th>
-                </tr>
-                </thead>
+            <ul class="nav nav-tabs">
+                <li class="tab-header active">
+                    <a href="#log" data-toggle="tab">日志</a>
+                </li>
+            </ul>
+            <div id="log" class="tab-pane fade in">
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>内容</th>
+                        <th>创建时间</th>
+                    </tr>
+                    </thead>
 
-                <% userInfoDetail.userInfoLog.forEach(function(item){
-                    if (item.type != 0 && !isHadAuthority('admin'))
-                        return;
-                %>
-                <tr>
-                    <td><%= item.content %></td>
-                    <td><%= item.createDate %></td>
-                </tr>
-                <% }); %>
-            </table>
+                    <% userInfoDetail.userInfoLog.forEach(function(item){
+                        if (item.type != 0 && !isHadAuthority('admin'))
+                            return;
+                    %>
+                    <tr>
+                        <td><%= item.content %></td>
+                        <td><%= item.createDate %></td>
+                    </tr>
+                    <% }); %>
+                </table>
+            </div>
         </div>
     </div>
 </div>
