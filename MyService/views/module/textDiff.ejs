@@ -12,17 +12,21 @@
         <div class="col-xs-12">
             <input id="contextSize" value="" type="hidden">
 
-            <div class="row">
-                <div class="col-xs-4 navbar-form">
+            <div class="row my-row">
+                <div class="col-xs-3 text-right">
                     <strong>结果查看方式:</strong>
+                </div>
+                <div class="col-xs-4">
                     <select class="form-control" id="viewtype" name="_viewtype">
                         <option value="0">左右并排</option>
                         <option value="1">上下对比</option>
                     </select>
                 </div>
-
-                <div class="col-xs-4 navbar-form">
+                <div class="col-xs-5">
                     <label><input type="checkbox" id="ignoreSpace"/>忽略前后空白字符</label>
+                </div>
+
+                <div class="col-xs-12">
                     <input id="submit" class="btn btn-primary" value="Submit" type="button">
                 </div>
             </div>
@@ -45,7 +49,7 @@
 			var ignoreSpace = $('#ignoreSpace').prop('checked');
 			if (ignoreSpace) {
 				var list = baseText;
-				$(baseText.concat(newText)).each(function (i, t) {
+				$(list).each(function (i, t) {
 					list[i] = $.trim(t);
 				});
 				list = newText;
