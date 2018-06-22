@@ -3,12 +3,11 @@ var gulp = require('gulp'),
 	replace = require('gulp-replace-path'), //替换文件内容
 	gulpSequence = require('gulp-sequence'),
 	ts = require('gulp-typescript'),
-	watch = require('gulp-watch'),
 	changed = require('gulp-changed'),
 	debug = require('gulp-debug'),
 	Q = require('q');
 
-var tsProject = ts.createProject('tsconfig.json');
+var tsProject = ts.createProject('tsconfig.json', {target: 'es2017'});
 var tsFrontProject = ts.createProject('tsconfig.json');
 
 let destDir = './bin';

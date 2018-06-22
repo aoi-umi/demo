@@ -29,15 +29,12 @@ export let query = function (sql, params, conn?) {
 //事务连接
 export let tranConnect = function (queryFunction) {
     var connection = null;
-    return common.promise(function () {
-        return getConnectionPromise();
-    }).then(function (t) {
-        connection = t;
-        return beginTransactionPromise(connection);
-    }).then(function (t) {
-        return queryFunction(connection);
-    }).then(function (t) {
-        return commitPromise(connection);
+    return common.promise(async function () {
+        connection = await getConnectionPromise();
+        await beginTransactionPromise(connection);
+        let result = await queryFunction(connection);
+        await commitPromise(connection);
+        return result;
     }).fail(function (e) {
         common.writeError(e);
         if (connection)

@@ -234,7 +234,7 @@ export let init = function (opt) {
         res.render(view, formatResResult);
         let error = formatResResult.error;
         logSave(req, res, {
-            result: error ? true : false,
+            result: !error,
             detail: error || (`${view}${formatResResult.view ? '[' + formatResResult.view + ']' : ''}`),
             code: (error ? error.code : '') || '',
             desc: '',
@@ -282,7 +282,7 @@ export let init = function (opt) {
         if (/^(::ffff:)?(127\.0\.0\.1)$/.test(req.myData.ip))
             user.authority['local'] = true;
 
-        if (req._parsedUrl.pathname == '/interface/log/save') {
+        if (common.isInArray(req._parsedUrl.pathname, ['/interface/log/save', '/log'])) {
             req.myData.noLog = true;
             req.body.requestIp = req.myData.ip;
         }

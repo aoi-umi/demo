@@ -11,9 +11,8 @@ import * as mainContentDal from '../dal/mainContent';
 
 export let query = function (opt, exOpt) {
     var user = exOpt.user;
-    return common.promise(function () {
-        return mainContentDal.query(opt);
-    }).then(function (t) {
+    return common.promise(async function () {
+        let t = await mainContentDal.query(opt);
         var detail = {
             list: t[0],
             count: t[1][0].count,
@@ -34,27 +33,27 @@ export let query = function (opt, exOpt) {
 };
 
 export let detailQuery = function (opt, exOpt) {
-    return common.promise(function () {
+    return common.promise(async function () {
+        let detail = {
+            mainContent: null,
+            mainContentTypeList: [],
+            mainContentChildList: [],
+            mainContentLogList: []
+        };
         if (opt.id == 0) {
-            var detail: any = {};
             detail.mainContent = {id: 0, status: 0, type: 0};
-            detail.mainContentTypeList = [];
-            detail.mainContentChildList = [];
-            detail.mainContentLogList = [];
-            return detail;
         } else if (!opt.id) {
             throw common.error('', errorConfig.ARGS_ERROR);
-        }
-        return mainContentDal.detailQuery(opt).then(function (t) {
-            var detail: any = {};
+        } else {
+            let t = await mainContentDal.detailQuery(opt);
             detail.mainContent = t[0][0];
             detail.mainContentTypeList = t[1];
             detail.mainContentChildList = t[2];
             detail.mainContentLogList = t[3];
             if (!detail.mainContent)
                 throw common.error('', errorConfig.DB_NO_DATA);
-            return detail;
-        });
+        }
+        return detail;
     }).then(function (t) {
         t.canDelete = canDelete(t.mainContent, exOpt.user);
         updateMainContent(t.mainContent);
@@ -70,10 +69,9 @@ export let detailQuery = function (opt, exOpt) {
 export let save = function (opt, exOpt) {
     var mainContent;
     var user = exOpt.user;
-    return common.promise(function () {
+    return common.promise(async function () {
         mainContent = opt.mainContent;
-        return detailQuery({id: mainContent.id}, exOpt);
-    }).then(function (mainContentDetail) {
+        let mainContentDetail = await detailQuery({id: mainContent.id}, exOpt);
         var delChildList, saveChildList;
         if (mainContent.id != 0) {
             //权限检查
@@ -110,56 +108,52 @@ export let save = function (opt, exOpt) {
             return match;
         });
 
-        return autoBll.tran(function (conn) {
+        //保存
+        return autoBll.tran(async function (conn) {
             var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
             mainContent.type = 0;
             mainContent.operator = `${user.account}(${user.nickname}#${user.id})`;
             mainContent.createDate =
                 mainContent.operateDate = now;
-            var mainContentId;
-            return autoBll.save('mainContent', mainContent, conn).then(function (t) {
-                mainContentId = t;
-                var list = [];
-                if (mainContent.id == 0 && opt.mainContentTypeList) {
-                    opt.mainContentTypeList.forEach(ele => {
-                        list.push(autoBll.save('mainContentTypeId', {
-                            mainContentId: mainContentId,
-                            mainContentTypeId: ele
-                        }, conn));
-                    });
-                }
-                //删除child
-                if (delChildList && delChildList.length) {
-                    delChildList.forEach(function (item) {
-                        list.push(autoBll.del('mainContentChild', {id: item.id}, conn));
-                    });
-                }
+            let mainContentId = await autoBll.save('mainContent', mainContent, conn);
 
-                //保存child
-                saveChildList.forEach(function (item, index) {
-                    item.mainContentId = mainContentId;
-                    item.num = index + 1;
-                    list.push(autoBll.save('mainContentChild', item, conn));
+            var list = [];
+            if (mainContent.id == 0 && opt.mainContentTypeList) {
+                opt.mainContentTypeList.forEach(ele => {
+                    list.push(autoBll.save('mainContentTypeId', {
+                        mainContentId: mainContentId,
+                        mainContentTypeId: ele
+                    }, conn));
                 });
-                //日志
-                var srcStatus = 0;
-                if (mainContent.id != 0)
-                    srcStatus = mainContentDetail.mainContent.status;
-                var mainContentLog = createLog({
-                    id: mainContentId,
-                    srcStatus: srcStatus,
-                    destStatus: mainContent.status,
-                    content: opt.remark,
-                    user: user
+            }
+            //删除child
+            if (delChildList && delChildList.length) {
+                delChildList.forEach(function (item) {
+                    list.push(autoBll.del('mainContentChild', {id: item.id}, conn));
                 });
-                list.push(autoBll.save('mainContentLog', mainContentLog, conn));
-                return q.all(list);
-            }).then(function () {
-                return mainContentId;
+            }
+
+            //保存child
+            saveChildList.forEach(function (item, index) {
+                item.mainContentId = mainContentId;
+                item.num = index + 1;
+                list.push(autoBll.save('mainContentChild', item, conn));
             });
-        }).then(function (t) {
-            return t;
-        });
+            //日志
+            var srcStatus = 0;
+            if (mainContent.id != 0)
+                srcStatus = mainContentDetail.mainContent.status;
+            var mainContentLog = createLog({
+                id: mainContentId,
+                srcStatus: srcStatus,
+                destStatus: mainContent.status,
+                content: opt.remark,
+                user: user
+            });
+            list.push(autoBll.save('mainContentLog', mainContentLog, conn));
+            await q.all(list);    
+            return mainContentId;    
+        });    
     });
 };
 
@@ -203,7 +197,7 @@ export let statusUpdate = function (opt, exOpt) {
             }
             mainContent.status = mainContentLogList[0].srcStatus;
         }
-        return autoBll.tran(function (conn) {
+        return autoBll.tran(async function (conn) {
             var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
             var updateStatusOpt = {
                 id: mainContent.id,
@@ -212,23 +206,20 @@ export let statusUpdate = function (opt, exOpt) {
                 operator: user.account + `(${user.nickname}#${user.id})`,
                 operateDate: now
             };
-            var mainContentId;
-            return autoBll.save('mainContent', updateStatusOpt, conn).then(function (t) {
-                mainContentId = t;
-                var list = [];
-                //日志
-                var mainContentLog = createLog({
-                    id: mainContentId,
-                    srcStatus: mainContentDetail.mainContent.status,
-                    destStatus: mainContent.status,
-                    content: opt.remark,
-                    user: user,
-                });
-                list.push(autoBll.save('mainContentLog', mainContentLog, conn));
-                return q.all(list)
-            }).then(function () {
-                return mainContentId;
+            let mainContentId = await autoBll.save('mainContent', updateStatusOpt, conn);
+
+            var list = [];
+            //日志
+            var mainContentLog = createLog({
+                id: mainContentId,
+                srcStatus: mainContentDetail.mainContent.status,
+                destStatus: mainContent.status,
+                content: opt.remark,
+                user: user,
             });
+            list.push(autoBll.save('mainContentLog', mainContentLog, conn));
+            await q.all(list)
+            return mainContentId;
         });
     });
 };

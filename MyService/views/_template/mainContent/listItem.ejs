@@ -1,17 +1,19 @@
-<div class="col-sm-6 col-md-4 itemRow">
-    <div class="thumbnail itemToDetail">
+<div class="col-xs-12 itemRow">
+    <div class="thumbnail">
         <img style="display: none" alt="" src="">
-        <div class="caption">
+        <div class="caption itemToDetail">
             <p>#<%= id %> <%= typeName %>(<%= statusName %>)</p>
             <h3><%= title %></h3>
             <p><%= description %></p>
-            <p>创建<%= userInfo %>/<%= createDate %></p>
-            <p>最后操作<%= operator %>/<%= operateDate %></p>
             <p>
-                <% if(common.isInArray('del', operation)){ %>
-                <a href="javascript:;" class="itemDel statusUpdate" data-id="<%= id %>" data-operate="del">删除</a>
-                <% } %>
+                <span>创建:<%= userInfo %>/<%= createDate %></span>
+                <span>最后操作:<%= operator %>/<%= operateDate %></span>
             </p>
-        </div>
+        </div>        
+        <p>
+            <% if(common.isInArray('del', operation)){ %>
+            <a href="javascript:;" class="itemDel statusUpdate" data-id="<%= id %>" data-operate="del">删除</a>
+            <% } %>
+        </p>
     </div>
 </div>
