@@ -28,7 +28,7 @@ body.no-nav .container {
     padding: 5px;
 }
 
-#tab-header-context-menu{
+#tab-header-context-menu {
     z-index: 2001;
 }
 
@@ -153,10 +153,14 @@ a.hover {
     margin: 0 5px 0 0;
 }
 
-.glyphicon{
+.glyphicon {
     font-size: 14px;
 }
 
 .more {
     display: none;
+}
+
+.itemToDetail {
+    cursor: pointer
 }

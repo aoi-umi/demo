@@ -1,21 +1,17 @@
-<tbody class="itemRow">
-<tr>
-    <td><%= id %></td>
-    <td><%= typeName %></td>
-    <td><%= statusName %></td>
-    <td>
-        <span title="<%= account + '(' + nickname + '#' + userInfoId + ')' %>"><%= userInfo %></span>
-    </td>
-    <td><%= title %></td>
-    <td><%= description %></td>
-    <td><%= createDate %></td>
-    <td><%= operateDate %></td>
-    <td><%= operator %></td>
-    <td>
-        <a href="javascript:;" class="itemToDetail">详细</a>
-        <% if(common.isInArray('del', operation)){ %>
-        <a href="javascript:;" class="itemDel statusUpdate" data-id="<%= id %>" data-operate="del">删除</a>
-        <% } %>
-    </td>
-</tr>
-</tbody>
+<div class="col-sm-6 col-md-4 itemRow">
+    <div class="thumbnail itemToDetail">
+        <img style="display: none" alt="" src="">
+        <div class="caption">
+            <p>#<%= id %> <%= typeName %>(<%= statusName %>)</p>
+            <h3><%= title %></h3>
+            <p><%= description %></p>
+            <p>创建<%= userInfo %>/<%= createDate %></p>
+            <p>最后操作<%= operator %>/<%= operateDate %></p>
+            <p>
+                <% if(common.isInArray('del', operation)){ %>
+                <a href="javascript:;" class="itemDel statusUpdate" data-id="<%= id %>" data-operate="del">删除</a>
+                <% } %>
+            </p>
+        </div>
+    </div>
+</div>
