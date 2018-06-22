@@ -58,17 +58,8 @@ export let query = function (name, params, conn?) {
     });
 };
 export let tran = function (fn) {
-    return common.promise((def) => {
-        db.tranConnect(function (conn) {
-            return common.promise(function () {
-                return fn(conn);
-            }).then(def.resolve).fail(function (e) {
-                throw e;
-            });
-        }).then(function () {
-            //console.log(arguments)
-        }).fail(def.reject);
-        return def.promise;
+    return db.tranConnect(function (conn) {
+        return fn(conn);
     });
 };
 export let custom = function (name, method, ...args) {

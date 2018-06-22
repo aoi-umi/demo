@@ -1,10 +1,9 @@
-﻿
-import * as autoBll from './_auto';
+﻿import * as autoBll from './_auto';
 import * as common from '../_system/common';
 import * as authorityDal from '../dal/authority';
 
 export let save = function (opt) {
-    return common.promise(function () {
+    return common.promise(async function () {
         if (opt.statusUpdateOnly) {
             if (!opt.id || opt.id == 0)
                 throw common.error('id不能为空');
@@ -13,23 +12,20 @@ export let save = function (opt) {
                 status: opt.status
             };
         } else {
-            return isExist(opt).then(function (t) {
-                if (t)
-                    throw common.error(`code[${opt.code}]已存在`);
-            });
+            let t = await isExist(opt);
+            if (t)
+                throw common.error(`code[${opt.code}]已存在`);
         }
-    }).then(function (t) {
-        return autoBll.save('authority', opt);
+        return autoBll.save('authority', opt);      
     });
 };
 
 export let isExist = function (opt) {
     var code = opt.code;
-    return common.promise(function () {
+    return common.promise(async function () {
         if (!code)
             throw common.error('code不能为空');
-        return autoBll.query('authority', { code: code });
-    }).then(function (t) {
+        let t = await autoBll.query('authority', {code: code});
         var result = false;
         if (t.list.length > 1)
             throw common.error('数据库中存在重复权限');
@@ -41,19 +37,20 @@ export let isExist = function (opt) {
 };
 
 export let query = function (opt) {
-    if (opt.id || opt.anyKey) {
-        delete opt.code;
-        delete opt.name;
-        if (opt.id) {
-            delete opt.anyKey;
+    return common.promise(async function(){
+        if (opt.id || opt.anyKey) {
+            delete opt.code;
+            delete opt.name;
+            if (opt.id) {
+                delete opt.anyKey;
+            }
         }
-    }
-    opt.orderBy = 'code';
-    return authorityDal.query(opt).then(function (t) {
+        opt.orderBy = 'code';
+        let t = await authorityDal.query(opt);
         return {
             list: t[0],
             count: t[1][0].count,
-        };
-    })
+        };        
+    });    
 };
 

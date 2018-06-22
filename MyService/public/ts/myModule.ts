@@ -365,11 +365,16 @@ export class MyModule extends ModuleBase {
                 self.opt.onQuerySuccess(t);
                 self.queryContainerDom.find(self.rowClass).remove();
                 var temp = self.queryItemTemp;
-                $(t.list).each(function (i) {
-                    var item: any = this;
-                    item.colNum = i + 1;
-                    self.queryContainerDom.append($(ejs.render(temp, item)).data('item', item));
-                });
+                if (t.list.length) {
+                    $(t.list).each(function (i) {
+                        var item: any = this;
+                        item.colNum = i + 1;
+                        self.queryContainerDom.append($(ejs.render(temp, item)).data('item', item));
+                    });
+                } else if(errorDom.length){
+                    self.queryContainerDom.find('[name=errorContent]').html('没有数据了');
+                    errorDom.show();
+                }
                 return t;
             }).fail(function (e) {
                 self.queryContainerDom.find(self.rowClass).remove();
