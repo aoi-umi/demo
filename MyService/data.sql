@@ -26,6 +26,7 @@ values
 ('default', 'mainContentSave'),
 ('default', 'mainContentDel'),
 ('default', 'mainContentRecovery'),
+('default', 'mainContentTypeQuery'),
 
 ('admin', 'admin'),
 ('admin', 'mainContentQuery'),
