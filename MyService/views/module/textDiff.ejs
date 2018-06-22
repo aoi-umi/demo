@@ -1,83 +1,76 @@
 <link rel="stylesheet" type="text/css" href="/css/diffview.css">
 <div class="container theme-showcase" role="main">
-    <div align="center">
-        <table id="table1" border="0" width="900">
-            <tbody>
-            <tr>
-                <td>
-                    <h3>Base Text</h3>
-                    <textarea class="form-control" id="baseText"></textarea>
+    <div class="row">
+        <div class="col-xs-12">
+            <h3>Base Text</h3>
+            <textarea class="form-control" id="baseText"></textarea>
+        </div>
+        <div class="col-xs-12">
+            <h3>New Text</h3>
+            <textarea class="form-control" id="newText"></textarea><br>
+        </div>
+        <div class="col-xs-12">
+            <input id="contextSize" value="" type="hidden">
 
-                    <h3>New Text</h3>
-                    <textarea class="form-control" id="newText"></textarea><br>
+            <div class="row">
+                <div class="col-xs-4 navbar-form">
+                    <strong>结果查看方式:</strong>
+                    <select class="form-control" id="viewtype" name="_viewtype">
+                        <option value="0">左右并排</option>
+                        <option value="1">上下对比</option>
+                    </select>
+                </div>
 
-                    <input id="contextSize" value="" type="hidden">
-
-                    <div class="row">
-                        <div class="col-xs-4 navbar-form">
-                            <strong>结果查看方式:</strong>
-                            <select class="form-control" id="viewtype" name="_viewtype">
-                                <option value="0">左右并排</option>
-                                <option value="1">上下对比</option>
-                            </select>
-                        </div>
-
-                        <div class="col-xs-4 navbar-form">
-                            <label><input type="checkbox" id="ignoreSpace"/>忽略前后空白字符</label>
-                            <input id="submit" class="btn btn-primary" value="Submit" type="button">
-                        </div>
-                    </div>
-                    <a name="diff"> </a>
-
-                    <div id="diffoutput" style="width:100%">
-                    </div>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+                <div class="col-xs-4 navbar-form">
+                    <label><input type="checkbox" id="ignoreSpace"/>忽略前后空白字符</label>
+                    <input id="submit" class="btn btn-primary" value="Submit" type="button">
+                </div>
+            </div>
+            <div id="diffoutput" class="col-xs-12">
+            </div>
+        </div>
     </div>
 </div>
 <script type="text/javascript">
-    require(['jquery', 'diffview', 'difflib', './_main'], function () {
-        var $ = require('jquery'),
-            difflib = require('difflib'),
-            main = require('./_main');
-        main.init();
+	require(['jquery', 'diffview', 'difflib', './_main'], function () {
+		var $ = require('jquery'),
+			difflib = require('difflib'),
+			diffview = require('diffview'),
+			main = require('./_main');
+		main.init();
 
-        function diffUsingJS() {
-            var base = difflib.stringAsLines($("#baseText").val());
-            var newtxt = difflib.stringAsLines($("#newText").val());
-            var ignoreSpace = $('#ignoreSpace').prop('checked');
-            if (ignoreSpace) {
-                var list = base;
-                $(list).each(function (i, t) {
-                    list[i] = $.trim(t);
-                });
-                list = newtxt;
-                $(list).each(function (i, t) {
-                    list[i] = $.trim(t);
-                });
-            }
-            var sm = new difflib.SequenceMatcher(base, newtxt);
-            var opcodes = sm.get_opcodes();
-            var diffoutputdiv = $("#diffoutput");
-            diffoutputdiv.html('');
-            var contextSize = $("#contextSize").val();
-            contextSize = contextSize ? contextSize : null;
-            diffoutputdiv.append(diffview.buildView({
-                baseTextLines: base,
-                newTextLines: newtxt,
-                opcodes: opcodes,
-                baseTextName: "Base Text",
-                newTextName: "New Text",
-                contextSize: contextSize,
-                viewType: parseInt($("#viewtype").val()),
-                tableClass: 'table table-bordered'
-            }));
-        }
+		function diffUsingJS() {
+			var baseText = difflib.stringAsLines($("#baseText").val());
+			var newText = difflib.stringAsLines($("#newText").val());
+			var ignoreSpace = $('#ignoreSpace').prop('checked');
+			if (ignoreSpace) {
+				var list = baseText;
+				$(baseText.concat(newText)).each(function (i, t) {
+					list[i] = $.trim(t);
+				});
+				list = newText;
+				$(list).each(function (i, t) {
+					list[i] = $.trim(t);
+				});
+			}
+			var sm = new difflib.SequenceMatcher(baseText, newText);
+			var opcodes = sm.get_opcodes();
+			var contextSize = $('#contextSize').val() || null;
+			var diffoutputdiv = $('#diffoutput');
+			diffoutputdiv.html('').append(diffview.buildView({
+				baseTextLines: baseText,
+				newTextLines: newText,
+				opcodes: opcodes,
+				baseTextName: 'Base Text',
+				newTextName: 'New Text',
+				contextSize: contextSize,
+				viewType: parseInt($('#viewtype').val()),
+				tableClass: 'table table-bordered'
+			}));
+		}
 
-        $('#submit').on('click', function () {
-            diffUsingJS();
-        });
-    });
+		$('#submit').on('click', function () {
+			diffUsingJS();
+		});
+	});
 </script>
