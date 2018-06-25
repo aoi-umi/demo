@@ -6,10 +6,8 @@ import * as fs from 'fs';
 import {Request, Response} from 'express';
 
 import * as common from '../_system/common';
-import * as auth from '../_system/auth';
 import * as myEnum from '../_system/enum';
 import * as main from '../_main';
-import * as autoBll from '../bll/_auto';
 import config from "../../config";
 
 export let get = function (req: Request, res: Response, next) {
