@@ -17,7 +17,7 @@ export let save = function (opt) {
             if (t)
                 throw common.error(`code[${opt.code}]已存在`);
         }
-        return autoBll.modules.authoritySave(opt);      
+        return autoBll.modules.authority.save(opt);      
     });
 };
 
@@ -26,7 +26,7 @@ export let isExist = function (opt) {
     return common.promise(async function () {
         if (!code)
             throw common.error('code不能为空');
-        let t = await autoBll.modules.authorityQuery({code: code});
+        let t = await autoBll.modules.authority.query({code: code});
         var result = false;
         if (t.list.length > 1)
             throw common.error('数据库中存在重复权限', errorConfig.DB_DATA_ERROR);

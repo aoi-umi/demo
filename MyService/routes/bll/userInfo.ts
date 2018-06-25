@@ -14,7 +14,7 @@ export let isAccountExist = function (account) {
     return common.promise(async function () {
         if (!account)
             throw common.error(null, errorConfig.ARGS_ERROR);
-        let t = await autoBll.modules.userInfoQuery({account: account});
+        let t = await autoBll.modules.userInfo.query({account: account});
         if (t.list.length > 1)
             throw common.error('数据库中存在重复账号');
         return t.list.length ? true : false;
@@ -27,7 +27,7 @@ export let save = function (opt, exOpt) {
     var userInfoLog = createLog();
     userInfoLog.userInfoId = user.id;
     return common.promise(async function () {
-        let t = await autoBll.modules.userInfoDetailQuery({id: user.id})
+        let t = await autoBll.modules.userInfo.detailQuery({id: user.id})
         if (!t || !t.id)
             throw common.error('查询用户信息为空');
         var isChanged = false;
@@ -59,8 +59,8 @@ export let save = function (opt, exOpt) {
             editDate: now,
         };
         return autoBll.tran(async function (conn) {
-            await autoBll.modules.userInfoSave(saveOpt, conn);
-            await autoBll.modules.userInfoLogSave(userInfoLog, conn);       
+            await autoBll.modules.userInfo.save(saveOpt, conn);
+            await autoBll.modules.userInfoLog.save(userInfoLog, conn);       
         });
     }).then(function () {
         if (user.key) {
@@ -161,7 +161,7 @@ export let adminSave = function (opt, exOpt) {
     return common.promise(function () {
         if (!id)
             throw common.error('id为空', errorConfig.CAN_NOT_BE_EMPTY);
-        return autoBll.modules.userInfoWithAuthorityQuery({userInfoId: id});
+        return autoBll.modules.userInfoWithAuthority.query({userInfoId: id});
     }).then(function (t) {
         //权限
         delUserAuthList = t.list.filter((dbAuth) => {
@@ -174,7 +174,7 @@ export let adminSave = function (opt, exOpt) {
                 return dbAuth.authorityCode == addAuth;
             }) < 0;
         });
-        return autoBll.modules.userInfoWithRoleQuery({userInfoId: id});
+        return autoBll.modules.userInfoWithRole.query({userInfoId: id});
     }).then(function (t) {
         //角色
         delUserRoleList = t.list.filter((dbAuth) => {
@@ -225,44 +225,44 @@ export let adminSave = function (opt, exOpt) {
         if (!isChanged)
             throw common.error('没有变更的信息');
         return autoBll.tran(async function (conn) {
-            await autoBll.modules.userInfoSave({id: id, editDate: now}, conn);
+            await autoBll.modules.userInfo.save({id: id, editDate: now}, conn);
             var list = [];
             //删除权限
             if (delUserAuthList.length) {
                 delUserAuthList.forEach(function (item) {
-                    list.push(autoBll.modules.userInfoWithAuthorityDel({id: item.id}, conn));
+                    list.push(autoBll.modules.userInfoWithAuthority.del({id: item.id}, conn));
                 })
             }
             //保存权限
             if (addUserAuthList.length) {
                 addUserAuthList.forEach(function (item) {
-                    list.push(autoBll.modules.userInfoWithAuthoritySave({userInfoId: id, authorityCode: item}));
+                    list.push(autoBll.modules.userInfoWithAuthority.save({userInfoId: id, authorityCode: item}));
                 });
             }
 
             //删除角色
             if (delUserRoleList.length) {
                 delUserRoleList.forEach(function (item) {
-                    list.push(autoBll.modules.userInfoWithRoleDel({id: item.id}, conn));
+                    list.push(autoBll.modules.userInfoWithRole.del({id: item.id}, conn));
                 })
             }
             //保存角色
             if (addUserRoleList.length) {
                 addUserRoleList.forEach(function (item) {
-                    list.push(autoBll.modules.userInfoWithRoleSave({userInfoId: id, roleCode: item}));
+                    list.push(autoBll.modules.userInfoWithRole.save({userInfoId: id, roleCode: item}));
                 });
             }
 
             //修改架构
             if (structList.length) {
                 structList.forEach(function (item) {
-                    list.push(autoBll.modules.userInfoWithStructSave(item));
+                    list.push(autoBll.modules.userInfoWithStruct.save(item));
                 });
             }
 
             await q.all(list);
             //日志
-            await autoBll.modules.userInfoLogSave(userInfoLog, conn);
+            await autoBll.modules.userInfoLog.save(userInfoLog, conn);
         });
     }).then(function (t) {
         return id;
