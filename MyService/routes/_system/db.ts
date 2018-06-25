@@ -35,10 +35,10 @@ export let tranConnect = function (queryFunction) {
         let result = await queryFunction(connection);
         await commitPromise(connection);
         return result;
-    }).fail(function (e) {
+    }).fail(async function (e) {
         common.writeError(e);
         if (connection)
-            rollbackPromise(connection);
+            await rollbackPromise(connection);
         throw e;
     }).finally(function () {
         if (connection)
@@ -51,13 +51,9 @@ function myQuery(sql, params) {
         params = [];
 
     var connection = null;
-    return common.promise(function () {
-        return getConnectionPromise();
-    }).then(function (t) {
-        connection = t;
+    return common.promise(async function () {
+        connection = await getConnectionPromise();
         return queryPromise(connection, sql, params);
-    }).then(function (t) {
-        return (t);
     }).fail(function (e) {
         throw e;
     }).finally(function () {

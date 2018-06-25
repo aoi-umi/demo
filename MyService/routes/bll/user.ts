@@ -19,7 +19,7 @@ export let signUp = function (opt, exOpt) {
         if (exist)
             throw common.error('account is exist!');
         return autoBll.tran(async function (conn) {
-            userInfoId = await autoBll.save('userInfo', {
+            userInfoId = await autoBll.modules.userInfoSave({
                 account: opt.account,
                 password: opt.password,
                 nickname: opt.nickname,
@@ -27,7 +27,7 @@ export let signUp = function (opt, exOpt) {
             }, conn);
 
             //默认角色
-            await autoBll.save('userInfoWithRole', {
+            await autoBll.modules.userInfoWithRoleSave({
                 userInfoId: userInfoId,
                 roleCode: 'default'
             }, conn);
@@ -36,7 +36,7 @@ export let signUp = function (opt, exOpt) {
             var userInfoLog = userInfoBll.createLog();
             userInfoLog.userInfoId = userInfoId;
             userInfoLog.content = '[创建账号]';
-            await autoBll.save('userInfoLog', userInfoLog, conn);
+            await autoBll.modules.userInfoLogSave(userInfoLog, conn);
         });
     }).then(function (t) {
         return userInfoId;
@@ -97,7 +97,7 @@ export let signInInside = function (req: Request) {
             reqBody = '';
         if (typeof reqBody != 'string')
             reqBody = JSON.stringify(reqBody);
-        let t = await autoBll.query('userInfo', {account: account});
+        let t = await autoBll.modules.userInfoQuery({account: account});
         if (!t.count)
             throw common.error('no account!');
         if (t.count > 1)

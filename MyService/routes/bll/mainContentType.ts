@@ -11,7 +11,7 @@ export let save = function (opt) {
         if (t) {
             throw common.error('type [' + opt.type + '] is exist');
         }
-        return autoBll.save('mainContentType', opt);
+        return autoBll.modules.mainContentTypeSave(opt);
     });
 };
 
@@ -19,7 +19,7 @@ export let isExist = function (opt) {
     return common.promise(async function () {
         if (!opt || !opt.type)
             throw common.error(null, errorConfig.ARGS_ERROR);
-        let t = await autoBll.query('mainContentType', {type: opt.type});
+        let t = await autoBll.modules.mainContentTypeQuery({type: opt.type});
         let result = false;
         if (t.list.length > 1)
             throw common.error('数据库中存在重复类型', errorConfig.DB_DATA_ERROR);

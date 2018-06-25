@@ -13,13 +13,13 @@ export let save = function (opt) {
         if (opt.statusUpdateOnly) {
             if (!dataRole.id || dataRole.id == 0)
                 throw common.error('id不能为空');
-            id = await autoBll.save('role', {id: dataRole.id, status: dataRole.status});
+            id = await autoBll.modules.roleSave({id: dataRole.id, status: dataRole.status});
         } else {
             let exist = await isExist(dataRole);
                 if (exist)
                     throw common.error(`code[${dataRole.code}]已存在`);
 
-            let roleWithAuthority = await autoBll.query('roleWithAuthority', {roleCode: dataRole.code});
+            let roleWithAuthority = await autoBll.modules.roleWithAuthorityQuery({roleCode: dataRole.code});
             var delRoleAuthList = roleWithAuthority.list.filter((dbAuth) => {
                 return opt.delAuthorityList.findIndex((delAuth) => {
                     return dbAuth.authorityCode == delAuth;
@@ -33,18 +33,18 @@ export let save = function (opt) {
             // console.log(delRoleAuthList);
             // console.log(addRoleAuthList);
             return autoBll.tran(async function (conn) {
-                id = await autoBll.save('role', dataRole, conn);                    
+                id = await autoBll.modules.roleSave(dataRole, conn);                    
                 var list = [];
                 //删除权限
                 if (delRoleAuthList.length) {
                     delRoleAuthList.forEach(function (item) {
-                        list.push(autoBll.del('roleWithAuthority', {id: item.id}, conn));
+                        list.push(autoBll.modules.roleWithAuthorityDel({id: item.id}, conn));
                     })
                 }
                 //保存权限
                 if (addRoleAuthList.length) {
                     addRoleAuthList.forEach(function (item) {
-                        list.push(autoBll.save('roleWithAuthority', {
+                        list.push(autoBll.modules.roleWithAuthoritySave({
                             roleCode: dataRole.code,
                             authorityCode: item
                         }, conn));
@@ -112,7 +112,7 @@ export let isExist = function (opt) {
     return common.promise(async function () {
         if (!code)
             throw common.error('code不能为空');
-        let t = await autoBll.query('role', {code: code});
+        let t = await autoBll.modules.roleQuery({code: code});
         var result = false;
         if (t.list.length > 1)
             throw common.error('数据库中存在重复角色');
