@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import {Request, Response, Express} from 'express';
+import {Request, Response} from 'express';
 //@ts-ignore
 import * as svgCaptcha from 'svg-captcha';
 

@@ -1,4 +1,3 @@
-import * as express from 'express';
 import {Request, Response, Express} from 'express';
 import * as common from './_system/common';
 import * as myEnum from './_system/enum';

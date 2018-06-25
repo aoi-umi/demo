@@ -1,13 +1,10 @@
 /**
  * Created by bang on 2017-9-7.
  */
-import * as path from 'path';
-import * as fs from 'fs';
+import { Request, Response } from 'express';
 import * as common from '../_system/common';
 import * as auth from '../_system/auth';
 import * as autoBll from '../bll/_auto';
-import { Request, Response } from 'express';
-import errorConfig from '../_system/errorConfig';
 
 //接口
 export let post = function (req: Request, res: Response, next) {
@@ -26,22 +23,21 @@ export let post = function (req: Request, res: Response, next) {
 function getBll(req: Request, res: Response, next) {
     var params = req.params;
     var args = req.body;
-    var module = params.module;
+    var moduleName = params.module;
     var method = params.method;
-    console.log(`[module:${module}][method:${method}]`);
+    console.log(`[module:${moduleName}][method:${method}]`);
     var opt = {
-        isCustom: isCustom(module, method)
+        isCustom: isCustom(moduleName, method)
     };
 
     if (!opt.isCustom)
-        checkArgs({method: method, module: module, args: args});
+        checkArgs({method: method, module: moduleName, args: args});
 
     //不记录日志
-    if (common.isInArray(module, ['log'])) {
+    if (common.isInArray(moduleName, ['log'])) {
         req.myData.noLog = true;
     }
 
-    var reqModule = module;
     let toNext = false;
     return common.promise(function () {
         if (opt.isCustom) {
@@ -49,31 +45,25 @@ function getBll(req: Request, res: Response, next) {
                 user: req.myData.user,
                 req: req
             };
-            let bll = autoBll.getRequire(module, {type: 'bll', notThrowError: true});
+            let bll = autoBll.getRequire(moduleName, {type: 'bll', notThrowError: true});
             if (!bll || !bll[method]) {
                 toNext = true;
                 return;
             }
             return bll[method](args, exOpt);
         } else {
-            let bll = autoBll.getRequire(module, {notThrowError: true});
+            let bll = autoBll.getRequire(moduleName, {notThrowError: true});
             if (!bll || !bll[method]) {
                 toNext = true;
                 return;
             }
-            // var modulePath = path.resolve(__dirname + '/../dal/_auto/' + module + '.js');
-            // var isExist = fs.existsSync(modulePath);            
-            // if (!isExist)
-            //     throw common.error('file is not exist', errorConfig.BAD_REQUEST);
-            // if (!autoBll[method])
-            //     throw common.error(`method[${method}] is not exist`, errorConfig.BAD_REQUEST);
-            return autoBll[method](module, args);
+            return autoBll[method](moduleName, args);
         }
     }).then(function (t) {
         if (!toNext) {
             updateValue({
                 t: t,
-                module: reqModule,
+                module: moduleName,
                 method: method,
                 user: req.myData.user
             });
@@ -84,17 +74,17 @@ function getBll(req: Request, res: Response, next) {
     });
 }
 
-var isCustom = function (module, method) {
+var isCustom = function (moduleName, method) {
     //使用custom
     if (!common.isInArray(method, ['query', 'save', 'detailQuery', 'del'])
-        || (module == 'onlineUser')
-        || (module == 'log' && common.isInArray(method, ['query']))
-        || (module == 'role' && common.isInArray(method, ['query', 'save', 'detailQuery']))
-        || (module == 'authority' && common.isInArray(method, ['query', 'save']))
-        || (module == 'userInfo' && common.isInArray(method, ['query', 'save', 'detailQuery']))
-        || (module == 'mainContentType' && common.isInArray(method, ['save']))
-        || (module == 'mainContent' && common.isInArray(method, ['query', 'save']))
-        || (module == 'struct' && common.isInArray(method, ['save']))
+        || (moduleName == 'onlineUser')
+        || (moduleName == 'log' && common.isInArray(method, ['query']))
+        || (moduleName == 'role' && common.isInArray(method, ['query', 'save', 'detailQuery']))
+        || (moduleName == 'authority' && common.isInArray(method, ['query', 'save']))
+        || (moduleName == 'userInfo' && common.isInArray(method, ['query', 'save', 'detailQuery']))
+        || (moduleName == 'mainContentType' && common.isInArray(method, ['save']))
+        || (moduleName == 'mainContent' && common.isInArray(method, ['query', 'save']))
+        || (moduleName == 'struct' && common.isInArray(method, ['save']))
     ) {
         return true;
     }
@@ -103,22 +93,22 @@ var isCustom = function (module, method) {
 
 var checkArgs = function (opt) {
     var method = opt.method;
-    var module = opt.module;
+    var moduleName = opt.module;
     var args = opt.args;
     if (!(
-            (module == 'mainContentType' && common.isInArray(method, ['query']))
-            || (module == 'struct' && common.isInArray(method, ['query']))
+            (moduleName == 'mainContentType' && common.isInArray(method, ['query']))
+            || (moduleName == 'struct' && common.isInArray(method, ['query']))
         )) {
         if (!args.pageIndex)
             args.pageIndex = 1;
         if (!args.pageSize)
             args.pageSize = 10;
-        if (args.pageSize > 100)
-            args.pageSize = 100;
+        if (args.pageSize > 50)
+            args.pageSize = 50;
     }
     if (common.isInArray(method, ['detailQuery'])) {
         var argsError = false;
-        if (module == 'role') {
+        if (moduleName == 'role') {
             if (!args.code)
                 argsError = true;
         }
