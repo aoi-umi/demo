@@ -6,8 +6,8 @@ import * as db from '../_system/db';
 import * as common from '../_system/common';
 import errorConfig from '../_system/errorConfig';
 
-type autoBllFun = (name, params, conn?: PoolConnection) => Q.Promise<any>;
-type autoBllModuleFun = (params, conn?: PoolConnection) => Q.Promise<any>;
+type AutoBllFun = (name, params, conn?: PoolConnection) => Q.Promise<any>;
+type AutoBllModuleFun = (params, conn?: PoolConnection) => Q.Promise<any>;
 
 export let getRequire = function (name, option?) {
     var filepath = '';
@@ -40,20 +40,20 @@ export let getRequire = function (name, option?) {
     return require(filepath);
 }
 
-export let save: autoBllFun = function (name, params, conn?) {
+export let save: AutoBllFun = function (name, params, conn?) {
     return getRequire(name).save(params, conn).then(function (t) {
         return t[0][0].id;
     });
 };
-export let del: autoBllFun = function (name, params, conn?) {
+export let del: AutoBllFun = function (name, params, conn?) {
     return getRequire(name).del(params, conn);
 };
-export let detailQuery: autoBllFun = function (name, params, conn?) {
+export let detailQuery: AutoBllFun = function (name, params, conn?) {
     return getRequire(name).detailQuery(params, conn).then(function (t) {
         return t[0][0];
     });
 };
-export let query: autoBllFun = function (name, params, conn?) {
+export let query: AutoBllFun = function (name, params, conn?) {
     return getRequire(name).query(params, conn).then(function (t) {
         return {
             list: t[0],
@@ -84,92 +84,37 @@ let moduleList = ['authority', 'log',
     'userInfo', 'userInfoLog', 'userInfoWithAuthority', 'userInfoWithRole', 'userInfoWithStruct'];
 let methodList = ['save', 'query', 'detailQuery', 'del'];
 
-interface autoBllModules {
-    authoritySave?: autoBllModuleFun;
-    authorityQuery?: autoBllModuleFun;
-    authorityDetailQuery?: autoBllModuleFun;
-    authorityDel?: autoBllModuleFun;
-
-    logSave?: autoBllModuleFun;
-    logQuery?: autoBllModuleFun;
-    logDetailQuery?: autoBllModuleFun;
-    logDel?: autoBllModuleFun;
-
-    mainContentSave?: autoBllModuleFun;
-    mainContentQuery?: autoBllModuleFun;
-    mainContentDetailQuery?: autoBllModuleFun;
-    mainContentDel?: autoBllModuleFun;
-
-    mainContentChildSave?: autoBllModuleFun;
-    mainContentChildQuery?: autoBllModuleFun;
-    mainContentChildDetailQuery?: autoBllModuleFun;
-    mainContentChildDel?: autoBllModuleFun;
-
-    mainContentLogSave?: autoBllModuleFun;
-    mainContentLogQuery?: autoBllModuleFun;
-    mainContentLogDetailQuery?: autoBllModuleFun;
-    mainContentLogDel?: autoBllModuleFun;
-
-    mainContentTagSave?: autoBllModuleFun;
-    mainContentTagQuery?: autoBllModuleFun;
-    mainContentTagDetailQuery?: autoBllModuleFun;
-    mainContentTagDel?: autoBllModuleFun;
-
-    mainContentTypeSave?: autoBllModuleFun;
-    mainContentTypeQuery?: autoBllModuleFun;
-    mainContentTypeDetailQuery?: autoBllModuleFun;
-    mainContentTypeDel?: autoBllModuleFun;
-
-    mainContentTypeIdSave?: autoBllModuleFun;
-    mainContentTypeIdQuery?: autoBllModuleFun;
-    mainContentTypeIdDetailQuery?: autoBllModuleFun;
-    mainContentTypeIdDel?: autoBllModuleFun;
-
-    roleSave?: autoBllModuleFun;
-    roleQuery?: autoBllModuleFun;
-    roleDetailQuery?: autoBllModuleFun;
-    roleDel?: autoBllModuleFun;
-
-    roleWithAuthoritySave?: autoBllModuleFun;
-    roleWithAuthorityQuery?: autoBllModuleFun;
-    roleWithAuthorityDetailQuery?: autoBllModuleFun;
-    roleWithAuthorityDel?: autoBllModuleFun;
-
-    structSave?: autoBllModuleFun;
-    structQuery?: autoBllModuleFun;
-    structDetailQuery?: autoBllModuleFun;
-    structDel?: autoBllModuleFun;
-
-    userInfoSave?: autoBllModuleFun;
-    userInfoQuery?: autoBllModuleFun;
-    userInfoDetailQuery?: autoBllModuleFun;
-    userInfoDel?: autoBllModuleFun;
-
-    userInfoLogSave?: autoBllModuleFun;
-    userInfoLogQuery?: autoBllModuleFun;
-    userInfoLogDetailQuery?: autoBllModuleFun;
-    userInfoLogDel?: autoBllModuleFun;
-
-    userInfoWithAuthoritySave?: autoBllModuleFun;
-    userInfoWithAuthorityQuery?: autoBllModuleFun;
-    userInfoWithAuthorityDetailQuery?: autoBllModuleFun;
-    userInfoWithAuthorityDel?: autoBllModuleFun;
-
-    userInfoWithRoleSave?: autoBllModuleFun;
-    userInfoWithRoleQuery?: autoBllModuleFun;
-    userInfoWithRoleDetailQuery?: autoBllModuleFun;
-    userInfoWithRoleDel?: autoBllModuleFun;
-
-    userInfoWithStructSave?: autoBllModuleFun;
-    userInfoWithStructQuery?: autoBllModuleFun;
-    userInfoWithStructDetailQuery?: autoBllModuleFun;
-    userInfoWithStructDel?: autoBllModuleFun;
+interface AutoBllModule {
+    save?: AutoBllModuleFun;
+    query?: AutoBllModuleFun;
+    detailQuery?: AutoBllModuleFun;
+    del?: AutoBllModuleFun;
 }
 
-export let modules: autoBllModules = {};
+interface AutoBllModules {
+    authority?: AutoBllModule;
+    log?: AutoBllModule;
+    mainContent?: AutoBllModule;
+    mainContentChild?: AutoBllModule;
+    mainContentLog?: AutoBllModule;
+    mainContentTag?: AutoBllModule;
+    mainContentType?: AutoBllModule;
+    mainContentTypeId?: AutoBllModule;
+    role?: AutoBllModule;
+    roleWithAuthority?: AutoBllModule;
+    struct?: AutoBllModule;
+    userInfo?: AutoBllModule;
+    userInfoLog?: AutoBllModule;
+    userInfoWithAuthority?: AutoBllModule;
+    userInfoWithRole?: AutoBllModule;
+    userInfoWithStruct?: AutoBllModule;
+}
+
+export let modules: AutoBllModules = {};
 moduleList.forEach(ele => {
+    let autoModule = modules[ele] = {};
     methodList.forEach(method => {
-        modules[ele + common.stringToPascal(method)] = (...args) => {
+        autoModule[method] = (...args) => {
             args.splice(0, 0, ele);
             return exports[method].apply(void 0, args);
         }
