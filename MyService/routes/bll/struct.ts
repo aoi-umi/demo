@@ -10,7 +10,7 @@ export let save = function (opt) {
         if (t) {
             throw common.error('struct [' + opt.struct + '] is exist');
         }
-        return autoBll.save('struct', opt);
+        return autoBll.modules.structSave(opt);
     });
 };
 
@@ -18,7 +18,7 @@ export let isExist = function (opt) {
     return common.promise(async function () {
         if (!opt || !opt.struct)
             throw common.error(null, errorConfig.ARGS_ERROR);
-        let t = await autoBll.query('struct', {struct: opt.struct});
+        let t = await autoBll.modules.structQuery({struct: opt.struct});
         let result = false;
         if (t.list.length > 1)
             throw common.error('数据库中存在重复架构', errorConfig.DB_DATA_ERROR);

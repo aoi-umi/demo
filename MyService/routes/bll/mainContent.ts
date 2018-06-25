@@ -115,12 +115,12 @@ export let save = function (opt, exOpt) {
             mainContent.operator = `${user.account}(${user.nickname}#${user.id})`;
             mainContent.createDate =
                 mainContent.operateDate = now;
-            let mainContentId = await autoBll.save('mainContent', mainContent, conn);
+            let mainContentId = await autoBll.modules.mainContentSave(mainContent, conn);
 
             var list = [];
             if (mainContent.id == 0 && opt.mainContentTypeList) {
                 opt.mainContentTypeList.forEach(ele => {
-                    list.push(autoBll.save('mainContentTypeId', {
+                    list.push(autoBll.modules.mainContentTypeIdSave({
                         mainContentId: mainContentId,
                         mainContentTypeId: ele
                     }, conn));
@@ -129,7 +129,7 @@ export let save = function (opt, exOpt) {
             //删除child
             if (delChildList && delChildList.length) {
                 delChildList.forEach(function (item) {
-                    list.push(autoBll.del('mainContentChild', {id: item.id}, conn));
+                    list.push(autoBll.modules.mainContentChildDel({id: item.id}, conn));
                 });
             }
 
@@ -137,7 +137,7 @@ export let save = function (opt, exOpt) {
             saveChildList.forEach(function (item, index) {
                 item.mainContentId = mainContentId;
                 item.num = index + 1;
-                list.push(autoBll.save('mainContentChild', item, conn));
+                list.push(autoBll.modules.mainContentChildSave(item, conn));
             });
             //日志
             var srcStatus = 0;
@@ -150,7 +150,7 @@ export let save = function (opt, exOpt) {
                 content: opt.remark,
                 user: user
             });
-            list.push(autoBll.save('mainContentLog', mainContentLog, conn));
+            list.push(autoBll.modules.mainContentLogSave(mainContentLog, conn));
             await q.all(list);    
             return mainContentId;    
         });    
@@ -206,7 +206,7 @@ export let statusUpdate = function (opt, exOpt) {
                 operator: user.account + `(${user.nickname}#${user.id})`,
                 operateDate: now
             };
-            let mainContentId = await autoBll.save('mainContent', updateStatusOpt, conn);
+            let mainContentId = await autoBll.modules.mainContentSave(updateStatusOpt, conn);
 
             var list = [];
             //日志
@@ -217,7 +217,7 @@ export let statusUpdate = function (opt, exOpt) {
                 content: opt.remark,
                 user: user,
             });
-            list.push(autoBll.save('mainContentLog', mainContentLog, conn));
+            list.push(autoBll.modules.mainContentLogSave(mainContentLog, conn));
             await q.all(list)
             return mainContentId;
         });
