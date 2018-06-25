@@ -6,18 +6,18 @@ import * as common from '../_system/common';
 import errorConfig from '../_system/errorConfig';
 import * as cache from '../_system/cache';
 import * as autoBll from './_auto';
+import * as main from '../_main';
 import * as userInfoWithStructBll from './userInfoWithStruct';
 import * as userInfoDal from '../dal/userInfo';
 
 export let isAccountExist = function (account) {
-    return common.promise(function () {
+    return common.promise(async function () {
         if (!account)
             throw common.error(null, errorConfig.ARGS_ERROR);
-        return autoBll.query('userInfo', {account: account}).then(function (t) {
-            if (t.list.length > 1)
-                throw common.error('数据库中存在重复账号');
-            return t.list.length ? true : false;
-        });
+        let t = await autoBll.query('userInfo', {account: account});
+        if (t.list.length > 1)
+            throw common.error('数据库中存在重复账号');
+        return t.list.length ? true : false;
     });
 };
 
@@ -26,32 +26,31 @@ export let save = function (opt, exOpt) {
     var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
     var userInfoLog = createLog();
     userInfoLog.userInfoId = user.id;
-    return common.promise(function () {
-        return autoBll.detailQuery('userInfo', {id: user.id}).then(function (t) {
-            if (!t || !t.id)
-                throw common.error('查询用户信息为空');
-            var isChanged = false;
-            if (opt.newPassword && opt.newPassword != t.password) {
-                if (!opt.password)
-                    throw common.error('原密码不能为空', errorConfig.ARGS_ERROR);
-                if (t.password != opt.password)
-                    throw common.error('密码不正确');
-                isChanged = true;
-                userInfoLog.content += '[修改了密码]';
-            } else {
-                opt.newPassword = null;
-            }
-            if (!opt.nickname || opt.nickname == t.nickname)
-                opt.nickname = null;
-            else {
-                isChanged = true;
-                userInfoLog.content += `[修改了昵称: ${t.nickname} -> ${opt.nickname} ]`;
-            }
+    return common.promise(async function () {
+        let t = await autoBll.detailQuery('userInfo', {id: user.id})
+        if (!t || !t.id)
+            throw common.error('查询用户信息为空');
+        var isChanged = false;
+        if (opt.newPassword && opt.newPassword != t.password) {
+            if (!opt.password)
+                throw common.error('原密码不能为空', errorConfig.ARGS_ERROR);
+            if (t.password != opt.password)
+                throw common.error('密码不正确');
+            isChanged = true;
+            userInfoLog.content += '[修改了密码]';
+        } else {
+            opt.newPassword = null;
+        }
+        if (!opt.nickname || opt.nickname == t.nickname)
+            opt.nickname = null;
+        else {
+            isChanged = true;
+            userInfoLog.content += `[修改了昵称: ${t.nickname} -> ${opt.nickname} ]`;
+        }
 
-            if (!isChanged) {
-                throw common.error('没有变更的信息');
-            }
-        });
+        if (!isChanged) {
+            throw common.error('没有变更的信息');
+        }
     }).then(function () {
         var saveOpt = {
             id: user.id,
@@ -59,10 +58,9 @@ export let save = function (opt, exOpt) {
             password: opt.newPassword,
             editDate: now,
         };
-        return autoBll.tran(function (conn) {
-            return autoBll.save('userInfo', saveOpt, conn).then(function () {
-                return autoBll.save('userInfoLog', userInfoLog, conn);
-            });
+        return autoBll.tran(async function (conn) {
+            await autoBll.save('userInfo', saveOpt, conn);
+            await autoBll.save('userInfoLog', userInfoLog, conn);       
         });
     }).then(function () {
         if (user.key) {
@@ -70,8 +68,7 @@ export let save = function (opt, exOpt) {
                 return cache.del(user.key);
             else if (opt.nickname) {
                 user.nickname = opt.nickname;
-                var seconds = 7 * 24 * 3600;
-                return cache.set(user.key, user, seconds);
+                return cache.set(user.key, user, main.cacheTime.userInfo);
             }
         }
     });
@@ -227,47 +224,45 @@ export let adminSave = function (opt, exOpt) {
         }
         if (!isChanged)
             throw common.error('没有变更的信息');
-        return autoBll.tran(function (conn) {
-            return autoBll.save('userInfo', {id: id, editDate: now}, conn).then(function (t) {
-                var list = [];
-                //删除权限
-                if (delUserAuthList.length) {
-                    delUserAuthList.forEach(function (item) {
-                        list.push(autoBll.del('userInfoWithAuthority', {id: item.id}, conn));
-                    })
-                }
-                //保存权限
-                if (addUserAuthList.length) {
-                    addUserAuthList.forEach(function (item) {
-                        list.push(autoBll.save('userInfoWithAuthority', {userInfoId: id, authorityCode: item}));
-                    });
-                }
+        return autoBll.tran(async function (conn) {
+            await autoBll.save('userInfo', {id: id, editDate: now}, conn);
+            var list = [];
+            //删除权限
+            if (delUserAuthList.length) {
+                delUserAuthList.forEach(function (item) {
+                    list.push(autoBll.del('userInfoWithAuthority', {id: item.id}, conn));
+                })
+            }
+            //保存权限
+            if (addUserAuthList.length) {
+                addUserAuthList.forEach(function (item) {
+                    list.push(autoBll.save('userInfoWithAuthority', {userInfoId: id, authorityCode: item}));
+                });
+            }
 
-                //删除角色
-                if (delUserRoleList.length) {
-                    delUserRoleList.forEach(function (item) {
-                        list.push(autoBll.del('userInfoWithRole', {id: item.id}, conn));
-                    })
-                }
-                //保存角色
-                if (addUserRoleList.length) {
-                    addUserRoleList.forEach(function (item) {
-                        list.push(autoBll.save('userInfoWithRole', {userInfoId: id, roleCode: item}));
-                    });
-                }
+            //删除角色
+            if (delUserRoleList.length) {
+                delUserRoleList.forEach(function (item) {
+                    list.push(autoBll.del('userInfoWithRole', {id: item.id}, conn));
+                })
+            }
+            //保存角色
+            if (addUserRoleList.length) {
+                addUserRoleList.forEach(function (item) {
+                    list.push(autoBll.save('userInfoWithRole', {userInfoId: id, roleCode: item}));
+                });
+            }
 
-                //修改架构
-                if (structList.length) {
-                    structList.forEach(function (item) {
-                        list.push(autoBll.save('userInfoWithStruct', item));
-                    });
-                }
+            //修改架构
+            if (structList.length) {
+                structList.forEach(function (item) {
+                    list.push(autoBll.save('userInfoWithStruct', item));
+                });
+            }
 
-                return q.all(list);
-            }).then(function () {
-                //日志
-                autoBll.save('userInfoLog', userInfoLog, conn);
-            });
+            await q.all(list);
+            //日志
+            await autoBll.save('userInfoLog', userInfoLog, conn);
         });
     }).then(function (t) {
         return id;

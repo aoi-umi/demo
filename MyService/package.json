@@ -55,5 +55,8 @@
     "gulp-sequence": "^1.0.0",
     "gulp-typescript": "^4.0.2",
     "typescript": "^2.8.3"
+  },
+  "engines": {
+    "node": ">= 8.0.0"
   }
 }

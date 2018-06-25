@@ -9,57 +9,51 @@ import * as roleDal from '../dal/role';
 export let save = function (opt) {
     var id;
     var dataRole = opt.role;
-    return common.promise(function () {
+    return common.promise(async function () {
         if (opt.statusUpdateOnly) {
             if (!dataRole.id || dataRole.id == 0)
                 throw common.error('id不能为空');
-            return autoBll.save('role', {id: dataRole.id, status: dataRole.status}).then(function (t) {
-                id = t;
-            });
+            id = await autoBll.save('role', {id: dataRole.id, status: dataRole.status});
         } else {
-            return isExist(dataRole).then(function (t) {
-                if (t)
+            let exist = await isExist(dataRole);
+                if (exist)
                     throw common.error(`code[${dataRole.code}]已存在`);
 
-                return autoBll.query('roleWithAuthority', {roleCode: dataRole.code});
-            }).then(function (t) {
-                var delRoleAuthList = t.list.filter((dbAuth) => {
-                    return opt.delAuthorityList.findIndex((delAuth) => {
-                        return dbAuth.authorityCode == delAuth;
-                    }) >= 0;
-                });
-                var addRoleAuthList = opt.addAuthorityList.filter((addAuth) => {
-                    return t.list.findIndex((dbAuth) => {
-                        return dbAuth.authorityCode == addAuth;
-                    }) < 0;
-                });
-                // console.log(delRoleAuthList);
-                // console.log(addRoleAuthList);
-                return autoBll.tran(function (conn) {
-                    return autoBll.save('role', dataRole, conn).then(function (t) {
-                        id = t;
-                        var list = [];
-                        //删除权限
-                        if (delRoleAuthList.length) {
-                            delRoleAuthList.forEach(function (item) {
-                                list.push(autoBll.del('roleWithAuthority', {id: item.id}, conn));
-                            })
-                        }
-                        //保存权限
-                        if (addRoleAuthList.length) {
-                            addRoleAuthList.forEach(function (item) {
-                                list.push(autoBll.save('roleWithAuthority', {
-                                    roleCode: dataRole.code,
-                                    authorityCode: item
-                                }, conn));
-                            });
-                        }
-                        return q.all(list);
+            let roleWithAuthority = await autoBll.query('roleWithAuthority', {roleCode: dataRole.code});
+            var delRoleAuthList = roleWithAuthority.list.filter((dbAuth) => {
+                return opt.delAuthorityList.findIndex((delAuth) => {
+                    return dbAuth.authorityCode == delAuth;
+                }) >= 0;
+            });
+            var addRoleAuthList = opt.addAuthorityList.filter((addAuth) => {
+                return roleWithAuthority.list.findIndex((dbAuth) => {
+                    return dbAuth.authorityCode == addAuth;
+                }) < 0;
+            });
+            // console.log(delRoleAuthList);
+            // console.log(addRoleAuthList);
+            return autoBll.tran(async function (conn) {
+                id = await autoBll.save('role', dataRole, conn);                    
+                var list = [];
+                //删除权限
+                if (delRoleAuthList.length) {
+                    delRoleAuthList.forEach(function (item) {
+                        list.push(autoBll.del('roleWithAuthority', {id: item.id}, conn));
+                    })
+                }
+                //保存权限
+                if (addRoleAuthList.length) {
+                    addRoleAuthList.forEach(function (item) {
+                        list.push(autoBll.save('roleWithAuthority', {
+                            roleCode: dataRole.code,
+                            authorityCode: item
+                        }, conn));
                     });
-                });
+                }
+                return q.all(list);
             });
         }
-    }).then(function (t) {
+    }).then(() => {
         return id;
     });
 };
@@ -115,11 +109,10 @@ export let query = function (opt) {
 
 export let isExist = function (opt) {
     var code = opt.code;
-    return common.promise(function () {
+    return common.promise(async function () {
         if (!code)
             throw common.error('code不能为空');
-        return autoBll.query('role', {code: code});
-    }).then(function (t) {
+        let t = await autoBll.query('role', {code: code});
         var result = false;
         if (t.list.length > 1)
             throw common.error('数据库中存在重复角色');

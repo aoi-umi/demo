@@ -308,7 +308,7 @@ export let init = function (opt) {
                 return;
             t.key = userInfoKey;
             req.myData.user = t;
-            if (t.cacheDatetime && new Date().getTime() - new Date(t.cacheDatetime).getTime() < 12 * 3600)
+            if (t.cacheDatetime && new Date().getTime() - new Date(t.cacheDatetime).getTime() < 12 * 3600 * 1000)
                 return;
             //region 自动重新登录获取信息
             req.myData.autoSignIn = true;

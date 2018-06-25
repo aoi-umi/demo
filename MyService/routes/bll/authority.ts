@@ -1,6 +1,7 @@
 ﻿import * as autoBll from './_auto';
 import * as common from '../_system/common';
 import * as authorityDal from '../dal/authority';
+import errorConfig from '../_system/errorConfig';
 
 export let save = function (opt) {
     return common.promise(async function () {
@@ -28,7 +29,7 @@ export let isExist = function (opt) {
         let t = await autoBll.query('authority', {code: code});
         var result = false;
         if (t.list.length > 1)
-            throw common.error('数据库中存在重复权限');
+            throw common.error('数据库中存在重复权限', errorConfig.DB_DATA_ERROR);
         if (t.list.length && t.list[0].id != opt.id) {
             result = true;
         }

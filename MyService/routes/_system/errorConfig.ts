@@ -93,6 +93,13 @@ export default {
             'en': 'db error',
         }
     },
+    DB_DATA_ERROR: {
+        code: 'DB_DATA_ERROR',
+        desc: {
+            'zh': '数据有误',
+            'en': 'db data error',
+        }
+    },
     //缓存
     CACHE_TIMEOUT: {
         code: 'CACHE_TIMEOUT',
