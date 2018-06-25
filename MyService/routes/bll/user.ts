@@ -8,37 +8,35 @@ import * as userInfoBll from './userInfo';
 
 export let signUp = function (opt, exOpt) {
     var userInfoId = 0;
-    return common.promise(function (e) {
+    return common.promise(async function (e) {
         if (!opt.account)
             throw common.error('', errorConfig.CAN_NOT_BE_EMPTY, {
                 format: function (msg) {
                     return common.stringFormat(msg, '用户名');
                 }
             });
-        return userInfoBll.isAccountExist(opt.account);
-    }).then(function (t) {
-        if (t)
+        let exist = await userInfoBll.isAccountExist(opt.account);
+        if (exist)
             throw common.error('account is exist!');
-        return autoBll.tran(function (conn) {
-            return autoBll.save('userInfo', {
+        return autoBll.tran(async function (conn) {
+            userInfoId = await autoBll.save('userInfo', {
                 account: opt.account,
                 password: opt.password,
                 nickname: opt.nickname,
                 createDate: new Date()
-            }, conn).then(function (t) {
-                userInfoId = t;
-                //默认角色
-                return autoBll.save('userInfoWithRole', {
-                    userInfoId: userInfoId,
-                    roleCode: 'default'
-                }, conn);
-            }).then(function () {
-                //日志
-                var userInfoLog = userInfoBll.createLog();
-                userInfoLog.userInfoId = userInfoId;
-                userInfoLog.content = '[创建账号]';
-                return autoBll.save('userInfoLog', userInfoLog, conn);
-            });
+            }, conn);
+
+            //默认角色
+            await autoBll.save('userInfoWithRole', {
+                userInfoId: userInfoId,
+                roleCode: 'default'
+            }, conn);
+            
+            //日志
+            var userInfoLog = userInfoBll.createLog();
+            userInfoLog.userInfoId = userInfoId;
+            userInfoLog.content = '[创建账号]';
+            await autoBll.save('userInfoLog', userInfoLog, conn);
         });
     }).then(function (t) {
         return userInfoId;
@@ -59,21 +57,19 @@ export let signOut = function (opt, exOpt) {
 export let signIn = function (opt, exOpt) {
     let captcha = opt.captcha;
     let cacheKey = main.cacheKey.captcha + opt.captchaKey;
-    return common.promise(() => {
+    return common.promise(async () => {
         if (!captcha)
             throw common.error('请输入验证码');
-        return cache.get(cacheKey)
-    }).then(t => {
-        if (!t)
+        let captchaCache = await cache.get(cacheKey);
+        if (!captchaCache)
             throw common.error('验证码已失效');
-        if (t.toLowerCase() != captcha.toLowerCase())
+        if (captchaCache.toLowerCase() != captcha.toLowerCase())
             throw common.error('验证码不正确');
         cache.del(cacheKey);
-        return signInInside(exOpt.req);
-    }).then(function (t) {
+        let userInfoDetail = await signInInside(exOpt.req);
         return {
-            id: t.userInfo.id,
-            nickname: t.userInfo.nickname
+            id: userInfoDetail.userInfo.id,
+            nickname: userInfoDetail.userInfo.nickname
         };
     });
 };
@@ -89,23 +85,23 @@ export let signInInside = function (req: Request) {
         token = user.token;
         reqBody = user.reqBody;
     }
-    return common.promise(function () {
-        if (!account)
+    return common.promise(async function () {
+        if (!account){
             throw common.error(null, errorConfig.CAN_NOT_BE_EMPTY, {
                 format: function (msg) {
                     return common.stringFormat(msg, 'account');
                 }
             });
+        }
         if (!reqBody)
             reqBody = '';
         if (typeof reqBody != 'string')
             reqBody = JSON.stringify(reqBody);
-        return autoBll.query('userInfo', {account: account});
-    }).then(function (t) {
+        let t = await autoBll.query('userInfo', {account: account});
         if (!t.count)
             throw common.error('no account!');
         if (t.count > 1)
-            throw common.error('system error: data wrong');
+            throw common.error('system error: data wrong', errorConfig.DB_DATA_ERROR);
         var userInfo = t.list[0];
         var pwd = userInfo.password;
         var checkToken = common.createToken(account + pwd + reqBody);

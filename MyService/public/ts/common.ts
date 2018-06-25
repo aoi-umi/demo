@@ -560,7 +560,7 @@ export let msgNotice = function (option: msgNoticeOption) {
         case 1:
             if (!opt.template) {
                 opt.template = `<div data-backdrop="false" role="dialog" tabindex="-1" class="modal fade msg-notice-1">
-                            <div class="modal-dialog" >
+                            <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-body">
                                         <button name="closeBtn" class="close" type="button">
@@ -624,8 +624,13 @@ export let msgNotice = function (option: msgNoticeOption) {
                 dom.find('[name=footer]').append(btnList);
             }
             $('.popover').hide();
-            if (dom.is(':hidden'))
+            if (dom.is(':hidden')){
                 dom.modal('show');
+                var args = getArgsFromUrlParams();
+                if (args.iframeId && parent) {
+                    parent.scrollTo(null, 0);
+                }
+            }
             break;
     }
     return dom;
