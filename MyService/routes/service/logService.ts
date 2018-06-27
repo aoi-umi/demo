@@ -2,7 +2,6 @@
  * Created by umi on 2017-5-29.
  */
 import * as common from '../_system/common';
-import config from '../../config';
 
 var getOption = function (): any {
     var opt = {

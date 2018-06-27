@@ -6,7 +6,7 @@ import * as cache from './_system/cache';
 import errorConfig from './_system/errorConfig';
 
 import * as userBll from './bll/user';
-import myMulter from './_system/myMulter';
+import * as upload from './upload';
 
 import config from '../config';
 
@@ -302,7 +302,7 @@ export let init = function (opt) {
             return next();
 
         userInfoKey = cacheKey.userInfo + userInfoKey;
-        cache.get(userInfoKey).then(function (t) {
+        cache.get(userInfoKey).then(async function (t) {
             if (!t)
                 return;
             t.key = userInfoKey;
@@ -311,15 +311,14 @@ export let init = function (opt) {
                 return;
             //region 自动重新登录获取信息
             req.myData.autoSignIn = true;
-            return userBll.signInInside(req).then(() => {
-                req.myData.autoSignIn = false;
-            }).fail(function (e) {
+            await userBll.signInInside(req).fail(function (e) {
                 if (e && common.isInArray(e.code, [errorConfig.DB_ERROR.code]))
                     throw e;
                 return cache.del(userInfoKey).then(function () {
                     throw common.error('请重新登录！');
                 });
             });
+            req.myData.autoSignIn = false;
             //endregion
         }).then(function () {
             next();
@@ -332,7 +331,7 @@ export let init = function (opt) {
 //注册路由
 export let register = function (app: Express) {
     app.get('/msg', require('./module/index').msg);
-    app.post('/interface/upload', myMulter.any(), require('./module/index').upload);
+    app.post('/interface/upload', upload.anyFile, require('./module/index').upload);
     app.post('/interface/captcha/get', require('./module/index').captchaGet);
     app.post(/\/interface\/([\s\S]+)\/([\s\S]+)/, require('./module/_interface').post);
     app.get('*', require('./module/_view').get);

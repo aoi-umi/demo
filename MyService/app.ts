@@ -61,5 +61,3 @@ import * as socket from './routes/socket';
 
 let io = socketIO(server);
 socket.init(io);
-//test
-//let x: model.Authority = {};

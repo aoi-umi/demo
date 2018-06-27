@@ -12,7 +12,7 @@ export let init = function (optIO) {
     io = optIO;
     bindEvent();
 };
-export let bindEvent = function () {
+let bindEvent = function () {
     io.on('connection', function (socket) {
         socket.myData = {};
         socket.on('init', function (opt) {
