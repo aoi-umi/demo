@@ -18,22 +18,25 @@ export let msg = function (req: Request, res: Response) {
 };
 
 export let upload = function (req: Request, res: Response) {
-    let flies = req.files as Express.Multer.File[];
-    var success = flies && flies.length ? 'upload ' + flies.length + ' file(s) success' : 'upload failed';
-    if (flies) {
-        flies.forEach(function (file) {
-            var readStream = fs.createReadStream(file.path);
-            common.streamToBuffer(readStream).then(function (buffer) {
-                return common.md5(buffer);
-            }).then(function (filename) {
-                fs.rename(file.path, file.destination + '/' + filename);
-            });
-        });
-    }
-    var opt = {
-        message: success,
-    };
-    res.mySend(null, opt);
+    common.promise(async () => {
+        let files = req.files as Express.Multer.File[];
+        var success = files && files.length ? 'upload ' + files.length + ' file(s) success' : 'upload failed';
+        if (files) {
+            for (let i = 0; i < files.length; i++) {
+                let file = files[i];
+                var readStream = fs.createReadStream(file.path);
+                let buffer = await common.streamToBuffer(readStream);
+                let filename = common.md5(buffer);
+                await common.promisify(fs.rename)(file.path, file.destination + '/' + filename);
+            }
+        }
+        var opt = {
+            message: success,
+        };
+        res.mySend(null, opt);
+    }).catch(e => {
+        res.mySend(e);
+    });
 };
 
 export let captchaGet = function (req: Request, res: Response) {

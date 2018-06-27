@@ -108,7 +108,7 @@ export let signInInside = function (req: Request) {
         if (token != checkToken)
             throw common.error(null, errorConfig.TOKEN_WRONG);
         return userInfoBll.detailQuery({id: userInfo.id});
-    }).then(function (t) {
+    }).then(async function (t) {
         //console.log(t);
         var userInfo = t.userInfo;
         user.id = userInfo.id;
@@ -127,7 +127,7 @@ export let signInInside = function (req: Request) {
             userInfoKey = main.cacheKey.userInfo + userInfoKey;
             user.key = userInfoKey;
             var seconds = main.cacheTime.userInfo;
-            cache.set(userInfoKey, user, seconds);
+            await cache.set(userInfoKey, user, seconds);
         }
         return t;
     });

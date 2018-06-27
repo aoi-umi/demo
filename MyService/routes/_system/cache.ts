@@ -23,114 +23,45 @@ client.on('error', function (err) {
     }
 });
 
-var _module: any = {};
-_module.get = function (key, cb) {
-    var isCallback = false;
-    client.get(cachePrefix + key, function (err, result) {
-        if (result && typeof result == 'string') {
-            try {
-                result = JSON.parse(result);
+export let get = function (key) {
+    return common.promise((defer: Q.Deferred<{}>) => {
+        common.promisify(client.get, client)(cachePrefix + key).then(result => {
+            if (result && typeof result == 'string') {
+                try {
+                    result = JSON.parse(result);
+                }
+                catch (e) {
+                }
             }
-            catch (e) {
-            }
-        }
-        if (!isCallback) {
-            cb(err, result);
-            isCallback = true;
-        }
+            defer.resolve(result);
+        }).fail(defer.reject);
+        //超时
+        setTimeout(function () {
+            defer.reject(common.error('Cache Get Timeout', errorConfig.CACHE_TIMEOUT));
+        }, 10 * 1000);
+        return defer.promise;
     });
-    setTimeout(function () {
-        if (!isCallback) {
-            cb(common.error('Cache Get Timeout', errorConfig.CACHE_TIMEOUT));
-            isCallback = true;
-        }
-    }, 10 * 1000);
-};
-
-_module.set = function (key, value, expire, cb) {
-    if (typeof expire == 'function') {
-        cb = expire;
-        expire = 0;
-    }
-    if (typeof value == 'object') value = JSON.stringify(value);
-    client.set(cachePrefix + key, value, cb);
-    if (expire)
-        client.expire(cachePrefix + key, expire);
-};
-
-_module.del = function (key, cb) {
-    client.del(cachePrefix + key, cb);
-};
-
-_module.keys = function (key, cb) {
-    client.keys(key, cb);
-};
-
-_module.select = function (db, cb) {
-    client.select(db, cb);
-};
-
-export let get = function (key, cb?) {
-    var fun = _module.get;
-    if (!cb) fun = _module.getPromise;
-    return fun.apply(null, arguments);
 }
 //expire seconds
-export let set = function (key, value, expire?, cb?) {
-    if (typeof expire == 'function') {
-        cb = expire;
-    }
-    var fun = _module.set;
-    if (!cb) fun = _module.setPromise;
-    return fun.apply(null, arguments);
+export let set = function (key, value, expire?) {    
+    return common.promise(()=>{
+        if (typeof value == 'object') value = JSON.stringify(value);
+        let setPromise = common.promisify(client.set, client);
+        let args = [cachePrefix + key, value];
+        if (expire)
+            args = [...args, 'EX', expire];
+        return setPromise.apply(void 0, args);
+    });
 };
 
-export let del = function (key, cb?) {
-    var fun = _module.del;
-    if (!cb) fun = _module.delPromise;
-    return fun.apply(null, arguments);
+export let del = function (key) {
+    return common.promisify(client.del, client)(cachePrefix + key);
 };
 
-export let keys = function (key, cb?) {
-    var fun = _module.keys;
-    if (!cb) fun = _module.keysPromise;
-    return fun.apply(null, arguments);
+export let keys = function (key) {
+    return common.promisify(client.keys, client)(key);
 };
 
-export let select = function (db, cb?) {
-    var fun = _module.select;
-    if (!cb) fun = _module.selectPromise;
-    return fun.apply(null, arguments);
+export let select = function (db) {
+    return common.promisify(client.select, client)(db);
 };
-
-var promiseList = ['get', 'set', 'del', 'keys', 'select'];
-promiseList.forEach(function (funName) {
-    _module[funName + 'Promise'] = common.promisify(_module[funName]);
-});
-
-//export let select(2, function() {
-//    export let set('foo', {bar: 'bar'}, 60, function (err, result) {
-//        console.log(err, result);
-//        export let get('foo', function (err, result) {
-//            console.log(err, result)
-//        });
-//    });
-//});
-//
-//export let keys('*', function(err, result) {
-//    console.log(err, result)
-//});
-//
-//export let get('foo', function(err, result) {
-//    console.log(err, result)
-//});
-////setTimeout(function(){
-////    export let del('foo', function(err, result) {
-////        console.log('del', err, result)
-////    });
-////},1000);
-//setTimeout(function(){
-//    export let get('foo', function(err, result) {
-//        console.log(err, result)
-//    });
-//},2000);
