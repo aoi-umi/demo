@@ -289,7 +289,7 @@ export let requestServiceByConfig = function (option) {
     var url = '';
     var log = logModle();
     var startTime = new Date().getTime();
-    return promise(function () {
+    return promise(async function () {
         var errStr = 'service "' + option.serviceName + '"';
         var service = config.api[option.serviceName];
         if (!service) throw error(errStr + ' is not exist!');
@@ -320,21 +320,21 @@ export let requestServiceByConfig = function (option) {
         };
         if (option.beforeRequest) {
             //发送的参数 当前所用参数
-            option.beforeRequest(opt, serviceArgs);
+            await option.beforeRequest(opt, serviceArgs);
         }
         log.guid = guid();
         log.url = url;
         log.req = opt.body;
         log.method = '[' + option.serviceName + '][' + option.methodName + ']';
         log.duration = startTime - new Date().getTime();
-        return requestService(opt);
-    }).then(function (t) {
+        let resData = await requestService(opt);
+        
         log.result = true;
-        log.res = t;
+        log.res = resData;
         if (option.afterResponse) {
-            t = option.afterResponse(t);
+            resData = await option.afterResponse(resData);
         }
-        return t;
+        return resData;
     }).fail(function (e) {
         log.result = false;
         log.res = e;
@@ -358,36 +358,25 @@ export let requestService = function (option) {
     if (!opt.headers) opt.headers = {};
     opt.headers['x-requested-with'] = 'xmlhttprequest';
     //console.log(opt)
-    return promise(function (def) {
-        request(opt, function (err, response, data) {
-            return promise(() => {
-                if (err)
-                    throw err;
-                var encoding = response.headers['content-encoding'];
-                if (encoding) {
-                    switch (encoding) {
-                        case 'gzip':
-                            return unzipPromise(data).then(function (buffer) {
-                                data = buffer.toString();
-                                if (data && typeof data == 'string')
-                                    data = JSON.parse(data);
-                                return data;
-                            });
-                        default:
-                            throw error('Not Accept Encoding');
-                    }
-                }
-                if (Buffer.isBuffer(data)) {
-                    data = data.toString();
-                }
-                return data;
-            })
-                .then(def.resolve)
-                .catch(def.reject);
-        });
-        return def.promise;
-    }).fail(function (e) {
-        throw e;
+    return promise(async function () {
+        let [response, data] = await promisify(request)(opt);
+        var encoding = response.headers['content-encoding'];
+        switch (encoding) {
+            case 'gzip':
+                let buffer = await unzipPromise(data);
+                data = buffer.toString();
+                if (data && typeof data == 'string')
+                    data = JSON.parse(data);
+                break;
+            default:
+                if (encoding) 
+                    throw error('Not Accept Encoding:' + encoding);
+        }
+        
+        if (Buffer.isBuffer(data)) {
+            data = data.toString();
+        }
+        return data;        
     });
 };
 
@@ -473,7 +462,7 @@ export let getClientIp = function (req) {
     return ip;
 };
 
-export let IPv4ToIPv6 = function (ip, convert) {
+export let IPv4ToIPv6 = function (ip, convert?) {
     if (net.isIPv4(ip)) {
         if (!convert) {
             ip = '::ffff:' + ip;

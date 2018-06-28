@@ -114,5 +114,12 @@ export default {
             'zh': '缓存失效',
             'en': 'Cache Expire',
         }
+    },
+    CAPTCHA_EXPIRE: {
+        code: 'CACHE_EXPIRE',
+        desc: {
+            'zh': '验证码失效',
+            'en': 'Captcha Expire',
+        }
     }
 };
