@@ -4,7 +4,6 @@
 import * as $ from 'jquery';
 
 import * as common from './common';
-import * as myInterface from './myInterface';
 import * as myVaild from './myVaild';
 import {MyModule, ModuleOption} from './myModule';
 
@@ -29,32 +28,30 @@ export class ModuleAuthority extends MyModule {
                 status: 1,
                 operation: ['save']
             },
-            queryArgsOpt: [{
-                name: 'id',
-                dom: $('#id'),
-                checkValue: function (val) {
-                    if (val && !myVaild.isInt(val, '001'))
-                        return '请输入正确的正整数';
-                }
-            }, {
-                name: 'code',
-                dom: $('#code'),
-            }, {
-                name: 'name',
-                dom: $('#name'),
-            }, {
-                name: 'status',
-                dom: $('#queryBox'),
-                focusDom: $('#queryBox [name=status]'),
-                getValue: function () {
-                    return this.dom.find('[name=status]:checked').val();
-                }
-            }, {
-                name: 'anyKey',
-                dom: $('#anyKey'),
-            },],
-            bindEvent: function (self) {
-
+            init: function (self: ModuleAuthority) {
+                self.opt.queryArgsOpt = [{
+                    name: 'id',
+                    dom: $(`${self.queryBoxId} [name=id]`),
+                    checkValue: function (val) {
+                        if (val && !myVaild.isInt(val, '001'))
+                            return '请输入正确的正整数';
+                    }
+                }, {
+                    name: 'code',
+                    dom: $(`${self.queryBoxId} [name=code]`),
+                }, {
+                    name: 'name',
+                    dom: $(`${self.queryBoxId} [name=name]`),
+                }, {
+                    name: 'status',
+                    dom: $(`${self.queryBoxId} [name=status]`),
+                    getValue: function () {
+                        return this.dom.filter(':checked').val();
+                    }
+                }, {
+                    name: 'anyKey',
+                    dom: $(`${self.queryBoxId} [name=anyKey]`),
+                },];
             },
             beforeQuery: function (data) {
                 let deleteIfNullList = [

@@ -6,16 +6,16 @@
             var prefix = '';
             var searchItemList = [{
                 text: 'id',
-                id: 'id',
+                name: 'id',
             }, {
                 text: 'code',
-                id: 'code',
+                name: 'code',
             }, {
                 text: 'name',
-                id: 'name',
+                name: 'name',
             }, {
                 text: 'anyKey',
-                id: 'anyKey',
+                name: 'anyKey',
             }];
             for(var i = 0;i < searchItemList.length;i++){
                 var item = searchItemList[i];
@@ -23,22 +23,27 @@
             <div class="<%= rowItemClass %>">
                 <div class="input-group">
                     <span class="input-group-addon"><%= item.text %></span>
-                    <input id="<%= prefix + item.id %>" type="text" class="form-control"/>
+                    <input name="<%= item.name %>" type="text" class="form-control"/>
                 </div>
             </div>
             <% } %>
         </div>
         <div class="row my-row">
             <label class="control-label">状态</label>
+            <%
+            let statusList = [
+                {val: '', text: '全部'},
+                {val: '1', text: '启用'},
+                {val: '0', text: '禁用'},
+            ];
+            for (let i = 0; i < statusList.length; i++) {
+                let status = statusList[i];
+            %>
             <label class="control-label">
-                <input type="radio" name="status" value="" checked/>全部
+                <input type="radio" name="status" value="<%= status.val %>" <%= i == 0 ? 'checked' : '' %>/>
+                <%= status.text %>
             </label>
-            <label class="control-label">
-                <input type="radio" name="status" value="1"/>启用
-            </label>
-            <label class="control-label">
-                <input type="radio" name="status" value="0"/>禁用
-            </label>
+            <% } %>
         </div>
         <div class="row my-row">
             <div class="<%= rowItemClass %> col-lg-offset-6 col-md-offset-6">
@@ -87,10 +92,10 @@
     <% include ../../_template_front/authority/detail %>
 </script>
 <script type="text/javascript">
-    require(['./_main', './moduleAuthority'], function () {
-        var main = require('./_main'),
-	        moduleAuthority = require('./moduleAuthority');
-        main.init();
-        new moduleAuthority.ModuleAuthority();
-    });
+	require(['./_main', './moduleAuthority'], function () {
+		var main = require('./_main'),
+			moduleAuthority = require('./moduleAuthority');
+		main.init();
+		new moduleAuthority.ModuleAuthority();
+	});
 </script>
