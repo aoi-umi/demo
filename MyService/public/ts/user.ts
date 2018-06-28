@@ -1,6 +1,7 @@
 import * as common from './common';
 import * as myInterface from './myInterface';
 import * as myVaild from './myVaild';
+import errorConfig from './errorConfig';
 
 export let init = function () {
     bindEvent();
@@ -23,7 +24,7 @@ export let bindEvent = function () {
         myInterface.api.signOut().then(function () {
             $('.nav-sign').removeClass('in');
         }).fail(function (e) {
-            common.msgNotice({type: 1, msg: e.message});
+            common.msgNotice({ type: 1, msg: e.message });
         });
     });
     $(document).on('click', '[name=changeCaptcha]', function () {
@@ -39,7 +40,7 @@ export let bindEvent = function () {
     $('#signUp').on('click', function () {
         signUp();
     });
-    $('[name=changeCaptcha]:visible').trigger('click');
+    refreshCaptcha();
 };
 export let signIn = function (dom) {
     var form = dom.closest('.sign-in-form');
@@ -60,12 +61,12 @@ export let signIn = function (dom) {
         canNotNull: true,
     }];
     common.promise(function () {
-        var opt = {list: signInArgsOpt};
+        var opt = { list: signInArgsOpt };
         var checkRes = common.dataCheck(opt);
         var err = null;
         if (!checkRes.success) {
             if (checkRes.dom) {
-                common.msgNotice({dom: checkRes.dom, msg: checkRes.desc});
+                common.msgNotice({ dom: checkRes.dom, msg: checkRes.desc });
             } else {
                 err = new Error(checkRes.desc);
             }
@@ -98,8 +99,19 @@ export let signIn = function (dom) {
             $('.nav-sign').addClass('in');
         }
     }).fail(function (e: any) {
-        if (e)
-            common.msgNotice({type: 1, msg: e.message});
+        let msg = '登录失败';
+        let btnOptList;
+        if (e) {
+            if (e.message) msg = e.message;
+            if (e.code == errorConfig.CAPTCHA_EXPIRE.code) {
+                btnOptList = {
+                    cb: function () {
+                        refreshCaptcha();
+                    }
+                }
+            }
+        }
+        common.msgNotice({ type: 1, msg: msg, btnOptList });
     });
 };
 export let signUp = function () {
@@ -138,12 +150,12 @@ export let signUp = function () {
         }
     }];
     common.promise(function () {
-        var opt = {list: signUpArgsOpt};
+        var opt = { list: signUpArgsOpt };
         var checkRes = common.dataCheck(opt);
         var err = null;
         if (!checkRes.success) {
             if (checkRes.dom) {
-                common.msgNotice({target: checkRes.dom.selector, msg: checkRes.desc});
+                common.msgNotice({ target: checkRes.dom.selector, msg: checkRes.desc });
             } else {
                 err = new Error(checkRes.desc);
             }
@@ -162,6 +174,10 @@ export let signUp = function () {
         });
     }).fail(function (e: any) {
         if (e)
-            common.msgNotice({type: 1, msg: e.message});
+            common.msgNotice({ type: 1, msg: e.message });
     });
 };
+
+let refreshCaptcha = function(){
+    $('[name=changeCaptcha]:visible').trigger('click');
+}

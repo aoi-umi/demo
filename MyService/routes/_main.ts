@@ -311,12 +311,12 @@ export let init = function (opt) {
                 return;
             //region 自动重新登录获取信息
             req.myData.autoSignIn = true;
-            await userBll.signInInside(req).fail(function (e) {
-                if (e && common.isInArray(e.code, [errorConfig.DB_ERROR.code]))
+            await userBll.signInInside(req).fail(async function (e) {
+                //登录失败以下错误直接抛出，否则先删除缓存
+                if (common.isInArray(e.code, [errorConfig.DB_ERROR.code]))
                     throw e;
-                return cache.del(userInfoKey).then(function () {
-                    throw common.error('请重新登录！');
-                });
+                await cache.del(userInfoKey)
+                throw common.error('请重新登录！', e.code);
             });
             req.myData.autoSignIn = false;
             //endregion
@@ -346,15 +346,14 @@ export let errorHandler = function (err, req: Request, res: Response, next) {
     }
     err.status = err.status || 500;
     err.code = err.code || err.status;
-    var method = req.method;
-    if (method && method.toLowerCase() == 'post') {
+    res.status(err.status);
+    if (req.xhr) {
         return res.mySend(err, err, {code: err.code});
     }
     if (errorConfig.NO_LOGIN.code == err.code) {
         var signIn = `/user/signIn?noNav=${req.myData.noNav}&toUrl=${encodeURIComponent(req.url)}`;
         return res.redirect(signIn);
     }
-    res.status(err.status);
     res.myRender('view', {
         view: 'error',
         title: '出错了',

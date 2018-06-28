@@ -62,7 +62,7 @@ export let signIn = function (opt, exOpt) {
             throw common.error('请输入验证码');
         let captchaCache = await cache.get(cacheKey);
         if (!captchaCache)
-            throw common.error('验证码已失效');
+            throw common.error('验证码已失效', errorConfig.CAPTCHA_EXPIRE);
         if (captchaCache.toLowerCase() != captcha.toLowerCase())
             throw common.error('验证码不正确');
         cache.del(cacheKey);

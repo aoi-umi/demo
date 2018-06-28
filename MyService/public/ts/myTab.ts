@@ -240,7 +240,10 @@ export let panel = function (t: PanelOption) {
             break;
     }
 
-    dom = $(`<div style="height: 512px" id="${t.id || ''}" class="tab-pane fade">${content}</div>`);
+    let height = $(window).height() - ($('#navTop').height() + $('#navBottom').height() + tabContainer.height() + 40);
+    if(height < 512)
+        height = 512;
+    dom = $(`<div style="height: ${height}px" id="${t.id || ''}" class="tab-pane fade">${content}</div>`);
     return dom;
 };
 export let panels = function (data: Array<PanelOption>) {

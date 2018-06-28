@@ -336,7 +336,29 @@ export let parseJSON = function (str) {
         throw e;
     }
 };
-export let dataCheck = function (option) {
+interface dataCheckOption {
+    list: Array<dataCheckOptionListOption>;
+}
+interface dataCheckOptionListOption {
+    name: string;
+    desc?: string,
+    dom: JQuery<HTMLElement>;
+    focusDom?: JQuery<HTMLElement>
+    canNotNull?: boolean;
+    canNotNullDesc?: string;
+    isTrim?: boolean;
+    getValue?: any;
+    // getValue: function () {
+    //     return this.dom.find("option:selected").text();
+    // },
+    checkValue?: Function;
+    // checkValue: function (value, model) {
+    //     if (!value) {
+    //         return ('密码只能由8~20位字母和数字组成');
+    //     }
+    // }
+}
+export let dataCheck = function (option: dataCheckOption) {
     var data = {
         success: false,
         model: {} as any,
@@ -344,25 +366,7 @@ export let dataCheck = function (option) {
         err: null,
         dom: null
     };
-    if (!option) return data;
-    //示例
-    //var dict = {
-    //    name: 'Password',
-    //    desc: '密码',
-    //    dom: $('#password'),
-    //    focusDom: $('#password'),
-    //    canNotNull: true,
-    //    canNotNullDesc: '请输入{0}',
-    //    isTrim: false,
-    //    getValue: function () {
-    //        return this.dom.find("option:selected").text();
-    //    },
-    //    checkValue: function (value, model) {
-    //        if (!value) {
-    //            return ('密码只能由8~20位字母和数字组成');
-    //        }
-    //    }
-    //}
+    if (!option) return data;    
     for (var i = 0; i < option.list.length; i++) {
         var noName = false;
         var t = option.list[i];
@@ -372,18 +376,19 @@ export let dataCheck = function (option) {
         if (!t.canNotNullDesc) t.canNotNullDesc = '{0}不能为空';
         var checkOpt: any = {};
         try {
-            var value = '';
+            var value: any = '';
             var typeOfGetValue = typeof t.getValue;
             switch (typeOfGetValue) {
                 case 'function':
                     value = t.getValue(data.model);
                     break;
                 case 'string':
-                    if (typeof t.dom[t.getValue] == 'function') value = t.dom[t.getValue]();
-                    else value = t.dom[t.getValue];
+                    let getValue = t.dom[t.getValue] as any;
+                    if (typeof getValue == 'function') value = getValue();
+                    else value = getValue;
                     break;
                 default:
-                    value = t.dom.val();
+                    value = t.getValue == void 0 ? t.dom.val() : t.getValue;
                     break;
             }
             if (typeof value == 'string') {
@@ -393,7 +398,7 @@ export let dataCheck = function (option) {
                     value = $.trim(value);
             }
             data.model[t.name] = value;
-            if (t.canNotNull && (value === '' || value == null || typeof value == 'undefined')) {
+            if (t.canNotNull && (value === '' || value == null)) {
                 noName = true;
                 throw stringFormat(t.canNotNullDesc, name);
             }
