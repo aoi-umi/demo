@@ -8,6 +8,7 @@ class ModuleBase {
     pagerId?: string;
     queryId?: string;
     queryItemTempId?: string;
+    queryBoxId?: string;
     queryContainerId?: string;
 
     detailId?: string;
@@ -76,6 +77,7 @@ export class MyModule extends ModuleBase {
 
     queryDom: JQuery<HTMLElement>;
     queryContainerDom: JQuery<HTMLElement>;
+    queryBoxDom: JQuery<HTMLElement>;
     queryItemTemp: string;
 
     detailDom: JQuery<HTMLElement>;
@@ -96,6 +98,7 @@ export class MyModule extends ModuleBase {
         pagerId: 'pager',
         queryId: 'query',
         queryItemTempId: 'queryItemTemp',
+        queryBoxId: 'queryBox',
         queryContainerId: 'queryContainer',
 
         detailId: 'detail',
@@ -122,11 +125,7 @@ export class MyModule extends ModuleBase {
         beforeQueryDataCheck: function (self: MyModule) {
             var list = self.opt.queryArgsOpt;
             if (list) {
-                var checkRes = common.dataCheck({list: list});
-                if (checkRes.success) {
-                    var data = checkRes.model;
-                }
-                return checkRes;
+                return common.dataCheck({list: list});
             }
         },
         beforeQuery: function (t) {
@@ -204,6 +203,7 @@ export class MyModule extends ModuleBase {
             'pagerId',
             'queryId',
             'queryContainerId',
+            'queryBoxId',
             'queryItemTempId',
             'detailId',
             'detailTempId',
@@ -218,6 +218,7 @@ export class MyModule extends ModuleBase {
         });
         self.queryDom = $(self.queryId);
         self.queryContainerDom = $(self.queryContainerId);
+        self.queryBoxDom = $(self.queryBoxId);
         self.queryItemTemp = $(self.queryItemTempId).html();
 
         self.detailDom = $(self.detailId);
