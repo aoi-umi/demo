@@ -48,6 +48,10 @@ export class ModuleLog extends MyModule {
                 }, {
                     name: 'createDateEnd',
                     dom: $(`${self.queryBoxId} [name=createDateEnd]`),
+                    getValue: function () {
+                        let val = this.dom.val();
+                        return val ? val + ' 23:59:59' : '';
+                    }
                 }, {
                     name: 'url',
                     dom: $(`${self.queryBoxId} [name=url]`),
@@ -65,16 +69,16 @@ export class ModuleLog extends MyModule {
                     dom: $(`${self.queryBoxId} [name=remark]`),
                 }];
             },
-            bindEvent: function (self: ModuleLog) {                
+            bindEvent: function (self: ModuleLog) {
                 let minDate = '1900-01-01';
-                let maxDate = '9999-12-31';                                     
+                let maxDate = '9999-12-31';
                 let dateOpt = {
                     format: 'yyyy-mm-dd',
                     minView: 'month',
                     autoclose: true,
                     todayBtn: true,
                     clearBtn: true,
-                    startDate: minDate,                        
+                    startDate: minDate,
                 };
                 $(`${self.queryBoxId} [name=createDateStart]`)
                     .datetimepicker(dateOpt)
