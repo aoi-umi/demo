@@ -42,12 +42,20 @@ export class ModuleUserInfo extends MyModule {
                     }, {
                         name: 'createDateEnd',
                         dom: $(`${self.queryBoxId} [name=createDateEnd]`),
+                        getValue: function () {
+                            let val = this.dom.val();
+                            return val ? val + ' 23:59:59' : '';
+                        }
                     }, {
                         name: 'editDateStart',
                         dom: $(`${self.queryBoxId} [name=editDateStart]`),
                     }, {
                         name: 'editDateEnd',
                         dom: $(`${self.queryBoxId} [name=editDateEnd]`),
+                        getValue: function () {
+                            let val = this.dom.val();
+                            return val ? val + ' 23:59:59' : '';
+                        }
                     }, {
                         name: 'id',
                         dom: $(`${self.queryBoxId} [name=id]`),

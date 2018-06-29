@@ -52,12 +52,20 @@ export class ModuleMainContent extends MyModule {
                 }, {
                     name: 'createDateEnd',
                     dom: $(`${self.queryBoxId} [name=createDateEnd]`),
+                    getValue: function () {
+                        let val = this.dom.val();
+                        return val ? val + ' 23:59:59' : '';
+                    }
                 }, {
                     name: 'operateDateStart',
                     dom: $(`${self.queryBoxId} [name=operateDateStart]`),
                 }, {
                     name: 'operateDateEnd',
                     dom: $(`${self.queryBoxId} [name=operateDateEnd]`),
+                    getValue: function () {
+                        let val = this.dom.val();
+                        return val ? val + ' 23:59:59' : '';
+                    }
                 }, {
                     name: 'operator',
                     dom: $(`${self.queryBoxId} [name=operator]`),
