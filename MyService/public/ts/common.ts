@@ -855,4 +855,12 @@ export let findInTree = function (tree, key) {
         }
     }
 };
+
+export let deleteIfEmpty = function(data) {
+    for(let key in data){
+        let val = data[key];
+        if(val === '' || val == null)
+            delete data[key];
+    }
+}
 //endregion

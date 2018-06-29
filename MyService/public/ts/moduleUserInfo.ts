@@ -1,10 +1,8 @@
 /**
  * Created by bang on 2017-9-11.
  */
-import * as ejs from 'ejs';
 import * as $ from 'jquery';
-//@ts-ignore
-import * as WdatePicker from 'WdatePicker';
+import 'bootstrap-datetimepicker';
 
 import * as common from './common';
 import * as myInterface from './myInterface';
@@ -22,98 +20,76 @@ export class ModuleUserInfo extends MyModule {
     constructor(option?: ModuleOption) {
         var opt: ModuleOption = {
             operation: ['query', 'save', 'detailQuery'],
-            queryId: 'search',
-            queryItemTempId: 'itemTemp',
-            queryContainerId: 'list',
-
-            rowClass: 'itemRow',
             interfacePrefix: 'userInfo',
-            detailUrl: '/userInfo/detail',
-
-            queryArgsOpt: [{
-                name: 'account',
-                dom: $('#account'),
-            }, {
-                name: 'nickname',
-                dom: $('#nickname'),
-            }, {
-                name: 'role',
-                dom: $('#role'),
-            }, {
-                name: 'authority',
-                dom: $('#authority'),
-            }, {
-                name: 'createDateStart',
-                dom: $('#createDateStart'),
-            }, {
-                name: 'createDateEnd',
-                dom: $('#createDateEnd'),
-            }, {
-                name: 'editDateStart',
-                dom: $('#editDateStart'),
-            }, {
-                name: 'editDateEnd',
-                dom: $('#editDateEnd'),
-            }, {
-                name: 'id',
-                dom: $('#id'),
-                checkValue: function (val) {
-                    if (val && !myVaild.isInt(val, '001'))
-                        return '请输入正确的正整数';
-                }
-            },],
-            init: function (self) {
+            detailUrl: '/userInfo/detail',            
+            init: function (self: ModuleUserInfo) {
                 if (self.operation.query) {
+                    self.opt.queryArgsOpt = [{
+                        name: 'account',
+                        dom: $(`${self.queryBoxId} [name=account]`),
+                    }, {
+                        name: 'nickname',
+                        dom: $(`${self.queryBoxId} [name=nickname]`),
+                    }, {
+                        name: 'role',
+                        dom: $(`${self.queryBoxId} [name=role]`),
+                    }, {
+                        name: 'authority',
+                        dom: $(`${self.queryBoxId} [name=authority]`),
+                    }, {
+                        name: 'createDateStart',
+                        dom: $(`${self.queryBoxId} [name=createDateStart]`),
+                    }, {
+                        name: 'createDateEnd',
+                        dom: $(`${self.queryBoxId} [name=createDateEnd]`),
+                    }, {
+                        name: 'editDateStart',
+                        dom: $(`${self.queryBoxId} [name=editDateStart]`),
+                    }, {
+                        name: 'editDateEnd',
+                        dom: $(`${self.queryBoxId} [name=editDateEnd]`),
+                    }, {
+                        name: 'id',
+                        dom: $(`${self.queryBoxId} [name=id]`),
+                        checkValue: function (val) {
+                            if (val && !myVaild.isInt(val, '001'))
+                                return '请输入正确的正整数';
+                        }
+                    },];
                     self.detailDom.find('.save').removeClass('save').addClass('admin-save');
                 }
             },
             bindEvent: function (self: ModuleUserInfo) {
-                if (self.operation.query) {
-                    $('#createDateStart').on('click', function () {
-                        var datePickerArgs = {
-                            el: this,
-                            //startDate: '#{%y-30}-01-01',
-                            doubleCalendar: true,
-                            dateFmt: 'yyyy-MM-dd',
-                            minDate: '1900-01-01',
-                            maxDate: '#F{$dp.$D(\'createDateEnd\')}',
-                        };
-                        WdatePicker(datePickerArgs);
-                    });
-                    $('#createDateEnd').on('click', function () {
-                        var datePickerArgs = {
-                            el: this,
-                            //startDate: minDate || '#{%y-30}-01-01',
-                            doubleCalendar: true,
-                            dateFmt: 'yyyy-MM-dd',
-                            minDate: '#F{$dp.$D(\'createDateStart\')||\'1900-01-01\'}',
-                            maxDate: '',
-                        };
-                        WdatePicker(datePickerArgs);
-                    });
+                if (self.operation.query) {   
+                    let minDate = '1900-01-01';
+                    let maxDate = '9999-12-31';                                     
+                    let dateOpt = {
+                        format: 'yyyy-mm-dd',
+                        minView: 'month',
+                        autoclose: true,
+                        todayBtn: true,
+                        clearBtn: true,
+                        startDate: minDate,                        
+                    };
+                    $(`${self.queryBoxId} [name=createDateStart]`)
+                        .datetimepicker(dateOpt)
+                        .on('click', function () {
+                            $(this).datetimepicker('setEndDate', $(`${self.queryBoxId} [name=createDateEnd]`).val() || maxDate);
+                        });
+                    $(`${self.queryBoxId} [name=createDateEnd]`)
+                        .datetimepicker(dateOpt)
+                        .on('click', function () {
+                            $(this).datetimepicker('setStartDate', $(`${self.queryBoxId} [name=createDateStart]`).val() || minDate);
+                        });
 
-                    $('#editDateStart').on('click', function () {
-                        var datePickerArgs = {
-                            el: this,
-                            //startDate: '#{%y-30}-01-01',
-                            doubleCalendar: true,
-                            dateFmt: 'yyyy-MM-dd',
-                            minDate: '1900-01-01',
-                            maxDate: '#F{$dp.$D(\'editDateEnd\')}',
-                        };
-                        WdatePicker(datePickerArgs);
-                    });
-                    $('#editDateEnd').on('click', function () {
-                        var datePickerArgs = {
-                            el: this,
-                            //startDate: minDate || '#{%y-30}-01-01',
-                            doubleCalendar: true,
-                            dateFmt: 'yyyy-MM-dd',
-                            minDate: '#F{$dp.$D(\'editDateStart\')||\'1900-01-01\'}',
-                            maxDate: '',
-                        };
-                        WdatePicker(datePickerArgs);
-                    });
+                    $(`${self.queryBoxId} [name=editDateStart]`).datetimepicker(dateOpt)
+                        .on('click', function () {
+                            $(this).datetimepicker('setEndDate', $(`${self.queryBoxId} [name=editDateEnd]`).val() || maxDate);
+                        });
+                    $(`${self.queryBoxId} [name=editDateEnd]`).datetimepicker(dateOpt)
+                        .on('click', function () {
+                            $(this).datetimepicker('setStartDate', $(`${self.queryBoxId} [name=editDateStart]`).val() || minDate);
+                        });                    
 
                     $(document).on('click', '.admin-save', function () {
                         self.adminSave();
@@ -128,7 +104,7 @@ export class ModuleUserInfo extends MyModule {
 
                     //角色
                     new RoleAutoComplete({
-                        dom: $('#role'),
+                        dom: $(`${self.queryBoxId} [name=role]`),
                         select: function (dom, item) {
                             dom.data('item', item).val(item.code);
                         }
@@ -136,7 +112,7 @@ export class ModuleUserInfo extends MyModule {
 
                     //权限                    
                     new AuthorityAutoComplete({
-                        dom: $('#authority'),
+                        dom: $(`${self.queryBoxId} [name=authority]`),
                         select: function (dom, item) {
                             dom.data('item', item).val(item.code);
                         }
@@ -187,16 +163,6 @@ export class ModuleUserInfo extends MyModule {
                         }
                     });
                 }
-            },
-            beforeQuery: function (data) {
-                let deleteIfNullList = [
-                    'id', 'account', 'nickname', 'role', 'authority',
-                    'createDateStart', 'createDateEnd', 'editDateStart', 'editDateEnd'
-                ];
-                deleteIfNullList.forEach(key => {
-                    if (!data[key])
-                        delete data[key];
-                });
             },
 
             editAfterRender: function (item, self) {

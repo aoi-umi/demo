@@ -10,18 +10,18 @@ import * as myInterface from './myInterface';
 import * as myVaild from './myVaild';
 import {MyModule, ModuleOption} from './myModule';
 
+interface ModuleMainContentTypeOption extends ModuleOption {
+    treeItemId?: string;
+}
+
 export class ModuleMainContentType extends MyModule {
-    constructor(option?: ModuleOption) {
-        var opt: ModuleOption = {
+    treeItemId: string;
+    treeItemTemp: string;
+
+    constructor(option?: ModuleMainContentTypeOption) {
+        var opt: ModuleMainContentTypeOption = {
             operation: ['query', 'save', 'del', 'detailQuery'],
-            queryId: 'search',
-            queryItemTempId: 'mainContentTypeItem',
-            queryContainerId: 'list',
-
-            detailId: 'detail',
-            detailContainerName: 'detailContainer',
-            detailTempId: 'mainContentTypeSaveTemp',
-
+            treeItemId: 'treeItem',
             saveClass: 'save',
             saveDefaultModel: {
                 id: 0,
@@ -31,36 +31,48 @@ export class ModuleMainContentType extends MyModule {
                 level: 0,
                 operation: ['save']
             },
-            addClass: 'add',
 
-            //            rowClass: 'itemRow',
-            //            editClass: 'itemEdit',
             interfacePrefix: 'mainContentType',
-            queryArgsOpt: [{
-                name: 'id',
-                dom: $('#id'),
-                checkValue: function (val) {
-                    if (val && !myVaild.isInt(val, '001'))
-                        return '请输入正确的正整数';
-                }
-            }, {
-                name: 'type',
-                dom: $('#type'),
-            }, {
-                name: 'typeName',
-                dom: $('#typeName'),
-            }, {
-                name: 'parentType',
-                dom: $('#parentType'),
-            }, {
-                name: 'level',
-                dom: $('#level'),
-                checkValue: function (val) {
-                    if (val && !myVaild.isInt(val, '001'))
-                        return '请输入正确的正整数';
-                }
-            }],
-            bindEvent: function (self) {
+            init: function (self: ModuleMainContentType) {
+                let idList = [
+                    'treeItemId',
+                ];
+
+                $(idList).each(function () {
+                    let ele: any = this;
+                    if (self.opt[ele])
+                        self[ele] = '#' + self.opt[ele];
+                    else
+                        self[ele] = '';
+                });
+                self.treeItemTemp = $(self.treeItemId).html();
+
+                self.opt.queryArgsOpt = [{
+                    name: 'id',
+                    dom: $(`${self.queryBoxId} [name=id]`),
+                    checkValue: function (val) {
+                        if (val && !myVaild.isInt(val, '001'))
+                            return '请输入正确的正整数';
+                    }
+                }, {
+                    name: 'type',
+                    dom: $(`${self.queryBoxId} [name=type]`),
+                }, {
+                    name: 'typeName',
+                    dom: $(`${self.queryBoxId} [name=typeName]`),
+                }, {
+                    name: 'parentType',
+                    dom: $(`${self.queryBoxId} [name=parentType]`),
+                }, {
+                    name: 'level',
+                    dom: $(`${self.queryBoxId} [name=level]`),
+                    checkValue: function (val) {
+                        if (val && !myVaild.isInt(val, '001'))
+                            return '请输入正确的正整数';
+                    }
+                }];
+            },
+            bindEvent: function (self: ModuleMainContentType) {
                 $('#tree, #treeRefresh').on('click', function () {
                     if ($(this).attr('id') == 'tree') {
                         $('#treeModal').modal('show');
@@ -74,7 +86,7 @@ export class ModuleMainContentType extends MyModule {
                         let tree = common.getTree(list, '', null, 'type', 'parentType');
                         let itemTree = tree.itemTree;
                         var rootTree = tree.rootTree;
-                        var temp = $('#mainContentTypeTreeItem').html();
+                        var temp = self.treeItemTemp;
 
                         function renderTree(leave, treeDom) {
                             leave.item.inRoot = leave.inRoot;
@@ -116,10 +128,6 @@ export class ModuleMainContentType extends MyModule {
                     item = $.extend(null, self.opt.saveDefaultModel, item ? {parentType: item.type} : null);
                     self.edit(item);
                 });
-            },
-            beforeQuery: function (data) {
-                if (!data.id) data.id = null;
-                if (!data.level) data.level = null;
             },
             editAfterRender: function (item, self: ModuleMainContentType) {
                 self.updateView(['mainContentTypeDetail'], {mainContentTypeDetail: item});

@@ -11,15 +11,6 @@ export class ModuleAuthority extends MyModule {
     constructor(option?: ModuleOption) {
         var opt: ModuleOption = {
             operation: ['query', 'save', 'detailQuery'],
-            queryId: 'query',
-            queryItemTempId: 'itemTemp',
-            queryContainerId: 'list',
-
-            detailId: 'detail',
-            detailContainerName: 'detailContainer',
-            detailTempId: 'detailTemp',
-
-            rowClass: 'itemRow',
             interfacePrefix: 'authority',
             saveDefaultModel: {
                 id: 0,
@@ -52,15 +43,6 @@ export class ModuleAuthority extends MyModule {
                     name: 'anyKey',
                     dom: $(`${self.queryBoxId} [name=anyKey]`),
                 },];
-            },
-            beforeQuery: function (data) {
-                let deleteIfNullList = [
-                    'id', 'code', 'name', 'status', 'anyKey',
-                ];
-                deleteIfNullList.forEach(key => {
-                    if (!data[key])
-                        delete data[key];
-                });
             },
 
             editAfterRender: function (item, self: ModuleAuthority) {

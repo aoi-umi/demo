@@ -99,7 +99,7 @@ export class MyModule extends ModuleBase {
         queryId: 'query',
         queryItemTempId: 'queryItemTemp',
         queryBoxId: 'queryBox',
-        queryContainerId: 'queryContainer',
+        queryContainerId: 'list',
 
         detailId: 'detail',
         detailContainerName: 'detailContainer',
@@ -128,7 +128,8 @@ export class MyModule extends ModuleBase {
                 return common.dataCheck({list: list});
             }
         },
-        beforeQuery: function (t) {
+        beforeQuery: function (data) {
+            common.deleteIfEmpty(data);
         },
         onQuerySuccess: function (t) {
         },
@@ -394,8 +395,8 @@ export class MyModule extends ModuleBase {
             if (e) {
                 console.log(e);
                 self.opt.onQueryFail(e, self);
+                throw e;
             }
-            throw e;
         });
     }
 

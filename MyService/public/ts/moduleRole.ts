@@ -57,7 +57,30 @@ export class ModuleRole extends MyModule {
                 name: 'anyKey',
                 dom: $('#anyKey'),
             },],
-            init: function (self) {
+            init: function (self: ModuleRole) {
+                self.opt.queryArgsOpt = [{
+                    name: 'id',
+                    dom: $(`${self.queryBoxId} [name=id]`),
+                    checkValue: function (val) {
+                        if (val && !myVaild.isInt(val, '001'))
+                            return '请输入正确的正整数';
+                    }
+                }, {
+                    name: 'code',
+                    dom: $(`${self.queryBoxId} [name=code]`),
+                }, {
+                    name: 'name',
+                    dom: $(`${self.queryBoxId} [name=name]`),
+                }, {
+                    name: 'status',
+                    dom: $(`${self.queryBoxId} [name=status]`),
+                    getValue: function () {
+                        return this.dom.filter(':checked').val();
+                    }
+                }, {
+                    name: 'anyKey',
+                    dom: $(`${self.queryBoxId} [name=anyKey]`),
+                },]
             },
             bindEvent: function (self) {
                 if (self.operation.detailQuery) {
@@ -91,15 +114,6 @@ export class ModuleRole extends MyModule {
                         dom.data('changeStatus', newStatus);
                     });
                 }
-            },
-            beforeQuery: function (data) {
-                let deleteIfNullList = [
-                    'id', 'code', 'name', 'status', 'anyKey',
-                ];
-                deleteIfNullList.forEach(key => {
-                    if (!data[key])
-                        delete data[key];
-                });
             },
 
             editAfterRender: function (item, self: ModuleRole) {

@@ -69,15 +69,20 @@ gulp.task('copyDep', function () {
 			.pipe(gulp.dest(destDir + '/public'))
 			.on('end', onFinished),
 
-		gulp.src(['bower_components/jquery-ui/themes/base/jquery-ui.min.css',])
+		gulp.src(['bower_components/jquery-ui/themes/base/jquery-ui.min.css',
+			'bower_components/smalot-bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css',
+		])
 			.pipe(gulp.dest(destDir + '/public/css'))
 			.on('end', onFinished),
 
 		gulp.src([
+			'bower_components/requirejs/require.js',
+			'bower_components/require-css/css.min.js',
 			'bower_components/bootstrap/dist/js/bootstrap.min.js',
 			'bower_components/bootstrap-fileinput/js/fileinput.min.js',
-			'bower_components/jquery-ui/jquery-ui.min.js',
+			'bower_components/smalot-bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js',
 			'bower_components/seiyria-bootstrap-slider/dist/bootstrap-slider.min.js',
+			'bower_components/jquery-ui/jquery-ui.min.js',
 			'bower_components/jquery/dist/jquery.min.js',
 			'bower_components/jquery.cookie/jquery.cookie.js',
 			'bower_components/SparkMD5/spark-md5.min.js',
