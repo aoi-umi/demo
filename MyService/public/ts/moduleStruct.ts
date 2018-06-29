@@ -11,17 +11,16 @@ import * as myVaild from './myVaild';
 import * as myEnum from './myEnum';
 import {MyModule, ModuleOption} from './myModule';
 
+interface ModuleStructOption extends ModuleOption {
+    treeItemId?: string;
+}
 export class ModuleStruct extends MyModule {
-    constructor(option?: ModuleOption) {
-        var opt: ModuleOption = {
+    treeItemId: string;
+    treeItemTemp: string;
+    constructor(option?: ModuleStructOption) {
+        var opt: ModuleStructOption = {
             operation: ['query', 'save', 'del', 'detailQuery'],
-            queryId: 'search',
-            queryItemTempId: 'structItem',
-            queryContainerId: 'list',
-
-            detailId: 'detail',
-            detailContainerName: 'detailContainer',
-            detailTempId: 'structSaveTemp',
+            treeItemId: 'treeItem',
 
             saveClass: 'save',
             saveDefaultModel: {
@@ -33,39 +32,50 @@ export class ModuleStruct extends MyModule {
                 level: 0,
                 operation: ['save']
             },
-            addClass: 'add',
-
-            //            rowClass: 'itemRow',
-            //            editClass: 'itemEdit',
             interfacePrefix: 'struct',
-            queryArgsOpt: [{
-                name: 'id',
-                dom: $('#id'),
-                checkValue: function (val) {
-                    if (val && !myVaild.isInt(val, '001'))
-                        return '请输入正确的正整数';
-                }
-            }, {
-                name: 'type',
-                dom: $('#type'),
-            }, {
-                name: 'struct',
-                dom: $('#struct'),
-            }, {
-                name: 'structName',
-                dom: $('#structName'),
-            }, {
-                name: 'parentStruct',
-                dom: $('#parentStruct'),
-            }, {
-                name: 'level',
-                dom: $('#level'),
-                checkValue: function (val) {
-                    if (val && !myVaild.isInt(val, '001'))
-                        return '请输入正确的正整数';
-                }
-            }],
-            bindEvent: function (self) {
+            init: function(self: ModuleStruct){
+                let idList = [
+                    'treeItemId',
+                ];
+
+                $(idList).each(function () {
+                    let ele: any = this;
+                    if (self.opt[ele])
+                        self[ele] = '#' + self.opt[ele];
+                    else
+                        self[ele] = '';
+                });
+                self.treeItemTemp = $(self.treeItemId).html();
+
+                self.opt.queryArgsOpt = [{
+                    name: 'id',
+                    dom: $(`${self.queryBoxId} [name=id]`),
+                    checkValue: function (val) {
+                        if (val && !myVaild.isInt(val, '001'))
+                            return '请输入正确的正整数';
+                    }
+                }, {
+                    name: 'type',
+                    dom: $(`${self.queryBoxId} [name=type]`),
+                }, {
+                    name: 'struct',
+                    dom: $(`${self.queryBoxId} [name=struct]`),
+                }, {
+                    name: 'structName',
+                    dom: $(`${self.queryBoxId} [name=structName]`),
+                }, {
+                    name: 'parentStruct',
+                    dom: $(`${self.queryBoxId} [name=parentStruct]`),
+                }, {
+                    name: 'level',
+                    dom: $(`${self.queryBoxId} [name=level]`),
+                    checkValue: function (val) {
+                        if (val && !myVaild.isInt(val, '001'))
+                            return '请输入正确的正整数';
+                    }
+                }];
+            },
+            bindEvent: function (self: ModuleStruct) {
                 $('#tree, #treeRefresh').on('click', function () {
                     if ($(this).attr('id') == 'tree') {
                         $('#treeModal').modal('show');
@@ -99,7 +109,7 @@ export class ModuleStruct extends MyModule {
                         }
 
                         setTree(rootTree, '', list);
-                        var temp = $('#structTreeItem').html();
+                        var temp = self.treeItemTemp;
 
                         function renderTree(leave, treeDom) {
                             leave.item.inRoot = leave.inRoot;
@@ -141,10 +151,6 @@ export class ModuleStruct extends MyModule {
                     item = $.extend(null, self.opt.saveDefaultModel, item ? {parentStruct: item.struct} : null);
                     self.edit(item);
                 });
-            },
-            beforeQuery: function (data) {
-                if (!data.id) data.id = null;
-                if (!data.level) data.level = null;
             },
             editBeforeRender: function (item) {
                 item.structTypeEnum = myEnum.getEnum('structTypeEnum');

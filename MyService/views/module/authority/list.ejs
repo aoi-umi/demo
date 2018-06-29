@@ -3,7 +3,6 @@
         <% var rowItemClass = 'col-lg-3 col-md-3 col-sm-6 col-xs-12'; %>
         <div class="row my-row">
             <%
-            var prefix = '';
             var searchItemList = [{
                 text: 'id',
                 name: 'id',
@@ -85,7 +84,7 @@
 <div id="detail" data-backdrop="false" role="dialog" tabindex="-1" class="modal fade pop-up-box">
     <% include ../../_template/detailModal %>
 </div>
-<script type="text/template" id="itemTemp">
+<script type="text/template" id="queryItemTemp">
     <% include ../../_template_front/authority/listItem %>
 </script>
 <script type="text/template" id="detailTemp">

@@ -3,19 +3,18 @@
         <% var rowItemClass = 'col-lg-3 col-md-3 col-sm-6 col-xs-12'; %>
         <div class="row my-row">
             <%
-            var prefix = '';
             var searchItemList = [{
                 text: 'id',
-                id: 'id',
+                name: 'id',
             }, {
                 text: 'code',
-                id: 'code',
+                name: 'code',
             }, {
                 text: 'name',
-                id: 'name',
+                name: 'name',
             }, {
                 text: 'anyKey',
-                id: 'anyKey',
+                name: 'anyKey',
             },];
             for(var i = 0;i < searchItemList.length;i++){
                 var item = searchItemList[i];
@@ -23,7 +22,7 @@
             <div class="<%= rowItemClass %>">
                 <div class="input-group">
                     <span class="input-group-addon"><%= item.text %></span>
-                    <input id="<%= prefix + item.id %>" type="text" class="form-control"/>
+                    <input name="<%= item.name %>" type="text" class="form-control"/>
                 </div>
             </div>
             <% } %>

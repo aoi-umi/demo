@@ -1,96 +1,110 @@
 <script type="text/javascript">
-    (function () {
-        if (!('placeholder' in document.createElement('input')) && location.pathname != '/msg')
-            location.href = '/msg?notSupportedBrowser=true';
-    })();
+	(function () {
+		if (!('placeholder' in document.createElement('input')) && location.pathname != '/msg')
+			location.href = '/msg?notSupportedBrowser=true';
+	})();
 </script>
 <script type="text/javascript">
-    window._namespace = {};
+	window._namespace = {};
 
-    window.namespace = function (namespace, factory) {
-        var list = namespace.split('.');
-        var ns = window[list[0]];
-        if (factory) {
-            if (list.length == 1) {
-                if (ns)
-                    throw new Error('namespace [' + namespace + '] is exist!');
-                ns = window[list[0]] = _namespace[list[0]] = factory;
-            } else {
-                if (!ns)
-                    ns = window[list[0]] = _namespace[list[0]] = {};
-                for (var i = 1; i < list.length; i++) {
-                    var ns_next = ns[list[i]];
-                    if (!ns_next) {
-                        if (i == list.length - 1)
-                            ns[list[i]] = factory;
-                        else
-                            ns[list[i]] = {};
-                    }
-                    else if (i == list.length - 1) {
-                        throw new Error('namespace [' + namespace + '] is exist!');
-                    }
-                    ns = ns[list[i]];
-                }
-            }
-        } else {
-            let notExist = false;
-            var i = 0;
-            if (!ns)
-                notExist = true;
-            else {
-                i = 1;
-                for (; i < list.length; i++) {
-                    if (!(ns = ns[list[i]])) {
-                        notExist = true;
-                        break;
-                    }
-                }
-            }
-            if (notExist)
-                throw new Error('namespace [' + namespace + '][' + list.slice(0, i + 1).join('.') + '] is null!');
-        }
-        return ns;
-    };
+	window.namespace = function (namespace, factory) {
+		var list = namespace.split('.');
+		var ns = window[list[0]];
+		if (factory) {
+			if (list.length == 1) {
+				if (ns)
+					throw new Error('namespace [' + namespace + '] is exist!');
+				ns = window[list[0]] = _namespace[list[0]] = factory;
+			} else {
+				if (!ns)
+					ns = window[list[0]] = _namespace[list[0]] = {};
+				for (var i = 1; i < list.length; i++) {
+					var ns_next = ns[list[i]];
+					if (!ns_next) {
+						if (i == list.length - 1)
+							ns[list[i]] = factory;
+						else
+							ns[list[i]] = {};
+					}
+					else if (i == list.length - 1) {
+						throw new Error('namespace [' + namespace + '] is exist!');
+					}
+					ns = ns[list[i]];
+				}
+			}
+		} else {
+			let notExist = false;
+			var i = 0;
+			if (!ns)
+				notExist = true;
+			else {
+				i = 1;
+				for (; i < list.length; i++) {
+					if (!(ns = ns[list[i]])) {
+						notExist = true;
+						break;
+					}
+				}
+			}
+			if (notExist)
+				throw new Error('namespace [' + namespace + '][' + list.slice(0, i + 1).join('.') + '] is null!');
+		}
+		return ns;
+	};
 </script>
 <script type="text/javascript" src="/js/libs/require.js"></script>
 <script type="text/javascript">
-    requirejs.config({
-        baseUrl: '/js',
-        paths: {
-            'jquery': 'libs/jquery.min',
-            'jquery.cookie': 'libs/jquery.cookie',
-            'jquery-ui': 'libs/jquery-ui.min',
-            'bootstrap': 'libs/bootstrap.min',
-            'bootstrap-slider': 'libs/bootstrap-slider.min',
-            'fileinput': 'libs/fileinput.min',
-            'ejs': 'libs/ejs.min',
-            'spark-md5': 'libs/spark-md5.min',
-            'socket.io': 'libs/socket.io/socket.io',
-            'WdatePicker': 'libs/My97DatePicker/WdatePicker.io',
-            'q': 'libs/q',
-            'diffview': 'libs/diffview',
-            'difflib': 'libs/difflib',
-            'WdatePicker': 'libs/My97DatePicker/WdatePicker'
-        },
-        shim: {
-            'ejs': {
-                exports: 'ejs'
-            },
-            'bootstrap': {
-                deps: ['jquery']
-            },            
-            'diffview': {
-                exports: 'diffview'
-            },            
-            'difflib': {
-                exports: 'difflib'
-            },            
-            'WdatePicker': {
-                exports: 'WdatePicker'
-            },
-        },
-	    urlArgs: function(id, url) {
-		    return this.paths[id] ? '' : '?v=<%=version%>&deploy=<%=deploy%>';
-	    }
-    });
+	requirejs.config({
+		baseUrl: '/js',
+		paths: {
+			'jquery': 'libs/jquery.min',
+			'jquery.cookie': 'libs/jquery.cookie',
+			'jquery-ui': 'libs/jquery-ui.min',
+			'bootstrap': 'libs/bootstrap.min',
+			'bootstrap-slider': 'libs/bootstrap-slider.min',
+			'bootstrap-datetimepicker': 'libs/bootstrap-datetimepicker.min',
+			'fileinput': 'libs/fileinput.min',
+			'ejs': 'libs/ejs.min',
+			'spark-md5': 'libs/spark-md5.min',
+			'socket.io': 'libs/socket.io/socket.io',
+			'q': 'libs/q',
+			'diffview': 'libs/diffview',
+			'difflib': 'libs/difflib',
+			'css': 'libs/css.min',
+		},
+		shim: {
+			'ejs': {
+				exports: 'ejs'
+			},
+			'bootstrap': {
+				deps: [
+					'jquery',
+				]
+			},
+			'jquery-ui': {
+				deps: ['css!../css/jquery-ui.min']
+			},
+			'diffview': {
+				exports: 'diffview',
+				deps: ['css!../css/diffview']
+			},
+			'difflib': {
+				exports: 'difflib'
+			},
+			'fileinput': {
+				deps: ['css!../css/fileinput']
+			},
+			'bootstrap-datetimepicker': {
+				deps: ['css!../css/bootstrap-datetimepicker.min']
+			},
+		},
+		urlArgs: function (id, url) {
+			return this.paths[id] ? '' : '?v=<%= version %>&deploy=<%= deploy %>';
+		},
+		map: {
+			'*': {
+				'css': 'css'
+			}
+		}
+	});
 </script>

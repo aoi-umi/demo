@@ -5,6 +5,7 @@ interface JQueryStatic {
 
 interface JQuery {
     autocomplete: any;
+    datetimepicker: any;
 }
 
 interface File {

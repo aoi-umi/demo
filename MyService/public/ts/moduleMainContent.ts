@@ -3,8 +3,7 @@
  */
 import * as ejs from 'ejs';
 import * as $ from 'jquery';
-//@ts-ignore
-import * as WdatePicker from 'WdatePicker';
+import 'bootstrap-datetimepicker';
 
 import * as common from './common';
 import * as myInterface from './myInterface';
@@ -17,119 +16,96 @@ export class ModuleMainContent extends MyModule {
     constructor(option?: ModuleOption) {
         var opt: ModuleOption = {
             operation: [],
-            queryId: 'search',
-            queryItemTempId: 'mainContentItem',
-            queryContainerId: 'list',
-
-            detailId: 'detail',
-            detailContainerName: 'detailContainer',
-            detailTempId: 'mainContentSaveTemp',
-
             interfacePrefix: 'mainContent',
-            itemToDetailClass: 'itemToDetail',
             detailUrl: '/mainContent/detail',
 
-            queryArgsOpt: [{
-                name: 'type',
-                dom: $('[name=typeBox]'),
-                getValue: function () {
-                    var val = [];
-                    this.dom.find('.type:checked').each(function () {
-                        val.push($(this).val());
-                    });
-                    return val.join(',');
-                }
-            }, {
-                name: 'status',
-                dom: $('[name=statusBox]'),
-                getValue: function () {
-                    var val = [];
-                    this.dom.find('.status:checked').each(function () {
-                        val.push($(this).val());
-                    });
-                    return val.join(',');
-                }
-            }, {
-                name: 'user',
-                dom: $('#user'),
-            }, {
-                name: 'title',
-                dom: $('#title'),
-            }, {
-                name: 'createDateStart',
-                dom: $('#createDateStart'),
-            }, {
-                name: 'createDateEnd',
-                dom: $('#createDateEnd'),
-            }, {
-                name: 'operateDateStart',
-                dom: $('#operateDateStart'),
-            }, {
-                name: 'operateDateEnd',
-                dom: $('#operateDateEnd'),
-            }, {
-                name: 'operator',
-                dom: $('#operator'),
-            }, {
-                name: 'id',
-                dom: $('#id'),
-                checkValue: function (val) {
-                    if (val && !myVaild.isInt(val, '001'))
-                        return '请输入正确的正整数';
-                }
-            },],
-            init: function (self) {
+            init: function (self: ModuleMainContent) {
+                self.opt.queryArgsOpt = [{
+                    name: 'type',
+                    dom: $(`${self.queryBoxId} [name=typeBox]`),
+                    getValue: function () {
+                        var val = [];
+                        this.dom.find('.type:checked').each(function () {
+                            val.push($(this).val());
+                        });
+                        return val.join(',');
+                    }
+                }, {
+                    name: 'status',
+                    dom: $(`${self.queryBoxId} [name=statusBox]`),
+                    getValue: function () {
+                        var val = [];
+                        this.dom.find('.status:checked').each(function () {
+                            val.push($(this).val());
+                        });
+                        return val.join(',');
+                    }
+                }, {
+                    name: 'user',
+                    dom: $(`${self.queryBoxId} [name=user]`),
+                }, {
+                    name: 'title',
+                    dom: $(`${self.queryBoxId} [name=title]`),
+                }, {
+                    name: 'createDateStart',
+                    dom: $(`${self.queryBoxId} [name=createDateStart]`),
+                }, {
+                    name: 'createDateEnd',
+                    dom: $(`${self.queryBoxId} [name=createDateEnd]`),
+                }, {
+                    name: 'operateDateStart',
+                    dom: $(`${self.queryBoxId} [name=operateDateStart]`),
+                }, {
+                    name: 'operateDateEnd',
+                    dom: $(`${self.queryBoxId} [name=operateDateEnd]`),
+                }, {
+                    name: 'operator',
+                    dom: $(`${self.queryBoxId} [name=operator]`),
+                }, {
+                    name: 'id',
+                    dom: $(`${self.queryBoxId} [name=id]`),
+                    checkValue: function (val) {
+                        if (val && !myVaild.isInt(val, '001'))
+                            return '请输入正确的正整数';
+                    }
+                },]
                 self.variable.delMainContentChildList = [];
                 if (self.operation.detailQuery) {
                 }
             },
             bindEvent: function (self: ModuleMainContent) {
                 if (self.operation.query) {
-                    $('#createDateStart').on('click', function () {
-                        var datePickerArgs = {
-                            el: this,
-                            //startDate: '#{%y-30}-01-01',
-                            doubleCalendar: true,
-                            dateFmt: 'yyyy-MM-dd',
-                            minDate: '1900-01-01',
-                            maxDate: '#F{$dp.$D(\'createDateEnd\')}',
-                        };
-                        WdatePicker(datePickerArgs);
-                    });
-                    $('#createDateEnd').on('click', function () {
-                        var datePickerArgs = {
-                            el: this,
-                            //startDate: minDate || '#{%y-30}-01-01',
-                            doubleCalendar: true,
-                            dateFmt: 'yyyy-MM-dd',
-                            minDate: '#F{$dp.$D(\'createDateStart\')||\'1900-01-01\'}',
-                            maxDate: '',
-                        };
-                        WdatePicker(datePickerArgs);
-                    });
+                    let minDate = '1900-01-01';
+                    let maxDate = '9999-12-31';                                     
+                    let dateOpt = {
+                        format: 'yyyy-mm-dd',
+                        minView: 'month',
+                        autoclose: true,
+                        todayBtn: true,
+                        clearBtn: true,
+                        startDate: minDate,                        
+                    };
+                    $(`${self.queryBoxId} [name=createDateStart]`)
+                        .datetimepicker(dateOpt)
+                        .on('click', function () {
+                            $(this).datetimepicker('setEndDate', $(`${self.queryBoxId} [name=createDateEnd]`).val() || maxDate);
+                        });
+                    $(`${self.queryBoxId} [name=createDateEnd]`)
+                        .datetimepicker(dateOpt)
+                        .on('click', function () {
+                            $(this).datetimepicker('setStartDate', $(`${self.queryBoxId} [name=createDateStart]`).val() || minDate);
+                        });
 
-                    $('#operateDateStart').on('click', function () {
-                        var datePickerArgs = {
-                            el: this,
-                            //startDate: '#{%y-30}-01-01',
-                            doubleCalendar: true,
-                            dateFmt: 'yyyy-MM-dd',
-                            minDate: '1900-01-01',
-                            maxDate: '#F{$dp.$D(\'operateDateEnd\')}',
-                        };
-                        WdatePicker(datePickerArgs);
-                    });
-                    $('#operateDateEnd').on('click', function () {
-                        var datePickerArgs = {
-                            el: this,
-                            //startDate: minDate || '#{%y-30}-01-01',
-                            doubleCalendar: true,
-                            dateFmt: 'yyyy-MM-dd',
-                            minDate: '#F{$dp.$D(\'operateDateStart\')||\'1900-01-01\'}',
-                            maxDate: '',
-                        };
-                        WdatePicker(datePickerArgs);
-                    });
+                    $(`${self.queryBoxId} [name=operateDateStart]`)
+                        .datetimepicker(dateOpt)
+                        .on('click', function () {
+                            $(this).datetimepicker('setEndDate', $(`${self.queryBoxId} [name=operateDateEnd]`).val() || maxDate);
+                        });
+                    $(`${self.queryBoxId} [name=operateDateEnd]`)
+                        .datetimepicker(dateOpt)
+                        .on('click', function () {
+                            $(this).datetimepicker('setStartDate', $(`${self.queryBoxId} [name=operateDateStart]`).val() || minDate);
+                        });                    
 
                     $(document).on('click', '.statusSearch', function () {
                         var status = $(this).find('.statusCount').data('status');
@@ -263,20 +239,14 @@ export class ModuleMainContent extends MyModule {
             },
             beforeQuery: function (data) {
                 $('.statusSearch').closest('li').removeClass('active');
-                if (!data.id) data.id = null;
-                if (!data.type) data.type = null;
+                common.deleteIfEmpty(data);
                 if (!data.status) {
-                    data.status = null;
                     $('.statusCount[data-status=""]').closest('li').addClass('active');
                 } else {
                     $(data.status.split(',')).each(function () {
                         $('.statusCount[data-status=' + this + ']').closest('li').addClass('active');
                     });
                 }
-                if (!data.createDateStart) data.createDateStart = null;
-                if (!data.createDateEnd) data.createDateEnd = null;
-                if (!data.operateDateStart) data.operateDateStart = null;
-                if (!data.operateDateEnd) data.operateDateEnd = null;
             },
             onQuerySuccess: function (t) {
                 $('.statusCount').text(0);
