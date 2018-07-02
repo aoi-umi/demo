@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50722
 File Encoding         : 65001
 
-Date: 2018-06-15 17:44:03
+Date: 2018-07-02 16:13:18
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -46,13 +46,13 @@ BEGIN
 	END IF;
 
 	IF pr_code IS NOT NULL AND length(pr_code) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND t1.`code` like ''%',replace_special_char(pr_code), '%''');
+		SET @Sql = CONCAT(@Sql, ' AND t1.`code` like ''%',replace_special_char_like(pr_code), '%''');
 	ELSEIF LOCATE(',code,', pr_nullList) > 0 THEN
 		SET @Sql = CONCAT(@Sql, ' AND t1.`code` IS NULL');
 	END IF;
 
 	IF pr_name IS NOT NULL AND length(pr_name) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND t1.`name` like ''%',replace_special_char(pr_name), '%''');
+		SET @Sql = CONCAT(@Sql, ' AND t1.`name` like ''%',replace_special_char_like(pr_name), '%''');
 	ELSEIF LOCATE(',name,', pr_nullList) > 0 THEN
 		SET @Sql = CONCAT(@Sql, ' AND t1.`name` IS NULL');
 	END IF;
@@ -64,8 +64,8 @@ BEGIN
 	END IF;
 
 	IF pr_anyKey IS NOT NULL AND length(pr_anyKey) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND (t1.`code` like ''%',replace_special_char(pr_anyKey), '%''');
-		SET @Sql = CONCAT(@Sql, ' OR t1.`name` like ''%',replace_special_char(pr_anyKey), '%'')');
+		SET @Sql = CONCAT(@Sql, ' AND (t1.`code` like ''%',replace_special_char_like(pr_anyKey), '%''');
+		SET @Sql = CONCAT(@Sql, ' OR t1.`name` like ''%',replace_special_char_like(pr_anyKey), '%'')');
 	END IF;
 
 	IF pr_excludeByUserId IS NOT NULL AND length(pr_excludeByUserId) > 0 THEN
@@ -130,25 +130,25 @@ BEGIN
 	END IF;
 
 	IF pr_url IS NOT NULL AND length(pr_url) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `url` like ''%',replace_special_char(pr_url), '%''');
+		SET @Sql = CONCAT(@Sql, ' AND `url` like ''%',replace_special_char_like(pr_url), '%''');
 	ELSEIF LOCATE(',url,', pr_nullList) > 0 THEN
 		SET @Sql = CONCAT(@Sql, ' AND `url` IS NULL');
 	END IF;
 
 	IF pr_application IS NOT NULL AND length(pr_application) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `application` like ''%',replace_special_char(pr_application), '%''');
+		SET @Sql = CONCAT(@Sql, ' AND `application` like ''%',replace_special_char_like(pr_application), '%''');
 	ELSEIF LOCATE(',application,', pr_nullList) > 0 THEN
 		SET @Sql = CONCAT(@Sql, ' AND `application` IS NULL');
 	END IF;
 
 	IF pr_method IS NOT NULL AND length(pr_method) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `method` like ''%',replace_special_char(pr_method), '%''');
+		SET @Sql = CONCAT(@Sql, ' AND `method` like ''%',replace_special_char_like(pr_method), '%''');
 	ELSEIF LOCATE(',method,', pr_nullList) > 0 THEN
 		SET @Sql = CONCAT(@Sql, ' AND `method` IS NULL');
 	END IF;
 
 	IF pr_methodName IS NOT NULL AND length(pr_methodName) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `methodName` like ''%',replace_special_char(pr_methodName), '%''');
+		SET @Sql = CONCAT(@Sql, ' AND `methodName` like ''%',replace_special_char_like(pr_methodName), '%''');
 	ELSEIF LOCATE(',methodName,', pr_nullList) > 0 THEN
 		SET @Sql = CONCAT(@Sql, ' AND `methodName` IS NULL');
 	END IF;
@@ -166,19 +166,19 @@ BEGIN
 	END IF;
 
 	IF pr_req IS NOT NULL AND length(pr_req) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `req` like ''%',replace_special_char(pr_req), '%''');
+		SET @Sql = CONCAT(@Sql, ' AND `req` like ''%',replace_special_char_like(pr_req), '%''');
 	ELSEIF LOCATE(',req,', pr_nullList) > 0 THEN
 		SET @Sql = CONCAT(@Sql, ' AND `req` IS NULL');
 	END IF;
 
 	IF pr_res IS NOT NULL AND length(pr_res) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `res` like ''%',replace_special_char(pr_res), '%''');
+		SET @Sql = CONCAT(@Sql, ' AND `res` like ''%',replace_special_char_like(pr_res), '%''');
 	ELSEIF LOCATE(',res,', pr_nullList) > 0 THEN
 		SET @Sql = CONCAT(@Sql, ' AND `res` IS NULL');
 	END IF;
 
 	IF pr_ip IS NOT NULL AND length(pr_ip) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `ip` like ''%',replace_special_char(pr_ip), '%''');
+		SET @Sql = CONCAT(@Sql, ' AND `ip` like ''%',replace_special_char_like(pr_ip), '%''');
 	ELSEIF LOCATE(',ip,', pr_nullList) > 0 THEN
 		SET @Sql = CONCAT(@Sql, ' AND `ip` IS NULL');
 	END IF;
@@ -196,7 +196,7 @@ BEGIN
 	END IF;
 
 	IF pr_remark IS NOT NULL AND length(pr_remark) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `remark` like ''%',replace_special_char(pr_remark), '%''');
+		SET @Sql = CONCAT(@Sql, ' AND `remark` like ''%',replace_special_char_like(pr_remark), '%''');
 	ELSEIF LOCATE(',remark,', pr_nullList) > 0 THEN
 		SET @Sql = CONCAT(@Sql, ' AND `remark` IS NULL');
 	END IF;
@@ -209,7 +209,7 @@ BEGIN
 
 
 	IF pr_requestIp IS NOT NULL AND length(pr_requestIp) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `requestIp` like ''%',replace_special_char(pr_requestIp), '%''');
+		SET @Sql = CONCAT(@Sql, ' AND `requestIp` like ''%',replace_special_char_like(pr_requestIp), '%''');
 	ELSEIF LOCATE(',requestIp,', pr_nullList) > 0 THEN
 		SET @Sql = CONCAT(@Sql, ' AND `requestIp` IS NULL');
 	END IF;
@@ -302,13 +302,13 @@ BEGIN
 	END IF;
 
 	IF pr_title IS NOT NULL AND length(pr_title) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND t1.`title` = ''',replace_special_char(pr_title), '''');
+		SET @Sql = CONCAT(@Sql, ' AND t1.`title` like ''%',replace_special_char_like(pr_title), '%''');
 	ELSEIF LOCATE(',title,', pr_nullList) > 0 THEN
 		SET @Sql = CONCAT(@Sql, ' AND t1.`title` IS NULL');
 	END IF;
 
 	IF pr_description IS NOT NULL AND length(pr_description) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND t1.`description` = ''',replace_special_char(pr_description), '''');
+		SET @Sql = CONCAT(@Sql, ' AND t1.`description` = ''%',replace_special_char_like(pr_description), '%''');
 	ELSEIF LOCATE(',description,', pr_nullList) > 0 THEN
 		SET @Sql = CONCAT(@Sql, ' AND t1.`description` IS NULL');
 	END IF;
@@ -335,14 +335,14 @@ BEGIN
 
 
 	IF pr_user IS NOT NULL AND length(pr_user) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND (t1.`user_info` like ''%', replace_special_char(pr_user), 
+		SET @Sql = CONCAT(@Sql, ' AND (t1.`user_info` like ''%', replace_special_char_like(pr_user), 
 				'%'' OR t1.`userInfoId` in ( SELECT id FROM t_user_info WHERE `account` like ''%', 
-				replace_special_char(pr_user), '%'' OR `nickname` like ''%',replace_special_char(pr_user), '%''))');
+				replace_special_char_like(pr_user), '%'' OR `nickname` like ''%',replace_special_char_like(pr_user), '%''))');
 	END IF;
 
 	IF pr_operator IS NOT NULL AND length(pr_operator) > 0 THEN
 		SET @Sql = CONCAT(@Sql, ' AND t1.`id` in ( SELECT distinct mainContentId FROM t_main_content_log WHERE `operator` like ''%', 
-				replace_special_char(pr_operator), '%'')');
+				replace_special_char_like(pr_operator), '%'')');
 	END IF;
 
 	SET @Sql = CONCAT(@Sql, ';');
@@ -430,13 +430,13 @@ BEGIN
 	END IF;
 
 	IF pr_code IS NOT NULL AND length(pr_code) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND t1.`code` like ''%',replace_special_char(pr_code), '%''');
+		SET @Sql = CONCAT(@Sql, ' AND t1.`code` like ''%',replace_special_char_like(pr_code), '%''');
 	ELSEIF LOCATE(',code,', pr_nullList) > 0 THEN
 		SET @Sql = CONCAT(@Sql, ' AND t1.`code` IS NULL');
 	END IF;
 
 	IF pr_name IS NOT NULL AND length(pr_name) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND t1.`name` like ''%',replace_special_char(pr_name), '%''');
+		SET @Sql = CONCAT(@Sql, ' AND t1.`name` like ''%',replace_special_char_like(pr_name), '%''');
 	ELSEIF LOCATE(',name,', pr_nullList) > 0 THEN
 		SET @Sql = CONCAT(@Sql, ' AND t1.`name` IS NULL');
 	END IF;
@@ -448,8 +448,8 @@ BEGIN
 	END IF;
 	
 	IF pr_anyKey IS NOT NULL AND length(pr_anyKey) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND (t1.`code` like ''%',replace_special_char(pr_anyKey), '%''');
-		SET @Sql = CONCAT(@Sql, ' OR t1.`name` like ''%',replace_special_char(pr_anyKey), '%'')');
+		SET @Sql = CONCAT(@Sql, ' AND (t1.`code` like ''%',replace_special_char_like(pr_anyKey), '%''');
+		SET @Sql = CONCAT(@Sql, ' OR t1.`name` like ''%',replace_special_char_like(pr_anyKey), '%'')');
 	END IF;
 
 	IF pr_excludeByUserId IS NOT NULL AND length(pr_excludeByUserId) > 0 THEN
@@ -581,19 +581,19 @@ BEGIN
 	END IF;
 
 	IF pr_account IS NOT NULL THEN
-		SET @Sql = CONCAT(@Sql, ' AND t1.`account` like ''%',replace_special_char(pr_account), '%''');
+		SET @Sql = CONCAT(@Sql, ' AND t1.`account` like ''%',replace_special_char_like(pr_account), '%''');
 	ELSEIF LOCATE(',account,', pr_nullList) > 0 THEN
 		SET @Sql = CONCAT(@Sql, ' AND t1.`account` IS NULL');
 	END IF;
 
 	IF pr_password IS NOT NULL THEN
-		SET @Sql = CONCAT(@Sql, ' AND t1.`password` like ''%',replace_special_char(pr_password), '%''');
+		SET @Sql = CONCAT(@Sql, ' AND t1.`password` like ''%',replace_special_char_like(pr_password), '%''');
 	ELSEIF LOCATE(',password,', pr_nullList) > 0 THEN
 		SET @Sql = CONCAT(@Sql, ' AND t1.`password` IS NULL');
 	END IF;
 
 	IF pr_nickname IS NOT NULL THEN
-		SET @Sql = CONCAT(@Sql, ' AND t1.`nickname` like ''%',replace_special_char(pr_nickname), '%''');
+		SET @Sql = CONCAT(@Sql, ' AND t1.`nickname` like ''%',replace_special_char_like(pr_nickname), '%''');
 	ELSEIF LOCATE(',nickname,', pr_nullList) > 0 THEN
 		SET @Sql = CONCAT(@Sql, ' AND t1.`nickname` IS NULL');
 	END IF;	
@@ -623,7 +623,7 @@ BEGIN
 	END IF;
 
 	IF pr_remark IS NOT NULL THEN
-		SET @Sql = CONCAT(@Sql, ' AND t1.`remark` like ''%',replace_special_char(pr_remark), '%''');
+		SET @Sql = CONCAT(@Sql, ' AND t1.`remark` like ''%',replace_special_char_like(pr_remark), '%''');
 	ELSEIF LOCATE(',remark,', pr_nullList) > 0 THEN
 		SET @Sql = CONCAT(@Sql, ' AND t1.`remark` IS NULL');
 	END IF;

@@ -68,14 +68,27 @@ if(SourceDatabase.Count > 0){
                             switch(DataBaseType){
                                 case Make.Tools.DatabaseTypeEnum.MySql:
                                     //替换特殊字符
-                                    
                                     strList.Add("DROP FUNCTION IF EXISTS `replace_special_char`;");
                                     strList.Add("DELIMITER ;;");
-                                    strList.Add("CREATE FUNCTION `replace_special_char`(`fun_str` text) RETURNS text CHARSET utf8");
+                                    strList.Add("CREATE FUNCTION `replace_special_char`(`str` text) RETURNS text CHARSET utf8");
                                     strList.Add("BEGIN");
-                                    strList.Add("    SET fun_str = REPLACE(fun_str, '\\\\', '\\\\\\\\');");
-                                    strList.Add("    SET fun_str = REPLACE(fun_str, '''', '''''');");
-                                    strList.Add("    RETURN fun_str;");
+                                    strList.Add("    SET str = REPLACE(str, '\\\\', '\\\\\\\\');");
+                                    strList.Add("    SET str = REPLACE(str, '''', '''''');");
+                                    strList.Add("    RETURN str;");
+                                    strList.Add("END");
+                                    strList.Add(";;");
+                                    strList.Add("DELIMITER ;");
+                                    
+                                    //替换特殊字符（like查询）
+                                    strList.Add("DROP FUNCTION IF EXISTS `replace_special_char_like`;");
+                                    strList.Add("DELIMITER ;;");
+                                    strList.Add("CREATE FUNCTION `replace_special_char_like`(`str` text) RETURNS text CHARSET utf8");
+                                    strList.Add("BEGIN");
+                                    strList.Add("    SET str = replace_special_char(str);");
+                                    strList.Add("    SET str = REPLACE(str, '\\\\', '\\\\\\\\');");
+                                    strList.Add("    SET str = REPLACE(str, '_', '\\_');");
+                                    strList.Add("    SET str = REPLACE(str, '%', '\\%');");
+                                    strList.Add("    RETURN str;");
                                     strList.Add("END");
                                     strList.Add(";;");
                                     strList.Add("DELIMITER ;");
