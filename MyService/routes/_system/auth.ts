@@ -5,22 +5,49 @@ import {Request, Response} from 'express';
 import * as common from './common';
 import errorConfig from './errorConfig';
 
-var authConfig = {
-    'dev': {
+export const authConfig = {
+    dev: {
+        code: 'dev',
         errCode: errorConfig.DEV,
     },
-    'local': {
+    local: {
+        code: 'local',
         errCode: errorConfig.NO_PERMISSIONS,
     },
-    'login': {
+    login: {
+        code: 'login',
         errCode: errorConfig.NO_LOGIN,
     },
-    'accessable': {
+    accessable: {
+        code: 'accessable',
         errCode: errorConfig.NO_PERMISSIONS,
     },
-    'admin': {
+    admin: {
+        code: 'admin',
         errCode: errorConfig.NO_PERMISSIONS,
     },
+
+    mainContentQuery: {
+        code: 'mainContentQuery'
+    },
+    mainContentDetailQuery: {
+        code: 'mainContentDetailQuery'
+    },
+    mainContentSave: {
+        code: 'mainContentSave'
+    },
+    mainContentTypeQuery: {
+        code: 'mainContentTypeQuery'
+    },
+    mainContentTypeDetailQuery: {
+        code: 'mainContentTypeDetailQuery'
+    },
+    mainContentTypeSave: {
+        code: 'mainContentTypeSave'
+    },
+    mainContentTypeDel: {
+        code: 'mainContentTypeDel'
+    }
 };
 
 export let accessableUrlConfig = [];
@@ -74,7 +101,7 @@ export let getAccessableUrl = function (user, pathname?) {
     var accessable = false;
     var isUrlExist = false;
     accessableUrlConfig.forEach(function (item) {
-        var opt = { notExistAuthority: null };
+        var opt = {notExistAuthority: null};
         var result = !item.auth || !item.auth.length || isHadAuthority(user, item.auth, opt);
         var isExist = item.url == pathname;
         if (isExist) isUrlExist = true;

@@ -73,7 +73,6 @@
         }, {
             text: 'user',
             listId: '',
-            auth: ['login'],
             childs: [{
                 text: 'user info',
                 tab: {
@@ -99,7 +98,6 @@
         }, {
             text: 'admin',
             listId: '',
-            auth: ['admin'],
             childs: [{
                 text: 'role',
                 tab: {
@@ -118,7 +116,6 @@
         }, {
             text: '菜单Test',
             listId: 'menuItemListTest',
-            auth: ['dev'],
             childs: [{
                 text: 'Help',
                 tab: {
@@ -168,7 +165,6 @@
                     content: 'testTemplate',
                     type: 'template'
                 },
-                auth: ['dev', 'login']
             },]
         },];
         %>
@@ -190,12 +186,8 @@
                 </li>
                 <%
                 menuList.forEach(function(t){
-                    if (t.auth && !isHadAuthority(t.auth))
-                        return;
                     var childs = [];
                     t.childs.forEach(function (child) {
-                        if (child.auth && !isHadAuthority(child.auth))
-                            return;
                         if (child.tabUrl && !accessableUrl[child.tabUrl])
                             return;
                         childs.push(child);

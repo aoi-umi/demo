@@ -1,6 +1,7 @@
 import {Request} from 'express'
 import * as common from '../_system/common';
 import * as cache from '../_system/cache';
+import * as auth from '../_system/auth';
 import * as main from '../_main';
 import errorConfig from '../_system/errorConfig';
 import * as autoBll from './_auto';
@@ -114,7 +115,7 @@ export let signInInside = function (req: Request) {
         user.id = userInfo.id;
         user.nickname = userInfo.nickname;
         user.account = userInfo.account;
-        user.authority['login'] = true;
+        user.authority[auth.authConfig.login.code] = true;
         user.reqBody = reqBody;
         user.token = token;
         for (var key in t.auth) {
