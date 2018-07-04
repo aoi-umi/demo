@@ -16,19 +16,24 @@ export let accessableUrlConfig = [
     {url: '/msg'},
     {url: '/textDiff'},
 
-    {url: '/onlineUser', auth: ['admin']},
-    {url: '/interface/onlineUser/query', auth: ['admin']},
-    {url: '/interface/onlineUser/detailQuery', auth: ['admin']},
-    {url: '/interface/upload', auth: ['login']},
+    {url: '/onlineUser', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
+    {url: '/interface/onlineUser/query', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
+    {url: '/interface/onlineUser/detailQuery', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
+    {url: '/interface/upload', auth: [auth.authConfig.login.code]},
 
-    {url: '/help', auth: ['dev']},
-    {url: '/status', auth: ['dev']},
-    {url: '/color', auth: ['dev']},
-    {url: '/systemInfo', auth: ['admin']},
+    {url: '/help', auth: [auth.authConfig.dev.code]},
+    {url: '/status', auth: [auth.authConfig.dev.code]},
+    {url: '/color', auth: [auth.authConfig.dev.code]},
+    {url: '/systemInfo', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
 
-    {url: '/log', auth: ['dev']},
-    {url: '/interface/log/query', auth: ['dev']},
-    {url: '/interface/log/save', auth: ['local']},
+    {
+        url: '/log',
+        auth: [
+            [auth.authConfig.dev.code, auth.authConfig.admin.code]
+        ]
+    },
+    {url: '/interface/log/query', auth: [auth.authConfig.dev.code]},
+    {url: '/interface/log/save', auth: [auth.authConfig.local.code]},
 
     {url: '/user/signUp'},
     {url: '/user/signIn'},
@@ -39,43 +44,61 @@ export let accessableUrlConfig = [
     {url: '/interface/captcha/get'},
 
     //角色
-    {url: '/role/list', auth: ['admin']},
-    {url: '/interface/role/query', auth: ['admin']},
-    {url: '/interface/role/save', auth: ['admin']},
-    {url: '/interface/role/detailQuery', auth: ['admin']},
+    {url: '/role/list', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
+    {url: '/interface/role/query', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
+    {url: '/interface/role/save', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
+    {url: '/interface/role/detailQuery', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
 
     //权限
-    {url: '/authority/list', auth: ['admin']},
-    {url: '/interface/authority/query', auth: ['admin']},
-    {url: '/interface/authority/save', auth: ['admin']},
-    {url: '/interface/authority/detailQuery', auth: ['admin']},
+    {url: '/authority/list', auth: [auth.authConfig.admin.code]},
+    {url: '/interface/authority/query', auth: [auth.authConfig.admin.code]},
+    {url: '/interface/authority/save', auth: [auth.authConfig.admin.code]},
+    {url: '/interface/authority/detailQuery', auth: [auth.authConfig.admin.code]},
 
     //用户信息
-    {url: '/userInfo/detail', auth: ['login']},
-    {url: '/userInfo/list', auth: ['admin']},
-    {url: '/interface/userInfo/query', auth: ['admin']},
-    {url: '/interface/userInfo/detailQuery', auth: ['admin']},
-    {url: '/interface/userInfo/save', auth: ['login']},
-    {url: '/interface/userInfo/adminSave', auth: ['admin']},
+    {url: '/userInfo/detail', auth: [auth.authConfig.login.code]},
+    {url: '/userInfo/list', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
+    {url: '/interface/userInfo/query', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
+    {url: '/interface/userInfo/detailQuery', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
+    {url: '/interface/userInfo/save', auth: [auth.authConfig.login.code, auth.authConfig.login.code]},
+    {url: '/interface/userInfo/adminSave', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
 
-    {url: '/mainContent/list', auth: ['mainContentQuery']},
-    {url: '/mainContent/detail', auth: ['mainContentDetailQuery']},
-    {url: '/interface/mainContent/query', auth: ['mainContentQuery']},
-    {url: '/interface/mainContent/save', auth: ['mainContentSave']},
-    {url: '/interface/mainContent/statusUpdate', auth: ['mainContentSave']},
-    //{url: '/interface/mainContent/del', auth: ['admin']},
+    //mainContent
+    {url: '/mainContent/list', auth: [auth.authConfig.login.code, auth.authConfig.mainContentQuery.code]},
+    {url: '/mainContent/detail', auth: [auth.authConfig.login.code, auth.authConfig.mainContentDetailQuery.code]},
+    {url: '/interface/mainContent/query', auth: [auth.authConfig.login.code, auth.authConfig.mainContentQuery.code]},
+    {url: '/interface/mainContent/save', auth: [auth.authConfig.login.code, auth.authConfig.mainContentSave.code]},
+    {
+        url: '/interface/mainContent/statusUpdate',
+        auth: [auth.authConfig.login.code, auth.authConfig.mainContentSave.code]
+    },
+    //{url: '/interface/mainContent/del', auth: [auth.authConfig.admin.code]},
 
-    {url: '/mainContentType/list', auth: ['mainContentTypeQuery']},
-    {url: '/interface/mainContentType/query', auth: ['mainContentTypeQuery']},
-    {url: '/interface/mainContentType/detailQuery', auth: ['mainContentTypeDetailQuery']},
-    {url: '/interface/mainContentType/save', auth: ['mainContentTypeSave']},
-    {url: '/interface/mainContentType/del', auth: ['mainContentTypeDel']},
+    //mainContentType
+    {url: '/mainContentType/list', auth: [auth.authConfig.login.code, auth.authConfig.mainContentTypeQuery.code]},
+    {
+        url: '/interface/mainContentType/query',
+        auth: [auth.authConfig.login.code, auth.authConfig.mainContentTypeQuery.code]
+    },
+    {
+        url: '/interface/mainContentType/detailQuery',
+        auth: [auth.authConfig.login.code, auth.authConfig.mainContentTypeDetailQuery.code]
+    },
+    {
+        url: '/interface/mainContentType/save',
+        auth: [auth.authConfig.login.code, auth.authConfig.mainContentTypeSave.code]
+    },
+    {
+        url: '/interface/mainContentType/del',
+        auth: [auth.authConfig.login.code, auth.authConfig.mainContentTypeDel.code]
+    },
 
-    {url: '/struct/list', auth: ['admin']},
-    {url: '/interface/struct/query', auth: ['admin']},
-    {url: '/interface/struct/detailQuery', auth: ['admin']},
-    {url: '/interface/struct/save', auth: ['admin']},
-    {url: '/interface/struct/del', auth: ['admin']},
+    //架构
+    {url: '/struct/list', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
+    {url: '/interface/struct/query', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
+    {url: '/interface/struct/detailQuery', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
+    {url: '/interface/struct/save', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
+    {url: '/interface/struct/del', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
 ];
 
 //枚举
@@ -279,14 +302,14 @@ export let init = function (opt) {
         req.myData.useStatus = common.parseBool(req.query.useStatus);
 
         if (/^(::ffff:)?(127\.0\.0\.1)$/.test(req.myData.ip))
-            user.authority['local'] = true;
+            user.authority[auth.authConfig.local.code] = true;
 
         if (common.isInArray(req._parsedUrl.pathname, ['/interface/log/save', '/log'])) {
             req.myData.noLog = true;
             req.body.requestIp = req.myData.ip;
         }
         if (config.env == 'dev')
-            user.authority['dev'] = true;
+            user.authority[auth.authConfig.dev.code] = true;
 
         res.myRender = function (view, options) {
             myRender(req, res, view, options);
