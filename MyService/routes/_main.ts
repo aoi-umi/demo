@@ -369,7 +369,6 @@ export let errorHandler = function (err, req: Request, res: Response, next) {
     }
     err.status = err.status || 500;
     err.code = err.code || err.status;
-    res.status(err.status);
     if (req.xhr) {
         return res.mySend(err, err, {code: err.code});
     }
@@ -377,6 +376,7 @@ export let errorHandler = function (err, req: Request, res: Response, next) {
         var signIn = `/user/signIn?noNav=${req.myData.noNav}&toUrl=${encodeURIComponent(req.url)}`;
         return res.redirect(signIn);
     }
+    res.status(err.status);
     res.myRender('view', {
         view: 'error',
         title: '出错了',
