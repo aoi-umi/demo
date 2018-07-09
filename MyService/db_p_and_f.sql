@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50722
 File Encoding         : 65001
 
-Date: 2018-07-02 16:13:18
+Date: 2018-07-09 17:00:54
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -224,6 +224,46 @@ BEGIN
 	PREPARE stmt1 FROM @Sql;
 	EXECUTE stmt1;
 	SELECT FOUND_ROWS() AS 'count';
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for p_log_statistics
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `p_log_statistics`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p_log_statistics`(pr_interval VARCHAR(20),
+pr_method VARCHAR(50),
+pr_createDateStart datetime,
+pr_createDateEnd datetime)
+    SQL SECURITY INVOKER
+BEGIN
+	IF pr_interval IS NULL OR length(pr_interval) = 0 THEN
+		SET pr_interval = '%Y-%m-%d';
+	END IF;
+	SET pr_interval = CONCAT('"', replace_special_char(pr_interval), '"');
+
+	SET @Sql = CONCAT('SELECT method, DATE_FORMAT(t1.createDate, ', pr_interval, ') AS date, count(result = 1 OR NULL) AS successCount, count(1) AS count FROM t_log t1 WHERE 1=1 ');
+	IF pr_method IS NOT NULL AND length(pr_method) > 0 THEN
+			SET @Sql = CONCAT(@Sql, ' AND `method` like ''%',replace_special_char_like(pr_method), '%''');
+	END IF;
+	
+	IF pr_createDateStart IS NOT NULL AND length(pr_createDateStart) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND `createDate` >= ''',replace_special_char(pr_createDateStart), '''');
+	END IF;
+
+	IF pr_createDateEnd IS NOT NULL AND length(pr_createDateEnd) > 0 THEN
+		SET @Sql = CONCAT(@Sql, ' AND `createDate` <= ''',replace_special_char(pr_createDateEnd), '''');
+	END IF;
+
+	SET @Sql = CONCAT(@Sql, ' GROUP BY DATE_FORMAT(t1.createDate, ', pr_interval, '), method');
+	SET @Sql = CONCAT(@Sql, ' HAVING successCount != count');
+	SET @Sql = CONCAT(@Sql, ' ORDER BY method, date');
+	SET @Sql = CONCAT(@Sql, ';');
+	-- SELECT @Sql;
+	PREPARE stmt1 FROM @Sql;
+	EXECUTE stmt1;
 END
 ;;
 DELIMITER ;

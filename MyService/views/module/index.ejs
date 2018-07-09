@@ -159,6 +159,12 @@
                 },
                 tabUrl: '/textDiff',
             }, {
+                text: '统计',
+                tab: {
+                    target: 'statistics',
+                },
+                tabUrl: '/statistics',
+            }, {
                 text: 'test',
                 tab: {
                     target: 'test',
@@ -213,7 +219,10 @@
                                data-tab-content="<%= child.tabUrl + (child.tabUrlArgs || '?noNav=true') %>"
                                data-url="<%= child.tabUrl + (child.tabUrlArgs || '') %>"
                                     <% } %>
-                                    <% for(var key in child.tab){
+                                    <%
+                                        if (!child.tab.name)
+                                            child.tab.name = child.text;
+                                            for(var key in child.tab){
                                     if(child.tab[key]){ %>
                                data-tab-<%= key %>="<%= child.tab[key] %>"
                                     <% }

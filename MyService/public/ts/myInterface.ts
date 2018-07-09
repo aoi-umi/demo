@@ -32,10 +32,12 @@ export let init = function (option: MyInterfaceOption) {
     var moduleList = opt.moduleList;
     var defaultMethod = opt.defaultMethod;
     $(moduleList).each(function () {
-        var module = this;
+        var module = this as any;
+        api[module] = {};
         $(defaultMethod).each(function () {
-            var method = this;
-            opt.setModuleConfig(module, method);
+            var method = this as any;
+            api[module][method] = createFunction({url: `/interface/${module}/${method}`});
+            //opt.setModuleConfig(module, method);
         });
     });
     for (var key in interfaceConfig) {

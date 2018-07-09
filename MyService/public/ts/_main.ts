@@ -32,9 +32,6 @@ export let init = function () {
             signOut: {
                 url: '/interface/user/signOut'
             },
-            logQuery: {
-                url: '/interface/log/query'
-            },
             onlineUserQuery: {
                 url: '/interface/onlineUser/query'
             },
@@ -50,8 +47,12 @@ export let init = function () {
             captchaGet: {
                 url: '/interface/captcha/get'
             },
+            logStatistics: {                
+                url: '/interface/log/statistics'
+            },
         },
         moduleList: [
+            'log',
             'mainContent',
             'mainContentType',
             'userInfo',

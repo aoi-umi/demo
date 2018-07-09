@@ -78,7 +78,7 @@ export class ModuleMainContentType extends MyModule {
                         $('#treeModal').modal('show');
                     }
                     var data = {};
-                    myInterface.api.mainContentTypeQuery(data).then(function (t) {
+                    myInterface.api.mainContentType.query(data).then(function (t) {
                         $('.tree').empty();
                         var list = t.list.sort(function (a, b) {
                             return b.level - a.level;

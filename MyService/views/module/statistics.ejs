@@ -1,0 +1,17 @@
+<div class="container">
+    <div id="logStatistics">
+        <p>接口失败统计</p>
+        <button class="btn btn-default" name="refresh">refresh</button>
+        <p class="text-danger" name="msg"></p>
+        <div name="chart" style="width: 600px;height:600px;">
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+	require(['./_main', './statistics'], function () {
+		var main = require('./_main'),
+			statistics = require('./statistics');
+		main.init();
+		new statistics.LogStatistics();
+	})
+</script>

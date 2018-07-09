@@ -361,9 +361,9 @@ export class MyModule extends ModuleBase {
             data.pageIndex = pageIndex || self.pager.pageIndex;
             data.pageSize = self.pager.pageSize;
             self.opt.beforeQuery(data);
-            var method = self.opt.interfacePrefix + 'Query';
+            var method = 'query';
             var notice = common.msgNotice({type: 1, msg: '查询中...', noClose: true});
-            return myInterface.api[method](data).then(function (t) {
+            return myInterface.api[self.opt.interfacePrefix][method](data).then(function (t) {
                 self.opt.onQuerySuccess(t);
                 self.queryContainerDom.find(self.rowClass).remove();
                 var temp = self.queryItemTemp;
@@ -428,8 +428,8 @@ export class MyModule extends ModuleBase {
                 }
                 var notice = common.msgNotice({type: 1, msg: '保存中...', noClose: true});
                 data = checkRes.model;
-                var method = self.opt.interfacePrefix + 'Save';
-                return myInterface.api[method](data).then(function (t) {
+                var method = 'save';
+                return myInterface.api[self.opt.interfacePrefix][method](data).then(function (t) {
                     self.opt.onSaveSuccess(t, self);
                     return t;
                 }).finally(function () {
@@ -466,8 +466,8 @@ export class MyModule extends ModuleBase {
             if (item && item.id)
                 data.id = item.id;
             self.opt.beforeDel(data);
-            var method = self.opt.interfacePrefix + 'Del';
-            return myInterface.api[method](data).then(function (t) {
+            var method = 'del';
+            return myInterface.api[self.opt.interfacePrefix][method](data).then(function (t) {
                 self.opt.onDelSuccess(t, self);
             }).fail(function (e) {
                 self.opt.onDelFail(e, self);
@@ -482,8 +482,8 @@ export class MyModule extends ModuleBase {
         return common.promise(function () {
             var notice = common.msgNotice({type: 1, msg: '查询中...', noClose: true});
             var data = self.opt.beforeDetailQuery(item, self);
-            var method = self.opt.interfacePrefix + 'DetailQuery';
-            return myInterface.api[method](data).then(function (t) {
+            var method = 'detailQuery';
+            return myInterface.api[self.opt.interfacePrefix][method](data).then(function (t) {
                 self.opt.onDetailQuerySuccess(t, self);
             }).fail(function (e) {
                 self.opt.onDetailQueryFail(e, self);

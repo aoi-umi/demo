@@ -15,6 +15,7 @@ export let accessableUrlConfig = [
     {url: '/'},
     {url: '/msg'},
     {url: '/textDiff'},
+    {url: '/statistics'},
 
     {url: '/onlineUser', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
     {url: '/interface/onlineUser/query', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
@@ -34,6 +35,7 @@ export let accessableUrlConfig = [
     },
     {url: '/interface/log/query', auth: [auth.authConfig.dev.code]},
     {url: '/interface/log/save', auth: [auth.authConfig.local.code]},
+    {url: '/interface/log/statistics'},
 
     {url: '/user/signUp'},
     {url: '/user/signIn'},
