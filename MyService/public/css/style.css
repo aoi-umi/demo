@@ -164,3 +164,8 @@ a.hover {
 .itemToDetail {
     cursor: pointer
 }
+
+/*datetimepicker*/
+.datetimepicker table{
+    min-width: 220px;
+}

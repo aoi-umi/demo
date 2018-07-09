@@ -64,7 +64,7 @@ export class AuthorityAutoComplete {
         };
         if (opt)
             queryOpt.anyKey = opt.anyKey;
-        return myInterface.api.authorityQuery(queryOpt).then(function (t) {
+        return myInterface.api.authority.query(queryOpt).then(function (t) {
             return t.list;
         });
     }
@@ -138,7 +138,7 @@ export class RoleAutoComplete {
             excludeByUserId: self.excludeByUserId
         };
         if (opt) queryOpt.anyKey = opt.anyKey;
-        return myInterface.api.roleQuery(queryOpt).then(function (t) {
+        return myInterface.api.role.query(queryOpt).then(function (t) {
             return t.list;
         });
     }

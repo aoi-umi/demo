@@ -228,7 +228,7 @@ export class ModuleMainContent extends MyModule {
                         }
                         $('#refreshMainContentType').on('click', function () {
                             $('#mainContentType .msg').text('');
-                            myInterface.api.mainContentTypeQuery({status: 1}).then((t) => {
+                            myInterface.api.mainContentType.query({status: 1}).then((t) => {
                                 self.mainContentTypeList = t.list;
                                 setOption();
                             }).catch(e => {

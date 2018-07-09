@@ -81,7 +81,7 @@ export class ModuleStruct extends MyModule {
                         $('#treeModal').modal('show');
                     }
                     var data = {};
-                    myInterface.api.structQuery(data).then(function (t) {
+                    myInterface.api.struct.query(data).then(function (t) {
                         var rootTree = {};
                         var itemTree = {};
                         $('.tree').empty();

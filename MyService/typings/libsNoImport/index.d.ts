@@ -15,7 +15,12 @@ interface File {
 
 //myInterface
 type Api = (data?, option?) => Q.Promise<any>;
-
+interface MyInterfaceModule {
+    query: Api;
+    detailQuery: Api;
+    save: Api;
+    swl: Api;
+}
 interface MyInterfaceApi {
     //自定义
     signUp?: Api;
@@ -30,36 +35,15 @@ interface MyInterfaceApi {
     userInfoAdminSave?: Api;
     captchaGet?: Api;
 
+    logStatistics?: Api;
+
     //模块
-    mainContentQuery?: Api;
-    mainContentDetailQuery?: Api;
-    mainContentSave?: Api;
-    mainContentDel?: Api;
-
-    mainContentTypeQuery?: Api;
-    mainContentTypeDetailQuery?: Api;
-    mainContentTypeSave?: Api;
-    mainContentTypeDel?: Api;
-
-    userInfoQuery?: Api;
-    userInfoDetailQuery?: Api;
-    userInfoSave?: Api;
-    userInfoDel?: Api;
-
-    authorityQuery?: Api;
-    authorityDetailQuery?: Api;
-    authoritySave?: Api;
-    authorityDel?: Api;
-
-    roleQuery?: Api;
-    roleDetailQuery?: Api;
-    roleSave?: Api;
-    roleDel?: Api;
-
-    structQuery?: Api;
-    structDetailQuery?: Api;
-    structSave?: Api;
-    structDel?: Api;
+    mainContent?: MyInterfaceModule;
+    mainContentType?: MyInterfaceModule;
+    userInfo?: MyInterfaceModule;
+    authority?: MyInterfaceModule;
+    role?: MyInterfaceModule;
+    struct?: MyInterfaceModule;
 }
 
 //myTab

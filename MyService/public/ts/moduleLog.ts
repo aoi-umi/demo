@@ -70,38 +70,40 @@ export class ModuleLog extends MyModule {
                 }];
             },
             bindEvent: function (self: ModuleLog) {
-                let minDate = '1900-01-01';
-                let maxDate = '9999-12-31';
-                let dateOpt = {
-                    format: 'yyyy-mm-dd',
-                    minView: 'month',
-                    autoclose: true,
-                    todayBtn: true,
-                    clearBtn: true,
-                    startDate: minDate,
-                };
-                $(`${self.queryBoxId} [name=createDateStart]`)
-                    .datetimepicker(dateOpt)
-                    .on('click', function () {
-                        $(this).datetimepicker('setEndDate', $(`${self.queryBoxId} [name=createDateEnd]`).val() || maxDate);
-                    });
-                $(`${self.queryBoxId} [name=createDateEnd]`)
-                    .datetimepicker(dateOpt)
-                    .on('click', function () {
-                        $(this).datetimepicker('setStartDate', $(`${self.queryBoxId} [name=createDateStart]`).val() || minDate);
-                    });
+                if (self.operation.query) {
+                    let minDate = '1900-01-01';
+                    let maxDate = '9999-12-31';
+                    let dateOpt = {
+                        format: 'yyyy-mm-dd',
+                        minView: 'month',
+                        autoclose: true,
+                        todayBtn: true,
+                        clearBtn: true,
+                        startDate: minDate,
+                    };
+                    $(`${self.queryBoxId} [name=createDateStart]`)
+                        .datetimepicker(dateOpt)
+                        .on('click', function () {
+                            $(this).datetimepicker('setEndDate', $(`${self.queryBoxId} [name=createDateEnd]`).val() || maxDate);
+                        });
+                    $(`${self.queryBoxId} [name=createDateEnd]`)
+                        .datetimepicker(dateOpt)
+                        .on('click', function () {
+                            $(this).datetimepicker('setStartDate', $(`${self.queryBoxId} [name=createDateStart]`).val() || minDate);
+                        });
 
-                self.queryContainerDom.on('click', '.itemToggle', function () {
-                    var dom = $(this);
-                    var content = dom.closest('.itemRow').find('.itemConetnt');
-                    if (dom.hasClass('dropup')) {
-                        dom.removeClass('dropup');
-                        content.slideUp();
-                    } else {
-                        dom.addClass('dropup');
-                        content.slideDown();
-                    }
-                });
+                    self.queryContainerDom.on('click', '.itemToggle', function () {
+                        var dom = $(this);
+                        var content = dom.closest('.itemRow').find('.itemConetnt');
+                        if (dom.hasClass('dropup')) {
+                            dom.removeClass('dropup');
+                            content.slideUp();
+                        } else {
+                            dom.addClass('dropup');
+                            content.slideDown();
+                        }
+                    });
+                }
             }
         };
 
