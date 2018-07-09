@@ -23,7 +23,7 @@ export class LogStatistics {
                     for (let i = 0; i < params.length; i++) {
                         data += params[i].marker + params[i].seriesName + ': '
                             + params[i].value[1] + ', '
-                            + params[i].value[2] + '<br/>';
+                            + params[i].value[3] + '<br/>';
                     }
                     return data;
                 }
@@ -75,7 +75,7 @@ export class LogStatistics {
                     }
                     let notSuccessCount = ele.count - ele.successCount;
                     let notSuccessRate = parseFloat((notSuccessCount / ele.count).toFixed(2));
-                    m.data.push([new Date(ele.date), notSuccessRate, notSuccessCount]);
+                    m.data.push([new Date(ele.date), notSuccessRate, notSuccessCount, `(${notSuccessCount}/${ele.count})`]);
                 });
                 echartsOpt.series = list;
                 self.echart.setOption(echartsOpt);

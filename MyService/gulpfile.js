@@ -5,7 +5,8 @@ var gulp = require('gulp'),
 	ts = require('gulp-typescript'),
 	changed = require('gulp-changed'),
 	debug = require('gulp-debug'),
-	Q = require('q');
+    Q = require('q'),    
+    sourcemaps = require('gulp-sourcemaps');
 
 var tsProject = ts.createProject('tsconfig.json', {target: 'es2017'});
 var tsFrontProject = ts.createProject('tsconfig.json');
@@ -45,9 +46,11 @@ gulp.task('ts', function () {
 let tsFrontSrc = ['public/ts/**/*.ts'];
 gulp.task('ts-front', function () {
 	let dest = destDir + '/public/js';
-	return gulp.src(tsFrontSrc)
+    return gulp.src(tsFrontSrc)
+        .pipe(sourcemaps.init())
 		.pipe(changed(dest, {extension: '.js'}))
-		.pipe(tsFrontProject())
+        .pipe(tsFrontProject())        
+        .pipe(sourcemaps.write('.'))
 		.pipe(gulp.dest(dest));
 });
 
