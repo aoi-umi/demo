@@ -28,6 +28,12 @@ export class LogStatistics {
                     return data;
                 }
             },
+            dataZoom: [{
+                id: 'dataZoomX',
+                type: 'slider',
+                xAxisIndex: [0],
+                filterMode: 'filter'
+            },],
             legend: {
                 data: []
             },
@@ -59,24 +65,29 @@ export class LogStatistics {
             let echartsOpt: echarts.EChartOption = self.echart.getOption();
             myInterface.api.logStatistics().then(t => {
                 let list = [];
-                let methodDict = {};
+                let dataDict = {};
                 t.list.forEach(ele => {
-                    let m = methodDict[ele.method]
-                    if (!m) {
-                        m = methodDict[ele.method] = {
-                            name: ele.method,
-                            type: 'line',
-                            data: [],
-                            symbolSize: function (value) {
-                                return value[2];
-                            },
-                        }
-                        list.push(m);
-                    }
+                    let data = dataDict[ele.method] || (dataDict[ele.method] = []);
                     let notSuccessCount = ele.count - ele.successCount;
                     let notSuccessRate = parseFloat((notSuccessCount / ele.count).toFixed(2));
-                    m.data.push([new Date(ele.date), notSuccessRate, notSuccessCount, `(${notSuccessCount}/${ele.count})`]);
+                    data.push([new Date(ele.date), notSuccessRate, notSuccessCount, `(${notSuccessCount}/${ele.count})`]);
                 });
+                for (let method in dataDict) {
+                    list.push({
+                        name: method,
+                        type: 'line',
+                        data: dataDict[method],
+                        symbolSize: function (value) {
+                            return value[2];
+                        },
+                    });
+                    // list.push({
+                    //     name: method,
+                    //     type: 'bar',
+                    //     data: dataDict[method],
+                    // });
+                }
+
                 echartsOpt.series = list;
                 self.echart.setOption(echartsOpt);
             }).catch(e => {
