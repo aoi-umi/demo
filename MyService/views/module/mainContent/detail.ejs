@@ -11,8 +11,21 @@
         display: none;
     }
 
-    #mainContentTypeReadOnly .mainContentType + .mainContentType:before {
+    .mainContentTypeText + .mainContentTypeText:before {
         content: '>>'
+    }
+
+    #mainContentType #editMainContentType {
+        display: none;
+    }
+
+    #mainContentType.disabled #refreshMainContentType,
+    #mainContentType.disabled #cancelMainContentType {
+        display: none;
+    }
+
+    #mainContentType.disabled #editMainContentType {
+        display: inherit;
     }
 </style>
 <div class="container">
@@ -63,21 +76,30 @@
                     <div class="form-group">
                         <label class="<%= col1Class %> control-label text-right">类别</label>
 
-                        <div class="<%= col2Class %>" style="padding-top: 7px">
-                            <% if(!mainContent.id){ %>
-                            <div id="mainContentType" class="row my-row">
-                                <div class="col-xs-2 mainContentType"><select class="form-control"></select></div>
-                                <a id="refreshMainContentType" href="javascript:;">刷新</a>
-                                <span class="text-danger msg"></span>
-                            </div>
-                            <% }else{ %>
-                            <div id="mainContentTypeReadOnly">
-                                <% var mainContentTypeList = mainContentDetail.mainContentTypeList;
+                        <div class="<%= col2Class %>">
+                            <%
+                            var mainContentTypeList = mainContentDetail.mainContentTypeList
+                            if(mainContentTypeList.length){ %>
+                            <div style="margin-top: 7px;margin-bottom: 7px">
+                                <%
                                 mainContentTypeList.forEach(function(item, index){ %>
-                                <span class="mainContentType">
+                                <span class="mainContentTypeText">
                                 <a href="javascript:;"><%= item.type %><%= item.typeName ? '(' + item.typeName + ')' : '' %></a>
                             </span>
                                 <% }) %>
+                            </div>
+                            <% }
+                            if(isEditable){ %>
+                            <div id="mainContentType"
+                                 class="row my-row <%= mainContentTypeList.length ? 'disabled' : '' %>"
+                                 data-list="<%= JSON.stringify(mainContentTypeList) %>">
+                                <div class="col-xs-2 mainContentType">
+                                    <select class="form-control"></select>
+                                </div>
+                                <a id="refreshMainContentType" href="javascript:;">刷新</a>
+                                <a id="cancelMainContentType" href="javascript:;">取消</a>
+                                <a id="editMainContentType" href="javascript:;">修改</a>
+                                <span class="text-danger msg"></span>
                             </div>
                             <% } %>
                         </div>

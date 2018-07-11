@@ -107,6 +107,11 @@ export let save = function (opt, exOpt) {
             });
             return match;
         });
+        let mainContentTypeIdList = [];
+        if (mainContent.id != 0) {
+            let query = await autoBll.modules.mainContentTypeId.query({mainContentId: mainContent.id});
+            mainContentTypeIdList = query.list;
+        }
 
         //保存
         return autoBll.tran(async function (conn) {
@@ -118,13 +123,24 @@ export let save = function (opt, exOpt) {
             let mainContentId = await autoBll.modules.mainContent.save(mainContent, conn);
 
             var list = [];
-            if (mainContent.id == 0 && opt.mainContentTypeList) {
-                opt.mainContentTypeList.forEach(ele => {
+            if (opt.mainContentTypeList) {
+                //覆盖旧数据，删除多余
+                opt.mainContentTypeList.forEach((ele, idx) => {
+                    let match = mainContentTypeIdList[idx];
                     list.push(autoBll.modules.mainContentTypeId.save({
+                        id: match ? match.id : null,
                         mainContentId: mainContentId,
                         mainContentTypeId: ele
                     }, conn));
                 });
+                if (mainContentTypeIdList.length > opt.mainContentTypeList.length) {
+                    for (let i = opt.mainContentTypeList.length; i < mainContentTypeIdList.length; i++) {
+                        let ele = mainContentTypeIdList[i];
+                        list.push(autoBll.modules.mainContentTypeId.del({
+                            id: ele.id
+                        }, conn));
+                    }
+                }
             }
             //删除child
             if (delChildList && delChildList.length) {
@@ -151,9 +167,9 @@ export let save = function (opt, exOpt) {
                 user: user
             });
             list.push(autoBll.modules.mainContentLog.save(mainContentLog, conn));
-            await q.all(list);    
-            return mainContentId;    
-        });    
+            await q.all(list);
+            return mainContentId;
+        });
     });
 };
 
