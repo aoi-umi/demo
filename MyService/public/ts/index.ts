@@ -193,9 +193,10 @@ export let bindEvent = function () {
             if (!$('#searchResult').hasClass('in'))
                 $('#menuSearchBtn').click();
             var list = [];
+            let reg = new RegExp(val, 'i');
             $('#menu .menuItem').each(function () {
-                var itemValue = $(this).text();
-                if (itemValue.indexOf(val) >= 0) {
+                var itemValue = $(this).text().trim();;
+                if (reg.test(itemValue)) {
                     list.push($(this).clone());
                 }
             });
