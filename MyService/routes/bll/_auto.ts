@@ -46,7 +46,9 @@ export let save: AutoBllFun = function (name, params, conn?) {
     });
 };
 export let del: AutoBllFun = function (name, params, conn?) {
-    return getRequire(name).del(params, conn);
+    return getRequire(name).del(params, conn).then(t => {
+        return 'success';
+    });
 };
 export let detailQuery: AutoBllFun = function (name, params, conn?) {
     return getRequire(name).detailQuery(params, conn).then(function (t) {
@@ -78,9 +80,9 @@ export let customDal = function (name, method, ...args) {
 };
 
 
-let moduleList = ['authority', 'log', 
+let moduleList = ['authority', 'log',
     'mainContent', 'mainContentChild', 'mainContentLog', 'mainContentTag', 'mainContentType', 'mainContentTypeId',
-    'role', 'roleWithAuthority', 'struct', 
+    'role', 'roleWithAuthority', 'struct',
     'userInfo', 'userInfoLog', 'userInfoWithAuthority', 'userInfoWithRole', 'userInfoWithStruct'];
 let methodList = ['save', 'query', 'detailQuery', 'del'];
 
