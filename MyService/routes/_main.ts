@@ -322,17 +322,16 @@ export let init = function (opt) {
         };
 
         var userInfoKey = req.cookies[cacheKey.userInfo];
-
-        if (!userInfoKey)
-            return next();
-
-        userInfoKey = cacheKey.userInfo + userInfoKey;
-        cache.get(userInfoKey).then(async function (t) {
-            if (!t)
+        common.promise(async () => {
+            if (!userInfoKey)
                 return;
-            t.key = userInfoKey;
-            req.myData.user = t;
-            if (t.cacheDatetime && new Date().getTime() - new Date(t.cacheDatetime).getTime() < 12 * 3600 * 1000)
+            userInfoKey = cacheKey.userInfo + userInfoKey;
+            let userCache = await cache.get(userInfoKey);
+            if (!userCache)
+                return;
+            userCache.key = userInfoKey;
+            req.myData.user = userCache;
+            if (userCache.cacheDatetime && new Date().getTime() - new Date(userCache.cacheDatetime).getTime() < 12 * 3600 * 1000)
                 return;
             //region 自动重新登录获取信息
             req.myData.autoSignIn = true;
