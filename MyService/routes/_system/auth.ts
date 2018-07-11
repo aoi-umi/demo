@@ -116,7 +116,11 @@ export let getAccessableUrl = function (user, pathname?) {
     });
     if (pathname) {
         if (!isUrlExist)
-            throw common.error('', errorConfig.NOT_FOUND);
+            throw common.error('', errorConfig.NOT_FOUND, {
+                format: function (msg) {
+                    return msg + ':' + pathname;
+                }
+            });
         if (!accessable)
             throw common.error('', authConfig.accessable.errCode);
     }
