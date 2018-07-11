@@ -12,6 +12,8 @@ import {MyModule, ModuleOption} from './myModule';
 
 export class ModuleMainContent extends MyModule {
     mainContentTypeList: Array<any>;
+    currMainContentTypeList: Array<any>;
+    mainContentTypeTemp: string;
 
     constructor(option?: ModuleOption) {
         var opt: ModuleOption = {
@@ -79,19 +81,20 @@ export class ModuleMainContent extends MyModule {
                 },]
                 self.variable.delMainContentChildList = [];
                 if (self.operation.detailQuery) {
+                    self.mainContentTypeTemp = $('.mainContentType:eq(0)').prop('outerHTML');
                 }
             },
             bindEvent: function (self: ModuleMainContent) {
                 if (self.operation.query) {
                     let minDate = '1900-01-01';
-                    let maxDate = '9999-12-31';                                     
+                    let maxDate = '9999-12-31';
                     let dateOpt = {
                         format: 'yyyy-mm-dd',
                         minView: 'month',
                         autoclose: true,
                         todayBtn: true,
                         clearBtn: true,
-                        startDate: minDate,                        
+                        startDate: minDate,
                     };
                     $(`${self.queryBoxId} [name=createDateStart]`)
                         .datetimepicker(dateOpt)
@@ -113,7 +116,7 @@ export class ModuleMainContent extends MyModule {
                         .datetimepicker(dateOpt)
                         .on('click', function () {
                             $(this).datetimepicker('setStartDate', $(`${self.queryBoxId} [name=operateDateStart]`).val() || minDate);
-                        });                    
+                        });
 
                     $(document).on('click', '.statusSearch', function () {
                         var status = $(this).find('.statusCount').data('status');
@@ -198,50 +201,49 @@ export class ModuleMainContent extends MyModule {
                         }
                     });
                     //
-                    let template = $('.mainContentType:eq(0)').prop('outerHTML');
-                    if (template) {
-                        let setOption = function (parentType?, index?) {
-                            let optionHtml = [];
-                            if (!index)
-                                index = 0;
-                            self.mainContentTypeList.forEach(ele => {
-                                if ((!index && !ele.parentType) || (index && ele.parentType && parentType == ele.parentType))
-                                    optionHtml.push(`<option value="${ele.type}" data-id="${ele.id}">${ele.type}${ele.typeName
-                                        ? '(' + ele.typeName + ')' : ''}</option>`);
-                            });
-
-                            let dom = $(`.mainContentType:eq(${index})`);
-                            if (optionHtml.length && !dom.length) {
-                                dom = $(template);
-                                $(`.mainContentType:eq(${index - 1})`).after(dom);
-                            }
-                            if (dom.length) {
-                                if (optionHtml.length)
-                                    optionHtml.unshift('<option value=""></option>');
-                                dom.find('select').html(optionHtml.join(''));
-                            }
-
-                            //移除空的select
-                            if (!optionHtml.length && index - 1 >= 0)
-                                index--;
-                            $(`.mainContentType:gt(${index})`).remove();
-                        }
-                        $('#refreshMainContentType').on('click', function () {
-                            $('#mainContentType .msg').text('');
-                            myInterface.api.mainContentType.query({status: 1}).then((t) => {
+                    let mainContentTypeDom = $('#mainContentType');
+                    if (mainContentTypeDom) {
+                        let refreshDom = $('#refreshMainContentType');
+                        let editDom = $('#editMainContentType');
+                        let cancelDom = $('#cancelMainContentType');
+                        let refresh = function () {
+                            return myInterface.api.mainContentType.query({status: 1}).then((t) => {
                                 self.mainContentTypeList = t.list;
-                                setOption();
+                            });
+                        }
+                        refreshDom.on('click', function () {
+                            mainContentTypeDom.find('.msg').text('');
+                            refresh().then(() => {
+                                self.setMainContentTypeOption();
                             }).catch(e => {
-                                $('#mainContentType .msg').text(e.message);
+                                mainContentTypeDom.find('.msg').text(e.message);
                             });
                         });
-                        $('#refreshMainContentType').trigger('click');
+                        editDom.on('click', function () {
+                            mainContentTypeDom.removeClass('disabled');
+                            refresh().then(() => {
+                                self.currMainContentTypeList.forEach((ele, index) => {
+                                    self.setMainContentTypeOption(index, ele.parentType, ele.type);
+                                });
+                            });
+                        });
+                        cancelDom.on('click', function(){
+                            $('#mainContentType .mainContentType select:not(:disabled)').prop('disabled', true);
+                        });
 
-                        $('#mainContentType').on('change', '.mainContentType select', function () {
+                        mainContentTypeDom.on('change', '.mainContentType select', function () {
                             let dom = $(this);
                             let box = dom.closest('.mainContentType');
-                            setOption(dom.val(), box.index() + 1);
+                            self.setMainContentTypeOption(box.index() + 1, dom.val());
                         });
+                        self.currMainContentTypeList = self.mainContentTypeList = mainContentTypeDom.data('list') || [];
+                        if (refreshDom.is(':visible')) {
+                            refreshDom.trigger('click');
+                        } else {
+                            self.currMainContentTypeList.forEach((ele, index) => {
+                                self.setMainContentTypeOption(index, ele.parentType, ele.type, true);
+                            });
+                        }
                     }
                 }
             },
@@ -297,7 +299,7 @@ export class ModuleMainContent extends MyModule {
                     else
                         throw new Error(`错误的操作类型[${operate}]`);
 
-                    if (mainContent.id == 0) {
+                    if ($('#mainContentType .mainContentType select:not(:disabled)').length) {
                         let valList = [];
                         $('#mainContentType .mainContentType option:selected').each(function () {
                             let id = $(this).data('id');
@@ -409,5 +411,38 @@ export class ModuleMainContent extends MyModule {
             self.queryDom.click();
         else
             location.reload(true);
+    }
+
+    setMainContentTypeOption(index?, parentType?, type?, disabled?) {
+        let self = this;
+        let template = self.mainContentTypeTemp;
+        let optionHtml = [];
+        if (!index)
+            index = 0;
+        self.mainContentTypeList.forEach((ele) => {
+            let selected = type && type == ele.type;
+            if ((!index && !ele.parentType) || (index && ele.parentType && parentType == ele.parentType)) {
+                optionHtml.push(`<option value="${ele.type}" data-id="${ele.id}" 
+                ${selected ? 'selected' : ''}>
+                ${ele.type}${ele.typeName ? '(' + ele.typeName + ')' : ''}</option>`);
+            }
+        });
+
+        let dom = $(`.mainContentType:eq(${index})`);
+        if (optionHtml.length && !dom.length) {
+            dom = $(template);
+            $(`.mainContentType:eq(${index - 1})`).after(dom);
+        }
+        if (dom.length) {
+            dom.find('select').prop('disabled', !!disabled);
+            if (optionHtml.length)
+                optionHtml.unshift('<option value=""></option>');
+            dom.find('select').html(optionHtml.join(''));
+        }
+
+        //移除空的select
+        if (!optionHtml.length && index - 1 >= 0)
+            index--;
+        $(`.mainContentType:gt(${index})`).remove();
     }
 }
