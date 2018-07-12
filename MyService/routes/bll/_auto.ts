@@ -113,11 +113,11 @@ interface AutoBllModules {
 }
 
 export let modules: AutoBllModules = {};
-moduleList.forEach(ele => {
-    let autoModule = modules[ele] = {};
+moduleList.forEach(moduleName => {
+    let autoModule = modules[moduleName] = {};
     methodList.forEach(method => {
         autoModule[method] = (...args) => {
-            args.splice(0, 0, ele);
+            args.unshift(moduleName);
             return exports[method].apply(void 0, args);
         }
     });
