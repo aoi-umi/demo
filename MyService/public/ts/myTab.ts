@@ -92,6 +92,17 @@ export let bindEvent = function () {
             tabDom.click();
         }
     });
+    //中键
+    $(document).on('mousedown', '.tab[data-url]', function(event){
+        let currTab = $(this);
+        if(event.which == 2){
+            var url = currTab.data('url');
+            var type = '_blank';
+            if (url && type) {
+                window.open(url, type);
+            }
+        }
+    });
     $(document).on('contextmenu', '.tab[data-url]', function (e) {
         var x = e.pageX;
         var y = e.pageY;
