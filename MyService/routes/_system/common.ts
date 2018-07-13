@@ -271,11 +271,12 @@ export let extend = function (...args) {
     var res = args[0] || {};
     for (let i = 1; i < args.length; i++) {
         var arg = args[i];
-        if (typeof (arg) == 'object') {
-            for (var key in arg) {
-                if (arg[key] !== undefined)
-                    res[key] = arg[key];
-            }
+        if (typeof (arg) !== 'object') {
+            continue;
+        }
+        for (var key in arg) {
+            if (arg[key] !== undefined)
+                res[key] = arg[key];
         }
     }
     return res;
@@ -360,7 +361,7 @@ export let requestService = function (option) {
         var encoding = response.headers['content-encoding'];
         switch (encoding) {
             case 'gzip':
-                let buffer = await unzipPromise(data);
+                let buffer = await promisify(zlib.unzip)(data);
                 data = buffer.toString();
                 if (data && typeof data == 'string')
                     data = JSON.parse(data);
@@ -376,8 +377,6 @@ export let requestService = function (option) {
         return data;        
     });
 };
-
-export let unzipPromise = promisify(zlib.unzip);
 
 export let getErrorConfigByCode = function (code) {
     for (let key in errorConfig) {
@@ -440,14 +439,12 @@ export let getStack = function (stack) {
 export let mkdirsSync = function (dirname, mode?) {
     if (fs.existsSync(dirname)) {
         return true;
-    } else {
-        if (mkdirsSync(path.dirname(dirname), mode)) {
-            fs.mkdirSync(dirname, mode);
-            return true;
-        } else {
-            return false;
-        }
-    }
+    } 
+    if (mkdirsSync(path.dirname(dirname), mode)) {
+        fs.mkdirSync(dirname, mode);
+        return true;
+    } 
+    return false;    
 }
 
 export let getClientIp = function (req) {
@@ -539,17 +536,17 @@ export let logSave = function (log) {
 // });
 
 export let streamToBuffer = function (stream) {
-    return promise(function (res) {
+    return promise(function (defer) {
         var buffers = [];
         stream.on('data', function (buffer) {
             buffers.push(buffer);
         });
         stream.on('end', function () {
             var buffer = Buffer.concat(buffers);
-            res.resolve(buffer);
+            defer.resolve(buffer);
         });
-        stream.on('error', res.reject);
-        return res.promise;
+        stream.on('error', defer.reject);
+        return defer.promise;
     });
 };
 
@@ -597,10 +594,7 @@ export let getListDiff = function (option) {
 };
 
 export let parseBool = function (b) {
-    var result = false;
-    if (b && b.toLocaleString() == 'true')
-        result = true;
-    return result;
+    return b && b.toLocaleString() == 'true';
 };
 //endregion
 
