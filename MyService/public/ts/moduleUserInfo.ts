@@ -90,24 +90,19 @@ export class ModuleUserInfo extends MyModule {
                             $(this).datetimepicker('setStartDate', $(`${self.queryBoxId} [name=createDateStart]`).val() || minDate);
                         });
 
-                    $(`${self.queryBoxId} [name=editDateStart]`).datetimepicker(dateOpt)
+                    $(`${self.queryBoxId} [name=editDateStart]`)
+                        .datetimepicker(dateOpt)
                         .on('click', function () {
                             $(this).datetimepicker('setEndDate', $(`${self.queryBoxId} [name=editDateEnd]`).val() || maxDate);
                         });
-                    $(`${self.queryBoxId} [name=editDateEnd]`).datetimepicker(dateOpt)
+                    $(`${self.queryBoxId} [name=editDateEnd]`)
+                        .datetimepicker(dateOpt)
                         .on('click', function () {
                             $(this).datetimepicker('setStartDate', $(`${self.queryBoxId} [name=editDateStart]`).val() || minDate);
                         });                    
 
                     $(document).on('click', '.admin-save', function () {
                         self.adminSave();
-                    });
-                    self.queryContainerDom.on('click', '.toggle-auth', function () {
-                        var authBox = $(this).siblings('.auth-box');
-                        if (authBox.hasClass('hidden'))
-                            authBox.removeClass('hidden');
-                        else
-                            authBox.addClass('hidden');
                     });
 
                     //角色
