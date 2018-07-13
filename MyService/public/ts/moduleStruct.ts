@@ -33,18 +33,10 @@ export class ModuleStruct extends MyModule {
                 operation: ['save']
             },
             interfacePrefix: 'struct',
-            init: function(self: ModuleStruct){
-                let idList = [
-                    'treeItemId',
-                ];
-
-                $(idList).each(function () {
-                    let ele: any = this;
-                    if (self.opt[ele])
-                        self[ele] = '#' + self.opt[ele];
-                    else
-                        self[ele] = '';
-                });
+            idList: [
+                'treeItemId',
+            ],
+            init: function(self: ModuleStruct){                
                 self.treeItemTemp = $(self.treeItemId).html();
 
                 self.opt.queryArgsOpt = [{
@@ -81,34 +73,14 @@ export class ModuleStruct extends MyModule {
                         $('#treeModal').modal('show');
                     }
                     var data = {};
-                    myInterface.api.struct.query(data).then(function (t) {
-                        var rootTree = {};
-                        var itemTree = {};
+                    myInterface.api.struct.query(data).then(function (t) {                        
                         $('.tree').empty();
                         var list = t.list.sort(function (a, b) {
                             return b.level - a.level;
                         });
-
-                        function setTree(tree, parentStruct, list) {
-                            $(list).each(function (i) {
-                                let item: any = this;
-                                if (!itemTree[item.struct])
-                                    itemTree[item.struct] = {item: item, inRoot: false};
-                                if (item.parentStruct == parentStruct) {
-                                    itemTree[item.struct].inRoot = true;
-                                    if (!tree[item.struct]) {
-                                        tree[item.struct] = {
-                                            item: item,
-                                            child: {},
-                                            inRoot: true,
-                                        }
-                                    }
-                                    setTree(tree[item.struct].child, item.struct, list);
-                                }
-                            });
-                        }
-
-                        setTree(rootTree, '', list);
+                        let tree = common.getTree(list, '', null, 'struct', 'parentStruct');
+                        let itemTree = tree.itemTree;
+                        var rootTree = tree.rootTree;
                         var temp = self.treeItemTemp;
 
                         function renderTree(leave, treeDom) {
@@ -134,18 +106,18 @@ export class ModuleStruct extends MyModule {
                         }
                     })
                 });
-
-                $('#treeModal').on('click', '.itemDetailQuery', function () {
+                let treeModal = $('#treeModal');
+                treeModal.on('click', self.detailQueryClass, function () {
                     var row = $(this).closest(self.rowClass);
                     self.detailQuery(row.data('item'));
                 });
 
-                $('#treeModal').on('click', '.itemDel', function () {
+                treeModal.on('click', self.delClass, function () {
                     var row = $(this).closest(self.rowClass);
                     self.del(row.data('item'));
                 });
 
-                $('#treeModal').on('click', '.itemAdd', function () {
+                treeModal.on('click', '.itemAdd', function () {
                     var row = $(this).closest(self.rowClass);
                     let item = row.data('item');
                     item = $.extend(null, self.opt.saveDefaultModel, item ? {parentStruct: item.struct} : null);
