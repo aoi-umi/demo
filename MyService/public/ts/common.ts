@@ -104,12 +104,10 @@ export let promisifyAll = function (obj) {
     }
 };
 export let s4 = function (count?: number) {
-    var str = '';
-    if (typeof count == 'undefined')
+    let str = '';
+    if (count == undefined)
         count = 1;
-    if (count <= 0) {
-
-    } else {
+    if (count > 0) {
         for (var i = 0; i < count; i++) {
             str += (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
         }
@@ -117,7 +115,7 @@ export let s4 = function (count?: number) {
     return str;
 };
 export let guid = function () {
-    return (s4(2) + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4(3));
+    return `${s4(2)}-${s4()}-${s4()}-${s4()}-${s4(3)}`;
 };
 export let createToken = function (str) {
     var code = md5(str);
@@ -125,7 +123,6 @@ export let createToken = function (str) {
 };
 export let dateFormat = function (date, format?) {
     try {
-        if (!format) format = 'yyyy-MM-dd';
         if (!date)
             date = new Date();
         else if (typeof date == 'number' || typeof date == 'string')
@@ -143,31 +140,31 @@ export let dateFormat = function (date, format?) {
         };
 
         var formatStr = format.replace(/(y+|M+|d+|h+|H+|m+|s+|S+)/g, function (e) {
-            if (e.match(/S+/))
-                return ('' + o[e.slice(-1)]).slice(0, e.length);
+            let key = e.slice(-1);
+            if (key == 'S')
+                return ('' + o[key]).slice(0, e.length);
             else
-                return ((e.length > 1 ? '0' : '') + o[e.slice(-1)]).slice(-(e.length > 2 ? e.length : 2));
+                return ((e.length > 1 ? '0' : '') + o[key]).slice(-(e.length > 2 ? e.length : 2));
         });
         return formatStr;
     } catch (e) {
-        console.log(e);
-        return '';
+        return e.message;
     }
 };
 //字符串
-export let stringFormat = function (...args) {
-    var reg = /(\{\d\})/g
-    var res = args[0] || '';
-    var split = res.split(reg);
-    for (var i = 0; i < split.length; i++) {
-        var m = split[i].length >= 3 && split[i].match(/\{(\d)\}/);
-        if (m) {
-            var index = parseInt(m[1]);
-            split[i] = split[i].replace('{' + index + '}', args[index + 1] || '');
-        }
+export let stringFormat = function (formatString: string, ...args) {
+    if(!formatString)
+        formatString = '';
+    let reg = /(\{(\d)\})/g;
+    if(typeof args[0] === 'object'){
+        args = args[0];
+        reg = /(\{([^{}]+)\})/g;
     }
-    res = split.join('');
-    return res;
+    let result = formatString.replace(reg, function(){
+        let match = arguments[2];
+        return args[match] || '';
+    });
+    return result;
 };
 //小写下划线
 export let stringToLowerCaseWithUnderscore = function (str) {
