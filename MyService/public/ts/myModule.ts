@@ -31,6 +31,7 @@ export class ModuleOption extends ModuleBase {
     interfacePrefix?: string;
     queryArgsOpt?: any[];
     saveDefaultModel?: any;
+    idList?: string[];
 
     init?(self: MyModule);
 
@@ -125,7 +126,7 @@ export class MyModule extends ModuleBase {
         beforeQueryDataCheck: function (self: MyModule) {
             var list = self.opt.queryArgsOpt;
             if (list) {
-                return common.dataCheck({list: list});
+                return common.dataCheck({ list: list });
             }
         },
         beforeQuery: function (data) {
@@ -134,7 +135,7 @@ export class MyModule extends ModuleBase {
         onQuerySuccess: function (t) {
         },
         onQueryFail: function (e, self: MyModule) {
-            common.msgNotice({type: 1, msg: e.message});
+            common.msgNotice({ type: 1, msg: e.message });
         },
         editBeforeRender: function (item, self: MyModule) {
             return item;
@@ -144,19 +145,19 @@ export class MyModule extends ModuleBase {
         beforeSave: function (dom, self: MyModule): any {
         },
         onSaveSuccess: function (t, self: MyModule) {
-            common.msgNotice({type: 1, msg: '保存成功:' + t});
+            common.msgNotice({ type: 1, msg: '保存成功:' + t });
         },
         onSaveFail: function (e, self: MyModule) {
-            common.msgNotice({type: 1, msg: '保存失败:' + e.message});
+            common.msgNotice({ type: 1, msg: '保存失败:' + e.message });
         },
         beforeDel: function (t) {
         },
         onDelSuccess: function (t, self: MyModule) {
-            common.msgNotice({type: 1, msg: '删除成功'});
+            common.msgNotice({ type: 1, msg: '删除成功' });
             self.pager.refresh();
         },
         onDelFail: function (e, self: MyModule) {
-            common.msgNotice({type: 1, msg: '删除失败:' + e.message});
+            common.msgNotice({ type: 1, msg: '删除失败:' + e.message });
         },
         beforeDetailQuery: function (t, self: MyModule) {
             var data: any = {};
@@ -168,7 +169,7 @@ export class MyModule extends ModuleBase {
             self.detailRender(t);
         },
         onDetailQueryFail: function (e, self: MyModule) {
-            common.msgNotice({type: 1, msg: '查询失败:' + e.message});
+            common.msgNotice({ type: 1, msg: '查询失败:' + e.message });
         }
     };
 
@@ -209,6 +210,8 @@ export class MyModule extends ModuleBase {
             'detailId',
             'detailTempId',
         ];
+        if (self.opt.idList)
+            idList = idList.concat(self.opt.idList);
 
         $(idList).each(function () {
             let ele: any = this;
@@ -233,7 +236,7 @@ export class MyModule extends ModuleBase {
                 pagerId: self.opt.pagerId,
                 changeHandle: function (cb) {
                     self.query().then(function (t: any) {
-                        cb({count: t.count});
+                        cb({ count: t.count });
                     }).fail(function () {
                         cb();
                     });
@@ -256,12 +259,12 @@ export class MyModule extends ModuleBase {
                     var item: any = this;
                     if (item.dom) {
                         item.dom.on('blur', function () {
-                            var checkRes = common.dataCheck({list: [item]});
+                            var checkRes = common.dataCheck({ list: [item] });
                             if (checkRes.success) {
                                 if (checkRes.dom)
                                     $('[data-target="' + checkRes.dom.selector + '"]').hide();
                             } else {
-                                common.msgNotice({dom: checkRes.dom, msg: checkRes.desc});
+                                common.msgNotice({ dom: checkRes.dom, msg: checkRes.desc });
                             }
                         });
 
@@ -349,7 +352,7 @@ export class MyModule extends ModuleBase {
                 var err = null;
                 if (!checkRes.success) {
                     if (checkRes.dom) {
-                        common.msgNotice({dom: checkRes.dom, msg: checkRes.desc});
+                        common.msgNotice({ dom: checkRes.dom, msg: checkRes.desc });
                     } else {
                         err = new Error(checkRes.desc);
                     }
@@ -362,7 +365,7 @@ export class MyModule extends ModuleBase {
             data.pageSize = self.pager.pageSize;
             self.opt.beforeQuery(data);
             var method = 'query';
-            var notice = common.msgNotice({type: 1, msg: '查询中...', noClose: true});
+            var notice = common.msgNotice({ type: 1, msg: '查询中...', noClose: true });
             return myInterface.api[self.opt.interfacePrefix][method](data).then(function (t) {
                 self.opt.onQuerySuccess(t);
                 self.queryContainerDom.find(self.rowClass).remove();
@@ -373,7 +376,7 @@ export class MyModule extends ModuleBase {
                         item.colNum = i + 1;
                         self.queryContainerDom.append($(ejs.render(temp, item)).data('item', item));
                     });
-                } else if(errorDom.length){
+                } else if (errorDom.length) {
                     self.queryContainerDom.find('[name=errorContent]').html('没有数据了');
                     errorDom.show();
                 }
@@ -420,13 +423,13 @@ export class MyModule extends ModuleBase {
                 if (!checkRes.success) {
                     var err = null;
                     if (checkRes.dom) {
-                        common.msgNotice({dom: checkRes.dom, msg: checkRes.desc});
+                        common.msgNotice({ dom: checkRes.dom, msg: checkRes.desc });
                     } else {
                         err = new Error(checkRes.desc);
                     }
                     throw err;
                 }
-                var notice = common.msgNotice({type: 1, msg: '保存中...', noClose: true});
+                var notice = common.msgNotice({ type: 1, msg: '保存中...', noClose: true });
                 data = checkRes.model;
                 var method = 'save';
                 return myInterface.api[self.opt.interfacePrefix][method](data).then(function (t) {
@@ -461,7 +464,7 @@ export class MyModule extends ModuleBase {
             });
             return defer.promise;
         }).then(function () {
-            var notice = common.msgNotice({type: 1, msg: '删除中...', noClose: true});
+            var notice = common.msgNotice({ type: 1, msg: '删除中...', noClose: true });
             var data: any = {};
             if (item && item.id)
                 data.id = item.id;
@@ -480,7 +483,7 @@ export class MyModule extends ModuleBase {
     detailQuery(item) {
         var self = this;
         return common.promise(function () {
-            var notice = common.msgNotice({type: 1, msg: '查询中...', noClose: true});
+            var notice = common.msgNotice({ type: 1, msg: '查询中...', noClose: true });
             var data = self.opt.beforeDetailQuery(item, self);
             var method = 'detailQuery';
             return myInterface.api[self.opt.interfacePrefix][method](data).then(function (t) {

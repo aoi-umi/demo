@@ -8,7 +8,7 @@ import * as $ from 'jquery';
 import * as common from './common';
 import * as myInterface from './myInterface';
 import * as myVaild from './myVaild';
-import {MyModule, ModuleOption} from './myModule';
+import { MyModule, ModuleOption } from './myModule';
 
 interface ModuleMainContentTypeOption extends ModuleOption {
     treeItemId?: string;
@@ -31,20 +31,11 @@ export class ModuleMainContentType extends MyModule {
                 level: 0,
                 operation: ['save']
             },
-
+            idList: [
+                'treeItemId',
+            ],
             interfacePrefix: 'mainContentType',
-            init: function (self: ModuleMainContentType) {
-                let idList = [
-                    'treeItemId',
-                ];
-
-                $(idList).each(function () {
-                    let ele: any = this;
-                    if (self.opt[ele])
-                        self[ele] = '#' + self.opt[ele];
-                    else
-                        self[ele] = '';
-                });
+            init: function (self: ModuleMainContentType) {                
                 self.treeItemTemp = $(self.treeItemId).html();
 
                 self.opt.queryArgsOpt = [{
@@ -112,25 +103,26 @@ export class ModuleMainContentType extends MyModule {
                     })
                 });
 
-                $('#treeModal').on('click', '.itemDetailQuery', function () {
+                let treeModal = $('#treeModal');
+                treeModal.on('click', self.detailQueryClass, function () {
                     var row = $(this).closest(self.rowClass);
                     self.detailQuery(row.data('item'));
                 });
 
-                $('#treeModal').on('click', '.itemDel', function () {
+                treeModal.on('click', self.delClass, function () {
                     var row = $(this).closest(self.rowClass);
                     self.del(row.data('item'));
                 });
 
-                $('#treeModal').on('click', '.itemAdd', function () {
+                treeModal.on('click', '.itemAdd', function () {
                     var row = $(this).closest(self.rowClass);
                     let item = row.data('item');
-                    item = $.extend(null, self.opt.saveDefaultModel, item ? {parentType: item.type} : null);
+                    item = $.extend(null, self.opt.saveDefaultModel, item ? { parentType: item.type } : null);
                     self.edit(item);
                 });
             },
             editAfterRender: function (item, self: ModuleMainContentType) {
-                self.updateView(['mainContentTypeDetail'], {mainContentTypeDetail: item});
+                self.updateView(['mainContentTypeDetail'], { mainContentTypeDetail: item });
                 self.detailDom.modal('show');
             },
             beforeSave: function (dom, self) {
@@ -151,7 +143,7 @@ export class ModuleMainContentType extends MyModule {
                     name: 'level',
                     dom: self.detailContainerDom.find('[name=level]'),
                 }];
-                var checkRes = common.dataCheck({list: list});
+                var checkRes = common.dataCheck({ list: list });
                 return checkRes;
             },
             onSaveSuccess: function (t, self) {
@@ -169,7 +161,7 @@ export class ModuleMainContentType extends MyModule {
             },
             onDetailQuerySuccess: function (t, self: ModuleMainContentType) {
                 self.detailRender(t);
-                self.updateView(['mainContentTypeDetail'], {mainContentTypeDetail: t});
+                self.updateView(['mainContentTypeDetail'], { mainContentTypeDetail: t });
                 self.detailDom.modal('show');
             },
         };
