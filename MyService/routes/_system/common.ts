@@ -160,14 +160,14 @@ export let dateFormat = function (date, format = 'yyyy-MM-dd') {
 };
 //字符串
 export let stringFormat = function (formatString: string, ...args) {
-    if(!formatString)
+    if (!formatString)
         formatString = '';
     let reg = /(\{(\d)\})/g;
-    if(typeof args[0] === 'object'){
+    if (typeof args[0] === 'object') {
         args = args[0];
         reg = /(\{([^{}]+)\})/g;
     }
-    let result = formatString.replace(reg, function(){
+    let result = formatString.replace(reg, function () {
         let match = arguments[2];
         return args[match] || '';
     });
@@ -252,7 +252,11 @@ export let error = function (msg, code?, option?) {
     if (error) {
         status = error.status;
         if (!msg) {
-            msg = error.desc[opt.lang];
+            let filepath = '../lang/' + opt.lang;
+            var resolvePath = path.resolve(__dirname + '/' + filepath + '.js');
+            var isExist = fs.existsSync(resolvePath);
+            let lang = require(isExist ? filepath : '../lang/zh');
+            msg = lang.errorConfig[code];
             if (typeof opt.format == 'function')
                 msg = opt.format(msg);
         }
@@ -326,7 +330,7 @@ export let requestServiceByConfig = function (option) {
         log.method = '[' + option.serviceName + '][' + option.methodName + ']';
         log.duration = startTime - new Date().getTime();
         let resData = await requestService(opt);
-        
+
         log.result = true;
         log.res = resData;
         if (option.afterResponse) {
@@ -367,14 +371,14 @@ export let requestService = function (option) {
                     data = JSON.parse(data);
                 break;
             default:
-                if (encoding) 
+                if (encoding)
                     throw error('Not Accept Encoding:' + encoding);
         }
-        
+
         if (Buffer.isBuffer(data)) {
             data = data.toString();
         }
-        return data;        
+        return data;
     });
 };
 
@@ -439,12 +443,12 @@ export let getStack = function (stack) {
 export let mkdirsSync = function (dirname, mode?) {
     if (fs.existsSync(dirname)) {
         return true;
-    } 
+    }
     if (mkdirsSync(path.dirname(dirname), mode)) {
         fs.mkdirSync(dirname, mode);
         return true;
-    } 
-    return false;    
+    }
+    return false;
 }
 
 export let getClientIp = function (req) {

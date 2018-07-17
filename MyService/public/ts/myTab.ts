@@ -16,8 +16,9 @@ interface TabContextMenu extends JQuery<HTMLElement> {
 interface MyTabInitOption {
     tabContainer?: string;
     panelContainer?: string;
-    closeBtnTemplate? :string;
+    closeBtnTemplate?: string;
 }
+
 export let opt: MyTabInitOption = {
     tabContainer: 'tab',
     panelContainer: 'panel',
@@ -93,9 +94,9 @@ export let bindEvent = function () {
         }
     });
     //中键
-    $(document).on('mousedown', '.tab[data-url]', function(event){
+    $(document).on('mousedown', '.tab[data-url]', function (event) {
         let currTab = $(this);
-        if(event.which == 2){
+        if (event.which == 2) {
             var url = currTab.data('url');
             var type = '_blank';
             if (url && type) {
@@ -232,17 +233,18 @@ export let tabs = function (data: Array<TabOption>) {
 };
 
 export let panel = function (t: PanelOption) {
-    var dom = null;
     var content = 'no content';
     switch (t.type) {
         case 'iframe':
         default:
             if (t.content) {
                 var iframeId = 'iframe-' + t.id;
+                let args = ['iframeId=' + iframeId];
                 if (t.content.indexOf('?') >= 0)
-                    t.content += '&iframeId=' + iframeId;
+                    t.content += '&';
                 else
-                    t.content += '?iframeId=' + iframeId;
+                    t.content += '?';
+                t.content += args.join('&');
                 content = `<iframe id="${iframeId}" src="${t.content}" width="100%" height="100%" frameborder="no" scrolling="no"></iframe>`;
             }
             break;
@@ -252,10 +254,9 @@ export let panel = function (t: PanelOption) {
     }
 
     let height = $(window).height() - ($('#navTop').height() + $('#navBottom').height() + tabContainer.height() + 40);
-    if(height < 512)
+    if (height < 512)
         height = 512;
-    dom = $(`<div style="height: ${height}px" id="${t.id || ''}" class="tab-pane fade">${content}</div>`);
-    return dom;
+    return $(`<div style="height: ${height}px" id="${t.id || ''}" class="tab-pane fade">${content}</div>`);
 };
 export let panels = function (data: Array<PanelOption>) {
     var list = [];

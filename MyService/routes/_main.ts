@@ -158,16 +158,16 @@ export let formatRes = function (err, detail, opt) {
     };
     var url = '';
     if (opt) {
-        if (opt.code)
-            res.code = opt.code;
         if (opt.desc)
             res.desc = opt.desc;
         if (opt.url)
             url = opt.url;
     }
+    if (err && err.code)
+        res.code = err.code;
+    if (opt && opt.code)
+        res.code = opt.code;
     if (err) {
-        if (err.code)
-            res.code = err.code;
         var writeOpt: any = {
             guid: res.guid
         };
@@ -302,6 +302,8 @@ export let init = function (opt) {
         var user = req.myData.user;
         req.myData.noNav = common.parseBool(req.query.noNav);
         req.myData.useStatus = common.parseBool(req.query.useStatus);
+        if (req.query.lang)
+            req.myData.lang = req.query.lang;
 
         if (/^(::ffff:)?(127\.0\.0\.1)$/.test(req.myData.ip))
             user.authority[auth.authConfig.local.code] = true;
@@ -371,7 +373,7 @@ export let errorHandler = function (err, req: Request, res: Response, next) {
     err.status = err.status || 500;
     err.code = err.code || err.status;
     if (req.xhr) {
-        return res.mySend(err, err, {code: err.code});
+        return res.mySend(err, err);
     }
     if (errorConfig.NO_LOGIN.code == err.code) {
         var signIn = `/user/signIn?noNav=${req.myData.noNav}&toUrl=${encodeURIComponent(req.url)}`;

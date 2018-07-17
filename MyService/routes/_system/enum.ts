@@ -39,7 +39,7 @@ export let enumChangeCheck = function (enumType, srcEnum, destEnum) {
     var operateEnum = getEnum(enumOperateType, true);
     var changeDict = enumChangeDict[enumType];
     if (srcEnum == undefined || srcEnum == null || destEnum == undefined || destEnum == null)
-        throw common.error('', 'ARGS_ERROR');
+        throw common.error('', errorConfig.ARGS_ERROR);
     srcEnum = srcEnum.toString();
     destEnum = destEnum.toString();
     var undefinedOrNull = [undefined, null];
