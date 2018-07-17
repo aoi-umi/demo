@@ -27,6 +27,7 @@ declare global {
                 useStatus?: boolean;
                 accessableUrl: { [url: string]: boolean };
                 ip: string;
+                lang?: string;
             };
             _parsedUrl: {
                 pathname: string;

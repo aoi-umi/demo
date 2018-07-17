@@ -51,7 +51,7 @@ export let detailQuery = function (opt, exOpt) {
             detail.mainContentChildList = t[2];
             detail.mainContentLogList = t[3];
             if (!detail.mainContent)
-                throw common.error('', errorConfig.DB_NO_DATA);
+                throw common.error('', errorConfig.DB_NO_DATA, {lang: exOpt.req.myData.lang});
         }
         return detail;
     }).then(function (t) {
@@ -198,7 +198,7 @@ export let statusUpdate = function (opt, exOpt) {
         necessaryAuth = 'mainContent' + common.stringToPascal(operate);
         if (!auth.isHadAuthority(user, necessaryAuth))
             throw common.error(`没有[${necessaryAuth}]权限`);
-        return detailQuery({id: mainContent.id}, {user: exOpt.user});
+        return detailQuery({id: mainContent.id}, exOpt);
     }).then(function (mainContentDetail) {
         if (necessaryAuth == 'mainContentDel' && !mainContentDetail.canDelete) {
             throw common.error(`没有权限`);
