@@ -1,7 +1,30 @@
 <div class="container">
     <div id="logStatistics">
         <p>接口失败统计</p>
-        <button class="btn btn-default" name="refresh">refresh</button>
+        <% var rowItemClass = 'col-lg-3 col-md-3 col-sm-6 col-xs-12'; %>
+        <div class="row my my-row">
+            <%
+            var searchItemList = [{
+                text: 'createDateStart',
+                name: 'createDateStart',
+            }, {
+                text: 'createDateEnd',
+                name: 'createDateEnd',
+            }];
+            for(var i = 0;i < searchItemList.length;i++){
+                var item = searchItemList[i];
+            %>
+            <div class="<%= rowItemClass %>">
+                <div class="input-group">
+                    <span class="input-group-addon"><%= item.text %></span>
+                    <input name="<%= item.name %>" type="text" class="form-control"/>
+                </div>
+            </div>
+            <% } %>
+            <div class="<%= rowItemClass %>">
+                <button class="btn btn-default btn-block" name="refresh">refresh</button>
+            </div>
+        </div>
         <p class="text-danger" name="msg"></p>
         <div name="chart" style="width: 600px;height:600px;">
         </div>
