@@ -1,17 +1,22 @@
 import * as $ from 'jquery';
 import * as echarts from 'echarts';
+import 'bootstrap-datetimepicker';
 import * as common from './common';
 import * as myInterface from './myInterface';
 
 export class LogStatistics {
     dom: JQuery<HTMLElement>;
     echart: echarts.ECharts;
+    queryBoxId: string;
+
     constructor(option?) {
+        let self = this;
         let opt = {
             id: 'logStatistics'
         };
         opt = $.extend(opt, option);
-        this.dom = $(`#${opt.id}`);
+        self.queryBoxId = '#' + opt.id;
+        this.dom = $(`${self.queryBoxId}`);
         let chart = this.dom.find('[name=chart]');
         let echartsOpt = {
             // 给echarts图设置背景色
@@ -52,6 +57,9 @@ export class LogStatistics {
         let echart = this.echart = echarts.init(chart[0] as HTMLDivElement);
         echart.setOption(echartsOpt);
 
+        let currMonth = new Date(common.dateFormat(new Date(), 'yyyy-MM-01'));
+        $(`${self.queryBoxId} [name=createDateStart]`).val(common.dateFormat(currMonth));
+        $(`${self.queryBoxId} [name=createDateEnd]`).val(common.dateFormat(currMonth.getTime() + 30 * 86400 * 1000));
         this.bindEvent();
 
         this.dom.find('[name=refresh]').trigger('click');
@@ -60,10 +68,28 @@ export class LogStatistics {
     bindEvent() {
         let self = this;
         let msgDom = this.dom.find('[name=msg]');
-        this.dom.find('[name=refresh]').on('click', function () {
+        let minDate = '1900-01-01';
+        let maxDate = '9999-12-31';
+        let dateOpt = {
+            format: 'yyyy-mm-dd',
+            minView: 'month',
+            autoclose: true,
+            todayBtn: true,
+            clearBtn: true,
+            startDate: minDate,
+        };
+        this.dom.on('click', '[name=refresh]', function () {
             msgDom.text('');
             let echartsOpt: echarts.EChartOption = self.echart.getOption();
-            myInterface.api.logStatistics().then(t => {
+            let createDateStart = ($(`${self.queryBoxId} [name=createDateStart]`).val() as string).trim() || null;
+            let createDateEnd = ($(`${self.queryBoxId} [name=createDateEnd]`).val() as string).trim() || null;
+            if (createDateEnd)
+                createDateEnd += ' 23:59:59';
+            let data = {
+                createDateStart,
+                createDateEnd,
+            };
+            myInterface.api.logStatistics(data).then(t => {
                 let list = [];
                 let dataDict = {};
                 t.list.forEach(ele => {
@@ -94,5 +120,15 @@ export class LogStatistics {
                 msgDom.text(e.message);
             });
         });
+        $(`${self.queryBoxId} [name=createDateStart]`)
+            .datetimepicker(dateOpt)
+            .on('click', function () {
+                $(this).datetimepicker('setEndDate', $(`${self.queryBoxId} [name=createDateEnd]`).val() || maxDate);
+            });
+        $(`${self.queryBoxId} [name=createDateEnd]`)
+            .datetimepicker(dateOpt)
+            .on('click', function () {
+                $(this).datetimepicker('setStartDate', $(`${self.queryBoxId} [name=createDateStart]`).val() || minDate);
+            });
     }
 }
