@@ -153,14 +153,14 @@ export let dateFormat = function (date, format = 'yyyy-MM-dd') {
 };
 //字符串
 export let stringFormat = function (formatString: string, ...args) {
-    if(!formatString)
+    if (!formatString)
         formatString = '';
     let reg = /(\{(\d)\})/g;
-    if(typeof args[0] === 'object'){
+    if (typeof args[0] === 'object') {
         args = args[0];
         reg = /(\{([^{}]+)\})/g;
     }
-    let result = formatString.replace(reg, function(){
+    let result = formatString.replace(reg, function () {
         let match = arguments[2];
         return args[match] || '';
     });
@@ -205,9 +205,12 @@ export let md5 = function (str) {
 export let isInArray = function (obj, list, startIndex?) {
     return $.inArray(obj, list, startIndex) >= 0;
 };
-export let error = function (msg, errCode?) {
-    var err: any = new Error(msg);
-    err.code = errCode;
+export let error = function (msg, code?) {
+    let err: any = new Error(msg);
+    if (typeof code !== 'string') {
+        code = code.code;
+    }
+    err.code = code;
     return err;
 };
 //endregion
@@ -333,9 +336,11 @@ export let parseJSON = function (str) {
         throw e;
     }
 };
+
 interface dataCheckOption {
     list: Array<dataCheckOptionListOption>;
 }
+
 interface dataCheckOptionListOption {
     name: string;
     desc?: string,
@@ -355,6 +360,7 @@ interface dataCheckOptionListOption {
     //     }
     // }
 }
+
 export let dataCheck = function (option: dataCheckOption) {
     var data = {
         success: false,
@@ -363,7 +369,7 @@ export let dataCheck = function (option: dataCheckOption) {
         err: null,
         dom: null
     };
-    if (!option) return data;    
+    if (!option) return data;
     for (var i = 0; i < option.list.length; i++) {
         var noName = false;
         var t = option.list[i];
@@ -626,7 +632,7 @@ export let msgNotice = function (option: msgNoticeOption) {
                 dom.find('[name=footer]').append(btnList);
             }
             $('.popover').hide();
-            if (dom.is(':hidden')){
+            if (dom.is(':hidden')) {
                 dom.modal('show');
                 var args = getArgsFromUrlParams();
                 if (args.iframeId && parent) {
@@ -771,11 +777,11 @@ export let setCountdown = function (option: setCountdownOption) {
     if (dom.hasClass('disabled'))
         return;
     dom.addClass('disabled');
-    
+
     var content = dom.html();
     var date = new Date(new Date().getTime() + opt.countdown * 1000);
     let countDownInterval = dom.data('countDownInterval');
-    if(countDownInterval){
+    if (countDownInterval) {
         clearInterval(countDownInterval);
         dom.data('countDownInterval', null);
     }
@@ -853,10 +859,10 @@ export let findInTree = function (tree, key) {
     }
 };
 
-export let deleteIfEmpty = function(data) {
-    for(let key in data){
+export let deleteIfEmpty = function (data) {
+    for (let key in data) {
         let val = data[key];
-        if(val === '' || val == null)
+        if (val === '' || val == null)
             delete data[key];
     }
 }

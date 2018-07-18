@@ -241,7 +241,7 @@ export let error = function (msg, code?, option?) {
         opt = extend(opt, option);
     if (!code)
         code = '';
-    var error;
+    let error;
     if (typeof code !== 'string') {
         error = code;
         code = error.code;
@@ -383,6 +383,8 @@ export let requestService = function (option) {
 };
 
 export let getErrorConfigByCode = function (code) {
+    if (!code)
+        return undefined;
     for (let key in errorConfig) {
         if (errorConfig[key].code == code)
             return errorConfig[key];
