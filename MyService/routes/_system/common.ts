@@ -392,39 +392,37 @@ export let getErrorConfigByCode = function (code) {
 };
 
 export let writeError = function (err, opt?) {
-    console.error(err);
+    promise(async () => {
+        console.error(err);
+        var list = [];
+        var createDate = dateFormat(new Date(), 'yyyy-MM-dd');
+        var createDateTime = dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
+        list.push(createDateTime);
+        if (opt)
+            list.push(JSON.stringify(opt));
+        list.push(err);
+        //用于查找上一级调用
+        var stack = new Error().stack;
+        var stackList = ['stack:']
+            .concat(getStack(err.stack))
+            .concat(['help stack:'])
+            .concat(getStack(stack));
+        for (var i = 0; i < stackList.length; i++) {
+            console.error(stackList[i]);
+            list.push(stackList[i]);
+        }
 
-    var list = [];
-    var createDate = dateFormat(new Date(), 'yyyy-MM-dd');
-    var createDateTime = dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
-    list.push(createDateTime);
-    if (opt)
-        list.push(JSON.stringify(opt));
-    list.push(err);
-    //用于查找上一级调用
-    var stack = new Error().stack;
-    var stackList = ['stack:']
-        .concat(getStack(err.stack))
-        .concat(['help stack:'])
-        .concat(getStack(stack));
-    for (var i = 0; i < stackList.length; i++) {
-        console.error(stackList[i]);
-        list.push(stackList[i]);
-    }
-
-    //write file
-    mkdirsSync(config.errorDir);
-    var fileName = config.errorDir + '/' + createDate + '.txt';
-    fs.appendFile(fileName, list.join('\r\n') + '\r\n\r\n', function () {
+        //write file
+        mkdirsSync(config.errorDir);
+        var fileName = config.errorDir + '/' + createDate + '.txt';
+        await promisify(fs.appendFile)(fileName, list.join('\r\n') + '\r\n\r\n');
     });
 };
 
 export let getStack = function (stack) {
     var stackList = [];
     var matchPath = [
-        '../../bin',
-        '../../app',
-        '../../routes',
+        '../../',
     ];
     for (var i = 0; i < matchPath.length; i++) {
         matchPath[i] = path.resolve(`${__dirname}/${matchPath[i]}`);
