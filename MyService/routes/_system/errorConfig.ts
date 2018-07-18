@@ -1,7 +1,3 @@
-/**
- * Created by bang on 2017-7-28.
- */
-//lang ISO 639-1
 export default {
     DEV: {
         code: 'DEV',

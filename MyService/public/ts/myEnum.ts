@@ -3,6 +3,7 @@
  */
 
 import * as common from './common';
+import errorConfig from './errorConfig';
 
 export let init = function (opt) {
     if (opt.enumDict)
@@ -11,7 +12,7 @@ export let init = function (opt) {
 
 export let getEnum = function (enumName, notThrowError?) {
     var enumType = enumDict[enumName];
-    if (!enumType && !notThrowError) throw common.error('enum "' + enumName + '" not exist!', 'CODE_ERROR');
+    if (!enumType && !notThrowError) throw common.error('enum "' + enumName + '" not exist!', errorConfig.CODE_ERROR);
     return enumType;
 };
 
