@@ -10,16 +10,24 @@ import * as myInterface from './myInterface';
 import * as myVaild from './myVaild';
 import {MyModule, ModuleOption} from './myModule';
 
+interface ModuleMainContentOption extends ModuleOption {
+    mainContentTypeId?: string;
+}
+
 export class ModuleMainContent extends MyModule {
     mainContentTypeList: Array<any>;
     currMainContentTypeList: Array<any>;
     mainContentTypeTemp: string;
+    mainContentTypeId: string;
+    mainContentTypeDom: JQuery<HTMLElement>;
 
-    constructor(option?: ModuleOption) {
-        var opt: ModuleOption = {
+    constructor(option?: ModuleMainContentOption) {
+        var opt: ModuleMainContentOption = {
             operation: [],
             interfacePrefix: 'mainContent',
             detailUrl: '/mainContent/detail',
+            mainContentTypeId: 'mainContentType',
+            idList: ['mainContentTypeId'],
 
             init: function (self: ModuleMainContent) {
                 self.opt.queryArgsOpt = [{
@@ -79,6 +87,7 @@ export class ModuleMainContent extends MyModule {
                             return '请输入正确的正整数';
                     }
                 },]
+                self.mainContentTypeDom = $(self.mainContentTypeId);
                 self.variable.delMainContentChildList = [];
                 if (self.operation.detailQuery) {
                     self.mainContentTypeTemp = $('.mainContentType:eq(0)').prop('outerHTML');
@@ -201,7 +210,7 @@ export class ModuleMainContent extends MyModule {
                         }
                     });
                     //
-                    let mainContentTypeDom = $('#mainContentType');
+                    let mainContentTypeDom = self.mainContentTypeDom;
                     if (mainContentTypeDom) {
                         let refreshDom = $('#refreshMainContentType');
                         let editDom = $('#editMainContentType');
@@ -211,30 +220,55 @@ export class ModuleMainContent extends MyModule {
                                 self.mainContentTypeList = t.list;
                             });
                         }
+                        let resetSelect = function () {
+                            let clone = [...self.currMainContentTypeList];
+                            if (!clone.length)
+                                clone.push({});
+                            else {
+                                clone.push({parentType: clone[clone.length - 1].type});
+                            }
+                            $(clone).each((index, ele: any) => {
+                                self.setMainContentTypeOption(index, ele.parentType, ele.type);
+                                if (!self.mainContentTypeList.find(item => ele.type == item.type))
+                                    return false;
+                            });
+                        }
                         refreshDom.on('click', function () {
                             mainContentTypeDom.find('.msg').text('');
                             refresh().then(() => {
-                                self.setMainContentTypeOption();
+                                resetSelect();
                             }).catch(e => {
                                 mainContentTypeDom.find('.msg').text(e.message);
                             });
                         });
-                        editDom.on('click', function () {
+                        editDom.on('click', async function () {
                             mainContentTypeDom.removeClass('disabled');
-                            refresh().then(() => {
-                                self.currMainContentTypeList.forEach((ele, index) => {
-                                    self.setMainContentTypeOption(index, ele.parentType, ele.type);
-                                });
-                            });
+                            if (!self.mainContentTypeList.length)
+                                await refresh();
+                            resetSelect();
                         });
-                        cancelDom.on('click', function(){
-                            $('#mainContentType .mainContentType select:not(:disabled)').prop('disabled', true);
+                        cancelDom.on('click', function () {
+                            mainContentTypeDom
+                                .addClass('disabled')
+                                .find('.mainContentType select:not(:disabled)').prop('disabled', true);
                         });
 
                         mainContentTypeDom.on('change', '.mainContentType select', function () {
                             let dom = $(this);
                             let box = dom.closest('.mainContentType');
                             self.setMainContentTypeOption(box.index() + 1, dom.val());
+                            let valList = [];
+                            mainContentTypeDom.find('.mainContentType option:selected').each(function () {
+                                let item = $(this).data('item');
+                                if (!item)
+                                    return false;
+                                valList.push({
+                                    type: item.type,
+                                    parentType: item.parentType,
+                                });
+                            });
+                            if (valList.length)
+                                self.currMainContentTypeList = valList;
                         });
                         self.currMainContentTypeList = self.mainContentTypeList = mainContentTypeDom.data('list') || [];
                         if (refreshDom.is(':visible')) {
@@ -244,6 +278,7 @@ export class ModuleMainContent extends MyModule {
                                 self.setMainContentTypeOption(index, ele.parentType, ele.type, true);
                             });
                         }
+                        self.mainContentTypeList = [];
                     }
                 }
             },
@@ -270,7 +305,7 @@ export class ModuleMainContent extends MyModule {
                 }
                 $(`.statusCount[data-status=""]`).text(totalCount);
             },
-            beforeSave: function (dom, self) {
+            beforeSave: function (dom, self: ModuleMainContent) {
                 var saveArgsOpt = [{
                     name: 'id',
                     desc: 'id',
@@ -299,11 +334,14 @@ export class ModuleMainContent extends MyModule {
                     else
                         throw new Error(`错误的操作类型[${operate}]`);
 
-                    if ($('#mainContentType .mainContentType select:not(:disabled)').length) {
+                    if (!self.mainContentTypeDom.hasClass('disabled')) {
                         let valList = [];
-                        $('#mainContentType .mainContentType option:selected').each(function () {
-                            let id = $(this).data('id');
-                            id && valList.push(id);
+                        self.mainContentTypeDom.find('.mainContentType option:selected').each(function () {
+                            let item = $(this).data('item');
+                            item && valList.push({
+                                type: item.type,
+                                typeName: item.typeName,
+                            });
                         });
                         detail.mainContentTypeList = valList;
                     }
@@ -416,32 +454,34 @@ export class ModuleMainContent extends MyModule {
     setMainContentTypeOption(index?, parentType?, type?, disabled?) {
         let self = this;
         let template = self.mainContentTypeTemp;
-        let optionHtml = [];
+        let optionList = [];
         if (!index)
             index = 0;
         self.mainContentTypeList.forEach((ele) => {
             let selected = type && type == ele.type;
             if ((!index && !ele.parentType) || (index && ele.parentType && parentType == ele.parentType)) {
-                optionHtml.push(`<option value="${ele.type}" data-id="${ele.id}" 
+                let option = $(`<option value="${ele.type}"
                 ${selected ? 'selected' : ''}>
                 ${ele.type}${ele.typeName ? '(' + ele.typeName + ')' : ''}</option>`);
+                option.data('item', ele);
+                optionList.push(option);
             }
         });
 
         let dom = $(`.mainContentType:eq(${index})`);
-        if (optionHtml.length && !dom.length) {
+        if (optionList.length && !dom.length) {
             dom = $(template);
             $(`.mainContentType:eq(${index - 1})`).after(dom);
         }
         if (dom.length) {
             dom.find('select').prop('disabled', !!disabled);
-            if (optionHtml.length)
-                optionHtml.unshift('<option value=""></option>');
-            dom.find('select').html(optionHtml.join(''));
+            if (optionList.length)
+                optionList.unshift('<option value=""></option>');
+            dom.find('select').empty().append(optionList);
         }
 
         //移除空的select
-        if (!optionHtml.length && index - 1 >= 0)
+        if (!optionList.length && index - 1 >= 0)
             index--;
         $(`.mainContentType:gt(${index})`).remove();
     }
