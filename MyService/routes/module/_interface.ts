@@ -65,7 +65,8 @@ function getBll(req: Request, res: Response, next) {
                 t: t,
                 module: moduleName,
                 method: method,
-                user: req.myData.user
+                myData: req.myData,
+                noOperation: args.noOperation,
             });
             res.mySend(null, t);
         } else {
@@ -124,12 +125,14 @@ var updateValue = function (opt) {
     var method = opt.method;
     var t = opt.t;
 
-    if (common.isInArray(method, ['query']) && t.list) {
-        t.list.forEach(function (item) {
-            setOperationDefault({item: item, user: opt.user});
-        });
-    } else if (common.isInArray(method, ['detailQuery']) && t) {
-        setOperationDefault({item: t, user: opt.user});
+    if(!opt.noOperation) {
+        if (common.isInArray(method, ['query']) && t.list) {
+            t.list.forEach(function (item) {
+                setOperationDefault({item: item, user: opt.myData.user});
+            });
+        } else if (common.isInArray(method, ['detailQuery']) && t) {
+            setOperationDefault({item: t, user: opt.myData.user});
+        }
     }
 };
 

@@ -11,23 +11,42 @@ import * as myVaild from './myVaild';
 import {MyModule, ModuleOption} from './myModule';
 
 interface ModuleMainContentOption extends ModuleOption {
+    mainContentDetailId?: string;
     mainContentTypeId?: string;
+    mainContentChildListId?: string;
+    mainContentChildId? : string;
+    mainContentChildDetailId?: string;
+    mainContentChildTempId?: string;
 }
 
 export class ModuleMainContent extends MyModule {
     mainContentTypeList: Array<any>;
     currMainContentTypeList: Array<any>;
+    mainContentDetailId: string;
     mainContentTypeTemp: string;
-    mainContentTypeId: string;
     mainContentTypeDom: JQuery<HTMLElement>;
+    mainContentChildListId: string;
+    mainContentChildId: string;
+    mainContentChildDetailId: string;
+    mainContentChildTempId: string;
 
     constructor(option?: ModuleMainContentOption) {
         var opt: ModuleMainContentOption = {
             operation: [],
             interfacePrefix: 'mainContent',
             detailUrl: '/mainContent/detail',
-            mainContentTypeId: 'mainContentType',
-            idList: ['mainContentTypeId'],
+            mainContentDetailId: 'mainContentDetail',
+            mainContentChildId: 'mainContentChild',
+            mainContentChildListId: 'mainContentChildList',
+            mainContentChildDetailId: 'mainContentChildDetail',
+            mainContentChildTempId: 'mainContentChildItem',
+            idList: [
+                'mainContentDetailId',
+                'mainContentChildListId',
+                'mainContentChildId',
+                'mainContentChildDetailId',
+                'mainContentChildTempId',
+            ],
 
             init: function (self: ModuleMainContent) {
                 self.opt.queryArgsOpt = [{
@@ -87,7 +106,7 @@ export class ModuleMainContent extends MyModule {
                             return '请输入正确的正整数';
                     }
                 },]
-                self.mainContentTypeDom = $(self.mainContentTypeId);
+                self.mainContentTypeDom = $(`${self.mainContentDetailId} [name=mainContentType]`);
                 self.variable.delMainContentChildList = [];
                 if (self.operation.detailQuery) {
                     self.mainContentTypeTemp = $('.mainContentType:eq(0)').prop('outerHTML');
@@ -142,7 +161,7 @@ export class ModuleMainContent extends MyModule {
                 });
 
                 if (self.operation.detailQuery) {
-                    $(document).on('click', '#mainContentChildList .itemDel', function () {
+                    $(document).on('click', `${self.mainContentChildListId} .itemDel`, function () {
                         var row = $(this).closest(self.rowClass);
                         var item = row.data('item');
                         if (item.id)
@@ -151,11 +170,11 @@ export class ModuleMainContent extends MyModule {
                         self.updateView(['mainContentChild']);
                     });
 
-                    $(document).on('click', '#mainContentChildList .itemEdit', function () {
+                    $(document).on('click', `${self.mainContentChildListId} .itemEdit`, function () {
                         self.setMainContentChildDetail($(this).closest(self.rowClass).data('item'));
-                        $('#mainContentChild').modal('show');
+                        $(self.mainContentChildId).modal('show');
                     });
-                    $('#mainContentChildList').on('click', '.moveUp, .moveDown', function () {
+                    $(self.mainContentChildListId).on('click', '.moveUp, .moveDown', function () {
                         var dom = $(this);
                         var row;
                         var secondRow;
@@ -175,10 +194,10 @@ export class ModuleMainContent extends MyModule {
 
                     $('#showMainContentChild').on('click', function () {
                         self.setMainContentChildDetail(null);
-                        $('#mainContentChild').modal('show');
+                        $(self.mainContentChildId).modal('show');
                     });
                     $('#addMainContentChild').on('click', function () {
-                        var mainContentChildDetailDom = $('#mainContentChildDetail');
+                        var mainContentChildDetailDom = $(self.mainContentChildDetailId);
                         var argsOpt = [{
                             name: 'type',
                             dom: mainContentChildDetailDom.find('[name=type]'),
@@ -200,13 +219,13 @@ export class ModuleMainContent extends MyModule {
                             delete dataItem.stringify;
                             item = $.extend(dataItem, item);
                             item.stringify = JSON.stringify(item);
-                            var temp = $('#mainContentChildItem').html();
-                            var replaceDom = $('#mainContentChildList').find(`[data-num=${item.num}]`);
+                            var temp = $(self.mainContentChildTempId).html();
+                            var replaceDom = $(self.mainContentChildListId).find(`[data-num=${item.num}]`);
                             if (!replaceDom.length)
-                                $('#mainContentChildList').append(ejs.render(temp, item));
+                                $(self.mainContentChildListId).append(ejs.render(temp, item));
                             else
                                 replaceDom.after(ejs.render(temp, item)).remove();
-                            $('#mainContentChild').modal('hide');
+                            $(self.mainContentChildId).modal('hide');
                         }
                     });
                     //
@@ -216,7 +235,7 @@ export class ModuleMainContent extends MyModule {
                         let editDom = $('#editMainContentType');
                         let cancelDom = $('#cancelMainContentType');
                         let refresh = function () {
-                            return myInterface.api.mainContentType.query({status: 1}).then((t) => {
+                            return myInterface.api.mainContentType.query({status: 1, noOperation: true}).then((t) => {
                                 self.mainContentTypeList = t.list;
                             });
                         }
@@ -347,7 +366,7 @@ export class ModuleMainContent extends MyModule {
                     }
 
                     detail.mainContentChildList = [];
-                    $(`#mainContentChildList>${self.rowClass}`).each(function () {
+                    $(`${self.mainContentChildListId}>${self.rowClass}`).each(function () {
                         detail.mainContentChildList.push($(this).data('item'));
                     });
                     if (!detail.mainContentChildList.length) {
@@ -378,9 +397,9 @@ export class ModuleMainContent extends MyModule {
 
     setMainContentChildDetail(item) {
         let self = this;
-        var mainContentChildDetailDom = $('#mainContentChildDetail');
+        var mainContentChildDetailDom = $(self.mainContentChildDetailId);
         if (!item) {
-            mainContentChildDetailDom.data('item', {num: $(`#mainContentChildList ${self.rowClass}`).length + 1});
+            mainContentChildDetailDom.data('item', {num: $(`${self.mainContentChildListId} ${self.rowClass}`).length + 1});
             mainContentChildDetailDom.find(':input').val('');
             mainContentChildDetailDom.find('option:eq(0)').prop('selected', true);
         } else {
@@ -393,7 +412,7 @@ export class ModuleMainContent extends MyModule {
     updateView(updateList) {
         let self = this;
         if (!updateList || common.isInArray('mainContentChild', updateList)) {
-            $(`#mainContentChildList ${self.rowClass}`).each(function (index) {
+            $(`${self.mainContentChildListId} ${self.rowClass}`).each(function (index) {
                 var row = $(this);
                 var val = index + 1;
                 row.attr('data-num', val);

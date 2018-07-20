@@ -60,7 +60,8 @@ export class AuthorityAutoComplete {
         let self = this;
         var queryOpt: any = {
             excludeByUserId: self.excludeByUserId,
-            excludeByRoleCode: self.excludeByRoleCode
+            excludeByRoleCode: self.excludeByRoleCode,
+            noOperation: true,
         };
         if (opt)
             queryOpt.anyKey = opt.anyKey;
@@ -135,7 +136,8 @@ export class RoleAutoComplete {
     private getRole(opt) {
         let self = this;
         var queryOpt: any = {
-            excludeByUserId: self.excludeByUserId
+            excludeByUserId: self.excludeByUserId,
+            noOperation: true,
         };
         if (opt) queryOpt.anyKey = opt.anyKey;
         return myInterface.api.role.query(queryOpt).then(function (t) {

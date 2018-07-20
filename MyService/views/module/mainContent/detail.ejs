@@ -15,20 +15,20 @@
         content: '>>'
     }
 
-    #mainContentType #editMainContentType {
+    [name=mainContentType] #editMainContentType {
         display: none;
     }
 
-    #mainContentType.disabled #refreshMainContentType,
-    #mainContentType.disabled #cancelMainContentType {
+    [name=mainContentType].disabled #refreshMainContentType,
+    [name=mainContentType].disabled #cancelMainContentType {
         display: none;
     }
 
-    #mainContentType.disabled #editMainContentType {
+    [name=mainContentType].disabled #editMainContentType {
         display: inherit;
     }
 </style>
-<div class="container">
+<div class="container" id="mainContentDetail">
     <%
     var rowItemClass = 'col-xs-12';
     var mainContent = mainContentDetail.mainContent;
@@ -90,7 +90,7 @@
                             </div>
                             <% }
                             if(isEditable){ %>
-                            <div id="mainContentType"
+                            <div name="mainContentType"
                                  class="row my-row <%= mainContentTypeList.length ? 'disabled' : '' %>"
                                  data-list="<%= JSON.stringify(mainContentTypeList) %>">
                                 <div class="col-xs-2 mainContentType">
