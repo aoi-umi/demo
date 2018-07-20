@@ -350,7 +350,7 @@ export class ModuleUserInfo extends MyModule {
 
     structQuery() {
         var self = this;
-        return myInterface.api.struct.query({status: 1}).then(t => {
+        return myInterface.api.struct.query({status: 1, noOperation: true}).then(t => {
             self.structTree = common.getTree(t.list, null, null, 'struct', 'parentStruct').rootTree;
         }).catch(e => {
             self.detailContainerDom.find('[name=structBox] [name=msg]').text(e.message);
