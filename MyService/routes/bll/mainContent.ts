@@ -38,7 +38,8 @@ export let detailQuery = function (opt, exOpt) {
             mainContent: null,
             mainContentTypeList: [],
             mainContentChildList: [],
-            mainContentLogList: []
+            mainContentLogList: [],
+            canDelete: true
         };
         if (opt.id == 0) {
             detail.mainContent = {id: 0, status: 0, type: 0};
@@ -53,16 +54,25 @@ export let detailQuery = function (opt, exOpt) {
             if (!detail.mainContent)
                 throw common.error('', errorConfig.DB_NO_DATA, {lang: exOpt.req.myData.lang});
         }
-        return detail;
-    }).then(function (t) {
-        t.canDelete = canDelete(t.mainContent, exOpt.user);
-        updateMainContent(t.mainContent);
-        if (t.mainContentLogList) {
-            t.mainContentLogList.forEach(function (item) {
+
+        //处理数据
+        detail.canDelete = canDelete(detail.mainContent, exOpt.user);
+        updateMainContent(detail.mainContent);
+        if (detail.mainContentLogList) {
+            detail.mainContentLogList.forEach(function (item) {
                 updateMainContentLog(item);
             });
         }
-        return t;
+        if (detail.mainContentTypeList) {
+            detail.mainContentTypeList.forEach((ele) => {
+                ele.type = ele.mainContentType;
+                if (ele.mainContentTypeName)
+                    ele.typeName = ele.mainContentTypeName;
+                delete ele.mainContentType;
+                delete ele.mainContentTypeName;
+            });
+        }
+        return detail;
     });
 };
 
@@ -107,10 +117,10 @@ export let save = function (opt, exOpt) {
             });
             return match;
         });
-        let mainContentTypeIdList = [];
+        let mainContentWithTypeList = [];
         if (mainContent.id != 0) {
-            let query = await autoBll.modules.mainContentTypeId.query({mainContentId: mainContent.id});
-            mainContentTypeIdList = query.list;
+            let query = await autoBll.modules.mainContentWithType.query({mainContentId: mainContent.id});
+            mainContentWithTypeList = query.list;
         }
 
         //保存
@@ -126,17 +136,18 @@ export let save = function (opt, exOpt) {
             if (opt.mainContentTypeList) {
                 //覆盖旧数据，删除多余
                 opt.mainContentTypeList.forEach((ele, idx) => {
-                    let match = mainContentTypeIdList[idx];
-                    list.push(autoBll.modules.mainContentTypeId.save({
+                    let match = mainContentWithTypeList[idx];
+                    list.push(autoBll.modules.mainContentWithType.save({
                         id: match ? match.id : null,
                         mainContentId: mainContentId,
-                        mainContentTypeId: ele
+                        mainContentType: ele.type,
+                        mainContentTypeName: ele.typeName
                     }, conn));
                 });
-                if (mainContentTypeIdList.length > opt.mainContentTypeList.length) {
-                    for (let i = opt.mainContentTypeList.length; i < mainContentTypeIdList.length; i++) {
-                        let ele = mainContentTypeIdList[i];
-                        list.push(autoBll.modules.mainContentTypeId.del({
+                if (mainContentWithTypeList.length > opt.mainContentTypeList.length) {
+                    for (let i = opt.mainContentTypeList.length; i < mainContentWithTypeList.length; i++) {
+                        let ele = mainContentWithTypeList[i];
+                        list.push(autoBll.modules.mainContentWithType.del({
                             id: ele.id
                         }, conn));
                     }

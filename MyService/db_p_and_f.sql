@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50722
 File Encoding         : 65001
 
-Date: 2018-07-09 17:00:54
+Date: 2018-07-20 16:18:32
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -282,8 +282,8 @@ BEGIN
 	WHERE t1.id = pr_id;
 
 	-- 类型
-	select * from t_main_content_type where 
-		id in (select mainContentTypeId from t_main_content_type_id where mainContentId = pr_id);
+	select t2.*,t1.mainContentType, t1.mainContentTypeName from t_main_content_with_type t1 LEFT JOIN t_main_content_type t2 ON t1.mainContentType = t2.type 
+		where mainContentId = pr_id ORDER BY t1.id;
 	
 	-- 内容
 	select * from t_main_content_child where mainContentId = pr_id order by num;

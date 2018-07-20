@@ -81,7 +81,7 @@ export let customDal = function (name, method, ...args) {
 
 
 let moduleList = ['authority', 'log',
-    'mainContent', 'mainContentChild', 'mainContentLog', 'mainContentTag', 'mainContentType', 'mainContentTypeId',
+    'mainContent', 'mainContentChild', 'mainContentLog', 'mainContentTag', 'mainContentWithType', 'mainContentType',
     'role', 'roleWithAuthority', 'struct',
     'userInfo', 'userInfoLog', 'userInfoWithAuthority', 'userInfoWithRole', 'userInfoWithStruct'];
 let methodList = ['save', 'query', 'detailQuery', 'del'];
@@ -100,8 +100,8 @@ interface AutoBllModules {
     mainContentChild?: AutoBllModule;
     mainContentLog?: AutoBllModule;
     mainContentTag?: AutoBllModule;
+    mainContentWithType?: AutoBllModule;
     mainContentType?: AutoBllModule;
-    mainContentTypeId?: AutoBllModule;
     role?: AutoBllModule;
     roleWithAuthority?: AutoBllModule;
     struct?: AutoBllModule;
