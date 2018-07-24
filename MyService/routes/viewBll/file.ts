@@ -38,7 +38,7 @@ export let get = async function (opt, viewOpt) {
         };
 
         if (stat.isFile()) {
-            let buffer = readChunk.sync(filepath, 0, 1000);
+            let buffer = readChunk.sync(filepath, 0, 4100);
             let type = fileType(buffer);
             file = {
                 ...file,
