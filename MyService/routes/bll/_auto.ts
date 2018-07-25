@@ -18,7 +18,7 @@ export let getRequire = function (name, option?) {
     if (option)
         opt = common.extend(opt, option);
     if (!opt.type)
-        filepath = '../dal/_auto/' + name;
+        filepath = '../dal/_auto/_auto.' + name;
     else {
         if (opt.type == 'dal')
             filepath = '../dal/' + name;
