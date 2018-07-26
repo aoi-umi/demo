@@ -103,9 +103,11 @@ function getConnectionPromise() {
 }
 
 function releasePromise(conn: mysql.PoolConnection) {
-    if (conn && pool['_freeConnections'].indexOf(conn) == -1) {
-        conn.release();
-    }
+    return common.promise(()=>{
+        if (conn && pool['_freeConnections'].indexOf(conn) == -1) {
+            conn.release();
+        }
+    });
 }
 
 function queryPromise(conn: mysql.PoolConnection, sql, params) {
