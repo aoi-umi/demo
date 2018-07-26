@@ -81,21 +81,19 @@ function myTranQuery(sql, params, conn) {
 
 function queryFormat(query, values) {
     if (!values) return query;
+    let escape = this.escape.bind(this);
     return query.replace(/\:(\w+)/g, function (txt, key) {
-        if (values.hasOwnProperty(key)) {
-            var val = values[key];
-            if (val) {
-                if (val instanceof Date)
-                    val = common.dateFormat(val, 'yyyy-MM-dd HH:mm:ss');
-                if (typeof val == 'object')
-                    val = JSON.stringify(val);
-            }
-            return this.escape(val);
+        if(!values.hasOwnProperty(key))
+            return null;
+        var val = values[key];
+        if (val) {
+            if (val instanceof Date)
+                val = common.dateFormat(val, 'yyyy-MM-dd HH:mm:ss');
+            if (typeof val == 'object')
+                val = JSON.stringify(val);
         }
-        else {
-            return this.escape(null);
-        }
-    }.bind(this));
+        return escape(val);        
+    });
 }
 
 function getConnectionPromise() {
