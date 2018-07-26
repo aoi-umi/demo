@@ -1,6 +1,6 @@
 ﻿import * as autoBll from './_auto';
+import * as customBll from './_custom';
 import * as common from '../_system/common';
-import * as authorityDal from '../dal/authority';
 import errorConfig from '../_system/errorConfig';
 
 export let save = function (opt) {
@@ -17,7 +17,7 @@ export let save = function (opt) {
             if (t)
                 throw common.error(`code[${opt.code}]已存在`);
         }
-        return autoBll.modules.authority.save(opt);      
+        return autoBll.modules.authority.save(opt);
     });
 };
 
@@ -38,7 +38,7 @@ export let isExist = function (opt) {
 };
 
 export let query = function (opt) {
-    return common.promise(async function(){
+    return common.promise(async function () {
         if (opt.id || opt.anyKey) {
             delete opt.code;
             delete opt.name;
@@ -47,11 +47,7 @@ export let query = function (opt) {
             }
         }
         opt.orderBy = 'code';
-        let t = await authorityDal.query(opt);
-        return {
-            list: t[0],
-            count: t[1][0].count,
-        };        
-    });    
+        return customBll.authority.query(opt);
+    });
 };
 

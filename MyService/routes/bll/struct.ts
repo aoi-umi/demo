@@ -25,6 +25,6 @@ export let isExist = function (opt) {
         if (t.list.length && t.list[0].id != opt.id) {
             result = true;
         }
-        return result;        
+        return result;
     });
 };
