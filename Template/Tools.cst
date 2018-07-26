@@ -79,8 +79,6 @@ public static DatabaseModel CreateDatabaseModel(TableSchema table, DatabaseTypeE
         cols.Add(colModel);
         
     }
-    if(dbModel.IdCol == null)
-        throw new Exception("不包含主键");
     dbModel.Cols = cols;
     return dbModel;
 }
@@ -214,7 +212,9 @@ public static string ConvertString(string str, FilenameTypeEnum type){
 
 #region 存储过程
 public static List<string> CreateProcedure(DatabaseModel databaseModel, DatabaseTypeEnum databaseType)
-{
+{    
+    if(databaseModel.IdCol == null)
+        throw new Exception("不包含主键");
     var procList = new List<string>();
     switch(databaseType)
     {
@@ -842,7 +842,9 @@ private static List<string> CreateSqlServerQueryProcedure(DatabaseModel database
 #region js/ts
 
 public static List<string> CreateScript(DatabaseModel databaseModel, DatabaseTypeEnum databaseType, int scriptType)
-{
+{    
+    if(databaseModel.IdCol == null)
+        throw new Exception("不包含主键");
     var list = new List<string>();
     switch(databaseType)
     {
