@@ -32,7 +32,7 @@ export let signUp = function (opt, exOpt) {
                 userInfoId: userInfoId,
                 roleCode: 'default'
             }, conn);
-            
+
             //日志
             var userInfoLog = userInfoBll.createLog();
             userInfoLog.userInfoId = userInfoId;
@@ -87,7 +87,7 @@ export let signInInside = function (req: Request) {
         reqBody = user.reqBody;
     }
     return common.promise(async function () {
-        if (!account){
+        if (!account) {
             throw common.error(null, errorConfig.CAN_NOT_BE_EMPTY, {
                 format: function (msg) {
                     return common.stringFormat(msg, 'account');
