@@ -35,13 +35,6 @@ export let promise = function (fn: Function, caller?: any, nodeCallback?: boolea
             defer.resolve(fn.apply(caller, args));
         } else {
             args.push(defer.makeNodeResolver());
-            // args.push(function (err, ...cbArgs) {
-            //     if (err)
-            //         defer.reject(err);
-            //     else {
-            //         defer.resolve.apply(void 0, cbArgs);
-            //     }
-            // });
             fn.apply(caller, args);
         }
     } catch (e) {
@@ -51,24 +44,24 @@ export let promise = function (fn: Function, caller?: any, nodeCallback?: boolea
 };
 
 //示例
-// let fun = function (type, def) {
-//     if (type == 1) {
+// let fun = function (nodeCallback, def) {
+//     if (!nodeCallback) {
 //         setTimeout(() => {
-//             def.resolve('promise_' + type);
+//             def.resolve('promise_' + nodeCallback);
 //         }, 1000);
 //         return def.promise;
-//     } else if (type == 2) {
+//     } else if (nodeCallback) {
 //         setTimeout(() => {
 //             let cb = def;
-//             cb(null, 'promise_' + type)
+//             cb(null, 'promise_' + nodeCallback)
 //         }, 1000);
 //     }
 // }
-// promise(fun, void 0, false, 1).then((t) => {
+// promise(fun, void 0, false, [false]).then((t) => {
 //     console.log(t);
 // });
 
-// promise(fun, void 0, true, 2).then((t) => {
+// promise(fun, void 0, true, [true]).then((t) => {
 //     console.log(t);
 // });
 
@@ -252,8 +245,8 @@ export let error = function (msg, code?, option?) {
     if (error) {
         status = error.status;
         if (!msg) {
-            let filepath = '../lang/' + opt.lang;
-            var resolvePath = path.resolve(__dirname + '/' + filepath + '.js');
+            let filepath = `../lang/${opt.lang}`;
+            var resolvePath = path.resolve(`${__dirname}/${filepath}.js`);
             var isExist = fs.existsSync(resolvePath);
             let lang = require(isExist ? filepath : '../lang/zh');
             msg = lang.errorConfig[code];
@@ -292,9 +285,9 @@ export let requestServiceByConfig = function (option) {
     var log = logModle();
     var startTime = new Date().getTime();
     return promise(async function () {
-        var errStr = 'service "' + option.serviceName + '"';
+        var errStr = `service "${option.serviceName}"`;
         var service = config.api[option.serviceName];
-        if (!service) throw error(errStr + ' is not exist!');
+        if (!service) throw error(`${errStr} is not exist!`);
         var serviceArgs = clone(service.defaultArgs);
 
         var defaultMethodArgs = {
@@ -309,11 +302,11 @@ export let requestServiceByConfig = function (option) {
         }
 
         var host = serviceArgs.host;
-        if (!host) throw error(errStr + ' host is empty!');
+        if (!host) throw error(`${errStr} host is empty!`);
 
         method = methodConfig.method;
         url = methodConfig.url;
-        if (!url) throw error(errStr + ' method "' + option.methodName + '" url is empty!');
+        if (!url) throw error(`${errStr} method "${option.methodName}" url is empty!`);
         url = host + url;
         var opt = {
             url: url,
@@ -327,7 +320,7 @@ export let requestServiceByConfig = function (option) {
         log.guid = guid();
         log.url = url;
         log.req = opt.body;
-        log.method = '[' + option.serviceName + '][' + option.methodName + ']';
+        log.method = `[${option.serviceName}][${option.methodName}]`;
         log.duration = startTime - new Date().getTime();
         let resData = await requestService(opt);
 
@@ -340,8 +333,8 @@ export let requestServiceByConfig = function (option) {
     }).fail(function (e) {
         log.result = false;
         log.res = e;
-        console.log('request', log.method, 'error');
-        console.log('url:', url);
+        console.log(`request ${log.method} error`);
+        console.log(`url: ${url}`);
         throw e;
     }).finally(function () {
         if (!option.noLog) {
@@ -372,7 +365,7 @@ export let requestService = function (option) {
                 break;
             default:
                 if (encoding)
-                    throw error('Not Accept Encoding:' + encoding);
+                    throw error(`Not Accept Encoding:${encoding}`);
         }
 
         if (Buffer.isBuffer(data)) {
@@ -414,7 +407,7 @@ export let writeError = function (err, opt?) {
 
         //write file
         mkdirsSync(config.errorDir);
-        var fileName = config.errorDir + '/' + createDate + '.txt';
+        var fileName = `${config.errorDir}/${createDate}.txt`;
         await promisify(fs.appendFile)(fileName, list.join('\r\n') + '\r\n\r\n');
     });
 };

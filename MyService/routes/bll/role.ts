@@ -3,8 +3,8 @@
  */
 import * as q from 'q';
 import * as autoBll from './_auto';
+import * as customBll from './_custom';
 import * as common from '../_system/common';
-import * as roleDal from '../dal/role';
 
 export let save = function (opt) {
     var id;
@@ -16,8 +16,8 @@ export let save = function (opt) {
             id = await autoBll.modules.role.save({id: dataRole.id, status: dataRole.status});
         } else {
             let exist = await isExist(dataRole);
-                if (exist)
-                    throw common.error(`code[${dataRole.code}]已存在`);
+            if (exist)
+                throw common.error(`code[${dataRole.code}]已存在`);
 
             let roleWithAuthority = await autoBll.modules.roleWithAuthority.query({roleCode: dataRole.code});
             var delRoleAuthList = roleWithAuthority.list.filter((dbAuth) => {
@@ -33,7 +33,7 @@ export let save = function (opt) {
             // console.log(delRoleAuthList);
             // console.log(addRoleAuthList);
             return autoBll.tran(async function (conn) {
-                id = await autoBll.modules.role.save(dataRole, conn);                    
+                id = await autoBll.modules.role.save(dataRole, conn);
                 var list = [];
                 //删除权限
                 if (delRoleAuthList.length) {
@@ -59,13 +59,7 @@ export let save = function (opt) {
 };
 
 export let detailQuery = function (opt) {
-    return roleDal.detailQuery(opt).then(function (t) {
-        var data = {
-            role: t[0][0],
-            authorityList: t[1],
-        };
-        return data;
-    });
+    return customBll.role.detailQuery(opt);
 };
 
 export let query = function (opt) {
@@ -77,14 +71,15 @@ export let query = function (opt) {
         }
     }
     opt.orderBy = 'code';
-    return roleDal.query(opt).then(function (t) {
+
+    return customBll.role.query(opt).then(function (t) {
         var data: any = {
-            list: t[0],
-            count: t[1][0].count,
+            list: t.list,
+            count: t.count,
         };
         var roleAuthority = {};
-        var authorityList = t[3];
-        t[2].forEach(ele => {
+        var authorityList = t.authorityList;
+        t.roleWithAuthorityList.forEach(ele => {
             if (!roleAuthority[ele.roleCode])
                 roleAuthority[ele.roleCode] = [];
             roleAuthority[ele.roleCode].push(ele.authorityCode);

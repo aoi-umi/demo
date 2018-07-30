@@ -3,22 +3,16 @@
  */
 import * as q from 'q';
 import * as autoBll from './_auto';
+import * as customBll from './_custom';
 import * as common from '../_system/common';
 import errorConfig from '../_system/errorConfig';
 import * as myEnum from '../_system/enum';
 import * as auth from '../_system/auth';
-import * as mainContentDal from '../dal/mainContent';
 
 export let query = function (opt, exOpt) {
     var user = exOpt.user;
     return common.promise(async function () {
-        let t = await mainContentDal.query(opt);
-        var detail = {
-            list: t[0],
-            count: t[1][0].count,
-            statusList: t[2]
-        };
-        return detail;
+        return customBll.mainContent.query(opt);
     }).then(function (t) {
         if (t.list && t.list.length) {
             t.list.forEach(function (item) {
@@ -46,11 +40,10 @@ export let detailQuery = function (opt, exOpt) {
         } else if (!opt.id) {
             throw common.error('', errorConfig.ARGS_ERROR);
         } else {
-            let t = await mainContentDal.detailQuery(opt);
-            detail.mainContent = t[0][0];
-            detail.mainContentTypeList = t[1];
-            detail.mainContentChildList = t[2];
-            detail.mainContentLogList = t[3];
+            let t = await customBll.mainContent.detailQuery(opt);
+            detail = {
+                ...detail, ...t
+            };
             if (!detail.mainContent)
                 throw common.error('', errorConfig.DB_NO_DATA, {lang: exOpt.req.myData.lang});
         }

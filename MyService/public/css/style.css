@@ -42,13 +42,13 @@ body.no-nav .container {
     border-bottom-right-radius: 0px;
 }
 
-.item {
+.chat-item {
     border: 1px solid #47a8ef;
     margin: 2px;
     border-radius: 8px;
 }
 
-.item.self .item-content {
+.chat-item.self .item-content {
     text-align: right;
 }
 

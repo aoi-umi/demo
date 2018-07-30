@@ -1,0 +1,26 @@
+<div class="container">
+    <table>
+        <thead>
+        <tr>
+            <th>文件名</th>
+            <th>大小</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <% files.forEach(file => { %>
+        <tr>
+            <td>
+                <a href="<%= file.isDir ? '/file?noNav=true&name=' + (file.path) : `/${file.name}` %>"><%= file.name %></a>
+            </td>
+            <td><%= file.size %></td>
+            <td>
+                <% if(file.mime && file.mime.indexOf('image/') == 0){ %>
+                <img height="100" src="/<%= file.name %>"/>
+                <% } %>
+            </td>
+        </tr>
+        <% }); %>
+        </tbody>
+    </table>
+</div>

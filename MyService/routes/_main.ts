@@ -16,6 +16,7 @@ export let accessableUrlConfig = [
     {url: '/msg'},
     {url: '/textDiff'},
     {url: '/statistics'},
+    {url: '/file', auth: [auth.authConfig.admin.code]},
 
     {url: '/onlineUser', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
     {url: '/interface/onlineUser/query', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
@@ -354,11 +355,12 @@ export let init = function (opt) {
     };
 };
 
+import * as index from './module/index';
 //注册路由
 export let register = function (app: Express) {
-    app.get('/msg', require('./module/index').msg);
-    app.post('/interface/upload', upload.anyFile, require('./module/index').upload);
-    app.post('/interface/captcha/get', require('./module/index').captchaGet);
+    app.get('/msg', index.msg);
+    app.post('/interface/upload', upload.anyFile, index.upload);
+    app.post('/interface/captcha/get', index.captchaGet);
     app.post(/\/interface\/([\s\S]+)\/([\s\S]+)/, require('./module/_interface').post);
     app.get('*', require('./module/_view').get);
 }
