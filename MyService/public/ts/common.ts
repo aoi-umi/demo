@@ -28,13 +28,6 @@ export let promise = function (fn: Function, caller?: any, nodeCallback?: boolea
             defer.resolve(fn.apply(caller, args));
         } else {
             args.push(defer.makeNodeResolver());
-            // args.push(function (err, ...cbArgs) {
-            //     if (err)
-            //         defer.reject(err);
-            //     else {
-            //         defer.resolve.apply(void 0, cbArgs);
-            //     }
-            // });
             fn.apply(caller, args);
         }
     } catch (e) {
@@ -44,24 +37,24 @@ export let promise = function (fn: Function, caller?: any, nodeCallback?: boolea
 };
 
 //示例
-// let fun = function (type, def) {
-//     if (type == 1) {
+// let fun = function (nodeCallback, def) {
+//     if (!nodeCallback) {
 //         setTimeout(() => {
-//             def.resolve('promise_' + type);
+//             def.resolve('promise_' + nodeCallback);
 //         }, 1000);
 //         return def.promise;
-//     } else if (type == 2) {
+//     } else if (nodeCallback) {
 //         setTimeout(() => {
 //             let cb = def;
-//             cb(null, 'promise_' + type)
+//             cb(null, 'promise_' + nodeCallback)
 //         }, 1000);
 //     }
 // }
-// promise(fun, void 0, false, 1).then((t) => {
+// promise(fun, void 0, false, [false]).then((t) => {
 //     console.log(t);
 // });
 
-// promise(fun, void 0, true, 2).then((t) => {
+// promise(fun, void 0, true, [true]).then((t) => {
 //     console.log(t);
 // });
 

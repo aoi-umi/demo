@@ -6,8 +6,10 @@
 <%@ Property Name="SourceDatabase" Type="SchemaExplorer.TableSchemaCollection" Category="数据源"   Description="需要生成的表" %>
 <%@ Property Name="MakeTypeList" Type="List<Make.MakeTypeEnum>" Category="生成类型"   Description="生成类型" %>
 <%@ Property Name="TsModelNamespace" Type="String" Default="" Optional="True" Category="生成类型" Description="d.ts命名空间名字" %>
-<%@ Property Name="RemoveTablePrefix" Type="String" Default="t_" DeepLoad="True" Optional="True" Category="移除数据表前缀" 
+<%@ Property Name="RemoveTablePrefix" Type="String" Default="t_" DeepLoad="True" Optional="True" Category="其他" 
 Description="移除数据表前缀"%>
+<%@ Property Name="DalPrefix" Type="String" Default="_auto." DeepLoad="True" Optional="True" Category="其他" 
+Description="dal前缀"%>
 <%@ Property Name="DataBaseType" Type="Make.Tools.DatabaseTypeEnum" Default="" DeepLoad="True" Optional="True" Category="数据库类型" 
 Description="数据库类型"%>
 <%@ Property Name="FileNameType" Type="Tools.FilenameTypeEnum" Default="" DeepLoad="True" Optional="True" Category="文件名类型" 
@@ -40,10 +42,10 @@ if(SourceDatabase.Count > 0){
                             outputFormat = "sql/{1}.sql";
                             break;
                         case Make.MakeTypeEnum.Js:
-                            outputFormat = "js/{1}.js";
+                            outputFormat = "js/" + DalPrefix + "{1}.js";
                             break;
                         case Make.MakeTypeEnum.Ts:
-                            outputFormat = "ts/{1}.ts";
+                            outputFormat = "ts/" + DalPrefix + "{1}.ts";
                             break;
                         case Make.MakeTypeEnum.Dts:
                             outputFormat = "dts/{1}.d.ts";

@@ -8,7 +8,7 @@ var gulp = require('gulp'),
     Q = require('q'),    
     sourcemaps = require('gulp-sourcemaps');
 
-var tsProject = ts.createProject('tsconfig.json', {target: 'es2017'});
+var tsProject = ts.createProject('tsconfig.json', {target: 'es2017', module: 'commonjs'});
 var tsFrontProject = ts.createProject('tsconfig.json');
 
 let destDir = './bin';
@@ -37,7 +37,7 @@ gulp.task('ts', function () {
 	], {
 		base: './'
 	})
-		.pipe(changed(destDir, {extension: '.js'}))
+		//.pipe(changed(destDir, {extension: '.js'}))
 		.pipe(tsProject())
 		.pipe(gulp.dest(destDir));
 });

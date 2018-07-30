@@ -6,7 +6,7 @@ import * as common from '../_system/common';
 import errorConfig from '../_system/errorConfig';
 
 export let save = function (opt) {
-    return common.promise(async ()=>{
+    return common.promise(async () => {
         let t = await isExist(opt);
         if (t) {
             throw common.error('type [' + opt.type + '] is exist');

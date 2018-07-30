@@ -6,9 +6,9 @@ import * as common from '../_system/common';
 import errorConfig from '../_system/errorConfig';
 import * as cache from '../_system/cache';
 import * as autoBll from './_auto';
+import * as customBll from './_custom';
 import * as main from '../_main';
 import * as userInfoWithStructBll from './userInfoWithStruct';
-import * as userInfoDal from '../dal/userInfo';
 
 export let isAccountExist = function (account) {
     return common.promise(async function () {
@@ -60,7 +60,7 @@ export let save = function (opt, exOpt) {
         };
         return autoBll.tran(async function (conn) {
             await autoBll.modules.userInfo.save(saveOpt, conn);
-            await autoBll.modules.userInfoLog.save(userInfoLog, conn);       
+            await autoBll.modules.userInfoLog.save(userInfoLog, conn);
         });
     }).then(function () {
         if (user.key) {
@@ -75,15 +75,10 @@ export let save = function (opt, exOpt) {
 };
 
 export let detailQuery = function (opt) {
-    return userInfoDal.detailQuery({id: opt.id, noLog: opt.noLog}).then(function (t) {
+    return customBll.userInfo.detailQuery({id: opt.id, noLog: opt.noLog}).then(function (t) {
         var detail = {
-            userInfo: t[0][0],
-            userInfoLog: t[1],
-            authorityList: t[2],
-            roleList: t[3],
-            roleAuthorityList: t[4],
-            auth: {},
-            structList: t[5]
+            ...t,
+            auth: {}
         };
         if (!detail.userInfo)
             return null;
@@ -97,16 +92,15 @@ export let detailQuery = function (opt) {
 };
 
 export let query = function (opt) {
-    return userInfoDal.query(opt).then(function (t) {
+    return customBll.userInfo.query(opt).then(function (t) {
         var data = {
-            list: t[0],
-            count: t[1][0].count
+            list: t.list,
+            count: t.count
         };
-        var userInfoWithAuthorityList = t[2];
-        var authorityList = t[3];
-        var userInfoWithRoleList = t[4];
-        var roleList = t[5];
-        var roleAuthorityList = t[6];
+        let {
+            userInfoWithAuthorityList, authorityList, userInfoWithRoleList,
+            roleList, roleAuthorityList
+        } = t;
 
         data.list.forEach(function (item) {
             var detail = {

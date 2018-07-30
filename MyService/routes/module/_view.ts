@@ -33,7 +33,7 @@ export let get = function (req: Request, res: Response, next) {
     });
 };
 
-var setViewOption = function (opt) {
+var setViewOption = async function (opt) {
     let req = opt.req;
     var query = req.query;
     var user = opt.user;
@@ -84,5 +84,7 @@ var setViewOption = function (opt) {
             }
             break;
 
+        case '/file':
+            return require('../viewBll/file').get(query, opt);
     }
 };

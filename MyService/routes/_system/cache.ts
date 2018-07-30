@@ -24,7 +24,7 @@ client.on('error', function (err) {
 });
 
 export let get = function (key) {
-    return common.promise((defer: Q.Deferred<{}>) => {
+    return common.promise((defer: Q.Deferred<any>) => {
         common.promisify(client.get, client)(cachePrefix + key).then(result => {
             if (result && typeof result == 'string') {
                 try {
