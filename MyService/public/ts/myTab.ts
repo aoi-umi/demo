@@ -111,7 +111,7 @@ export let bindEvent = function () {
             left: x,
             top: y,
         }).show();
-        tabContextMenu.currTab = $(this);
+        tabContextMenu.currTab = $(this) as any;
         return false;
 
     });
