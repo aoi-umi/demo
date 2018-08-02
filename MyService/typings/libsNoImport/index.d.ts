@@ -6,6 +6,7 @@ interface JQueryStatic {
 interface JQuery {
     autocomplete: any;
     datetimepicker: any;
+    liMarquee: any;
 }
 
 interface File {

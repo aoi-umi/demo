@@ -16,6 +16,7 @@
     "bootstrap-fileinput": "^4.4.8",
     "requirejs": "^2.3.5",
     "require-css": "^0.1.10",
-    "smalot-bootstrap-datetimepicker": "^2.4.4"
+    "smalot-bootstrap-datetimepicker": "^2.4.4",
+    "jquery.liMarquee": "^4.6.0"
   }
 }
