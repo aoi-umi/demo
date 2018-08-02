@@ -66,19 +66,6 @@ export let query: AutoBllFun = function (name, params, conn?) {
 export let tran = function (fn: (conn: PoolConnection) => any): Q.Promise<any> {
     return db.tranConnect(fn);
 };
-export let custom = function (name, method, ...args) {
-    var bll = getRequire(name, {type: 'bll'});
-    if (!bll[method])
-        throw common.error(`method[${method}] is not exist`, errorConfig.CODE_ERROR);
-    return bll[method].apply(void 0, args);
-};
-export let customDal = function (name, method, ...args) {
-    var dal = getRequire(name, {type: 'dal'});
-    if (!dal[method])
-        throw common.error(`method[${method}] is not exist`, errorConfig.CODE_ERROR);
-    return dal[method].apply(void 0, args);
-};
-
 
 let moduleList = ['authority', 'log',
     'mainContent', 'mainContentChild', 'mainContentLog', 'mainContentTag', 'mainContentWithType', 'mainContentType',
