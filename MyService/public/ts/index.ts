@@ -1,5 +1,6 @@
 import 'fileinput';
 import 'jquery.cookie';
+import 'jquery.liMarquee';
 import * as ejs from 'ejs';
 import * as $ from 'jquery';
 
@@ -160,6 +161,7 @@ export let init = function () {
         $('#countdown2').html(common.getDateDiff(new Date(), `${common.dateFormat(new Date())} 23:59`));
     }, 1000);
 
+    $('#marquee').liMarquee();
     bindEvent();
 };
 export let bindEvent = function () {

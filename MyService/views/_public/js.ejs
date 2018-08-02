@@ -72,6 +72,7 @@
 			'difflib': 'libs/difflib',
 			'css': 'libs/css.min',
 			'echarts': 'libs/echarts.common.min',
+			'jquery.liMarquee': 'libs/jquery.liMarquee',
 		},
 		shim: {
 			'ejs': {
@@ -98,6 +99,9 @@
 			'bootstrap-datetimepicker': {
 				deps: ['css!../css/bootstrap-datetimepicker.min']
 			},
+            'jquery.liMarquee':{
+	            deps: ['css!../css/liMarquee']
+            }
 		},
 		urlArgs: function (id, url) {
 			return this.paths[id] ? '' : '?v=<%= version %>&deploy=<%= deploy %>';
