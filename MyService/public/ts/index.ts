@@ -70,7 +70,7 @@ export let init = function () {
         var res = data.response;
     }).on('fileuploaderror', function (event, data, msg) {
         var args = arguments;
-        if(data && data.response){
+        if (data && data.response) {
             var res = data.response;
             if (!res.result) {
                 return {
@@ -162,6 +162,9 @@ export let init = function () {
     }, 1000);
 
     $('#marquee').liMarquee();
+    $('#carousel-example-generic').carousel({
+        interval: 3000
+    });
     bindEvent();
 };
 export let bindEvent = function () {
@@ -197,7 +200,8 @@ export let bindEvent = function () {
             var list = [];
             let reg = new RegExp(val, 'i');
             $('#menu .menuItem').each(function () {
-                var itemValue = $(this).text().trim();;
+                var itemValue = $(this).text().trim();
+                ;
                 if (reg.test(itemValue)) {
                     list.push($(this).clone());
                 }
