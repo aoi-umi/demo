@@ -43,14 +43,14 @@ export let get = function (key) {
     });
 }
 //expire seconds
-export let set = function (key, value, expire?) {    
-    return common.promise(()=>{
-        if (typeof value == 'object') value = JSON.stringify(value);
-        let setPromise = common.promisify(client.set, client);
+export let set = function (key, value, expire?) {
+    return common.promise(() => {
+        if (typeof value == 'object')
+            value = JSON.stringify(value);
         let args = [cachePrefix + key, value];
         if (expire)
             args = [...args, 'EX', expire];
-        return setPromise.apply(void 0, args);
+        return common.promisify(client.set, client)(...args);
     });
 };
 
