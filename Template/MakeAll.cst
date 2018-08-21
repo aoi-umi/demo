@@ -36,7 +36,7 @@ if(SourceDatabase.Count > 0){
             temp.TsModelNamespace = TsModelNamespace;
             MakeTypeList.ForEach(makeType=>{
                 try{
-                    var outputFormat = "./Output/{0}/";
+                    var outputFormat = "{1}.txt";
                     switch(makeType){
                         case Make.MakeTypeEnum.Procedure:
                             outputFormat = "sql/{1}.sql";
@@ -50,17 +50,18 @@ if(SourceDatabase.Count > 0){
                         case Make.MakeTypeEnum.Dts:
                             outputFormat = "dts/{1}.d.ts";
                             break;
+                        case Make.MakeTypeEnum.SequelizeModel:
+                            outputFormat = "models/" + DalPrefix + "{1}.model.ts";
+                            break;
                     }
-                    outputFormat = "./Output/{0}/" + outputFormat;
-                    var list = new List<Make.MakeTypeEnum>(){
+                    outputFormat = "./Output/{0}/" + outputFormat;                                
+                    if((new List<Make.MakeTypeEnum>(){
                         Make.MakeTypeEnum.Js,
                         Make.MakeTypeEnum.Ts,
-                    };                    
-                    if(list.Contains(makeType)){
+                        Make.MakeTypeEnum.Dts,
+                        Make.MakeTypeEnum.SequelizeModel,
+                    }).Contains(makeType)){
                         fileName = Tools.ConvertString(fileName, FileNameType);                        
-                    }else if(makeType == Make.MakeTypeEnum.Dts){                        
-                        //类名用pascal
-                        fileName = Tools.ConvertString(fileName, Tools.FilenameTypeEnum.Pascal);  
                     }
                     temp.MakeType = makeType;
                     temp.RenderToFile(string.Format(outputFormat, dbName, fileName), true);

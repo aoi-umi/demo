@@ -6,5 +6,4 @@ package-lock.json
 yarn.lock
 Template/Output
 MyService/bin
-MyService/routes/dal/_auto/*.ts
-MyService/typings/model/dbModel
+MyService/routes/dal/models/_auto

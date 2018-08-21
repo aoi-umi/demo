@@ -9,7 +9,7 @@ var gulp = require('gulp'),
     sourcemaps = require('gulp-sourcemaps');
 
 var tsProject = ts.createProject('tsconfig.json', {target: 'es2017', module: 'commonjs'});
-var tsFrontProject = ts.createProject('tsconfig.json');
+var tsFrontProject = ts.createProject('tsconfig.json', {target: 'es5', module: 'umd'});
 
 let destDir = './bin';
 
