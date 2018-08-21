@@ -30,14 +30,15 @@ let sequelize = new Sequelize({
 export let query = function (sql, params, conn?) {
     return common.promise(() => {
         sql = sql.replace(/\:(\w+)/g, function (txt, key) {
-            if (!params || !params.hasOwnProperty(key))
+            if (!params || !params.hasOwnProperty(key) || params[key] === undefined)
                 return null;       
             return txt;
         });
         return sequelize.query(sql, {
             replacements: params,
             transaction: conn,
-            type : sequelize.QueryTypes.SELECT
+            type : sequelize.QueryTypes.SELECT,
+            raw: true,
         });
     }).fail(e => {
         common.writeError(e);

@@ -105,7 +105,7 @@ export let bindEvent = function () {
     })
     //浮动
     $(document).on('mouseover mouseleave', '.hover', function (e) {
-        var dom = $(this);
+        var dom = $(this) as any as JQuery<HTMLElement>;
         var target = $(dom.attr('href'));
         if (target.length && dom.hasClass('hover-source')) {
             target.css({'left': dom.position().left, 'margin-top': '0px'});
