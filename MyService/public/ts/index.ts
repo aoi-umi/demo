@@ -12,7 +12,7 @@ import * as main from './_main';
 export let init = function () {
     //socket
     var socketData = {
-        postSuccess: {}
+        postSuccess: {} as any
     };
 
     var connection = socket.connection;

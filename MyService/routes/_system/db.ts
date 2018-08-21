@@ -2,32 +2,65 @@
  * Created by bang on 2017-8-1.
  */
 import * as mysql from 'mysql';
+import * as path from 'path';
+import { Sequelize } from 'sequelize-typescript';
 import * as common from './common';
 import errorConfig from './errorConfig';
 import config from '../../config';
 
-let pool = mysql.createPool({
-    host: config.datebase.host,
-    user: config.datebase.user,
-    password: config.datebase.password,
+let pool = null;
+// mysql.createPool({
+//     host: config.datebase.host,
+//     user: config.datebase.user,
+//     password: config.datebase.password,
+//     database: config.datebase.database,
+//     port: config.datebase.port,
+// });
+let sequelize = new Sequelize({
     database: config.datebase.database,
-    port: config.datebase.port
+    dialect: 'mysql',
+    username: config.datebase.user,
+    password: config.datebase.password,
+
+    modelPaths: [path.resolve(__dirname + '/../dal/models/**')],
+    operatorsAliases: false,
+    logging: false,
 });
 
 export let query = function (sql, params, conn?) {
+    return common.promise(() => {
+        sql = sql.replace(/\:(\w+)/g, function (txt, key) {
+            if (!params || !params.hasOwnProperty(key))
+                return null;       
+            return txt;
+        });
+        return sequelize.query(sql, {
+            replacements: params,
+            transaction: conn,
+            type : sequelize.QueryTypes.SELECT
+        });
+    }).fail(e => {
+        common.writeError(e);
+        throw common.error(null, errorConfig.DB_ERROR);
+    });
+}
+let queryV1 = function (sql, params, conn?) {
     return common.promise(() => {
         if (!conn)
             return myQuery(sql, params);
         else
             return myTranQuery(sql, params, conn);
-    }).fail(e => {
-        common.writeError(e);
-        throw common.error(null, errorConfig.DB_ERROR);
     });
 };
 
 //事务连接
 export let tranConnect = function (queryFunction) {
+    return sequelize.transaction(async (t) => {
+        let result = await queryFunction(t);
+        return result;
+    });
+}
+let tranConnectV1 = function (queryFunction) {
     var connection = null;
     return common.promise(async function () {
         connection = await getConnectionPromise();
@@ -83,7 +116,7 @@ function queryFormat(query, values) {
     if (!values) return query;
     let escape = this.escape.bind(this);
     return query.replace(/\:(\w+)/g, function (txt, key) {
-        if(!values.hasOwnProperty(key))
+        if (!values.hasOwnProperty(key))
             return null;
         var val = values[key];
         if (val) {
@@ -92,7 +125,7 @@ function queryFormat(query, values) {
             if (typeof val == 'object')
                 val = JSON.stringify(val);
         }
-        return escape(val);        
+        return escape(val);
     });
 }
 
@@ -101,7 +134,7 @@ function getConnectionPromise() {
 }
 
 function releasePromise(conn: mysql.PoolConnection) {
-    return common.promise(()=>{
+    return common.promise(() => {
         if (conn && pool['_freeConnections'].indexOf(conn) == -1) {
             conn.release();
         }

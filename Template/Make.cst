@@ -28,6 +28,7 @@ public enum MakeTypeEnum{
     Ts,
     Dts,
     Cs,
+    SequelizeModel
 }
 </script>
 <%
@@ -50,6 +51,9 @@ switch(MakeType){
         break;
     case MakeTypeEnum.Cs:
         list = Tools.CreateCs(dbModel, TsModelNamespace);
+        break;
+    case MakeTypeEnum.SequelizeModel:
+        list = Tools.CreateSequelizeModel(dbModel);
         break;
 }
 list.ForEach(x=>{

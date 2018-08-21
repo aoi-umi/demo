@@ -3,7 +3,7 @@
  */
 import * as io from 'socket.io';
 import * as main from './_main';
-export let connection = null;
+export let connection: io.Server;
 export let init = function () {
     connection = io(location.host);
     bindEvent();

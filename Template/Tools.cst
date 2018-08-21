@@ -145,6 +145,40 @@ public static string GetCSharpDataTypeByDBColumn(ColumnSchema column)
     }
 }
 
+
+public static string GetTypescriptTypeByDBColumn(ColumnSchema column)
+{
+    switch (column.DataType)
+    {
+        case DbType.AnsiString: return "string";
+        case DbType.AnsiStringFixedLength: return "string";
+        case DbType.Binary: return "any";
+        case DbType.Boolean: return "boolean";
+        case DbType.Byte: return "number";
+        case DbType.Currency: return "number";
+        case DbType.Date: return "Date";
+        case DbType.DateTime: return "Date";
+        case DbType.Decimal: return "number";
+        case DbType.Double: return "number";
+        case DbType.Guid: return "string";
+        case DbType.Int16: return "number";
+        case DbType.Int32: return "number";
+        case DbType.Int64: return "number";
+        case DbType.Object: return "any";
+        case DbType.SByte: return "number";
+        case DbType.Single: return "number";
+        case DbType.String: return "string";
+        case DbType.StringFixedLength: return "string";
+        case DbType.Time: return "Date";
+        case DbType.UInt16: return "number";
+        case DbType.UInt32: return "number";
+        case DbType.UInt64: return "number";
+        case DbType.VarNumeric: return "number";
+        default:
+            return "__UNKNOWN__" + column.NativeType;
+    }
+}
+
 public enum OperateTypeEnum
 {
     Save,
@@ -954,6 +988,42 @@ public static List<string> CreateDts(DatabaseModel databaseModel, string ns)
     level = 1;
     tabStr = GetRepeatStr("\t", level);
     scriptStrList.Add(tabStr + "}");    
+    scriptStrList.Add("}");     
+    list.Add(string.Join(Environment.NewLine, scriptStrList.ToArray()));      
+    return list;
+}
+#endregion
+
+#region SequelizeModel
+public static List<string> CreateSequelizeModel(DatabaseModel databaseModel)
+{
+    var list = new List<string>();
+    var tableName = databaseModel.TableName;
+    if(!string.IsNullOrEmpty(databaseModel.RemoveTablePrefix)){
+        if(tableName.StartsWith(databaseModel.RemoveTablePrefix))
+            tableName = tableName.Substring(databaseModel.RemoveTablePrefix.Length);
+    }
+    tableName = "_Auto" + ConvertString(tableName, FilenameTypeEnum.Pascal);
+    
+    var level = 1;
+    var tabStr = GetRepeatStr("  ", level);
+    var scriptStrList = new List<string>();    
+    scriptStrList.Add("import { Table, Column, Model } from 'sequelize-typescript';");
+    scriptStrList.Add("@Table({");
+    scriptStrList.Add("    tableName: '" + databaseModel.TableName + "',");
+    scriptStrList.Add("    timestamps: false,");
+    scriptStrList.Add("})");
+    scriptStrList.Add("export default class " + tableName + " extends Model<" + tableName + "> {");
+    level = 2;
+    tabStr = GetRepeatStr("  ", level);
+    databaseModel.Cols.ForEach(col=>{      
+        var ele = col.Name;
+        if("id" == col.Name)
+            return;
+        scriptStrList.Add(tabStr + "@Column");       
+        scriptStrList.Add(tabStr + ele + ": " + GetTypescriptTypeByDBColumn(col.column) +  ";\r\n");
+    });
+    level = 1;
     scriptStrList.Add("}");     
     list.Add(string.Join(Environment.NewLine, scriptStrList.ToArray()));      
     return list;

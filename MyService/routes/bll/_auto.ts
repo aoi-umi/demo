@@ -1,13 +1,13 @@
 ﻿import * as path from 'path';
 import * as fs from 'fs';
-import {PoolConnection} from 'mysql';
 
 import * as db from '../_system/db';
 import * as common from '../_system/common';
 import errorConfig from '../_system/errorConfig';
+import { Transaction, Model } from 'sequelize';
 
-type AutoBllFun = (name, params, conn?: PoolConnection) => Q.Promise<any>;
-type AutoBllModuleFun = (params, conn?: PoolConnection) => Q.Promise<any>;
+type AutoBllFun = (name, params, conn?: Transaction) => Q.Promise<any>;
+type AutoBllModuleFun = (params, conn?: Transaction) => Q.Promise<any>;
 
 export let getRequire = function (name, option?) {
     var filepath = '';
@@ -18,7 +18,7 @@ export let getRequire = function (name, option?) {
     if (option)
         opt = common.extend(opt, option);
     if (!opt.type)
-        filepath = '../dal/_auto/_auto.' + name;
+        filepath = '../dal/models/_auto/_auto.' + name + '.model';
     else {
         if (opt.type == 'dal')
             filepath = '../dal/' + name;
@@ -41,30 +41,68 @@ export let getRequire = function (name, option?) {
 }
 
 export let save: AutoBllFun = function (name, params, conn?) {
-    return getRequire(name).save(params, conn).then(function (t) {
-        return t[0][0].id;
+    let model = getRequire(name).default as Model<any, any>;
+    return common.promise(async () => {
+        let id = 0;
+        if (!params.id || params.id == 0) {
+            delete params.id;
+            let t = await model.create(params, { transaction: conn });
+            id = t.id;
+        } else {
+            let t = await model.update(params, { where: { id: params.id }, transaction: conn });
+            id = params.id;
+        }
+        return id;
     });
 };
 export let del: AutoBllFun = function (name, params, conn?) {
-    return getRequire(name).del(params, conn).then(t => {
-        return 'success';
+    return common.promise(() => {
+        let model = getRequire(name).default as Model<any, any>;
+        let options = {
+            where: { id: params.id },
+            transaction: conn
+        } as any;
+        return model.destroy(options);
     });
 };
 export let detailQuery: AutoBllFun = function (name, params, conn?) {
-    return getRequire(name).detailQuery(params, conn).then(function (t) {
-        return t[0][0];
+    return common.promise(() => {
+        let model = getRequire(name).default as Model<any, any>;
+        let options = {
+            where: { id: params.id },
+            transaction: conn
+        } as any;
+        return model.find(options).then(t => {
+            if (t != null)
+                return t.dataValues;
+        });
     });
 };
 export let query: AutoBllFun = function (name, params, conn?) {
-    return getRequire(name).query(params, conn).then(function (t) {
-        return {
-            list: t[0],
-            count: t[1][0].count,
-        };
+    return common.promise(() => {
+        let model = getRequire(name).default as Model<any, any>;
+        let options = {
+            transaction: conn
+        } as any;
+        if (params.pageSize && params.pageIndex) {
+            options.limit = params.pageSize;
+            options.offset = (params.pageIndex - 1) * params.pageSize;
+        }
+        delete params.pageSize;
+        delete params.pageIndex;
+        options.where = params;
+        return model.findAndCountAll(options).then(t => {
+            return {
+                list: t.rows.map(r => r.dataValues),
+                count: t.count
+            }
+        });
     });
 };
-export let tran = function (fn: (conn: PoolConnection) => any): Q.Promise<any> {
-    return db.tranConnect(fn);
+export let tran = function (fn: (conn: Transaction) => any): Q.Promise<any> {
+    return common.promise(() => {
+        return db.tranConnect(fn);
+    });
 };
 
 let moduleList = ['authority', 'log',

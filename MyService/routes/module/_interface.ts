@@ -53,7 +53,7 @@ function getBll(req: Request, res: Response, next) {
             return bll[method](args, exOpt);
         } else {
             let bll = autoBll.getRequire(moduleName, {notThrowError: true});
-            if (!bll || !bll[method]) {
+            if (!bll) {
                 toNext = true;
                 return;
             }
