@@ -29,15 +29,16 @@ gulp.task('make-template', function () {
 		.pipe(gulp.dest(dest));
 });
 
+let tsSrc = [
+    'app.ts',
+    'config.ts',
+    'routes/**'
+];
 gulp.task('ts', function () {
-	return gulp.src([
-		'app.ts',
-		'config.ts',
-		'routes/**'
-	], {
+	return gulp.src(tsSrc, {
 		base: './'
 	})
-		//.pipe(changed(destDir, {extension: '.js'}))
+		.pipe(changed(destDir, {extension: '.js'}))
 		.pipe(tsProject())
 		.pipe(gulp.dest(destDir));
 });
@@ -121,7 +122,7 @@ gulp.task('watch', function () {
 	gulp.watch(copySrc, ['copy']);
 	//gulp.watch(tsFrontSrc, ['ts-front']);
 	gulp.watch(templateSrc, ['make-template']);
-	//gulp.watch(["**/*.ts", "!**/node_modules/**"], ['ts']);
+	gulp.watch(tsSrc, ['ts']);
 });
 
 

@@ -309,9 +309,11 @@ export let init = function (opt) {
         if (/^(::ffff:)?(127\.0\.0\.1)$/.test(req.myData.ip))
             user.authority[auth.authConfig.local.code] = true;
 
-        if (common.isInArray(req._parsedUrl.pathname, ['/interface/log/save', '/log'])) {
-            req.myData.noLog = true;
+        if (req._parsedUrl.pathname == '/interface/log/save') {
             req.body.requestIp = req.myData.ip;
+        }
+        if (common.isInArray(req._parsedUrl.pathname, ['/interface/log/save', '/log', '/interface/captcha/get'])) {
+            req.myData.noLog = true;
         }
         if (config.env == 'dev')
             user.authority[auth.authConfig.dev.code] = true;
