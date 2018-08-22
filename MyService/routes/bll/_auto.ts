@@ -90,8 +90,12 @@ export let query: AutoBllFun = function (name, params, conn?) {
             options.limit = params.pageSize;
             options.offset = (params.pageIndex - 1) * params.pageSize;
         }
-        
-        options.where = model.build(params);
+        let attributes:string[] = model.build(params)._modelOptions.instanceMethods.attributes;
+        for(let key in params){
+            if(!attributes.includes(key))
+                delete params[key];
+        }
+        options.where = params;
         return model.findAndCountAll(options).then(t => {
             return {
                 list: t.rows.map(r => r.dataValues),

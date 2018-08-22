@@ -1,16 +1,16 @@
 /*
 Navicat MySQL Data Transfer
 
-Source Server         : localhost
-Source Server Version : 50722
+Source Server         : mysql
+Source Server Version : 50710
 Source Host           : localhost:3306
 Source Database       : myweb
 
 Target Server Type    : MYSQL
-Target Server Version : 50722
+Target Server Version : 50710
 File Encoding         : 65001
 
-Date: 2018-07-20 16:18:32
+Date: 2018-08-22 22:56:22
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -375,7 +375,7 @@ BEGIN
 
 
 	IF pr_user IS NOT NULL AND length(pr_user) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND (t1.`user_info` like ''%', replace_special_char_like(pr_user), 
+		SET @Sql = CONCAT(@Sql, ' AND (t1.`userInfo` like ''%', replace_special_char_like(pr_user), 
 				'%'' OR t1.`userInfoId` in ( SELECT id FROM t_user_info WHERE `account` like ''%', 
 				replace_special_char_like(pr_user), '%'' OR `nickname` like ''%',replace_special_char_like(pr_user), '%''))');
 	END IF;
