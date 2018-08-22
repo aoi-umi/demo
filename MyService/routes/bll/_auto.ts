@@ -6,6 +6,7 @@ import * as common from '../_system/common';
 import errorConfig from '../_system/errorConfig';
 import { Transaction, Model } from 'sequelize';
 
+
 type AutoBllFun = (name, params, conn?: Transaction) => Q.Promise<any>;
 type AutoBllModuleFun = (params, conn?: Transaction) => Q.Promise<any>;
 
@@ -81,6 +82,7 @@ export let detailQuery: AutoBllFun = function (name, params, conn?) {
 export let query: AutoBllFun = function (name, params, conn?) {
     return common.promise(() => {
         let model = getRequire(name).default as Model<any, any>;
+        
         let options = {
             transaction: conn
         } as any;
@@ -88,9 +90,8 @@ export let query: AutoBllFun = function (name, params, conn?) {
             options.limit = params.pageSize;
             options.offset = (params.pageIndex - 1) * params.pageSize;
         }
-        delete params.pageSize;
-        delete params.pageIndex;
-        options.where = params;
+        
+        options.where = model.build(params);
         return model.findAndCountAll(options).then(t => {
             return {
                 list: t.rows.map(r => r.dataValues),
