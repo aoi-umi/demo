@@ -4,13 +4,13 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/app",
-    "start-dev": "supervisor -n error -w ./bin/config.js,./bin/app.js,./bin/routes ./bin/app"
+    "start-dev": "supervisor -n error -w ./bin/config.js,./bin/app.js ./bin/app"
   },
   "dependencies": {
     "body-parser": "^1.18.3",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
-    "debug": "~0.7.4",
+    "debug": "^3.1.0",
     "echarts": "^4.1.0",
     "ejs": "^2.5.7",
     "express": "^4.16.3",

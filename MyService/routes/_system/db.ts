@@ -28,18 +28,30 @@ let sequelize = new Sequelize({
 });
 
 export let query = function (sql, params, conn?) {
-    return common.promise(() => {
+    return common.promise(async () => {
         sql = sql.replace(/\:(\w+)/g, function (txt, key) {
             if (!params || !params.hasOwnProperty(key) || params[key] === undefined)
-                return null;       
+                return null;
             return txt;
         });
-        return sequelize.query(sql, {
+        let result: any[] = await sequelize.query(sql, {
             replacements: params,
             transaction: conn,
-            type : sequelize.QueryTypes.SELECT,
+            type: sequelize.QueryTypes.SELECT,
             raw: true,
         });
+        result = result.map((v, i) => {
+            if (i < result.length - 1) {
+                let list = [];
+                for (let key in v) {
+                    list.push(v[key]);
+                }
+                return list;
+            }
+            return v;
+        });
+
+        return result;
     }).fail(e => {
         common.writeError(e);
         throw common.error(null, errorConfig.DB_ERROR);
