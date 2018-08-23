@@ -9,7 +9,7 @@ import { Transaction, Model } from 'sequelize';
 
 type AutoBllFun = (name, params, conn?: Transaction) => Q.Promise<any>;
 type AutoBllModuleFun = (params, conn?: Transaction) => Q.Promise<any>;
-
+let dalModelsPath = '../dal/models/_auto';
 export let getRequire = function (name, option?) {
     var filepath = '';
     let opt = {
@@ -19,17 +19,17 @@ export let getRequire = function (name, option?) {
     if (option)
         opt = common.extend(opt, option);
     if (!opt.type)
-        filepath = '../dal/models/_auto/_auto.' + name + '.model';
+        filepath = `${dalModelsPath}/_auto.${name}.model`;
     else {
         if (opt.type == 'dal')
-            filepath = '../dal/' + name;
+            filepath = `../dal/${name}`;
         else if (opt.type == 'bll')
-            filepath = './' + name;
+            filepath = `./${name}`;
     }
     if (!filepath)
         throw common.error('path is null', errorConfig.CODE_ERROR);
 
-    var resolvePath = path.resolve(__dirname + '/' + filepath + '.js');
+    var resolvePath = path.resolve(`${__dirname}/${filepath}.js`);
     var isExist = fs.existsSync(resolvePath);
     if (!isExist) {
         if (opt.notThrowError)
@@ -109,11 +109,6 @@ export let tran = function (fn: (conn: Transaction) => any): Q.Promise<any> {
         return db.tranConnect(fn);
     });
 };
-
-let moduleList = ['authority', 'log',
-    'mainContent', 'mainContentChild', 'mainContentLog', 'mainContentTag', 'mainContentWithType', 'mainContentType',
-    'role', 'roleWithAuthority', 'struct',
-    'userInfo', 'userInfoLog', 'userInfoWithAuthority', 'userInfoWithRole', 'userInfoWithStruct'];
 let methodList = ['save', 'query', 'detailQuery', 'del'];
 
 interface AutoBllModule {
@@ -143,7 +138,13 @@ interface AutoBllModules {
 }
 
 export let modules: AutoBllModules = {};
-moduleList.forEach(moduleName => {
+let files = fs.readdirSync(path.resolve(`${__dirname}/${dalModelsPath}`));
+
+files.forEach(filename => {
+    let match =  /_auto\.([\S]+)\.model/.exec(filename);
+    if(!match)
+        throw common.error(`error dal model: ${filename}`);
+    let moduleName = match[1];
     let autoModule = modules[moduleName] = {};
     methodList.forEach(method => {
         autoModule[method] = (...args) => {
