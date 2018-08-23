@@ -1,6 +1,5 @@
 import * as fs from 'fs';
 import {Request, Response} from 'express';
-//@ts-ignore
 import * as svgCaptcha from 'svg-captcha';
 
 import * as common from '../_system/common';
