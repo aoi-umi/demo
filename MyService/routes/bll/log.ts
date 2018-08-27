@@ -5,7 +5,7 @@ import { Op } from 'sequelize';
 import * as autoBll from './_auto';
 import * as customBll from './_custom';
 import * as common from '../_system/common';
-import { Log } from '../dal/models/log';
+import { Log } from '../dal/models/dbModel';
 import { replaceSpCharLike } from '../_system/db';
 
 export let query = function (opt) {

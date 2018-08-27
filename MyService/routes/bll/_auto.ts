@@ -5,10 +5,12 @@ import * as db from '../_system/db';
 import * as common from '../_system/common';
 import errorConfig from '../_system/errorConfig';
 import { Transaction, Model } from 'sequelize';
+import { FilteredModelAttributes } from 'sequelize-typescript/lib/models/Model';
+import * as dbModel from '../dal/models/dbModel';
 
 
 type AutoBllFun = (name, params, conn?: Transaction) => Q.Promise<any>;
-type AutoBllModuleFun = (params, conn?: Transaction) => Q.Promise<any>;
+type AutoBllModuleFun<T> = (params, conn?: Transaction) => Q.Promise<T>;
 let dalModelsPath = '../dal/models/_auto';
 export let getRequire = function (name, option?) {
     var filepath = '';
@@ -116,30 +118,30 @@ export let createQueryOption = function(model, params){
 
 let methodList = ['save', 'query', 'detailQuery', 'del'];
 
-interface AutoBllModule {
-    save?: AutoBllModuleFun;
-    query?: AutoBllModuleFun;
-    detailQuery?: AutoBllModuleFun;
-    del?: AutoBllModuleFun;
+interface AutoBllModule<T> {
+    save?: AutoBllModuleFun<string | number>;
+    query?: AutoBllModuleFun<{list: Array<T>, count: number}>;
+    detailQuery?: AutoBllModuleFun<T>;
+    del?: AutoBllModuleFun<number>;
 }
 
 interface AutoBllModules {
-    authority?: AutoBllModule;
-    log?: AutoBllModule;
-    mainContent?: AutoBllModule;
-    mainContentChild?: AutoBllModule;
-    mainContentLog?: AutoBllModule;
-    mainContentTag?: AutoBllModule;
-    mainContentWithType?: AutoBllModule;
-    mainContentType?: AutoBllModule;
-    role?: AutoBllModule;
-    roleWithAuthority?: AutoBllModule;
-    struct?: AutoBllModule;
-    userInfo?: AutoBllModule;
-    userInfoLog?: AutoBllModule;
-    userInfoWithAuthority?: AutoBllModule;
-    userInfoWithRole?: AutoBllModule;
-    userInfoWithStruct?: AutoBllModule;
+    authority?: AutoBllModule<FilteredModelAttributes<dbModel.Authority>>;
+    log?: AutoBllModule<FilteredModelAttributes<dbModel.Log>>;
+    mainContent?: AutoBllModule<FilteredModelAttributes<dbModel.MainContent>>;
+    mainContentChild?: AutoBllModule<FilteredModelAttributes<dbModel.MainContentChild>>;
+    mainContentLog?: AutoBllModule<FilteredModelAttributes<dbModel.MainContentLog>>;
+    mainContentTag?: AutoBllModule<FilteredModelAttributes<dbModel.MainContentTag>>;
+    mainContentWithType?: AutoBllModule<FilteredModelAttributes<dbModel.MainContentWithType>>;
+    mainContentType?: AutoBllModule<FilteredModelAttributes<dbModel.MainContentType>>;
+    role?: AutoBllModule<FilteredModelAttributes<dbModel.Role>>;
+    roleWithAuthority?: AutoBllModule<FilteredModelAttributes<dbModel.RoleWithAuthority>>;
+    struct?: AutoBllModule<FilteredModelAttributes<dbModel.Struct>>;
+    userInfo?: AutoBllModule<FilteredModelAttributes<dbModel.UserInfo>>;
+    userInfoLog?: AutoBllModule<FilteredModelAttributes<dbModel.UserInfoLog>>;
+    userInfoWithAuthority?: AutoBllModule<FilteredModelAttributes<dbModel.UserInfoWithAuthority>>;
+    userInfoWithRole?: AutoBllModule<FilteredModelAttributes<dbModel.UserInfoWithRole>>;
+    userInfoWithStruct?: AutoBllModule<FilteredModelAttributes<dbModel.UserInfoWithStruct>>;
 }
 
 export let modules: AutoBllModules = {};

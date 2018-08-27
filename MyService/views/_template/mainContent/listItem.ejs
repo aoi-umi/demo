@@ -8,12 +8,12 @@
             <p>
                 <span>创建:<%= userInfo %>/<%= createDate %></span>
                 <span>最后操作:<%= operator %>/<%= operateDate %></span>
-            </p>
-        </div>        
-        <p>
-            <% if(common.isInArray('del', operation)){ %>
-            <a href="javascript:;" class="itemDel statusUpdate" data-id="<%= id %>" data-operate="del">删除</a>
-            <% } %>
-        </p>
+            </p>       
+            <div>
+                <% if(common.isInArray('del', operation)){ %>
+                <a href="javascript:;" class="itemDel statusUpdate" data-id="<%= id %>" data-operate="del">删除</a>
+                <% } %>
+            </div>
+        </div> 
     </div>
 </div>
