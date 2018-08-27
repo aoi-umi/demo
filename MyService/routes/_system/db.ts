@@ -22,7 +22,7 @@ let sequelize = new Sequelize({
     username: config.datebase.user,
     password: config.datebase.password,
 
-    modelPaths: [path.resolve(__dirname + '/../dal/models/**')],
+    modelPaths: [path.resolve(__dirname + '/../dal/models/_auto')],
     operatorsAliases: false,
     logging: false,
 });
