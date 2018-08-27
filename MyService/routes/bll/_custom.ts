@@ -46,16 +46,6 @@ export class authority {
 }
 
 export class log {
-    static query(params, conn?) {
-        return common.promise(async () => {
-            let t = await logDal.query(params, conn);
-            return {
-                list: t[0],
-                count: t[1][0].count,
-            };
-        });
-    }
-
     static statistics(params, conn?) {
         return common.promise(async () => {
             let t = await logDal.statistics(params, conn);

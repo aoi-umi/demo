@@ -36,6 +36,7 @@ function getBll(req: Request, res: Response, next) {
     //不记录日志
     if (common.isInArray(moduleName, ['log'])) {
         req.myData.noLog = true;
+        args.noOperation = true;
     }
 
     let toNext = false;

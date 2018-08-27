@@ -174,3 +174,10 @@ function rollbackPromise(conn: mysql.PoolConnection) {
     console.log('rollback');
     return common.promise(conn.rollback, conn, true);
 }
+
+export let replaceSpCharLike = function(str){
+    str = str.replace(/\\/g, '\\\\');
+    str = str.replace(/_/g, '\\_');
+    str = str.replace(/%/g, '\\%');
+    return str;
+}
