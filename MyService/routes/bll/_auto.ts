@@ -81,21 +81,9 @@ export let detailQuery: AutoBllFun = function (name, params, conn?) {
 };
 export let query: AutoBllFun = function (name, params, conn?) {
     return common.promise(() => {
-        let model = getRequire(name).default as Model<any, any>;
-        
-        let options = {
-            transaction: conn
-        } as any;
-        if (params.pageSize && params.pageIndex) {
-            options.limit = params.pageSize;
-            options.offset = (params.pageIndex - 1) * params.pageSize;
-        }
-        let attributes:string[] = model.build(params)._modelOptions.instanceMethods.attributes;
-        for(let key in params){
-            if(!attributes.includes(key))
-                delete params[key];
-        }
-        options.where = params;
+        let model = getRequire(name).default as Model<any, any>;        
+        let options = createQueryOption(model, params);
+        options.transaction = conn;
         return model.findAndCountAll(options).then(t => {
             return {
                 list: t.rows.map(r => r.dataValues),
@@ -109,6 +97,23 @@ export let tran = function (fn: (conn: Transaction) => any): Q.Promise<any> {
         return db.tranConnect(fn);
     });
 };
+
+export let createQueryOption = function(model, params){
+    let options = {
+        where: {}
+    } as any;
+    if (params.pageSize && params.pageIndex) {
+        options.limit = params.pageSize;
+        options.offset = (params.pageIndex - 1) * params.pageSize;
+    }
+    let attributes:string[] = model.build(params)._modelOptions.instanceMethods.attributes;
+    for (let key in params) {
+        if (attributes.includes(key))
+            options.where[key] = params[key];
+    }
+    return options;
+}
+
 let methodList = ['save', 'query', 'detailQuery', 'del'];
 
 interface AutoBllModule {

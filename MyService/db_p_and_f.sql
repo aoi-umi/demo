@@ -1,16 +1,16 @@
 /*
 Navicat MySQL Data Transfer
 
-Source Server         : mysql
-Source Server Version : 50710
+Source Server         : localhost
+Source Server Version : 50722
 Source Host           : localhost:3306
 Source Database       : myweb
 
 Target Server Type    : MYSQL
-Target Server Version : 50710
+Target Server Version : 50722
 File Encoding         : 65001
 
-Date: 2018-08-22 22:56:22
+Date: 2018-08-27 11:20:42
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -79,142 +79,6 @@ BEGIN
 	IF pr_orderBy IS NOT NULL AND length(pr_orderBy) > 0 THEN
 		SET @Sql = CONCAT(@Sql, ' ORDER BY ', replace_special_char(pr_orderBy));
 	END IF;
-
-	IF pr_pageIndex IS NOT NULL AND pr_pageSize IS NOT NULL THEN
-		SET @Sql = CONCAT(@Sql, ' limit ', (pr_pageIndex - 1) * pr_pageSize, ',', pr_pageSize);
-	END IF;
-	SET @Sql = CONCAT(@Sql, ';');
-	-- SELECT @Sql;
-	PREPARE stmt1 FROM @Sql;
-	EXECUTE stmt1;
-	SELECT FOUND_ROWS() AS 'count';
-END
-;;
-DELIMITER ;
-
--- ----------------------------
--- Procedure structure for p_log_query
--- ----------------------------
-DROP PROCEDURE IF EXISTS `p_log_query`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `p_log_query`(pr_id int,
-	pr_url varchar(50),
-	pr_application varchar(50),
-	pr_method varchar(50),
-	pr_methodName varchar(50),
-	pr_result tinyint,
-	pr_code varchar(50),
-	pr_req text,
-	pr_res text,
-	pr_ip varchar(50),
-	pr_createDateStart datetime,
-	pr_createDateEnd datetime,
-	pr_remark text,
-	pr_guid varchar(50),
-	pr_requestIp varchar(50),
-	pr_nullList varchar(1000),
-	pr_pageIndex int,
-	pr_pageSize int)
-    SQL SECURITY INVOKER
-BEGIN  
-	IF pr_nullList IS NULL THEN
-		SET pr_nullList = '';
-	END IF;
-	SET pr_nullList = CONCAT(',', pr_nullList, ',');
-
-	SET @Sql ='SELECT SQL_CALC_FOUND_ROWS * FROM t_log WHERE 1 = 1 ';
-	IF pr_id IS NOT NULL AND length(pr_id) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `id` = ''',replace_special_char(pr_id), '''');
-	ELSEIF LOCATE(',id,', pr_nullList) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `id` IS NULL');
-	END IF;
-
-	IF pr_url IS NOT NULL AND length(pr_url) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `url` like ''%',replace_special_char_like(pr_url), '%''');
-	ELSEIF LOCATE(',url,', pr_nullList) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `url` IS NULL');
-	END IF;
-
-	IF pr_application IS NOT NULL AND length(pr_application) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `application` like ''%',replace_special_char_like(pr_application), '%''');
-	ELSEIF LOCATE(',application,', pr_nullList) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `application` IS NULL');
-	END IF;
-
-	IF pr_method IS NOT NULL AND length(pr_method) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `method` like ''%',replace_special_char_like(pr_method), '%''');
-	ELSEIF LOCATE(',method,', pr_nullList) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `method` IS NULL');
-	END IF;
-
-	IF pr_methodName IS NOT NULL AND length(pr_methodName) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `methodName` like ''%',replace_special_char_like(pr_methodName), '%''');
-	ELSEIF LOCATE(',methodName,', pr_nullList) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `methodName` IS NULL');
-	END IF;
-
-	IF pr_result IS NOT NULL AND length(pr_result) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `result` = ''',replace_special_char(pr_result), '''');
-	ELSEIF LOCATE(',result,', pr_nullList) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `result` IS NULL');
-	END IF;
-
-	IF pr_code IS NOT NULL AND length(pr_code) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `code` = ''',replace_special_char(pr_code), '''');
-	ELSEIF LOCATE(',code,', pr_nullList) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `code` IS NULL');
-	END IF;
-
-	IF pr_req IS NOT NULL AND length(pr_req) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `req` like ''%',replace_special_char_like(pr_req), '%''');
-	ELSEIF LOCATE(',req,', pr_nullList) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `req` IS NULL');
-	END IF;
-
-	IF pr_res IS NOT NULL AND length(pr_res) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `res` like ''%',replace_special_char_like(pr_res), '%''');
-	ELSEIF LOCATE(',res,', pr_nullList) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `res` IS NULL');
-	END IF;
-
-	IF pr_ip IS NOT NULL AND length(pr_ip) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `ip` like ''%',replace_special_char_like(pr_ip), '%''');
-	ELSEIF LOCATE(',ip,', pr_nullList) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `ip` IS NULL');
-	END IF;
-
-	IF pr_createDateStart IS NOT NULL AND length(pr_createDateStart) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `createDate` >= ''',replace_special_char(pr_createDateStart), '''');
-	ELSEIF LOCATE(',createDate,', pr_nullList) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `createDate` IS NULL');
-	END IF;
-
-	IF pr_createDateEnd IS NOT NULL AND length(pr_createDateEnd) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `createDate` <= ''',replace_special_char(pr_createDateEnd), '''');
-	ELSEIF LOCATE(',createDate,', pr_nullList) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `createDate` IS NULL');
-	END IF;
-
-	IF pr_remark IS NOT NULL AND length(pr_remark) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `remark` like ''%',replace_special_char_like(pr_remark), '%''');
-	ELSEIF LOCATE(',remark,', pr_nullList) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `remark` IS NULL');
-	END IF;
-
-	IF pr_guid IS NOT NULL AND length(pr_guid) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `guid` = ''',replace_special_char(pr_guid), '''');
-	ELSEIF LOCATE(',guid,', pr_nullList) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `guid` IS NULL');
-	END IF;
-
-
-	IF pr_requestIp IS NOT NULL AND length(pr_requestIp) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `requestIp` like ''%',replace_special_char_like(pr_requestIp), '%''');
-	ELSEIF LOCATE(',requestIp,', pr_nullList) > 0 THEN
-		SET @Sql = CONCAT(@Sql, ' AND `requestIp` IS NULL');
-	END IF;
-
-	SET @Sql = CONCAT(@Sql, ' ORDER BY id desc ');
 
 	IF pr_pageIndex IS NOT NULL AND pr_pageSize IS NOT NULL THEN
 		SET @Sql = CONCAT(@Sql, ' limit ', (pr_pageIndex - 1) * pr_pageSize, ',', pr_pageSize);
