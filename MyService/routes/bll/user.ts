@@ -25,7 +25,7 @@ export let signUp = function (opt, exOpt) {
                 password: opt.password,
                 nickname: opt.nickname,
                 createDate: new Date()
-            }, conn);
+            }, conn) as number;
 
             //默认角色
             await autoBll.modules.userInfoWithRole.save({
