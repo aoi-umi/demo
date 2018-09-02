@@ -1,6 +1,7 @@
 .idea
 node_modules
 bower_components
+dest
 npm-debug.log
 package-lock.json
 yarn.lock
