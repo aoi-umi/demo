@@ -1,6 +1,6 @@
 import * as mongoose from 'mongoose';
-import { Types, SchemaTypes } from 'mongoose';
-import { Typegoose, GetModelForClassOptions, InstanceType, prop, staticMethod, instanceMethod } from 'typegoose';
+import { Types, Mongoose, ConnectionOptions } from 'mongoose';
+import { Typegoose, GetModelForClassOptions, InstanceType } from 'typegoose';
 import * as  data_1 from 'typegoose/lib/data';
 import { Omit, RecursivePartial } from 'sequelize-typescript/lib/utils/types';
 Typegoose.prototype['setModelForClass'] = function (t, { existingMongoose, schemaOptions, existingConnection } = {}) {
@@ -65,25 +65,37 @@ Typegoose.prototype['setModelForClass'] = function (t, { existingMongoose, schem
 }
 
 type DefaultInstance = mongoose.Document & Typegoose;
-export declare type ModelType<T, TT> = mongoose.Model<InstanceType<T>> & TT;
+export declare type ModelType<T, typeofT> = mongoose.Model<InstanceType<T>> & typeofT;
 
 export type FilteredModelAttributes<T extends DefaultInstance> =
     RecursivePartial<Omit<T, keyof DefaultInstance>> & {
         _id: Types.ObjectId;
-        createdAt?: Date;
-        updatedAt?: Date;
     };
 
 declare module "mongoose" {
     interface Document {
         _doc: FilteredModelAttributes<this & Typegoose>;
+
+        save(options?: SaveOptions & { session: any }, fn?: (err: any, product: this) => void): Promise<this>;
     }
 }
-
 export class Model<T> extends Typegoose {
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
-export function getModelForClass<T extends Typegoose, TT>(t: { new(): T }, getModelForClassOptions?: GetModelForClassOptions) {
-    const model = new t().getModelForClass(t, getModelForClassOptions) as any as Typegoose & mongoose.Model<InstanceType<T>> & TT;
+export function getModelForClass<T extends Typegoose, typeofT>(t: { new(): T }, getModelForClassOptions?: GetModelForClassOptions) {
+    const model = new t().getModelForClass(t, getModelForClassOptions) as any as Typegoose & mongoose.Model<InstanceType<T>> & typeofT;
     return model;
+}
+
+/**
+ * 
+ * @param uris 'mongodb://localhost:27017/test'
+ */
+export function connect(uris: string, { existingMongoose, mongooseOption }: {
+    existingMongoose?: Mongoose,
+    mongooseOption?: ConnectionOptions
+} = {}) {
+    return (existingMongoose || mongoose).connect(uris, { useNewUrlParser: true, ...mongooseOption });
 }
