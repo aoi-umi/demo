@@ -6,9 +6,8 @@ import * as common from '../_system/common';
 import errorConfig from '../_system/errorConfig';
 import * as cache from '../_system/cache';
 import * as autoBll from './_auto';
-import * as customBll from './_custom';
 import * as main from '../_main';
-import * as userInfoWithStructBll from './userInfoWithStruct';
+import { UserInfo, UserInfoWithStruct } from '../dal/models/dbModel';
 
 export let isAccountExist = function (account) {
     return common.promise(async function () {
@@ -74,8 +73,8 @@ export let save = function (opt, exOpt) {
     });
 };
 
-export let detailQuery = function (opt) {
-    return customBll.userInfo.detailQuery({ id: opt.id, noLog: opt.noLog }).then(function (t) {
+export let detailQuery = function (opt) {    
+    return UserInfo.customDetailQuery({ id: opt.id, noLog: opt.noLog }).then(function (t) {
         var detail = {
             ...t,
             auth: {}
@@ -92,7 +91,7 @@ export let detailQuery = function (opt) {
 };
 
 export let query = function (opt) {
-    return customBll.userInfo.query(opt).then(function (t) {
+    return UserInfo.customQuery(opt).then(function (t) {
         var data = {
             list: t.list,
             count: t.count
@@ -182,7 +181,7 @@ export let adminSave = function (opt, exOpt) {
             }) < 0;
         });
 
-        return userInfoWithStructBll.query({ userInfoId: id });
+        return UserInfoWithStruct.customQuery({ userInfoId: id });
     }).then(function (t) {
         let structList = [];
         let structTypeList = ['company', 'department', 'group'];

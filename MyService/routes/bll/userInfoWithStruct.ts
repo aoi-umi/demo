@@ -1,6 +1,7 @@
-﻿import * as customBll from './_custom';
+﻿import { UserInfoWithStruct } from "../dal/models/dbModel";
+
 
 export let query = function (opt) {
-    return customBll.userInfoWithStruct.query(opt);
+    return UserInfoWithStruct.customQuery(opt);
 };
 

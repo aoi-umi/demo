@@ -1,7 +1,7 @@
 ﻿import * as autoBll from './_auto';
-import * as customBll from './_custom';
 import * as common from '../_system/common';
 import errorConfig from '../_system/errorConfig';
+import { Authority } from '../dal/models/dbModel/Authority';
 
 export let save = function (opt) {
     return common.promise(async function () {
@@ -47,7 +47,7 @@ export let query = function (opt) {
             }
         }
         opt.orderBy = 'code';
-        return customBll.authority.query(opt);
+        return Authority.customQuery(opt);
     });
 };
 
