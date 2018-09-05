@@ -2,7 +2,7 @@
  * Created by bang on 2017-8-1.
  */
 import * as path from 'path';
-import { Sequelize } from 'sequelize-typescript';
+import { Sequelize, Model, IFindOptions } from 'sequelize-typescript';
 import * as common from './common';
 import errorConfig from './errorConfig';
 import config from '../../config';
@@ -57,9 +57,27 @@ export let tranConnect = function (queryFunction) {
     });
 }
 
-export let replaceSpCharLike = function(str){
+export let replaceSpCharLike = function (str) {
     str = str.replace(/\\/g, '\\\\');
     str = str.replace(/_/g, '\\_');
     str = str.replace(/%/g, '\\%');
     return str;
+}
+
+export class QueryGenerator {
+    static selectQuery<T>(t: typeof Model, option?: IFindOptions<T>) {
+        let attributes = [];
+        for (let key in t.attributes) {
+            let attribute = t.attributes[key];
+            if (!attribute.field || attribute.field == key)
+                attributes.push(key);
+            else
+                attributes.push([attribute.field, key]);
+        }
+        let sql = sequelize.getQueryInterface().QueryGenerator.selectQuery(t.getTableName(), {
+            attributes: attributes,
+            ...option
+        }, t);
+        return sql;
+    }
 }
