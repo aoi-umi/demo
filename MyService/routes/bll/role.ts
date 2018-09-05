@@ -3,8 +3,8 @@
  */
 import * as q from 'q';
 import * as autoBll from './_auto';
-import * as customBll from './_custom';
 import * as common from '../_system/common';
+import { Role } from '../dal/models/dbModel';
 
 export let save = function (opt) {
     var id;
@@ -58,8 +58,8 @@ export let save = function (opt) {
     });
 };
 
-export let detailQuery = function (opt) {
-    return customBll.role.detailQuery(opt);
+export let detailQuery = function (opt) {    
+    return Role.customDetailQuery(opt);
 };
 
 export let query = function (opt) {
@@ -72,7 +72,7 @@ export let query = function (opt) {
     }
     opt.orderBy = 'code';
 
-    return customBll.role.query(opt).then(function (t) {
+    return Role.customQuery(opt).then(function (t) {
         var data: any = {
             list: t.list,
             count: t.count,

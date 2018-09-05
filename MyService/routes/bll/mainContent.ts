@@ -3,16 +3,16 @@
  */
 import * as q from 'q';
 import * as autoBll from './_auto';
-import * as customBll from './_custom';
 import * as common from '../_system/common';
 import errorConfig from '../_system/errorConfig';
 import * as myEnum from '../_system/enum';
 import * as auth from '../_system/auth';
+import { MainContent } from '../dal/models/dbModel';
 
 export let query = function (opt, exOpt) {
     var user = exOpt.user;
-    return common.promise(async function () {
-        return customBll.mainContent.query(opt);
+    return common.promise(async function () {        
+        return MainContent.customQuery(opt);
     }).then(function (t) {
         if (t.list && t.list.length) {
             t.list.forEach(function (item) {
@@ -40,7 +40,7 @@ export let detailQuery = function (opt, exOpt) {
         } else if (!opt.id) {
             throw common.error('', errorConfig.ARGS_ERROR);
         } else {
-            let t = await customBll.mainContent.detailQuery(opt);
+            let t = await MainContent.customDetailQuery(opt);
             detail = {
                 ...detail, ...t
             };

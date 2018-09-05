@@ -38,7 +38,7 @@ gulp.task('ts', function () {
 	return gulp.src(tsSrc, {
 		base: './'
 	})
-		.pipe(changed(destDir, {extension: '.js'}))
+		//.pipe(changed(destDir, {extension: '.js'}))
 		.pipe(tsProject())
 		.pipe(gulp.dest(destDir));
 });
