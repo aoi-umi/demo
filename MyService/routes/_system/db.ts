@@ -3,6 +3,7 @@
  */
 import * as path from 'path';
 import { Sequelize, Model, IFindOptions } from 'sequelize-typescript';
+import { Utils } from 'sequelize';
 import * as common from './common';
 import errorConfig from './errorConfig';
 import config from '../../config';
@@ -65,19 +66,9 @@ export let replaceSpCharLike = function (str) {
 }
 
 export class QueryGenerator {
-    static selectQuery<T>(t: typeof Model, option?: IFindOptions<T>) {
-        let attributes = [];
-        for (let key in t.attributes) {
-            let attribute = t.attributes[key];
-            if (!attribute.field || attribute.field == key)
-                attributes.push(key);
-            else
-                attributes.push([attribute.field, key]);
-        }
-        let sql = sequelize.getQueryInterface().QueryGenerator.selectQuery(t.getTableName(), {
-            attributes: attributes,
-            ...option
-        }, t);
+    static selectQuery<T>(t: typeof Model, option: IFindOptions<T> = {}) {
+        option = Utils.mapOptionFieldNames(option, t as any);       
+        let sql = sequelize.getQueryInterface().QueryGenerator.selectQuery(t.getTableName(), option, t);
         return sql;
     }
 }
