@@ -167,10 +167,12 @@ export let signUp = function () {
     }).then(function (t) {
         common.msgNotice({
             type: 1, msg: 'success', btnOptList: [{
-                cb: function () {
-                    location.href = '/';
-                }
+                returnValue: 'accept'                
             }]
+        }).waitClose().then(val => {
+            if(val == 'accept') {
+                location.href = '/';
+            }
         });
     }).fail(function (e: any) {
         if (e)

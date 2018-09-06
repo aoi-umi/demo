@@ -453,14 +453,14 @@ export class MyModule extends ModuleBase {
                 type: 1, msg: '是否删除?',
                 btnOptList: [{
                     content: '确认',
-                    cb: function () {
-                        defer.resolve();
-                    }
+                    returnValue: 'accept'                    
                 }, {
                     content: '取消',
-                    cb: function () {
-                    }
                 }]
+            }).waitClose().then(val => {
+                if(val == 'accept') {
+                    defer.resolve();
+                }
             });
             return defer.promise;
         }).then(function () {

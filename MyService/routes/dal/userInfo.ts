@@ -1,9 +1,19 @@
 ﻿import * as db from '../_system/db';
+import * as UserInfoModel from './models/dbModel/UserInfo';
+
+export type DetailType = {
+    userInfo?: any;
+    userInfoLog?: any;
+    authorityList: any[];
+    roleList: any[];
+    roleAuthorityList: any[];
+    structList?: any[];
+}
 
 export let detailQuery = async function (params, conn?) {
     var sql = 'call p_user_info_detail_query(:id, :noLog)';
     let t = await db.query(sql, params, conn);
-    let data = {
+    let data: DetailType = {
         userInfo: t[0][0],
         userInfoLog: t[1],
         authorityList: t[2],
@@ -21,13 +31,13 @@ export let query = async function (params, conn?) {
     var sql = 'call p_user_info_query(:id, :account, :password, :nickname, :role, :authority, :editDateStart, :editDateEnd, :createDateStart, :createDateEnd, :remark, :nullList, :pageIndex, :pageSize)';
     let t = await db.query(sql, params, conn);
     let data = {
-        list: t[0],
-        count: t[1][0].count,
-        userInfoWithAuthorityList: t[2],
-        authorityList: t[3],
-        userInfoWithRoleList: t[4],
-        roleList: t[5],
-        roleAuthorityList: t[6],
+        list: t[0] as UserInfoModel.DataType[],
+        count: t[1][0].count as number,
+        userInfoWithAuthorityList: t[2] as any[],
+        authorityList: t[3] as any[],
+        userInfoWithRoleList: t[4] as any[],
+        roleList: t[5] as any[],
+        roleAuthorityList: t[6] as any[],
     };
     return {
         rawData: t,
