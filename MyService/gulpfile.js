@@ -48,7 +48,7 @@ let tsFrontSrc = ['public/ts/**/*.ts'];
 gulp.task('ts-front', function () {
 	let dest = destDir + '/public/js';
     return gulp.src(tsFrontSrc)
-		.pipe(changed(dest, {extension: '.js'}))
+		//.pipe(changed(dest, {extension: '.js'}))
 	    //.pipe(sourcemaps.init())
         .pipe(tsFrontProject())        
         //.pipe(sourcemaps.write('.'))
