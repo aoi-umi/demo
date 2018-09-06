@@ -1,7 +1,8 @@
 
 import * as userInfoDal from '../../userInfo';
-import _AutoUserInfo from "../_auto/_auto.userInfo.model";
+import _AutoUserInfo, { _AutoUserInfoDataType } from "../_auto/_auto.userInfo.model";
 export type CustomDetailType = userInfoDal.DetailType;
+export type UserInfoDataType = _AutoUserInfoDataType;
 
 export class UserInfo extends _AutoUserInfo {
     static async customQuery(params, conn?) {
@@ -13,5 +14,3 @@ export class UserInfo extends _AutoUserInfo {
         return t.data;
     }
 };
-let dataValues = new UserInfo().dataValues;
-export type DataType = typeof dataValues;

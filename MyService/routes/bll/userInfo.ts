@@ -7,8 +7,7 @@ import errorConfig from '../_system/errorConfig';
 import * as cache from '../_system/cache';
 import * as autoBll from './_auto';
 import * as main from '../_main';
-import { UserInfo, UserInfoWithStruct } from '../dal/models/dbModel';
-import * as UserInfoModel from '../dal/models/dbModel/UserInfo';
+import { UserInfoModel, UserInfoWithStructModel } from '../dal/models/dbModel';
 
 export let isAccountExist = function (account) {
     return common.promise(async function () {
@@ -75,7 +74,7 @@ export let save = function (opt, exOpt) {
 };
 
 export let detailQuery = function (opt) {    
-    return UserInfo.customDetailQuery({ id: opt.id, noLog: opt.noLog }).then(function (t) {
+    return UserInfoModel.UserInfo.customDetailQuery({ id: opt.id, noLog: opt.noLog }).then(function (t) {
         var detail = {
             ...t,
             auth: {}
@@ -92,9 +91,10 @@ export let detailQuery = function (opt) {
 };
 
 export let query = function (opt) {
-    return UserInfo.customQuery(opt).then(function (t) {
+    return UserInfoModel.UserInfo.customQuery(opt).then(function (t) {
+        type returnType = UserInfoModel.UserInfoDataType & {roleList?: any[], authorityList?: any, auth?: {}};
         var data = {
-            list: t.list,
+            list: t.list as returnType[],
             count: t.count
         };
         let {
@@ -102,7 +102,7 @@ export let query = function (opt) {
             roleList, roleAuthorityList
         } = t;
 
-        data.list.forEach(function (item: UserInfoModel.DataType & {roleList?: any[], authorityList?: any, auth?: {}}) {
+        data.list.forEach(function (item) {
             var detail = {
                 auth: {},
                 roleList: [],
@@ -182,7 +182,7 @@ export let adminSave = function (opt, exOpt) {
             }) < 0;
         });
 
-        return UserInfoWithStruct.customQuery({ userInfoId: id });
+        return UserInfoWithStructModel.UserInfoWithStruct.customQuery({ userInfoId: id });
     }).then(function (t) {
         let structList = [];
         let structTypeList = ['company', 'department', 'group'];

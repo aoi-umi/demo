@@ -7,12 +7,12 @@ import * as common from '../_system/common';
 import errorConfig from '../_system/errorConfig';
 import * as myEnum from '../_system/enum';
 import * as auth from '../_system/auth';
-import { MainContent } from '../dal/models/dbModel';
+import { MainContentModel } from '../dal/models/dbModel';
 
 export let query = function (opt, exOpt) {
     var user = exOpt.user;
     return common.promise(async function () {        
-        let t = await MainContent.customQuery(opt);
+        let t = await MainContentModel.MainContent.customQuery(opt);
         if (t.list && t.list.length) {
             t.list.forEach(function (item) {
                 item.operation = ['detailQuery'];
@@ -39,7 +39,7 @@ export let detailQuery = function (opt, exOpt) {
         } else if (!opt.id) {
             throw common.error('', errorConfig.ARGS_ERROR);
         } else {
-            let t = await MainContent.customDetailQuery(opt);
+            let t = await MainContentModel.MainContent.customDetailQuery(opt);
             detail = {
                 ...detail, ...t
             };
