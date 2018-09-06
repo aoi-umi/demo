@@ -12,8 +12,7 @@ import { MainContent } from '../dal/models/dbModel';
 export let query = function (opt, exOpt) {
     var user = exOpt.user;
     return common.promise(async function () {        
-        return MainContent.customQuery(opt);
-    }).then(function (t) {
+        let t = await MainContent.customQuery(opt);
         if (t.list && t.list.length) {
             t.list.forEach(function (item) {
                 item.operation = ['detailQuery'];

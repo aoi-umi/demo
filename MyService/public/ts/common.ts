@@ -14,9 +14,9 @@ window['common'] = exports;
  * @param nodeCallback false通过defer控制,true cb参数控制
  * @param args
  */
-export let promise = function (fn: Function, caller?: any, nodeCallback?: boolean, args?: any[]): Q.Promise<any> {
-    var defer = Q.defer();
-    try {
+export function promise<T>(fn: (...args) => Q.IWhenable<T>, caller?: any, nodeCallback?: boolean, args?: any[]): Q.Promise<T> {
+    return Q.fcall((): any => {
+        var defer = Q.defer();        
         if (!fn) {
             throw error('fn can not be null');
         }
@@ -30,10 +30,8 @@ export let promise = function (fn: Function, caller?: any, nodeCallback?: boolea
             args.push(defer.makeNodeResolver());
             fn.apply(caller, args);
         }
-    } catch (e) {
-        defer.reject(e);
-    }
-    return defer.promise;
+        return defer.promise;
+    });
 };
 
 //示例
@@ -226,7 +224,7 @@ export let md5File = function (file) {
 
         fileReader.onload = function (e) {
             //console.log('read chunk nr', currentChunk + 1, 'of', chunks);
-            spark.append(e.target.result);                   // Append array buffer
+            spark.append(e.target['result']);                   // Append array buffer
             currentChunk++;
 
             if (currentChunk < chunks) {
