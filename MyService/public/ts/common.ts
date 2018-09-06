@@ -473,8 +473,7 @@ interface msgNoticeOption {
 interface msgNoticeBtnOption {
     class?: string;
     content?: any;
-    cbOpt?: any;
-    cb?: Function;
+    returnValue?: any;
 }
 
 export let msgNotice = function (option: msgNoticeOption) {
@@ -502,138 +501,146 @@ export let msgNotice = function (option: msgNoticeOption) {
 
     //type 1
     //弹出提示
-    var dom: JQuery<HTMLElement> & {close?: Function} = null;
+    var dom: JQuery<HTMLElement> & {close?: Function, waitClose?: () => Q.Promise<any>} = null;
     opt = $.extend(opt, option);
-    switch (opt.type) {
-        case 0:
-            if (!opt.target && opt.dom)
-                opt.target = opt.dom['selector'];
-            if (!opt.target)
-                throw new Error('target can not be null');
-            if (!opt.msg)
-                throw new Error('msg can not be null');
-            if (!opt.template) {
-                opt.template = '<div class="popover right" role="tooltip"><div class="arrow"></div><div class="popover-content"></div></div>';
-            }
-            dom = $('[data-target="' + opt.target + '"]');
-            if (!dom.length) {
-                dom = $(opt.template);
-                $('body').append(dom);
-            }
-            dom.attr('data-target', opt.target).find('.popover-content').html(opt.msg);
-            dom.removeClass('top bottom left right').addClass(opt.position);
-            var x = 0, y = 0;
-            var targetDom = opt.dom || $(opt.target);
-            switch (opt.position) {
-                case 'top':
-                    x = targetDom.offset().left;
-                    y = targetDom.offset().top - dom.outerHeight() - 3;
-                    break;
-                case 'bottom':
-                    x = targetDom.offset().left;
-                    y = targetDom.offset().top + targetDom.outerHeight() + 3;
-                    break;
-                case 'left':
-                    x = targetDom.offset().left - dom.outerWidth() - 3;
-                    y = targetDom.offset().top + (targetDom.outerHeight() - dom.outerHeight()) / 2;
-                    break;
-                default:
-                case 'right':
-                    opt.position = 'right';
-                    x = targetDom.offset().left + targetDom.outerWidth() + 3;
-                    y = targetDom.offset().top + (targetDom.outerHeight() - dom.outerHeight()) / 2;
-                    break;
-            }
-            dom.css({'left': x, 'top': y}).show();
+    if(opt.type == 0){
+        if (!opt.target && opt.dom)
+            opt.target = opt.dom['selector'];
+        if (!opt.target)
+            throw new Error('target can not be null');
+        if (!opt.msg)
+            throw new Error('msg can not be null');
+        if (!opt.template) {
+            opt.template = '<div class="popover right" role="tooltip"><div class="arrow"></div><div class="popover-content"></div></div>';
+        }
+        dom = $('[data-target="' + opt.target + '"]');
+        if (!dom.length) {
+            dom = $(opt.template);
+            $('body').append(dom);
             dom.close = function () {
                 dom.remove();
             };
-            if (opt.focus)
-                targetDom.focus();
-            if (opt.autoHide) {
-                targetDom.on('blur', function () {
-                    dom.remove();
-                });
-            }
-            break;
-        case 1:
-            if (!opt.template) {
-                opt.template = `<div data-backdrop="false" role="dialog" tabindex="-1" class="modal fade msg-notice-1">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-body">
-                                        <button name="closeBtn" class="close" type="button">
-                                            ×
-                                        </button>
-                                        <h4 name="title" class="modal-title">
-                                            提示
-                                        </h4>
-                                    </div>
-                                    <div name="content" class="modal-body">
-                                    </div>
-                                    <div name="footer" class="modal-body">
+        }
+        dom.attr('data-target', opt.target).find('.popover-content').html(opt.msg);
+        dom.removeClass('top bottom left right').addClass(opt.position);
+        var x = 0, y = 0;
+        var targetDom = opt.dom || $(opt.target);
+        switch (opt.position) {
+            case 'top':
+                x = targetDom.offset().left;
+                y = targetDom.offset().top - dom.outerHeight() - 3;
+                break;
+            case 'bottom':
+                x = targetDom.offset().left;
+                y = targetDom.offset().top + targetDom.outerHeight() + 3;
+                break;
+            case 'left':
+                x = targetDom.offset().left - dom.outerWidth() - 3;
+                y = targetDom.offset().top + (targetDom.outerHeight() - dom.outerHeight()) / 2;
+                break;
+            default:
+            case 'right':
+                opt.position = 'right';
+                x = targetDom.offset().left + targetDom.outerWidth() + 3;
+                y = targetDom.offset().top + (targetDom.outerHeight() - dom.outerHeight()) / 2;
+                break;
+        }
+        dom.css({'left': x, 'top': y}).show();        
+        if (opt.focus)
+            targetDom.focus();
+        if (opt.autoHide) {
+            targetDom.on('blur', function () {
+                dom.close();
+            });
+        }
+        return dom;
+    } else if(opt.type == 1) {
+        if (!opt.template) {
+            opt.template = `<div data-backdrop="false" role="dialog" tabindex="-1" class="modal fade msg-notice-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-body">
+                                            <button name="closeBtn" class="close" type="button">
+                                                ×
+                                            </button>
+                                            <h4 name="title" class="modal-title">
+                                                提示
+                                            </h4>
+                                        </div>
+                                        <div name="content" class="modal-body">
+                                        </div>
+                                        <div name="footer" class="modal-body">
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>`;
-            }
-            dom = opt.dom;
-            if (!opt.createNew && !dom) {
-                dom = $('.msg-notice-1:eq(0)');
-            }
-            if (!dom || !dom.length) {
-                dom = $(opt.template).attr('id', 'msgNoticeBox_' + new Date().getTime());
-                dom.find('[name=closeBtn]').on('click', function () {
-                    dom.close();
+                            </div>`;
+        }
+        dom = opt.dom;
+        let defer: Q.Deferred<any>;
+        if (!opt.createNew && !dom) {
+            dom = $('.msg-notice-1:eq(0)');
+        }
+        if (!dom || !dom.length) {
+            dom = $(opt.template).attr('id', 'msgNoticeBox_' + new Date().getTime());
+            dom.find('[name=closeBtn]').on('click', function () {
+                dom.close();
+            });
+            dom.on('shown.bs.modal', function(e) {
+                dom.find('[name=footer] .btn:first').focus();
+            });
+        }
+        dom.waitClose = function() {
+            return promise((d: Q.Deferred<any>) => {
+                defer = d;
+                return d.promise;
+            });
+        }
+        dom.close = function (val) {
+            dom.modal('hide');
+            defer && defer.resolve(val);
+        }        
+        dom.on('hidden.bs.modal', function(e) {
+            defer && defer.resolve();
+        });
+
+        if (opt.noClose)
+            dom.find('[name=closeBtn]').addClass('hidden');
+        else
+            dom.find('[name=closeBtn]').removeClass('hidden');
+        dom.find('[name=content]').html(opt.msg);
+        dom.find('[name=footer]').empty();
+        if (!opt.btnOptList && !opt.noClose) {
+            opt.btnOptList = [{
+                content: '确认'
+            }];
+        }
+        if (opt.btnOptList) {
+            var btnList = [];
+            $(opt.btnOptList).each(function () {
+                var item = this as msgNoticeBtnOption;
+                var btn = $(opt.btnTemplate);
+                var btnClass = item.class || 'btn-default';
+                let content = item.content || '确认';
+                btn.addClass(btnClass);
+                if (btn.hasClass('btn-content'))
+                    btn.html(content);
+                else
+                    btn.find('.btn-content').html(content);
+                btn.on('click', function () {
+                    dom.close(item.returnValue);
                 });
-                dom.close = function () {
-                    dom.modal('hide');
-                }
-                dom.on('shown.bs.modal', function(e) {
-                    dom.find('[name=footer] .btn:first').focus();
-                });
+                btnList.push(btn);
+            });
+            dom.find('[name=footer]').append(btnList);
+        }
+        $('.popover').hide();
+        if (dom.is(':hidden')) {
+            var args = getArgsFromUrlParams();
+            if (args.iframeId && parent) {
+                parent.scrollTo(null, 0);
             }
-            if (opt.noClose)
-                dom.find('[name=closeBtn]').addClass('hidden');
-            else
-                dom.find('[name=closeBtn]').removeClass('hidden');
-            dom.find('[name=content]').html(opt.msg);
-            dom.find('[name=footer]').empty();
-            if (!opt.btnOptList && !opt.noClose) {
-                opt.btnOptList = [{
-                    content: '确认'
-                }];
-            }
-            if (opt.btnOptList) {
-                var btnList = [];
-                $(opt.btnOptList).each(function () {
-                    var item = this as msgNoticeBtnOption;
-                    var btn = $(opt.btnTemplate);
-                    var btnClass = item.class || 'btn-default';
-                    let content = item.content || '确认';
-                    btn.addClass(btnClass);
-                    if (btn.hasClass('btn-content'))
-                        btn.html(content);
-                    else
-                        btn.find('.btn-content').html(content);
-                    btn.on('click', function () {
-                        dom.close();
-                        if (item.cb)
-                            item.cb(item.cbOpt);
-                    });
-                    btnList.push(btn);
-                });
-                dom.find('[name=footer]').append(btnList);
-            }
-            $('.popover').hide();
-            if (dom.is(':hidden')) {
-                var args = getArgsFromUrlParams();
-                if (args.iframeId && parent) {
-                    parent.scrollTo(null, 0);
-                }
-                dom.modal('show');
-            }
-            break;
+            dom.modal('show');
+        }
     }
     return dom;
 };

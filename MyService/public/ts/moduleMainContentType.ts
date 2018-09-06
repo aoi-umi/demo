@@ -152,11 +152,14 @@ export class ModuleMainContentType extends MyModule {
                     btnOptList: [{
                         content: '继续'
                     }, {
-                        content: '关闭', cb: function () {
-                            self.detailDom.modal('hide');
-                            self.pager.refresh();
-                        }
+                        content: '关闭', 
+                        returnValue: 'close',                        
                     }]
+                }).waitClose().then(val => {
+                    if(val == 'close') {
+                        self.detailDom.modal('hide');
+                        self.pager.refresh();
+                    }
                 });
             },
             onDetailQuerySuccess: function (t, self: ModuleMainContentType) {

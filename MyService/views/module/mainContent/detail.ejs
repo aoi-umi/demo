@@ -228,7 +228,9 @@
             }
             operateList.forEach(function(item){ %>
             <button class="btn btn-default <%= item.className %>"
-                    data-operate="<%= item.operate %>" data-id="<%= mainContent.id %>">
+                    data-operate="<%= item.operate %>" 
+                    data-text="<%= item.text %>"
+                    data-id="<%= mainContent.id %>">
                 <%= item.text %>
             </button>
             <% }); %>

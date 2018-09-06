@@ -382,9 +382,11 @@ export class ModuleMainContent extends MyModule {
                 common.msgNotice({
                     type: 1, msg: '保存成功:' + t, btnOptList: {
                         content: '确认',
-                        cb: function () {
-                            location.reload(true);
-                        }
+                        returnValue: 'accept',
+                    }
+                }).waitClose().then(val => {
+                    if(val == 'accept') {
+                        location.reload(true);
                     }
                 });
             },
@@ -425,26 +427,39 @@ export class ModuleMainContent extends MyModule {
     statusUpdate(dom) {
         let self = this;
         var mainContent: any = {id: dom.data('id')};
-        return common.promise(function () {
+        return common.promise(async function () {
             var operate = dom.data('operate');
             mainContent.operate = operate;
             var operateList = ['audit', 'pass', 'notPass', 'del', 'recovery'];
             if (!common.isInArray(operate, operateList))
                 throw new Error(`错误的操作类型[${operate}]`);
+            let text = dom.data('text');
+            let closeValue = await common.msgNotice({
+                type: 1, msg: `确认[${text}]?`, btnOptList: [{
+                    content: '确认',
+                    returnValue: 'accept',
+                },{
+                    content: '取消',
+                }]
+            }).waitClose();
+            if(closeValue != 'accept')
+                return;
             var detail = {
                 mainContent: mainContent,
                 remark: $('#remark').val()
             };
             var notice = common.msgNotice({type: 1, msg: '处理中', noClose: true});
-            return myInterface.api.mainContentStatusUpdate(detail).then(function () {
-                common.msgNotice({
-                    type: 1, msg: '处理成功!', btnOptList: {
-                        content: '确认',
-                        cb: function () {
-                            self.onStatusUpdateSuccess();
-                        }
+            return myInterface.api.mainContentStatusUpdate(detail).then(async function () {
+                let val = await common.msgNotice({
+                        type: 1, msg: '处理成功!', btnOptList: {
+                        content: '确认',                        
+                        returnValue: 'accept',
                     }
-                });
+                }).waitClose();
+                
+                if(val == 'accept')
+                    self.onStatusUpdateSuccess();
+
             }).finally(function () {
                 notice.close();
             });
@@ -453,9 +468,7 @@ export class ModuleMainContent extends MyModule {
                 e = e.message;
             common.msgNotice({
                 type: 1, msg: '处理失败:' + e, btnOptList: {
-                    content: '确认',
-                    cb: function () {
-                    }
+                    content: '确认'
                 }
             });
             throw e;

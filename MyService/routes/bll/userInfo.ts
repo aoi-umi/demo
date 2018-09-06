@@ -8,6 +8,7 @@ import * as cache from '../_system/cache';
 import * as autoBll from './_auto';
 import * as main from '../_main';
 import { UserInfo, UserInfoWithStruct } from '../dal/models/dbModel';
+import * as UserInfoModel from '../dal/models/dbModel/UserInfo';
 
 export let isAccountExist = function (account) {
     return common.promise(async function () {
@@ -101,7 +102,7 @@ export let query = function (opt) {
             roleList, roleAuthorityList
         } = t;
 
-        data.list.forEach(function (item) {
+        data.list.forEach(function (item: UserInfoModel.DataType & {roleList?: any[], authorityList?: any, auth?: {}}) {
             var detail = {
                 auth: {},
                 roleList: [],
@@ -229,7 +230,7 @@ export let adminSave = function (opt, exOpt) {
             //保存权限
             if (addUserAuthList.length) {
                 addUserAuthList.forEach(function (item) {
-                    list.push(autoBll.modules.userInfoWithAuthority.save({ userInfoId: id, authorityCode: item }));
+                    list.push(autoBll.modules.userInfoWithAuthority.save({ userInfoId: id, authorityCode: item }, conn));
                 });
             }
 
@@ -242,14 +243,14 @@ export let adminSave = function (opt, exOpt) {
             //保存角色
             if (addUserRoleList.length) {
                 addUserRoleList.forEach(function (item) {
-                    list.push(autoBll.modules.userInfoWithRole.save({ userInfoId: id, roleCode: item }));
+                    list.push(autoBll.modules.userInfoWithRole.save({ userInfoId: id, roleCode: item }, conn));
                 });
             }
 
             //修改架构
             if (structList.length) {
                 structList.forEach(function (item) {
-                    list.push(autoBll.modules.userInfoWithStruct.save(item));
+                    list.push(autoBll.modules.userInfoWithStruct.save(item, conn));
                 });
             }
 
@@ -262,7 +263,7 @@ export let adminSave = function (opt, exOpt) {
     });
 };
 
-var updateUserInfo = function (detail) {
+var updateUserInfo = function (detail: UserInfoModel.CustomDetailType & {auth: any}) {
     var authorityList = [];
     var auth = {};
     detail.authorityList.forEach(function (t) {

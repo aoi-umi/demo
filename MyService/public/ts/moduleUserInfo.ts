@@ -214,10 +214,12 @@ export class ModuleUserInfo extends MyModule {
                 common.msgNotice({
                     type: 1, msg: '修改成功', btnOptList: [{
                         content: '确认',
-                        cb: function () {
-                            location.reload(true);
-                        }
+                        returnValue: 'accept',
                     }]
+                }).waitClose().then(val => {
+                    if(val == 'accept') {
+                        location.reload(true);
+                    }
                 });
             },
             beforeDetailQuery: function (item) {
@@ -313,11 +315,14 @@ export class ModuleUserInfo extends MyModule {
             common.msgNotice({
                 type: 1, msg: '保存成功:' + t,
                 btnOptList: [{
-                    content: '确定', cb: function () {
-                        self.detailDom.modal('hide');
-                        self.pager.refresh();
-                    }
+                    content: '确定',
+                    returnValue: 'accept',                        
                 }]
+            }).waitClose().then(val => {
+                if(val == 'accept') {
+                    self.detailDom.modal('hide');
+                    self.pager.refresh();
+                }
             });
         }).fail(function (e) {
             common.msgNotice({type: 1, msg: e.message});
