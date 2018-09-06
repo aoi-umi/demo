@@ -502,7 +502,7 @@ export let msgNotice = function (option: msgNoticeOption) {
 
     //type 1
     //弹出提示
-    var dom = null;
+    var dom: JQuery<HTMLElement> & {close?: Function} = null;
     opt = $.extend(opt, option);
     switch (opt.type) {
         case 0:
@@ -589,6 +589,9 @@ export let msgNotice = function (option: msgNoticeOption) {
                 dom.close = function () {
                     dom.modal('hide');
                 }
+                dom.on('shown.bs.modal', function(e) {
+                    dom.find('[name=footer] .btn:first').focus();
+                });
             }
             if (opt.noClose)
                 dom.find('[name=closeBtn]').addClass('hidden');
@@ -624,11 +627,11 @@ export let msgNotice = function (option: msgNoticeOption) {
             }
             $('.popover').hide();
             if (dom.is(':hidden')) {
-                dom.modal('show');
                 var args = getArgsFromUrlParams();
                 if (args.iframeId && parent) {
                     parent.scrollTo(null, 0);
                 }
+                dom.modal('show');
             }
             break;
     }

@@ -11,9 +11,9 @@ var gulp = require('gulp'),
 var tsProject = ts.createProject('tsconfig.json', {target: 'es2017', module: 'commonjs'});
 var tsFrontProject = ts.createProject('tsconfig.json', {target: 'es5', module: 'umd'});
 
-let destDir = './bin';
+let destDir = './dest';
 
-gulp.task('clearBin', function () {
+gulp.task('clearDest', function () {
 	return del([
 		destDir
 	]);
@@ -130,7 +130,7 @@ gulp.task('front', gulpSequence('ts-front', 'copy'));
 
 gulp.task('make', ['make-template']);
 
-gulp.task('clear', ['clearBin']);
+gulp.task('clear', ['clearDest']);
 
 gulp.task('dev', gulpSequence(['make', 'copyDep'], ['front', 'ts']));
 
