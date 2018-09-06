@@ -4,7 +4,7 @@
 import * as q from 'q';
 import * as autoBll from './_auto';
 import * as common from '../_system/common';
-import { Role } from '../dal/models/dbModel';
+import { RoleModel } from '../dal/models/dbModel';
 
 export let save = function (opt) {
     var id;
@@ -59,7 +59,7 @@ export let save = function (opt) {
 };
 
 export let detailQuery = function (opt) {    
-    return Role.customDetailQuery(opt);
+    return RoleModel.Role.customDetailQuery(opt);
 };
 
 export let query = function (opt) {
@@ -72,7 +72,7 @@ export let query = function (opt) {
     }
     opt.orderBy = 'code';
 
-    return Role.customQuery(opt).then(function (t) {
+    return RoleModel.Role.customQuery(opt).then(function (t) {
         var data: any = {
             list: t.list,
             count: t.count,

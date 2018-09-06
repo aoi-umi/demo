@@ -1,6 +1,7 @@
 
 import * as RoleDal from '../../role';
-import _AutoRole from "../_auto/_auto.role.model";
+import _AutoRole, { _AutoRoleDataType } from "../_auto/_auto.role.model";
+export type RoleDataType = _AutoRoleDataType;
 export class Role extends _AutoRole {
     static async customQuery(params, conn?) {
         let t = await RoleDal.query(params, conn);

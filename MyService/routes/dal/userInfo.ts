@@ -31,7 +31,7 @@ export let query = async function (params, conn?) {
     var sql = 'call p_user_info_query(:id, :account, :password, :nickname, :role, :authority, :editDateStart, :editDateEnd, :createDateStart, :createDateEnd, :remark, :nullList, :pageIndex, :pageSize)';
     let t = await db.query(sql, params, conn);
     let data = {
-        list: t[0] as UserInfoModel.DataType[],
+        list: t[0] as UserInfoModel.UserInfoDataType[],
         count: t[1][0].count as number,
         userInfoWithAuthorityList: t[2] as any[],
         authorityList: t[3] as any[],

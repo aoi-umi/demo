@@ -1007,25 +1007,39 @@ public static List<string> CreateSequelizeModel(DatabaseModel databaseModel)
     
     var level = 1;
     var tabStr = GetRepeatStr("  ", level);
-    var scriptStrList = new List<string>();    
+    var scriptStrList = new List<string>();
+    var dataTypeScriptStrList = new List<string>();    
     scriptStrList.Add("import { Table, Column, Model } from 'sequelize-typescript';");
     scriptStrList.Add("@Table({");
     scriptStrList.Add("    tableName: '" + databaseModel.TableName + "',");
     scriptStrList.Add("    timestamps: false,");
     scriptStrList.Add("})");
     scriptStrList.Add("export default class " + tableName + " extends Model<" + tableName + "> {");
+    dataTypeScriptStrList.Add("export type " + tableName + "DataType = {");
     level = 2;
     tabStr = GetRepeatStr("  ", level);
-    databaseModel.Cols.ForEach(col=>{      
+    databaseModel.Cols.ForEach(col => {      
         var ele = col.Name;
-        if("id" == col.Name)
-            return;
-        scriptStrList.Add(tabStr + "@Column");       
-        scriptStrList.Add(tabStr + ele + ": " + GetTypescriptTypeByDBColumn(col.column) +  ";\r\n");
+        var optionList = new List<string>();
+        if(col.column.IsPrimaryKeyMember)
+            optionList.Add("primaryKey: true");
+        var colDeco = "@Column";
+        if(optionList.Count > 0){       
+            colDeco += "({";
+            scriptStrList.Add(tabStr + colDeco);
+            scriptStrList.AddRange(optionList.Select(s => GetRepeatStr("  ", level + 1) + s + ","));
+            scriptStrList.Add(tabStr + "})");
+        }else{            
+            scriptStrList.Add(tabStr + colDeco);
+        }
+        var colStr = tabStr + ele + ": " + GetTypescriptTypeByDBColumn(col.column) +  ";\r\n";
+        scriptStrList.Add(colStr);
+        dataTypeScriptStrList.Add(colStr);
     });
     level = 1;
-    scriptStrList.Add("}");     
-    list.Add(string.Join(Environment.NewLine, scriptStrList.ToArray()));      
+    scriptStrList.Add("}");
+    dataTypeScriptStrList.Add("}");
+    list.Add(string.Join(Environment.NewLine, scriptStrList.Concat(dataTypeScriptStrList).ToArray()));      
     return list;
 }
 #endregion

@@ -1,7 +1,7 @@
-﻿import { UserInfoWithStruct } from "../dal/models/dbModel";
+﻿import { UserInfoWithStructModel } from "../dal/models/dbModel";
 
 
 export let query = function (opt) {
-    return UserInfoWithStruct.customQuery(opt);
+    return UserInfoWithStructModel.UserInfoWithStruct.customQuery(opt);
 };
 

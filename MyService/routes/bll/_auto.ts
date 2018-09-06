@@ -4,9 +4,9 @@ import * as fs from 'fs';
 import * as db from '../_system/db';
 import * as common from '../_system/common';
 import errorConfig from '../_system/errorConfig';
-import { Transaction, Model } from 'sequelize';
-import { FilteredModelAttributes } from 'sequelize-typescript/lib/models/Model';
+import { Transaction, Model, FindOptions } from 'sequelize';
 import * as dbModel from '../dal/models/dbModel';
+import { IFindOptions } from 'sequelize-typescript';
 
 
 type AutoBllFun = (name, params, conn?: Transaction) => Q.Promise<any>;
@@ -84,7 +84,7 @@ export let detailQuery: AutoBllFun = function (name, params, conn?) {
 export let query: AutoBllFun = function (name, params, conn?) {
     return common.promise(() => {
         let model = getRequire(name).default as Model<any, any>;        
-        let options = createQueryOption(model, params);
+        let options = createQueryOption(model, params) as any as FindOptions<any>;
         options.transaction = conn;
         return model.findAndCountAll(options).then(t => {
             return {
@@ -100,10 +100,10 @@ export let tran = function (fn: (conn: Transaction) => any): Q.Promise<any> {
     });
 };
 
-export let createQueryOption = function(model, params){
-    let options = {
+export let createQueryOption = function<T>(model: any, params){
+    let options: IFindOptions<T> = {
         where: {}
-    } as any;
+    };
     if (params.pageSize && params.pageIndex) {
         options.limit = params.pageSize;
         options.offset = (params.pageIndex - 1) * params.pageSize;
@@ -126,22 +126,22 @@ interface AutoBllModule<T> {
 }
 
 interface AutoBllModules {
-    authority?: AutoBllModule<FilteredModelAttributes<dbModel.Authority>>;
-    log?: AutoBllModule<FilteredModelAttributes<dbModel.Log>>;
-    mainContent?: AutoBllModule<FilteredModelAttributes<dbModel.MainContent>>;
-    mainContentChild?: AutoBllModule<FilteredModelAttributes<dbModel.MainContentChild>>;
-    mainContentLog?: AutoBllModule<FilteredModelAttributes<dbModel.MainContentLog>>;
-    mainContentTag?: AutoBllModule<FilteredModelAttributes<dbModel.MainContentTag>>;
-    mainContentWithType?: AutoBllModule<FilteredModelAttributes<dbModel.MainContentWithType>>;
-    mainContentType?: AutoBllModule<FilteredModelAttributes<dbModel.MainContentType>>;
-    role?: AutoBllModule<FilteredModelAttributes<dbModel.Role>>;
-    roleWithAuthority?: AutoBllModule<FilteredModelAttributes<dbModel.RoleWithAuthority>>;
-    struct?: AutoBllModule<FilteredModelAttributes<dbModel.Struct>>;
-    userInfo?: AutoBllModule<FilteredModelAttributes<dbModel.UserInfo>>;
-    userInfoLog?: AutoBllModule<FilteredModelAttributes<dbModel.UserInfoLog>>;
-    userInfoWithAuthority?: AutoBllModule<FilteredModelAttributes<dbModel.UserInfoWithAuthority>>;
-    userInfoWithRole?: AutoBllModule<FilteredModelAttributes<dbModel.UserInfoWithRole>>;
-    userInfoWithStruct?: AutoBllModule<FilteredModelAttributes<dbModel.UserInfoWithStruct>>;
+    authority?: AutoBllModule<dbModel.AuthorityModel.AuthorityDataType>;
+    log?: AutoBllModule<dbModel.LogModel.LogDataType>;
+    mainContent?: AutoBllModule<dbModel.MainContentModel.MainContentDataType>;
+    mainContentChild?: AutoBllModule<dbModel.MainContentChildModel.MainContentChildDataType>;
+    mainContentLog?: AutoBllModule<dbModel.MainContentLogModel.MainContentLogDataType>;
+    mainContentTag?: AutoBllModule<dbModel.MainContentTagModel.MainContentTagDataType>;
+    mainContentWithType?: AutoBllModule<dbModel.MainContentTypeModel.MainContentTypeDataType>;
+    mainContentType?: AutoBllModule<dbModel.MainContentTypeModel.MainContentTypeDataType>;
+    role?: AutoBllModule<dbModel.RoleModel.RoleDataType>;
+    roleWithAuthority?: AutoBllModule<dbModel.RoleWithAuthorityModel.RoleWithAuthorityDataType>;
+    struct?: AutoBllModule<dbModel.StructModel.StructDataType>;
+    userInfo?: AutoBllModule<dbModel.UserInfoModel.UserInfoDataType>;
+    userInfoLog?: AutoBllModule<dbModel.UserInfoLogModel.UserInfoLogDataType>;
+    userInfoWithAuthority?: AutoBllModule<dbModel.UserInfoWithAuthorityModel.UserInfoWithAuthorityDataType>;
+    userInfoWithRole?: AutoBllModule<dbModel.UserInfoWithRoleModel.UserInfoWithRoleDataType>;
+    userInfoWithStruct?: AutoBllModule<dbModel.UserInfoWithStructModel.UserInfoWithStructDataType>;
 }
 
 export let modules: AutoBllModules = {};
