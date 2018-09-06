@@ -63,40 +63,39 @@ export let signIn = function (dom) {
     common.promise(function () {
         var opt = { list: signInArgsOpt };
         var checkRes = common.dataCheck(opt);
-        var err = null;
         if (!checkRes.success) {
             if (checkRes.dom) {
                 common.msgNotice({ dom: checkRes.dom, msg: checkRes.desc });
             } else {
-                err = new Error(checkRes.desc);
+                throw common.error(checkRes.desc);
             }
-            throw err;
-        }
-        var model: any = checkRes.model;
-        var data = {
-            random: common.s4(2),
-            captcha: model.captcha,
-            captchaKey: $('[name=captchaBox]').data('captchaKey')
-        };
-        var token = common.createToken(model.account + common.md5(model.password) + JSON.stringify(data));
-        var headers = {
-            'account': model.account,
-            'token': token,
-        };
-        var req = {
-            headers: headers,
-        };
-        return myInterface.api.signIn(data, req);
-    }).then(function (t) {
-        if (location.pathname == '/user/signIn') {
-            var args = common.getArgsFromUrlParams();
-            location.href = args.toUrl || ('/?noNav=' + (args.noNav || ''));
-        }
-        else {
-            form.find('[name=captcha]').val('');
-            $('#signInBox').modal('hide');
-            $('.nav-nickname').text(t.nickname);
-            $('.nav-sign').addClass('in');
+        } else {
+            var model: any = checkRes.model;
+            var data = {
+                random: common.s4(2),
+                captcha: model.captcha,
+                captchaKey: $('[name=captchaBox]').data('captchaKey')
+            };
+            var token = common.createToken(model.account + common.md5(model.password) + JSON.stringify(data));
+            var headers = {
+                'account': model.account,
+                'token': token,
+            };
+            var req = {
+                headers: headers,
+            };
+            return myInterface.api.signIn(data, req).then(function (t) {
+                if (location.pathname == '/user/signIn') {
+                    var args = common.getArgsFromUrlParams();
+                    location.href = args.toUrl || ('/?noNav=' + (args.noNav || ''));
+                }
+                else {
+                    form.find('[name=captcha]').val('');
+                    $('#signInBox').modal('hide');
+                    $('.nav-nickname').text(t.nickname);
+                    $('.nav-sign').addClass('in');
+                }
+            });
         }
     }).fail(function (e: any) {
         let msg = '登录失败';
@@ -105,13 +104,14 @@ export let signIn = function (dom) {
             if (e.message) msg = e.message;
             if (e.code == errorConfig.CAPTCHA_EXPIRE.code) {
                 btnOptList = {
-                    cb: function () {
-                        refreshCaptcha();
-                    }
+                    returnValue: 'refreshCaptcha'
                 }
             }
         }
-        common.msgNotice({ type: 1, msg: msg, btnOptList });
+        common.msgNotice({ type: 1, msg: msg, btnOptList }).waitClose().then(t => {
+            if(t == 'refreshCaptcha')
+                refreshCaptcha();
+        });
     });
 };
 export let signUp = function () {
