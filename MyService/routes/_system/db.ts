@@ -3,10 +3,14 @@
  */
 import * as path from 'path';
 import { Sequelize, Model, IFindOptions } from 'sequelize-typescript';
+import * as seq from 'sequelize';
 import { Utils } from 'sequelize';
 import * as common from './common';
 import errorConfig from './errorConfig';
 import config from '../../config';
+
+export type Transaction = seq.Transaction;
+export type ListQueryOption<T> = T & {pageIndex?: number, pageSize?: number, nullList?: string[], orderBy?: any};
 
 let sequelize = new Sequelize({
     database: config.datebase.database,
@@ -19,7 +23,7 @@ let sequelize = new Sequelize({
     logging: false,
 });
 
-export let query = function (sql, params, conn?) {
+export let query = function (sql, params, conn?: Transaction): Q.Promise<any[]> {
     return common.promise(async () => {
         sql = sql.replace(/\:(\w+)/g, function (txt, key) {
             if (!params || !params.hasOwnProperty(key) || params[key] === undefined)
@@ -51,14 +55,14 @@ export let query = function (sql, params, conn?) {
 }
 
 //事务连接
-export let tranConnect = function (queryFunction) {
+export let tranConnect = function (queryFunction: Function) {
     return sequelize.transaction(async (t) => {
         let result = await queryFunction(t);
         return result;
     });
 }
 
-export let replaceSpCharLike = function (str) {
+export let replaceSpCharLike = function (str: string) {
     str = str.replace(/\\/g, '\\\\');
     str = str.replace(/_/g, '\\_');
     str = str.replace(/%/g, '\\%');

@@ -1032,9 +1032,8 @@ public static List<string> CreateSequelizeModel(DatabaseModel databaseModel)
         }else{            
             scriptStrList.Add(tabStr + colDeco);
         }
-        var colStr = tabStr + ele + ": " + GetTypescriptTypeByDBColumn(col.column) +  ";\r\n";
-        scriptStrList.Add(colStr);
-        dataTypeScriptStrList.Add(colStr);
+        scriptStrList.Add(tabStr + ele + ": " + GetTypescriptTypeByDBColumn(col.column) +  ";\r\n");
+        dataTypeScriptStrList.Add(tabStr + ele + "?: " + GetTypescriptTypeByDBColumn(col.column) +  ";\r\n");
     });
     level = 1;
     scriptStrList.Add("}");

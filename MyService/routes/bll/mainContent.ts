@@ -7,14 +7,15 @@ import * as common from '../_system/common';
 import errorConfig from '../_system/errorConfig';
 import * as myEnum from '../_system/enum';
 import * as auth from '../_system/auth';
-import { MainContentModel } from '../dal/models/dbModel';
+import { MainContent } from '../dal/models/dbModel/MainContent';
 
 export let query = function (opt, exOpt) {
     var user = exOpt.user;
-    return common.promise(async function () {        
-        let t = await MainContentModel.MainContent.customQuery(opt);
+    return common.promise(async function () {
+        let t = await MainContent.customQuery(opt);
         if (t.list && t.list.length) {
-            t.list.forEach(function (item) {
+            t.list.forEach(function (ele) {
+                let item = ele as (typeof ele) & { operation: string[] }
                 item.operation = ['detailQuery'];
                 if (canDelete(item, user))
                     item.operation.push('del');
@@ -35,16 +36,16 @@ export let detailQuery = function (opt, exOpt) {
             canDelete: true
         };
         if (opt.id == 0) {
-            detail.mainContent = {id: 0, status: 0, type: 0};
+            detail.mainContent = { id: 0, status: 0, type: 0 };
         } else if (!opt.id) {
             throw common.error('', errorConfig.ARGS_ERROR);
         } else {
-            let t = await MainContentModel.MainContent.customDetailQuery(opt);
+            let t = await MainContent.customDetailQuery(opt);
             detail = {
                 ...detail, ...t
             };
             if (!detail.mainContent)
-                throw common.error('', errorConfig.DB_NO_DATA, {lang: exOpt.req.myData.lang});
+                throw common.error('', errorConfig.DB_NO_DATA, { lang: exOpt.req.myData.lang });
         }
 
         //处理数据
@@ -73,7 +74,7 @@ export let save = function (opt, exOpt) {
     var user = exOpt.user;
     return common.promise(async function () {
         mainContent = opt.mainContent;
-        let mainContentDetail = await detailQuery({id: mainContent.id}, exOpt);
+        let mainContentDetail = await detailQuery({ id: mainContent.id }, exOpt);
         var delChildList, saveChildList;
         if (mainContent.id != 0) {
             //权限检查
@@ -111,7 +112,7 @@ export let save = function (opt, exOpt) {
         });
         let mainContentWithTypeList = [];
         if (mainContent.id != 0) {
-            let query = await autoBll.modules.mainContentWithType.query({mainContentId: mainContent.id});
+            let query = await autoBll.modules.mainContentWithType.query({ mainContentId: mainContent.id });
             mainContentWithTypeList = query.list;
         }
 
@@ -148,7 +149,7 @@ export let save = function (opt, exOpt) {
             //删除child
             if (delChildList && delChildList.length) {
                 delChildList.forEach(function (item) {
-                    list.push(autoBll.modules.mainContentChild.del({id: item.id}, conn));
+                    list.push(autoBll.modules.mainContentChild.del({ id: item.id }, conn));
                 });
             }
 
@@ -201,7 +202,7 @@ export let statusUpdate = function (opt, exOpt) {
         necessaryAuth = 'mainContent' + common.stringToPascal(operate);
         if (!auth.isHadAuthority(user, necessaryAuth))
             throw common.error(`没有[${necessaryAuth}]权限`);
-        return detailQuery({id: mainContent.id}, exOpt);
+        return detailQuery({ id: mainContent.id }, exOpt);
     }).then(function (mainContentDetail) {
         if (necessaryAuth == 'mainContentDel' && !mainContentDetail.canDelete) {
             throw common.error(`没有权限`);

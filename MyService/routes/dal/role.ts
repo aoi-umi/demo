@@ -1,10 +1,15 @@
 ﻿import * as db from '../_system/db';
-export let detailQuery = async function (params, conn?) {
+import { Transaction } from '../_system/db';
+import { RoleDataType } from './models/dbModel/Role';
+import { AuthorityDataType } from './models/dbModel/Authority';
+import { RoleWithAuthorityModel } from './models/dbModel';
+type RoleWithAuthorityDataType = RoleWithAuthorityModel.RoleWithAuthorityDataType;
+export let detailQuery = async function (params, conn?: Transaction) {
     var sql = 'call p_role_detail_query(:code)';
     let t = await db.query(sql, params, conn);
     let data = {
-        role: t[0][0],
-        authorityList: t[1],
+        role: t[0][0] as RoleDataType,
+        authorityList: t[1] as AuthorityDataType[],
     };
     return {
         rawData: t,
@@ -12,14 +17,14 @@ export let detailQuery = async function (params, conn?) {
     };
 };
 
-export let query = async function (params, conn?) {
+export let query = async function (params, conn?: Transaction) {
     var sql = 'call p_role_query(:id, :code, :name, :status, :anyKey, :excludeByUserId, :orderBy, :nullList, :pageIndex, :pageSize)';
     let t = await db.query(sql, params, conn);
     let data = {
-        list: t[0],
-        count: t[1][0].count,
-        roleWithAuthorityList: t[2],
-        authorityList: t[3],
+        list: t[0] as RoleDataType[],
+        count: t[1][0].count as number,
+        roleWithAuthorityList: t[2] as RoleWithAuthorityDataType[],
+        authorityList: t[3] as AuthorityDataType[],
     };
     return {
         rawData: t,
