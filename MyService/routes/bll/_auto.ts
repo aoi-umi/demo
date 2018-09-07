@@ -4,9 +4,9 @@ import * as fs from 'fs';
 import * as db from '../_system/db';
 import * as common from '../_system/common';
 import errorConfig from '../_system/errorConfig';
-import { Transaction, Model, FindOptions } from 'sequelize';
+import { Transaction, Model, FindOptions, Op } from 'sequelize';
 import * as dbModel from '../dal/models/dbModel';
-import { IFindOptions } from 'sequelize-typescript';
+import { IFindOptions, Model as ModelTs } from 'sequelize-typescript';
 
 
 type AutoBllFun = (name, params, conn?: Transaction) => Q.Promise<any>;
@@ -47,6 +47,14 @@ export let save: AutoBllFun = function (name, params, conn?) {
     let model = getRequire(name).default as Model<any, any>;
     return common.promise(async () => {
         let id = 0;
+        let nullList = params.nullList || [];
+        delete params.nullList;
+        for (let key in params) {
+            if (nullList.includes(key))
+                params[key] = null;
+            else if (params[key] === null)
+                delete params[key];
+        }
         if (!params.id || params.id == 0) {
             delete params.id;
             let t = await model.create(params, { transaction: conn });
@@ -83,7 +91,7 @@ export let detailQuery: AutoBllFun = function (name, params, conn?) {
 };
 export let query: AutoBllFun = function (name, params, conn?) {
     return common.promise(() => {
-        let model = getRequire(name).default as Model<any, any>;        
+        let model = getRequire(name).default as Model<any, any>;
         let options = createQueryOption(model, params) as any as FindOptions<any>;
         options.transaction = conn;
         return model.findAndCountAll(options).then(t => {
@@ -100,7 +108,10 @@ export let tran = function (fn: (conn: Transaction) => any): Q.Promise<any> {
     });
 };
 
-export let createQueryOption = function<T>(model: any, params){
+export let createQueryOption = function <T>(model: any, params, opt?: { likeKeyList?: string[] }) {
+    opt = {
+        ...opt,
+    }
     let options: IFindOptions<T> = {
         where: {}
     };
@@ -108,10 +119,15 @@ export let createQueryOption = function<T>(model: any, params){
         options.limit = params.pageSize;
         options.offset = (params.pageIndex - 1) * params.pageSize;
     }
-    let attributes:string[] = model.build(params)._modelOptions.instanceMethods.attributes;
+    let attributes: string[] = model.build(params)._modelOptions.instanceMethods.attributes;
     for (let key in params) {
-        if (attributes.includes(key))
-            options.where[key] = params[key];
+        let val = params[key];
+        if (null !== val && attributes.includes(key)) {
+            if (opt.likeKeyList && opt.likeKeyList.includes(key))
+                options.where[key] = { [Op.like]: `%${db.replaceSpCharLike(val)}%` };
+            else
+                options.where[key] = val;
+        }
     }
     return options;
 }
@@ -120,7 +136,7 @@ let methodList = ['save', 'query', 'detailQuery', 'del'];
 
 interface AutoBllModule<T> {
     save?: AutoBllModuleFun<string | number>;
-    query?: AutoBllModuleFun<{list: Array<T>, count: number}>;
+    query?: AutoBllModuleFun<{ list: Array<T>, count: number }>;
     detailQuery?: AutoBllModuleFun<T>;
     del?: AutoBllModuleFun<number>;
 }
@@ -148,8 +164,8 @@ export let modules: AutoBllModules = {};
 let files = fs.readdirSync(path.resolve(`${__dirname}/${dalModelsPath}`));
 
 files.forEach(filename => {
-    let match =  /_auto\.([\S]+)\.model/.exec(filename);
-    if(!match)
+    let match = /_auto\.([\S]+)\.model/.exec(filename);
+    if (!match)
         throw common.error(`error dal model: ${filename}`);
     let moduleName = match[1];
     let autoModule = modules[moduleName] = {};
