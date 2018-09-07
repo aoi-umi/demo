@@ -785,7 +785,7 @@ export let setCountdown = function (option: setCountdownOption) {
     if (countDownInterval) {
         clearInterval(countDownInterval);
         dom.data('countDownInterval', null);
-    }
+    }    
     countDownInterval = setInterval(function () {
         if (new Date() >= date && countDownInterval) {
             clearInterval(countDownInterval);
@@ -795,6 +795,7 @@ export let setCountdown = function (option: setCountdownOption) {
             opt.onCountdown(dom, date);
         }
     }, opt.interval * 1000);
+    opt.onCountdown(dom, date);
     dom.data('countDownInterval', countDownInterval);
 };
 export let getBrowserType = function () {
