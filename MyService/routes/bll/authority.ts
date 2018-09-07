@@ -1,9 +1,9 @@
 ﻿import * as autoBll from './_auto';
 import * as common from '../_system/common';
 import errorConfig from '../_system/errorConfig';
-import { Authority } from '../dal/models/dbModel/Authority';
+import { Authority, AuthorityDataType } from '../dal/models/dbModel/Authority';
 
-export let save = function (opt) {
+export let save = function (opt: AuthorityDataType & {statusUpdateOnly? : boolean}) {
     return common.promise(async function () {
         if (opt.statusUpdateOnly) {
             if (!opt.id || opt.id == 0)
@@ -21,7 +21,7 @@ export let save = function (opt) {
     });
 };
 
-export let isExist = function (opt) {
+export let isExist = function (opt: AuthorityDataType) {
     var code = opt.code;
     return common.promise(async function () {
         if (!code)

@@ -81,6 +81,7 @@ export namespace UserInfoWithAuthorityModel {
 }
 
 import _AutoUserInfoWithRole, { _AutoUserInfoWithRoleDataType } from "../_auto/_auto.userInfoWithRole.model";
+import { userInfo } from 'os';
 export namespace UserInfoWithRoleModel {
     export class UserInfoWithRole extends _AutoUserInfoWithRole { };
     export type UserInfoWithRoleDataType = _AutoUserInfoWithRoleDataType;

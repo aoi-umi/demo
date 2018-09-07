@@ -1,12 +1,14 @@
 ﻿import * as path from 'path';
 import * as fs from 'fs';
+import { Model, FindOptions, Op } from 'sequelize';
+import { IFindOptions, Model as ModelTs } from 'sequelize-typescript';
+import { Omit, RecursivePartial } from 'sequelize-typescript/lib/utils/types';
 
 import * as db from '../_system/db';
+import { Transaction } from '../_system/db';
 import * as common from '../_system/common';
 import errorConfig from '../_system/errorConfig';
-import { Transaction, Model, FindOptions, Op } from 'sequelize';
 import * as dbModel from '../dal/models/dbModel';
-import { IFindOptions, Model as ModelTs } from 'sequelize-typescript';
 
 
 type AutoBllFun = (name, params, conn?: Transaction) => Q.Promise<any>;
@@ -119,7 +121,8 @@ export let createQueryOption = function <T>(model: any, params, opt?: { likeKeyL
         options.limit = params.pageSize;
         options.offset = (params.pageIndex - 1) * params.pageSize;
     }
-    let attributes: string[] = model.build(params)._modelOptions.instanceMethods.attributes;
+    let m = model as Model<any, any>;
+    let attributes: string[] = m.build(params)._modelOptions.instanceMethods.attributes;
     for (let key in params) {
         let val = params[key];
         if (null !== val && attributes.includes(key)) {

@@ -7,7 +7,8 @@ import errorConfig from '../_system/errorConfig';
 import * as cache from '../_system/cache';
 import * as autoBll from './_auto';
 import * as main from '../_main';
-import { UserInfoModel, UserInfoWithStructModel } from '../dal/models/dbModel';
+import { UserInfoWithStruct } from '../dal/models/dbModel/UserInfoWithStruct';
+import { UserInfo, UserInfoCustomDetailType, UserInfoDataType, UserInfoRoleAuthorityType } from '../dal/models/dbModel/UserInfo';
 
 export let isAccountExist = function (account) {
     return common.promise(async function () {
@@ -73,8 +74,8 @@ export let save = function (opt, exOpt) {
     });
 };
 
-export let detailQuery = function (opt) {    
-    return UserInfoModel.UserInfo.customDetailQuery({ id: opt.id, noLog: opt.noLog }).then(function (t) {
+export let detailQuery = function (opt) {
+    return UserInfo.customDetailQuery({ id: opt.id, noLog: opt.noLog }).then(function (t) {
         var detail = {
             ...t,
             auth: {}
@@ -91,8 +92,8 @@ export let detailQuery = function (opt) {
 };
 
 export let query = function (opt) {
-    return UserInfoModel.UserInfo.customQuery(opt).then(function (t) {
-        type returnType = UserInfoModel.UserInfoDataType & {roleList?: any[], authorityList?: any, auth?: {}};
+    return UserInfo.customQuery(opt).then(function (t) {
+        type returnType = UserInfoDataType & { roleList?: any[], authorityList?: any, auth?: {} };
         var data = {
             list: t.list as returnType[],
             count: t.count
@@ -103,7 +104,7 @@ export let query = function (opt) {
         } = t;
 
         data.list.forEach(function (item) {
-            var detail = {
+            var detail: UpdateUserInfoType = {
                 auth: {},
                 roleList: [],
                 authorityList: [],
@@ -182,7 +183,7 @@ export let adminSave = function (opt, exOpt) {
             }) < 0;
         });
 
-        return UserInfoWithStructModel.UserInfoWithStruct.customQuery({ userInfoId: id });
+        return UserInfoWithStruct.customQuery({ userInfoId: id });
     }).then(function (t) {
         let structList = [];
         let structTypeList = ['company', 'department', 'group'];
@@ -262,8 +263,8 @@ export let adminSave = function (opt, exOpt) {
         return id;
     });
 };
-
-var updateUserInfo = function (detail: UserInfoModel.CustomDetailType & {auth: any}) {
+type UpdateUserInfoType = UserInfoCustomDetailType & { auth: any };
+var updateUserInfo = function (detail: UpdateUserInfoType) {
     var authorityList = [];
     var auth = {};
     detail.authorityList.forEach(function (t) {
@@ -278,14 +279,15 @@ var updateUserInfo = function (detail: UserInfoModel.CustomDetailType & {auth: a
             auth[t.code] = true;
         }
     });
-    let compare = function (a, b) {
+    let compare = function (a: UserInfoRoleAuthorityType, b: UserInfoRoleAuthorityType) {
         if (a.code < b.code)
             return -1;
         if (a.code > b.code)
             return 1;
         return 0;
     };
-    detail.roleList.forEach(function (role) {
+    detail.roleList.forEach(function (ele) {
+        let role = ele as (typeof ele) & { authorityList: UserInfoRoleAuthorityType[] };
         role.authorityList = detail.roleAuthorityList.filter(function (roleAuthority) {
             return roleAuthority.roleCode == role.code;
         });
