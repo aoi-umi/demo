@@ -68,5 +68,5 @@ interface TabAndPanelOption {
     content?: string;
 }
 interface MyTab {
-    addOrOpenTab:(opt: TabAndPanelOption) => void;
+    addOrOpenTab: (opt: TabAndPanelOption) => void;
 }
