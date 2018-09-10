@@ -1,17 +1,34 @@
 import * as mongoose from 'mongoose';
 import { DocumentQuery } from 'mongoose';
-import { Typegoose, InstanceType, prop, instanceMethod, staticMethod, pre, Ref } from 'typegoose';
+import { Typegoose, InstanceType, prop, instanceMethod, staticMethod, pre, post, Ref, plugin } from 'typegoose';
 import { Model, getModelForClass, ModelType, connect } from './mongo';
 
 (async () => {
     connect('mongodb://localhost:27017/test', { mongooseOption: { useNewUrlParser: true } });
 
+    function lastModifiedPlugin(schema: mongoose.Schema, options) {
+        schema.add({ lastMod: Date });
+        schema.pre('save', function (this: mongoose.Document & { lastMod: Date }, next) {
+            this.lastMod = new Date();
+            next();
+        });
+
+        // if (options && options.index) {
+        //     schema.path('lastMod').index(options.index);
+        // }
+    }
+
+    @pre<BaseUser>('save', function (this: InstanceType<User>, next) {
+        this.name += 'base';
+        next();
+    })
+    @plugin(lastModifiedPlugin)
     class BaseUser extends Model<BaseUser> {
         @prop()
         name?: string;
         @instanceMethod
         a() {
-            console.log('a, base');
+            return 'a, base';
         }
     }
     class User extends BaseUser {
@@ -21,7 +38,14 @@ import { Model, getModelForClass, ModelType, connect } from './mongo';
         name?: string;
         @instanceMethod
         a(this: InstanceType<User>) {
-            console.log('a, user 1');
+            return 'a, user 1';
+        }
+        @prop()
+        get myName() {
+            return 'my name is ' + this.name;
+        }
+        set myName(val) {
+            this.name = val + Date.now();
         }
     }
 
@@ -54,7 +78,7 @@ import { Model, getModelForClass, ModelType, connect } from './mongo';
 
         @instanceMethod
         b(this: InstanceTypeUser2) {
-            console.log('b, user 2');
+            return 'b, user 2';
         }
     }
 
@@ -64,26 +88,27 @@ import { Model, getModelForClass, ModelType, connect } from './mongo';
         }
     });
     let u = new UserModel({ name: '123' });
+    u.myName = u.name;
     await u.save();
 
-    let child = new UserModel();
-    child.name = 'child';
+    // let child = new UserModel();
+    // child.name = 'child';
 
-    let u2 = new UserModel2({
-        num: parseFloat('1'),
-        child: child,
-        childId: child._id,
-    });
-    await u2.save();
-    let u11 = await UserModel.findOne({});
+    // let u2 = new UserModel2({
+    //     num: parseFloat('1'),
+    //     child: child,
+    //     childId: child._id,
+    // });
+    // await u2.save();
+    let u11 = await UserModel.findOne({}).sort({ _id: -1 });
     if (u11 != null) {
-        u11.a();
-        console.log(u11._doc);
+        console.log(u11.a());
+        console.log(u11);
     }
 
-    let u22 = await UserModel2.findOne({ _id: u2.id });
+    let u22 = await UserModel2.findOne({}).sort({ _id: -1 });
     if (u22 != null)
-        u22.a(), u22.b(), console.log(u22.createdAt);
+        console.log(`${u22.a()}; ${u22.b()}; ${u22.createdAt}`);
 
     UserModel2.c().then(t => {
         console.log(t);
