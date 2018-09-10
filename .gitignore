@@ -6,4 +6,4 @@ npm-debug.log
 package-lock.json
 yarn.lock
 Template/Output
-MyService/routes/dal/models/_auto
+MyService/**/routes/dal/models/_auto
