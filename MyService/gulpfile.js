@@ -6,12 +6,27 @@ var gulp = require('gulp'),
 	changed = require('gulp-changed'),
 	debug = require('gulp-debug'),
     Q = require('q'),    
-    sourcemaps = require('gulp-sourcemaps');
+    sourcemaps = require('gulp-sourcemaps'),    
+    path = require('path');
 
 var tsProject = ts.createProject('tsconfig.json', {target: 'es2017', module: 'commonjs'});
 var tsFrontProject = ts.createProject('tsconfig.json', {target: 'es5', module: 'umd'});
 
-let destDir = './dest';
+let destDir = tsProject.config.compilerOptions.outDir || './dest';
+let srcDir = tsProject.config.compilerOptions.rootDir || './src';
+
+function getDest(dest){
+	return path.join(destDir, dest);
+}
+
+function getSrc(src){	
+	if(!Array.isArray(src))
+		src = [src];
+	src = src.map(ele => {
+		return path.join(srcDir, ele);
+	});
+	return src;
+}
 
 gulp.task('clearDest', function () {
 	return del([
@@ -19,9 +34,9 @@ gulp.task('clearDest', function () {
 	]);
 });
 
-let templateSrc = 'views/_template/**';
+let templateSrc = getSrc('views/_template/**');
 gulp.task('make-template', function () {
-	let dest = destDir + '/views/_template_front/';
+	let dest = getDest('/views/_template_front/');
 	return gulp.src(templateSrc)
 		.pipe(changed(dest))
 		.pipe(replace('<%', '<%%'))
@@ -29,14 +44,14 @@ gulp.task('make-template', function () {
 		.pipe(gulp.dest(dest));
 });
 
-let tsSrc = [
+let tsSrc = getSrc([
     'app.ts',
     'config.ts',
     'routes/**'
-];
+]);
 gulp.task('ts', function () {
 	return gulp.src(tsSrc, {
-		base: './'
+		base: srcDir
 	})
 		//.pipe(changed(destDir, {extension: '.js'}))
 		.pipe(tsProject())
@@ -44,9 +59,9 @@ gulp.task('ts', function () {
 });
 
 //前端
-let tsFrontSrc = ['public/ts/**/*.ts'];
+let tsFrontSrc = getSrc(['public/ts/**/*.ts']);
 gulp.task('ts-front', function () {
-	let dest = destDir + '/public/js';
+	let dest = getDest('/public/js');
     return gulp.src(tsFrontSrc)
 		//.pipe(changed(dest, {extension: '.js'}))
 	    //.pipe(sourcemaps.init())
@@ -70,14 +85,14 @@ gulp.task('copyDep', function () {
 			'bower_components/seiyria-bootstrap-slider/dist/@(css)/**',
 			'bower_components/bootstrap-fileinput/@(css|img)/**',
 		])
-			.pipe(gulp.dest(destDir + '/public'))
+			.pipe(gulp.dest(getDest('/public')))
 			.on('end', onFinished),
 
 		gulp.src(['bower_components/jquery-ui/themes/base/jquery-ui.min.css',
 			'bower_components/smalot-bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css',
 			'bower_components/jquery.liMarquee/css/liMarquee.css',
 		])
-			.pipe(gulp.dest(destDir + '/public/css'))
+			.pipe(gulp.dest(getDest('/public/css')))
 			.on('end', onFinished),
 
 		gulp.src([
@@ -97,22 +112,22 @@ gulp.task('copyDep', function () {
 			'node_modules/ejs/ejs.min.js',
 			'node_modules/echarts/dist/echarts.common.min.js',
 		])
-			.pipe(gulp.dest(destDir + '/public/js/libs'))
+			.pipe(gulp.dest(getDest('/public/js/libs')))
 			.on('end', onFinished),
 
 		gulp.src([
 			'node_modules/socket.io-client/dist/**',
 		])
-			.pipe(gulp.dest(destDir + '/public/js/libs/socket.io'))
+			.pipe(gulp.dest(getDest('/public/js/libs/socket.io')))
 			.on('end', onFinished)
 	]);
 	return defer.promise;
 });
 
-let copySrc = ['public/!(ts)/**', 'views/**'];
+let copySrc = getSrc(['public/!(ts)/**', 'views/**']);
 gulp.task('copy', function () {
 	return gulp.src(copySrc, {
-		base: './',
+		base: srcDir,
 		noDir: true,
 	}).pipe(changed(destDir))
 		.pipe(gulp.dest(destDir));

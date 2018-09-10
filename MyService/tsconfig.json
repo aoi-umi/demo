@@ -10,9 +10,10 @@
         ],
         "sourceMap": true,
         "outDir": "./dest",
+        "rootDir": "./src",
         "typeRoots": [
             "./node_modules/@types",
-            "./typings"
+            "./src/typings"
         ],
         // "strict": true,
         // "noImplicitAny": false,
