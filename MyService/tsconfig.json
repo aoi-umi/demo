@@ -9,7 +9,7 @@
             "dom"
         ],
         "sourceMap": true,
-        "outDir": "./bin",
+        "outDir": "./dest",
         "typeRoots": [
             "./node_modules/@types",
             "./typings"
@@ -20,7 +20,7 @@
         /* Enables experimental support for ES7 decorators. */
         "emitDecoratorMetadata": true,
         /* Enables experimental support for emitting type metadata for decorators. */
-        "strictPropertyInitialization": false,
+        "strictPropertyInitialization": false,        
     },
     "exclude": [
         "node_modules",
