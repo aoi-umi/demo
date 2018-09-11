@@ -1023,6 +1023,11 @@ public static List<string> CreateSequelizeModel(DatabaseModel databaseModel)
         var optionList = new List<string>();
         if(col.column.IsPrimaryKeyMember)
             optionList.Add("primaryKey: true");
+        //驼峰显示字段
+        var nameInClass = ToCamelCase(ele);
+        if(nameInClass != ele)
+            optionList.Add("field: '" + nameInClass + "'");
+        
         var colDeco = "@Column";
         if(optionList.Count > 0){       
             colDeco += "({";
@@ -1032,8 +1037,8 @@ public static List<string> CreateSequelizeModel(DatabaseModel databaseModel)
         }else{            
             scriptStrList.Add(tabStr + colDeco);
         }
-        scriptStrList.Add(tabStr + ele + ": " + GetTypescriptTypeByDBColumn(col.column) +  ";\r\n");
-        dataTypeScriptStrList.Add(tabStr + ele + "?: " + GetTypescriptTypeByDBColumn(col.column) +  ";\r\n");
+        scriptStrList.Add(tabStr + nameInClass + ": " + GetTypescriptTypeByDBColumn(col.column) +  ";\r\n");
+        dataTypeScriptStrList.Add(tabStr + nameInClass + "?: " + GetTypescriptTypeByDBColumn(col.column) +  ";\r\n");
     });
     level = 1;
     scriptStrList.Add("}");
