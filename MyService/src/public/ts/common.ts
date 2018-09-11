@@ -1,7 +1,6 @@
 import 'jquery-ui';
 import * as $ from 'jquery';
 import * as Q from 'q';
-//@ts-ignore
 import * as SparkMD5 from 'spark-md5';
 
 window['common'] = exports;
