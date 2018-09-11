@@ -1,6 +1,5 @@
 
-
-declare module SparkMD5 {
+declare module 'spark-md5' {
     export function hash(str: string, raw?: boolean): string;
     export class ArrayBuffer {
         append(arr: ArrayBuffer): this;
@@ -8,4 +7,3 @@ declare module SparkMD5 {
     }
 }
 
-export = SparkMD5;
