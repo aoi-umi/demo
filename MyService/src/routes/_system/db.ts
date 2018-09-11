@@ -23,7 +23,7 @@ let sequelize = new Sequelize({
     logging: false,
 });
 
-export let query = function (sql, params, conn?: Transaction): Q.Promise<any[]> {
+export let query = function (sql: string, params, conn?: Transaction): Q.Promise<any[]> {
     return common.promise(async () => {
         sql = sql.replace(/\:(\w+)/g, function (txt, key) {
             if (!params || !params.hasOwnProperty(key) || params[key] === undefined)

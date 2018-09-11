@@ -2,9 +2,10 @@
  * Created by umi on 2017-5-29.
  */
 import * as common from '../_system/common';
+import { RequestServiceByConfigOption } from '../_system/common';
 
-var getOption = function (): any {
-    var opt = {
+var getOption = function () {
+    var opt: RequestServiceByConfigOption = {
         noLog: true,
         serviceName: 'logService',
         beforeRequest: function (option, args) {

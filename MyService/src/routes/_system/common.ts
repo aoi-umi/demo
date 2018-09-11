@@ -23,7 +23,7 @@ import * as logService from '../service/logService';
  */
 export function promise<T>(fn: (...args) => Q.IWhenable<T>, caller?: any, nodeCallback?: boolean, args?: any[]): Q.Promise<T> {
     return Q.fcall((): any => {
-        var defer = Q.defer();        
+        var defer = Q.defer();
         if (!fn) {
             throw error('fn can not be null');
         }
@@ -76,10 +76,10 @@ export let promiseAll = function (list: Array<Q.Promise<any>>) {
         list.forEach((ele, idx) => {
             ele.then(t => {
                 returnData.successCount++;
-                returnData.resultList[idx] = {success: true, detail: t};
+                returnData.resultList[idx] = { success: true, detail: t };
             }).fail(e => {
                 returnData.failCount++;
-                returnData.resultList[idx] = {success: false, detail: e};
+                returnData.resultList[idx] = { success: false, detail: e };
             }).finally(() => {
                 if (returnData.successCount + returnData.failCount == returnData.count)
                     defer.resolve(returnData);
@@ -191,7 +191,7 @@ export let stringToPascal = function (str) {
     return str[0].toUpperCase() + str.substr(1);
 };
 
-export let clone = function (obj) {
+export let clone = function <T>(obj: T): T {
     return JSON.parse(JSON.stringify(obj));
 };
 //endregion
@@ -277,14 +277,35 @@ export let extend = function (...args) {
     return res;
 };
 
-export let requestServiceByConfig = function (option) {
+export type RequestServiceByConfigOption = {
+    serviceName?: string;
+    methodName?: string;
+    data?: any;
+    beforeRequest?: Function;
+    afterResponse?: Function;
+    noLog?: boolean;
+}
+export let requestServiceByConfig = function (option: RequestServiceByConfigOption) {
     var method = '';
     var url = '';
     var log = logModle();
     var startTime = new Date().getTime();
     return promise(async function () {
         var errStr = `service "${option.serviceName}"`;
-        var service = config.api[option.serviceName];
+        type Args = {
+            host: string;
+        };
+        var service = config.api[option.serviceName] as {
+            defaultArgs: Args,
+            method: {
+                [methodName: string]: {
+                    url: string;
+                    method: string;
+                    isUseDefault: boolean;
+                    args: Args;
+                }
+            }
+        };
         if (!service) throw error(`${errStr} is not exist!`);
         var serviceArgs = clone(service.defaultArgs);
 
@@ -319,8 +340,8 @@ export let requestServiceByConfig = function (option) {
         log.url = url;
         log.req = opt.body;
         log.method = `[${option.serviceName}][${option.methodName}]`;
-        log.duration = startTime - new Date().getTime();
         let resData = await requestService(opt);
+        log.duration = startTime - new Date().getTime();
 
         log.result = true;
         log.res = resData;
@@ -341,8 +362,8 @@ export let requestServiceByConfig = function (option) {
     });
 };
 
-export let requestService = function (option) {
-    var opt: any = {
+export let requestService = function (option: request.CoreOptions) {
+    var opt: request.CoreOptions = {
         method: 'POST',
         json: true,
         encoding: null,
