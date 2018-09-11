@@ -1,7 +1,7 @@
 /**
  * Created by umi on 2017-5-29.
  */
-import {Request, Response} from 'express';
+import { Request, Response } from 'express';
 import * as common from './common';
 import errorConfig from './errorConfig';
 
@@ -50,9 +50,15 @@ export const authConfig = {
     }
 };
 
-export let accessableUrlConfig = [];
+export type AccessableUrlConfigType = {
+    url: string;
+    auth?: string | string[] | string[][];
+}
+export let accessableUrlConfig: AccessableUrlConfigType[] = [];
 
-export let init = function (opt) {
+export let init = function (opt: {
+    accessableUrlConfig: AccessableUrlConfigType[]
+}) {
     accessableUrlConfig = opt.accessableUrlConfig;
 };
 
@@ -64,7 +70,7 @@ export let check = function (req: Request, res: Response, next) {
     next();
 };
 
-export let isHadAuthority = function (user, authData, opt?) {
+export let isHadAuthority = function (user: Express.MyDataUser, authData: string | string[] | string[][], opt?: IsExistAuthorityOption) {
     if (typeof authData == 'string')
         authData = [authData];
     for (var i = 0; i < authData.length; i++) {
@@ -75,8 +81,12 @@ export let isHadAuthority = function (user, authData, opt?) {
     }
     return true;
 };
-
-export let isExistAuthority = function (user, authData, opt) {
+type IsExistAuthorityOption = {
+    //output
+    notExistAuthority?: string;
+    throwError?: boolean;
+}
+export let isExistAuthority = function (user: Express.MyDataUser, authData: string | string[], opt: IsExistAuthorityOption) {
     if (typeof authData == 'string')
         authData = authData.split(',');
     for (var i = 0; i < authData.length; i++) {
@@ -96,12 +106,12 @@ export let isExistAuthority = function (user, authData, opt) {
 };
 
 //获取可访问的url，如传入pathname，该路径不可访问时抛出错误
-export let getAccessableUrl = function (user, pathname?) {
+export let getAccessableUrl = function (user: Express.MyDataUser, pathname?: string) {
     var url = {};
     var accessable = false;
     var isUrlExist = false;
     accessableUrlConfig.forEach(function (item) {
-        var opt = {notExistAuthority: null};
+        var opt = { notExistAuthority: null };
         var result = !item.auth || !item.auth.length || isHadAuthority(user, item.auth, opt);
         var isExist = item.url == pathname;
         if (isExist) isUrlExist = true;

@@ -1,4 +1,4 @@
-import {Request, Response, Express} from 'express';
+import { Request, Response, Express } from 'express';
 import * as common from './_system/common';
 import * as myEnum from './_system/enum';
 import * as auth from './_system/auth';
@@ -11,22 +11,22 @@ import * as upload from './upload';
 import config from '../config';
 
 //访问权限配置
-export let accessableUrlConfig = [
-    {url: '/'},
-    {url: '/msg'},
-    {url: '/textDiff'},
-    {url: '/statistics'},
-    {url: '/file', auth: [auth.authConfig.admin.code]},
+export let accessableUrlConfig: auth.AccessableUrlConfigType[] = [
+    { url: '/' },
+    { url: '/msg' },
+    { url: '/textDiff' },
+    { url: '/statistics' },
+    { url: '/file', auth: [auth.authConfig.admin.code] },
 
-    {url: '/onlineUser', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
-    {url: '/interface/onlineUser/query', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
-    {url: '/interface/onlineUser/detailQuery', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
-    {url: '/interface/upload', auth: [auth.authConfig.login.code]},
+    { url: '/onlineUser', auth: [auth.authConfig.login.code, auth.authConfig.admin.code] },
+    { url: '/interface/onlineUser/query', auth: [auth.authConfig.login.code, auth.authConfig.admin.code] },
+    { url: '/interface/onlineUser/detailQuery', auth: [auth.authConfig.login.code, auth.authConfig.admin.code] },
+    { url: '/interface/upload', auth: [auth.authConfig.login.code] },
 
-    {url: '/help', auth: [auth.authConfig.dev.code]},
-    {url: '/status', auth: [auth.authConfig.dev.code]},
-    {url: '/color', auth: [auth.authConfig.dev.code]},
-    {url: '/systemInfo', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
+    { url: '/help', auth: [auth.authConfig.dev.code] },
+    { url: '/status', auth: [auth.authConfig.dev.code] },
+    { url: '/color', auth: [auth.authConfig.dev.code] },
+    { url: '/systemInfo', auth: [auth.authConfig.login.code, auth.authConfig.admin.code] },
 
     {
         url: '/log',
@@ -34,43 +34,43 @@ export let accessableUrlConfig = [
             [auth.authConfig.dev.code, auth.authConfig.admin.code]
         ]
     },
-    {url: '/interface/log/query', auth: [auth.authConfig.dev.code]},
-    {url: '/interface/log/save', auth: [auth.authConfig.local.code]},
-    {url: '/interface/log/statistics'},
+    { url: '/interface/log/query', auth: [auth.authConfig.dev.code] },
+    { url: '/interface/log/save', auth: [auth.authConfig.local.code] },
+    { url: '/interface/log/statistics' },
 
-    {url: '/user/signUp'},
-    {url: '/user/signIn'},
-    {url: '/interface/user/signUp'},
-    {url: '/interface/user/signIn'},
-    {url: '/interface/user/signOut'},
+    { url: '/user/signUp' },
+    { url: '/user/signIn' },
+    { url: '/interface/user/signUp' },
+    { url: '/interface/user/signIn' },
+    { url: '/interface/user/signOut' },
 
-    {url: '/interface/captcha/get'},
+    { url: '/interface/captcha/get' },
 
     //角色
-    {url: '/role/list', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
-    {url: '/interface/role/query', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
-    {url: '/interface/role/save', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
-    {url: '/interface/role/detailQuery', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
+    { url: '/role/list', auth: [auth.authConfig.login.code, auth.authConfig.admin.code] },
+    { url: '/interface/role/query', auth: [auth.authConfig.login.code, auth.authConfig.admin.code] },
+    { url: '/interface/role/save', auth: [auth.authConfig.login.code, auth.authConfig.admin.code] },
+    { url: '/interface/role/detailQuery', auth: [auth.authConfig.login.code, auth.authConfig.admin.code] },
 
     //权限
-    {url: '/authority/list', auth: [auth.authConfig.admin.code]},
-    {url: '/interface/authority/query', auth: [auth.authConfig.admin.code]},
-    {url: '/interface/authority/save', auth: [auth.authConfig.admin.code]},
-    {url: '/interface/authority/detailQuery', auth: [auth.authConfig.admin.code]},
+    { url: '/authority/list', auth: [auth.authConfig.admin.code] },
+    { url: '/interface/authority/query', auth: [auth.authConfig.admin.code] },
+    { url: '/interface/authority/save', auth: [auth.authConfig.admin.code] },
+    { url: '/interface/authority/detailQuery', auth: [auth.authConfig.admin.code] },
 
     //用户信息
-    {url: '/userInfo/detail', auth: [auth.authConfig.login.code]},
-    {url: '/userInfo/list', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
-    {url: '/interface/userInfo/query', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
-    {url: '/interface/userInfo/detailQuery', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
-    {url: '/interface/userInfo/save', auth: [auth.authConfig.login.code, auth.authConfig.login.code]},
-    {url: '/interface/userInfo/adminSave', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
+    { url: '/userInfo/detail', auth: [auth.authConfig.login.code] },
+    { url: '/userInfo/list', auth: [auth.authConfig.login.code, auth.authConfig.admin.code] },
+    { url: '/interface/userInfo/query', auth: [auth.authConfig.login.code, auth.authConfig.admin.code] },
+    { url: '/interface/userInfo/detailQuery', auth: [auth.authConfig.login.code, auth.authConfig.admin.code] },
+    { url: '/interface/userInfo/save', auth: [auth.authConfig.login.code, auth.authConfig.login.code] },
+    { url: '/interface/userInfo/adminSave', auth: [auth.authConfig.login.code, auth.authConfig.admin.code] },
 
     //mainContent
-    {url: '/mainContent/list', auth: [auth.authConfig.login.code, auth.authConfig.mainContentQuery.code]},
-    {url: '/mainContent/detail', auth: [auth.authConfig.login.code, auth.authConfig.mainContentDetailQuery.code]},
-    {url: '/interface/mainContent/query', auth: [auth.authConfig.login.code, auth.authConfig.mainContentQuery.code]},
-    {url: '/interface/mainContent/save', auth: [auth.authConfig.login.code, auth.authConfig.mainContentSave.code]},
+    { url: '/mainContent/list', auth: [auth.authConfig.login.code, auth.authConfig.mainContentQuery.code] },
+    { url: '/mainContent/detail', auth: [auth.authConfig.login.code, auth.authConfig.mainContentDetailQuery.code] },
+    { url: '/interface/mainContent/query', auth: [auth.authConfig.login.code, auth.authConfig.mainContentQuery.code] },
+    { url: '/interface/mainContent/save', auth: [auth.authConfig.login.code, auth.authConfig.mainContentSave.code] },
     {
         url: '/interface/mainContent/statusUpdate',
         auth: [auth.authConfig.login.code, auth.authConfig.mainContentSave.code]
@@ -78,7 +78,7 @@ export let accessableUrlConfig = [
     //{url: '/interface/mainContent/del', auth: [auth.authConfig.admin.code]},
 
     //mainContentType
-    {url: '/mainContentType/list', auth: [auth.authConfig.login.code, auth.authConfig.mainContentTypeQuery.code]},
+    { url: '/mainContentType/list', auth: [auth.authConfig.login.code, auth.authConfig.mainContentTypeQuery.code] },
     {
         url: '/interface/mainContentType/query',
         auth: [auth.authConfig.login.code, auth.authConfig.mainContentTypeQuery.code]
@@ -97,19 +97,19 @@ export let accessableUrlConfig = [
     },
 
     //架构
-    {url: '/struct/list', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
-    {url: '/interface/struct/query', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
-    {url: '/interface/struct/detailQuery', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
-    {url: '/interface/struct/save', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
-    {url: '/interface/struct/del', auth: [auth.authConfig.login.code, auth.authConfig.admin.code]},
+    { url: '/struct/list', auth: [auth.authConfig.login.code, auth.authConfig.admin.code] },
+    { url: '/interface/struct/query', auth: [auth.authConfig.login.code, auth.authConfig.admin.code] },
+    { url: '/interface/struct/detailQuery', auth: [auth.authConfig.login.code, auth.authConfig.admin.code] },
+    { url: '/interface/struct/save', auth: [auth.authConfig.login.code, auth.authConfig.admin.code] },
+    { url: '/interface/struct/del', auth: [auth.authConfig.login.code, auth.authConfig.admin.code] },
 ];
 
 //枚举
 export let enumDict = {
-    mainContentTypeEnum: {'0': '文章',},
-    mainContentStatusEnum: {'-1': '已删除', '0': '草稿', '1': '待审核', '2': '审核中', '3': '通过', '4': '退回'},
+    mainContentTypeEnum: { '0': '文章', },
+    mainContentStatusEnum: { '-1': '已删除', '0': '草稿', '1': '待审核', '2': '审核中', '3': '通过', '4': '退回' },
     //添加 Operate 后缀
-    mainContentStatusEnumOperate: {'recovery': '恢复'},
+    mainContentStatusEnumOperate: { 'recovery': '恢复' },
     mainContentLogTypeEnum: {
         //mainConetnt
         '0': '主内容保存', '1': '主内容提交', '2': '主内容审核', '3': '主内容审核通过', '4': '主内容审核不通过', '5': '主内容删除', '6': '主内容恢复',
@@ -124,12 +124,12 @@ export let enumDict = {
 export let enumChangeDict = {
     mainContentStatusEnum: {
         //初始状态
-        '0': {'0': '保存', '1': '提交', '-1': '删除'},
-        '1': {'2': '审核', '3': '审核通过', '4': '审核不通过', '-1': '删除'},
-        '2': {'2': '审核', '3': '审核通过', '4': '审核不通过', '-1': '删除'},
-        '3': {'-1': '删除'},
-        '4': {'0': '保存', '1': '提交', '-1': '删除'},
-        '-1': {'recovery': '恢复'},
+        '0': { '0': '保存', '1': '提交', '-1': '删除' },
+        '1': { '2': '审核', '3': '审核通过', '4': '审核不通过', '-1': '删除' },
+        '2': { '2': '审核', '3': '审核通过', '4': '审核不通过', '-1': '删除' },
+        '3': { '-1': '删除' },
+        '4': { '0': '保存', '1': '提交', '-1': '删除' },
+        '-1': { 'recovery': '恢复' },
     }
 };
 
@@ -144,48 +144,41 @@ export let cacheTime = {
     captcha: 10 * 60
 };
 
+type FormatResResult = {
+    result?: boolean,
+    detail?: any,
+    code?: string,
+    desc?: string,
+    guid?: string
+}
 export let formatRes = function (err, detail, opt) {
     //result    是否成功
     //detail    成功 返回的内容
     //          失败 错误详细
     //code      成功/失败代码
     //desc      描述
-    var res = {
-        result: null,
-        detail: null,
-        code: null,
-        desc: null,
-        guid: common.guid()
+    var res: FormatResResult = {
+        guid: common.guid(),
+        result: true,
     };
-    var url = '';
-    if (opt) {
-        if (opt.desc)
-            res.desc = opt.desc;
-        if (opt.url)
-            url = opt.url;
+    opt = {
+        ...opt,
     }
-    if (err && err.code)
-        res.code = err.code;
-    if (opt && opt.code)
-        res.code = opt.code;
+    res.desc = opt.desc || 'success';
+    res.detail = detail || null;
+    res.code = opt.code;
+
     if (err) {
-        var writeOpt: any = {
-            guid: res.guid
-        };
-        if (url)
-            writeOpt.url = url;
-        common.writeError(err, writeOpt);
-        var errMsg = err;
-        if (err.message) errMsg = err.message;
+        if (!res.code && err.code)
+            res.code = err.code;
         res.result = false;
-        res.desc = errMsg;
-    } else {
-        res.result = true;
-        if (!res.desc)
-            res.desc = 'success';
+        res.desc = err.message || err;
+        var writeOpt: any = {
+            guid: res.guid,
+            url: opt.url || null
+        };
+        common.writeError(err, writeOpt);
     }
-    if (detail)
-        res.detail = detail;
     return res;
 };
 

@@ -183,7 +183,7 @@ export let stringToPascal = function (str) {
     return str[0].toUpperCase() + str.substr(1);
 };
 
-export let clone = function (obj) {
+export let clone = function <T>(obj: T): T {
     return JSON.parse(JSON.stringify(obj));
 };
 //endregion
