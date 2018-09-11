@@ -1,6 +1,7 @@
 import * as $ from 'jquery';
 import * as echarts from 'echarts';
 import 'bootstrap-datetimepicker';
+import * as moment from 'moment';
 import * as common from './common';
 import * as myInterface from './myInterface';
 
@@ -68,16 +69,6 @@ export class LogStatistics {
     bindEvent() {
         let self = this;
         let msgDom = this.dom.find('[name=msg]');
-        let minDate = '1900-01-01';
-        let maxDate = '9999-12-31';
-        let dateOpt = {
-            format: 'yyyy-mm-dd',
-            minView: 'month',
-            autoclose: true,
-            todayBtn: true,
-            clearBtn: true,
-            startDate: minDate,
-        };
         this.dom.on('click', '[name=refresh]', function () {
             msgDom.text('');
             let echartsOpt: echarts.EChartOption = self.echart.getOption();
@@ -99,6 +90,18 @@ export class LogStatistics {
                     data.push([new Date(ele.date), notSuccessRate, notSuccessCount, `(${notSuccessCount}/${ele.count})`]);
                 });
                 for (let method in dataDict) {
+                    let first = moment(dataDict[method][0][0]);
+                    let last = moment({ hour: 0 });
+                    let newData = [];
+                    while (first <= last) {
+                        let match = dataDict[method].find(ele => ele[0].getTime() == first.toDate().getTime());
+                        if (match)
+                            newData.push(match);
+                        else
+                            newData.push([first.toDate(), 0, 0, '(0/0)']);
+                        first.add({ day: 1 });
+                    }
+                    dataDict[method] = newData;
                     list.push({
                         name: method,
                         type: 'line',
@@ -120,6 +123,16 @@ export class LogStatistics {
                 msgDom.text(e.message);
             });
         });
+        let minDate = '1900-01-01';
+        let maxDate = '9999-12-31';
+        let dateOpt = {
+            format: 'yyyy-mm-dd',
+            minView: 'month',
+            autoclose: true,
+            todayBtn: true,
+            clearBtn: true,
+            startDate: minDate,
+        };
         $(`${self.queryBoxId} [name=createDateStart]`)
             .datetimepicker(dateOpt)
             .on('click', function () {
