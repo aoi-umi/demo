@@ -257,22 +257,23 @@ export class MyModuleGeneric<TModule extends MyModuleGeneric<TModule, TOption>, 
             if (self.opt.queryArgsOpt) {
                 $(self.opt.queryArgsOpt).each(function () {
                     var item: any = this;
-                    if (item.dom) {
-                        item.dom.on('blur', function () {
-                            var checkRes = common.dataCheck({ list: [item] });
-                            if (checkRes.success) {
-                                if (checkRes.dom)
-                                    $('[data-target="' + checkRes.dom.selector + '"]').hide();
-                            } else {
-                                common.msgNotice({ dom: checkRes.dom, msg: checkRes.desc });
-                            }
-                        });
+                    if (!item.dom)
+                        return;
+                    item.dom.on('blur', function () {
+                        var checkRes = common.dataCheck({ list: [item] });
+                        if (checkRes.success) {
+                            if (checkRes.dom)
+                                $('[data-target="' + checkRes.dom.selector + '"]').hide();
+                        } else {
+                            common.msgNotice({ dom: checkRes.dom, msg: checkRes.desc });
+                        }
+                    });
 
-                        item.dom.on('keyup', function (event) {
-                            if (event.which == 13)
-                                self.queryDom.click();
-                        });
-                    }
+                    item.dom.on('keyup', function (event) {
+                        if (event.which == 13)
+                            self.queryDom.click();
+                    });
+
                 });
             }
 
@@ -419,27 +420,27 @@ export class MyModuleGeneric<TModule extends MyModuleGeneric<TModule, TOption>, 
         return common.promise(function () {
             var data = null;
             var checkRes = self.opt.beforeSave(dom, self);
-            if (checkRes) {
-                console.log(checkRes)
-                if (!checkRes.success) {
-                    var err = null;
-                    if (checkRes.dom) {
-                        common.msgNotice({ dom: checkRes.dom, msg: checkRes.desc });
-                    } else {
-                        err = new Error(checkRes.desc);
-                    }
-                    throw err;
+            if (!checkRes)
+                return;
+            console.log(checkRes)
+            if (!checkRes.success) {
+                var err = null;
+                if (checkRes.dom) {
+                    common.msgNotice({ dom: checkRes.dom, msg: checkRes.desc });
+                } else {
+                    err = new Error(checkRes.desc);
                 }
-                var notice = common.msgNotice({ type: 1, msg: '保存中...', noClose: true });
-                data = checkRes.model;
-                var method = 'save';
-                return myInterface.api[self.opt.interfacePrefix][method](data).then(function (t) {
-                    self.opt.onSaveSuccess(t, self);
-                    return t;
-                }).finally(function () {
-                    notice.close();
-                });
+                throw err;
             }
+            var notice = common.msgNotice({ type: 1, msg: '保存中...', noClose: true });
+            data = checkRes.model;
+            var method = 'save';
+            return myInterface.api[self.opt.interfacePrefix][method](data).then(function (t) {
+                self.opt.onSaveSuccess(t, self);
+                return t;
+            }).finally(function () {
+                notice.close();
+            });
         }).fail(function (e: any) {
             if (e)
                 self.opt.onSaveFail(e, self);
