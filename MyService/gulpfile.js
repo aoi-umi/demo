@@ -138,7 +138,7 @@ gulp.task('watch', function () {
 	gulp.watch(copySrc, ['copy']);
 	//gulp.watch(tsFrontSrc, ['ts-front']);
 	gulp.watch(templateSrc, ['make-template']);
-	gulp.watch(tsSrc, ['ts']);
+	//gulp.watch(tsSrc, ['ts']);
 });
 
 
