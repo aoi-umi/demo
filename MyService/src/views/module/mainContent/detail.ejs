@@ -235,7 +235,7 @@
             </button>
             <% }); %>
         </div>
-        <div class="row">
+        <div class="">
             <% if(mainContent.id){ %>
             <ul class="nav nav-tabs">
                 <li class="tab-header active">
@@ -249,7 +249,7 @@
                             style="margin: 5px">刷新
                     </button>
                 </div>
-                <table class="table table-bordered">
+                <table class="table table-bordered table-striped">
                     <thead>
                     <tr>
                         <th>类型</th>
@@ -263,7 +263,7 @@
                     <tbody id="logList">
                     </tbody>
                 </table>
-                <div id="logPager"></div>
+                <div id="logPager" class="row" style="margin:0"></div>
             </div>
             <% } %>
         </div>
