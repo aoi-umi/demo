@@ -9,12 +9,12 @@ import * as common from './common';
 import * as myInterface from './myInterface';
 import * as myVaild from './myVaild';
 import * as myEnum from './myEnum';
-import {MyModule, ModuleOption} from './myModule';
+import { ModuleOptionGeneric, MyModuleGeneric } from './myModule';
 
-interface ModuleStructOption extends ModuleOption {
+interface ModuleStructOption extends ModuleOptionGeneric<ModuleStruct> {
     treeItemId?: string;
 }
-export class ModuleStruct extends MyModule {
+export class ModuleStruct extends MyModuleGeneric<ModuleStruct, ModuleStructOption> {
     treeItemId: string;
     treeItemTemp: string;
     constructor(option?: ModuleStructOption) {
@@ -36,7 +36,7 @@ export class ModuleStruct extends MyModule {
             idList: [
                 'treeItemId',
             ],
-            init: function(self: ModuleStruct){                
+            init: function (self) {
                 self.treeItemTemp = $(self.treeItemId).html();
 
                 self.opt.queryArgsOpt = [{
@@ -67,13 +67,13 @@ export class ModuleStruct extends MyModule {
                     }
                 }];
             },
-            bindEvent: function (self: ModuleStruct) {
+            bindEvent: function (self) {
                 $('#tree, #treeRefresh').on('click', function () {
                     if ($(this).attr('id') == 'tree') {
                         $('#treeModal').modal('show');
                     }
                     var data = {};
-                    myInterface.api.struct.query(data).then(function (t) {                        
+                    myInterface.api.struct.query(data).then(function (t) {
                         $('.tree').empty();
                         var list = t.list.sort(function (a, b) {
                             return b.level - a.level;
@@ -120,7 +120,7 @@ export class ModuleStruct extends MyModule {
                 treeModal.on('click', '.itemAdd', function () {
                     var row = $(this).closest(self.rowClass);
                     let item = row.data('item');
-                    item = $.extend(null, self.opt.saveDefaultModel, item ? {parentStruct: item.struct} : null);
+                    item = $.extend(null, self.opt.saveDefaultModel, item ? { parentStruct: item.struct } : null);
                     self.edit(item);
                 });
             },
@@ -128,8 +128,8 @@ export class ModuleStruct extends MyModule {
                 item.structTypeEnum = myEnum.getEnum('structTypeEnum');
                 return item;
             },
-            editAfterRender: function (item, self: ModuleStruct) {
-                self.updateView(['structDetail'], {structDetail: item});
+            editAfterRender: function (item, self) {
+                self.updateView(['structDetail'], { structDetail: item });
                 self.detailDom.modal('show');
             },
             beforeSave: function (dom, self) {
@@ -155,7 +155,7 @@ export class ModuleStruct extends MyModule {
                     name: 'level',
                     dom: self.detailContainerDom.find('[name=level]'),
                 }];
-                var checkRes = common.dataCheck({list: list});
+                var checkRes = common.dataCheck({ list: list });
                 return checkRes;
             },
             onSaveSuccess: function (t, self) {
@@ -164,20 +164,20 @@ export class ModuleStruct extends MyModule {
                     btnOptList: [{
                         content: '继续'
                     }, {
-                        content: '关闭', 
-                        returnValue: 'close',                        
+                        content: '关闭',
+                        returnValue: 'close',
                     }]
                 }).waitClose().then(val => {
-                    if(val == 'close') {
+                    if (val == 'close') {
                         self.detailDom.modal('hide');
                         self.pager.refresh();
                     }
                 });
             },
-            onDetailQuerySuccess: function (t, self: ModuleStruct) {
+            onDetailQuerySuccess: function (t, self) {
                 t.structTypeEnum = myEnum.getEnum('structTypeEnum');
                 self.detailRender(t);
-                self.updateView(['structDetail'], {structDetail: t});
+                self.updateView(['structDetail'], { structDetail: t });
                 self.detailDom.modal('show');
             },
         };

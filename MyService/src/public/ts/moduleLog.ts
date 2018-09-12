@@ -13,7 +13,7 @@ export class ModuleLog extends MyModule {
             operation: ['query'],
             interfacePrefix: 'log',
 
-            init: function (self: ModuleLog) {
+            init: function (self) {
                 self.opt.queryArgsOpt = [{
                     name: 'id',
                     dom: $(`${self.queryBoxId} [name=id]`),
@@ -69,7 +69,7 @@ export class ModuleLog extends MyModule {
                     dom: $(`${self.queryBoxId} [name=remark]`),
                 }];
             },
-            bindEvent: function (self: ModuleLog) {
+            bindEvent: function (self) {
                 if (self.operation.query) {
                     let minDate = '1900-01-01';
                     let maxDate = '9999-12-31';

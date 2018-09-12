@@ -7,22 +7,24 @@ import 'bootstrap-datetimepicker';
 import * as common from './common';
 import * as myInterface from './myInterface';
 import * as myVaild from './myVaild';
-import {MyModule, ModuleOption} from './myModule';
-import {AuthorityAutoComplete, RoleAutoComplete} from './autoComplete';
+import { ModuleOptionGeneric, MyModuleGeneric } from './myModule';
+import { AuthorityAutoComplete, RoleAutoComplete } from './autoComplete';
 
-export class ModuleUserInfo extends MyModule {
+interface ModuleUserInfoOption extends ModuleOptionGeneric<ModuleUserInfo> {
+}
+export class ModuleUserInfo extends MyModuleGeneric<ModuleUserInfo, ModuleUserInfoOption> {
     currUserId: number;
     currUserDetail: any;
     authorityAutoComplete: AuthorityAutoComplete;
     roleAutoComplete: RoleAutoComplete;
     structTree: any;
 
-    constructor(option?: ModuleOption) {
-        var opt: ModuleOption = {
+    constructor(option?: ModuleUserInfoOption) {
+        var opt: ModuleUserInfoOption = {
             operation: ['query', 'save', 'detailQuery'],
             interfacePrefix: 'userInfo',
-            detailUrl: '/userInfo/detail',            
-            init: function (self: ModuleUserInfo) {
+            detailUrl: '/userInfo/detail',
+            init: function (self) {
                 if (self.operation.query) {
                     self.opt.queryArgsOpt = [{
                         name: 'account',
@@ -67,17 +69,17 @@ export class ModuleUserInfo extends MyModule {
                     self.detailDom.find('.save').removeClass('save').addClass('admin-save');
                 }
             },
-            bindEvent: function (self: ModuleUserInfo) {
-                if (self.operation.query) {   
+            bindEvent: function (self) {
+                if (self.operation.query) {
                     let minDate = '1900-01-01';
-                    let maxDate = '9999-12-31';                                     
+                    let maxDate = '9999-12-31';
                     let dateOpt = {
                         format: 'yyyy-mm-dd',
                         minView: 'month',
                         autoclose: true,
                         todayBtn: true,
                         clearBtn: true,
-                        startDate: minDate,                        
+                        startDate: minDate,
                     };
                     $(`${self.queryBoxId} [name=createDateStart]`)
                         .datetimepicker(dateOpt)
@@ -99,7 +101,7 @@ export class ModuleUserInfo extends MyModule {
                         .datetimepicker(dateOpt)
                         .on('click', function () {
                             $(this).datetimepicker('setStartDate', $(`${self.queryBoxId} [name=editDateStart]`).val() || minDate);
-                        });                    
+                        });
 
                     $(document).on('click', '.admin-save', function () {
                         self.adminSave();
@@ -199,7 +201,7 @@ export class ModuleUserInfo extends MyModule {
                             return '密码不一致';
                     }
                 }];
-                var checkRes = common.dataCheck({list: list});
+                var checkRes = common.dataCheck({ list: list });
                 if (checkRes.success) {
                     var data = checkRes.model;
                     if (data.newPassword) {
@@ -217,19 +219,19 @@ export class ModuleUserInfo extends MyModule {
                         returnValue: 'accept',
                     }]
                 }).waitClose().then(val => {
-                    if(val == 'accept') {
+                    if (val == 'accept') {
                         location.reload(true);
                     }
                 });
             },
             beforeDetailQuery: function (item) {
-                return {id: item.id, noLog: true};
+                return { id: item.id, noLog: true };
             },
-            onDetailQuerySuccess: function (t, self: ModuleUserInfo) {
+            onDetailQuerySuccess: function (t, self) {
                 self.detailRender(t.userInfo);
                 self.currUserId = t.userInfo.id;
                 self.currUserDetail = t;
-                self.updateView(['userInfoDetail'], {userInfoAllDetail: t});
+                self.updateView(['userInfoDetail'], { userInfoAllDetail: t });
                 self.detailDom.modal('show');
                 common.promise(() => {
                     if (!self.structTree) {
@@ -303,7 +305,7 @@ export class ModuleUserInfo extends MyModule {
             var val = dom.find('option:selected').val() || '';
             let oldStruct = dom.data('oldStruct') || '';
             if (oldStruct != val) {
-                data.structList.push({type: dom.attr('name'), struct: val});
+                data.structList.push({ type: dom.attr('name'), struct: val });
             }
         });
 
@@ -316,16 +318,16 @@ export class ModuleUserInfo extends MyModule {
                 type: 1, msg: '保存成功:' + t,
                 btnOptList: [{
                     content: '确定',
-                    returnValue: 'accept',                        
+                    returnValue: 'accept',
                 }]
             }).waitClose().then(val => {
-                if(val == 'accept') {
+                if (val == 'accept') {
                     self.detailDom.modal('hide');
                     self.pager.refresh();
                 }
             });
         }).fail(function (e) {
-            common.msgNotice({type: 1, msg: e.message});
+            common.msgNotice({ type: 1, msg: e.message });
         });
     }
 
@@ -355,7 +357,7 @@ export class ModuleUserInfo extends MyModule {
 
     structQuery() {
         var self = this;
-        return myInterface.api.struct.query({status: 1, noOperation: true}).then(t => {
+        return myInterface.api.struct.query({ status: 1, noOperation: true }).then(t => {
             self.structTree = common.getTree(t.list, null, null, 'struct', 'parentStruct').rootTree;
         }).catch(e => {
             self.detailContainerDom.find('[name=structBox] [name=msg]').text(e.message);

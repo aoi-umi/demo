@@ -1,4 +1,7 @@
-/// <reference types="jquery"/>
+//后端
+type InterfaceCustomFunction = (opt, exOpt: { req: Request, user: Express.MyDataUser }) => any;
+
+//前端
 interface JQueryStatic {
     ui: any;
 }
@@ -69,4 +72,29 @@ interface TabAndPanelOption {
 }
 interface MyTab {
     addOrOpenTab: (opt: TabAndPanelOption) => void;
+}
+
+//common
+interface dataCheckOption {
+    list: Array<dataCheckOptionListOption>;
+}
+
+interface dataCheckOptionListOption {
+    name: string;
+    desc?: string,
+    dom?: JQuery<HTMLElement>;
+    focusDom?: JQuery<HTMLElement>
+    canNotNull?: boolean;
+    canNotNullDesc?: string;
+    isTrim?: boolean;
+    getValue?: any;
+    // getValue: function () {
+    //     return this.dom.find("option:selected").text();
+    // },
+    checkValue?: Function;
+    // checkValue: function (value, model) {
+    //     if (!value) {
+    //         return ('密码只能由8~20位字母和数字组成');
+    //     }
+    // }
 }

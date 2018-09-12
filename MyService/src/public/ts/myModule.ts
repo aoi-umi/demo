@@ -25,51 +25,51 @@ class ModuleBase {
     itemToDetailClass?: string;
 }
 
-export class ModuleOption extends ModuleBase {
+export class ModuleOptionGeneric<T> extends ModuleBase {
     operation?: any[];
     detailUrl?: string;
     interfacePrefix?: string;
-    queryArgsOpt?: any[];
+    queryArgsOpt?: dataCheckOptionListOption[];
     saveDefaultModel?: any;
     idList?: string[];
 
-    init?(self: MyModule);
+    init?(self: T);
 
-    bindEvent?(self: MyModule);
+    bindEvent?(self: T);
 
-    beforeQueryDataCheck?(self: MyModule);
+    beforeQueryDataCheck?(self: T);
 
     beforeQuery?(data: any);
 
     onQuerySuccess?(data: any);
 
-    onQueryFail?(data: any, self: MyModule);
+    onQueryFail?(data: any, self: T);
 
-    editBeforeRender?(data: any, self: MyModule);
+    editBeforeRender?(data: any, self: T);
 
-    editAfterRender?(data: any, self: MyModule);
+    editAfterRender?(data: any, self: T);
 
-    beforeSave?(data: any, self: MyModule);
+    beforeSave?(data: any, self: T);
 
-    onSaveSuccess?(data: any, self: MyModule);
+    onSaveSuccess?(data: any, self: T);
 
-    onSaveFail?(data: any, self: MyModule);
+    onSaveFail?(data: any, self: T);
 
     beforeDel?(data: any);
 
-    onDelSuccess?(data: any, self: MyModule);
+    onDelSuccess?(data: any, self: T);
 
-    onDelFail?(data: any, self: MyModule);
+    onDelFail?(data: any, self: T);
 
-    beforeDetailQuery?(data: any, self: MyModule);
+    beforeDetailQuery?(data: any, self: T);
 
-    onDetailQuerySuccess?(data: any, self: MyModule);
+    onDetailQuerySuccess?(data: any, self: T);
 
-    onDetailQueryFail?(data: any, self: MyModule);
+    onDetailQueryFail?(data: any, self: T);
 }
-
-export class MyModule extends ModuleBase {
-    constructor(option) {
+export class ModuleOption extends ModuleOptionGeneric<MyModule> { }
+export class MyModuleGeneric<TModule extends MyModuleGeneric<TModule, TOption>, TOption extends ModuleOptionGeneric<TModule>> extends ModuleBase {
+    constructor(option: TOption) {
         super();
         this.init(option);
     }
@@ -93,7 +93,7 @@ export class MyModule extends ModuleBase {
         del: false,
     };
     variable: any = {};
-    opt: ModuleOption = {
+    opt: TOption = {
         //query detailQuery save del
         operation: [],
         pagerId: 'pager',
@@ -119,11 +119,11 @@ export class MyModule extends ModuleBase {
         interfacePrefix: '',
         detailUrl: '',
 
-        init: function (self: MyModule) {
+        init: function (self: TModule) {
         },
-        bindEvent: function (self: MyModule) {
+        bindEvent: function (self: TModule) {
         },
-        beforeQueryDataCheck: function (self: MyModule) {
+        beforeQueryDataCheck: function (self: TModule) {
             var list = self.opt.queryArgsOpt;
             if (list) {
                 return common.dataCheck({ list: list });
@@ -134,47 +134,47 @@ export class MyModule extends ModuleBase {
         },
         onQuerySuccess: function (t) {
         },
-        onQueryFail: function (e, self: MyModule) {
+        onQueryFail: function (e, self: TModule) {
             common.msgNotice({ type: 1, msg: e.message });
         },
-        editBeforeRender: function (item, self: MyModule) {
+        editBeforeRender: function (item, self: TModule) {
             return item;
         },
-        editAfterRender: function (item, self: MyModule) {
+        editAfterRender: function (item, self: TModule) {
         },
-        beforeSave: function (dom, self: MyModule): any {
+        beforeSave: function (dom, self: TModule): any {
         },
-        onSaveSuccess: function (t, self: MyModule) {
+        onSaveSuccess: function (t, self: TModule) {
             common.msgNotice({ type: 1, msg: '保存成功:' + t });
         },
-        onSaveFail: function (e, self: MyModule) {
+        onSaveFail: function (e, self: TModule) {
             common.msgNotice({ type: 1, msg: '保存失败:' + e.message });
         },
         beforeDel: function (t) {
         },
-        onDelSuccess: function (t, self: MyModule) {
+        onDelSuccess: function (t, self: TModule) {
             common.msgNotice({ type: 1, msg: '删除成功' });
             self.pager.refresh();
         },
-        onDelFail: function (e, self: MyModule) {
+        onDelFail: function (e, self: TModule) {
             common.msgNotice({ type: 1, msg: '删除失败:' + e.message });
         },
-        beforeDetailQuery: function (t, self: MyModule) {
+        beforeDetailQuery: function (t, self: TModule) {
             var data: any = {};
             if (t && t.id)
                 data.id = t.id;
             return data;
         },
-        onDetailQuerySuccess: function (t, self: MyModule) {
+        onDetailQuerySuccess: function (t, self: TModule) {
             self.detailRender(t);
         },
-        onDetailQueryFail: function (e, self: MyModule) {
+        onDetailQueryFail: function (e, self: TModule) {
             common.msgNotice({ type: 1, msg: '查询失败:' + e.message });
         }
-    };
+    } as any;
 
     private init(option) {
-        var self = this;
+        var self = this as any as TModule;
         self.opt = $.extend(self.opt, option);
 
         if (self.opt.operation && self.opt.operation.length) {
@@ -247,7 +247,7 @@ export class MyModule extends ModuleBase {
     }
 
     private bindEvent() {
-        var self = this;
+        var self = this as any as TModule;
 
         if (self.operation.query) {
             self.queryDom.on('click', function () {
@@ -342,8 +342,8 @@ export class MyModule extends ModuleBase {
     }
 
     query(pageIndex?) {
-        var self = this;
-        return common.promise(function () {
+        var self = this as any as TModule;
+        return common.promise(async function () {
             var errorDom = self.queryContainerDom.find('.error').hide();
             var data = null;
             var checkRes = self.opt.beforeQueryDataCheck(self);
@@ -366,7 +366,8 @@ export class MyModule extends ModuleBase {
             self.opt.beforeQuery(data);
             var method = 'query';
             var notice = common.msgNotice({ type: 1, msg: '查询中...', noClose: true });
-            return myInterface.api[self.opt.interfacePrefix][method](data).then(function (t) {
+            try {
+                let t = await myInterface.api[self.opt.interfacePrefix][method](data)
                 self.opt.onQuerySuccess(t);
                 self.queryContainerDom.find(self.rowClass).remove();
                 var temp = self.queryItemTemp;
@@ -381,7 +382,7 @@ export class MyModule extends ModuleBase {
                     errorDom.show();
                 }
                 return t;
-            }).fail(function (e) {
+            } catch (e) {
                 self.queryContainerDom.find(self.rowClass).remove();
                 if (errorDom.length) {
                     if (e instanceof Error) e = e.message;
@@ -391,9 +392,9 @@ export class MyModule extends ModuleBase {
                     e = null;
                 }
                 throw e;
-            }).finally(function () {
+            } finally {
                 notice.close();
-            });
+            }
         }).fail(function (e) {
             if (e) {
                 console.log(e);
@@ -404,7 +405,7 @@ export class MyModule extends ModuleBase {
     }
 
     edit(item?) {
-        var self = this;
+        var self = this as any as TModule;
         if (!item) {
             item = self.opt.saveDefaultModel;
         }
@@ -414,7 +415,7 @@ export class MyModule extends ModuleBase {
     }
 
     save(dom) {
-        var self = this;
+        var self = this as any as TModule;
         return common.promise(function () {
             var data = null;
             var checkRes = self.opt.beforeSave(dom, self);
@@ -447,18 +448,18 @@ export class MyModule extends ModuleBase {
     }
 
     del(item) {
-        var self = this;
+        var self = this as any as TModule;
         return common.promise(function (defer) {
             common.msgNotice({
                 type: 1, msg: '是否删除?',
                 btnOptList: [{
                     content: '确认',
-                    returnValue: 'accept'                    
+                    returnValue: 'accept'
                 }, {
                     content: '取消',
                 }]
             }).waitClose().then(val => {
-                if(val == 'accept') {
+                if (val == 'accept') {
                     defer.resolve();
                 }
             });
@@ -481,7 +482,7 @@ export class MyModule extends ModuleBase {
     }
 
     detailQuery(item) {
-        var self = this;
+        var self = this as any as TModule;
         return common.promise(function () {
             var notice = common.msgNotice({ type: 1, msg: '查询中...', noClose: true });
             var data = self.opt.beforeDetailQuery(item, self);
@@ -502,3 +503,4 @@ export class MyModule extends ModuleBase {
         self.detailContainerDom.html(ejs.render(temp, item));
     }
 }
+export class MyModule extends MyModuleGeneric<MyModule, ModuleOption>{ }

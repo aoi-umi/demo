@@ -8,13 +8,13 @@ import * as $ from 'jquery';
 import * as common from './common';
 import * as myInterface from './myInterface';
 import * as myVaild from './myVaild';
-import {MyModule, ModuleOption} from './myModule';
+import {MyModuleGeneric, ModuleOptionGeneric} from './myModule';
 
-interface ModuleMainContentTypeOption extends ModuleOption {
+interface ModuleMainContentTypeOption extends ModuleOptionGeneric<ModuleMainContentType> {
     treeItemId?: string;
 }
 
-export class ModuleMainContentType extends MyModule {
+export class ModuleMainContentType extends MyModuleGeneric<ModuleMainContentType, ModuleMainContentTypeOption> {
     treeItemId: string;
     treeItemTemp: string;
 
@@ -35,7 +35,7 @@ export class ModuleMainContentType extends MyModule {
                 'treeItemId',
             ],
             interfacePrefix: 'mainContentType',
-            init: function (self: ModuleMainContentType) {
+            init: function (self) {
                 self.treeItemTemp = $(self.treeItemId).html();
 
                 self.opt.queryArgsOpt = [{
@@ -63,7 +63,7 @@ export class ModuleMainContentType extends MyModule {
                     }
                 }];
             },
-            bindEvent: function (self: ModuleMainContentType) {
+            bindEvent: function (self) {
                 $('#tree, #treeRefresh').on('click', function () {
                     if ($(this).attr('id') == 'tree') {
                         $('#treeModal').modal('show');
@@ -121,7 +121,7 @@ export class ModuleMainContentType extends MyModule {
                     self.edit(item);
                 });
             },
-            editAfterRender: function (item, self: ModuleMainContentType) {
+            editAfterRender: function (item, self) {
                 self.updateView(['mainContentTypeDetail'], {mainContentTypeDetail: item});
                 self.detailDom.modal('show');
             },
@@ -162,7 +162,7 @@ export class ModuleMainContentType extends MyModule {
                     }
                 });
             },
-            onDetailQuerySuccess: function (t, self: ModuleMainContentType) {
+            onDetailQuerySuccess: function (t, self) {
                 self.detailRender(t);
                 self.updateView(['mainContentTypeDetail'], {mainContentTypeDetail: t});
                 self.detailDom.modal('show');

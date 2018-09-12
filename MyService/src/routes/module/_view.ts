@@ -3,7 +3,7 @@
  */
 import * as path from 'path';
 import * as fs from 'fs';
-import {Request, Response} from 'express';
+import { Request, Response } from 'express';
 
 import * as common from '../_system/common';
 import * as myEnum from '../_system/enum';
@@ -33,7 +33,12 @@ export let get = function (req: Request, res: Response, next) {
     });
 };
 
-var setViewOption = async function (opt) {
+var setViewOption = async function (opt: {
+    req: Request;
+    user: Express.MyDataUser;
+    view: string;
+    [key: string]: any;
+}) {
     let req = opt.req;
     var query = req.query;
     var user = opt.user;
@@ -48,7 +53,7 @@ var setViewOption = async function (opt) {
             break;
 
         case '/userInfo/detail':
-            return require('../viewBll/userInfo').detailQuery({id: query.id || user.id}, opt);
+            return require('../viewBll/userInfo').detailQuery({ id: query.id || user.id }, opt);
 
         case '/mainContent/list':
             opt.mainContentStatusEnum = myEnum.getEnum('mainContentStatusEnum');
@@ -56,7 +61,7 @@ var setViewOption = async function (opt) {
             break;
 
         case '/mainContent/detail':
-            return require('../viewBll/mainContent').detailQuery({id: query.id}, opt);
+            return require('../viewBll/mainContent').detailQuery({ id: query.id }, opt);
 
         case '/help':
             return require('../viewBll/help').get(null, opt);
@@ -65,7 +70,7 @@ var setViewOption = async function (opt) {
             opt.config = {};
             for (let key in config) {
                 if (common.isInArray(key, ['name', 'port', 'deploy', 'version', 'env',
-                        'errorDir', 'fileDir', 'cachePrefix',])) {
+                    'errorDir', 'fileDir', 'cachePrefix',])) {
                     opt.config[key] = config[key];
                 }
                 opt.config.redis = `${config.redis.host}:${config.redis.port}`;

@@ -39,7 +39,7 @@ export let detailQuery = function (opt, exOpt) {
             detail.mainContent = { id: 0, status: 0, type: 0 };
         } else if (!opt.id) {
             throw common.error('', errorConfig.ARGS_ERROR);
-        } else {
+        } else {            
             let t = await MainContent.customDetailQuery(opt);
             detail = {
                 ...detail, ...t
@@ -58,10 +58,8 @@ export let detailQuery = function (opt, exOpt) {
         }
         if (detail.mainContentTypeList) {
             detail.mainContentTypeList.forEach((ele) => {
-                ele.type = ele.mainContentType;
                 if (ele.mainContentTypeName)
                     ele.typeName = ele.mainContentTypeName;
-                delete ele.mainContentType;
                 delete ele.mainContentTypeName;
             });
         }
@@ -288,7 +286,7 @@ function updateMainContent(item) {
     item.statusName = myEnum.getValue('mainContentStatusEnum', item.status);
 }
 
-function updateMainContentLog(item) {
+export function updateMainContentLog(item) {
     item.typeName = myEnum.getValue('mainContentLogTypeEnum', item.type);
     item.srcStatusName = myEnum.getValue('mainContentStatusEnum', item.srcStatus);
     item.destStatusName = myEnum.getValue('mainContentStatusEnum', item.destStatus);
