@@ -6,7 +6,6 @@ import * as cache from './_system/cache';
 import errorConfig from './_system/errorConfig';
 
 import * as userBll from './bll/user';
-import * as upload from './upload';
 
 import config from '../config';
 
@@ -75,7 +74,7 @@ export let accessableUrlConfig: auth.AccessableUrlConfigType[] = [
         url: '/interface/mainContent/statusUpdate',
         auth: [auth.authConfig.login.code, auth.authConfig.mainContentSave.code]
     },
-    //{url: '/interface/mainContent/del', auth: [auth.authConfig.admin.code]},
+    {url: '/interface/mainContentLog/query', auth: [auth.authConfig.login.code]},
 
     //mainContentType
     { url: '/mainContentType/list', auth: [auth.authConfig.login.code, auth.authConfig.mainContentTypeQuery.code] },
@@ -199,7 +198,7 @@ export let formatViewRes = function (option) {
     return opt;
 };
 
-export let init = function (opt) {
+export let init = function (opt: { viewPath: string }) {
     Date.prototype.toJSON = function () {
         return common.dateFormat(this, 'yyyy-MM-dd HH:mm:ss');
     };
@@ -351,6 +350,7 @@ export let init = function (opt) {
 };
 
 import * as index from './module/index';
+import * as upload from './upload';
 //注册路由
 export let register = function (app: Express) {
     app.get('/msg', index.msg);

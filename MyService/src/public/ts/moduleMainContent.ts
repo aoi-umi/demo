@@ -8,18 +8,18 @@ import 'bootstrap-datetimepicker';
 import * as common from './common';
 import * as myInterface from './myInterface';
 import * as myVaild from './myVaild';
-import {MyModule, ModuleOption} from './myModule';
+import { MyModuleGeneric, ModuleOptionGeneric } from './myModule';
 
-interface ModuleMainContentOption extends ModuleOption {
+interface ModuleMainContentOption extends ModuleOptionGeneric<ModuleMainContent> {
     mainContentDetailId?: string;
     mainContentTypeId?: string;
     mainContentChildListId?: string;
-    mainContentChildId? : string;
+    mainContentChildId?: string;
     mainContentChildDetailId?: string;
     mainContentChildTempId?: string;
 }
 
-export class ModuleMainContent extends MyModule {
+export class ModuleMainContent extends MyModuleGeneric<ModuleMainContent, ModuleMainContentOption> {
     mainContentTypeList: Array<any>;
     currMainContentTypeList: Array<any>;
     mainContentDetailId: string;
@@ -48,7 +48,7 @@ export class ModuleMainContent extends MyModule {
                 'mainContentChildTempId',
             ],
 
-            init: function (self: ModuleMainContent) {
+            init: function (self) {
                 self.opt.queryArgsOpt = [{
                     name: 'type',
                     dom: $(`${self.queryBoxId} [name=typeBox]`),
@@ -112,7 +112,7 @@ export class ModuleMainContent extends MyModule {
                     self.mainContentTypeTemp = $('.mainContentType:eq(0)').prop('outerHTML');
                 }
             },
-            bindEvent: function (self: ModuleMainContent) {
+            bindEvent: function (self) {
                 if (self.operation.query) {
                     let minDate = '1900-01-01';
                     let maxDate = '9999-12-31';
@@ -206,7 +206,7 @@ export class ModuleMainContent extends MyModule {
                             dom: mainContentChildDetailDom.find('[name=content]'),
                             canNotNull: true
                         }];
-                        var checkRes = common.dataCheck({list: argsOpt});
+                        var checkRes = common.dataCheck({ list: argsOpt });
                         if (!checkRes.success) {
                             common.msgNotice({
                                 type: checkRes.dom ? 0 : 1,
@@ -235,7 +235,7 @@ export class ModuleMainContent extends MyModule {
                         let editDom = $('#editMainContentType');
                         let cancelDom = $('#cancelMainContentType');
                         let refresh = function () {
-                            return myInterface.api.mainContentType.query({status: 1, noOperation: true}).then((t) => {
+                            return myInterface.api.mainContentType.query({ status: 1, noOperation: true }).then((t) => {
                                 self.mainContentTypeList = t.list;
                             });
                         }
@@ -244,7 +244,7 @@ export class ModuleMainContent extends MyModule {
                             if (!clone.length)
                                 clone.push({});
                             else {
-                                clone.push({parentType: clone[clone.length - 1].type});
+                                clone.push({ parentType: clone[clone.length - 1].type });
                             }
                             $(clone).each((index, ele: any) => {
                                 self.setMainContentTypeOption(index, ele.parentType, ele.type);
@@ -324,7 +324,7 @@ export class ModuleMainContent extends MyModule {
                 }
                 $(`.statusCount[data-status=""]`).text(totalCount);
             },
-            beforeSave: function (dom, self: ModuleMainContent) {
+            beforeSave: function (dom, self) {
                 var saveArgsOpt = [{
                     name: 'id',
                     desc: 'id',
@@ -341,7 +341,7 @@ export class ModuleMainContent extends MyModule {
                     canNotNull: true,
                 }];
                 var detail: any = {};
-                var checkRes = common.dataCheck({list: saveArgsOpt});
+                var checkRes = common.dataCheck({ list: saveArgsOpt });
                 if (checkRes.success) {
                     var mainContent =
                         detail.mainContent = checkRes.model;
@@ -385,7 +385,7 @@ export class ModuleMainContent extends MyModule {
                         returnValue: 'accept',
                     }
                 }).waitClose().then(val => {
-                    if(val == 'accept') {
+                    if (val == 'accept') {
                         location.reload(true);
                     }
                 });
@@ -401,7 +401,7 @@ export class ModuleMainContent extends MyModule {
         let self = this;
         var mainContentChildDetailDom = $(self.mainContentChildDetailId);
         if (!item) {
-            mainContentChildDetailDom.data('item', {num: $(`${self.mainContentChildListId} ${self.rowClass}`).length + 1});
+            mainContentChildDetailDom.data('item', { num: $(`${self.mainContentChildListId} ${self.rowClass}`).length + 1 });
             mainContentChildDetailDom.find(':input').val('');
             mainContentChildDetailDom.find('option:eq(0)').prop('selected', true);
         } else {
@@ -426,7 +426,7 @@ export class ModuleMainContent extends MyModule {
 
     statusUpdate(dom) {
         let self = this;
-        var mainContent: any = {id: dom.data('id')};
+        var mainContent: any = { id: dom.data('id') };
         return common.promise(async function () {
             var operate = dom.data('operate');
             mainContent.operate = operate;
@@ -438,26 +438,26 @@ export class ModuleMainContent extends MyModule {
                 type: 1, msg: `确认[${text}]?`, btnOptList: [{
                     content: '确认',
                     returnValue: 'accept',
-                },{
+                }, {
                     content: '取消',
                 }]
             }).waitClose();
-            if(closeValue != 'accept')
+            if (closeValue != 'accept')
                 return;
             var detail = {
                 mainContent: mainContent,
                 remark: $('#remark').val()
             };
-            var notice = common.msgNotice({type: 1, msg: '处理中', noClose: true});
+            var notice = common.msgNotice({ type: 1, msg: '处理中', noClose: true });
             return myInterface.api.mainContentStatusUpdate(detail).then(async function () {
                 let val = await common.msgNotice({
-                        type: 1, msg: '处理成功!', btnOptList: {
-                        content: '确认',                        
+                    type: 1, msg: '处理成功!', btnOptList: {
+                        content: '确认',
                         returnValue: 'accept',
                     }
                 }).waitClose();
-                
-                if(val == 'accept')
+
+                if (val == 'accept')
                     self.onStatusUpdateSuccess();
 
             }).finally(function () {

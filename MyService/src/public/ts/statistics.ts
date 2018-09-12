@@ -91,9 +91,9 @@ export class LogStatistics {
                 });
                 for (let method in dataDict) {
                     let first = moment(dataDict[method][0][0]);
-                    let last = moment({ hour: 0 });
+                    let last = moment({ hour: 0 }).add({day: 1});
                     let newData = [];
-                    while (first <= last) {
+                    while (first.toDate().getTime() < last.toDate().getTime()) {
                         let match = dataDict[method].find(ele => ele[0].getTime() == first.toDate().getTime());
                         if (match)
                             newData.push(match);

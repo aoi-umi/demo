@@ -228,20 +228,27 @@
             }
             operateList.forEach(function(item){ %>
             <button class="btn btn-default <%= item.className %>"
-                    data-operate="<%= item.operate %>" 
+                    data-operate="<%= item.operate %>"
                     data-text="<%= item.text %>"
                     data-id="<%= mainContent.id %>">
                 <%= item.text %>
             </button>
             <% }); %>
         </div>
-        <div>
+        <div class="row">
+            <% if(mainContent.id){ %>
             <ul class="nav nav-tabs">
                 <li class="tab-header active">
                     <a href="#log" data-toggle="tab">日志</a>
                 </li>
             </ul>
-            <div id="log" class="tab-pane fade in">
+            <!--日志-->
+            <div id="log" class="tab-content fade in">
+                <div>
+                    <button id="logQuery" type="button" class="btn btn-default btn-content pull-right"
+                            style="margin: 5px">刷新
+                    </button>
+                </div>
                 <table class="table table-bordered">
                     <thead>
                     <tr>
@@ -253,18 +260,12 @@
                         <th>创建时间</th>
                     </tr>
                     </thead>
-                    <% mainContentDetail.mainContentLogList.forEach(function(item){ %>
-                    <tr>
-                        <td><%= item.typeName %></td>
-                        <td><%= item.srcStatusName %></td>
-                        <td><%= item.destStatusName %></td>
-                        <td><%= item.content %></td>
-                        <td><%= item.operator %></td>
-                        <td><%= item.createDate %></td>
-                    </tr>
-                    <% }) %>
+                    <tbody id="logList">
+                    </tbody>
                 </table>
+                <div id="logPager"></div>
             </div>
+            <% } %>
         </div>
     </div>
 </div>
@@ -310,14 +311,35 @@
 <script type="text/template" id="mainContentChildItem">
     <% include ../../_template_front/mainContent/childItem %>
 </script>
+<% if(mainContent.id){ %>
+<script type="text/template" id="mainContentLogItem">
+    <% include ../../_template_front/mainContentLog/listItem %>
+</script>
+<% } %>
 <script type="text/javascript">
-	require(['./_main', './moduleMainContent'], function () {
-		var main = require('./_main'),
-			moduleMainContent = require('./moduleMainContent');
-		main.init();
-		var opt = {
-			operation: ['detailQuery', 'save']
-		};
-		new moduleMainContent.ModuleMainContent(opt);
-	});
+	(function () {
+		var requireList = ['./_main', './moduleMainContent'];
+        <% if(mainContent.id){ %>
+		requireList.push('./moduleMainContentLog')
+        <% } %>
+		require(requireList, function () {
+			var main = require('./_main'),
+				moduleMainContent = require('./moduleMainContent');
+			main.init();
+			var opt = {
+				operation: ['detailQuery', 'save']
+			};
+			new moduleMainContent.ModuleMainContent(opt);
+            <% if(mainContent.id){ %>
+			var moduleMainContentLog = require('./moduleMainContentLog');
+			new moduleMainContentLog.ModuleMainContentLog({
+				mainContentId: '<%= mainContent.id %>',
+				queryContainerId: 'logList',
+				pagerId: 'logPager',
+				queryId: 'logQuery',
+				queryItemTempId: 'mainContentLogItem'
+			});
+            <% } %>
+		});
+	})()
 </script>

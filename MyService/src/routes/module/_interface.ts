@@ -31,7 +31,7 @@ function getBll(req: Request, res: Response, next) {
     };
 
     if (!opt.isCustom)
-        checkArgs({method: method, module: moduleName, args: args});
+        checkArgs({ method: method, module: moduleName, args: args });
 
     //不记录日志
     if (common.isInArray(moduleName, ['log'])) {
@@ -46,14 +46,14 @@ function getBll(req: Request, res: Response, next) {
                 user: req.myData.user,
                 req: req
             };
-            let bll = autoBll.getRequire(moduleName, {type: 'bll', notThrowError: true});
+            let bll = autoBll.getRequire(moduleName, { type: 'bll', notThrowError: true });
             if (!bll || !bll[method]) {
                 toNext = true;
                 return;
             }
             return bll[method](args, exOpt);
         } else {
-            let bll = autoBll.getRequire(moduleName, {notThrowError: true});
+            let bll = autoBll.getRequire(moduleName, { notThrowError: true });
             if (!bll) {
                 toNext = true;
                 return;
@@ -87,6 +87,7 @@ var isCustom = function (moduleName, method) {
         || (moduleName == 'mainContentType' && common.isInArray(method, ['save']))
         || (moduleName == 'mainContent' && common.isInArray(method, ['query', 'save']))
         || (moduleName == 'struct' && common.isInArray(method, ['save']))
+        || (moduleName == 'mainContentLog' && common.isInArray(method, ['query']))
     ) {
         return true;
     }
@@ -98,15 +99,10 @@ var checkArgs = function (opt) {
     var moduleName = opt.module;
     var args = opt.args;
     if (!(
-            (moduleName == 'mainContentType' && common.isInArray(method, ['query']))
-            || (moduleName == 'struct' && common.isInArray(method, ['query']))
-        )) {
-        if (!args.pageIndex)
-            args.pageIndex = 1;
-        if (!args.pageSize)
-            args.pageSize = 10;
-        if (args.pageSize > 50)
-            args.pageSize = 50;
+        (moduleName == 'mainContentType' && common.isInArray(method, ['query']))
+        || (moduleName == 'struct' && common.isInArray(method, ['query']))
+    )) {
+        autoBll.fixPage(args);
     }
     if (common.isInArray(method, ['detailQuery'])) {
         var argsError = false;
@@ -126,13 +122,13 @@ var updateValue = function (opt) {
     var method = opt.method;
     var t = opt.t;
 
-    if(!opt.noOperation) {
+    if (!opt.noOperation) {
         if (common.isInArray(method, ['query']) && t.list) {
             t.list.forEach(function (item) {
-                setOperationDefault({item: item, user: opt.myData.user});
+                setOperationDefault({ item: item, user: opt.myData.user });
             });
         } else if (common.isInArray(method, ['detailQuery']) && t) {
-            setOperationDefault({item: t, user: opt.myData.user});
+            setOperationDefault({ item: t, user: opt.myData.user });
         }
     }
 };

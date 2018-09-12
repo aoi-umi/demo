@@ -5,19 +5,21 @@ import * as $ from 'jquery';
 
 import * as common from './common';
 import * as myVaild from './myVaild';
-import {MyModule, ModuleOption} from './myModule';
+import {MyModuleGeneric, ModuleOptionGeneric} from './myModule';
 import {AuthorityAutoComplete} from './autoComplete';
 
-export class ModuleRole extends MyModule {
+interface ModuleRoleOption extends ModuleOptionGeneric<ModuleRole> {
+    mainContentId?: number;
+}
+export class ModuleRole extends MyModuleGeneric<ModuleRole, ModuleRoleOption> {
     currRoleCode: string;
     authorityAutoComplete: AuthorityAutoComplete;
 
-    constructor(option?: ModuleOption) {
-        var opt: ModuleOption = {
+    constructor(option?: ModuleRoleOption) {
+        var opt: ModuleRoleOption = {
             operation: ['query', 'save', 'detailQuery'],
             queryId: 'query',
             queryItemTempId: 'itemTemp',
-            queryContainerId: 'list',
 
             detailId: 'detail',
             detailContainerName: 'detailContainer',
@@ -57,7 +59,7 @@ export class ModuleRole extends MyModule {
                 name: 'anyKey',
                 dom: $('#anyKey'),
             },],
-            init: function (self: ModuleRole) {
+            init: function (self) {
                 self.opt.queryArgsOpt = [{
                     name: 'id',
                     dom: $(`${self.queryBoxId} [name=id]`),
@@ -116,7 +118,7 @@ export class ModuleRole extends MyModule {
                 }
             },
 
-            editAfterRender: function (item, self: ModuleRole) {
+            editAfterRender: function (item, self) {
                 self.updateView(['roleDetail'], {roleDetail: item});
                 self.detailDom.modal('show');
             },
@@ -198,13 +200,13 @@ export class ModuleRole extends MyModule {
             beforeDetailQuery: function (t, self) {
                 return {code: t.code};
             },
-            onDetailQuerySuccess: function (t, self: ModuleRole) {
+            onDetailQuerySuccess: function (t, self) {
                 self.detailRender(t.role);
                 self.currRoleCode = t.role.code;
                 self.updateView(['roleDetail'], {roleAllDetail: t});
                 self.detailDom.modal('show');
             },
-            editBeforeRender: function (data, self: ModuleRole) {
+            editBeforeRender: function (data, self) {
                 self.currRoleCode = null;
                 return data;
             },

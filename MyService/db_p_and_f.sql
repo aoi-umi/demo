@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50722
 File Encoding         : 65001
 
-Date: 2018-08-27 11:20:42
+Date: 2018-09-12 16:57:23
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -146,7 +146,7 @@ BEGIN
 	WHERE t1.id = pr_id;
 
 	-- 类型
-	select t2.*,t1.mainContentType, t1.mainContentTypeName from t_main_content_with_type t1 LEFT JOIN t_main_content_type t2 ON t1.mainContentType = t2.type 
+	select t2.*, t1.mainContentTypeName from t_main_content_with_type t1 LEFT JOIN t_main_content_type t2 ON t1.mainContentType = t2.type 
 		where mainContentId = pr_id ORDER BY t1.id;
 	
 	-- 内容
@@ -156,7 +156,7 @@ BEGIN
 	IF pr_noLog = 1 THEN
 		SELECT 1 FROM (SELECT 1) t WHERE 1=0;
 	ELSE
-		select * from t_main_content_log where mainContentId = pr_id order by id desc;
+		select * from t_main_content_log where mainContentId = pr_id order by id desc LIMIT 1;
 	END IF;
 END
 ;;

@@ -11,7 +11,7 @@ import errorConfig from '../_system/errorConfig';
 import * as dbModel from '../dal/models/dbModel';
 
 
-type AutoBllFun = (name, params, conn?: Transaction) => Q.Promise<any>;
+type AutoBllFun = (name: string, params, conn?: Transaction) => Q.Promise<any>;
 type AutoBllModuleFun<T> = (params, conn?: Transaction) => Q.Promise<T>;
 let dalModelsPath = '../dal/models/_auto';
 export let getRequire = function (name, option?) {
@@ -96,6 +96,8 @@ export let query: AutoBllFun = function (name, params, conn?) {
         let model = getRequire(name).default as Model<any, any>;
         let options = createQueryOption(model, params) as any as FindOptions<any>;
         options.transaction = conn;
+        if (params.orderBy)
+            options.order = params.orderBy;
         return model.findAndCountAll(options).then(t => {
             return {
                 list: t.rows.map(r => r.dataValues),
@@ -179,3 +181,12 @@ files.forEach(filename => {
         }
     });
 });
+
+export function fixPage(args) {
+    if (!args.pageIndex)
+        args.pageIndex = 1;
+    if (!args.pageSize)
+        args.pageSize = 10;
+    if (args.pageSize > 50)
+        args.pageSize = 50;
+}

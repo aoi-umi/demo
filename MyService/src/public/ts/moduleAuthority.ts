@@ -5,11 +5,13 @@ import * as $ from 'jquery';
 
 import * as common from './common';
 import * as myVaild from './myVaild';
-import {MyModule, ModuleOption} from './myModule';
+import { MyModuleGeneric, ModuleOptionGeneric } from './myModule';
 
-export class ModuleAuthority extends MyModule {
-    constructor(option?: ModuleOption) {
-        var opt: ModuleOption = {
+interface ModuleAuthorityOption extends ModuleOptionGeneric<ModuleAuthority> {
+}
+export class ModuleAuthority extends MyModuleGeneric<ModuleAuthority, ModuleOptionGeneric<ModuleAuthority>> {
+    constructor(option?: ModuleAuthorityOption) {
+        var opt: ModuleAuthorityOption = {
             operation: ['query', 'save', 'detailQuery'],
             interfacePrefix: 'authority',
             saveDefaultModel: {
@@ -19,7 +21,7 @@ export class ModuleAuthority extends MyModule {
                 status: 1,
                 operation: ['save']
             },
-            init: function (self: ModuleAuthority) {
+            init: function (self) {
                 self.opt.queryArgsOpt = [{
                     name: 'id',
                     dom: $(`${self.queryBoxId} [name=id]`),
@@ -45,8 +47,8 @@ export class ModuleAuthority extends MyModule {
                 },];
             },
 
-            editAfterRender: function (item, self: ModuleAuthority) {
-                self.updateView(['authorityDetail'], {authorityDetail: item});
+            editAfterRender: function (item, self) {
+                self.updateView(['authorityDetail'], { authorityDetail: item });
                 self.detailDom.modal('show');
             },
             beforeSave: function (dom, self) {
@@ -86,7 +88,7 @@ export class ModuleAuthority extends MyModule {
                             return this.dom.prop('checked');
                         }
                     },];
-                    let checkRes = common.dataCheck({list: list});
+                    let checkRes = common.dataCheck({ list: list });
                     return checkRes;
                 }
             },
@@ -96,19 +98,19 @@ export class ModuleAuthority extends MyModule {
                     btnOptList: [{
                         content: '继续'
                     }, {
-                        content: '关闭', 
+                        content: '关闭',
                         returnValue: 'close',
                     }]
                 }).waitClose().then(val => {
-                    if(val == 'close') {
+                    if (val == 'close') {
                         self.detailDom.modal('hide');
                         self.pager.refresh();
                     }
                 });
             },
-            onDetailQuerySuccess: function (t, self: ModuleAuthority) {
+            onDetailQuerySuccess: function (t, self) {
                 self.detailRender(t);
-                self.updateView(['authorityDetail'], {authorityDetail: t});
+                self.updateView(['authorityDetail'], { authorityDetail: t });
                 self.detailDom.modal('show');
             },
         };

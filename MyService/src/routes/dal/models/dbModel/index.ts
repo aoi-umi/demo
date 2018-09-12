@@ -44,12 +44,6 @@ export namespace MainContentTypeModel {
     export type MainContentTypeDataType = _AutoMainContentTypeDataType;
 }
 
-import _AutoMainContentTypeId, { _AutoMainContentTypeIdDataType } from "../_auto/_auto.mainContentTypeId.model";
-export namespace MainContentTypeIdModel {
-    export class MainContentTypeId extends _AutoMainContentTypeId { };
-    export type MainContentTypeIdDataType = _AutoMainContentTypeIdDataType;
-}
-
 import _AutoMainContentWithType, { _AutoMainContentWithTypeDataType } from "../_auto/_auto.mainContentWithType.model";
 export namespace MainContentWithTypeModel {
     export class MainContentWithType extends _AutoMainContentWithType { };
