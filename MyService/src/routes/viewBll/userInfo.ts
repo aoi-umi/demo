@@ -3,8 +3,8 @@
  */
 import * as common from '../_system/common';
 import errorConfig from '../_system/errorConfig';
-import * as auth from '../_system/auth';
 import * as userInfoBll from '../bll/userInfo';
+import { isHadAuthority, authConfig } from '../_system/auth';
 
 export let detailQuery = function (opt, viewOpt) {
     let req = viewOpt.req;
@@ -12,7 +12,7 @@ export let detailQuery = function (opt, viewOpt) {
     var user = viewOpt.user;
     var userInfoId = user.id;
     if (query.id && query.id != userInfoId) {
-        auth.isHadAuthority(user, 'admin', { throwError: true });
+        isHadAuthority(user, authConfig.admin, { throwError: true });
         userInfoId = query.id;
     }
     return userInfoBll.detailQuery(opt).then(function (t) {

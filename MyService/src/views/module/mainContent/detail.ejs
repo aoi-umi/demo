@@ -171,7 +171,7 @@
             switch (mainContent.status) {
                 case 0:
                 case 4:
-                    if (isHadAuthority('mainContentSave')
+                    if (isHadAuthority(authConfig.mainContentSave)
                             && (!mainContent.id || mainContent.userInfoId == user.id)) {
                         operateList.push({
                             text: '保存',
@@ -187,21 +187,21 @@
                     break;
                 case 1:
                 case 2:
-                    if (isHadAuthority('mainContentAudit')) {
+                    if (isHadAuthority(authConfig.mainContentAudit)) {
                         operateList.push({
                             text: '审核',
                             operate: 'audit',
                             className: 'statusUpdate'
                         });
                     }
-                    if (isHadAuthority('mainContentPass')) {
+                    if (isHadAuthority(authConfig.mainContentPass)) {
                         operateList.push({
                             text: '审核通过',
                             operate: 'pass',
                             className: 'statusUpdate'
                         });
                     }
-                    if (isHadAuthority('mainContentNotPass')) {
+                    if (isHadAuthority(authConfig.mainContentNotPass)) {
                         operateList.push({
                             text: '审核不通过',
                             operate: 'notPass',
@@ -210,7 +210,7 @@
                     }
                     break;
                 case -1:
-                    if (isHadAuthority('mainContentRecovery')) {
+                    if (isHadAuthority(authConfig.mainContentRecovery)) {
                         operateList.push({
                             text: '恢复',
                             operate: 'recovery',

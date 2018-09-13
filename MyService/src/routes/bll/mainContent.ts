@@ -6,7 +6,7 @@ import * as autoBll from './_auto';
 import * as common from '../_system/common';
 import errorConfig from '../_system/errorConfig';
 import * as myEnum from '../_system/enum';
-import * as auth from '../_system/auth';
+import { isHadAuthority, authConfig } from '../_system/auth';
 import { MainContent } from '../dal/models/dbModel/MainContent';
 
 export let query = function (opt, exOpt) {
@@ -39,7 +39,7 @@ export let detailQuery = function (opt, exOpt) {
             detail.mainContent = { id: 0, status: 0, type: 0 };
         } else if (!opt.id) {
             throw common.error('', errorConfig.ARGS_ERROR);
-        } else {            
+        } else {
             let t = await MainContent.customDetailQuery(opt);
             detail = {
                 ...detail, ...t
@@ -198,7 +198,7 @@ export let statusUpdate = function (opt, exOpt) {
             throw common.error(`错误的操作类型[${operate}]`);
 
         necessaryAuth = 'mainContent' + common.stringToPascal(operate);
-        if (!auth.isHadAuthority(user, necessaryAuth))
+        if (!isHadAuthority(user, necessaryAuth))
             throw common.error(`没有[${necessaryAuth}]权限`);
         return detailQuery({ id: mainContent.id }, exOpt);
     }).then(function (mainContentDetail) {
@@ -294,8 +294,8 @@ export function updateMainContentLog(item) {
 
 function canDelete(mainContent, user) {
     if (mainContent.status != -1
-        && ((auth.isHadAuthority(user, ['mainContentDel']) && (user.id == mainContent.userInfoId))
-            || (auth.isHadAuthority(user, ['admin']) && mainContent.status != 0))
+        && ((isHadAuthority(user, [authConfig.mainContentDel]) && (user.id == mainContent.userInfoId))
+            || (isHadAuthority(user, [authConfig.admin]) && mainContent.status != 0))
     ) {
         return true;
     }
