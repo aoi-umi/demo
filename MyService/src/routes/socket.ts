@@ -1,31 +1,39 @@
 /**
  * Created by umi on 2017-8-31.
  */
+import * as cookie from 'cookie';
 import * as main from './_main';
 import * as common from './_system/common';
 import * as cache from './_system/cache';
 
 export let onlineCount = 0;
 export let onlineUser = {};
-export let io = null;
-export let init = function (optIO) {
+interface Socket extends SocketIO.Socket {
+    myData?: {
+        user?: string;
+    }
+    cookies: any;
+}
+
+export let io: SocketIO.Server = null;
+export let init = function (optIO: SocketIO.Server) {
     io = optIO;
     bindEvent();
 };
 let bindEvent = function () {
-    io.on('connection', function (socket) {
+    io.on('connection', function (socket: Socket) {
+        let cookieData = socket.cookies = cookie.parse(socket.handshake.headers.cookie);
+        let userCacheKey = cookieData[main.cacheKey.userInfo];
         socket.myData = {};
-        socket.on('init', function (opt) {
-            tryFn(socket, function () {
-                socket.myData.user = opt.user;
-                if (!onlineUser[opt.user]) {
-                    onlineUser[opt.user] = 1;
-                    onlineCount++;
-                }
-                else
-                    onlineUser[opt.user]++;
-                io.sockets.emit('onlineCount', onlineCount);
-            });
+        tryFn(socket, function () {
+            socket.myData.user = userCacheKey;
+            if (!onlineUser[userCacheKey]) {
+                onlineUser[userCacheKey] = 1;
+                onlineCount++;
+            }
+            else
+                onlineUser[userCacheKey]++;
+            io.sockets.emit('onlineCount', onlineCount);
         });
 
         socket.on('postMsg', function (opt) {

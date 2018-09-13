@@ -101,3 +101,9 @@ interface dataCheckOptionListOption {
     //     }
     // }
 }
+
+//共用
+type ErrorConfigType = {
+    code: string;
+    status?: number;
+}

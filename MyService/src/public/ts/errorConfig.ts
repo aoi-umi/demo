@@ -1,4 +1,4 @@
-export default {
+let errorConfig: { [key: string]: ErrorConfigType } = {
     DEV: {
         code: 'DEV',
     },
@@ -55,3 +55,4 @@ export default {
         code: 'CACHE_EXPIRE',
     }
 };
+export default errorConfig;

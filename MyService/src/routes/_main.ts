@@ -256,7 +256,7 @@ export let init = function (opt: { viewPath: string }) {
         logSave(req, res, {
             result: !error,
             detail: error || (`${view}${formatResResult.view ? '[' + formatResResult.view + ']' : ''}`),
-            code: (error ? error.code : '') || '',
+            code: (error && error.code) || '',
             desc: '',
             guid: formatResResult.guid
         });
@@ -302,7 +302,9 @@ export let init = function (opt: { viewPath: string }) {
             req.myData.lang = req.query.lang;
 
         if (/^(::ffff:)?(127\.0\.0\.1)$/.test(req.myData.ip))
-            user.authority[auth.authConfig.local.code] = true;
+            user.authority[authConfig.local.code] = true;
+        if (config.env == 'dev')
+            user.authority[authConfig.dev.code] = true;
 
         if (req._parsedUrl.pathname == '/interface/log/save') {
             req.body.requestIp = req.myData.ip;
@@ -310,8 +312,6 @@ export let init = function (opt: { viewPath: string }) {
         if (common.isInArray(req._parsedUrl.pathname, ['/interface/log/save', '/log', '/interface/captcha/get'])) {
             req.myData.noLog = true;
         }
-        if (config.env == 'dev')
-            user.authority[auth.authConfig.dev.code] = true;
 
         res.myRender = function (view, options) {
             myRender(req, res, view, options);
