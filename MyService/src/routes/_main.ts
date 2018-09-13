@@ -64,6 +64,7 @@ export let accessableUrlConfig: auth.AccessableUrlConfigType[] = [
     { url: '/interface/userInfo/detailQuery', auth: [auth.authConfig.login.code, auth.authConfig.admin.code] },
     { url: '/interface/userInfo/save', auth: [auth.authConfig.login.code, auth.authConfig.login.code] },
     { url: '/interface/userInfo/adminSave', auth: [auth.authConfig.login.code, auth.authConfig.admin.code] },
+    { url: '/interface/userInfoLog/query', auth: [auth.authConfig.login.code] },
 
     //mainContent
     { url: '/mainContent/list', auth: [auth.authConfig.login.code, auth.authConfig.mainContentQuery.code] },
@@ -74,7 +75,7 @@ export let accessableUrlConfig: auth.AccessableUrlConfigType[] = [
         url: '/interface/mainContent/statusUpdate',
         auth: [auth.authConfig.login.code, auth.authConfig.mainContentSave.code]
     },
-    {url: '/interface/mainContentLog/query', auth: [auth.authConfig.login.code]},
+    { url: '/interface/mainContentLog/query', auth: [auth.authConfig.login.code] },
 
     //mainContentType
     { url: '/mainContentType/list', auth: [auth.authConfig.login.code, auth.authConfig.mainContentTypeQuery.code] },

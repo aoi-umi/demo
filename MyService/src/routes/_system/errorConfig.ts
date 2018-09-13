@@ -1,4 +1,8 @@
-export default {
+export type ErrorConfigType = {
+    code: string;
+    status?: number;
+}
+let errorConfig: { [key: string]: ErrorConfigType } = {
     DEV: {
         code: 'DEV',
     },
@@ -55,3 +59,4 @@ export default {
         code: 'CACHE_EXPIRE',
     }
 };
+export default errorConfig;

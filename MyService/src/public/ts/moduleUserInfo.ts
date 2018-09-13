@@ -225,7 +225,7 @@ export class ModuleUserInfo extends MyModuleGeneric<ModuleUserInfo, ModuleUserIn
                 });
             },
             beforeDetailQuery: function (item) {
-                return { id: item.id, noLog: true };
+                return { id: item.id };
             },
             onDetailQuerySuccess: function (t, self) {
                 self.detailRender(t.userInfo);

@@ -3,9 +3,13 @@
  */
 import { Request, Response } from 'express';
 import * as common from './common';
-import errorConfig from './errorConfig';
+import errorConfig, { ErrorConfigType } from './errorConfig';
 
-export const authConfig = {
+type AuthConfigType = {
+    code: string;
+    errCode?: ErrorConfigType;
+}
+export const authConfig: { [key: string]: AuthConfigType } = {
     dev: {
         code: 'dev',
         errCode: errorConfig.DEV,

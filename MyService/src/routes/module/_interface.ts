@@ -84,10 +84,11 @@ var isCustom = function (moduleName, method) {
         || (moduleName == 'role' && common.isInArray(method, ['query', 'save', 'detailQuery']))
         || (moduleName == 'authority' && common.isInArray(method, ['query', 'save']))
         || (moduleName == 'userInfo' && common.isInArray(method, ['query', 'save', 'detailQuery']))
+        || (moduleName == 'userInfoLog' && common.isInArray(method, ['query']))
         || (moduleName == 'mainContentType' && common.isInArray(method, ['save']))
         || (moduleName == 'mainContent' && common.isInArray(method, ['query', 'save']))
-        || (moduleName == 'struct' && common.isInArray(method, ['save']))
         || (moduleName == 'mainContentLog' && common.isInArray(method, ['query']))
+        || (moduleName == 'struct' && common.isInArray(method, ['save']))
     ) {
         return true;
     }

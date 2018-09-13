@@ -552,7 +552,7 @@ export let logSave = function (log) {
 // });
 
 export let streamToBuffer = function (stream) {
-    return promise(function (defer) {
+    return promise(function (defer: Q.Deferred<Buffer>) {
         var buffers = [];
         stream.on('data', function (buffer) {
             buffers.push(buffer);
