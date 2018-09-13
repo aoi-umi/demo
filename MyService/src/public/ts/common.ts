@@ -5,7 +5,7 @@ import * as SparkMD5 from 'spark-md5';
 
 window['common'] = exports;
 
-//region 前后通用
+//#region 前后通用
 /**
  *
  * @param fn 带nodeCallback参数的方法
@@ -186,9 +186,9 @@ export let stringToPascal = function (str) {
 export let clone = function <T>(obj: T): T {
     return JSON.parse(JSON.stringify(obj));
 };
-//endregion
+//#endregion
 
-//region 同名但实现不同
+//#region 同名但实现不同
 export let md5 = function (str) {
     return SparkMD5.hash(str);
 };
@@ -203,9 +203,9 @@ export let error = function (msg, code?) {
     err.code = code;
     return err;
 };
-//endregion
+//#endregion
 
-//region only
+//#region only
 export let stringToBase64 = function (str) {
     return btoa(encodeURIComponent(str));
 };
@@ -843,4 +843,4 @@ export let deleteIfEmpty = function (data) {
             delete data[key];
     }
 }
-//endregion
+//#endregion

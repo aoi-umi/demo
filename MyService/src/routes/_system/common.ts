@@ -8,12 +8,13 @@ import * as net from 'net';
 import * as crypto from 'crypto';
 import * as Q from 'q';
 import * as zlib from 'zlib';
+import { Request } from 'express';
 import config from '../../config';
 import errorConfig from './errorConfig';
 import * as logService from '../service/logService';
 
 
-//region 前后通用
+//#region 前后通用
 /**
  *
  * @param fn 带nodeCallback参数的方法
@@ -194,9 +195,9 @@ export let stringToPascal = function (str) {
 export let clone = function <T>(obj: T): T {
     return JSON.parse(JSON.stringify(obj));
 };
-//endregion
+//#endregion
 
-//region 同名但实现不同
+//#region 同名但实现不同
 export let md5 = function (data, option?) {
     var opt = {
         encoding: 'hex',
@@ -259,9 +260,9 @@ export let error = function (msg, code?, option?) {
     err.status = status;
     return err;
 };
-//endregion
+//#endregion
 
-//region only
+//#region only
 export let extend = function (...args) {
     var res = args[0] || {};
     for (let i = 1; i < args.length; i++) {
@@ -284,7 +285,7 @@ export type RequestServiceByConfigOption = {
     beforeRequest?: Function;
     afterResponse?: Function;
     noLog?: boolean;
-}
+} & request.CoreOptions;
 export let requestServiceByConfig = function (option: RequestServiceByConfigOption) {
     var method = '';
     var url = '';
@@ -327,7 +328,7 @@ export let requestServiceByConfig = function (option: RequestServiceByConfigOpti
         url = methodConfig.url;
         if (!url) throw error(`${errStr} method "${option.methodName}" url is empty!`);
         url = host + url;
-        var opt = {
+        var opt: request.Options = {
             url: url,
             body: option.data,
             method: method
@@ -362,7 +363,7 @@ export let requestServiceByConfig = function (option: RequestServiceByConfigOpti
     });
 };
 
-export let requestService = function (option: request.CoreOptions) {
+export let requestService = function (option: request.Options) {
     var opt: request.CoreOptions = {
         method: 'POST',
         json: true,
@@ -463,7 +464,7 @@ export let mkdirsSync = function (dirname, mode?) {
     return false;
 }
 
-export let getClientIp = function (req) {
+export let getClientIp = function (req: Request) {
     // var ip = req.headers['x-forwarded-for']
     // || req.connection.remoteAddress
     // || req.socket.remoteAddress
@@ -472,7 +473,7 @@ export let getClientIp = function (req) {
     return ip;
 };
 
-export let IPv4ToIPv6 = function (ip, convert?) {
+export let IPv4ToIPv6 = function (ip, convert?: boolean) {
     if (net.isIPv4(ip)) {
         if (!convert) {
             ip = '::ffff:' + ip;
@@ -551,7 +552,7 @@ export let logSave = function (log) {
 //     });
 // });
 
-export let streamToBuffer = function (stream) {
+export let streamToBuffer = function (stream: fs.ReadStream) {
     return promise(function (defer: Q.Deferred<Buffer>) {
         var buffers = [];
         stream.on('data', function (buffer) {
@@ -566,7 +567,13 @@ export let streamToBuffer = function (stream) {
     });
 };
 
-export let getListDiff = function (option) {
+export let getListDiff = function <T1, T2>(option: {
+    list: T1[],
+    newList?: T2[],
+    compare?: (t1: T1, t2: T2) => boolean,
+    delReturnValue?: (t: T1) => any,
+    addReturnValue?: (t: T2) => any,
+}) {
     var opt: any = {
         compare: function (item1, item2) {
             return item1 == item2;
@@ -612,7 +619,7 @@ export let getListDiff = function (option) {
 export let parseBool = function (b) {
     return b && b.toLocaleString() == 'true';
 };
-//endregion
+//#endregion
 
 //删除require
 //delete require.cache[require.resolve('./configData')];

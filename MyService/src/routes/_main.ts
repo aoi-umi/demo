@@ -354,13 +354,15 @@ export let init = function (opt: { viewPath: string }) {
 
 import * as index from './module/index';
 import * as upload from './upload';
+import * as _interface from '././module/_interface';
+import * as _view from '././module/_view';
 //注册路由
 export let register = function (app: Express) {
     app.get('/msg', index.msg);
     app.post('/interface/upload', upload.anyFile, index.upload);
     app.post('/interface/captcha/get', index.captchaGet);
-    app.post(/\/interface\/([\s\S]+)\/([\s\S]+)/, require('./module/_interface').post);
-    app.get('*', require('./module/_view').get);
+    app.post(/\/interface\/([\s\S]+)\/([\s\S]+)/, _interface.post);
+    app.get('*', _view.get);
 }
 
 export let errorHandler = function (err, req: Request, res: Response, next) {
