@@ -6,8 +6,8 @@ import * as fs from 'fs';
 import { Request, Response } from 'express';
 
 import * as common from '../_system/common';
-import * as myEnum from '../_system/enum';
 import * as main from '../_main';
+import { myEnum } from '../_main';
 import config from "../../config";
 
 export let get = function (req: Request, res: Response, next) {
@@ -56,8 +56,8 @@ var setViewOption = async function (opt: {
             return require('../viewBll/userInfo').detailQuery({ id: query.id || user.id }, opt);
 
         case '/mainContent/list':
-            opt.mainContentStatusEnum = myEnum.getEnum('mainContentStatusEnum');
-            opt.mainContentTypeEnum = myEnum.getEnum('mainContentTypeEnum');
+            opt.mainContentStatusEnum = myEnum.mainContentStatusEnum;
+            opt.mainContentTypeEnum = myEnum.mainContentTypeEnum;
             break;
 
         case '/mainContent/detail':

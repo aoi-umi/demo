@@ -4,20 +4,25 @@ import 'bootstrap';
 import * as common from './common';
 import * as socket from './socket';
 import * as myInterface from './myInterface';
-import * as myEnum from './myEnum';
+import { MyEnum, MyEnumInstance } from './myEnum';
 import * as user from './user';
 
 export let variable = {
     frameDom: null,
     frameDefaultHeight: 0,
 };
-
+let enumDict = {
+    structTypeEnum: {
+        'company': '公司', 'department': '部门', 'group': '小组',
+    }
+}
+export let myEnum: MyEnumInstance<typeof enumDict, any>;
 export let init = function () {
     var userInfo = $.cookie(cacheKey.userInfo);
     if (!userInfo) {
         userInfo = common.guid();
     }
-    $.cookie(cacheKey.userInfo, userInfo, {expires: 30});
+    $.cookie(cacheKey.userInfo, userInfo, { expires: 30 });
 
     if (parent == window)
         socket.init();
@@ -47,7 +52,7 @@ export let init = function () {
             captchaGet: {
                 url: '/interface/captcha/get'
             },
-            logStatistics: {                
+            logStatistics: {
                 url: '/interface/log/statistics'
             },
         },
@@ -67,13 +72,7 @@ export let init = function () {
     $(`.nav.navbar-nav a[href="${location.pathname}"]`).closest('li').addClass('active');
 
     bindEvent();
-    myEnum.init({
-        enumDict: {
-            structTypeEnum: {
-                'company': '公司', 'department': '部门', 'group': '小组',
-            }
-        }
-    });
+    myEnum = MyEnum.createInstance(enumDict, {});
 };
 
 export let bindEvent = function () {
@@ -110,7 +109,7 @@ export let bindEvent = function () {
         var dom = $(this) as any as JQuery<HTMLElement>;
         var target = $(dom.attr('href'));
         if (target.length && dom.hasClass('hover-source')) {
-            target.css({'left': dom.position().left, 'margin-top': '0px'});
+            target.css({ 'left': dom.position().left, 'margin-top': '0px' });
         } else if (dom.hasClass('hover-target'))
             target = dom;
         if (!target.length)

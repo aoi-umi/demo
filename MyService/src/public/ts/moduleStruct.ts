@@ -8,7 +8,7 @@ import * as $ from 'jquery';
 import * as common from './common';
 import * as myInterface from './myInterface';
 import * as myVaild from './myVaild';
-import * as myEnum from './myEnum';
+import { myEnum } from './_main';
 import { ModuleOptionGeneric, MyModuleGeneric } from './myModule';
 
 interface ModuleStructOption extends ModuleOptionGeneric<ModuleStruct> {
@@ -125,7 +125,7 @@ export class ModuleStruct extends MyModuleGeneric<ModuleStruct, ModuleStructOpti
                 });
             },
             editBeforeRender: function (item) {
-                item.structTypeEnum = myEnum.getEnum('structTypeEnum');
+                item.structTypeEnum = myEnum.structTypeEnum;
                 return item;
             },
             editAfterRender: function (item, self) {
@@ -175,7 +175,7 @@ export class ModuleStruct extends MyModuleGeneric<ModuleStruct, ModuleStructOpti
                 });
             },
             onDetailQuerySuccess: function (t, self) {
-                t.structTypeEnum = myEnum.getEnum('structTypeEnum');
+                t.structTypeEnum = myEnum.structTypeEnum;
                 self.detailRender(t);
                 self.updateView(['structDetail'], { structDetail: t });
                 self.detailDom.modal('show');
