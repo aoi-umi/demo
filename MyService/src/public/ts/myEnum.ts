@@ -17,7 +17,7 @@ export let getEnum = function (enumName, notThrowError?) {
 };
 
 export let getKey = function (enumName, value) {
-    var enumType = this.getEnum(enumName);
+    var enumType = getEnum(enumName);
     for (var i in enumType) {
         if (enumType[i] == value) return i;
     }
@@ -25,7 +25,7 @@ export let getKey = function (enumName, value) {
 };
 
 export let getValue = function (enumName, key) {
-    var enumType = this.getEnum(enumName);
+    var enumType = getEnum(enumName);
     return enumType[key];
 };
 

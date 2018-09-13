@@ -17,7 +17,7 @@ export let getEnum = function (enumName, notThrowError?) {
 };
 
 export let getKey = function (enumName, value) {
-    var enumType = this.getEnum(enumName);
+    var enumType = getEnum(enumName);
     for (var i in enumType) {
         if (enumType[i] == value) return i;
     }
@@ -25,7 +25,7 @@ export let getKey = function (enumName, value) {
 };
 
 export let getValue = function (enumName, key) {
-    var enumType = this.getEnum(enumName);
+    var enumType = getEnum(enumName);
     return enumType[key];
 };
 
@@ -72,3 +72,46 @@ export let enumChangeCheck = function (enumType, srcEnum, destEnum) {
         });
     }
 };
+
+class MyEnum<T>{
+    constructor(public enumDict: T) {
+
+    }
+    getEnum(enumName: keyof T, notThrowError?) {
+        var enumType = this.enumDict[enumName];
+        if (!enumType && !notThrowError) throw common.error('enum "' + enumName + '" not exist!', errorConfig.CODE_ERROR);
+        return enumType;
+    }
+    getKey(enumName, value) {
+        var enumType = this.getEnum(enumName);
+        for (var i in enumType) {
+            if (enumType[i] == value) return i;
+        }
+        return '';
+    }
+    getValue(enumName, key) {
+        var enumType = this.getEnum(enumName);
+        return enumType[key];
+    }
+}
+
+export let createInstance = function <T>(enumDict: T) {
+    let instance: {
+        [P in keyof T]?: T[P] & {
+            getKey(value): any;
+            getValue(name): any;
+        };
+    } & MyEnum<T> = new MyEnum(enumDict) as any;
+    for (let enumName in enumDict) {
+        let clone = common.clone(enumDict[enumName]) as any;
+        clone.getKey = function (value) {
+            return instance.getKey(enumName, value);
+        }
+        clone.getValue = function (key) {
+            return instance.getValue(enumName, key);
+        }
+        instance[enumName] = clone;
+    }
+
+    return instance;
+}
