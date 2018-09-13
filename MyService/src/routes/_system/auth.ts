@@ -9,7 +9,7 @@ type AuthConfigType = {
     code: string;
     errCode?: ErrorConfigType;
 }
-export const authConfig: { [key: string]: AuthConfigType } = {
+export const authConfig = {
     dev: {
         code: 'dev',
         errCode: errorConfig.DEV,
@@ -40,6 +40,22 @@ export const authConfig: { [key: string]: AuthConfigType } = {
     mainContentSave: {
         code: 'mainContentSave'
     },
+    mainContentDel: {
+        code: 'mainContentDel'
+    },
+    mainContentAudit: {
+        code: 'mainContentAudit'
+    },
+    mainContentPass: {
+        code: 'mainContentPass'
+    },
+    mainContentNotPass: {
+        code: 'mainContentNotPass'
+    },
+    mainContentRecovery: {
+        code: 'mainContentRecovery'
+    },
+
     mainContentTypeQuery: {
         code: 'mainContentTypeQuery'
     },
@@ -56,8 +72,11 @@ export const authConfig: { [key: string]: AuthConfigType } = {
 
 export type AccessableUrlConfigType = {
     url: string;
-    auth?: string | string[] | string[][];
+    auth?: AuthorityType | AuthorityType[] | AuthorityType[][];
 }
+
+type AuthorityType = string | AuthConfigType;
+
 export let accessableUrlConfig: AccessableUrlConfigType[] = [];
 
 export let init = function (opt: {
@@ -74,8 +93,8 @@ export let check = function (req: Request, res: Response, next) {
     next();
 };
 
-export let isHadAuthority = function (user: Express.MyDataUser, authData: string | string[] | string[][], opt?: IsExistAuthorityOption) {
-    if (typeof authData == 'string')
+export let isHadAuthority = function (user: Express.MyDataUser, authData: AuthorityType | AuthorityType[] | AuthorityType[][], opt?: IsExistAuthorityOption) {
+    if (!Array.isArray(authData))
         authData = [authData];
     for (var i = 0; i < authData.length; i++) {
         var item = authData[i];
@@ -90,11 +109,16 @@ type IsExistAuthorityOption = {
     notExistAuthority?: string;
     throwError?: boolean;
 }
-export let isExistAuthority = function (user: Express.MyDataUser, authData: string | string[], opt: IsExistAuthorityOption) {
+export let isExistAuthority = function (user: Express.MyDataUser, authData: AuthorityType | AuthorityType[], opt: IsExistAuthorityOption) {
+    let au = authData as AuthConfigType;
+    if (!Array.isArray(authData) && typeof authData != 'string')
+        authData = authData.code;
     if (typeof authData == 'string')
         authData = authData.split(',');
     for (var i = 0; i < authData.length; i++) {
         var item = authData[i];
+        if (typeof item != 'string')
+            item = item.code;
         if (user.authority[item]) {
             if (opt) opt.notExistAuthority = null;
             return true;
@@ -116,7 +140,9 @@ export let getAccessableUrl = function (user: Express.MyDataUser, pathname?: str
     var isUrlExist = false;
     accessableUrlConfig.forEach(function (item) {
         var opt = { notExistAuthority: null };
-        var result = !item.auth || !item.auth.length || isHadAuthority(user, item.auth, opt);
+        var result = !item.auth
+            || (Array.isArray(item.auth) && !item.auth.length)
+            || isHadAuthority(user, item.auth, opt);
         var isExist = item.url == pathname;
         if (isExist) isUrlExist = true;
         if (result) {

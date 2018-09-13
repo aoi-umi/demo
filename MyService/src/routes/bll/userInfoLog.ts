@@ -1,7 +1,7 @@
 
 import * as common from '../_system/common';
 import * as autoBll from './_auto';
-import { isHadAuthority } from '../_system/auth';
+import { isHadAuthority, authConfig } from '../_system/auth';
 
 export let query: InterfaceCustomFunction = function (opt, exOpt) {
     return common.promise(async () => {
@@ -15,7 +15,7 @@ export let query: InterfaceCustomFunction = function (opt, exOpt) {
         //todo 校验权限
         let result = await autoBll.modules.userInfoLog.query(opt);
         result.list = result.list.filter(ele => {
-            return !(ele.type != 0 && !isHadAuthority(exOpt.user, 'admin'))
+            return !(ele.type != 0 && !isHadAuthority(exOpt.user, authConfig.admin))
         });
         return result;
     });

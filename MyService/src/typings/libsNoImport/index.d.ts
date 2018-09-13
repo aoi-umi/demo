@@ -42,9 +42,12 @@ interface MyInterfaceApi {
     logStatistics?: Api;
 
     //模块
+    log?: MyInterfaceModule;
     mainContent?: MyInterfaceModule;
     mainContentType?: MyInterfaceModule;
+    mainContentLog?: MyInterfaceModule;
     userInfo?: MyInterfaceModule;
+    userInfoLog?: MyInterfaceModule;
     authority?: MyInterfaceModule;
     role?: MyInterfaceModule;
     struct?: MyInterfaceModule;

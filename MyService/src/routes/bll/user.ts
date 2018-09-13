@@ -9,7 +9,7 @@ import * as userInfoBll from './userInfo';
 
 export let signUp = function (opt, exOpt) {
     var userInfoId = 0;
-    return common.promise(async function (e) {
+    return common.promise(async function () {
         if (!opt.account)
             throw common.error('', errorConfig.CAN_NOT_BE_EMPTY, {
                 format: function (msg) {

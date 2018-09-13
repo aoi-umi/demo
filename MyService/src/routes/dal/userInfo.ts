@@ -7,7 +7,6 @@ import { UserInfoWithRoleModel, UserInfoLogModel, StructModel, RoleWithAuthority
 type UserInfoWithRoleDataType = UserInfoWithRoleModel.UserInfoWithRoleDataType;
 type UserInfoLogDataType = UserInfoLogModel.UserInfoLogDataType;
 type StructDataType = StructModel.StructDataType;
-type RoleWithAuthorityDataType = RoleWithAuthorityModel.RoleWithAuthorityDataType;
 type UserInfoWithAuthorityDataType = UserInfoWithAuthorityModel.UserInfoWithAuthorityDataType;
 export type DetailType = {
     userInfo?: UserInfoDataType;

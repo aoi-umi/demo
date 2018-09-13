@@ -3,8 +3,8 @@
  */
 import { Request, Response } from 'express';
 import * as common from '../_system/common';
-import * as auth from '../_system/auth';
 import * as autoBll from '../bll/_auto';
+import { isHadAuthority, authConfig } from '../_system/auth';
 
 //接口
 export let post = function (req: Request, res: Response, next) {
@@ -138,10 +138,10 @@ var setOperationDefault = function (opt) {
     var item = opt.item;
     if (!item.operation) {
         item.operation = [];
-        if (auth.isHadAuthority(opt.user, 'login')) {
+        if (isHadAuthority(opt.user, authConfig.login)) {
             item.operation.push('save');
         }
-        if (auth.isHadAuthority(opt.user, 'admin')) {
+        if (isHadAuthority(opt.user, authConfig.admin)) {
             item.operation.push('del');
         }
     }
