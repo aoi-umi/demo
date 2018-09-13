@@ -1,7 +1,3 @@
-export type ErrorConfigType = {
-    code: string;
-    status?: number;
-}
 let errorConfig: { [key: string]: ErrorConfigType } = {
     DEV: {
         code: 'DEV',

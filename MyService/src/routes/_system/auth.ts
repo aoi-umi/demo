@@ -3,7 +3,7 @@
  */
 import { Request, Response } from 'express';
 import * as common from './common';
-import errorConfig, { ErrorConfigType } from './errorConfig';
+import errorConfig from './errorConfig';
 
 type AuthConfigType = {
     code: string;
