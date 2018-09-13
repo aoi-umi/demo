@@ -2,116 +2,118 @@ import config from '../../config';
 import * as common from './common';
 import errorConfig from './errorConfig';
 
-export let enumDict = {};
-export let enumChangeDict = {};
+export type MyEnumInstance<T1, T2> = {
+    [P in keyof T1]?: EnumInstance<T1>
+} & MyEnum<T1, T2>;
 
-export let init = function (opt) {
-    enumDict = opt.enumDict;
-    enumChangeDict = opt.enumChangeDict;
-};
-
-export let getEnum = function (enumName, notThrowError?) {
-    var enumType = enumDict[enumName];
-    if (!enumType && !notThrowError) throw common.error('enum "' + enumName + '" not exist!', errorConfig.CODE_ERROR);
-    return enumType;
-};
-
-export let getKey = function (enumName, value) {
-    var enumType = getEnum(enumName);
-    for (var i in enumType) {
-        if (enumType[i] == value) return i;
-    }
-    return '';
-};
-
-export let getValue = function (enumName, key) {
-    var enumType = getEnum(enumName);
-    return enumType[key];
-};
-
-//状态变更
-export let enumChangeCheck = function (enumType, srcEnum, destEnum) {
-    if (enumType == undefined)
-        throw common.error('enumType can not be empty!');
-
-    var enumOperateType = enumType + 'Operate';
-    var matchEnum = getEnum(enumType);
-    var operateEnum = getEnum(enumOperateType, true);
-    var changeDict = enumChangeDict[enumType];
-    if (srcEnum == undefined || srcEnum == null || destEnum == undefined || destEnum == null)
-        throw common.error('', errorConfig.ARGS_ERROR);
-    srcEnum = srcEnum.toString();
-    destEnum = destEnum.toString();
-    var undefinedOrNull = [undefined, null];
-    if (common.isInArray(matchEnum[srcEnum], undefinedOrNull)
-        && (!operateEnum && common.isInArray(operateEnum[srcEnum], undefinedOrNull))
-    )
-        throw common.error(common.stringFormat('no match src enum [{0}] in [{1}]!', srcEnum, enumType), errorConfig.CODE_ERROR);
-
-    if (common.isInArray(matchEnum[destEnum], undefinedOrNull)
-        && (!operateEnum && common.isInArray(operateEnum[destEnum], undefinedOrNull))
-    )
-        throw common.error(common.stringFormat('no match dest enum [{0}] in [{1}]!', destEnum, enumType), errorConfig.CODE_ERROR);
-
-    if (!changeDict[srcEnum] || !changeDict[srcEnum][destEnum]) {
-        var srcEnumName = getValue(enumType, srcEnum) || getValue(enumOperateType, srcEnum);
-        var destEnumName = getValue(enumType, destEnum) || getValue(enumOperateType, destEnum);
-        throw common.error(null, errorConfig.ENUM_CHANGED_INVALID, {
-            //lang:'en',
-            format: function (msg) {
-                if (config.env == 'dev') {
-                    return common.stringFormat(msg,
-                        `${enumType}:` + `[${srcEnum}](${srcEnumName})`,
-                        `[${destEnum}](${destEnumName})`);
-                } else {
-                    return common.stringFormat(msg,
-                        `[${srcEnumName}]`,
-                        `[${destEnumName}]`);
-                }
+class EnumInstance<T1> {
+    private enumName: keyof T1;
+    private instance: MyEnumInstance<T1, any>;
+    constructor(enumName: keyof T1, instance: MyEnumInstance<T1, any>) {
+        function getKey(value) {
+            return this.instance.getKey(this.enumName, value);
+        }
+        function getValue(key) {
+            return this.instance.getValue(this.enumName, key);
+        }
+        function enumChangeCheck(srcEnum, destEnum) {
+            return this.instance.enumChangeCheck(this.enumName, srcEnum, destEnum);
+        }
+        Object.defineProperties(this, {
+            enumName: {
+                enumerable: false,
+                value: enumName
+            },
+            instance: {
+                enumerable: false,
+                value: instance
+            },
+            getKey: {
+                enumerable: false,
+                value: getKey
+            },
+            getValue: {
+                enumerable: false,
+                value: getValue
+            },
+            enumChangeCheck: {
+                enumerable: false,
+                value: enumChangeCheck
             }
         });
+        let clone = common.clone(this.instance.enumDict[enumName]);
+        for (let key in clone) {
+            this[key as string] = clone[key];
+        }
     }
-};
 
-class MyEnum<T>{
-    constructor(public enumDict: T) {
+    getKey: (value) => any;
+    getValue: (key) => any;
+    enumChangeCheck: (srcEnum, destEnum) => void;
+}
+
+export class MyEnum<T1, T2>{
+    static createInstance<T1, T2>(enumDict: T1, enumChangeDict: T2) {
+        let instance: MyEnumInstance<T1, T2> = new MyEnum(enumDict, enumChangeDict) as any;
+        for (let enumName in enumDict) {
+            instance[enumName] = new EnumInstance(enumName, instance) as any;
+        }
+
+        return instance;
+    }
+    constructor(public enumDict: T1, public enumChangeDict: T2) {
 
     }
-    getEnum(enumName: keyof T, notThrowError?) {
+    getEnum(enumName: keyof T1, notThrowError?) {
         var enumType = this.enumDict[enumName];
         if (!enumType && !notThrowError) throw common.error('enum "' + enumName + '" not exist!', errorConfig.CODE_ERROR);
         return enumType;
     }
-    getKey(enumName, value) {
+    getKey(enumName: keyof T1, value) {
         var enumType = this.getEnum(enumName);
         for (var i in enumType) {
             if (enumType[i] == value) return i;
         }
         return '';
     }
-    getValue(enumName, key) {
+    getValue(enumName: keyof T1, key) {
         var enumType = this.getEnum(enumName);
         return enumType[key];
     }
-}
 
-export let createInstance = function <T>(enumDict: T) {
-    let instance: {
-        [P in keyof T]?: T[P] & {
-            getKey(value): any;
-            getValue(name): any;
-        };
-    } & MyEnum<T> = new MyEnum(enumDict) as any;
-    for (let enumName in enumDict) {
-        let clone = common.clone(enumDict[enumName]) as any;
-        clone.getKey = function (value) {
-            return instance.getKey(enumName, value);
+    enumChangeCheck(enumType: keyof T1, srcEnum, destEnum) {
+        if (enumType == undefined)
+            throw common.error('enumType can not be empty!');
+
+        var enumOperateType = enumType + 'Operate';
+        var matchEnum = this.getEnum(enumType);
+        var operateEnum = this.getEnum(enumOperateType as any, true);
+        var changeDict = this.enumChangeDict[enumType as any];
+        if (srcEnum == undefined || srcEnum == null || destEnum == undefined || destEnum == null)
+            throw common.error('', errorConfig.ARGS_ERROR);
+        srcEnum = srcEnum.toString();
+        destEnum = destEnum.toString();
+        var undefinedOrNull = [undefined, null];
+        if (common.isInArray(matchEnum[srcEnum], undefinedOrNull)
+            && (!operateEnum && common.isInArray(operateEnum[srcEnum], undefinedOrNull))
+        )
+            throw common.error(common.stringFormat('no match src enum [{0}] in [{1}]!', srcEnum, enumType), errorConfig.CODE_ERROR);
+
+        if (common.isInArray(matchEnum[destEnum], undefinedOrNull)
+            && (!operateEnum && common.isInArray(operateEnum[destEnum], undefinedOrNull))
+        )
+            throw common.error(common.stringFormat('no match dest enum [{0}] in [{1}]!', destEnum, enumType), errorConfig.CODE_ERROR);
+
+        if (!changeDict[srcEnum] || !changeDict[srcEnum][destEnum]) {
+            var srcEnumName = this.getValue(enumType, srcEnum) || this.getValue(enumOperateType as any, srcEnum);
+            var destEnumName = this.getValue(enumType, destEnum) || this.getValue(enumOperateType as any, destEnum);
+            throw common.error(null, errorConfig.ENUM_CHANGED_INVALID, {
+                format: function (msg) {
+                    return common.stringFormat(msg,
+                        `${enumType}:` + `[${srcEnum}](${srcEnumName})`,
+                        `[${destEnum}](${destEnumName})`);
+                }
+            });
         }
-        clone.getValue = function (key) {
-            return instance.getValue(enumName, key);
-        }
-        instance[enumName] = clone;
     }
-
-    return instance;
 }

@@ -1,6 +1,6 @@
 import { Request, Response, Express } from 'express';
 import * as common from './_system/common';
-import * as myEnum from './_system/enum';
+import { MyEnum, MyEnumInstance } from './_system/enum';
 import * as auth from './_system/auth';
 import { authConfig } from './_system/auth';
 import * as cache from './_system/cache';
@@ -200,6 +200,8 @@ export let formatViewRes = function (option) {
     return opt;
 };
 
+export let myEnum: MyEnumInstance<typeof enumDict, typeof enumChangeDict>;
+
 export let init = function (opt: { viewPath: string }) {
     Date.prototype.toJSON = function () {
         return common.dateFormat(this, 'yyyy-MM-dd HH:mm:ss');
@@ -211,10 +213,8 @@ export let init = function (opt: { viewPath: string }) {
     auth.init({
         accessableUrlConfig: accessableUrlConfig
     });
-    myEnum.init({
-        enumDict: enumDict,
-        enumChangeDict: enumChangeDict,
-    });
+    
+    myEnum = MyEnum.createInstance(enumDict, enumChangeDict);
     let logSave = function (req: Request, res: Response, responseData: any) {
         var url = req.header('host') + req.originalUrl;
         var result = responseData.result;

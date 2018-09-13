@@ -5,7 +5,7 @@ import * as q from 'q';
 import * as autoBll from './_auto';
 import * as common from '../_system/common';
 import errorConfig from '../_system/errorConfig';
-import * as myEnum from '../_system/enum';
+import { myEnum } from '../_main';
 import { isHadAuthority, authConfig } from '../_system/auth';
 import { MainContent } from '../dal/models/dbModel/MainContent';
 
@@ -78,7 +78,7 @@ export let save = function (opt, exOpt) {
             //权限检查
             if (user.id != mainContentDetail.mainContent.userInfoId)
                 throw common.error('没有权限处理此记录');
-            myEnum.enumChangeCheck('mainContentStatusEnum', mainContentDetail.mainContent.status, mainContent.status);
+            myEnum.mainContentStatusEnum.enumChangeCheck(mainContentDetail.mainContent.status, mainContent.status);
             //要删除的child
             delChildList = mainContentDetail.mainContentChildList.filter(function (child) {
                 //查找删除列表中的项
@@ -206,7 +206,7 @@ export let statusUpdate = function (opt, exOpt) {
             throw common.error(`没有权限`);
         }
 
-        myEnum.enumChangeCheck('mainContentStatusEnum', mainContentDetail.mainContent.status, mainContent.status);
+        myEnum.mainContentStatusEnum.enumChangeCheck(mainContentDetail.mainContent.status, mainContent.status);
         if (mainContent.status == 'recovery') {
             var mainContentLogList = mainContentDetail.mainContentLogList;
             if (!mainContentLogList || !mainContentLogList.length
@@ -282,14 +282,14 @@ function createLog(opt) {
 }
 
 function updateMainContent(item) {
-    item.typeName = myEnum.getValue('mainContentTypeEnum', item.type);
-    item.statusName = myEnum.getValue('mainContentStatusEnum', item.status);
+    item.typeName = myEnum.mainContentTypeEnum.getValue(item.type);
+    item.statusName = myEnum.mainContentStatusEnum.getValue(item.status);
 }
 
 export function updateMainContentLog(item) {
-    item.typeName = myEnum.getValue('mainContentLogTypeEnum', item.type);
-    item.srcStatusName = myEnum.getValue('mainContentStatusEnum', item.srcStatus);
-    item.destStatusName = myEnum.getValue('mainContentStatusEnum', item.destStatus);
+    item.typeName = myEnum.mainContentLogTypeEnum.getValue(item.type);
+    item.srcStatusName = myEnum.mainContentStatusEnum.getValue(item.srcStatus);
+    item.destStatusName = myEnum.mainContentStatusEnum.getValue(item.destStatus);
 }
 
 function canDelete(mainContent, user) {
