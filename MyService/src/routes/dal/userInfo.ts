@@ -24,15 +24,14 @@ export type RoleAuthorityType = AuthorityDataType & {
 }
 
 export let detailQuery = async function (params, conn?: Transaction) {
-    var sql = 'call p_user_info_detail_query(:id, :noLog)';
+    var sql = 'call p_user_info_detail_query(:id)';
     let t = await db.query(sql, params, conn);
     let data: DetailType = {
         userInfo: t[0][0],
-        userInfoLogList: t[1],
-        authorityList: t[2],
-        roleList: t[3],
-        roleAuthorityList: t[4],
-        structList: t[5]
+        authorityList: t[1],
+        roleList: t[2],
+        roleAuthorityList: t[3],
+        structList: t[4]
     };
     return {
         rawData: t,

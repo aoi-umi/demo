@@ -141,37 +141,49 @@
                     <a href="#log" data-toggle="tab">日志</a>
                 </li>
             </ul>
-            <div id="log" class="tab-pane fade in">
-                <table class="table table-bordered">
+            <!--日志-->
+            <div id="log" class="tab-content fade in">
+                <div>
+                    <button id="logQuery" type="button" class="btn btn-default btn-content pull-right"
+                            style="margin: 5px">刷新
+                    </button>
+                </div>
+                <table class="table table-bordered table-striped">
                     <thead>
                     <tr>
                         <th>内容</th>
                         <th>创建时间</th>
                     </tr>
                     </thead>
-
-                    <% userInfoDetail.userInfoLogList.forEach(function(item){
-                        if (item.type != 0 && !isHadAuthority('admin'))
-                            return;
-                    %>
-                    <tr>
-                        <td><%= item.content %></td>
-                        <td><%= item.createDate %></td>
-                    </tr>
-                    <% }); %>
+                    <tbody id="logList">
+                    </tbody>
                 </table>
+                <div id="logPager" class="row" style="margin:0"></div>
             </div>
         </div>
     </div>
 </div>
-<script type="text/javascript">
-	require(['./_main', './moduleUserInfo'], function () {
-		var main = require('./_main'),
-			moduleUserInfo = require('./moduleUserInfo');
-		main.init();
-		var opt = {
-			operation: ['save']
-		}
-		new moduleUserInfo.ModuleUserInfo(opt);
-	})
+<script type="text/template" id="userInfoLogItem">
+    <% include ../../_template_front/userInfoLog/listItem %>
+</script>
+<script type="text/javascript">(function () {
+		var requireList = ['./_main', './moduleUserInfo', './moduleUserInfoLog'];
+		require(requireList, function () {
+			var main = require('./_main'),
+				moduleUserInfo = require('./moduleUserInfo');
+			main.init();
+			var opt = {
+				operation: ['save']
+			}
+			new moduleUserInfo.ModuleUserInfo(opt);
+			var moduleUserInfoLog = require('./moduleUserInfoLog');
+			new moduleUserInfoLog.ModuleUserInfoLog({
+				userInfoId: '<%= userInfo.id %>',
+				queryContainerId: 'logList',
+				pagerId: 'logPager',
+				queryId: 'logQuery',
+				queryItemTempId: 'userInfoLogItem'
+			});
+		});
+	})()
 </script>
