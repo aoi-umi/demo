@@ -15,7 +15,7 @@ window['common'] = exports;
  */
 export function promise<T>(fn: (...args) => Q.IWhenable<T>, caller?: any, nodeCallback?: boolean, args?: any[]): Q.Promise<T> {
     return Q.fcall((): any => {
-        var defer = Q.defer();        
+        var defer = Q.defer();
         if (!fn) {
             throw error('fn can not be null');
         }
@@ -68,10 +68,10 @@ export let promiseAll = function (list: Array<Q.Promise<any>>) {
         list.forEach((ele, idx) => {
             ele.then(t => {
                 returnData.successCount++;
-                returnData.resultList[idx] = {success: true, detail: t};
+                returnData.resultList[idx] = { success: true, detail: t };
             }).fail(e => {
                 returnData.failCount++;
-                returnData.resultList[idx] = {success: false, detail: e};
+                returnData.resultList[idx] = { success: false, detail: e };
             }).finally(() => {
                 if (returnData.successCount + returnData.failCount == returnData.count)
                     defer.resolve(returnData);
@@ -195,11 +195,19 @@ export let md5 = function (str) {
 export let isInArray = function (obj, list, startIndex?) {
     return $.inArray(obj, list, startIndex) >= 0;
 };
-export let error = function (msg, code?) {
+export let error = function (msg, code?, option?) {
+    var opt = {
+        format: null,
+    };
+
+    if (option)
+        opt = $.extend(opt, option);
     let err: any = new Error(msg);
     if (typeof code !== 'string') {
         code = code.code;
     }
+    if (typeof opt.format == 'function')
+        msg = opt.format(msg);
     err.code = code;
     return err;
 };
@@ -476,9 +484,9 @@ export let msgNotice = function (option: msgNoticeOption) {
 
     //type 1
     //弹出提示
-    var dom: JQuery<HTMLElement> & {close?: Function, waitClose?: () => Q.Promise<any>} = null;
+    var dom: JQuery<HTMLElement> & { close?: Function, waitClose?: () => Q.Promise<any> } = null;
     opt = $.extend(opt, option);
-    if(opt.type == 0){
+    if (opt.type == 0) {
         if (!opt.target && opt.dom)
             opt.target = opt.dom['selector'];
         if (!opt.target)
@@ -520,7 +528,7 @@ export let msgNotice = function (option: msgNoticeOption) {
                 y = targetDom.offset().top + (targetDom.outerHeight() - dom.outerHeight()) / 2;
                 break;
         }
-        dom.css({'left': x, 'top': y}).show();        
+        dom.css({ 'left': x, 'top': y }).show();
         if (opt.focus)
             targetDom.focus();
         if (opt.autoHide) {
@@ -529,7 +537,7 @@ export let msgNotice = function (option: msgNoticeOption) {
             });
         }
         return dom;
-    } else if(opt.type == 1) {
+    } else if (opt.type == 1) {
         if (!opt.template) {
             opt.template = `<div data-backdrop="false" role="dialog" tabindex="-1" class="modal fade msg-notice-1">
                                 <div class="modal-dialog">
@@ -560,11 +568,11 @@ export let msgNotice = function (option: msgNoticeOption) {
             dom.find('[name=closeBtn]').on('click', function () {
                 dom.close();
             });
-            dom.on('shown.bs.modal', function(e) {
+            dom.on('shown.bs.modal', function (e) {
                 dom.find('[name=footer] .btn:first').focus();
             });
         }
-        dom.waitClose = function() {
+        dom.waitClose = function () {
             return promise((d: Q.Deferred<any>) => {
                 defer = d;
                 return d.promise;
@@ -573,8 +581,8 @@ export let msgNotice = function (option: msgNoticeOption) {
         dom.close = function (val) {
             dom.modal('hide');
             defer && defer.resolve(val);
-        }        
-        dom.on('hidden.bs.modal', function(e) {
+        }
+        dom.on('hidden.bs.modal', function (e) {
             defer && defer.resolve();
         });
 
@@ -760,7 +768,7 @@ export let setCountdown = function (option: setCountdownOption) {
     if (countDownInterval) {
         clearInterval(countDownInterval);
         dom.data('countDownInterval', null);
-    }    
+    }
     countDownInterval = setInterval(function () {
         if (new Date() >= date && countDownInterval) {
             clearInterval(countDownInterval);
@@ -805,7 +813,7 @@ export let getTree = function (list: any[], parent, tree?, key = 'key', parentKe
         $(list).each(function (i) {
             let item: any = this;
             if (!itemTree[item[key]])
-                itemTree[item[key]] = {item: item, inRoot: false};
+                itemTree[item[key]] = { item: item, inRoot: false };
             if (item[parentKey] == parent) {
                 itemTree[item[key]].inRoot = true;
                 if (!tree[item[key]]) {
