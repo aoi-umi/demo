@@ -6,8 +6,15 @@ import * as autoBll from './_auto';
 import * as common from '../_system/common';
 import errorConfig from '../_system/errorConfig';
 import { myEnum } from '../_main';
+import * as auth from '../_system/auth';
 import { isHadAuthority, authConfig } from '../_system/auth';
 import { MainContent } from '../dal/models/dbModel/MainContent';
+const {
+    mainContentStatusEnum,
+    mainContentStatusEnumOperate,
+    mainContentLogTypeEnum,
+    mainContentTypeEnum,
+} = myEnum;
 
 export let query = function (opt, exOpt) {
     var user = exOpt.user;
@@ -74,11 +81,12 @@ export let save = function (opt, exOpt) {
         mainContent = opt.mainContent;
         let mainContentDetail = await detailQuery({ id: mainContent.id }, exOpt);
         var delChildList, saveChildList;
+        let changeDesc;
         if (mainContent.id != 0) {
             //权限检查
             if (user.id != mainContentDetail.mainContent.userInfoId)
                 throw common.error('没有权限处理此记录');
-            myEnum.mainContentStatusEnum.enumChangeCheck(mainContentDetail.mainContent.status, mainContent.status);
+            changeDesc = mainContentStatusEnum.enumChangeCheck(mainContentDetail.mainContent.status, mainContent.status);
             //要删除的child
             delChildList = mainContentDetail.mainContentChildList.filter(function (child) {
                 //查找删除列表中的项
@@ -117,7 +125,7 @@ export let save = function (opt, exOpt) {
         //保存
         return autoBll.tran(async function (conn) {
             var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
-            mainContent.type = 0;
+            mainContent.type = mainContentTypeEnum.文章;
             mainContent.operator = `${user.account}(${user.nickname}#${user.id})`;
             mainContent.createDate =
                 mainContent.operateDate = now;
@@ -165,7 +173,7 @@ export let save = function (opt, exOpt) {
                 id: mainContentId,
                 srcStatus: srcStatus,
                 destStatus: mainContent.status,
-                content: opt.remark,
+                content: opt.remark || changeDesc,
                 user: user
             });
             list.push(autoBll.modules.mainContentLog.save(mainContentLog, conn));
@@ -179,21 +187,22 @@ export let statusUpdate = function (opt, exOpt) {
     var mainContent = opt.mainContent;
     var user = exOpt.user;
     var necessaryAuth;
+    var operate;
     return common.promise(function () {
         if (!mainContent.id) {
             throw common.error('', errorConfig.ARGS_ERROR);
         }
-        var operate = mainContent.operate;
+        operate = mainContent.operate;
         if (operate == 'audit')
-            mainContent.status = 2;
+            mainContent.status = mainContentStatusEnum.审核中;
         else if (operate == 'pass')
-            mainContent.status = 3;
+            mainContent.status = mainContentStatusEnum.通过;
         else if (operate == 'notPass')
-            mainContent.status = 4;
+            mainContent.status = mainContentStatusEnum.退回;
         else if (operate == 'del')
-            mainContent.status = -1;
+            mainContent.status = mainContentStatusEnum.已删除;
         else if (operate == 'recovery')
-            mainContent.status = 'recovery';
+            mainContent.status = mainContentStatusEnumOperate.恢复;
         else
             throw common.error(`错误的操作类型[${operate}]`);
 
@@ -202,11 +211,11 @@ export let statusUpdate = function (opt, exOpt) {
             throw common.error(`没有[${necessaryAuth}]权限`);
         return detailQuery({ id: mainContent.id }, exOpt);
     }).then(function (mainContentDetail) {
-        if (necessaryAuth == 'mainContentDel' && !mainContentDetail.canDelete) {
+        if (auth.isEqual(necessaryAuth, authConfig.mainContentDel) && !mainContentDetail.canDelete) {
             throw common.error(`没有权限`);
         }
 
-        myEnum.mainContentStatusEnum.enumChangeCheck(mainContentDetail.mainContent.status, mainContent.status);
+        let changeDesc = mainContentStatusEnum.enumChangeCheck(mainContentDetail.mainContent.status, mainContent.status);
         if (mainContent.status == 'recovery') {
             var mainContentLogList = mainContentDetail.mainContentLogList;
             if (!mainContentLogList || !mainContentLogList.length
@@ -232,8 +241,9 @@ export let statusUpdate = function (opt, exOpt) {
                 id: mainContentId,
                 srcStatus: mainContentDetail.mainContent.status,
                 destStatus: mainContent.status,
-                content: opt.remark,
-                user: user,
+                content: opt.remark || changeDesc,
+                user,
+                operate,
             });
             list.push(autoBll.modules.mainContentLog.save(mainContentLog, conn));
             await q.all(list)
@@ -247,55 +257,46 @@ function createLog(opt) {
     var user = opt.user;
     var mainContentLog = {
         mainContentId: opt.id,
-        type: 0,
+        type: mainContentLogTypeEnum.主内容保存 as number,
         srcStatus: opt.srcStatus,
         destStatus: opt.destStatus,
-        content: '保存',
+        content: opt.content || '保存',
         createDate: now,
         operateDate: now,
         operatorId: user.id,
         operator: user.account + `(${user.nickname}#${user.id})`,
     };
-    if (opt.srcStatus == -1) {
-        mainContentLog.type = 6;
-        mainContentLog.content = '恢复';
+    if (opt.operate == mainContentStatusEnumOperate.恢复) {
+        mainContentLog.type = mainContentLogTypeEnum.主内容恢复;
+    } else if (opt.destStatus == mainContentStatusEnum.待审核) {
+        mainContentLog.type = mainContentLogTypeEnum.主内容提交;
+    } else if (opt.destStatus == mainContentStatusEnum.审核中) {
+        mainContentLog.type = mainContentLogTypeEnum.主内容审核;
+    } else if (opt.destStatus == mainContentStatusEnum.通过) {
+        mainContentLog.type = mainContentLogTypeEnum.主内容审核通过;
+    } else if (opt.destStatus == mainContentStatusEnum.退回) {
+        mainContentLog.type = mainContentLogTypeEnum.主内容审核不通过;
+    } else if (opt.destStatus == mainContentStatusEnum.已删除) {
+        mainContentLog.type = mainContentLogTypeEnum.主内容删除;
     }
-    else if (opt.destStatus == 1) {
-        mainContentLog.type = 1;
-        mainContentLog.content = '提交';
-    } else if (opt.destStatus == 2) {
-        mainContentLog.type = 2;
-        mainContentLog.content = '审核';
-    } else if (opt.destStatus == 3) {
-        mainContentLog.type = 3;
-        mainContentLog.content = '审核通过';
-    } else if (opt.destStatus == 4) {
-        mainContentLog.type = 4;
-        mainContentLog.content = '审核不通过';
-    } else if (opt.destStatus == -1) {
-        mainContentLog.type = 5;
-        mainContentLog.content = '删除';
-    }
-    if (opt.content)
-        mainContentLog.content = opt.content;
     return mainContentLog;
 }
 
 function updateMainContent(item) {
-    item.typeName = myEnum.mainContentTypeEnum.getName(item.type);
-    item.statusName = myEnum.mainContentStatusEnum.getName(item.status);
+    item.typeName = mainContentTypeEnum.getName(item.type);
+    item.statusName = mainContentStatusEnum.getName(item.status);
 }
 
 export function updateMainContentLog(item) {
-    item.typeName = myEnum.mainContentLogTypeEnum.getName(item.type);
-    item.srcStatusName = myEnum.mainContentStatusEnum.getName(item.srcStatus);
-    item.destStatusName = myEnum.mainContentStatusEnum.getName(item.destStatus);
+    item.typeName = mainContentLogTypeEnum.getName(item.type);
+    item.srcStatusName = mainContentStatusEnum.getName(item.srcStatus);
+    item.destStatusName = mainContentStatusEnum.getName(item.destStatus);
 }
 
 function canDelete(mainContent, user) {
     if (mainContent.status != -1
         && ((isHadAuthority(user, [authConfig.mainContentDel]) && (user.id == mainContent.userInfoId))
-            || (isHadAuthority(user, [authConfig.admin]) && mainContent.status != 0))
+            || (isHadAuthority(user, [authConfig.admin]) && mainContent.status != mainContentStatusEnum.草稿))
     ) {
         return true;
     }

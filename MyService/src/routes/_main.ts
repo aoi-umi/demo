@@ -107,24 +107,41 @@ export let accessableUrlConfig: auth.AccessableUrlConfigType[] = [
 //#endregion
 
 //#region 枚举
+class mainContentTypeEnum {
+    文章: 0 = 0;
+}
+class mainContentStatusEnum {
+    草稿: 0 = 0;
+    待审核: 1 = 1;
+    审核中: 2 = 2;
+    通过: 3 = 3;
+    退回: 4 = 4;
+    已删除: -1 = -1;
+}
+//添加 Operate 后缀 不要包含于上面相同的键值
+class mainContentStatusEnumOperate {
+    恢复: "recovery" = "recovery";
+}
+class mainContentLogTypeEnum {
+    主内容保存: 0 = 0;
+    主内容提交: 1 = 1;
+    主内容审核: 2 = 2;
+    主内容审核通过: 3 = 3;
+    主内容审核不通过: 4 = 4;
+    主内容删除: 5 = 5;
+    主内容恢复: 6 = 6;
+}
+class structTypeEnum {
+    公司: "company" = "company";
+    部门: "department" = "department";
+    小组: "group" = "group";
+}
 export let enumDict = {
-    mainContentTypeEnum: {
-        文章: "0"
-    },
-    mainContentStatusEnum: {
-        草稿: "0", 待审核: "1", 审核中: "2", 通过: "3", 退回: "4", 已删除: "-1"
-    },
-    //添加 Operate 后缀 不要包含于上面相同的键值
-    mainContentStatusEnumOperate: {
-        恢复: "recovery"
-    },
-    //mainConetnt
-    mainContentLogTypeEnum: {
-        主内容保存: "0", 主内容提交: "1", 主内容审核: "2", 主内容审核通过: "3", 主内容审核不通过: "4", 主内容删除: "5", 主内容恢复: "6"
-    },
-    structTypeEnum: {
-        公司: "company", 部门: "department", 小组: "group"
-    }
+    mainContentTypeEnum: new mainContentTypeEnum(),
+    mainContentStatusEnum: new mainContentStatusEnum(),
+    mainContentStatusEnumOperate: new mainContentStatusEnumOperate(),
+    mainContentLogTypeEnum: new mainContentLogTypeEnum(),
+    structTypeEnum: new structTypeEnum(),
 };
 
 //枚举变更权限
