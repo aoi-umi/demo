@@ -195,6 +195,22 @@ export let stringToPascal = function (str) {
 export let clone = function <T>(obj: T): T {
     return JSON.parse(JSON.stringify(obj));
 };
+
+
+/**
+ * enumerable装饰器
+ * @enumerable decorator that sets the enumerable property of a class field to false.
+ * @param value true|false
+ */
+export function enumerable(value: boolean) {
+    return function (target: any, propertyKey: string) {
+        let descriptor = Object.getOwnPropertyDescriptor(target, propertyKey) || {};
+        if (descriptor.enumerable != value) {
+            descriptor.enumerable = value;
+            Object.defineProperty(target, propertyKey, descriptor)
+        }
+    };
+}
 //#endregion
 
 //#region 同名但实现不同
