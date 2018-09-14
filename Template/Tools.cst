@@ -69,7 +69,7 @@ public static DatabaseModel CreateDatabaseModel(TableSchema table, DatabaseTypeE
         colModel.NativeType = GetTypeWithSize(col, databaseType); 
         colModel.IsString = IsString(col.DataType);
         colModel.column = col;
-        //第一个主键为id
+        //主键为id
         if(string.IsNullOrEmpty(id) && col.IsPrimaryKeyMember){
             dbModel.IdCol = colModel;
             var intTypeList = new List<DbType>(){DbType.Int16, DbType.Int32, DbType.Int64};
@@ -1023,11 +1023,15 @@ public static List<string> CreateSequelizeModel(DatabaseModel databaseModel)
         var optionList = new List<string>();
         if(col.column.IsPrimaryKeyMember)
             optionList.Add("primaryKey: true");
+        if(databaseModel.IdCol == col && databaseModel.IsIdInt)
+            optionList.Add("autoIncrement: true");
+        
         //驼峰显示字段
         var nameInClass = ToCamelCase(ele);
         if(nameInClass != ele)
             optionList.Add("field: '" + nameInClass + "'");
         
+        //autoIncrement
         var colDeco = "@Column";
         if(optionList.Count > 0){       
             colDeco += "({";

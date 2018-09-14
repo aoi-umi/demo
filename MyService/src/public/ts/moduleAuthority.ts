@@ -9,7 +9,7 @@ import { MyModuleGeneric, ModuleOptionGeneric } from './myModule';
 
 interface ModuleAuthorityOption extends ModuleOptionGeneric<ModuleAuthority> {
 }
-export class ModuleAuthority extends MyModuleGeneric<ModuleAuthority, ModuleOptionGeneric<ModuleAuthority>> {
+export class ModuleAuthority extends MyModuleGeneric<ModuleAuthority, ModuleAuthorityOption> {
     constructor(option?: ModuleAuthorityOption) {
         var opt: ModuleAuthorityOption = {
             operation: ['query', 'save', 'detailQuery'],

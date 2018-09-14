@@ -2,7 +2,6 @@
 import * as fs from 'fs';
 import { Model, FindOptions, Op } from 'sequelize';
 import { IFindOptions, Model as ModelTs } from 'sequelize-typescript';
-import { Omit, RecursivePartial } from 'sequelize-typescript/lib/utils/types';
 
 import * as db from '../_system/db';
 import { Transaction } from '../_system/db';

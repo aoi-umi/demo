@@ -42,14 +42,18 @@
         <div class="row">
             <div name="typeBox" class="col-xs-12">
                 <span>类型:</span>
-                <% for(var key in mainContentTypeEnum){ %>
-                <label><input class="type" type="checkbox" value="<%= key %>"/><%= mainContentTypeEnum[key] %></label>
+                <% for(var key in mainContentTypeEnum){ 
+                    let value = mainContentTypeEnum[key];
+                    %>
+                <label><input class="type" type="checkbox" value="<%= value %>"/><%= key %></label>
                 <% } %>
             </div>
             <div name="statusBox" class="col-xs-12">
                 <span>状态:</span>
-                <% for(var key in mainContentStatusEnum){ %>
-                <label><input class="status" type="checkbox" value="<%= key %>"/><%= mainContentStatusEnum[key] %>
+                <% for(var key in mainContentStatusEnum){                     
+                    let value = mainContentStatusEnum[key];
+                    %>
+                <label><input class="status" type="checkbox" value="<%= value %>"/><%= key %>
                 </label>
                 <% } %>
             </div>
@@ -74,10 +78,12 @@
                     <span class="badge statusCount" data-status="">0</span>
                 </a>
             </li>
-            <% for(var key in mainContentStatusEnum){ %>
+            <% for(var key in mainContentStatusEnum){ 
+                let value = mainContentStatusEnum[key];
+                %>
             <li>
-                <a class="statusSearch" href="javascript:;"><%= mainContentStatusEnum[key] %>
-                    <span class="badge statusCount" data-status="<%= key %>">0</span>
+                <a class="statusSearch" href="javascript:;"><%= key %>
+                    <span class="badge statusCount" data-status="<%= value %>">0</span>
                 </a>
             </li>
             <% } %>

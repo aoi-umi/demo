@@ -107,24 +107,29 @@ export let accessableUrlConfig: auth.AccessableUrlConfigType[] = [
 
 //枚举
 export let enumDict = {
-    mainContentTypeEnum: { '0': '文章', },
-    mainContentStatusEnum: { '-1': '已删除', '0': '草稿', '1': '待审核', '2': '审核中', '3': '通过', '4': '退回' },
-    //添加 Operate 后缀
-    mainContentStatusEnumOperate: { 'recovery': '恢复' },
-    mainContentLogTypeEnum: {
-        //mainConetnt
-        '0': '主内容保存', '1': '主内容提交', '2': '主内容审核', '3': '主内容审核通过', '4': '主内容审核不通过', '5': '主内容删除', '6': '主内容恢复',
+    mainContentTypeEnum: {
+        文章: "0"
     },
-
+    mainContentStatusEnum: {
+        草稿: "0", 待审核: "1", 审核中: "2", 通过: "3", 退回: "4", 已删除: "-1"
+    },
+    //添加 Operate 后缀 不要包含于上面相同的键值
+    mainContentStatusEnumOperate: {
+        恢复: "recovery"
+    },
+    //mainConetnt
+    mainContentLogTypeEnum: {
+        主内容保存: "0", 主内容提交: "1", 主内容审核: "2", 主内容审核通过: "3", 主内容审核不通过: "4", 主内容删除: "5", 主内容恢复: "6"
+    },
     structTypeEnum: {
-        'company': '公司', 'department': '部门', 'group': '小组',
+        公司: "company", 部门: "department", 小组: "group"
     }
 };
 
 //枚举变更权限
 export let enumChangeDict = {
     mainContentStatusEnum: {
-        //初始状态->变更状态
+        //初始状态 -> 变更状态
         '0': { '0': '保存', '1': '提交', '-1': '删除' },
         '1': { '2': '审核', '3': '审核通过', '4': '审核不通过', '-1': '删除' },
         '2': { '2': '审核', '3': '审核通过', '4': '审核不通过', '-1': '删除' },
@@ -213,7 +218,7 @@ export let init = function (opt: { viewPath: string }) {
     auth.init({
         accessableUrlConfig: accessableUrlConfig
     });
-    
+
     myEnum = MyEnum.createInstance(enumDict, enumChangeDict);
     let logSave = function (req: Request, res: Response, responseData: any) {
         var url = req.header('host') + req.originalUrl;
