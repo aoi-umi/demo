@@ -1,4 +1,4 @@
-let errorConfig: { [key: string]: ErrorConfigType } = {
+let errorConfig = {
     DEV: {
         code: 'DEV',
     },

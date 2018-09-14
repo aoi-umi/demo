@@ -118,5 +118,6 @@ export class MyEnum<T1, T2>{
                 }
             });
         }
+        return changeDict[srcEnum][destEnum];
     }
 }

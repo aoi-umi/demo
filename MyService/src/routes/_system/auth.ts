@@ -172,3 +172,7 @@ export let getErrorCode = function (authData) {
         return authConfig[authData].errCode;
     return errorConfig.NO_PERMISSIONS;
 };
+
+export function isEqual(code: string, authConfig: AuthConfigType) {
+    return code === authConfig.code;
+}
