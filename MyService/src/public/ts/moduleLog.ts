@@ -5,11 +5,12 @@ import * as $ from 'jquery';
 import 'bootstrap-datetimepicker';
 
 import * as myVaild from './myVaild';
-import {MyModule, ModuleOption} from './myModule';
-
-export class ModuleLog extends MyModule {
-    constructor(option?: ModuleOption) {
-        var opt: ModuleOption = {
+import { ModuleOptionGeneric, MyModuleGeneric } from './myModule';
+interface ModuleLogOption extends ModuleOptionGeneric<ModuleLog> {
+}
+export class ModuleLog extends MyModuleGeneric<ModuleLog, ModuleLogOption> {
+    constructor(option?: ModuleLogOption) {
+        var opt: ModuleLogOption = {
             operation: ['query'],
             interfacePrefix: 'log',
 

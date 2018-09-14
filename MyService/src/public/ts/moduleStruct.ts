@@ -78,6 +78,9 @@ export class ModuleStruct extends MyModuleGeneric<ModuleStruct, ModuleStructOpti
                         var list = t.list.sort(function (a, b) {
                             return b.level - a.level;
                         });
+                        list.forEach(ele => {
+                            self.updateStructValue(ele);
+                        });
                         let tree = common.getTree(list, '', null, 'struct', 'parentStruct');
                         let itemTree = tree.itemTree;
                         var rootTree = tree.rootTree;
@@ -122,6 +125,11 @@ export class ModuleStruct extends MyModuleGeneric<ModuleStruct, ModuleStructOpti
                     let item = row.data('item');
                     item = $.extend(null, self.opt.saveDefaultModel, item ? { parentStruct: item.struct } : null);
                     self.edit(item);
+                });
+            },
+            onQuerySuccess: function (t, self) {
+                t.list.forEach(ele => {
+                    self.updateStructValue(ele);
                 });
             },
             editBeforeRender: function (item) {
@@ -185,6 +193,9 @@ export class ModuleStruct extends MyModuleGeneric<ModuleStruct, ModuleStructOpti
         super(opt);
     }
 
+    updateStructValue(ele) {
+        ele.typeName = myEnum.structTypeEnum.getName(ele.type);
+    }
     updateView(list, opt) {
         let self = this;
         if (!list || common.isInArray('structDetail', list)) {

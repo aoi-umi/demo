@@ -41,7 +41,7 @@ export class ModuleOptionGeneric<T> extends ModuleBase {
 
     beforeQuery?(data: any);
 
-    onQuerySuccess?(data: any);
+    onQuerySuccess?(data: any, self: T);
 
     onQueryFail?(data: any, self: T);
 
@@ -67,7 +67,7 @@ export class ModuleOptionGeneric<T> extends ModuleBase {
 
     onDetailQueryFail?(data: any, self: T);
 }
-export class ModuleOption extends ModuleOptionGeneric<MyModule> { }
+
 export class MyModuleGeneric<TModule extends MyModuleGeneric<TModule, TOption>, TOption extends ModuleOptionGeneric<TModule>> extends ModuleBase {
     constructor(option: TOption) {
         super();
@@ -132,7 +132,7 @@ export class MyModuleGeneric<TModule extends MyModuleGeneric<TModule, TOption>, 
         beforeQuery: function (data) {
             common.deleteIfEmpty(data);
         },
-        onQuerySuccess: function (t) {
+        onQuerySuccess: function (t, self: TModule) {
         },
         onQueryFail: function (e, self: TModule) {
             common.msgNotice({ type: 1, msg: e.message });
@@ -369,7 +369,7 @@ export class MyModuleGeneric<TModule extends MyModuleGeneric<TModule, TOption>, 
             var notice = common.msgNotice({ type: 1, msg: '查询中...', noClose: true });
             try {
                 let t = await myInterface.api[self.opt.interfacePrefix][method](data)
-                self.opt.onQuerySuccess(t);
+                self.opt.onQuerySuccess(t, self);
                 self.queryContainerDom.find(self.rowClass).remove();
                 var temp = self.queryItemTemp;
                 if (t.list.length) {
@@ -504,4 +504,3 @@ export class MyModuleGeneric<TModule extends MyModuleGeneric<TModule, TOption>, 
         self.detailContainerDom.html(ejs.render(temp, item));
     }
 }
-export class MyModule extends MyModuleGeneric<MyModule, ModuleOption>{ }

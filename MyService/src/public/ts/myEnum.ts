@@ -3,12 +3,12 @@ import { enumerable } from './common';
 import errorConfig from './errorConfig';
 
 export type MyEnumInstance<T1, T2> = {
-    [P in keyof T1]?: EnumInstance<T1> & T1[P]
+    [P in keyof T1]?: EnumInstance<T1, T1[P]> & T1[P]
 } & MyEnum<T1, T2>;
 
-class EnumInstance<T1> {
-    enumName: keyof T1;
-    instance: MyEnumInstance<T1, any>;
+class EnumInstance<T1, T2> {
+    readonly enumName: keyof T1;
+    readonly instance: MyEnumInstance<T1, any>;
 
     constructor(enumName: keyof T1, instance: MyEnumInstance<T1, any>) {
         Object.defineProperties(this, {
@@ -28,12 +28,16 @@ class EnumInstance<T1> {
         }
     }
 
-    getKey(value) {
-        return this.instance.getKey(this.enumName, value);
+    getKey(value: T2[keyof T2]) {
+        return this.instance.getKey(this.enumName, value as any);
     }
 
-    getValue(key) {
-        return this.instance.getValue(this.enumName, key);
+    getName(value: T2[keyof T2]) {
+        return this.instance.getName(this.enumName, value as any);
+    }
+
+    getValue(key: keyof T2) {
+        return this.instance.getValue(this.enumName, key as any);
     }
 
     enumChangeCheck(srcEnum, destEnum) {
@@ -42,11 +46,15 @@ class EnumInstance<T1> {
 }
 
 enumerable(false)(EnumInstance.prototype, 'getKey');
+enumerable(false)(EnumInstance.prototype, 'getName');
 enumerable(false)(EnumInstance.prototype, 'getValue');
 enumerable(false)(EnumInstance.prototype, 'enumChangeCheck');
 
+type EnumKey<T> = Extract<keyof T[keyof T], string>;
+type EnumValue<T> = T[keyof T][EnumKey<T>];
+
 export class MyEnum<T1, T2>{
-    static createInstance<T1, T2>(enumDict: T1, enumChangeDict: T2) {
+    static createInstance<T1, T2>(enumDict: T1, enumChangeDict?: T2) {
         let instance: MyEnumInstance<T1, T2> = new MyEnum(enumDict, enumChangeDict) as any;
         for (let enumName in enumDict) {
             instance[enumName] = new EnumInstance(enumName, instance) as any;
@@ -54,7 +62,7 @@ export class MyEnum<T1, T2>{
 
         return instance;
     }
-    constructor(public enumDict: T1, public enumChangeDict: T2) {
+    constructor(public enumDict: T1, public enumChangeDict: T2 = {} as any) {
 
     }
     getEnum(enumName: keyof T1, notThrowError?: boolean) {
@@ -62,15 +70,23 @@ export class MyEnum<T1, T2>{
         if (!enumType && !notThrowError) throw common.error(`enum "${enumName}" not exist!`, errorConfig.CODE_ERROR);
         return enumType;
     }
-    getKey(enumName: keyof T1, value) {
-        var enumType = this.getEnum(enumName);
-        for (var i in enumType) {
-            if (enumType[i] == value) return i;
-        }
-        return '';
+    isInEnum(enumName: keyof T1, value: EnumValue<T1>, notThrowError?: boolean) {
+        return this.getKey(enumName, value, notThrowError) === null ? false : true;
     }
-    getValue(enumName: keyof T1, key) {
-        var enumType = this.getEnum(enumName);
+    getKey(enumName: keyof T1, value: EnumValue<T1>, notThrowError?: boolean) {
+        var enumType = this.getEnum(enumName, notThrowError);
+        for (var i in enumType) {
+            if (enumType[i] == value) {
+                return i;
+            }
+        }
+        return null;
+    }
+    getName(enumName: keyof T1, value: EnumValue<T1>, notThrowError?: boolean) {
+        return this.getKey(enumName, value, notThrowError);
+    }
+    getValue(enumName: keyof T1, key: EnumKey<T1>, notThrowError?: boolean) {
+        var enumType = this.getEnum(enumName, notThrowError);
         return enumType[key];
     }
 
@@ -79,27 +95,21 @@ export class MyEnum<T1, T2>{
             throw common.error('enumType can not be empty!');
 
         var enumOperateType = enumType + 'Operate';
-        var matchEnum = this.getEnum(enumType);
-        var operateEnum = this.getEnum(enumOperateType as any, true);
         var changeDict = this.enumChangeDict[enumType as any];
         if (srcEnum == undefined || srcEnum == null || destEnum == undefined || destEnum == null)
             throw common.error('', errorConfig.ARGS_ERROR);
         srcEnum = srcEnum.toString();
         destEnum = destEnum.toString();
-        var undefinedOrNull = [undefined, null];
-        if (common.isInArray(matchEnum[srcEnum], undefinedOrNull)
-            && (!operateEnum && common.isInArray(operateEnum[srcEnum], undefinedOrNull))
-        )
+
+        var srcEnumName = this.getName(enumType, srcEnum, true);
+        var destEnumName = this.getName(enumType, destEnum, true) || this.getName(enumOperateType as any, destEnum, true);
+        if (srcEnumName === null)
             throw common.error(common.stringFormat('no match src enum [{0}] in [{1}]!', srcEnum, enumType), errorConfig.CODE_ERROR);
 
-        if (common.isInArray(matchEnum[destEnum], undefinedOrNull)
-            && (!operateEnum && common.isInArray(operateEnum[destEnum], undefinedOrNull))
-        )
+        if (destEnumName === null)
             throw common.error(common.stringFormat('no match dest enum [{0}] in [{1}]!', destEnum, enumType), errorConfig.CODE_ERROR);
 
         if (!changeDict[srcEnum] || !changeDict[srcEnum][destEnum]) {
-            var srcEnumName = this.getValue(enumType, srcEnum) || this.getValue(enumOperateType as any, srcEnum);
-            var destEnumName = this.getValue(enumType, destEnum) || this.getValue(enumOperateType as any, destEnum);
             throw common.error(null, errorConfig.ENUM_CHANGED_INVALID, {
                 format: function (msg) {
                     return common.stringFormat(msg,

@@ -282,14 +282,14 @@ function createLog(opt) {
 }
 
 function updateMainContent(item) {
-    item.typeName = myEnum.mainContentTypeEnum.getValue(item.type);
-    item.statusName = myEnum.mainContentStatusEnum.getValue(item.status);
+    item.typeName = myEnum.mainContentTypeEnum.getName(item.type);
+    item.statusName = myEnum.mainContentStatusEnum.getName(item.status);
 }
 
 export function updateMainContentLog(item) {
-    item.typeName = myEnum.mainContentLogTypeEnum.getValue(item.type);
-    item.srcStatusName = myEnum.mainContentStatusEnum.getValue(item.srcStatus);
-    item.destStatusName = myEnum.mainContentStatusEnum.getValue(item.destStatus);
+    item.typeName = myEnum.mainContentLogTypeEnum.getName(item.type);
+    item.srcStatusName = myEnum.mainContentStatusEnum.getName(item.srcStatus);
+    item.destStatusName = myEnum.mainContentStatusEnum.getName(item.destStatus);
 }
 
 function canDelete(mainContent, user) {

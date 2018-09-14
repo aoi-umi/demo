@@ -13,7 +13,7 @@ export let variable = {
 };
 let enumDict = {
     structTypeEnum: {
-        'company': '公司', 'department': '部门', 'group': '小组',
+        公司: "company", 部门: "department", 小组: "group"
     }
 }
 export let myEnum: MyEnumInstance<typeof enumDict, any>;
@@ -72,7 +72,7 @@ export let init = function () {
     $(`.nav.navbar-nav a[href="${location.pathname}"]`).closest('li').addClass('active');
 
     bindEvent();
-    myEnum = MyEnum.createInstance(enumDict, {});
+    myEnum = MyEnum.createInstance(enumDict);
 };
 
 export let bindEvent = function () {
