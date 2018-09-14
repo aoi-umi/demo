@@ -1,4 +1,5 @@
 import * as common from './common';
+import { enumerable } from './common';
 import errorConfig from './errorConfig';
 
 export type MyEnumInstance<T1, T2> = {
@@ -8,6 +9,7 @@ export type MyEnumInstance<T1, T2> = {
 class EnumInstance<T1> {
     enumName: keyof T1;
     instance: MyEnumInstance<T1, any>;
+
     constructor(enumName: keyof T1, instance: MyEnumInstance<T1, any>) {
         Object.defineProperties(this, {
             enumName: {
@@ -19,40 +21,29 @@ class EnumInstance<T1> {
                 value: instance
             }
         });
+
         let clone = common.clone(this.instance.enumDict[enumName]);
         for (let key in clone) {
             this[key as string] = clone[key];
         }
     }
 
-    getKey: typeof getKey;
-    getValue: typeof getValue;
-    enumChangeCheck: typeof enumChangeCheck;
+    getKey(value) {
+        return this.instance.getKey(this.enumName, value);
+    }
+
+    getValue(key) {
+        return this.instance.getValue(this.enumName, key);
+    }
+
+    enumChangeCheck(srcEnum, destEnum) {
+        return this.instance.enumChangeCheck(this.enumName, srcEnum, destEnum);
+    }
 }
 
-function getKey<T>(this: EnumInstance<T>, value) {
-    return this.instance.getKey(this.enumName, value);
-}
-function getValue<T>(this: EnumInstance<T>, key) {
-    return this.instance.getValue(this.enumName, key);
-}
-function enumChangeCheck<T>(this: EnumInstance<T>, srcEnum, destEnum) {
-    return this.instance.enumChangeCheck(this.enumName, srcEnum, destEnum);
-}
-Object.defineProperties(EnumInstance.prototype, {
-    getKey: {
-        enumerable: false,
-        value: getKey
-    },
-    getValue: {
-        enumerable: false,
-        value: getValue
-    },
-    enumChangeCheck: {
-        enumerable: false,
-        value: enumChangeCheck
-    }
-});
+enumerable(false)(EnumInstance.prototype, 'getKey');
+enumerable(false)(EnumInstance.prototype, 'getValue');
+enumerable(false)(EnumInstance.prototype, 'enumChangeCheck');
 
 export class MyEnum<T1, T2>{
     static createInstance<T1, T2>(enumDict: T1, enumChangeDict: T2) {
