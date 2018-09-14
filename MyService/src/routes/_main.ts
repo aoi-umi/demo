@@ -1,6 +1,6 @@
 import { Request, Response, Express } from 'express';
 import * as common from './_system/common';
-import { MyEnum, MyEnumInstance } from './_system/enum';
+import { MyEnum, MyEnumInstance } from './_system/myEnum';
 import * as auth from './_system/auth';
 import { authConfig } from './_system/auth';
 import * as cache from './_system/cache';
