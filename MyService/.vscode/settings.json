@@ -2,5 +2,6 @@
     "search.exclude": {
         "./dest": true,
         ".idea": true
-    }
+    },
+    "vscode-region-manager.innerSpacing": false
 }

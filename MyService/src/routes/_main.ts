@@ -10,7 +10,7 @@ import * as userBll from './bll/user';
 
 import config from '../config';
 
-//访问权限配置
+//#region 访问权限配置
 export let accessableUrlConfig: auth.AccessableUrlConfigType[] = [
     { url: '/' },
     { url: '/msg' },
@@ -104,8 +104,9 @@ export let accessableUrlConfig: auth.AccessableUrlConfigType[] = [
     { url: '/interface/struct/save', auth: [authConfig.login, authConfig.admin] },
     { url: '/interface/struct/del', auth: [authConfig.login, authConfig.admin] },
 ];
+//#endregion
 
-//枚举
+//#region 枚举
 export let enumDict = {
     mainContentTypeEnum: {
         文章: "0"
@@ -138,7 +139,9 @@ export let enumChangeDict = {
         '-1': { 'recovery': '恢复' },
     }
 };
+//#endregion
 
+//#region 缓存 
 export let cacheKey = {
     userInfo: 'userInfoCacheKey',
     captcha: 'captchaKey'
@@ -149,6 +152,7 @@ export let cacheTime = {
     userInfo: 7 * 24 * 3600,
     captcha: 10 * 60
 };
+//#endregion
 
 type FormatResResult = {
     result?: boolean,
