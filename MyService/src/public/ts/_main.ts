@@ -12,13 +12,13 @@ export let variable = {
     frameDefaultHeight: 0,
 };
 
-class structTypeEnum {
+class StructTypeEnum {
     公司: "company" = "company";
     部门: "department" = "department";
     小组: "group" = "group";
 }
 let enumDict = {
-    structTypeEnum: new structTypeEnum(),
+    structTypeEnum: new StructTypeEnum(),
 }
 export let myEnum: MyEnumInstance<typeof enumDict, any>;
 export let init = function () {

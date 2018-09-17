@@ -8,7 +8,9 @@ import errorConfig from '../_system/errorConfig';
 import { myEnum } from '../_main';
 import * as auth from '../_system/auth';
 import { isHadAuthority, authConfig } from '../_system/auth';
+import { MainContentTypeModel } from '../dal/models/dbModel';
 import { MainContent } from '../dal/models/dbModel/MainContent';
+type MainContentTypeDataType = MainContentTypeModel.MainContentTypeDataType;
 const {
     mainContentStatusEnum,
     mainContentStatusEnumOperate,
@@ -81,12 +83,11 @@ export let save = function (opt, exOpt) {
         mainContent = opt.mainContent;
         let mainContentDetail = await detailQuery({ id: mainContent.id }, exOpt);
         var delChildList, saveChildList;
-        let changeDesc;
+        let changeDesc = mainContentStatusEnum.enumChangeCheck(mainContentDetail.mainContent.status, mainContent.status);
         if (mainContent.id != 0) {
             //权限检查
             if (user.id != mainContentDetail.mainContent.userInfoId)
                 throw common.error('没有权限处理此记录');
-            changeDesc = mainContentStatusEnum.enumChangeCheck(mainContentDetail.mainContent.status, mainContent.status);
             //要删除的child
             delChildList = mainContentDetail.mainContentChildList.filter(function (child) {
                 //查找删除列表中的项
@@ -116,7 +117,7 @@ export let save = function (opt, exOpt) {
             });
             return match;
         });
-        let mainContentWithTypeList = [];
+        let mainContentWithTypeList: MainContentTypeDataType[] = [];
         if (mainContent.id != 0) {
             let query = await autoBll.modules.mainContentWithType.query({ mainContentId: mainContent.id });
             mainContentWithTypeList = query.list;
@@ -166,12 +167,9 @@ export let save = function (opt, exOpt) {
                 list.push(autoBll.modules.mainContentChild.save(item, conn));
             });
             //日志
-            var srcStatus = 0;
-            if (mainContent.id != 0)
-                srcStatus = mainContentDetail.mainContent.status;
             var mainContentLog = createLog({
                 id: mainContentId,
-                srcStatus: srcStatus,
+                srcStatus: mainContentDetail.mainContent.status,
                 destStatus: mainContent.status,
                 content: opt.remark || changeDesc,
                 user: user

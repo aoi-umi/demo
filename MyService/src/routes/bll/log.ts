@@ -4,14 +4,14 @@
 import { Op, WhereOptions } from 'sequelize';
 import * as autoBll from './_auto';
 import * as common from '../_system/common';
-import { LogModel } from '../dal/models/dbModel';
+import { Log } from '../dal/models/dbModel/Log';
 export let query = function (opt) {
     return common.promise(async () => {
-        let options = autoBll.createQueryOption(LogModel.Log, opt, {
+        let options = autoBll.createQueryOption(Log, opt, {
             //like option
             likeKeyList: ['url', 'application', 'method', 'methodName', 'req', 'res', 'ip', 'remark', 'requestIp']
         });
-        let where = options.where as WhereOptions<LogModel.Log>;        
+        let where = options.where as WhereOptions<Log>;
         if (opt.createDateStart || opt.createDateEnd) {
             where.createDate = {};
             if (opt.createDateStart)
@@ -20,7 +20,7 @@ export let query = function (opt) {
                 where.createDate[Op.lte] = opt.createDateEnd;
         }
         options.order = [['id', 'DESC']];
-        let t = await LogModel.Log.findAndCountAll(options);
+        let t = await Log.findAndCountAll(options);
         return {
             list: t.rows.map(r => r.dataValues),
             count: t.count
@@ -29,5 +29,5 @@ export let query = function (opt) {
 };
 
 export let statistics = function (opt) {
-    return LogModel.Log.customStatistics(opt);
+    return Log.customStatistics(opt);
 }
