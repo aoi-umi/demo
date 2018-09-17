@@ -107,10 +107,10 @@ export let accessableUrlConfig: auth.AccessableUrlConfigType[] = [
 //#endregion
 
 //#region 枚举
-class mainContentTypeEnum {
+class MainContentTypeEnum {
     文章: 0 = 0;
 }
-class mainContentStatusEnum {
+class MainContentStatusEnum {
     草稿: 0 = 0;
     待审核: 1 = 1;
     审核中: 2 = 2;
@@ -119,10 +119,10 @@ class mainContentStatusEnum {
     已删除: -1 = -1;
 }
 //添加 Operate 后缀 不要包含于上面相同的键值
-class mainContentStatusEnumOperate {
+class MainContentStatusEnumOperate {
     恢复: "recovery" = "recovery";
 }
-class mainContentLogTypeEnum {
+class MainContentLogTypeEnum {
     主内容保存: 0 = 0;
     主内容提交: 1 = 1;
     主内容审核: 2 = 2;
@@ -131,29 +131,56 @@ class mainContentLogTypeEnum {
     主内容删除: 5 = 5;
     主内容恢复: 6 = 6;
 }
-class structTypeEnum {
+class StructTypeEnum {
     公司: "company" = "company";
     部门: "department" = "department";
     小组: "group" = "group";
 }
+let mainContentTypeEnum = new MainContentTypeEnum();
+let mainContentStatusEnum = new MainContentStatusEnum();
+let mainContentStatusEnumOperate = new MainContentStatusEnumOperate();
+let mainContentLogTypeEnum = new MainContentLogTypeEnum();
+let structTypeEnum = new StructTypeEnum();
 export let enumDict = {
-    mainContentTypeEnum: new mainContentTypeEnum(),
-    mainContentStatusEnum: new mainContentStatusEnum(),
-    mainContentStatusEnumOperate: new mainContentStatusEnumOperate(),
-    mainContentLogTypeEnum: new mainContentLogTypeEnum(),
-    structTypeEnum: new structTypeEnum(),
+    mainContentTypeEnum,
+    mainContentStatusEnum,
+    mainContentStatusEnumOperate,
+    mainContentLogTypeEnum,
+    structTypeEnum,
 };
 
 //枚举变更权限
 export let enumChangeDict = {
     mainContentStatusEnum: {
         //初始状态 -> 变更状态
-        '0': { '0': '保存', '1': '提交', '-1': '删除' },
-        '1': { '2': '审核', '3': '审核通过', '4': '审核不通过', '-1': '删除' },
-        '2': { '2': '审核', '3': '审核通过', '4': '审核不通过', '-1': '删除' },
-        '3': { '-1': '删除' },
-        '4': { '0': '保存', '1': '提交', '-1': '删除' },
-        '-1': { 'recovery': '恢复' },
+        [mainContentStatusEnum.草稿]: {
+            [mainContentStatusEnum.草稿]: '保存',
+            [mainContentStatusEnum.待审核]: '提交',
+            [mainContentStatusEnum.已删除]: '删除'
+        },
+        [mainContentStatusEnum.待审核]: {
+            [mainContentStatusEnum.审核中]: '审核',
+            [mainContentStatusEnum.通过]: '审核通过',
+            [mainContentStatusEnum.退回]: '审核不通过',
+            [mainContentStatusEnum.已删除]: '删除'
+        },
+        [mainContentStatusEnum.审核中]: {
+            [mainContentStatusEnum.审核中]: '审核',
+            [mainContentStatusEnum.通过]: '审核通过',
+            [mainContentStatusEnum.退回]: '审核不通过',
+            [mainContentStatusEnum.已删除]: '删除'
+        },
+        [mainContentStatusEnum.通过]: {
+            [mainContentStatusEnum.已删除]: '删除'
+        },
+        [mainContentStatusEnum.退回]: {
+            [mainContentStatusEnum.草稿]: '保存',
+            [mainContentStatusEnum.待审核]: '提交',
+            [mainContentStatusEnum.已删除]: '删除'
+        },
+        [mainContentStatusEnum.已删除]: {
+            [mainContentStatusEnumOperate.恢复]: '恢复'
+        },
     }
 };
 //#endregion

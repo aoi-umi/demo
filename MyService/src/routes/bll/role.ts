@@ -4,7 +4,7 @@
 import * as q from 'q';
 import * as autoBll from './_auto';
 import * as common from '../_system/common';
-import { RoleModel } from '../dal/models/dbModel';
+import { Role } from '../dal/models/dbModel/Role';
 
 export let save = function (opt) {
     var id;
@@ -13,13 +13,13 @@ export let save = function (opt) {
         if (opt.statusUpdateOnly) {
             if (!dataRole.id || dataRole.id == 0)
                 throw common.error('id不能为空');
-            id = await autoBll.modules.role.save({id: dataRole.id, status: dataRole.status});
+            id = await autoBll.modules.role.save({ id: dataRole.id, status: dataRole.status });
         } else {
             let exist = await isExist(dataRole);
             if (exist)
                 throw common.error(`code[${dataRole.code}]已存在`);
 
-            let roleWithAuthority = await autoBll.modules.roleWithAuthority.query({roleCode: dataRole.code});
+            let roleWithAuthority = await autoBll.modules.roleWithAuthority.query({ roleCode: dataRole.code });
             var delRoleAuthList = roleWithAuthority.list.filter((dbAuth) => {
                 return opt.delAuthorityList.findIndex((delAuth) => {
                     return dbAuth.authorityCode == delAuth;
@@ -38,7 +38,7 @@ export let save = function (opt) {
                 //删除权限
                 if (delRoleAuthList.length) {
                     delRoleAuthList.forEach(function (item) {
-                        list.push(autoBll.modules.roleWithAuthority.del({id: item.id}, conn));
+                        list.push(autoBll.modules.roleWithAuthority.del({ id: item.id }, conn));
                     })
                 }
                 //保存权限
@@ -58,8 +58,8 @@ export let save = function (opt) {
     });
 };
 
-export let detailQuery = function (opt) {    
-    return RoleModel.Role.customDetailQuery(opt);
+export let detailQuery = function (opt) {
+    return Role.customDetailQuery(opt);
 };
 
 export let query = function (opt) {
@@ -72,7 +72,7 @@ export let query = function (opt) {
     }
     opt.orderBy = 'code';
 
-    return RoleModel.Role.customQuery(opt).then(function (t) {
+    return Role.customQuery(opt).then(function (t) {
         var data: any = {
             list: t.list,
             count: t.count,
@@ -107,7 +107,7 @@ export let isExist = function (opt) {
     return common.promise(async function () {
         if (!code)
             throw common.error('code不能为空');
-        let t = await autoBll.modules.role.query({code: code});
+        let t = await autoBll.modules.role.query({ code: code });
         var result = false;
         if (t.list.length > 1)
             throw common.error('数据库中存在重复角色');
