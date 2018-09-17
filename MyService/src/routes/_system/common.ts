@@ -490,36 +490,34 @@ export let getClientIp = function (req: Request) {
 };
 
 export let IPv4ToIPv6 = function (ip, convert?: boolean) {
-    if (net.isIPv4(ip)) {
-        if (!convert) {
-            ip = '::ffff:' + ip;
-        } else {
-            //转为2进制的数，每4位为一组，转换成16进制的
-            //192.168.1.1  11000000 10101000 00000001 00000001  C0 A8 01 01 0:0:0:0:0:0:C0A8:0101  ::C0A8:0101
-            var ipv6 = [];
-            var list = ip.split('.');
-            for (var i = 0; i < list.length; i++) {
-                var t = parseInt(list[i]).toString(2);
-                if (t.length % 8 != 0) {
-                    var fixNum = 8 - t.length;
-                    for (var j = 0; j < fixNum; j++) {
-                        t = '0' + t;
-                    }
-                }
-                ipv6.push(parseInt(t.substr(0, 4), 2).toString(16));
-                ipv6.push(parseInt(t.substr(4, 4), 2).toString(16));
+    if (!net.isIPv4(ip))
+        return ip;
+    if (!convert) {
+        ip = '::ffff:' + ip;
+    } else {
+        //转为2进制的数，每4位为一组，转换成16进制的
+        //192.168.1.1  11000000 10101000 00000001 00000001  C0 A8 01 01 0:0:0:0:0:0:C0A8:0101  ::C0A8:0101
+        var ipv6 = [];
+        var list = ip.split('.');
+        for (var i = 0; i < list.length; i++) {
+            var t = parseInt(list[i]).toString(2);
+            let fixNum = 8 - t.length;
+            if (fixNum != 0) {
+                t = '00000000'.slice(-fixNum) + t;
             }
-            var ipv6List = [];
-            var ipv6Str = '';
-            for (var i = 0; i < ipv6.length; i++) {
-                ipv6Str += ipv6[i];
-                if ((i + 1) % 4 == 0 && ipv6Str) {
-                    ipv6List.push(ipv6Str);
-                    ipv6Str = '';
-                }
-            }
-            ip = '::' + ipv6List.join(':');
+            ipv6.push(parseInt(t.substr(0, 4), 2).toString(16));
+            ipv6.push(parseInt(t.substr(4, 4), 2).toString(16));
         }
+        var ipv6List = [];
+        var ipv6Str = '';
+        for (var i = 0; i < ipv6.length; i++) {
+            ipv6Str += ipv6[i];
+            if ((i + 1) % 4 == 0 && ipv6Str) {
+                ipv6List.push(ipv6Str);
+                ipv6Str = '';
+            }
+        }
+        ip = '::' + ipv6List.join(':');
     }
     return ip;
 };
@@ -547,7 +545,7 @@ export let logSave = function (log) {
     for (var key in log) {
         var value = log[key];
         var type = typeof (value);
-        if (value !== null && type == 'object')
+        if (value && type == 'object')
             log[key] = JSON.stringify(value);
     }
     return logService.save(log).fail(function () {
