@@ -119,8 +119,13 @@ class MainContentStatusEnum {
     退回: 4 = 4;
     已删除: -1 = -1;
 }
-//添加 Operate 后缀 不要包含于上面相同的键值
+//添加 Operate 后缀 不要包含于上面相同的值
 class MainContentStatusEnumOperate {
+    提交: "submit" = "submit";
+    审核: "audit" = "audit";
+    通过: "pass" = "pass";
+    不通过: "notPass" = "notPass";
+    删除: "del" = "del";
     恢复: "recovery" = "recovery";
 }
 class MainContentLogTypeEnum {

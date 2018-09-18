@@ -190,15 +190,20 @@ export let clone = function <T>(obj: T): T {
 
 /**
  * enumerable装饰器
- * @enumerable decorator that sets the enumerable property of a class field to false.
- * @param value true|false
  */
+export function enumerable(value: boolean): (target: any, propertyKey: string) => void;
+export function enumerable(value: boolean): (target: any, propertyKey: string, descriptor: PropertyDescriptor) => PropertyDescriptor;
 export function enumerable(value: boolean) {
-    return function (target: any, propertyKey: string) {
-        let descriptor = Object.getOwnPropertyDescriptor(target, propertyKey) || {};
-        if (descriptor.enumerable != value) {
+    return function (target: any, propertyKey: string, descriptor?: PropertyDescriptor) {
+        if (descriptor) {
             descriptor.enumerable = value;
-            Object.defineProperty(target, propertyKey, descriptor)
+            return descriptor;
+        } else {
+            descriptor = Object.getOwnPropertyDescriptor(target, propertyKey) || {};
+            if (descriptor.enumerable != value) {
+                descriptor.enumerable = value;
+                Object.defineProperty(target, propertyKey, descriptor)
+            }
         }
     };
 }

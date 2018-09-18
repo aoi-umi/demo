@@ -167,66 +167,46 @@
         <!--操作-->
         <div class="my-row text-center">
             <%
-            var operateList = [];
-            switch (mainContent.status) {
-                case 0:
-                case 4:
-                    if (isHadAuthority(authConfig.mainContentSave)
-                            && (!mainContent.id || mainContent.userInfoId == user.id)) {
-                        operateList.push({
-                            text: '保存',
-                            operate: 'save',
-                            className: 'save'
-                        });
-                        operateList.push({
-                            text: '提交',
-                            operate: 'submit',
-                            className: 'save'
-                        });
-                    }
-                    break;
-                case 1:
-                case 2:
-                    if (isHadAuthority(authConfig.mainContentAudit)) {
-                        operateList.push({
-                            text: '审核',
-                            operate: 'audit',
-                            className: 'statusUpdate'
-                        });
-                    }
-                    if (isHadAuthority(authConfig.mainContentPass)) {
-                        operateList.push({
-                            text: '审核通过',
-                            operate: 'pass',
-                            className: 'statusUpdate'
-                        });
-                    }
-                    if (isHadAuthority(authConfig.mainContentNotPass)) {
-                        operateList.push({
-                            text: '审核不通过',
-                            operate: 'notPass',
-                            className: 'statusUpdate'
-                        });
-                    }
-                    break;
-                case -1:
-                    if (isHadAuthority(authConfig.mainContentRecovery)) {
-                        operateList.push({
-                            text: '恢复',
-                            operate: 'recovery',
-                            className: 'statusUpdate'
-                        });
-                    }
-                    break;
-            }
-            if (mainContentDetail.canDelete) {
-                operateList.push({
+            let dict = {
+                save: {
+                    text: '保存',
+                    operate: 'save',
+                    className: 'save'
+                },
+                submit: {
+                    text: '提交',
+                    operate: 'submit',
+                    className: 'save'
+                },
+                audit: {
+                    text: '审核',
+                    operate: 'audit',
+                    className: 'statusUpdate'
+                },
+                pass: {
+                    text: '审核通过',
+                    operate: 'pass',
+                    className: 'statusUpdate'
+                },
+                notPass: {
+                    text: '审核不通过',
+                    operate: 'notPass',
+                    className: 'statusUpdate'
+                },
+                recovery: {
+                    text: '恢复',
+                    operate: 'recovery',
+                    className: 'statusUpdate'
+                },
+                del: {
                     text: '删除',
                     operate: 'del',
                     className: 'statusUpdate'
-                });
-            }
-            operateList.forEach(function(item){ %>
+                }
+            };
+            mainContent.operation.forEach(function(operate){
+                let item = dict[operate];
+            %>
             <button class="btn btn-default <%= item.className %>"
                     data-operate="<%= item.operate %>"
                     data-text="<%= item.text %>"
