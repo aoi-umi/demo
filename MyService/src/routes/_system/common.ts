@@ -199,13 +199,13 @@ export let clone = function <T>(obj: T): T {
 /**
  * enumerable装饰器
  */
-export function enumerable(value: boolean): (target: any, propertyKey: string) => void;
-export function enumerable(value: boolean): (target: any, propertyKey: string, descriptor: PropertyDescriptor) => PropertyDescriptor;
+export function enumerable(value: boolean): PropertyDecorator;
+export function enumerable(value: boolean): MethodDecorator;
 export function enumerable(value: boolean) {
     return function (target: any, propertyKey: string, descriptor?: PropertyDescriptor) {
         if (descriptor) {
             descriptor.enumerable = value;
-            return descriptor;
+            //return descriptor;
         } else {
             descriptor = Object.getOwnPropertyDescriptor(target, propertyKey) || {};
             if (descriptor.enumerable != value) {
