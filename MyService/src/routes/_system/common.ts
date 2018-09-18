@@ -11,7 +11,6 @@ import * as zlib from 'zlib';
 import { Request } from 'express';
 import config from '../../config';
 import errorConfig from './errorConfig';
-import * as logService from '../service/logService';
 
 
 //#region 前后通用
@@ -300,7 +299,7 @@ export type RequestServiceByConfigOption = {
     data?: any;
     beforeRequest?: Function;
     afterResponse?: Function;
-    noLog?: boolean;
+    outLog?: any;
 } & request.CoreOptions;
 export let requestServiceByConfig = function (option: RequestServiceByConfigOption) {
     var method = '';
@@ -372,10 +371,8 @@ export let requestServiceByConfig = function (option: RequestServiceByConfigOpti
         console.log(`request ${log.method} error`);
         console.log(`url: ${url}`);
         throw e;
-    }).finally(function () {
-        if (!option.noLog) {
-            logSave(log);
-        }
+    }).finally(() => {
+        option.outLog = log;
     });
 };
 
@@ -539,18 +536,6 @@ export let logModle = function () {
         duration: null,
         requestIp: null,
     };
-};
-
-export let logSave = function (log) {
-    for (var key in log) {
-        var value = log[key];
-        var type = typeof (value);
-        if (value && type == 'object')
-            log[key] = JSON.stringify(value);
-    }
-    return logService.save(log).fail(function () {
-
-    });
 };
 
 // import * as soap from 'soap';

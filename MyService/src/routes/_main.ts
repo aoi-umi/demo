@@ -1,5 +1,6 @@
 import { Request, Response, Express } from 'express';
 import * as common from './_system/common';
+import * as util from './util';
 import { MyEnum, MyEnumInstance } from './_system/myEnum';
 import * as auth from './_system/auth';
 import { authConfig } from './_system/auth';
@@ -268,7 +269,7 @@ export let init = function (opt: { viewPath: string }) {
     });
 
     myEnum = MyEnum.createInstance(enumDict, enumChangeDict);
-    let logSave = function (req: Request, res: Response, responseData: any) {
+    let logSave = function (req: Request, res: Response, responseData: FormatResResult) {
         var url = req.header('host') + req.originalUrl;
         var result = responseData.result;
         var logReq = req.method == 'POST' ? req.body : req.query;
@@ -288,7 +289,7 @@ export let init = function (opt: { viewPath: string }) {
             log.remark = responseData.desc + `[${req.method}][account:${req.myData.user.account}]`;
             log.guid = responseData.guid;
             log.duration = new Date().getTime() - req.myData.startTime;
-            common.logSave(log);
+            util.logSave(log);
         }
     }
     let myRender = function (req: Request, res: Response, view, options) {
