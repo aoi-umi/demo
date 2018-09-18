@@ -20,6 +20,10 @@ export let post = function (req: Request, res: Response, next) {
     });
 };
 
+export type InterfaceExOpt = {
+    user: Express.MyDataUser,
+    req: Express.Request
+};
 function getBll(req: Request, res: Response, next) {
     var params = req.params;
     var args = req.body;

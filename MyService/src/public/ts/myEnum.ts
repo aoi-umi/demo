@@ -28,27 +28,26 @@ class EnumInstance<T1, T2> {
         }
     }
 
+    @enumerable(false)
     getKey(value: T2[keyof T2]) {
         return this.instance.getKey(this.enumName, value as any);
     }
 
+    @enumerable(false)
     getName(value: T2[keyof T2]) {
         return this.instance.getName(this.enumName, value as any);
     }
 
+    @enumerable(false)
     getValue(key: keyof T2) {
         return this.instance.getValue(this.enumName, key as any);
     }
 
+    @enumerable(false)
     enumChangeCheck(srcEnum, destEnum) {
         return this.instance.enumChangeCheck(this.enumName, srcEnum, destEnum);
     }
 }
-
-enumerable(false)(EnumInstance.prototype, 'getKey');
-enumerable(false)(EnumInstance.prototype, 'getName');
-enumerable(false)(EnumInstance.prototype, 'getValue');
-enumerable(false)(EnumInstance.prototype, 'enumChangeCheck');
 
 type EnumKey<T> = Extract<keyof T[keyof T], string>;
 type EnumValue<T> = T[keyof T][EnumKey<T>];

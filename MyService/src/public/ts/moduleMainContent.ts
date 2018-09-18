@@ -9,6 +9,7 @@ import * as common from './common';
 import * as myInterface from './myInterface';
 import * as myVaild from './myVaild';
 import { MyModuleGeneric, ModuleOptionGeneric } from './myModule';
+import { myEnum } from './_main';
 
 interface ModuleMainContentOption extends ModuleOptionGeneric<ModuleMainContent> {
     mainContentDetailId?: string;
@@ -430,7 +431,14 @@ export class ModuleMainContent extends MyModuleGeneric<ModuleMainContent, Module
         return common.promise(async function () {
             var operate = dom.data('operate');
             mainContent.operate = operate;
-            var operateList = ['audit', 'pass', 'notPass', 'del', 'recovery'];
+            var operateList = [
+                myEnum.mainContentStatusEnumOperate.提交,
+                myEnum.mainContentStatusEnumOperate.审核,
+                myEnum.mainContentStatusEnumOperate.通过,
+                myEnum.mainContentStatusEnumOperate.不通过,
+                myEnum.mainContentStatusEnumOperate.删除,
+                myEnum.mainContentStatusEnumOperate.恢复
+            ];
             if (!common.isInArray(operate, operateList))
                 throw new Error(`错误的操作类型[${operate}]`);
             let text = dom.data('text');

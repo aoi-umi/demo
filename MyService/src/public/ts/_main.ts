@@ -12,6 +12,15 @@ export let variable = {
     frameDefaultHeight: 0,
 };
 
+class MainContentStatusEnumOperate {
+    提交: "submit" = "submit";
+    审核: "audit" = "audit";
+    通过: "pass" = "pass";
+    不通过: "notPass" = "notPass";
+    删除: "del" = "del";
+    恢复: "recovery" = "recovery";
+}
+
 class StructTypeEnum {
     公司: "company" = "company";
     部门: "department" = "department";
@@ -19,6 +28,7 @@ class StructTypeEnum {
 }
 let enumDict = {
     structTypeEnum: new StructTypeEnum(),
+    mainContentStatusEnumOperate: new MainContentStatusEnumOperate(),
 }
 export let myEnum: MyEnumInstance<typeof enumDict, any>;
 export let init = function () {

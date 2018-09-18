@@ -10,11 +10,48 @@
                     <span>创建:<%= userInfo %>/<%= createDate %></span>
                     <span>最后操作:<%= operator %>/<%= operateDate %></span>
                 </p>
-            </div>        
+            </div>
             <div>
-                <% if(common.isInArray('del', operation)){ %>
-                <a href="javascript:;" class="itemDel statusUpdate" data-id="<%= id %>" data-operate="del" data-text="删除">删除</a>
-                <% } %>
+                <% var dict = {
+                    submit: {
+                        text: '提交',
+                        operate: 'submit',
+                        className: 'statusUpdate'
+                    },
+                    audit: {
+                        text: '审核',
+                        operate: 'audit',
+                        className: 'statusUpdate'
+                    },
+                    pass: {
+                        text: '审核通过',
+                        operate: 'pass',
+                        className: 'statusUpdate'
+                    },
+                    notPass: {
+                        text: '审核不通过',
+                        operate: 'notPass',
+                        className: 'statusUpdate'
+                    },
+                    recovery: {
+                        text: '恢复',
+                        operate: 'recovery',
+                        className: 'statusUpdate'
+                    },
+                    del: {
+                        text: '删除',
+                        operate: 'del',
+                        className: 'statusUpdate'
+                    }
+                };
+                        for (var operate of operation) {
+                    var op = dict[operate];
+                if (op) { %>
+                <a href="javascript:;" class="itemDel <%= op.className %>" data-id="<%= id %>"
+                   data-operate="<%= op.operate %>"
+                   data-text="<%= op.text %>"><%= op.text %></a>
+                <% }
+                } %>
             </div>
         </div>
     </div>

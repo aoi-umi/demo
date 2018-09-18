@@ -9,7 +9,8 @@ import { myEnum } from '../_main';
 import * as auth from '../_system/auth';
 import { isHadAuthority, authConfig } from '../_system/auth';
 import { MainContentTypeModel } from '../dal/models/dbModel';
-import { MainContent } from '../dal/models/dbModel/MainContent';
+import { MainContent, MainContentDataType } from '../dal/models/dbModel/MainContent';
+import { InterfaceExOpt } from '../module/_interface';
 type MainContentTypeDataType = MainContentTypeModel.MainContentTypeDataType;
 const {
     mainContentStatusEnum,
@@ -18,7 +19,13 @@ const {
     mainContentTypeEnum,
 } = myEnum;
 
-export let query = function (opt, exOpt) {
+type ManiContentReturnType = MainContentDataType & {
+    statusName?: string;
+    typeName?: string;
+    operation?: string[];
+}
+
+export let query = function (opt, exOpt: InterfaceExOpt) {
     var user = exOpt.user;
     return common.promise(async function () {
         let t = await MainContent.customQuery(opt);
@@ -26,23 +33,20 @@ export let query = function (opt, exOpt) {
             t.list.forEach(function (ele) {
                 let item = ele as (typeof ele) & { operation: string[] }
                 item.operation = ['detailQuery'];
-                if (canDelete(item, user))
-                    item.operation.push('del');
-                updateMainContent(item);
+                updateMainContent(item, exOpt.user);
             });
         }
         return t;
     });
 };
 
-export let detailQuery = function (opt, exOpt) {
+export let detailQuery = function (opt, exOpt: InterfaceExOpt) {
     return common.promise(async function () {
         let detail = {
-            mainContent: null,
+            mainContent: null as ManiContentReturnType,
             mainContentTypeList: [],
             mainContentChildList: [],
             mainContentLogList: [],
-            canDelete: true
         };
         if (opt.id == 0) {
             detail.mainContent = { id: 0, status: 0, type: 0 };
@@ -58,8 +62,7 @@ export let detailQuery = function (opt, exOpt) {
         }
 
         //处理数据
-        detail.canDelete = canDelete(detail.mainContent, exOpt.user);
-        updateMainContent(detail.mainContent);
+        updateMainContent(detail.mainContent, exOpt.user);
         if (detail.mainContentLogList) {
             detail.mainContentLogList.forEach(function (item) {
                 updateMainContentLog(item);
@@ -76,7 +79,7 @@ export let detailQuery = function (opt, exOpt) {
     });
 };
 
-export let save = function (opt, exOpt) {
+export let save = function (opt, exOpt: InterfaceExOpt) {
     var mainContent;
     var user = exOpt.user;
     return common.promise(async function () {
@@ -181,7 +184,7 @@ export let save = function (opt, exOpt) {
     });
 };
 
-export let statusUpdate = function (opt, exOpt) {
+export let statusUpdate = function (opt, exOpt: InterfaceExOpt) {
     var mainContent = opt.mainContent;
     var user = exOpt.user;
     var necessaryAuth;
@@ -191,15 +194,19 @@ export let statusUpdate = function (opt, exOpt) {
             throw common.error('', errorConfig.ARGS_ERROR);
         }
         operate = mainContent.operate;
-        if (operate == 'audit')
+        if (operate == mainContentStatusEnumOperate.提交) {
+            mainContent.status = mainContentStatusEnum.待审核;
+            operate = 'save';
+        }
+        else if (operate == mainContentStatusEnumOperate.审核)
             mainContent.status = mainContentStatusEnum.审核中;
-        else if (operate == 'pass')
+        else if (operate == mainContentStatusEnumOperate.通过)
             mainContent.status = mainContentStatusEnum.通过;
-        else if (operate == 'notPass')
+        else if (operate == mainContentStatusEnumOperate.不通过)
             mainContent.status = mainContentStatusEnum.退回;
-        else if (operate == 'del')
+        else if (operate == mainContentStatusEnumOperate.删除)
             mainContent.status = mainContentStatusEnum.已删除;
-        else if (operate == 'recovery')
+        else if (operate == mainContentStatusEnumOperate.恢复)
             mainContent.status = mainContentStatusEnumOperate.恢复;
         else
             throw common.error(`错误的操作类型[${operate}]`);
@@ -209,7 +216,7 @@ export let statusUpdate = function (opt, exOpt) {
             throw common.error(`没有[${necessaryAuth}]权限`);
         return detailQuery({ id: mainContent.id }, exOpt);
     }).then(function (mainContentDetail) {
-        if (auth.isEqual(necessaryAuth, authConfig.mainContentDel) && !mainContentDetail.canDelete) {
+        if (auth.isEqual(necessaryAuth, authConfig.mainContentDel) && mainContentDetail.mainContent.operation.includes('dev')) {
             throw common.error(`没有权限`);
         }
 
@@ -280,9 +287,42 @@ function createLog(opt) {
     return mainContentLog;
 }
 
-function updateMainContent(item) {
-    item.typeName = mainContentTypeEnum.getName(item.type);
-    item.statusName = mainContentStatusEnum.getName(item.status);
+function updateMainContent(mainContent: ManiContentReturnType, user: Express.MyDataUser) {
+    mainContent.typeName = mainContentTypeEnum.getName(mainContent.type as any);
+    mainContent.statusName = mainContentStatusEnum.getName(mainContent.status as any);
+    if (!mainContent.operation)
+        mainContent.operation = [];
+    let operation = mainContent.operation;
+    switch (mainContent.status) {
+        case 0:
+        case 4:
+            if (isHadAuthority(user, authConfig.mainContentSave)
+                && (!mainContent.id || mainContent.userInfoId == user.id)) {
+                operation.push('save');
+                operation.push('submit');
+            }
+            break;
+        case 1:
+        case 2:
+            if (isHadAuthority(user, authConfig.mainContentAudit)) {
+                operation.push('audit');
+            }
+            if (isHadAuthority(user, authConfig.mainContentPass)) {
+                operation.push('pass');
+            }
+            if (isHadAuthority(user, authConfig.mainContentNotPass)) {
+                operation.push('notPass');
+            }
+            break;
+        case -1:
+            if (isHadAuthority(user, authConfig.mainContentRecovery)) {
+                operation.push('recovery');
+            }
+            break;
+    }
+
+    if (canDelete(mainContent, user))
+        operation.push('del');
 }
 
 export function updateMainContentLog(item) {
@@ -291,7 +331,7 @@ export function updateMainContentLog(item) {
     item.destStatusName = mainContentStatusEnum.getName(item.destStatus);
 }
 
-function canDelete(mainContent, user) {
+function canDelete(mainContent: MainContentDataType, user: Express.MyDataUser) {
     if (mainContent.status != -1
         && ((isHadAuthority(user, [authConfig.mainContentDel]) && (user.id == mainContent.userInfoId))
             || (isHadAuthority(user, [authConfig.admin]) && mainContent.status != mainContentStatusEnum.草稿))
