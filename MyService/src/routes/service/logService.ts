@@ -2,7 +2,8 @@
  * Created by umi on 2017-5-29.
  */
 import * as common from '../_system/common';
-import { RequestServiceByConfigOption } from '../_system/common';
+import * as util from '../util';
+import { RequestServiceByConfigOption } from '../util';
 
 var getOption = function () {
     var opt: RequestServiceByConfigOption = {
@@ -25,5 +26,5 @@ export let save = function (data) {
     var opt = getOption();
     opt.methodName = 'save';
     opt.data = data;
-    return common.requestServiceByConfig(opt);
+    return util.requestServiceByConfig(opt);
 };
