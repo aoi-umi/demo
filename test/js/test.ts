@@ -1,7 +1,7 @@
 import * as mongoose from 'mongoose';
 import { DocumentQuery } from 'mongoose';
 import { Typegoose, InstanceType, prop, instanceMethod, staticMethod, pre, post, Ref, plugin } from 'typegoose';
-import { Model, getModelForClass, ModelType, connect } from './mongo';
+import { Model, getModelForClass, ModelType, connect, DocType } from './mongo';
 
 (async () => {
     connect('mongodb://localhost:27017/test', { mongooseOption: { useNewUrlParser: true } });
@@ -12,10 +12,6 @@ import { Model, getModelForClass, ModelType, connect } from './mongo';
             this.lastMod = new Date();
             next();
         });
-
-        // if (options && options.index) {
-        //     schema.path('lastMod').index(options.index);
-        // }
     }
 
     @pre<BaseUser>('save', function (this: InstanceType<User>, next) {
@@ -59,12 +55,13 @@ import { Model, getModelForClass, ModelType, connect } from './mongo';
         }
     });
 
-    type InstanceTypeUser2 = InstanceType<User2>;
-    type ModelTypeUser2 = ModelType<User2, typeof User2>;
+    type User2Instance = InstanceType<User2>;
+    type User2Model = ModelType<User2, typeof User2>;
+    type User2Doc = DocType<User2Instance>;
     class User2 extends BaseUser {
         @staticMethod
-        static c(this: ModelTypeUser2, conditions?: any, projection?: any | null, options?: any | null,
-            callback?: (err: any, res: InstanceTypeUser2 | null) => void): DocumentQuery<InstanceTypeUser2 | null, InstanceTypeUser2> {
+        static c(this: User2Model, conditions?: any, projection?: any | null, options?: any | null,
+            callback?: (err: any, res: User2Instance | null) => void): DocumentQuery<User2Instance | null, User2Instance> {
             return this.findOne.apply(this, arguments);
         }
 
@@ -72,12 +69,17 @@ import { Model, getModelForClass, ModelType, connect } from './mongo';
         num?: number;
 
         @prop()
+        get virtualNum() {
+            return (this.num || 0) + 10;
+        }
+
+        @prop()
         child: User;
         @prop({ ref: User, required: false })
         childId: Ref<User>;
 
         @instanceMethod
-        b(this: InstanceTypeUser2) {
+        b(this: User2Instance) {
             return 'b, user 2';
         }
     }
@@ -85,6 +87,24 @@ import { Model, getModelForClass, ModelType, connect } from './mongo';
     const UserModel2 = getModelForClass<User2, typeof User2>(User2, {
         schemaOptions: {
             timestamps: true,
+            toObject: {
+                virtuals: true,
+                transform: (doc: User2Doc, ret) => {
+                    ret.num = 100;
+                    return ret;
+                }
+            },
+            toJSON: {
+                virtuals: true,
+                transform: (doc, ret) => {
+                    for (let key in ret) {
+                        let value = ret[key];
+                        if (value !== null && value !== undefined)
+                            ret[key] = value.toString();
+                    }
+                    return ret;
+                }
+            }
         }
     });
     let u = new UserModel({ name: '123' });
@@ -110,8 +130,8 @@ import { Model, getModelForClass, ModelType, connect } from './mongo';
     if (u22 != null)
         console.log(`${u22.a()}; ${u22.b()}; ${u22.createdAt}`);
 
-    UserModel2.c().then(t => {
-        console.log(t);
+    UserModel2.c().sort({ _id: -1 }).then(t => {
+        console.log(t.toJSON());
     });
 
 })().then(() => {
