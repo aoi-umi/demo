@@ -10,8 +10,8 @@ import errorConfig from '../_system/errorConfig';
 import * as dbModel from '../dal/models/dbModel';
 
 
-type AutoBllFun = (name: string, params, conn?: Transaction) => Q.Promise<any>;
-type AutoBllModuleFun<T> = (params, conn?: Transaction) => Q.Promise<T>;
+type AutoBllFun<T = any, U = any> = (name: string, params: T, conn?: Transaction) => Q.Promise<U>;
+type AutoBllModuleFun<T, U> = (params: T, conn?: Transaction) => Q.Promise<U>;
 let dalModelsPath = '../dal/models/_auto';
 export let getRequire = function (name, option?) {
     var filepath = '';
@@ -137,34 +137,34 @@ export let createQueryOption = function <T>(model: any, params, opt?: { likeKeyL
 }
 
 let methodList = ['save', 'query', 'detailQuery', 'del'];
-
+type IdType = number;
 interface AutoBllModule<T> {
-    save?: AutoBllModuleFun<string | number>;
-    query?: AutoBllModuleFun<{ list: Array<T>, count: number }>;
-    detailQuery?: AutoBllModuleFun<T>;
-    del?: AutoBllModuleFun<number>;
+    save: AutoBllModuleFun<T, IdType>;
+    query: AutoBllModuleFun<T, { list: Array<T>, count: number }>;
+    detailQuery: AutoBllModuleFun<{ id: IdType }, T>;
+    del: AutoBllModuleFun<{ id: IdType }, number>;
 }
 
 interface AutoBllModules {
-    authority?: AutoBllModule<dbModel.AuthorityModel.AuthorityDataType>;
-    log?: AutoBllModule<dbModel.LogModel.LogDataType>;
-    mainContent?: AutoBllModule<dbModel.MainContentModel.MainContentDataType>;
-    mainContentChild?: AutoBllModule<dbModel.MainContentChildModel.MainContentChildDataType>;
-    mainContentLog?: AutoBllModule<dbModel.MainContentLogModel.MainContentLogDataType>;
-    mainContentTag?: AutoBllModule<dbModel.MainContentTagModel.MainContentTagDataType>;
-    mainContentWithType?: AutoBllModule<dbModel.MainContentTypeModel.MainContentTypeDataType>;
-    mainContentType?: AutoBllModule<dbModel.MainContentTypeModel.MainContentTypeDataType>;
-    role?: AutoBllModule<dbModel.RoleModel.RoleDataType>;
-    roleWithAuthority?: AutoBllModule<dbModel.RoleWithAuthorityModel.RoleWithAuthorityDataType>;
-    struct?: AutoBllModule<dbModel.StructModel.StructDataType>;
-    userInfo?: AutoBllModule<dbModel.UserInfoModel.UserInfoDataType>;
-    userInfoLog?: AutoBllModule<dbModel.UserInfoLogModel.UserInfoLogDataType>;
-    userInfoWithAuthority?: AutoBllModule<dbModel.UserInfoWithAuthorityModel.UserInfoWithAuthorityDataType>;
-    userInfoWithRole?: AutoBllModule<dbModel.UserInfoWithRoleModel.UserInfoWithRoleDataType>;
-    userInfoWithStruct?: AutoBllModule<dbModel.UserInfoWithStructModel.UserInfoWithStructDataType>;
+    authority: AutoBllModule<dbModel.AuthorityModel.AuthorityDataType>;
+    log: AutoBllModule<dbModel.LogModel.LogDataType>;
+    mainContent: AutoBllModule<dbModel.MainContentModel.MainContentDataType>;
+    mainContentChild: AutoBllModule<dbModel.MainContentChildModel.MainContentChildDataType>;
+    mainContentLog: AutoBllModule<dbModel.MainContentLogModel.MainContentLogDataType>;
+    mainContentTag: AutoBllModule<dbModel.MainContentTagModel.MainContentTagDataType>;
+    mainContentWithType: AutoBllModule<dbModel.MainContentWithTypeModel.MainContentWithTypeDataType>;
+    mainContentType: AutoBllModule<dbModel.MainContentTypeModel.MainContentTypeDataType>;
+    role: AutoBllModule<dbModel.RoleModel.RoleDataType>;
+    roleWithAuthority: AutoBllModule<dbModel.RoleWithAuthorityModel.RoleWithAuthorityDataType>;
+    struct: AutoBllModule<dbModel.StructModel.StructDataType>;
+    userInfo: AutoBllModule<dbModel.UserInfoModel.UserInfoDataType>;
+    userInfoLog: AutoBllModule<dbModel.UserInfoLogModel.UserInfoLogDataType>;
+    userInfoWithAuthority: AutoBllModule<dbModel.UserInfoWithAuthorityModel.UserInfoWithAuthorityDataType>;
+    userInfoWithRole: AutoBllModule<dbModel.UserInfoWithRoleModel.UserInfoWithRoleDataType>;
+    userInfoWithStruct: AutoBllModule<dbModel.UserInfoWithStructModel.UserInfoWithStructDataType>;
 }
 
-export let modules: AutoBllModules = {};
+export let modules: AutoBllModules = {} as any;
 let files = fs.readdirSync(path.resolve(`${__dirname}/${dalModelsPath}`));
 
 files.forEach(filename => {

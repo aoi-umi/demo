@@ -129,14 +129,21 @@ export let bindEvent = function () {
     });
     //关闭
     tabContainer.on('click', '.close', function (event) {
-        $($(this).data('close-target')).remove();
-        clickTabIdList.pop();
+        let dom = $(this);
+        $(dom.data('close-target')).remove();
+        let tabId = dom.data('tab-id');
+        if (tabId) {
+            let match = clickTabIdList.findIndex(ele => ele == tabId);
+            if (match >= 0)
+                clickTabIdList.splice(match, 1);
+        }
         if (tabContainer.find('> .active').length == 0) {
             var lastId = clickTabIdList[clickTabIdList.length - 1];
-            if (!$('#' + lastId).length)
+            let last = $('#' + lastId);
+            if (!last.length)
                 tabContainer.find('a:eq(0)').click();
             else
-                $('#' + lastId).click();
+                last.click();
         }
         event.stopPropagation();
     });
@@ -213,7 +220,9 @@ export let tab = function (t: TabOption) {
 
             if (t.closeTarget) {
                 var closeBtn = dom.find('[name=tab-close-btn]');
-                closeBtn.removeClass('hidden').attr('data-close-target', t.closeTarget)
+                closeBtn.removeClass('hidden')
+                    .attr('data-close-target', t.closeTarget)
+                    .attr('data-tab-id', t.id)
                 dom.on('dblclick', function () {
                     closeBtn.click();
                 });

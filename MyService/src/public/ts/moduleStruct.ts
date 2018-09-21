@@ -10,6 +10,7 @@ import * as myInterface from './myInterface';
 import * as myVaild from './myVaild';
 import { myEnum } from './_main';
 import { ModuleOptionGeneric, MyModuleGeneric } from './myModule';
+const { structTypeEnum } = myEnum;
 
 interface ModuleStructOption extends ModuleOptionGeneric<ModuleStruct> {
     treeItemId?: string;
@@ -133,7 +134,7 @@ export class ModuleStruct extends MyModuleGeneric<ModuleStruct, ModuleStructOpti
                 });
             },
             editBeforeRender: function (item) {
-                item.structTypeEnum = myEnum.structTypeEnum;
+                item.structTypeEnum = structTypeEnum;
                 return item;
             },
             editAfterRender: function (item, self) {
@@ -183,7 +184,7 @@ export class ModuleStruct extends MyModuleGeneric<ModuleStruct, ModuleStructOpti
                 });
             },
             onDetailQuerySuccess: function (t, self) {
-                t.structTypeEnum = myEnum.structTypeEnum;
+                t.structTypeEnum = structTypeEnum;
                 self.detailRender(t);
                 self.updateView(['structDetail'], { structDetail: t });
                 self.detailDom.modal('show');
@@ -194,7 +195,7 @@ export class ModuleStruct extends MyModuleGeneric<ModuleStruct, ModuleStructOpti
     }
 
     updateStructValue(ele) {
-        ele.typeName = myEnum.structTypeEnum.getName(ele.type);
+        ele.typeName = structTypeEnum.getName(ele.type);
     }
     updateView(list, opt) {
         let self = this;

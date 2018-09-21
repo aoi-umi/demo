@@ -10,6 +10,7 @@ import * as myInterface from './myInterface';
 import * as myVaild from './myVaild';
 import { MyModuleGeneric, ModuleOptionGeneric } from './myModule';
 import { myEnum } from './_main';
+const { mainContentStatusEnumOperate } = myEnum;
 
 interface ModuleMainContentOption extends ModuleOptionGeneric<ModuleMainContent> {
     mainContentDetailId?: string;
@@ -432,12 +433,12 @@ export class ModuleMainContent extends MyModuleGeneric<ModuleMainContent, Module
             var operate = dom.data('operate');
             mainContent.operate = operate;
             var operateList = [
-                myEnum.mainContentStatusEnumOperate.提交,
-                myEnum.mainContentStatusEnumOperate.审核,
-                myEnum.mainContentStatusEnumOperate.通过,
-                myEnum.mainContentStatusEnumOperate.不通过,
-                myEnum.mainContentStatusEnumOperate.删除,
-                myEnum.mainContentStatusEnumOperate.恢复
+                mainContentStatusEnumOperate.提交,
+                mainContentStatusEnumOperate.审核,
+                mainContentStatusEnumOperate.通过,
+                mainContentStatusEnumOperate.不通过,
+                mainContentStatusEnumOperate.删除,
+                mainContentStatusEnumOperate.恢复
             ];
             if (!common.isInArray(operate, operateList))
                 throw new Error(`错误的操作类型[${operate}]`);
