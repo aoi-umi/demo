@@ -5,13 +5,14 @@ import * as q from 'q';
 import * as autoBll from './_auto';
 import * as common from '../_system/common';
 import errorConfig from '../_system/errorConfig';
-import { myEnum } from '../_main';
+import { myEnum, MainContentStatusEnum } from '../_main';
 import * as auth from '../_system/auth';
 import { isHadAuthority, authConfig } from '../_system/auth';
-import { MainContentTypeModel } from '../dal/models/dbModel';
-import { MainContent, MainContentDataType } from '../dal/models/dbModel/MainContent';
+import { MainContentTypeModel, MainContentChildModel } from '../dal/models/dbModel';
+import { MainContent, MainContentDataType, MainContentCustomDetailQueryOptions, MainContentCustomQueryOptions } from '../dal/models/dbModel/MainContent';
 import { InterfaceExOpt } from '../module/_interface';
 type MainContentTypeDataType = MainContentTypeModel.MainContentTypeDataType;
+type MainContentChildDataType = MainContentChildModel.MainContentChildDataType;
 const {
     mainContentStatusEnum,
     mainContentStatusEnumOperate,
@@ -25,7 +26,7 @@ type ManiContentReturnType = MainContentDataType & {
     operation?: string[];
 }
 
-export let query = function (opt, exOpt: InterfaceExOpt) {
+export let query = function (opt: MainContentCustomQueryOptions, exOpt: InterfaceExOpt) {
     var user = exOpt.user;
     return common.promise(async function () {
         let t = await MainContent.customQuery(opt);
@@ -40,7 +41,7 @@ export let query = function (opt, exOpt: InterfaceExOpt) {
     });
 };
 
-export let detailQuery = function (opt, exOpt: InterfaceExOpt) {
+export let detailQuery = function (opt: MainContentCustomDetailQueryOptions, exOpt: InterfaceExOpt) {
     return common.promise(async function () {
         let detail = {
             mainContent: null as ManiContentReturnType,
@@ -79,7 +80,13 @@ export let detailQuery = function (opt, exOpt: InterfaceExOpt) {
     });
 };
 
-export let save = function (opt, exOpt: InterfaceExOpt) {
+export let save = function (opt: {
+    mainContent: MainContentDataType,
+    mainContentChildList?: MainContentChildDataType[],
+    delMainContentChildList?: number[],
+    mainContentTypeList?: MainContentTypeDataType[],
+    remark?: string;
+}, exOpt: InterfaceExOpt) {
     var mainContent;
     var user = exOpt.user;
     return common.promise(async function () {
@@ -184,7 +191,14 @@ export let save = function (opt, exOpt: InterfaceExOpt) {
     });
 };
 
-export let statusUpdate = function (opt, exOpt: InterfaceExOpt) {
+export let statusUpdate = function (opt: {
+    mainContent: {
+        id: number,
+        operate: string,
+        status?: any
+    }
+    remark: string;
+}, exOpt: InterfaceExOpt) {
     var mainContent = opt.mainContent;
     var user = exOpt.user;
     var necessaryAuth;
@@ -257,7 +271,15 @@ export let statusUpdate = function (opt, exOpt: InterfaceExOpt) {
     });
 };
 
-function createLog(opt) {
+type createLogOptions = {
+    id?: number,
+    srcStatus?: any,
+    destStatus?: any,
+    content?: string,
+    user?: Express.MyDataUser,
+    operate?: string,
+}
+function createLog(opt: createLogOptions) {
     var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
     var user = opt.user;
     var mainContentLog = {

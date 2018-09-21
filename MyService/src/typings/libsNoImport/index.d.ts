@@ -1,5 +1,5 @@
 //后端
-type InterfaceCustomFunction = (opt, exOpt: { req: Request, user: Express.MyDataUser }) => any;
+
 
 //前端
 interface JQueryStatic {

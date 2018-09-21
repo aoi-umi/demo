@@ -4,9 +4,14 @@
 import * as q from 'q';
 import * as autoBll from './_auto';
 import * as common from '../_system/common';
-import { Role } from '../dal/models/dbModel/Role';
+import { Role, RoleCustomQueryOptions, RoleCustomDetailQueryOptions, RoleDataType } from '../dal/models/dbModel/Role';
 
-export let save = function (opt) {
+export let save = function (opt: {
+    role: RoleDataType,
+    statusUpdateOnly?: boolean,
+    delAuthorityList?: string[],
+    addAuthorityList?: string[],
+}) {
     var id;
     var dataRole = opt.role;
     return common.promise(async function () {
@@ -58,11 +63,11 @@ export let save = function (opt) {
     });
 };
 
-export let detailQuery = function (opt) {
+export let detailQuery = function (opt: RoleCustomDetailQueryOptions) {
     return Role.customDetailQuery(opt);
 };
 
-export let query = function (opt) {
+export let query = function (opt: RoleCustomQueryOptions) {
     if (opt.id || opt.anyKey) {
         delete opt.code;
         delete opt.name;
@@ -102,7 +107,7 @@ export let query = function (opt) {
     });
 };
 
-export let isExist = function (opt) {
+export let isExist = function (opt: { id?: number, code?: string }) {
     var code = opt.code;
     return common.promise(async function () {
         if (!code)

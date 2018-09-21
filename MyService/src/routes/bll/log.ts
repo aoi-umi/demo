@@ -3,9 +3,13 @@
  */
 import { Op, WhereOptions } from 'sequelize';
 import * as autoBll from './_auto';
+import { QueryOptions } from './_auto';
 import * as common from '../_system/common';
-import { Log } from '../dal/models/dbModel/Log';
-export let query = function (opt) {
+import { Log, LogDataType, LogStatisticsOptions } from '../dal/models/dbModel/Log';
+export let query = function (opt: QueryOptions<LogDataType> & {
+    createDateStart?: string;
+    createDateEnd?: string;
+}) {
     return common.promise(async () => {
         let options = autoBll.createQueryOption(Log, opt, {
             //like option
@@ -28,6 +32,6 @@ export let query = function (opt) {
     });
 };
 
-export let statistics = function (opt) {
+export let statistics = function (opt: LogStatisticsOptions) {
     return Log.customStatistics(opt);
 }
