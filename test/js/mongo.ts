@@ -5,8 +5,7 @@ import * as  data_1 from 'typegoose/lib/data';
 import { Omit, RecursivePartial } from 'sequelize-typescript/lib/utils/types';
 Typegoose.prototype['setModelForClass'] = function (t, { existingMongoose, schemaOptions, existingConnection } = {}) {
     const name = this.constructor.name;
-    //=======
-    //多个模型继承同一parent, 会覆盖
+    //#region 多个模型继承同一parent, 会覆盖
     // // get schema of current model
     // let sch = this.buildSchema(name, schemaOptions);
     // // get parents class name
@@ -18,7 +17,8 @@ Typegoose.prototype['setModelForClass'] = function (t, { existingMongoose, schem
     //     // next parent
     //     parentCtor = Object.getPrototypeOf(parentCtor.prototype).constructor;
     // }
-    //=======
+    //#endregion
+    //#region 新的继承
     let className = [];
     let parentCtor = Object.getPrototypeOf(this.constructor.prototype).constructor
     while (parentCtor && parentCtor.name !== 'Typegoose' && parentCtor.name !== 'Object') {
@@ -50,7 +50,7 @@ Typegoose.prototype['setModelForClass'] = function (t, { existingMongoose, schem
     });
 
     let sch = this.buildSchema(name, schemaOptions);
-    //=======
+    //#endregion
 
     let model = mongoose.model.bind(mongoose);
     if (existingConnection) {
@@ -72,11 +72,10 @@ export type FilteredModelAttributes<T extends DefaultInstance> =
         _id: Types.ObjectId;
     };
 
+export type DocType<T extends DefaultInstance> = FilteredModelAttributes<T>;
 declare module "mongoose" {
     interface Document {
-        _doc: FilteredModelAttributes<this & Typegoose>;
-
-        save(options?: SaveOptions & { session: any }, fn?: (err: any, product: this) => void): Promise<this>;
+        _doc: DocType<this & Typegoose>;
     }
 }
 export class Model<T> extends Typegoose {
