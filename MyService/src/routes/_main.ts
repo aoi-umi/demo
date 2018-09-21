@@ -259,7 +259,7 @@ export let formatViewRes = function (option) {
     return opt;
 };
 
-export let myEnum: MyEnumInstance<typeof enumDict, typeof enumChangeDict>;
+export let myEnum = MyEnum.createInstance(enumDict, enumChangeDict);
 
 export let init = function (opt: { viewPath: string }) {
     Date.prototype.toJSON = function () {
@@ -273,7 +273,6 @@ export let init = function (opt: { viewPath: string }) {
         accessableUrlConfig: accessableUrlConfig
     });
 
-    myEnum = MyEnum.createInstance(enumDict, enumChangeDict);
     let logSave = function (req: Request, res: Response, responseData: FormatResResult) {
         var url = req.header('host') + req.originalUrl;
         var result = responseData.result;

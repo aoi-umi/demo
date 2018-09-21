@@ -4,7 +4,7 @@ import 'bootstrap';
 import * as common from './common';
 import * as socket from './socket';
 import * as myInterface from './myInterface';
-import { MyEnum, MyEnumInstance } from './myEnum';
+import { MyEnum } from './myEnum';
 import * as user from './user';
 
 export let variable = {
@@ -30,7 +30,7 @@ let enumDict = {
     structTypeEnum: new StructTypeEnum(),
     mainContentStatusEnumOperate: new MainContentStatusEnumOperate(),
 }
-export let myEnum: MyEnumInstance<typeof enumDict, any>;
+export let myEnum = MyEnum.createInstance(enumDict);
 export let init = function () {
     var userInfo = $.cookie(cacheKey.userInfo);
     if (!userInfo) {
@@ -86,7 +86,6 @@ export let init = function () {
     $(`.nav.navbar-nav a[href="${location.pathname}"]`).closest('li').addClass('active');
 
     bindEvent();
-    myEnum = MyEnum.createInstance(enumDict);
 };
 
 export let bindEvent = function () {
