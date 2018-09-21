@@ -12,6 +12,23 @@ import * as dbModel from '../dal/models/dbModel';
 
 type AutoBllFun<T = any, U = any> = (name: string, params: T, conn?: Transaction) => Q.Promise<U>;
 type AutoBllModuleFun<T, U> = (params: T, conn?: Transaction) => Q.Promise<U>;
+
+type IdType = number;
+export type QueryOptions<T> = T & {
+    pageIndex?: number;
+    pageSize?: number;
+    orderBy?: any;
+};
+export type SaveOptions<T> = T & {
+    nullList?: string[];
+};
+export type DetailQueryOptions = {
+    id: number;
+};
+export type DelOptions = {
+    id: number;
+};
+
 let dalModelsPath = '../dal/models/_auto';
 export let getRequire = function (name, option?) {
     var filepath = '';
@@ -44,7 +61,7 @@ export let getRequire = function (name, option?) {
     return require(filepath);
 }
 
-export let save: AutoBllFun = function (name, params, conn?) {
+export let save: AutoBllFun<SaveOptions<{id: number}>> = function (name, params, conn?) {
     let model = getRequire(name).default as Model<any, any>;
     return common.promise(async () => {
         let id = 0;
@@ -67,7 +84,7 @@ export let save: AutoBllFun = function (name, params, conn?) {
         return id;
     });
 };
-export let del: AutoBllFun = function (name, params, conn?) {
+export let del: AutoBllFun<DelOptions> = function (name, params, conn?) {
     return common.promise(() => {
         let model = getRequire(name).default as Model<any, any>;
         let options = {
@@ -77,7 +94,7 @@ export let del: AutoBllFun = function (name, params, conn?) {
         return model.destroy(options);
     });
 };
-export let detailQuery: AutoBllFun = function (name, params, conn?) {
+export let detailQuery: AutoBllFun<DetailQueryOptions> = function (name, params, conn?) {
     return common.promise(() => {
         let model = getRequire(name).default as Model<any, any>;
         let options = {
@@ -90,7 +107,7 @@ export let detailQuery: AutoBllFun = function (name, params, conn?) {
         });
     });
 };
-export let query: AutoBllFun = function (name, params, conn?) {
+export let query: AutoBllFun<QueryOptions<{}>> = function (name, params, conn?) {
     return common.promise(() => {
         let model = getRequire(name).default as Model<any, any>;
         let options = createQueryOption(model, params) as any as FindOptions<any>;
@@ -137,12 +154,11 @@ export let createQueryOption = function <T>(model: any, params, opt?: { likeKeyL
 }
 
 let methodList = ['save', 'query', 'detailQuery', 'del'];
-type IdType = number;
 interface AutoBllModule<T> {
-    save: AutoBllModuleFun<T, IdType>;
-    query: AutoBllModuleFun<T, { list: Array<T>, count: number }>;
-    detailQuery: AutoBllModuleFun<{ id: IdType }, T>;
-    del: AutoBllModuleFun<{ id: IdType }, number>;
+    save: AutoBllModuleFun<SaveOptions<T>, IdType>;
+    query: AutoBllModuleFun<QueryOptions<T>, { list: Array<T>, count: number }>;
+    detailQuery: AutoBllModuleFun<DetailQueryOptions, T>;
+    del: AutoBllModuleFun<DelOptions, number>;
 }
 
 interface AutoBllModules {

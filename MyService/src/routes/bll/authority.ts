@@ -1,9 +1,10 @@
 ﻿import * as autoBll from './_auto';
+import { QueryOptions } from './_auto';
 import * as common from '../_system/common';
 import errorConfig from '../_system/errorConfig';
-import { Authority, AuthorityDataType } from '../dal/models/dbModel/Authority';
+import { Authority, AuthorityDataType, AuthorityCustomQueryptions } from '../dal/models/dbModel/Authority';
 
-export let save = function (opt: AuthorityDataType & {statusUpdateOnly? : boolean}) {
+export let save = function (opt: AuthorityDataType & { statusUpdateOnly?: boolean }) {
     return common.promise(async function () {
         if (opt.statusUpdateOnly) {
             if (!opt.id || opt.id == 0)
@@ -26,7 +27,7 @@ export let isExist = function (opt: AuthorityDataType) {
     return common.promise(async function () {
         if (!code)
             throw common.error('code不能为空');
-        let t = await autoBll.modules.authority.query({code: code});
+        let t = await autoBll.modules.authority.query({ code: code });
         var result = false;
         if (t.list.length > 1)
             throw common.error('数据库中存在重复权限', errorConfig.DB_DATA_ERROR);
@@ -37,7 +38,7 @@ export let isExist = function (opt: AuthorityDataType) {
     });
 };
 
-export let query = function (opt) {
+export let query = function (opt: AuthorityCustomQueryptions) {
     return common.promise(async function () {
         if (opt.id || opt.anyKey) {
             delete opt.code;

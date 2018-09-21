@@ -6,9 +6,13 @@ import * as common from '../_system/common';
 import errorConfig from '../_system/errorConfig';
 import * as cache from '../_system/cache';
 import * as autoBll from './_auto';
+import { SaveOptions } from './_auto';
 import * as main from '../_main';
 import { UserInfoWithStruct } from '../dal/models/dbModel/UserInfoWithStruct';
-import { UserInfo, UserInfoCustomDetailType, UserInfoDataType, UserInfoRoleAuthorityType } from '../dal/models/dbModel/UserInfo';
+import { UserInfo, UserInfoCustomDetailType, UserInfoDataType, UserInfoRoleAuthorityType, UserInfoCustomDetailQueryOptions, UserInfoCustomQueryOptions } from '../dal/models/dbModel/UserInfo';
+import { InterfaceExOpt } from '../module/_interface';
+import { StructModel } from '../dal/models/dbModel';
+type StructDataType = StructModel.StructDataType;
 
 export let isAccountExist = function (account) {
     return common.promise(async function () {
@@ -21,7 +25,9 @@ export let isAccountExist = function (account) {
     });
 };
 
-export let save = function (opt, exOpt) {
+export let save = function (opt: SaveOptions<UserInfoDataType> & {
+    newPassword?: string;
+}, exOpt: InterfaceExOpt) {
     var user = exOpt.user;
     var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
     var userInfoLog = createLog();
@@ -74,8 +80,8 @@ export let save = function (opt, exOpt) {
     });
 };
 
-export let detailQuery = function (opt) {
-    return UserInfo.customDetailQuery({ id: opt.id, noLog: opt.noLog }).then(function (t) {
+export let detailQuery = function (opt: UserInfoCustomDetailQueryOptions) {
+    return UserInfo.customDetailQuery({ id: opt.id }).then(function (t) {
         var detail = {
             ...t,
             auth: {}
@@ -91,7 +97,7 @@ export let detailQuery = function (opt) {
     });
 };
 
-export let query = function (opt) {
+export let query = function (opt: UserInfoCustomQueryOptions) {
     return UserInfo.customQuery(opt).then(function (t) {
         type returnType = UserInfoDataType & { roleList?: any[], authorityList?: any, auth?: {} };
         var data = {
@@ -104,7 +110,7 @@ export let query = function (opt) {
         } = t;
 
         data.list.forEach(function (item) {
-            var detail: UpdateUserInfoType = {
+            var detail: UserInfoUpdateType = {
                 auth: {},
                 roleList: [],
                 authorityList: [],
@@ -143,7 +149,15 @@ export let query = function (opt) {
     });
 };
 
-export let adminSave = function (opt, exOpt) {
+export let adminSave = function (opt: {
+    id: number,
+    addAuthorityList?: string[],
+    delAuthorityList?: string[],
+    addRoleList?: string[],
+    delRoleList?: string[],
+    structList?: StructDataType[],
+
+}, exOpt: InterfaceExOpt) {
     var delUserRoleList, addUserRoleList;
     var delUserAuthList, addUserAuthList;
     var now = common.dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
@@ -263,8 +277,8 @@ export let adminSave = function (opt, exOpt) {
         return id;
     });
 };
-type UpdateUserInfoType = UserInfoCustomDetailType & { auth: any };
-var updateUserInfo = function (detail: UpdateUserInfoType) {
+type UserInfoUpdateType = UserInfoCustomDetailType & { auth: any };
+var updateUserInfo = function (detail: UserInfoUpdateType) {
     var authorityList = [];
     var auth = {};
     detail.authorityList.forEach(function (t) {

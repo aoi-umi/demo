@@ -1,4 +1,4 @@
-import {Request} from 'express'
+import { Request } from 'express'
 import * as common from '../_system/common';
 import * as cache from '../_system/cache';
 import * as auth from '../_system/auth';
@@ -6,8 +6,13 @@ import * as main from '../_main';
 import errorConfig from '../_system/errorConfig';
 import * as autoBll from './_auto';
 import * as userInfoBll from './userInfo';
+import { InterfaceExOpt } from '../module/_interface';
 
-export let signUp = function (opt, exOpt) {
+export let signUp = function (opt: {
+    account: string;
+    nickname: string;
+    password: string;
+}) {
     var userInfoId = 0;
     return common.promise(async function () {
         if (!opt.account)
@@ -44,7 +49,7 @@ export let signUp = function (opt, exOpt) {
     });
 };
 
-export let signOut = function (opt, exOpt) {
+export let signOut = function (opt, exOpt: InterfaceExOpt) {
     var user = exOpt.user;
     return common.promise(function () {
         if (user.key) {
@@ -55,7 +60,10 @@ export let signOut = function (opt, exOpt) {
     });
 };
 
-export let signIn = function (opt, exOpt) {
+export let signIn = function (opt: {
+    captcha: string,
+    captchaKey: string,
+}, exOpt: InterfaceExOpt) {
     let captcha = opt.captcha;
     let cacheKey = main.cacheKey.captcha + opt.captchaKey;
     return common.promise(async () => {
@@ -98,7 +106,7 @@ export let signInInside = function (req: Request) {
             reqBody = '';
         if (typeof reqBody != 'string')
             reqBody = JSON.stringify(reqBody);
-        let t = await autoBll.modules.userInfo.query({account: account});
+        let t = await autoBll.modules.userInfo.query({ account: account });
         if (!t.count)
             throw common.error('no account!');
         if (t.count > 1)
@@ -108,7 +116,7 @@ export let signInInside = function (req: Request) {
         var checkToken = common.createToken(account + pwd + reqBody);
         if (token != checkToken)
             throw common.error(null, errorConfig.TOKEN_WRONG);
-        return userInfoBll.detailQuery({id: userInfo.id});
+        return userInfoBll.detailQuery({ id: userInfo.id });
     }).then(async function (t) {
         //console.log(t);
         var userInfo = t.userInfo;

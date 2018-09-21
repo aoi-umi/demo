@@ -4,6 +4,7 @@ import { UserInfoDataType } from './models/dbModel/UserInfo';
 import { RoleDataType } from './models/dbModel/Role';
 import { AuthorityDataType } from './models/dbModel/Authority';
 import { UserInfoWithRoleModel, UserInfoLogModel, StructModel, RoleWithAuthorityModel, UserInfoWithAuthorityModel } from './models/dbModel';
+import { QueryOptions } from '../bll/_auto';
 type UserInfoWithRoleDataType = UserInfoWithRoleModel.UserInfoWithRoleDataType;
 type UserInfoLogDataType = UserInfoLogModel.UserInfoLogDataType;
 type StructDataType = StructModel.StructDataType;
@@ -22,7 +23,10 @@ export type RoleAuthorityType = AuthorityDataType & {
     roleStatus: number,
 }
 
-export let detailQuery = async function (params, conn?: Transaction) {
+export type _DetailQueryOptions = {
+    id?: number;
+}
+export let detailQuery = async function (params: _DetailQueryOptions, conn?: Transaction) {
     var sql = 'call p_user_info_detail_query(:id)';
     let t = await db.query(sql, params, conn);
     let data: DetailType = {
@@ -38,7 +42,13 @@ export let detailQuery = async function (params, conn?: Transaction) {
     };
 };
 
-export let query = async function (params, conn?: Transaction) {
+export type _QueryOptions = QueryOptions<UserInfoDataType & {
+    editDateStart?: string;
+    editDateEnd?: string;
+    createDateStart?: number;
+    createDateEnd?: number;
+}>;
+export let query = async function (params: _QueryOptions, conn?: Transaction) {
     var sql = 'call p_user_info_query(:id, :account, :password, :nickname, :role, :authority, :editDateStart, :editDateEnd, :createDateStart, :createDateEnd, :remark, :nullList, :pageIndex, :pageSize)';
     let t = await db.query(sql, params, conn);
     let data = {

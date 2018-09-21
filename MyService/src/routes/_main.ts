@@ -111,7 +111,7 @@ export let accessableUrlConfig: auth.AccessableUrlConfigType[] = [
 class MainContentTypeEnum {
     文章: 0 = 0;
 }
-class MainContentStatusEnum {
+export class MainContentStatusEnum {
     草稿: 0 = 0;
     待审核: 1 = 1;
     审核中: 2 = 2;
