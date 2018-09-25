@@ -210,7 +210,7 @@ export let statusUpdate = function (opt: {
         operate = mainContent.operate;
         if (operate == mainContentStatusEnumOperate.提交) {
             mainContent.status = mainContentStatusEnum.待审核;
-            operate = 'save';
+            operate = mainContentStatusEnumOperate.保存;
         }
         else if (operate == mainContentStatusEnumOperate.审核)
             mainContent.status = mainContentStatusEnum.审核中;
@@ -222,6 +222,8 @@ export let statusUpdate = function (opt: {
             mainContent.status = mainContentStatusEnum.已删除;
         else if (operate == mainContentStatusEnumOperate.恢复)
             mainContent.status = mainContentStatusEnumOperate.恢复;
+        else if (operate == mainContentStatusEnumOperate.退回)
+            mainContent.status = mainContentStatusEnum.退回;
         else
             throw common.error(`错误的操作类型[${operate}]`);
 
@@ -230,12 +232,8 @@ export let statusUpdate = function (opt: {
             throw common.error(`没有[${necessaryAuth}]权限`);
         return detailQuery({ id: mainContent.id }, exOpt);
     }).then(function (mainContentDetail) {
-        if (auth.isEqual(necessaryAuth, authConfig.mainContentDel) && mainContentDetail.mainContent.operation.includes('dev')) {
-            throw common.error(`没有权限`);
-        }
-
         let changeDesc = mainContentStatusEnum.enumChangeCheck(mainContentDetail.mainContent.status, mainContent.status);
-        if (mainContent.status == 'recovery') {
+        if (mainContent.status == mainContentStatusEnumOperate.恢复) {
             var mainContentLogList = mainContentDetail.mainContentLogList;
             if (!mainContentLogList || !mainContentLogList.length
                 || mainContentLogList[0].srcStatus == undefined) {
@@ -295,14 +293,16 @@ function createLog(opt: createLogOptions) {
     };
     if (opt.operate == mainContentStatusEnumOperate.恢复) {
         mainContentLog.type = mainContentLogTypeEnum.主内容恢复;
+    } else if (opt.operate == mainContentStatusEnumOperate.不通过) {
+        mainContentLog.type = mainContentLogTypeEnum.主内容审核不通过;
+    } else if (opt.operate == mainContentStatusEnumOperate.退回) {
+        mainContentLog.type = mainContentLogTypeEnum.主内容退回;
     } else if (opt.destStatus == mainContentStatusEnum.待审核) {
         mainContentLog.type = mainContentLogTypeEnum.主内容提交;
     } else if (opt.destStatus == mainContentStatusEnum.审核中) {
         mainContentLog.type = mainContentLogTypeEnum.主内容审核;
     } else if (opt.destStatus == mainContentStatusEnum.通过) {
         mainContentLog.type = mainContentLogTypeEnum.主内容审核通过;
-    } else if (opt.destStatus == mainContentStatusEnum.退回) {
-        mainContentLog.type = mainContentLogTypeEnum.主内容审核不通过;
     } else if (opt.destStatus == mainContentStatusEnum.已删除) {
         mainContentLog.type = mainContentLogTypeEnum.主内容删除;
     }
@@ -316,35 +316,40 @@ function updateMainContent(mainContent: ManiContentReturnType, user: Express.MyD
         mainContent.operation = [];
     let operation = mainContent.operation;
     switch (mainContent.status) {
-        case 0:
-        case 4:
+        case mainContentStatusEnum.草稿:
+        case mainContentStatusEnum.退回:
             if (isHadAuthority(user, authConfig.mainContentSave)
                 && (!mainContent.id || mainContent.userInfoId == user.id)) {
-                operation.push('save');
-                operation.push('submit');
+                operation.push(mainContentStatusEnumOperate.保存);
+                operation.push(mainContentStatusEnumOperate.提交);
             }
             break;
-        case 1:
-        case 2:
+        case mainContentStatusEnum.待审核:
+        case mainContentStatusEnum.审核中:
             if (isHadAuthority(user, authConfig.mainContentAudit)) {
-                operation.push('audit');
+                operation.push(mainContentStatusEnumOperate.审核);
             }
             if (isHadAuthority(user, authConfig.mainContentPass)) {
-                operation.push('pass');
+                operation.push(mainContentStatusEnumOperate.通过);
             }
             if (isHadAuthority(user, authConfig.mainContentNotPass)) {
-                operation.push('notPass');
+                operation.push(mainContentStatusEnumOperate.不通过);
             }
             break;
-        case -1:
+        case mainContentStatusEnum.已删除:
             if (isHadAuthority(user, authConfig.mainContentRecovery)) {
-                operation.push('recovery');
+                operation.push(mainContentStatusEnumOperate.恢复);
+            }
+            break;
+        case mainContentStatusEnum.通过:
+            if (isHadAuthority(user, authConfig.mainContentUntread)) {
+                operation.push(mainContentStatusEnumOperate.退回);
             }
             break;
     }
 
     if (canDelete(mainContent, user))
-        operation.push('del');
+        operation.push(mainContentStatusEnumOperate.删除);
 }
 
 export function updateMainContentLog(item) {

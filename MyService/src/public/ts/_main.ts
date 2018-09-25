@@ -13,12 +13,14 @@ export let variable = {
 };
 
 class MainContentStatusEnumOperate {
+    保存: "save" = "save";
     提交: "submit" = "submit";
     审核: "audit" = "audit";
     通过: "pass" = "pass";
     不通过: "notPass" = "notPass";
     删除: "del" = "del";
     恢复: "recovery" = "recovery";
+    退回: "untread" = "untread";
 }
 
 class StructTypeEnum {

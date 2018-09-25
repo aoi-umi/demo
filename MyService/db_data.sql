@@ -13,7 +13,9 @@ values
 ('mainContentTypeQuery','',1),
 ('mainContentTypeDetailQuery','',1),
 ('mainContentTypeSave','',1),
-('mainContentTypeDel','',1);
+('mainContentTypeDel','',1),
+('mainContentUntread','',1);
+
 
 insert into t_role(code, name, status) 
 values
@@ -37,6 +39,7 @@ values
 ('admin', 'mainContentPass'),
 ('admin', 'mainContentNotPass'),
 ('admin', 'mainContentRecovery'),
+('admin', 'mainContentUntread'),
 
 
 ('admin', 'mainContentTypeQuery'),

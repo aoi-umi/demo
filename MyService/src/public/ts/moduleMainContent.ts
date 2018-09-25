@@ -438,7 +438,8 @@ export class ModuleMainContent extends MyModuleGeneric<ModuleMainContent, Module
                 mainContentStatusEnumOperate.通过,
                 mainContentStatusEnumOperate.不通过,
                 mainContentStatusEnumOperate.删除,
-                mainContentStatusEnumOperate.恢复
+                mainContentStatusEnumOperate.恢复,
+                mainContentStatusEnumOperate.退回
             ];
             if (!common.isInArray(operate, operateList))
                 throw new Error(`错误的操作类型[${operate}]`);
