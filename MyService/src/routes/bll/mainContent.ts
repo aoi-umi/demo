@@ -5,14 +5,14 @@ import * as q from 'q';
 import * as autoBll from './_auto';
 import * as common from '../_system/common';
 import errorConfig from '../_system/errorConfig';
-import { myEnum, MainContentStatusEnum } from '../_main';
-import * as auth from '../_system/auth';
+import { myEnum } from '../_main';
 import { isHadAuthority, authConfig } from '../_system/auth';
-import { MainContentTypeModel, MainContentChildModel } from '../dal/models/dbModel';
+import { MainContentTypeModel, MainContentChildModel, MainContentLogModel } from '../dal/models/dbModel';
 import { MainContent, MainContentDataType, MainContentCustomDetailQueryOptions, MainContentCustomQueryOptions } from '../dal/models/dbModel/MainContent';
 import { InterfaceExOpt } from '../module/_interface';
 type MainContentTypeDataType = MainContentTypeModel.MainContentTypeDataType;
 type MainContentChildDataType = MainContentChildModel.MainContentChildDataType;
+type MainContentLogDataType = MainContentLogModel.MainContentLogDataType;
 const {
     mainContentStatusEnum,
     mainContentStatusEnumOperate,
@@ -45,9 +45,9 @@ export let detailQuery = function (opt: MainContentCustomDetailQueryOptions, exO
     return common.promise(async function () {
         let detail = {
             mainContent: null as ManiContentReturnType,
-            mainContentTypeList: [],
-            mainContentChildList: [],
-            mainContentLogList: [],
+            mainContentTypeList: [] as (MainContentTypeDataType & { mainContentTypeName?: string })[],
+            mainContentChildList: [] as MainContentChildDataType[],
+            mainContentLogList: [] as MainContentLogDataType[],
         };
         if (opt.id == 0) {
             detail.mainContent = { id: 0, status: 0, type: 0 };
@@ -208,6 +208,8 @@ export let statusUpdate = function (opt: {
             throw common.error('', errorConfig.ARGS_ERROR);
         }
         operate = mainContent.operate;
+        //根据操作转换为相应状态
+        //操作为submit 所需权限为mainContentSave
         if (operate == mainContentStatusEnumOperate.提交) {
             mainContent.status = mainContentStatusEnum.待审核;
             operate = mainContentStatusEnumOperate.保存;
@@ -233,6 +235,7 @@ export let statusUpdate = function (opt: {
         return detailQuery({ id: mainContent.id }, exOpt);
     }).then(function (mainContentDetail) {
         let changeDesc = mainContentStatusEnum.enumChangeCheck(mainContentDetail.mainContent.status, mainContent.status);
+        //恢复，取最后一条日志的srcStatus
         if (mainContent.status == mainContentStatusEnumOperate.恢复) {
             var mainContentLogList = mainContentDetail.mainContentLogList;
             if (!mainContentLogList || !mainContentLogList.length
@@ -359,7 +362,7 @@ export function updateMainContentLog(item) {
 }
 
 function canDelete(mainContent: MainContentDataType, user: Express.MyDataUser) {
-    if (mainContent.status != -1
+    if (mainContent.status != mainContentStatusEnum.已删除
         && ((isHadAuthority(user, [authConfig.mainContentDel]) && (user.id == mainContent.userInfoId))
             || (isHadAuthority(user, [authConfig.admin]) && mainContent.status != mainContentStatusEnum.草稿))
     ) {
