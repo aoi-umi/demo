@@ -58,9 +58,9 @@ export class LogStatistics {
         let echart = this.echart = echarts.init(chart[0] as HTMLDivElement);
         echart.setOption(echartsOpt);
 
-        let currMonth = new Date(common.dateFormat(new Date(), 'yyyy-MM-01'));
-        $(`${self.queryBoxId} [name=createDateStart]`).val(common.dateFormat(currMonth));
-        $(`${self.queryBoxId} [name=createDateEnd]`).val(common.dateFormat(currMonth.getTime() + 30 * 86400 * 1000));
+        let currMonth = moment().format('YYYY-MM-01');
+        $(`${self.queryBoxId} [name=createDateStart]`).val(currMonth);
+        $(`${self.queryBoxId} [name=createDateEnd]`).val(moment(currMonth).add({ month: 1, day: -1 }).format('YYYY-MM-DD'));
         this.bindEvent();
 
         this.dom.find('[name=refresh]').trigger('click');
@@ -82,16 +82,17 @@ export class LogStatistics {
             };
             myInterface.api.logStatistics(data).then(t => {
                 let list = [];
-                let dataDict = {};
+                let dataDict: { [key: string]: any[] } = {};
                 t.list.forEach(ele => {
                     let data = dataDict[ele.method] || (dataDict[ele.method] = []);
                     let notSuccessCount = ele.count - ele.successCount;
                     let notSuccessRate = parseFloat((notSuccessCount / ele.count).toFixed(2));
                     data.push([new Date(ele.date), notSuccessRate, notSuccessCount, `(${notSuccessCount}/${ele.count})`]);
                 });
+                //填0
                 for (let method in dataDict) {
                     let first = moment(dataDict[method][0][0]);
-                    let last = moment({ hour: 0 }).add({day: 1});
+                    let last = moment({ hour: 0 }).add({ day: 1 });
                     let newData = [];
                     while (first.toDate().getTime() < last.toDate().getTime()) {
                         let match = dataDict[method].find(ele => ele[0].getTime() == first.toDate().getTime());
