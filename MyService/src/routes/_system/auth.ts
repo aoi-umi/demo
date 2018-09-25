@@ -55,6 +55,9 @@ export const authConfig = {
     mainContentRecovery: {
         code: 'mainContentRecovery'
     },
+    mainContentUntread: {
+        code: 'mainContentUntread'
+    },
 
     mainContentTypeQuery: {
         code: 'mainContentTypeQuery'

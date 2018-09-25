@@ -121,12 +121,14 @@ export class MainContentStatusEnum {
 }
 //添加 Operate 后缀 不要包含于上面相同的值
 class MainContentStatusEnumOperate {
+    保存: "save" = "save";
     提交: "submit" = "submit";
     审核: "audit" = "audit";
     通过: "pass" = "pass";
     不通过: "notPass" = "notPass";
     删除: "del" = "del";
     恢复: "recovery" = "recovery";
+    退回: "untread" = "untread";
 }
 class MainContentLogTypeEnum {
     主内容保存: 0 = 0;
@@ -136,6 +138,7 @@ class MainContentLogTypeEnum {
     主内容审核不通过: 4 = 4;
     主内容删除: 5 = 5;
     主内容恢复: 6 = 6;
+    主内容退回: 7 = 7;
 }
 class StructTypeEnum {
     公司: "company" = "company";
@@ -177,7 +180,8 @@ export let enumChangeDict = {
             [mainContentStatusEnum.已删除]: '删除'
         },
         [mainContentStatusEnum.通过]: {
-            [mainContentStatusEnum.已删除]: '删除'
+            [mainContentStatusEnum.已删除]: '删除',
+            [mainContentStatusEnum.退回]: '退回'
         },
         [mainContentStatusEnum.退回]: {
             [mainContentStatusEnum.草稿]: '保存',
