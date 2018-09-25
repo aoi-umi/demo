@@ -2,6 +2,7 @@ import 'jquery-ui';
 import * as $ from 'jquery';
 import * as Q from 'q';
 import * as SparkMD5 from 'spark-md5';
+import * as qs from 'qs';
 
 window['common'] = exports;
 
@@ -650,24 +651,11 @@ export let msgNotice = function (option: msgNoticeOption) {
 };
 
 export let getArgsFromUrlParams = function () {
-    var args: any = {};
-    var query = location.search.substring(1);//获取查询串
-    var params = query.split('&');
-    for (var i = 0; i < params.length; i++) {
-        var pos = params[i].indexOf('=');
-        if (pos == -1) continue;
-        var argname = params[i].substring(0, pos);
-        var value = params[i].substring(pos + 1);
-        args[argname] = decodeURIComponent(value);
-    }
-    return args;
+    var query = location.search.substring(1);//获取查询串    
+    return qs.parse(query);
 };
-export let getUrlParamsFromArgs = function (args) {
-    var list = [];
-    for (var i in args) {
-        list.push(i + '=' + encodeURIComponent(args[i]));
-    }
-    return list.join('&');
+export let getUrlParamsFromArgs = function (args) {    
+    return $.param(args);
 };
 
 interface autoCompleteOption {

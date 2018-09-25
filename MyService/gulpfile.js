@@ -1,7 +1,6 @@
 var gulp = require('gulp'),
 	del = require('del'), //删除文件
 	replace = require('gulp-replace-path'), //替换文件内容
-	gulpSequence = require('gulp-sequence'),
 	ts = require('gulp-typescript'),
 	changed = require('gulp-changed'),
 	debug = require('gulp-debug'),
@@ -111,7 +110,8 @@ gulp.task('copyDep', function () {
 			'node_modules/q/q.js',
 			'node_modules/ejs/ejs.min.js',
             'node_modules/echarts/dist/echarts.common.min.js',
-            'node_modules/moment/min/moment.min.js'
+            'node_modules/moment/min/moment.min.js',            
+			'node_modules/qs/dist/qs.js',
 		])
 			.pipe(gulp.dest(getDest('/public/js/libs')))
 			.on('end', onFinished),
@@ -142,12 +142,12 @@ gulp.task('watch', function () {
 });
 
 
-gulp.task('front', gulpSequence('ts-front', 'copy'));
+gulp.task('front', gulp.series('ts-front', 'copy'));
 
-gulp.task('make', ['make-template']);
+gulp.task('make', gulp.series('make-template'));
 
-gulp.task('clear', ['clearDest']);
+gulp.task('clear', gulp.series('clearDest'));
 
-gulp.task('dev', gulpSequence(['make', 'copyDep'], ['front', 'ts']));
+gulp.task('dev', gulp.series(gulp.parallel('make', 'copyDep'), gulp.parallel('front', 'ts')));
 
-gulp.task('default', gulpSequence('clear', 'dev'));
+gulp.task('default', gulp.series('clear', 'dev'));
