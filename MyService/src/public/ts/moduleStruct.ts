@@ -10,6 +10,7 @@ import * as myInterface from './myInterface';
 import * as myVaild from './myVaild';
 import { myEnum } from './_main';
 import { ModuleOptionGeneric, MyModuleGeneric } from './myModule';
+import { Tree } from './tree';
 const { structTypeEnum } = myEnum;
 
 interface ModuleStructOption extends ModuleOptionGeneric<ModuleStruct> {
@@ -75,39 +76,16 @@ export class ModuleStruct extends MyModuleGeneric<ModuleStruct, ModuleStructOpti
                     }
                     var data = {};
                     myInterface.api.struct.query(data).then(function (t) {
-                        $('.tree').empty();
                         var list = t.list.sort(function (a, b) {
                             return b.level - a.level;
                         });
                         list.forEach(ele => {
                             self.updateStructValue(ele);
                         });
-                        let tree = common.getTree(list, '', null, 'struct', 'parentStruct');
-                        let itemTree = tree.itemTree;
-                        var rootTree = tree.rootTree;
-                        var temp = self.treeItemTemp;
-
-                        function renderTree(leave, treeDom) {
-                            leave.item.inRoot = leave.inRoot;
-                            var leaveDom = $(ejs.render(temp, leave.item));
-                            leaveDom.data('item', leave.item);
-                            treeDom.append(leaveDom);
-                            if (leave.child) {
-                                for (var key in leave.child) {
-                                    renderTree(leave.child[key], leaveDom.find('.child:eq(0)'));
-                                }
-                            }
-                        }
-
-                        for (var key in rootTree) {
-                            renderTree(rootTree[key], $('#treeList'));
-                        }
-                        for (var key in itemTree) {
-                            var val = itemTree[key];
-                            if (!val.inRoot) {
-                                renderTree(val, $('#notInRootTreeList'));
-                            }
-                        }
+                        Tree.renderTree(list, self.treeItemTemp, {
+                            typeKey: 'struct',
+                            parentTypeKey: 'parentStruct'
+                        });
                     })
                 });
                 let treeModal = $('#treeModal');
