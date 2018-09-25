@@ -15,14 +15,14 @@ let destDir = tsProject.config.compilerOptions.outDir || './dest';
 let srcDir = tsProject.config.compilerOptions.rootDir || './src';
 
 function getDest(dest){
-	return path.join(destDir, dest);
+	return path.join(destDir, dest).replace(/\\/g, '/');
 }
 
 function getSrc(src){	
 	if(!Array.isArray(src))
 		src = [src];
 	src = src.map(ele => {
-		return path.join(srcDir, ele);
+		return path.join(srcDir, ele).replace(/\\/g, '/');
 	});
 	return src;
 }
@@ -35,8 +35,8 @@ gulp.task('clearDest', function () {
 
 let templateSrc = getSrc('views/_template/**');
 gulp.task('make-template', function () {
-	let dest = getDest('/views/_template_front/');
-	return gulp.src(templateSrc)
+    let dest = getDest('/views/_template_front/');
+    return gulp.src(templateSrc)
 		.pipe(changed(dest))
 		.pipe(replace('<%', '<%%'))
 		.pipe(replace('%>', '%%>'))
