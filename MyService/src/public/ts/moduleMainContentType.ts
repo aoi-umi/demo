@@ -8,7 +8,8 @@ import * as $ from 'jquery';
 import * as common from './common';
 import * as myInterface from './myInterface';
 import * as myVaild from './myVaild';
-import {MyModuleGeneric, ModuleOptionGeneric} from './myModule';
+import { MyModuleGeneric, ModuleOptionGeneric } from './myModule';
+import { Tree } from './tree';
 
 interface ModuleMainContentTypeOption extends ModuleOptionGeneric<ModuleMainContentType> {
     treeItemId?: string;
@@ -70,37 +71,11 @@ export class ModuleMainContentType extends MyModuleGeneric<ModuleMainContentType
                     }
                     var data = {};
                     myInterface.api.mainContentType.query(data).then(function (t) {
-                        $('.tree').empty();
                         var list = t.list.sort(function (a, b) {
                             return b.level - a.level;
                         });
-                        let tree = common.getTree(list, '', null, 'type', 'parentType');
-                        let itemTree = tree.itemTree;
-                        var rootTree = tree.rootTree;
-                        var temp = self.treeItemTemp;
-
-                        function renderTree(leave, treeDom) {
-                            leave.item.inRoot = leave.inRoot;
-                            var leaveDom = $(ejs.render(temp, leave.item));
-                            leaveDom.data('item', leave.item);
-                            treeDom.append(leaveDom);
-                            if (leave.child) {
-                                for (var key in leave.child) {
-                                    renderTree(leave.child[key], leaveDom.find('.child:eq(0)'));
-                                }
-                            }
-                        }
-
-                        for (var key in rootTree) {
-                            renderTree(rootTree[key], $('#treeList'));
-                        }
-                        for (var key in itemTree) {
-                            var val = itemTree[key];
-                            if (!val.inRoot) {
-                                renderTree(val, $('#notInRootTreeList'));
-                            }
-                        }
-                    })
+                        Tree.renderTree(list, self.treeItemTemp);
+                    });
                 });
 
                 let treeModal = $('#treeModal');
@@ -117,12 +92,12 @@ export class ModuleMainContentType extends MyModuleGeneric<ModuleMainContentType
                 treeModal.on('click', '.itemAdd', function () {
                     var row = $(this).closest(self.rowClass);
                     let item = row.data('item');
-                    item = $.extend(null, self.opt.saveDefaultModel, item ? {parentType: item.type} : null);
+                    item = $.extend(null, self.opt.saveDefaultModel, item ? { parentType: item.type } : null);
                     self.edit(item);
                 });
             },
             editAfterRender: function (item, self) {
-                self.updateView(['mainContentTypeDetail'], {mainContentTypeDetail: item});
+                self.updateView(['mainContentTypeDetail'], { mainContentTypeDetail: item });
                 self.detailDom.modal('show');
             },
             beforeSave: function (dom, self) {
@@ -143,7 +118,7 @@ export class ModuleMainContentType extends MyModuleGeneric<ModuleMainContentType
                     name: 'level',
                     dom: self.detailContainerDom.find('[name=level]'),
                 }];
-                var checkRes = common.dataCheck({list: list});
+                var checkRes = common.dataCheck({ list: list });
                 return checkRes;
             },
             onSaveSuccess: function (t, self) {
@@ -152,11 +127,11 @@ export class ModuleMainContentType extends MyModuleGeneric<ModuleMainContentType
                     btnOptList: [{
                         content: '继续'
                     }, {
-                        content: '关闭', 
-                        returnValue: 'close',                        
+                        content: '关闭',
+                        returnValue: 'close',
                     }]
                 }).waitClose().then(val => {
-                    if(val == 'close') {
+                    if (val == 'close') {
                         self.detailDom.modal('hide');
                         self.pager.refresh();
                     }
@@ -164,7 +139,7 @@ export class ModuleMainContentType extends MyModuleGeneric<ModuleMainContentType
             },
             onDetailQuerySuccess: function (t, self) {
                 self.detailRender(t);
-                self.updateView(['mainContentTypeDetail'], {mainContentTypeDetail: t});
+                self.updateView(['mainContentTypeDetail'], { mainContentTypeDetail: t });
                 self.detailDom.modal('show');
             },
         };
