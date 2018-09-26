@@ -19,8 +19,8 @@
         <td><%=enumKeySrc%>(<%=value[enumKeySrc]%>)</td>
         <%for(var enumKeyDest in value){%>
         <td>
-            <%if(enumChangeDict[key] && enumChangeDict[key][enumKeySrc] && enumChangeDict[key][enumKeySrc][enumKeyDest]){%>
-            <%=enumChangeDict[key][enumKeySrc][enumKeyDest]%>
+            <%if(enumChangeDict[key] && enumChangeDict[key][value[enumKeySrc]] && enumChangeDict[key][value[enumKeySrc]][value[enumKeyDest]]){%>
+            <%=enumChangeDict[key][value[enumKeySrc]][value[enumKeyDest]]%>
             <%}else{%>
             -
             <%}%>

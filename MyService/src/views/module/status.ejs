@@ -2,9 +2,11 @@
     <div>
         <%for(var key in enumDict){
             var value = enumDict[key];
+            if(enumChangeDict[key]){
         %>
         <% include ../_template/status%>
-        <%}%>
+        <%}
+}%>
     </div>
 </div>
 <script type="text/javascript">
