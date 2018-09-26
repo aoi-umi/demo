@@ -135,9 +135,9 @@ gulp.task('copy', function () {
 });
 
 gulp.task('watch', function () {
-	gulp.watch(copySrc, ['copy']);
+	gulp.watch(copySrc, gulp.parallel('copy'));
 	//gulp.watch(tsFrontSrc, ['ts-front']);
-	gulp.watch(templateSrc, ['make-template']);
+	gulp.watch(templateSrc, gulp.parallel('make-template'));
 	//gulp.watch(tsSrc, ['ts']);
 });
 
