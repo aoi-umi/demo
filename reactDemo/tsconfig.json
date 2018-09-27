@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "outDir": "./dest/public",
+        "sourceMap": true,
+        //"noImplicitAny": false,
+        //"strict": false,
+        "module": "commonjs",
+        "target": "es5",
+        "jsx": "react",
+        "experimentalDecorators": true,
+        "strictPropertyInitialization": false,
+        "moduleResolution": "node",        
+    },
+    "files": ["./src/index.tsx"]
+}
