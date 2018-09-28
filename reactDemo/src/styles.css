@@ -1,7 +1,11 @@
 html,
 body,
-#app {
+#main {
     height: 100%;
+}
+
+body {
+    margin: 0;
 }
 
 .App {

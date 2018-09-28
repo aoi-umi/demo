@@ -2,8 +2,9 @@ import * as React from 'react';
 import * as PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-import Drawer from '@material-ui/core/Drawer';
+import { withStyles } from '@material-ui/core/styles';
 import { Theme } from '@material-ui/core';
+import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -12,13 +13,14 @@ import IconButton from '@material-ui/core/IconButton';
 import List from '@material-ui/core/List';
 import MenuItem from '@material-ui/core/MenuItem';
 import TextField from '@material-ui/core/TextField';
-import { withStyles } from '@material-ui/core/styles';
+import Tooltip from '@material-ui/core/Tooltip';
 
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 
 import { mailFolderListItems, otherMailFolderListItems } from './tileData';
+import { withStylesDeco } from '../helpers/util';
 
 const drawerWidth = 240;
 type StyleType = {
@@ -36,7 +38,7 @@ const styles = (theme: Theme) => {
     let style: StyleType = {
         root: {
             flexGrow: 1,
-            height: '440',
+            height: '100%',
             zIndex: 1,
             overflow: 'hidden',
             position: 'relative',
@@ -90,26 +92,38 @@ const styles = (theme: Theme) => {
             justifyContent: 'flex-end',
             padding: '0 8px',
             ...theme.mixins.toolbar,
+            backgroundColor: theme.palette.primary.main
         },
         content: {
             flexGrow: 1,
             backgroundColor: theme.palette.background.default,
-            padding: theme.spacing.unit * 3,
+            padding: theme.spacing.unit,
+            marginTop: theme.mixins.toolbar.minHeight,
         },
     };
-
-    style.root.height = '100%';
     return style;
 };
 
-class MiniDrawer extends React.Component<{ classes: StyleType, theme: Theme }> {
+type Props = {
+    classes?: StyleType,
+    theme?: Theme,
+    title?: string,
+};
+
+@withStylesDeco(styles, { withTheme: true })
+export default class MainPage extends React.Component<Props> {
     static propTypes = {
         classes: PropTypes.object.isRequired,
         theme: PropTypes.object.isRequired,
+        title: PropTypes.string
     }
     state = {
         open: false,
     };
+
+    constructor(props: Props) {
+        super(props);
+    }
 
     handleDrawerOpen = () => {
         this.setState({ open: true });
@@ -120,7 +134,7 @@ class MiniDrawer extends React.Component<{ classes: StyleType, theme: Theme }> {
     };
 
     render() {
-        const { classes, theme, children } = this.props;
+        const { classes, theme, children, title } = this.props;
 
         return (
             <div className={classes.root}>
@@ -137,9 +151,11 @@ class MiniDrawer extends React.Component<{ classes: StyleType, theme: Theme }> {
                         >
                             <MenuIcon />
                         </IconButton>
-                        <Typography variant="title" color="inherit" noWrap>
-                            Mini variant drawer
-                        </Typography>
+                        <Tooltip title="这是个提示" placement="bottom">
+                            <Typography variant="title" color="inherit" noWrap>
+                                {title}
+                            </Typography>
+                        </Tooltip>
                     </Toolbar>
                 </AppBar>
                 <Drawer
@@ -160,12 +176,9 @@ class MiniDrawer extends React.Component<{ classes: StyleType, theme: Theme }> {
                     <List>{otherMailFolderListItems}</List>
                 </Drawer>
                 <main className={classes.content}>
-                    <div className={classes.toolbar} />
                     {children}
                 </main>
             </div>
         );
     }
 }
-
-export default withStyles(styles as any, { withTheme: true })(MiniDrawer as any);
