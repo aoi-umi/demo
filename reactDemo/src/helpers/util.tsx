@@ -33,23 +33,20 @@ export function ajax(options: AxiosRequestConfig) {
 
 export function withStylesDeco<ClassKey extends string, Options extends WithStylesOptions<ClassKey> = {}>(style, options?: Options) {
     return function <T extends { new(...args: any[]): {} }>(constructor: T) {
-        let newClass = withStyles(style, options)(constructor as any) as any as T;
-        return class extends newClass {
-        }
+        return withStyles(style, options)(constructor as any) as any as T;
     }
 }
 
 export function connectDeco(mapStateToProps, mapDispatchToProps?) {
     return function <T extends { new(...args: any[]): {} }>(constructor: T) {
-        let newClass = connect(mapStateToProps, mapDispatchToProps)(constructor as any) as any as T;
-        return class extends newClass {
-        }
+        return connect(mapStateToProps, mapDispatchToProps)(constructor as any) as any as T;
     }
 }
 
 export function withRouterDeco<T extends { new(...args: any[]): {} }>(constructor: T) {
-    let newClass = withRouter(constructor as any) as any as T;
-    return class extends newClass {
+    return withRouter(constructor as any) as any as T;
+}
 
-    }
+export function UniqueKey(key?: string) {
+    return Symbol(key) as any as string;
 }

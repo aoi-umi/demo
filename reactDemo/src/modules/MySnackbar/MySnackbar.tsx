@@ -1,7 +1,5 @@
 import * as React from 'react';
-import * as PropTypes from 'prop-types';
 import classNames from 'classnames';
-import Button from '@material-ui/core/Button';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import ErrorIcon from '@material-ui/icons/Error';
 import InfoIcon from '@material-ui/icons/Info';
@@ -12,8 +10,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Snackbar, { SnackbarOrigin } from '@material-ui/core/Snackbar';
 import SnackbarContent from '@material-ui/core/SnackbarContent';
 import WarningIcon from '@material-ui/icons/Warning';
-import { withStyles, StyleRulesCallback } from '@material-ui/core/styles';
-import { withStylesDeco } from '../helpers/util';
+import { withStylesDeco } from '../../helpers/util';
 
 const variantIcon = {
     success: CheckCircleIcon,
@@ -99,7 +96,6 @@ export default class MySnackbar extends React.Component<{
                             <CloseIcon className={classes.icon} />
                         </IconButton>,
                     ]}
-                    {...other}
                 />
             </Snackbar>
         );
