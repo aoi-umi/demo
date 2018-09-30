@@ -29,7 +29,7 @@ module.exports = {
                     test: /node_modules/,
                     name: "vendors",
                     chunks: "all",
-                    minSize: 0
+                    minSize: 30000
                 },
                 // styles: {
                 //     name: 'styles',
@@ -40,7 +40,8 @@ module.exports = {
                 //     enforce: true
                 // }
             }
-        }
+        },
+        runtimeChunk: true
     },
     devServer: {
         port: 9000,
@@ -56,5 +57,5 @@ module.exports = {
     performance: {
         hints: false
     },
-    devtool: 'cheap-module-source-map'
+    devtool: 'cheap-module-source-map',
 };

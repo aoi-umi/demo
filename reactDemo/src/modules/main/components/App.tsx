@@ -19,7 +19,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { HashRouter as Router, Route, Switch, withRouter } from 'react-router-dom';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 
 import { mailFolderListItems, otherMailFolderListItems } from '../constants/tileData';
 import { withStylesDeco } from '../../../helpers/util';
@@ -32,7 +32,31 @@ import {
 import Test2 from '../../test2';
 import * as appModel from '../model';
 
+//#region route
+const routes: {
+    path?: string,
+    comp: JSX.Element,
+    title?: string,
+    exact?: boolean,
+}[] = [{
+    path: '/',
+    comp: <TestMainSection />,
+    title: 'test',
+}, {
+    path: '/test2',
+    comp: <Test2 />,
+    title: 'test2',
+}, {
+    path: '/test2/:p1/:p2?',
+    comp: <Test2 />,
+    title: 'test2//',
+}, {
+    comp: <NotMatch />,
+    title: 'Not Found',
+}];
+//#endregion
 
+//#region style 
 const drawerWidth = 240;
 
 const styles = (theme: Theme) => createStyles({
@@ -102,15 +126,19 @@ const styles = (theme: Theme) => createStyles({
     },
 });
 
+//#endregion 
 type AppProps = {
-    title?: string,
-    test?: number,
 }
-type Props = AppProps & WithStyles<typeof styles, true>;
+type InnerProps = AppProps & WithStyles<typeof styles, true> & {
+    test: testModel.Test
+};
 
 @withStylesDeco(styles, { withTheme: true })
 @observer
 export default class App extends React.Component<AppProps> {
+    private get innerProps() {
+        return this.props as InnerProps;
+    }
     dataSource = new appModel.Main();
 
     handleDrawerOpen = () => {
@@ -121,7 +149,7 @@ export default class App extends React.Component<AppProps> {
         this.dataSource.toggleDrawer(false);
     };
     renderTop() {
-        const { classes } = this.props as Props;
+        const { classes } = this.innerProps;
         const { dataSource } = this;
         return (
             <AppBar
@@ -147,7 +175,7 @@ export default class App extends React.Component<AppProps> {
         );
     }
     renderMenu() {
-        const { classes, theme } = this.props as Props;
+        const { classes, theme } = this.innerProps;
         const { dataSource } = this;
         return (
             <Drawer
@@ -170,25 +198,13 @@ export default class App extends React.Component<AppProps> {
         );
     }
     renderRoute() {
-        const { } = this.props as Props;
+        const { } = this.innerProps;
         const { dataSource } = this;
         return (
             <Router>
                 <Switch>
-                    {[{
-                        path: '/',
-                        comp:
-                            <TestMainSection />,
-                        title: 'test',
-                    }, {
-                        path: '/test2',
-                        comp: <Test2 />,
-                        title: 'test2',
-                    }, {
-                        comp: <NotMatch />,
-                        title: 'Not Found',
-                    }].map((ele, i) => {
-                        return <Route key={i} exact path={ele.path || null} render={() => {
+                    {routes.map((ele, i) => {
+                        return <Route key={i} exact={ele.exact === false ? false : true} path={ele.path || null} render={() => {
                             dataSource.setTitle(ele.title);
                             return ele.comp;
                         }}></Route>
@@ -199,7 +215,7 @@ export default class App extends React.Component<AppProps> {
         );
     }
     render() {
-        const { classes } = this.props as Props;
+        const { classes } = this.innerProps;
         return (
             <div className={classes.root}>
                 {this.renderTop()}
