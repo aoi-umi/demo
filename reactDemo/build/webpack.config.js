@@ -24,13 +24,26 @@ module.exports = {
     },
     optimization: {
         splitChunks: {
+            maxInitialRequests: 10,
             cacheGroups: {
                 vendors: {
                     test: /node_modules/,
                     name: "vendors",
                     chunks: "all",
-                    minSize: 30000
+                    priority: 10,
                 },
+                react: {
+                    test: /node_modules[\\/]react/,
+                    name: "react",
+                    chunks: "all",
+                    priority: 30,
+                },
+                materialUI: {
+                    test: /node_modules[\\/]@material-ui/,
+                    name: "material-ui",
+                    chunks: "all",
+                    priority: 20,
+                }
                 // styles: {
                 //     name: 'styles',
                 //     test: /\.(scss|css)$/,
@@ -41,7 +54,6 @@ module.exports = {
                 // }
             }
         },
-        runtimeChunk: true
     },
     devServer: {
         port: 9000,
