@@ -2,12 +2,8 @@ import * as React from 'react';
 import { NavLink } from 'react-router-dom';
 import Button from '@material-ui/core/Button';
 import Input from '@material-ui/core/Input';
-
-import { createStore } from 'redux';
-
-import { connectDeco, ajax, withRouterDeco } from '../../helpers/util';
+import { ajax, withRouterDeco } from '../../helpers/util';
 import * as common from '../../helpers/common';
-import { Provider } from 'react-redux';
 
 export default class Test2 extends React.Component {
     private input: React.RefObject<HTMLInputElement>;

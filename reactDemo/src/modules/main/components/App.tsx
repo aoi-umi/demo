@@ -18,22 +18,19 @@ import Tooltip from '@material-ui/core/Tooltip';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import { connect } from 'react-redux';
-import { Dispatch } from 'redux';
-import { Action } from 'redux-actions';
 import { HashRouter as Router, Route, Switch, withRouter } from 'react-router-dom';
+import { observer } from 'mobx-react';
 
 import { mailFolderListItems, otherMailFolderListItems } from '../constants/tileData';
-import { withStylesDeco, connectDeco } from '../../../helpers/util';
+import { withStylesDeco } from '../../../helpers/util';
 import { NotMatch } from '../../error';
 import {
     MainSection as TestMainSection,
-    mapDispatchToProps,
-    model,
-    DispatchResult
+    model as testModel,
 } from '../../test';
 
 import Test2 from '../../test2';
+import * as appModel from '../model';
 
 
 const drawerWidth = 240;
@@ -109,49 +106,40 @@ type AppProps = {
     title?: string,
     test?: number,
 }
-type Props = {
-    test: model.Test,
-} & AppProps & DispatchResult & WithStyles<typeof styles, true>;
+type Props = AppProps & WithStyles<typeof styles, true>;
 
-
-const mapStateToProps = state => ({
-    test: state.test,
-    main: state.main,
-});
-
-@connectDeco(mapStateToProps, mapDispatchToProps)
 @withStylesDeco(styles, { withTheme: true })
+@observer
 export default class App extends React.Component<AppProps> {
-    state = {
-        open: false,
-    };
+    dataSource = new appModel.Main();
 
     handleDrawerOpen = () => {
-        this.setState({ open: true });
+        this.dataSource.toggleDrawer(true);
     };
 
     handleDrawerClose = () => {
-        this.setState({ open: false });
+        this.dataSource.toggleDrawer(false);
     };
     renderTop() {
-        const { classes, title } = this.props as Props;
+        const { classes } = this.props as Props;
+        const { dataSource } = this;
         return (
             <AppBar
                 position="absolute"
-                className={classNames(classes.appBar, this.state.open && classes.appBarShift)}
+                className={classNames(classes.appBar, dataSource.open && classes.appBarShift)}
             >
-                <Toolbar disableGutters={!this.state.open}>
+                <Toolbar disableGutters={!dataSource.open}>
                     <IconButton
                         color="inherit"
                         aria-label="Open drawer"
                         onClick={this.handleDrawerOpen}
-                        className={classNames(classes.menuButton, this.state.open && classes.hide)}
+                        className={classNames(classes.menuButton, dataSource.open && classes.hide)}
                     >
                         <MenuIcon />
                     </IconButton>
                     <Tooltip title="这是个提示" placement="bottom">
                         <Typography variant="title" color="inherit" noWrap>
-                            {title}
+                            {dataSource.title}
                         </Typography>
                     </Tooltip>
                 </Toolbar>
@@ -160,13 +148,14 @@ export default class App extends React.Component<AppProps> {
     }
     renderMenu() {
         const { classes, theme } = this.props as Props;
+        const { dataSource } = this;
         return (
             <Drawer
                 variant="permanent"
                 classes={{
-                    paper: classNames(classes.drawerPaper, !this.state.open && classes.drawerPaperClose),
+                    paper: classNames(classes.drawerPaper, !dataSource.open && classes.drawerPaperClose),
                 }}
-                open={this.state.open}
+                open={dataSource.open}
             >
                 <div className={classes.toolbar}>
                     <IconButton onClick={this.handleDrawerClose}>
@@ -181,18 +170,15 @@ export default class App extends React.Component<AppProps> {
         );
     }
     renderRoute() {
-        const { test, btnClick, textClick } = this.props as Props;
+        const { } = this.props as Props;
+        const { dataSource } = this;
         return (
             <Router>
                 <Switch>
                     {[{
                         path: '/',
                         comp:
-                            <TestMainSection
-                                test={test}
-                                btnClick={btnClick}
-                                textClick={textClick}
-                            />,
+                            <TestMainSection />,
                         title: 'test',
                     }, {
                         path: '/test2',
@@ -203,8 +189,7 @@ export default class App extends React.Component<AppProps> {
                         title: 'Not Found',
                     }].map((ele, i) => {
                         return <Route key={i} exact path={ele.path || null} render={() => {
-                            //this.setState({ title: ele.title });
-                            //dispatch(btnClick());
+                            dataSource.setTitle(ele.title);
                             return ele.comp;
                         }}></Route>
                     })}
