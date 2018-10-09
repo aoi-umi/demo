@@ -1,6 +1,6 @@
 import * as mongoose from 'mongoose';
-import { Types, Mongoose, ConnectionOptions } from 'mongoose';
-import { Typegoose, GetModelForClassOptions, InstanceType } from 'typegoose';
+import { Types, Mongoose, ConnectionOptions, SchemaTypeOpts, Schema, SchemaType } from 'mongoose';
+import { Typegoose, GetModelForClassOptions, InstanceType, prop as typegooseProp, PropOptionsWithValidate } from 'typegoose';
 import * as  data_1 from 'typegoose/lib/data';
 import { Omit, RecursivePartial } from 'sequelize-typescript/lib/utils/types';
 Typegoose.prototype['setModelForClass'] = function (t, { existingMongoose, schemaOptions, existingConnection } = {}) {
@@ -98,3 +98,7 @@ export function connect(uris: string, { existingMongoose, mongooseOption }: {
 } = {}) {
     return (existingMongoose || mongoose).connect(uris, { useNewUrlParser: true, ...mongooseOption });
 }
+
+export function prop(options?: (SchemaTypeOpts<any> | Schema | SchemaType) & PropOptionsWithValidate) {
+    return typegooseProp(options);
+};
