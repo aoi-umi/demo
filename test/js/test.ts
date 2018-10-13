@@ -1,7 +1,8 @@
 import * as mongoose from 'mongoose';
 import { DocumentQuery } from 'mongoose';
-import { Typegoose, InstanceType, prop, instanceMethod, staticMethod, pre, post, Ref, plugin } from 'typegoose';
-import { Model, getModelForClass, ModelType, connect, DocType } from './mongo';
+import { Typegoose, InstanceType, instanceMethod, staticMethod, pre, post, Ref, plugin } from 'typegoose';
+import { Model, getModelForClass, ModelType, connect, DocType, prop, model, arrayProp } from './mongo';
+
 
 (async () => {
     connect('mongodb://localhost:27017/test', { mongooseOption: { useNewUrlParser: true } });
@@ -14,6 +15,7 @@ import { Model, getModelForClass, ModelType, connect, DocType } from './mongo';
         });
     }
 
+    @model()
     @pre<BaseUser>('save', function (this: InstanceType<User>, next) {
         this.name += 'base';
         next();
@@ -27,13 +29,19 @@ import { Model, getModelForClass, ModelType, connect, DocType } from './mongo';
             return 'a, base';
         }
     }
+
+
+    type UserInstance = InstanceType<User>;
+    type UserModel = ModelType<User, typeof User>;
+    type UserDoc = DocType<UserInstance>;
+    @model()
     class User extends BaseUser {
         @prop({
             required: true,
         })
         name?: string;
         @instanceMethod
-        a(this: InstanceType<User>) {
+        a() {
             return 'a, user 1';
         }
         @prop()
@@ -58,6 +66,7 @@ import { Model, getModelForClass, ModelType, connect, DocType } from './mongo';
     type User2Instance = InstanceType<User2>;
     type User2Model = ModelType<User2, typeof User2>;
     type User2Doc = DocType<User2Instance>;
+    @model()
     class User2 extends BaseUser {
         @staticMethod
         static c(this: User2Model, conditions?: any, projection?: any | null, options?: any | null,
@@ -78,8 +87,21 @@ import { Model, getModelForClass, ModelType, connect, DocType } from './mongo';
         @prop({ ref: User, required: false })
         childId: Ref<User>;
 
+        @arrayProp({
+            items: User
+        })
+        childList: User[];
+
+
+        @arrayProp({
+            items: Date
+        })
+        testList: Date[];
+
         @instanceMethod
-        b(this: User2Instance) {
+        b() {
+            if (this.child)
+                console.log(1);
             return 'b, user 2';
         }
     }
@@ -111,15 +133,17 @@ import { Model, getModelForClass, ModelType, connect, DocType } from './mongo';
     u.myName = u.name;
     await u.save();
 
-    // let child = new UserModel();
-    // child.name = 'child';
+    let child = new UserModel();
+    child.name = 'child';
 
-    // let u2 = new UserModel2({
-    //     num: parseFloat('1'),
-    //     child: child,
-    //     childId: child._id,
-    // });
-    // await u2.save();
+    let u2 = new UserModel2({
+        num: parseFloat('1'),
+        child: child,
+        childId: child._id,
+        childList: [child],
+        testList: [new Date()]
+    });
+    await u2.save();
     let u11 = await UserModel.findOne({}).sort({ _id: -1 });
     if (u11 != null) {
         console.log(u11.a());
