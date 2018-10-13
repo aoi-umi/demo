@@ -1,5 +1,5 @@
 import * as mongoose from 'mongoose';
-import { Types, Mongoose, ConnectionOptions, SchemaTypeOpts, Schema, SchemaType } from 'mongoose';
+import { Types, Mongoose, ConnectionOptions, SchemaTypeOpts, Schema, SchemaType, SchemaOptions } from 'mongoose';
 import { Typegoose, GetModelForClassOptions, InstanceType, PropOptionsWithValidate, ModelType as typegooseModelType, ArrayPropOptions, PropOptionsWithStringValidate, PropOptionsWithNumberValidate } from 'typegoose';
 
 import * as _ from 'lodash';
@@ -8,7 +8,6 @@ import { isPrimitive, initAsObject, initAsArray, isString, isNumber, isObject } 
 import { InvalidPropError, NotNumberTypeError, NotStringTypeError, NoMetadataError } from 'typegoose/lib/errors';
 
 import { Omit, RecursivePartial } from 'sequelize-typescript/lib/utils/types';
-import { SchemaOptions } from 'sequelize';
 let newSchema = {};
 let instanceTypegoose = new Typegoose();
 
@@ -223,6 +222,7 @@ export let model = function (options: { schemaOptions?: SchemaOptions } = {}): C
             hooks,
             plugins,
             virtuals,
+            schema,
         ];
         //放在最后
         let clone = [];
