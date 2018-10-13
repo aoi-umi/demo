@@ -17,7 +17,7 @@ import { Model, getModelForClass, ModelType, connect, DocType, prop, model, arra
 
     @model()
     @pre<BaseUser>('save', function (this: InstanceType<User>, next) {
-        this.name += 'base';
+        this.name += '_preBase';
         next();
     })
     @plugin(lastModifiedPlugin)
@@ -31,10 +31,18 @@ import { Model, getModelForClass, ModelType, connect, DocType, prop, model, arra
     }
 
 
-    type UserInstance = InstanceType<User>;
-    type UserModel = ModelType<User, typeof User>;
-    type UserDoc = DocType<UserInstance>;
-    @model()
+    type UserInstanceType = InstanceType<User>;
+    type UserModelType = ModelType<User, typeof User>;
+    type UserDocType = DocType<UserInstanceType>;
+    @model({
+        schemaOptions: {
+            timestamps: true,
+            collection: 'userTest1',
+            toObject: {
+                virtuals: true
+            }
+        }
+    })
     class User extends BaseUser {
         @prop({
             required: true,
@@ -53,25 +61,40 @@ import { Model, getModelForClass, ModelType, connect, DocType, prop, model, arra
         }
     }
 
-    const UserModel = getModelForClass<User, typeof User>(User, {
+    const UserModel = getModelForClass<User, typeof User>(User);
+
+    type User2InstanceType = InstanceType<User2>;
+    type User2ModelType = ModelType<User2, typeof User2>;
+    type User2DocType = DocType<User2InstanceType>;
+    @model({
         schemaOptions: {
             timestamps: true,
-            collection: 'userTest1',
             toObject: {
-                virtuals: true
+                virtuals: true,
+                transform: (doc: User2DocType, ret) => {
+                    ret.num = 100;
+                    return ret;
+                }
+            },
+            toJSON: {
+                virtuals: true,
+                transform: (doc, ret) => {
+                    for (let key in ret) {
+                        let value = ret[key];
+                        if (value !== null && value !== undefined)
+                            ret[key] = value.toString();
+                    }
+                    return ret;
+                }
             }
         }
-    });
-
-    type User2Instance = InstanceType<User2>;
-    type User2Model = ModelType<User2, typeof User2>;
-    type User2Doc = DocType<User2Instance>;
-    @model()
+    })
     class User2 extends BaseUser {
         @staticMethod
-        static c(this: User2Model, conditions?: any, projection?: any | null, options?: any | null,
-            callback?: (err: any, res: User2Instance | null) => void): DocumentQuery<User2Instance | null, User2Instance> {
-            return this.findOne.apply(this, arguments);
+        static c(conditions?: any, projection?: any | null, options?: any | null,
+            callback?: (err: any, res: User2InstanceType | null) => void): DocumentQuery<User2InstanceType | null, User2InstanceType> {
+            let self = this as User2ModelType;
+            return self.findOne.apply(this, arguments);
         }
 
         @prop()
@@ -106,29 +129,7 @@ import { Model, getModelForClass, ModelType, connect, DocType, prop, model, arra
         }
     }
 
-    const UserModel2 = getModelForClass<User2, typeof User2>(User2, {
-        schemaOptions: {
-            timestamps: true,
-            toObject: {
-                virtuals: true,
-                transform: (doc: User2Doc, ret) => {
-                    ret.num = 100;
-                    return ret;
-                }
-            },
-            toJSON: {
-                virtuals: true,
-                transform: (doc, ret) => {
-                    for (let key in ret) {
-                        let value = ret[key];
-                        if (value !== null && value !== undefined)
-                            ret[key] = value.toString();
-                    }
-                    return ret;
-                }
-            }
-        }
-    });
+    const User2Model = getModelForClass<User2, typeof User2>(User2);
     let u = new UserModel({ name: '123' });
     u.myName = u.name;
     await u.save();
@@ -136,7 +137,8 @@ import { Model, getModelForClass, ModelType, connect, DocType, prop, model, arra
     let child = new UserModel();
     child.name = 'child';
 
-    let u2 = new UserModel2({
+    let u2 = new User2Model({
+        name: 'user2',
         num: parseFloat('1'),
         child: child,
         childId: child._id,
@@ -150,11 +152,11 @@ import { Model, getModelForClass, ModelType, connect, DocType, prop, model, arra
         console.log(u11);
     }
 
-    let u22 = await UserModel2.findOne({}).sort({ _id: -1 });
+    let u22 = await User2Model.findOne({}).sort({ _id: -1 });
     if (u22 != null)
         console.log(`${u22.a()}; ${u22.b()}; ${u22.createdAt}`);
 
-    UserModel2.c().sort({ _id: -1 }).then(t => {
+    User2Model.c().sort({ _id: -1 }).then(t => {
         console.log(t.toJSON());
     });
 
