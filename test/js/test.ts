@@ -1,7 +1,7 @@
 import * as mongoose from 'mongoose';
 import { DocumentQuery } from 'mongoose';
 import { Typegoose, InstanceType, instanceMethod, staticMethod, pre, post, Ref, plugin } from 'typegoose';
-import { Model, getModelForClass, ModelType, connect, DocType, prop, model, arrayProp } from './mongo';
+import { Model, getModelForClass, ModelType, connect, DocType, prop, setSchema, arrayProp } from './mongo';
 
 
 (async () => {
@@ -15,15 +15,20 @@ import { Model, getModelForClass, ModelType, connect, DocType, prop, model, arra
         });
     }
 
-    @model()
+    @setSchema()
     @pre<BaseUser>('save', function (this: InstanceType<User>, next) {
         this.name += '_preBase';
         next();
     })
     @plugin(lastModifiedPlugin)
     class BaseUser extends Model<BaseUser> {
-        @prop()
+        @prop({
+            test: 'just a test'
+        })
         name?: string;
+        
+        @prop()
+        name2?: string;
         @instanceMethod
         a() {
             return 'a, base';
@@ -34,7 +39,7 @@ import { Model, getModelForClass, ModelType, connect, DocType, prop, model, arra
     type UserInstanceType = InstanceType<User>;
     type UserModelType = ModelType<User, typeof User>;
     type UserDocType = DocType<UserInstanceType>;
-    @model({
+    @setSchema({
         schemaOptions: {
             timestamps: true,
             collection: 'userTest1',
@@ -45,7 +50,7 @@ import { Model, getModelForClass, ModelType, connect, DocType, prop, model, arra
     })
     class User extends BaseUser {
         @prop({
-            required: true,
+            required: true
         })
         name?: string;
         @instanceMethod
@@ -66,7 +71,7 @@ import { Model, getModelForClass, ModelType, connect, DocType, prop, model, arra
     type User2InstanceType = InstanceType<User2>;
     type User2ModelType = ModelType<User2, typeof User2>;
     type User2DocType = DocType<User2InstanceType>;
-    @model({
+    @setSchema({
         schemaOptions: {
             timestamps: true,
             toObject: {
@@ -131,8 +136,9 @@ import { Model, getModelForClass, ModelType, connect, DocType, prop, model, arra
 
     const User2Model = getModelForClass<User2, typeof User2>(User2);
     let u = new UserModel({ name: '123' });
+
     u.myName = u.name;
-    await u.save();
+    //await u.save();
 
     let child = new UserModel();
     child.name = 'child';
@@ -145,6 +151,8 @@ import { Model, getModelForClass, ModelType, connect, DocType, prop, model, arra
         childList: [child],
         testList: [new Date()]
     });
+    console.log(u2);
+    return;
     await u2.save();
     let u11 = await UserModel.findOne({}).sort({ _id: -1 });
     if (u11 != null) {

@@ -10,7 +10,9 @@ import { InvalidPropError, NotNumberTypeError, NotStringTypeError, NoMetadataErr
 import { Omit, RecursivePartial } from 'sequelize-typescript/lib/utils/types';
 let newSchema = {};
 let instanceTypegoose = new Typegoose();
-
+const SchemaKey = {
+    prop: 'schema:prop',
+};
 //#region setModelForClass 
 
 Typegoose.prototype.setModelForClass = function <T>(t: T, { existingMongoose, schemaOptions, existingConnection }: GetModelForClassOptions = {}) {
@@ -89,7 +91,39 @@ const baseProp = (rawOptions, Type, target, key, isArray = false) => {
     } else {
         initAsObject(name, key);
     }
+    const options = _.omit(rawOptions, ['ref', 'items']);
+    let test = Reflect.getMetadata(SchemaKey.prop, target) || {};
+    test = {
+        ...test,
+        [key]: 1,
+    }
+    Reflect.defineMetadata(SchemaKey.prop, test, target);
+    let propObj = Reflect.getMetadata(SchemaKey.prop, target, key) || {};
+    //let propObj = isArray ? propsObj[key] && propsObj[key][0] : propsObj[key];
+    if (isArray && Array.isArray(propObj))
+        propObj = propObj[0];
 
+    let hasOption = false;
+    for (let key in options) {
+        hasOption = true;
+        break;
+    }
+    if (hasOption) {
+        propObj = {
+            ...options,
+            type: Type
+        }
+    } else {
+        propObj = {
+            ...options,
+            type: Type
+        }
+    }
+    if (isArray) {
+        propObj = [propObj];
+    }
+    //propsObj[key] = propObj;
+    Reflect.defineMetadata(SchemaKey.prop, propObj, target, key);
     const ref = rawOptions.ref;
     if (ref) {
         schema[name][key] = {
@@ -132,7 +166,6 @@ const baseProp = (rawOptions, Type, target, key, isArray = false) => {
         throw new InvalidPropError(Type.name, key);
     }
 
-    const options = _.omit(rawOptions, ['ref', 'items']);
     if (isPrimitive(Type)) {
         if (isArray) {
             schema[name][key][0] = {
@@ -202,8 +235,15 @@ export const arrayProp = (options: ArrayPropOptions) => (target: any, key: strin
 };
 //#endregion
 
-export let model = function (options: { schemaOptions?: SchemaOptions } = {}): ClassDecorator {
+export let setSchema = function (options: { schemaOptions?: SchemaOptions } = {}): ClassDecorator {
     return function (target) {
+        console.log(target.name);
+        let propKeyObj = Reflect.getMetadata(SchemaKey.prop, target.prototype);
+        let props: any = {};
+        for (let key in propKeyObj) {
+            props[key] = Reflect.getMetadata(SchemaKey.prop, target.prototype, key);
+        }
+        console.log(props);
         options = {
             ...options
         };
