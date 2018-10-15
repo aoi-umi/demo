@@ -1,12 +1,14 @@
 import * as mongoose from 'mongoose';
 import { DocumentQuery } from 'mongoose';
-import { Typegoose, InstanceType, instanceMethod, staticMethod, pre, post, Ref, plugin } from 'typegoose';
-import { Model, getModelForClass, ModelType, connect, DocType, prop, setSchema, arrayProp } from './mongo';
+import {
+    Model, getModelForClass, ModelType, connect, DocType, InstanceType, Ref,
+    setSchema, prop, arrayProp, setMethod as instanceMethod, setStatic as staticMethod,
+    setPre as pre, setPost as post, setPlugin as plugin
+} from './mongo';
 
 
 (async () => {
     connect('mongodb://localhost:27017/test', { mongooseOption: { useNewUrlParser: true } });
-
     function lastModifiedPlugin(schema: mongoose.Schema, options) {
         schema.add({ lastMod: Date });
         schema.pre('save', function (this: mongoose.Document & { lastMod: Date }, next) {
@@ -16,7 +18,7 @@ import { Model, getModelForClass, ModelType, connect, DocType, prop, setSchema, 
     }
 
     @setSchema()
-    @pre<BaseUser>('save', function (this: InstanceType<User>, next) {
+    @pre<BaseUser>('save', function (this, next) {
         this.name += '_preBase';
         next();
     })
@@ -26,7 +28,7 @@ import { Model, getModelForClass, ModelType, connect, DocType, prop, setSchema, 
             test: 'just a test'
         })
         name?: string;
-        
+
         @prop()
         name2?: string;
         @instanceMethod
@@ -47,6 +49,10 @@ import { Model, getModelForClass, ModelType, connect, DocType, prop, setSchema, 
                 virtuals: true
             }
         }
+    })
+    @pre<BaseUser>('save', function (this, next) {
+        this.name += '_preUser';
+        next();
     })
     class User extends BaseUser {
         @prop({
@@ -94,6 +100,10 @@ import { Model, getModelForClass, ModelType, connect, DocType, prop, setSchema, 
             }
         }
     })
+    @pre<BaseUser>('save', function (this, next) {
+        this.name += '_preUser2';
+        next();
+    })
     class User2 extends BaseUser {
         @staticMethod
         static c(conditions?: any, projection?: any | null, options?: any | null,
@@ -138,11 +148,10 @@ import { Model, getModelForClass, ModelType, connect, DocType, prop, setSchema, 
     let u = new UserModel({ name: '123' });
 
     u.myName = u.name;
-    //await u.save();
+    await u.save();
 
     let child = new UserModel();
     child.name = 'child';
-
     let u2 = new User2Model({
         name: 'user2',
         num: parseFloat('1'),
@@ -151,8 +160,7 @@ import { Model, getModelForClass, ModelType, connect, DocType, prop, setSchema, 
         childList: [child],
         testList: [new Date()]
     });
-    console.log(u2);
-    return;
+
     await u2.save();
     let u11 = await UserModel.findOne({}).sort({ _id: -1 });
     if (u11 != null) {

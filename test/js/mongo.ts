@@ -1,294 +1,320 @@
+import 'reflect-metadata';
 import * as mongoose from 'mongoose';
 import { Types, Mongoose, ConnectionOptions, SchemaTypeOpts, Schema, SchemaType, SchemaOptions } from 'mongoose';
-import { Typegoose, GetModelForClassOptions, InstanceType, PropOptionsWithValidate, ModelType as typegooseModelType, ArrayPropOptions, PropOptionsWithStringValidate, PropOptionsWithNumberValidate } from 'typegoose';
-
 import * as _ from 'lodash';
-import { schema, models, methods, virtuals, hooks, plugins, constructors } from 'typegoose/lib/data';
-import { isPrimitive, initAsObject, initAsArray, isString, isNumber, isObject } from 'typegoose/lib//utils';
-import { InvalidPropError, NotNumberTypeError, NotStringTypeError, NoMetadataError } from 'typegoose/lib/errors';
+import * as hooks from './hooks';
 
 import { Omit, RecursivePartial } from 'sequelize-typescript/lib/utils/types';
-let newSchema = {};
-let instanceTypegoose = new Typegoose();
-const SchemaKey = {
+
+
+export declare type InstanceType<T> = T & mongoose.Document;
+export declare type Ref<T> = T | mongoose.Types.ObjectId;
+
+export interface PropOptions<T> extends SchemaTypeOpts<T> {
+    ref?: any;
+}
+
+export interface ArrayPropOptions extends SchemaTypeOpts<any> {
+    items?: any;
+    itemsRef?: any;
+}
+
+export const SchemaKey = {
+    schema: 'schema:schema',
     prop: 'schema:prop',
+    virtual: 'schema:virtual',
+    method: 'schema:method',
+    static: 'schema:static',
+    hook: 'schema:hook',
 };
-//#region setModelForClass 
+export function defineSchemaMetadata(fn: (obj) => any, metadataKey: any, target: Object, propertyKey: string | symbol) {
+    let dict = Reflect.getMetadata(metadataKey, target) || {};
+    dict = {
+        ...dict,
+        [propertyKey]: 1,
+    }
+    Reflect.defineMetadata(metadataKey, dict, target);
+    let obj = Reflect.getMetadata(metadataKey, target, propertyKey);
+    obj = fn(obj);
+    Reflect.defineMetadata(metadataKey, obj, target, propertyKey);
+}
 
-Typegoose.prototype.setModelForClass = function <T>(t: T, { existingMongoose, schemaOptions, existingConnection }: GetModelForClassOptions = {}) {
-    const name = this.constructor.name;
-    //#region
-    // get schema of current model
-    // let sch = this.buildSchema(name, schemaOptions);
-    // // get parents class name
-    // let parentCtor = Object.getPrototypeOf(this.constructor.prototype).constructor;
-    // // iterate trough all parents
-    // while (parentCtor && parentCtor.name !== 'Typegoose' && parentCtor.name !== 'Object') {
-    //   // extend schema
-    //   sch = this.buildSchema(parentCtor.name, schemaOptions, sch);
-    //   // next parent
-    //   parentCtor = Object.getPrototypeOf(parentCtor.prototype).constructor;
-    // }
-    //#endregion
-
-    let model = mongoose.model.bind(mongoose);
+function getSchemaMetadata<T=any>(metadataKey: any, target: Object) {
+    let dict = Reflect.getMetadata(metadataKey, target) || {};
+    let returnObj: {
+        [key: string]: T
+    } = {};
+    for (let key in dict) {
+        returnObj[key] = Reflect.getMetadata(metadataKey, target, key);
+    }
+    return returnObj;
+}
+//#region getModelForClass 
+export interface GetModelForClassOptions {
+    existingMongoose?: mongoose.Mongoose;
+    modelOptions?: {
+        name?: string;
+        collection?: string;
+        skipInit?: boolean;
+    };
+    existingConnection?: mongoose.Connection;
+}
+export function getModelForClass<T extends Model<T>, typeofT>(t: { new(): T }
+    , {
+        existingMongoose,
+        existingConnection,
+        modelOptions
+    }: GetModelForClassOptions = {}) {
+    let schema = Reflect.getMetadata(SchemaKey.schema, t);
+    let model: typeof mongoose.model = mongoose.model.bind(mongoose);
     if (existingConnection) {
         model = existingConnection.model.bind(existingConnection);
     } else if (existingMongoose) {
         model = existingMongoose.model.bind(existingMongoose);
     }
-    //new 
-    let sch: Schema = newSchema[name];
-
-    models[name] = model(name, sch);
-    constructors[name] = this.constructor;
-
-    return models[name];// as typegooseModelType<this> & T;
+    modelOptions = {
+        ...modelOptions
+    }
+    let name = modelOptions.name || t.name;
+    return model(name, schema, modelOptions.collection, modelOptions.skipInit) as any as & mongoose.Model<InstanceType<T>> & typeofT;
 }
 //#endregion
 
-//#region prop 
-const isWithStringValidate = (options: PropOptionsWithStringValidate) =>
-    (options.minlength || options.maxlength || options.match);
-
-const isWithNumberValidate = (options: PropOptionsWithNumberValidate) =>
-    (options.min || options.max);
+//#region schema
 
 const baseProp = (rawOptions, Type, target, key, isArray = false) => {
     const name = target.constructor.name;
     const isGetterSetter = Object.getOwnPropertyDescriptor(target, key);
-    if (isGetterSetter) {
-        if (isGetterSetter.get) {
-            if (!virtuals[name]) {
-                virtuals[name] = {};
+    if (isGetterSetter && (isGetterSetter.get || isGetterSetter.set)) {
+        defineSchemaMetadata((obj) => {
+            if (isGetterSetter.get) {
+                obj = {
+                    ...obj,
+                    get: isGetterSetter.get
+                }
             }
-            if (!virtuals[name][key]) {
-                virtuals[name][key] = {};
-            }
-            virtuals[name][key] = {
-                ...virtuals[name][key],
-                get: isGetterSetter.get,
-            };
-        }
 
-        if (isGetterSetter.set) {
-            if (!virtuals[name]) {
-                virtuals[name] = {};
+            if (isGetterSetter.set) {
+                obj = {
+                    ...obj,
+                    get: isGetterSetter.set
+                }
             }
-            if (!virtuals[name][key]) {
-                virtuals[name][key] = {};
-            }
-            virtuals[name][key] = {
-                ...virtuals[name][key],
-                set: isGetterSetter.set,
-            };
-        }
+            return obj;
+        }, SchemaKey.virtual, target, key);
         return;
     }
 
-    if (isArray) {
-        initAsArray(name, key);
-    } else {
-        initAsObject(name, key);
-    }
     const options = _.omit(rawOptions, ['ref', 'items']);
-    let test = Reflect.getMetadata(SchemaKey.prop, target) || {};
-    test = {
-        ...test,
-        [key]: 1,
-    }
-    Reflect.defineMetadata(SchemaKey.prop, test, target);
-    let propObj = Reflect.getMetadata(SchemaKey.prop, target, key) || {};
-    //let propObj = isArray ? propsObj[key] && propsObj[key][0] : propsObj[key];
-    if (isArray && Array.isArray(propObj))
-        propObj = propObj[0];
+    defineSchemaMetadata((obj) => {
+        if (isArray && Array.isArray(obj))
+            obj = obj[0];
 
-    let hasOption = false;
-    for (let key in options) {
-        hasOption = true;
-        break;
-    }
-    if (hasOption) {
-        propObj = {
-            ...options,
-            type: Type
+        let hasOption = false;
+        for (let key in options) {
+            hasOption = true;
+            break;
         }
-    } else {
-        propObj = {
-            ...options,
-            type: Type
-        }
-    }
-    if (isArray) {
-        propObj = [propObj];
-    }
-    //propsObj[key] = propObj;
-    Reflect.defineMetadata(SchemaKey.prop, propObj, target, key);
-    const ref = rawOptions.ref;
-    if (ref) {
-        schema[name][key] = {
-            ...schema[name][key],
-            type: mongoose.Schema.Types.ObjectId,
-            ref: ref.name,
-        };
-        return;
-    }
-
-    const itemsRef = rawOptions.itemsRef;
-    if (itemsRef) {
-        schema[name][key][0] = {
-            ...schema[name][key][0],
-            type: mongoose.Schema.Types.ObjectId,
-            ref: itemsRef.name,
-        };
-        return;
-    }
-
-    const enumOption = rawOptions.enum;
-    if (enumOption) {
-        if (!Array.isArray(enumOption)) {
-            rawOptions.enum = Object.keys(enumOption).map((propKey) => enumOption[propKey]);
-        }
-    }
-
-    // check for validation inconsistencies
-    if (isWithStringValidate(rawOptions) && !isString(Type)) {
-        throw new NotStringTypeError(key);
-    }
-
-    if (isWithNumberValidate(rawOptions) && !isNumber(Type)) {
-        throw new NotNumberTypeError(key);
-    }
-
-    const instance = new Type();
-    const subSchema = schema[instance.constructor.name];
-    if (!subSchema && !isPrimitive(Type) && !isObject(Type)) {
-        throw new InvalidPropError(Type.name, key);
-    }
-
-    if (isPrimitive(Type)) {
-        if (isArray) {
-            schema[name][key][0] = {
-                ...schema[name][key][0],
+        if (hasOption) {
+            obj = {
                 ...options,
-                type: Type,
-            };
-            return;
+                type: Type
+            }
+        } else {
+            obj = {
+                ...options,
+                type: Type
+            }
         }
-        schema[name][key] = {
-            ...schema[name][key],
-            ...options,
-            type: Type,
-        };
-        return;
-    }
+        if (isArray) {
+            obj = [obj];
+        }
+        return obj;
+    }, SchemaKey.prop, target, key);
+    // const ref = rawOptions.ref;
+    // if (ref) {
+    //     schema[name][key] = {
+    //         ...schema[name][key],
+    //         type: mongoose.Schema.Types.ObjectId,
+    //         ref: ref.name,
+    //     };
+    //     return;
+    // }
 
-    // If the 'Type' is not a 'Primitive Type' and no subschema was found treat the type as 'Object'
-    // so that mongoose can store it as nested document
-    if (isObject(Type) && !subSchema) {
-        schema[name][key] = {
-            ...schema[name][key],
-            ...options,
-            type: Object,
-        };
-        return;
-    }
+    // const itemsRef = rawOptions.itemsRef;
+    // if (itemsRef) {
+    //     schema[name][key][0] = {
+    //         ...schema[name][key][0],
+    //         type: mongoose.Schema.Types.ObjectId,
+    //         ref: itemsRef.name,
+    //     };
+    //     return;
+    // }
 
-    if (isArray) {
-        let obj: any = {};
-        if (subSchema)
-            obj.type = newSchema[instance.constructor.name];
-        schema[name][key][0] = {
-            ...schema[name][key][0],
-            ...options,
-            //...subSchema,
-            ...obj,
-        };
-        return;
-    }
 
-    const Schema = mongoose.Schema;
+    // const instance = new Type();
+    // const subSchema = schema[instance.constructor.name];
+    // if (!subSchema && !isPrimitive(Type) && !isObject(Type)) {
+    //     throw new InvalidPropError(Type.name, key);
+    // }
 
-    const supressSubschemaId = rawOptions._id === false;
-    schema[name][key] = {
-        ...schema[name][key],
-        ...options,
-        type: newSchema[instance.constructor.name]
-        //new Schema({ ...subSchema }, supressSubschemaId ? { _id: false } : {}),
-    };
-    return;
+    // if (isPrimitive(Type)) {
+    //     if (isArray) {
+    //         schema[name][key][0] = {
+    //             ...schema[name][key][0],
+    //             ...options,
+    //             type: Type,
+    //         };
+    //         return;
+    //     }
+    //     schema[name][key] = {
+    //         ...schema[name][key],
+    //         ...options,
+    //         type: Type,
+    //     };
+    //     return;
+    // }
+
+    // // If the 'Type' is not a 'Primitive Type' and no subschema was found treat the type as 'Object'
+    // // so that mongoose can store it as nested document
+    // if (isObject(Type) && !subSchema) {
+    //     schema[name][key] = {
+    //         ...schema[name][key],
+    //         ...options,
+    //         type: Object,
+    //     };
+    //     return;
+    // }
+
+    // if (isArray) {
+    //     let obj: any = {};
+    //     if (subSchema)
+    //         obj.type = newSchema[instance.constructor.name];
+    //     schema[name][key][0] = {
+    //         ...schema[name][key][0],
+    //         ...options,
+    //         //...subSchema,
+    //         ...obj,
+    //     };
+    //     return;
+    // }
+
+    // const Schema = mongoose.Schema;
+
+    // const supressSubschemaId = rawOptions._id === false;
+    // schema[name][key] = {
+    //     ...schema[name][key],
+    //     ...options,
+    //     type: newSchema[instance.constructor.name]
+    //     //new Schema({ ...subSchema }, supressSubschemaId ? { _id: false } : {}),
+    // };
+    // return;
 };
 
-export const prop = (options: (SchemaTypeOpts<any> | Schema | SchemaType) & PropOptionsWithValidate = {}) => (target: any, key: string) => {
+export const prop = (options?: PropOptions<any> | Schema | SchemaType): PropertyDecorator => (target, key: string) => {
     const Type = (Reflect as any).getMetadata('design:type', target, key);
 
     if (!Type) {
-        throw new NoMetadataError(key);
+        throw new Error(`key [${key}]no metadata`);
     }
 
     baseProp(options, Type, target, key);
 };
 
-export const arrayProp = (options: ArrayPropOptions) => (target: any, key: string) => {
+export const arrayProp = (options: ArrayPropOptions): PropertyDecorator => (target, key) => {
     const Type = options.items;
     baseProp(options, Type, target, key, true);
 };
+
+const baseMethod = (target: Object, key: string | symbol, descriptor: TypedPropertyDescriptor<any>, metadataKey: string) => {
+    if (descriptor === undefined) {
+        descriptor = Object.getOwnPropertyDescriptor(target, key);
+    }
+    defineSchemaMetadata((obj) => {
+        return descriptor.value;
+    }, metadataKey, target, key);
+
+};
+export const setStatic: MethodDecorator = (target, key, descriptor) => {
+    baseMethod(target, key, descriptor, SchemaKey.static);
+
+};
+export const setMethod: MethodDecorator = (target, key, descriptor) => {
+    baseMethod(target, key, descriptor, SchemaKey.method);
+};
+
+export const setPre = hooks.setPre;
+export const setPost = hooks.setPost;
+export const setPlugin = hooks.setPlugin;
 //#endregion
 
 export let setSchema = function (options: { schemaOptions?: SchemaOptions } = {}): ClassDecorator {
     return function (target) {
-        console.log(target.name);
-        let propKeyObj = Reflect.getMetadata(SchemaKey.prop, target.prototype);
-        let props: any = {};
-        for (let key in propKeyObj) {
-            props[key] = Reflect.getMetadata(SchemaKey.prop, target.prototype, key);
+        //#region props 
+        let props = getSchemaMetadata(SchemaKey.prop, target.prototype);
+        for (let key in props) {
+            let isArray = Array.isArray(props[key]);
+            let type = (isArray ? props[key][0] : props[key]).type;
+            let sch = Reflect.getMetadata(SchemaKey.schema, type);
+            if (sch) {
+                props[key] = isArray ? [sch] : sch;
+            }
         }
-        console.log(props);
         options = {
             ...options
         };
         let { schemaOptions } = options;
-        const name = target.name;
-        let className = [];
-        let parentCtor = Object.getPrototypeOf(target.prototype).constructor;
-        while (parentCtor && parentCtor.name !== 'Typegoose' && parentCtor.name !== 'Object') {
-            className.unshift(parentCtor.name);
-            parentCtor = Object.getPrototypeOf(parentCtor.prototype).constructor;
+        //#endregion
+
+        let schema = new Schema(props, schemaOptions);
+
+        //#region virtuals 
+        let virtuals = getSchemaMetadata<{ get?, set?}>(SchemaKey.virtual, target.prototype);
+        for (let key in virtuals) {
+            if (virtuals[key].get)
+                schema.virtual(key).get(virtuals[key].get);
+            if (virtuals[key].set)
+                schema.virtual(key).set(virtuals[key].set);
         }
+        //#endregion
 
-        let extendList = [
-            methods.staticMethods,
-            methods.instanceMethods,
-            hooks,
-            plugins,
-            virtuals,
-            schema,
-        ];
-        //放在最后
-        let clone = [];
-        extendList.forEach(ele => {
-            clone.push(ele[name]);
-        });
-        //合并父类
-        className.forEach(key => {
-            extendList.forEach(ele => {
-                if (ele[key])
-                    ele[name] = Object.assign({}, ele[name], ele[key]);
-            });
-        });
-        extendList.forEach((ele, idx) => {
-            if (clone[idx])
-                ele[name] = Object.assign({}, ele[name], clone[idx]);
-        });
+        //#region methods 
+        let methods = getSchemaMetadata(SchemaKey.method, target.prototype);
+        if (methods) {
+            schema.methods = {
+                ...schema.methods,
+                ...methods
+            }
+        }
+        //#endregion
 
-        let sch: Schema = instanceTypegoose['buildSchema'](name, schemaOptions);
-        if (newSchema[name])
-            throw new Error(`schema [${name}] have exists`);
-        newSchema[name] = sch;
+        //#region statics
+        let statics = getSchemaMetadata(SchemaKey.static, target);
+        if (statics) {
+            schema.statics = {
+                ...schema.statics,
+                ...statics
+            }
+        }
+        //#endregion
+
+        //#region hook 
+        let hooks = getSchemaMetadata(SchemaKey.hook, target);
+        if (hooks) {
+            for (let key in hooks) {
+                if (hooks[key]) {
+                    hooks[key].forEach(ele => {
+                        schema[key](...ele);
+                    });
+                }
+            }
+        }
+        //#endregion        
+        Reflect.defineMetadata(SchemaKey.schema, schema, target);
     }
 }
 
-type DefaultInstance = mongoose.Document & Typegoose;
+type DefaultInstance = mongoose.Document;
 export declare type ModelType<T, typeofT> = mongoose.Model<InstanceType<T>> & typeofT;
 
 export type FilteredModelAttributes<T extends DefaultInstance> =
@@ -299,17 +325,12 @@ export type FilteredModelAttributes<T extends DefaultInstance> =
 export type DocType<T extends DefaultInstance> = FilteredModelAttributes<T>;
 declare module "mongoose" {
     interface Document {
-        _doc: DocType<this & Typegoose>;
+        _doc: DocType<this>;
     }
 }
-export class Model<T> extends Typegoose {
+export class Model<T>  {
     createdAt?: Date;
     updatedAt?: Date;
-}
-
-export function getModelForClass<T extends Typegoose, typeofT>(t: { new(): T }, getModelForClassOptions?: GetModelForClassOptions) {
-    const model = new t().getModelForClass(t, getModelForClassOptions) as any as Typegoose & mongoose.Model<InstanceType<T>> & typeofT;
-    return model;
 }
 
 /**
