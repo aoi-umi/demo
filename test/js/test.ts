@@ -1,5 +1,4 @@
-import * as mongoose from 'mongoose';
-import { DocumentQuery } from 'mongoose';
+import { DocumentQuery, Schema, Document } from 'mongoose';
 import {
     Model, getModelForClass, ModelType, connect, DocType, InstanceType, Ref,
     setSchema, prop, arrayProp, setMethod as instanceMethod, setStatic as staticMethod,
@@ -9,16 +8,18 @@ import {
 
 (async () => {
     connect('mongodb://localhost:27017/test', { mongooseOption: { useNewUrlParser: true } });
-    function lastModifiedPlugin(schema: mongoose.Schema, options) {
+
+    type BaseUserInstanceType = InstanceType<BaseUser>;
+    function lastModifiedPlugin(schema: Schema) {
         schema.add({ lastMod: Date });
-        schema.pre('save', function (this: mongoose.Document & { lastMod: Date }, next) {
+        schema.pre('save', function (this: Document & { lastMod: Date }, next) {
             this.lastMod = new Date();
             next();
         });
     }
 
     @setSchema()
-    @pre<BaseUser>('save', function (this, next) {
+    @pre<BaseUserInstanceType>('save', function (this, next) {
         this.name += '_preBase';
         next();
     })
@@ -109,7 +110,7 @@ import {
         static c(conditions?: any, projection?: any | null, options?: any | null,
             callback?: (err: any, res: User2InstanceType | null) => void): DocumentQuery<User2InstanceType | null, User2InstanceType> {
             let self = this as User2ModelType;
-            return self.findOne.apply(this, arguments);
+            return self.findOne.apply(this, arguments).skip(1).sort({ _id: -1 }).populate('childId');
         }
 
         @prop()
@@ -138,8 +139,6 @@ import {
 
         @instanceMethod
         b() {
-            if (this.child)
-                console.log(1);
             return 'b, user 2';
         }
     }
@@ -150,14 +149,13 @@ import {
     u.myName = u.name;
     await u.save();
 
-    let child = new UserModel();
-    child.name = 'child';
+    u.name = 'child';
     let u2 = new User2Model({
         name: 'user2',
         num: parseFloat('1'),
-        child: child,
-        childId: child._id,
-        childList: [child],
+        child: u,
+        childId: u._id,
+        childList: [u],
         testList: [new Date()]
     });
 
