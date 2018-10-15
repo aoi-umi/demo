@@ -2,21 +2,19 @@ import 'reflect-metadata';
 import * as mongoose from 'mongoose';
 import { Types, Mongoose, ConnectionOptions, SchemaTypeOpts, Schema, SchemaType, SchemaOptions } from 'mongoose';
 import * as _ from 'lodash';
-import * as hooks from './hooks';
-
 import { Omit, RecursivePartial } from 'sequelize-typescript/lib/utils/types';
 
+import * as hooks from './hooks';
 
 export declare type InstanceType<T> = T & mongoose.Document;
-export declare type Ref<T> = T | mongoose.Types.ObjectId;
+export declare type Ref<T> = T | Types.ObjectId;
 
 export interface PropOptions<T> extends SchemaTypeOpts<T> {
     ref?: any;
 }
 
-export interface ArrayPropOptions extends SchemaTypeOpts<any> {
+export interface ArrayPropOptions extends PropOptions<any> {
     items?: any;
-    itemsRef?: any;
 }
 
 export const SchemaKey = {
@@ -83,7 +81,6 @@ export function getModelForClass<T extends Model<T>, typeofT>(t: { new(): T }
 //#region schema
 
 const baseProp = (rawOptions, Type, target, key, isArray = false) => {
-    const name = target.constructor.name;
     const isGetterSetter = Object.getOwnPropertyDescriptor(target, key);
     if (isGetterSetter && (isGetterSetter.get || isGetterSetter.set)) {
         defineSchemaMetadata((obj) => {
@@ -116,6 +113,10 @@ const baseProp = (rawOptions, Type, target, key, isArray = false) => {
             break;
         }
         if (hasOption) {
+            if (rawOptions.ref) {
+                options.ref = typeof rawOptions.ref === 'string' ? rawOptions.ref : rawOptions.ref.name;
+                Type = Schema.Types.ObjectId;
+            }
             obj = {
                 ...options,
                 type: Type
@@ -131,84 +132,6 @@ const baseProp = (rawOptions, Type, target, key, isArray = false) => {
         }
         return obj;
     }, SchemaKey.prop, target, key);
-    // const ref = rawOptions.ref;
-    // if (ref) {
-    //     schema[name][key] = {
-    //         ...schema[name][key],
-    //         type: mongoose.Schema.Types.ObjectId,
-    //         ref: ref.name,
-    //     };
-    //     return;
-    // }
-
-    // const itemsRef = rawOptions.itemsRef;
-    // if (itemsRef) {
-    //     schema[name][key][0] = {
-    //         ...schema[name][key][0],
-    //         type: mongoose.Schema.Types.ObjectId,
-    //         ref: itemsRef.name,
-    //     };
-    //     return;
-    // }
-
-
-    // const instance = new Type();
-    // const subSchema = schema[instance.constructor.name];
-    // if (!subSchema && !isPrimitive(Type) && !isObject(Type)) {
-    //     throw new InvalidPropError(Type.name, key);
-    // }
-
-    // if (isPrimitive(Type)) {
-    //     if (isArray) {
-    //         schema[name][key][0] = {
-    //             ...schema[name][key][0],
-    //             ...options,
-    //             type: Type,
-    //         };
-    //         return;
-    //     }
-    //     schema[name][key] = {
-    //         ...schema[name][key],
-    //         ...options,
-    //         type: Type,
-    //     };
-    //     return;
-    // }
-
-    // // If the 'Type' is not a 'Primitive Type' and no subschema was found treat the type as 'Object'
-    // // so that mongoose can store it as nested document
-    // if (isObject(Type) && !subSchema) {
-    //     schema[name][key] = {
-    //         ...schema[name][key],
-    //         ...options,
-    //         type: Object,
-    //     };
-    //     return;
-    // }
-
-    // if (isArray) {
-    //     let obj: any = {};
-    //     if (subSchema)
-    //         obj.type = newSchema[instance.constructor.name];
-    //     schema[name][key][0] = {
-    //         ...schema[name][key][0],
-    //         ...options,
-    //         //...subSchema,
-    //         ...obj,
-    //     };
-    //     return;
-    // }
-
-    // const Schema = mongoose.Schema;
-
-    // const supressSubschemaId = rawOptions._id === false;
-    // schema[name][key] = {
-    //     ...schema[name][key],
-    //     ...options,
-    //     type: newSchema[instance.constructor.name]
-    //     //new Schema({ ...subSchema }, supressSubschemaId ? { _id: false } : {}),
-    // };
-    // return;
 };
 
 export const prop = (options?: PropOptions<any> | Schema | SchemaType): PropertyDecorator => (target, key: string) => {
