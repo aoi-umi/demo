@@ -1,8 +1,12 @@
 import { DocumentQuery, Schema, Document } from 'mongoose';
 import {
-    Model, getModelForClass, ModelType, connect, DocType, InstanceType, Ref,
+    Model, getModelForClass, ModelType, DocType, InstanceType, Ref,
     setSchema, prop, arrayProp, setMethod as instanceMethod, setStatic as staticMethod,
     setPre as pre, setPost as post, setPlugin as plugin
+} from 'mongoose-ts-ua';
+
+import {
+    connect
 } from './mongo';
 
 
