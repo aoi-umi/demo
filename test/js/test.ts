@@ -131,13 +131,13 @@ import {
         childId: Ref<User>;
 
         @arrayProp({
-            items: User
+            type: User
         })
         childList: User[];
 
 
         @arrayProp({
-            items: Date
+            type: Date
         })
         testList: Date[];
 
