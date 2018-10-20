@@ -1,9 +1,12 @@
-import * as redis from 'redis';
+import * as Redis from 'ioredis';
 import config from '../../config';
 import * as common from './common';
 import errorConfig from './errorConfig';
 
-var client = redis.createClient(config.redis.port, config.redis.host);
+var client = new Redis({
+    port: config.redis.port,
+    host: config.redis.host,
+});
 var cachePrefix = config.cachePrefix ? config.cachePrefix + ':' : '';
 
 function writeCacheErr(err) {
@@ -25,7 +28,7 @@ client.on('error', function (err) {
 
 export let get = function (key) {
     return common.promise((defer: Q.Deferred<any>) => {
-        common.promisify(client.get, client)(cachePrefix + key).then(result => {
+        client.get(cachePrefix + key).then(result => {
             if (result && typeof result == 'string') {
                 try {
                     result = JSON.parse(result);
@@ -34,7 +37,7 @@ export let get = function (key) {
                 }
             }
             defer.resolve(result);
-        }).fail(defer.reject);
+        }).catch(defer.reject);
         //超时
         setTimeout(function () {
             defer.reject(common.error('Cache Get Timeout', errorConfig.CACHE_TIMEOUT));
@@ -50,18 +53,14 @@ export let set = function (key, value, expire?) {
         let args = [cachePrefix + key, value];
         if (expire)
             args = [...args, 'EX', expire];
-        return common.promisify(client.set, client)(...args);
+        return (client.set as any)(...args);
     });
 };
 
 export let del = function (key) {
-    return common.promisify(client.del, client)(cachePrefix + key);
+    return client.del(cachePrefix + key);
 };
 
-export let keys = function (key) {
-    return common.promisify(client.keys, client)(key);
-};
+export let keys = client.keys;
 
-export let select = function (db) {
-    return common.promisify(client.select, client)(db);
-};
+export let select = client.select;
