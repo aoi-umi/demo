@@ -361,15 +361,15 @@ export let requestServiceByConfig = function (option: RequestServiceByConfigOpti
         log.url = url;
         log.req = opt.body;
         log.method = `[${option.serviceName}][${option.methodName}]`;
-        let resData = await requestService(opt);
+        let {response, data} = await requestService(opt);
         log.duration = startTime - new Date().getTime();
 
         log.result = true;
-        log.res = resData;
+        log.res = data;
         if (option.afterResponse) {
-            resData = await option.afterResponse(resData);
+            data = await option.afterResponse(data, response);
         }
-        return resData;
+        return data;
     }).fail(function (e) {
         log.result = false;
         log.res = e;
@@ -409,7 +409,7 @@ export let requestService = function (option: request.Options) {
         if (Buffer.isBuffer(data)) {
             data = data.toString();
         }
-        return data;
+        return { response, data };
     });
 };
 
