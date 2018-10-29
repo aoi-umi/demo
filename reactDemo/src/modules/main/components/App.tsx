@@ -1,8 +1,7 @@
 import * as React from 'react';
-import * as PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-import { withStyles, WithStyles, createStyles } from '@material-ui/core/styles';
+import { WithStyles, createStyles, createGenerateClassName, jssPreset } from '@material-ui/core/styles';
 import { Theme } from '@material-ui/core';
 import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
@@ -11,25 +10,22 @@ import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import List from '@material-ui/core/List';
-import MenuItem from '@material-ui/core/MenuItem';
-import TextField from '@material-ui/core/TextField';
-import Tooltip from '@material-ui/core/Tooltip';
 
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import { HashRouter as Router, Route, Switch, withRouter } from 'react-router-dom';
-import { observer, inject } from 'mobx-react';
+import { Route, Switch, RouteComponentProps } from 'react-router-dom';
+import { observer } from 'mobx-react';
 
 import { mailFolderListItems, otherMailFolderListItems } from '../constants/tileData';
-import { withStylesDeco } from '../../../helpers/util';
+import { withStylesDeco, withRouterDeco } from '../../../helpers/util';
 import { NotMatch } from '../../error';
 import {
     MainSection as TestMainSection,
     model as testModel,
 } from '../../test';
 
-import Test2 from '../../test2';
+import BookMark from '../../bookmark';
 import * as appModel from '../model';
 
 //#region route
@@ -40,16 +36,12 @@ const routes: {
     exact?: boolean,
 }[] = [{
     path: '/',
+    comp: <BookMark />,
+    title: '书签',
+}, {
+    path: '/test',
     comp: <TestMainSection />,
     title: 'test',
-}, {
-    path: '/test2',
-    comp: <Test2 />,
-    title: 'test2',
-}, {
-    path: '/test2/:p1/:p2?',
-    comp: <Test2 />,
-    title: 'test2//',
 }, {
     comp: <NotMatch />,
     title: 'Not Found',
@@ -121,7 +113,7 @@ const styles = (theme: Theme) => createStyles({
     content: {
         flexGrow: 1,
         backgroundColor: theme.palette.background.default,
-        padding: theme.spacing.unit,
+        padding: 4 * theme.spacing.unit,
         marginTop: theme.mixins.toolbar.minHeight,
     },
 });
@@ -129,11 +121,12 @@ const styles = (theme: Theme) => createStyles({
 //#endregion 
 type AppProps = {
 }
-type InnerProps = AppProps & WithStyles<typeof styles, true> & {
+type InnerProps = RouteComponentProps<AppProps> & WithStyles<typeof styles, true> & {
     test: testModel.Test
 };
 
 @withStylesDeco(styles, { withTheme: true })
+@withRouterDeco
 @observer
 export default class App extends React.Component<AppProps> {
     private get innerProps() {
@@ -149,7 +142,7 @@ export default class App extends React.Component<AppProps> {
         this.dataSource.toggleDrawer(false);
     };
     renderTop() {
-        const { classes } = this.innerProps;
+        const { classes, history } = this.innerProps;
         const { dataSource } = this;
         return (
             <AppBar
@@ -165,17 +158,15 @@ export default class App extends React.Component<AppProps> {
                     >
                         <MenuIcon />
                     </IconButton>
-                    <Tooltip title="这是个提示" placement="bottom">
-                        <Typography variant="title" color="inherit" noWrap>
-                            {dataSource.title}
-                        </Typography>
-                    </Tooltip>
+                    <Typography variant="title" color="inherit" noWrap>
+                        {dataSource.title}
+                    </Typography>
                 </Toolbar>
             </AppBar>
         );
     }
     renderMenu() {
-        const { classes, theme } = this.innerProps;
+        const { classes, theme, history } = this.innerProps;
         const { dataSource } = this;
         return (
             <Drawer
@@ -191,7 +182,7 @@ export default class App extends React.Component<AppProps> {
                     </IconButton>
                 </div>
                 <Divider />
-                <List>{mailFolderListItems}</List>
+                <List>{mailFolderListItems(history)}</List>
                 <Divider />
                 <List>{otherMailFolderListItems}</List>
             </Drawer>
@@ -201,16 +192,14 @@ export default class App extends React.Component<AppProps> {
         const { } = this.innerProps;
         const { dataSource } = this;
         return (
-            <Router>
-                <Switch>
-                    {routes.map((ele, i) => {
-                        return <Route key={i} exact={ele.exact === false ? false : true} path={ele.path || null} render={() => {
-                            dataSource.setTitle(ele.title);
-                            return ele.comp;
-                        }}></Route>
-                    })}
-                </Switch>
-            </Router>
+            <Switch>
+                {routes.map((ele, i) => {
+                    return <Route key={i} exact={ele.exact === false ? false : true} path={ele.path || null} render={() => {
+                        dataSource.setTitle(ele.title);
+                        return ele.comp;
+                    }}></Route>
+                })}
+            </Switch>
 
         );
     }

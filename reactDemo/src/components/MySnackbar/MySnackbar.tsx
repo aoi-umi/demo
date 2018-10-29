@@ -10,7 +10,9 @@ import IconButton from '@material-ui/core/IconButton';
 import Snackbar, { SnackbarOrigin } from '@material-ui/core/Snackbar';
 import SnackbarContent from '@material-ui/core/SnackbarContent';
 import WarningIcon from '@material-ui/icons/Warning';
+import { WithStyles } from '@material-ui/core';
 import { withStylesDeco } from '../../helpers/util';
+import { PaginationModel } from './model';
 
 const variantIcon = {
     success: CheckCircleIcon,
@@ -19,7 +21,7 @@ const variantIcon = {
     info: InfoIcon,
 };
 
-const styles1 = theme => ({
+const styles = theme => ({
     success: {
         backgroundColor: green[600],
     },
@@ -45,25 +47,29 @@ const styles1 = theme => ({
     },
 });
 
-@withStylesDeco(styles1)
-export default class MySnackbar extends React.Component<{
-    classes?: any,
+type MySnackbarProps = {
     className?: any,
     message?: any,
     onClose?: (event) => void,
     variant?: 'success' | 'warning' | 'error' | 'info',
     autoHideDuration?: number,
-} & Partial<SnackbarOrigin>> {
-    state = {
-        open: true,
+} & Partial<SnackbarOrigin>;
+type InnerProps = MySnackbarProps & WithStyles<typeof styles> & {
+
+};
+
+@withStylesDeco(styles)
+export default class MySnackbar extends React.Component<MySnackbarProps> {
+    private get innerProps() {
+        return this.props as InnerProps;
     }
+    private model = new PaginationModel();
     private onClose = (event) => {
-        this.setState({ open: false }, () => {
-            this.props.onClose && this.props.onClose(event);
-        });
+        this.model.toggle(false);
+        this.props.onClose && this.props.onClose(event);
     }
     public render() {
-        const { classes, className, message, variant, ...other } = this.props;
+        const { classes, className, message, variant, ...other } = this.innerProps;
         const Icon = variantIcon[variant];
 
         return (
@@ -72,7 +78,7 @@ export default class MySnackbar extends React.Component<{
                     vertical: this.props.vertical || 'top',
                     horizontal: this.props.horizontal || 'center',
                 }}
-                open={this.state.open}
+                open={this.model.open}
                 autoHideDuration={this.props.autoHideDuration || 6000}
                 onClose={this.onClose}
             >
@@ -90,7 +96,7 @@ export default class MySnackbar extends React.Component<{
                             key="close"
                             aria-label="Close"
                             color="inherit"
-                            className={classes.close}
+                            //className={classes.close}
                             onClick={this.onClose}
                         >
                             <CloseIcon className={classes.icon} />

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import MySnackbar from '../modules/MySnackbar';
+import { MySnackbar } from '../components';
 export function msgNotice(msg: string, options?) {
     let body = document.body;
     let showDom = document.createElement("div");

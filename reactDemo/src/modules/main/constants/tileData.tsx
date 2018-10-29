@@ -3,20 +3,25 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
+import HomeIcon from '@material-ui/icons/Home';
 import DraftsIcon from '@material-ui/icons/Drafts';
 import StarIcon from '@material-ui/icons/Star';
 import SendIcon from '@material-ui/icons/Send';
 import MailIcon from '@material-ui/icons/Mail';
 import DeleteIcon from '@material-ui/icons/Delete';
 import ReportIcon from '@material-ui/icons/Report';
+import { History } from 'history';
 
-export const mailFolderListItems = (
-    <div>
-        <ListItem button>
+export const mailFolderListItems = (history: History<any>) => {
+    return (<div>
+        <ListItem button onClick={() => {
+            if (history.location.pathname != '/')
+                history.push('/');
+        }} >
             <ListItemIcon>
-                <InboxIcon />
+                <HomeIcon />
             </ListItemIcon>
-            <ListItemText primary="Inbox" />
+            <ListItemText primary="Home" />
         </ListItem>
         <ListItem button>
             <ListItemIcon>
@@ -36,8 +41,8 @@ export const mailFolderListItems = (
             </ListItemIcon>
             <ListItemText primary="Drafts" />
         </ListItem>
-    </div>
-);
+    </div>);
+};
 
 export const otherMailFolderListItems = (
     <div>
