@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { render } from 'react-dom';
+import { HashRouter as Router } from 'react-router-dom';
 import { configure } from 'mobx';
 import { Provider } from 'mobx-react';
 configure({ enforceActions: 'always' });
@@ -14,6 +15,8 @@ const store = {
 }
 render((
     <Provider {...store}>
-        <App />
+        <Router>
+            <App />
+        </Router>
     </Provider>
 ), document.getElementById('main'));

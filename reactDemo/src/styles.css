@@ -12,3 +12,11 @@ body {
     font-family: sans-serif;
     text-align: center;
 }
+
+a {
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
