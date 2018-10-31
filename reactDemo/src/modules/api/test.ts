@@ -1,20 +1,14 @@
-import { ApiModel } from './model';
+import { ApiModel, ApiConfigModel, ApiMethodConfigType } from './model';
+import { ListQueryRequest } from '.';
 
-type ListQueryRequest = {
-    pageIndex?: number,
-    pageSize?: number,
-}
-export class TestApi extends ApiModel {
-    constructor(host: string) {
-        super(host);
-    }
-
-    protected async request(url: string, method?: string, originResponse?: boolean) {
-        let result = await super.request(url, method);
-        if (!originResponse) {
-
-        }
-        return result;
+type TestApiMethod = { bookmarkQuery: ApiMethodConfigType };
+export class TestApi extends ApiModel<TestApiMethod> {
+    constructor(apiConfig: ApiConfigModel<TestApiMethod>) {
+        super(apiConfig, {
+            afterResponse: async (response) => {
+                return response;
+            }
+        });
     }
 
     async bookmarkQuery(opt?: { name?, url?, anyKey?} & ListQueryRequest) {
@@ -30,8 +24,7 @@ export class TestApi extends ApiModel {
             if (opt.anyKey == 'test')
                 throw new Error('test');
             if (opt.anyKey == 'request') {
-                let url = opt.url, method = 'get';
-                await this.request(url, method);
+                await this.requestByConfig(this.apiConfig.method.bookmarkQuery, { data: opt });
             }
             list = list.filter(ele => {
                 return (!opt.name || (opt.name && new RegExp(opt.name, 'i').test(ele.name)))
