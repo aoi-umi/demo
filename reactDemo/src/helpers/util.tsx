@@ -39,6 +39,10 @@ export function extend(...args) {
     return res;
 }
 
+export function clone<T>(obj: T): T {
+    return JSON.parse(JSON.stringify(obj));
+}
+
 export function withStylesDeco<ClassKey extends string, Options extends WithStylesOptions<ClassKey> = {}>(style, options?: Options) {
     return function <T extends { new(...args: any[]): {} }>(constructor: T) {
         return withStyles(style, options)(constructor as any) as any as T;
