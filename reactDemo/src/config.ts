@@ -7,10 +7,10 @@ export default {
             method: {
                 bookmarkQuery: {
                     url: '/bookmark/query',
-                    method: 'POST',
+                    method: 'get',
                     isUseDefault: false,
                     args: {
-                        host: 'http://localhost:6001',
+                        host: 'http://localhost:8000',
                     }
                 },
             }

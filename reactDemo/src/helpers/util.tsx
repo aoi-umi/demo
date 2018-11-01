@@ -53,6 +53,8 @@ export function withRouterDeco<T extends { new(...args: any[]): {} }>(constructo
     return withRouter(constructor as any) as any as T;
 }
 
-export function UniqueKey(key?: string) {
-    return Symbol(key) as any as string;
+export function error(e, code?) {
+    if (!(e instanceof Error))
+        e = new Error(e);
+    return e;
 }

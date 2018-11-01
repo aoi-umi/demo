@@ -9,6 +9,7 @@ import * as common from '../../helpers/common';
 import { MyList } from '../../components';
 import { BookmarkQueryModel } from './model';
 import { testApi } from '../api';
+import { ListModel } from '../../components/MyList';
 
 
 type InnerProps = RouteComponentProps<{ p1: string, p2: string }>;
@@ -39,11 +40,15 @@ export default class Bookmark extends React.Component {
                         id: 'anyKey'
                     }]}
                     queryModel={queryModel}
-                    onQueryClick={async (query: BookmarkQueryModel) => {
+                    onQueryClick={async (model: ListModel<BookmarkQueryModel>) => {
+                        let query = model.query;
+                        let page = model.page;
                         let data = await testApi.bookmarkQuery({
                             name: query.name,
                             url: query.url,
-                            anyKey: query.anyKey
+                            anyKey: query.anyKey,
+                            pageIndex: page.pageIndex + 1,
+                            pageSize: page.pageSize,
                         });
                         return data;
                     }}

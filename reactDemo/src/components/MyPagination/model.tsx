@@ -1,5 +1,6 @@
 
 import { observable, action, runInAction } from 'mobx';
+type onPageChangeHandler = () => any;
 export class PaginationModel {
     @observable
     pageIndex: number;
@@ -10,8 +11,16 @@ export class PaginationModel {
     totalPage: number;
     @observable
     total: number;
-    constructor() {
+
+    onPageChange?: onPageChangeHandler;
+    constructor(opt?: {
+        onPageChange?: onPageChangeHandler;
+    }) {
         this.init();
+        if (opt) {
+            if (opt.onPageChange)
+                this.onPageChange = opt.onPageChange
+        }
     }
     @action
     init = () => {
@@ -28,8 +37,10 @@ export class PaginationModel {
     }
     @action
     setPage = (page: number) => {
-        if (page >= 0)
+        if (page >= 0) {
             this.pageIndex = page;
+            this.onPageChange && this.onPageChange();
+        }
     }
     @action
     setPageSize = (pageSize: number | string) => {
