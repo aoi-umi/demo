@@ -26,7 +26,7 @@ export abstract class QueryModel {
     }
 }
 
-export type QueryDataType = { list: any[], total: number };
+export type QueryDataType = { rows: any[], total: number };
 export type QueryResult = {
     success?: boolean;
     data?: QueryDataType;

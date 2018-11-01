@@ -50,6 +50,7 @@ export default class MyList extends React.Component<ListProps> {
         super(props);
         let { labelNoData, queryModel } = this.innerProps;
         this.listModel.query = queryModel;
+        this.listModel.page.onPageChange = this.onQuery.bind(this);
         if (labelNoData)
             this.labelNoData = labelNoData;
         this.onQuery();
@@ -60,7 +61,7 @@ export default class MyList extends React.Component<ListProps> {
             success: false,
         }
         try {
-            result.data = await this.props.onQueryClick(this.listModel.query);
+            result.data = await this.props.onQueryClick(this.listModel);
             result.success = true;
         } catch (e) {
             result.msg = e.message;
@@ -79,12 +80,12 @@ export default class MyList extends React.Component<ListProps> {
             if (!listModel.result.success)
                 msg = listModel.result.msg || 'Query Fail';
             else if (listModel.result.success) {
-                if (!listModel.result.data.list.length)
+                if (!listModel.result.data.rows.length)
                     msg = labelNoData;
                 else {
                     let list = [];
                     let idx = 0;
-                    for (let ele of listModel.result.data.list) {
+                    for (let ele of listModel.result.data.rows) {
                         list.push(this.innerProps.onRowRender(ele, idx++));
                     }
                     return list;
