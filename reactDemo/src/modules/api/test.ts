@@ -17,7 +17,7 @@ export class TestApi extends ApiModel<TestApiMethod> {
     async bookmarkQuery(opt?: { name?, url?, anyKey?} & ListQueryRequest) {
         return this.requestByConfig(this.apiConfig.method.bookmarkQuery, { data: opt });
         //test
-        let rows = [
+        let list = [
             { name: 'github', url: '//github.com' },
             { name: 'stackoverflow', url: '//stackoverflow.com' },
             { name: 'material-ui', url: '//material-ui.com' },
@@ -30,13 +30,13 @@ export class TestApi extends ApiModel<TestApiMethod> {
             if (opt.anyKey == 'request') {
                 await this.requestByConfig(this.apiConfig.method.bookmarkQuery, { data: opt });
             }
-            rows = rows.filter(ele => {
+            list = list.filter(ele => {
                 return (!opt.name || (opt.name && new RegExp(opt.name, 'i').test(ele.name)))
                     && (!opt.url || (opt.url && new RegExp(opt.url, 'i').test(ele.url)))
                     && (!opt.anyKey || (opt.anyKey && (new RegExp(opt.anyKey, 'i').test(ele.name) || new RegExp(opt.anyKey, 'i').test(ele.url))));
             });
         }
-        return { rows, total: 50 };
+        return { list: list, total: 50 };
     }
 }
 

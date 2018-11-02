@@ -47,8 +47,8 @@ export default class Bookmark extends React.Component {
                             name: query.name,
                             url: query.url,
                             anyKey: query.anyKey,
-                            pageIndex: page.pageIndex + 1,
-                            pageSize: page.pageSize,
+                            page: page.pageIndex + 1,
+                            rows: page.pageSize,
                         });
                         return data;
                     }}

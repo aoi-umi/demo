@@ -115,6 +115,7 @@ const styles = (theme: Theme) => createStyles({
         backgroundColor: theme.palette.background.default,
         padding: 4 * theme.spacing.unit,
         marginTop: theme.mixins.toolbar.minHeight,
+        overflow: 'auto'
     },
 });
 
