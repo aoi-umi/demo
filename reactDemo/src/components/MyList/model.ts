@@ -1,6 +1,7 @@
 
 import { observable, action, runInAction } from 'mobx';
 import { PaginationModel } from '../MyPagination';
+import { loadavg } from 'os';
 export class ListModel<T extends QueryModel> {
     page = new PaginationModel();
 
@@ -9,8 +10,17 @@ export class ListModel<T extends QueryModel> {
     @observable
     result: QueryResult;
 
+    @observable
+    loading: boolean;
+
+    @action
+    load() {
+        this.loading = true;
+    }
+
     @action
     changeResult(value: QueryResult) {
+        this.loading = false;
         this.result = value;
         if (value.success)
             this.page.setTotal(value.data.total);

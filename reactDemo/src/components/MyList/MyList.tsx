@@ -1,18 +1,21 @@
 import * as React from "react";
+
+import { WithStyles } from "@material-ui/core";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableFooter from "@material-ui/core/TableFooter";
 import TableRow from "@material-ui/core/TableRow";
+import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
 import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
-import Toolbar from '@material-ui/core/Toolbar';
 import Grid from '@material-ui/core/Grid';
 import FormControl from '@material-ui/core/FormControl';
-import FilledInput from '@material-ui/core/FilledInput';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import TextField from '@material-ui/core/TextField';
+
 import { observer, inject } from 'mobx-react';
-import { WithStyles, TableCell } from "@material-ui/core";
+
 import MyPagination, { PaginationModel } from '../MyPagination';
 import { ListModel, QueryDataType, QueryResult, QueryModel } from "./model";
 import { withStylesDeco } from "../../helpers/util";
@@ -56,11 +59,14 @@ export default class MyList extends React.Component<ListProps> {
         this.onQuery();
     }
 
-    async onQuery() {
+    async onQuery(page?: number) {
         let result: QueryResult = {
             success: false,
         }
+        if (page !== undefined)
+            this.listModel.page.setPage(page);
         try {
+            this.listModel.load();
             result.data = await this.props.onQueryClick(this.listModel);
             result.success = true;
         } catch (e) {
@@ -75,7 +81,16 @@ export default class MyList extends React.Component<ListProps> {
 
     private contentRender() {
         let { listModel, labelNoData } = this;
-        if (listModel.result) {
+        if (listModel.loading) {
+            return (
+                <TableRow title={'loading'}>
+                    <TableCell colSpan={100} style={{ textAlign: 'center' }}>
+                        <CircularProgress />
+                    </TableCell>
+                </TableRow>
+            );
+        }
+        else if (listModel.result) {
             let msg: any;
             if (!listModel.result.success)
                 msg = listModel.result.msg || 'Query Fail';
@@ -144,7 +159,7 @@ export default class MyList extends React.Component<ListProps> {
                         </Grid>
                         <Grid item>
                             <Button variant="contained" onClick={() => {
-                                this.onQuery();
+                                this.onQuery(0);
                             }}>查询</Button>
                         </Grid>
                     </Grid>
@@ -158,8 +173,6 @@ export default class MyList extends React.Component<ListProps> {
                             {
                                 this.contentRender()
                             }
-                            <TableRow title={'loading'}>
-                            </TableRow>
                         </TableBody>
                         <TableFooter>
                             <TableRow>
@@ -172,3 +185,4 @@ export default class MyList extends React.Component<ListProps> {
         )
     }
 }
+

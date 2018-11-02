@@ -19,6 +19,10 @@ export function request(options: AxiosRequestConfig) {
         delete options.headers;
     }
     opt = extend(opt, options);
+    
+    if (opt.method.toLowerCase() == 'get')
+        opt.params = opt.data;
+
     return axios.request(opt).then(t => {
         return t.data;
     });
