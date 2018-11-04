@@ -123,7 +123,7 @@ export default class MyList extends React.Component<ListProps> {
                     <Grid container item spacing={16}>
                         {queryRows && queryRows.map((ele, idx) => {
                             return (<Grid item key={idx} xs={12} sm={4} md={3}>
-                                <FormControl variant="filled" fullWidth={true}>
+                                <FormControl fullWidth={true}>
                                     <TextField
                                         variant="outlined"
                                         InputLabelProps={{

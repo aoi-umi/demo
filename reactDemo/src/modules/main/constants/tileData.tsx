@@ -12,7 +12,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import ReportIcon from '@material-ui/icons/Report';
 import { History } from 'history';
 
-export const mailFolderListItems = (history: History<any>) => {
+export const mailFolderListItems = (history: History) => {
     return (<div>
         <ListItem button onClick={() => {
             if (history.location.pathname != '/')

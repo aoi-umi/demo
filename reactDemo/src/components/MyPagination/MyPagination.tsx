@@ -171,7 +171,7 @@ class TablePaginationActions extends React.Component<PaginationActionsProps> {
                 <TextField
                     variant="outlined"
                     InputLabelProps={{
-                        shrink: true,
+                        shrink: false,
                     }}
                     style={{ width: 55, height: 30, verticalAlign: 'middle' }}
                     onChange={(e) => {
