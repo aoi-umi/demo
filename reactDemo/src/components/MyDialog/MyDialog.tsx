@@ -14,8 +14,10 @@ export type MyDialogButtonType = {
     text: string;
     type?: string;
 }
+export type MyDialogType = 'alert' | 'confirm' | 'loading';
 type MyDialogProps = {
     title?: string;
+    type?: MyDialogType;
     children: React.ReactNode;
     onClose?: (event, type) => void,
     btnList?: MyDialogButtonType[]
@@ -27,8 +29,16 @@ export default class MyDialog extends React.Component<MyDialogProps> {
     private btnList: MyDialogButtonType[];
     constructor(props) {
         super(props);
-        this.btnList = this.props.btnList || [{ text: '确认' }];
+        let type = this.props.type || 'alert';
+        this.btnList = this.props.btnList || {
+            loading: [],
+            alert: [{ text: '确认', type: 'accept' }],
+            confirm: [{ text: '取消', type: 'cancel' }, { text: '确认', type: 'accept' }]
+        }[type];
 
+    }
+    close() {
+        this.handleClose(null);
     }
     private handleClose = (event, type?: string) => {
         this.model.toggle(false);
@@ -42,6 +52,8 @@ export default class MyDialog extends React.Component<MyDialogProps> {
                 scroll={'paper'}
                 aria-labelledby="scroll-dialog-title"
                 fullWidth={true}
+                disableBackdropClick={true}
+                disableEscapeKeyDown={true}
             >
                 <DialogTitle id="scroll-dialog-title">{this.props.title || '提示'}</DialogTitle>
                 <DialogContent>

@@ -2,44 +2,45 @@ import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import * as Q from 'q';
 import { MySnackbar, MyDialog } from '../components';
-import { MyDialogButtonType } from '../components/MyDialog';
+import { MyDialogButtonType, MyDialogType } from '../components/MyDialog';
 import { extend } from './util';
 type MsgNoticeOptions = {
     type?: 'snackbar' | 'dialog',
+    dialogType?: MyDialogType;
     dialogBtnList?: MyDialogButtonType[]
 }
-export async function msgNotice(msg: React.ReactNode, options?: MsgNoticeOptions) {
+export function msgNotice(msg: React.ReactNode, options?: MsgNoticeOptions) {
     let defer = Q.defer();
+    let dom: any;
+    let body = document.body;
+    let showDom = document.createElement("div");
+    body.appendChild(showDom);
+    let close = (event?, type?) => {
+        ReactDom.unmountComponentAtNode(showDom);
+        body.removeChild(showDom);
+        defer.resolve(type);
+    }
     try {
         options = extend({
             type: 'snackbar'
         }, options);
-        let body = document.body;
-        let showDom = document.createElement("div");
-        body.appendChild(showDom);
-        let dom: any;
 
         if (options.type === 'snackbar') {
-            let close = (event) => {
-                //关闭动画结束后销毁
-                setTimeout(() => {
-                    ReactDom.unmountComponentAtNode(showDom);
-                    body.removeChild(showDom);
-                    defer.resolve();
-                }, 2000);
-            }
             dom =
                 <MySnackbar variant="warning"
-                    message={msg} onClose={close}>
+                    message={msg} onClose={(event) => {
+                        //关闭动画结束后销毁
+                        setTimeout(() => {
+                            close(event);
+                        }, 2000);
+                    }}>
                 </MySnackbar>;
         } else {
-            let close = (event, type) => {
-                ReactDom.unmountComponentAtNode(showDom);
-                body.removeChild(showDom);
-                defer.resolve(type);
-            }
             dom =
-                <MyDialog onClose={close} btnList={options.dialogBtnList}>
+                <MyDialog
+                    onClose={close}
+                    type={options.dialogType}
+                    btnList={options.dialogBtnList}>
                     {msg}
                 </MyDialog>;
         }
@@ -48,5 +49,8 @@ export async function msgNotice(msg: React.ReactNode, options?: MsgNoticeOptions
     } catch (e) {
         defer.reject(e);
     }
-    return defer.promise;
+    return {
+        close,
+        waitClose: () => defer.promise
+    }
 }
