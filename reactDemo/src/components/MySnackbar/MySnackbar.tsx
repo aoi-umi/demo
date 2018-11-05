@@ -11,8 +11,9 @@ import Snackbar, { SnackbarOrigin } from '@material-ui/core/Snackbar';
 import SnackbarContent from '@material-ui/core/SnackbarContent';
 import WarningIcon from '@material-ui/icons/Warning';
 import { WithStyles } from '@material-ui/core';
+import { observer, inject } from 'mobx-react';
 import { withStylesDeco } from '../../helpers/util';
-import { PaginationModel } from './model';
+import { MySnackbarModel } from './model';
 
 const variantIcon = {
     success: CheckCircleIcon,
@@ -54,24 +55,22 @@ type MySnackbarProps = {
     variant?: 'success' | 'warning' | 'error' | 'info',
     autoHideDuration?: number,
 } & Partial<SnackbarOrigin>;
-type InnerProps = MySnackbarProps & WithStyles<typeof styles> & {
-
-};
+type InnerProps = MySnackbarProps & WithStyles<typeof styles>;
 
 @withStylesDeco(styles)
+@observer
 export default class MySnackbar extends React.Component<MySnackbarProps> {
     private get innerProps() {
         return this.props as InnerProps;
     }
-    private model = new PaginationModel();
+    private model = new MySnackbarModel();
     private onClose = (event) => {
         this.model.toggle(false);
         this.props.onClose && this.props.onClose(event);
     }
-    public render() {
+    render() {
         const { classes, className, message, variant, ...other } = this.innerProps;
         const Icon = variantIcon[variant];
-
         return (
             <Snackbar
                 anchorOrigin={{

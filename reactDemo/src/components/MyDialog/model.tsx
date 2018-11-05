@@ -1,6 +1,6 @@
 
 import { observable, action, runInAction } from 'mobx';
-export class MySnackbarModel {
+export class MyDialogModel {
     @observable
     open: boolean;
     constructor() {

@@ -1,8 +1,7 @@
 
 import { observable, action, runInAction } from 'mobx';
 import { PaginationModel } from '../MyPagination';
-import { loadavg } from 'os';
-export class ListModel<T extends QueryModel> {
+export class ListModel<T extends QueryModel = QueryModel> {
     page = new PaginationModel();
 
     query: T;
@@ -12,6 +11,12 @@ export class ListModel<T extends QueryModel> {
 
     @observable
     loading: boolean;
+
+    constructor(query: T) {
+        runInAction(() => {
+            this.query = query;
+        });
+    }
 
     @action
     load() {
