@@ -29,7 +29,8 @@ type ListProps = {
     labelNoData?: React.ReactNode;
     onQueryClick: (query) => Promise<QueryDataType>;
     onRowRender: (ele, idx?: number) => any;
-    queryModel: QueryModel;
+    listModel: ListModel;
+    onAddClick?: () => any;
 }
 
 const styles = theme => ({
@@ -47,12 +48,12 @@ export default class MyList extends React.Component<ListProps> {
     private get innerProps() {
         return this.props as InnerProps;
     }
-    private listModel = new ListModel();
+    private listModel: ListModel;
     private labelNoData: React.ReactNode = 'No Data';
     constructor(props) {
         super(props);
-        let { labelNoData, queryModel } = this.innerProps;
-        this.listModel.query = queryModel;
+        let { labelNoData, listModel } = this.innerProps;
+        this.listModel = listModel;
         this.listModel.page.onPageChange = this.onQuery.bind(this);
         if (labelNoData)
             this.labelNoData = labelNoData;
@@ -73,6 +74,10 @@ export default class MyList extends React.Component<ListProps> {
             result.msg = e.message;
         }
         this.listModel.changeResult(result);
+    }
+
+    onAddClick = () => {
+        this.innerProps.onAddClick && this.innerProps.onAddClick();
     }
 
     onReset() {
@@ -161,6 +166,11 @@ export default class MyList extends React.Component<ListProps> {
                             <Button variant="contained" onClick={() => {
                                 this.onQuery(0);
                             }}>查询</Button>
+                        </Grid>
+                        <Grid item>
+                            <Button variant="contained" onClick={() => {
+
+                            }}>添加</Button>
                         </Grid>
                     </Grid>
                 </Grid>

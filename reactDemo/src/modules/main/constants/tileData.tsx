@@ -23,7 +23,10 @@ export const mailFolderListItems = (history: History) => {
             </ListItemIcon>
             <ListItemText primary="Home" />
         </ListItem>
-        <ListItem button>
+        <ListItem button onClick={() => {
+            if (history.location.pathname != '/test')
+                history.push('/test');
+        }}>
             <ListItemIcon>
                 <StarIcon />
             </ListItemIcon>

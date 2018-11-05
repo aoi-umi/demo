@@ -1,10 +1,15 @@
 import { ApiModel, ApiConfigModel, ApiMethodConfigType } from './model';
-import { ListQueryRequest } from '.';
+import { ListQueryRequest, ApiMethod } from '.';
 import { error } from '../../helpers/util';
 
-type TestApiMethod = { bookmarkQuery: ApiMethodConfigType };
+type TestApiMethod = ApiMethod<ApiMethodConfigType, {
+    bookmarkQuery,
+    bookmarkSave,
+    bookmarkDel,
+}>;
+export type TestApiConfigType = ApiConfigModel<TestApiMethod>;
 export class TestApi extends ApiModel<TestApiMethod> {
-    constructor(apiConfig: ApiConfigModel<TestApiMethod>) {
+    constructor(apiConfig: TestApiConfigType) {
         super(apiConfig, {
             afterResponse: async (response) => {
                 if (response.code != 0)
@@ -14,29 +19,16 @@ export class TestApi extends ApiModel<TestApiMethod> {
         });
     }
 
+    //#region bookmark 
     async bookmarkQuery(opt?: { name?, url?, anyKey?} & ListQueryRequest) {
         return this.requestByConfig(this.apiConfig.method.bookmarkQuery, { data: opt });
-        //test
-        let list = [
-            { name: 'github', url: '//github.com' },
-            { name: 'stackoverflow', url: '//stackoverflow.com' },
-            { name: 'material-ui', url: '//material-ui.com' },
-            { name: 'reactjs', url: '//reactjs.org' },
-            { name: 'npmjs', url: '//www.npmjs.com' },
-        ];
-        if (opt) {
-            if (opt.anyKey == 'test')
-                throw new Error('test');
-            if (opt.anyKey == 'request') {
-                await this.requestByConfig(this.apiConfig.method.bookmarkQuery, { data: opt });
-            }
-            list = list.filter(ele => {
-                return (!opt.name || (opt.name && new RegExp(opt.name, 'i').test(ele.name)))
-                    && (!opt.url || (opt.url && new RegExp(opt.url, 'i').test(ele.url)))
-                    && (!opt.anyKey || (opt.anyKey && (new RegExp(opt.anyKey, 'i').test(ele.name) || new RegExp(opt.anyKey, 'i').test(ele.url))));
-            });
-        }
-        return { list: list, total: 50 };
     }
+    async bookmarkSave(data) {
+        return this.requestByConfig(this.apiConfig.method.bookmarkSave, { data });
+    }
+    async bookmarkDel(_id: string) {
+        return this.requestByConfig(this.apiConfig.method.bookmarkDel, { data: { _id } });
+    }
+    //#endregion
 }
 
