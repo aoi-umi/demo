@@ -1,6 +1,6 @@
 
 import { observable, action, runInAction } from 'mobx';
-export class PaginationModel {
+export class MySnackbarModel {
     @observable
     open: boolean;
     constructor() {
@@ -8,7 +8,7 @@ export class PaginationModel {
     }
     @action
     init = () => {
-        this.open = false;
+        this.open = true;
     }
 
     @action
