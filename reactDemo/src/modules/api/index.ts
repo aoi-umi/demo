@@ -5,6 +5,10 @@ export type ListQueryRequest = {
     rows?: number,
 }
 
+export type ApiMethod<U, T> = {
+    [P in keyof T]: U
+}
+
 import { TestApi } from './test';
 export * from './test';
 

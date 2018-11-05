@@ -5,11 +5,11 @@ import TableCell from '@material-ui/core/TableCell';
 import Button from '@material-ui/core/Button';
 
 import { withRouterDeco } from '../../helpers/util';
-import * as common from '../../helpers/common';
 import { MyList } from '../../components';
 import { BookmarkQueryModel } from './model';
 import { testApi } from '../api';
 import { ListModel } from '../../components/MyList';
+import { msgNotice } from '../../helpers/common';
 
 
 type InnerProps = RouteComponentProps<{ p1: string, p2: string }>;
@@ -20,15 +20,38 @@ export default class Bookmark extends React.Component {
     private get innerProps() {
         return this.props as InnerProps;
     }
-    private queryModel = new BookmarkQueryModel();
+    private listModel: ListModel<BookmarkQueryModel>;
     constructor(props, context) {
         super(props, context);
         this.input = React.createRef();
+        this.listModel = new ListModel(new BookmarkQueryModel());
+    }
+
+    private showDetail = () => {
+        console.log('这里写新增/修改');
+    }
+
+    private onDelClick = async (_id: string) => {
+        let obj = msgNotice('确认删除?', { type: 'dialog', dialogType: 'confirm' });
+        let type = await obj.waitClose();
+        if (type == 'accept') {
+            let loading = msgNotice('删除中', { type: 'dialog', dialogType: 'loading' });
+            try {
+                await testApi.bookmarkDel(_id);
+                msgNotice('删除成功', { type: 'dialog', dialogType: 'alert' }).waitClose().then(e => {
+                    this.listModel.page.setPage(this.listModel.page.pageIndex);
+                });
+            } catch (e) {
+                msgNotice(`删除失败:${e.message}`, { type: 'dialog', dialogType: 'alert' });
+            } finally {
+                loading.close();
+            }
+        }
     }
 
     public render() {
         const { history, match } = this.innerProps;
-        const { queryModel } = this;
+        const { listModel } = this;
         return (
             <div>
                 <MyList
@@ -39,7 +62,7 @@ export default class Bookmark extends React.Component {
                     }, {
                         id: 'anyKey'
                     }]}
-                    queryModel={queryModel}
+                    listModel={listModel}
                     onQueryClick={async (model: ListModel<BookmarkQueryModel>) => {
                         let query = model.query;
                         let page = model.page;
@@ -56,6 +79,7 @@ export default class Bookmark extends React.Component {
                         <TableRow>
                             <TableCell>名字</TableCell>
                             <TableCell>url</TableCell>
+                            <TableCell>操作</TableCell>
                         </TableRow>
                     }
                     onRowRender={(ele, idx) => {
@@ -69,8 +93,20 @@ export default class Bookmark extends React.Component {
                                 <TableCell>
                                     {ele.url}
                                 </TableCell>
+                                <TableCell>
+                                    <Button onClick={() => {
+                                        this.showDetail();
+                                    }}>修改</Button>
+                                    <Button onClick={() => {
+                                        this.onDelClick(ele._id);
+                                    }}>删除</Button>
+                                </TableCell>
                             </TableRow>
                         );
+                    }}
+
+                    onAddClick={() => {
+                        this.showDetail();
                     }}
                 >
                 </MyList>

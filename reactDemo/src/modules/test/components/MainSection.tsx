@@ -5,6 +5,7 @@ import Input from '@material-ui/core/Input';
 import { observer, inject } from 'mobx-react';
 import { Test } from '../model';
 import { withRouterDeco } from '../../../helpers/util';
+import { msgNotice } from '../../../helpers/common';
 
 interface MainSectionProps {
 };
@@ -32,6 +33,14 @@ export default class MainSection extends React.Component<MainSectionProps> {
                 <Button onClick={() => { history.goBack() }}>back</Button>
                 <Input onChange={(e) => { test.input = e.target.value; }} defaultValue={test.input} />
                 <NavLink to="/test2">Test2</NavLink>
+                <Button onClick={() => {
+                    msgNotice('测试');
+                }}>msg notice</Button>
+                <Button onClick={() => {
+                    msgNotice('测试', { type: 'dialog', dialogBtnList: [{ text: '确认', type: 'accept' }] }).waitClose().then(t => {
+                        console.log(t);
+                    });
+                }}>msg notice</Button>
             </div>
         )
     }
