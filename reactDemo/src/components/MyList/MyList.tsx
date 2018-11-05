@@ -30,6 +30,7 @@ type ListProps = {
     onQueryClick: (query) => Promise<QueryDataType>;
     onRowRender: (ele, idx?: number) => any;
     queryModel: QueryModel;
+    onAddClick?: () => any;
 }
 
 const styles = theme => ({
@@ -73,6 +74,10 @@ export default class MyList extends React.Component<ListProps> {
             result.msg = e.message;
         }
         this.listModel.changeResult(result);
+    }
+
+    onAddClick = () => {
+        this.innerProps.onAddClick && this.innerProps.onAddClick();
     }
 
     onReset() {
@@ -161,6 +166,11 @@ export default class MyList extends React.Component<ListProps> {
                             <Button variant="contained" onClick={() => {
                                 this.onQuery(0);
                             }}>查询</Button>
+                        </Grid>
+                        <Grid item>
+                            <Button variant="contained" onClick={() => {
+
+                            }}>添加</Button>
                         </Grid>
                     </Grid>
                 </Grid>
