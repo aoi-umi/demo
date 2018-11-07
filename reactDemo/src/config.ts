@@ -1,19 +1,24 @@
-export default {
+import { TestApiConfigType } from "./modules/api";
+
+let config = {
     api: {
         test: {
             defaultArgs: {
-                host: 'http://localhost:3010',
+                host: 'http://localhost:8000',
             },
             method: {
                 bookmarkQuery: {
                     url: '/bookmark/query',
-                    method: 'get',
-                    isUseDefault: false,
-                    args: {
-                        host: 'http://localhost:8000',
-                    }
+                    method: 'GET',
+                },
+                bookmarkSave: {
+                    url: '/bookmark/save',
+                },
+                bookmarkDel: {
+                    url: '/bookmark/del',
                 },
             }
-        }
+        } as TestApiConfigType
     }
 }
+export default config;
