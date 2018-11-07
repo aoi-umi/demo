@@ -43,8 +43,10 @@ export default class MyPagination extends React.Component<PaginationProps> {
                 rowsPerPage={pageModel.pageSize}
                 onChangePage={(event, page) => {
                     pageModel.setPage(page);
-                }} onChangeRowsPerPage={(event) => {
+                }}
+                onChangeRowsPerPage={(event) => {
                     pageModel.setPageSize(event.target.value);
+                    pageModel.setPage(0);
                 }}
                 ActionsComponent={TablePaginationActions}
             >
@@ -59,6 +61,9 @@ const actionsStyles = theme => ({
         color: theme.palette.text.secondary,
         marginLeft: theme.spacing.unit * 2.5,
     },
+    totalText: {
+        marginLeft: theme.spacing.unit * 2.5
+    }
 });
 
 type PaginationActionsProps = {
@@ -120,6 +125,7 @@ class TablePaginationActions extends React.Component<PaginationActionsProps> {
         return (
             <div className={classes.root}>
                 <InputLabel>{page + 1}/{totalPage + 1}</InputLabel>
+                <InputLabel className={classes.totalText}>共{count}条</InputLabel>
                 <IconButton
                     onClick={this.handleFirstPageButtonClick}
                     disabled={page === 0}

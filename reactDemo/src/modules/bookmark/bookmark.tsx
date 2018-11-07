@@ -38,9 +38,16 @@ export default class Bookmark extends React.Component {
             let loading = msgNotice('删除中', { type: 'dialog', dialogType: 'loading' });
             try {
                 await testApi.bookmarkDel(_id);
-                msgNotice('删除成功', { type: 'dialog', dialogType: 'alert' }).waitClose().then(e => {
+                let closeType = await msgNotice('删除成功', {
+                    type: 'dialog', dialogBtnList: [{
+                        text: '刷新', type: 'refresh'
+                    }, {
+                        text: '关闭'
+                    }]
+                }).waitClose();
+                if (closeType == 'refresh') {
                     this.listModel.page.setPage(this.listModel.page.pageIndex);
-                });
+                }
             } catch (e) {
                 msgNotice(`删除失败:${e.message}`, { type: 'dialog', dialogType: 'alert' });
             } finally {
