@@ -6,10 +6,11 @@ import { Provider } from 'mobx-react';
 configure({ enforceActions: 'always' });
 
 import './styles.css';
+import config from './config';
 import App from './modules/main/components/App';
 import { Test } from './modules/test/model';
 
-document.title = 'Title';
+document.title = config.title;
 const store = {
     test: new Test()
 }

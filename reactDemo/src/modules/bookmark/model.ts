@@ -1,8 +1,8 @@
 
 import { observable, action, runInAction } from 'mobx';
 
-import { QueryModel } from '../../components/MyList';
-export class BookmarkQueryModel extends QueryModel {
+import { Model } from '../../components/MyList';
+export class BookmarkQueryModel extends Model {
     @observable
     name: string;
     @observable
@@ -15,5 +15,22 @@ export class BookmarkQueryModel extends QueryModel {
         this.name = '';
         this.url = '';
         this.anyKey = '';
+    }
+}
+
+
+export class BookmarkDetailModel extends Model {
+    @observable
+    _id: string;
+    @observable
+    name: string;
+    @observable
+    url: string;
+
+    @action
+    init(detail?) {
+        ['_id', 'name', 'url'].forEach(key => {
+            this[key] = (detail && detail[key]) || '';
+        });
     }
 }

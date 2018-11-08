@@ -1,7 +1,7 @@
 
 import { observable, action, runInAction } from 'mobx';
 import { PaginationModel } from '../MyPagination';
-export class ListModel<T extends QueryModel = QueryModel> {
+export class ListModel<T extends Model = Model> {
     page = new PaginationModel();
 
     query: T;
@@ -33,7 +33,10 @@ export class ListModel<T extends QueryModel = QueryModel> {
 
 }
 
-export abstract class QueryModel {
+export abstract class Model {
+    constructor() {
+        this.init();
+    }
     abstract init(): void;
     @action
     changeValue(key: string, value: any) {

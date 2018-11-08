@@ -51,6 +51,7 @@ const styles = theme => ({
 type MySnackbarProps = {
     className?: any,
     message?: any,
+    noClose?: boolean,
     onClose?: (event) => void,
     variant?: 'success' | 'warning' | 'error' | 'info',
     autoHideDuration?: number,
@@ -69,7 +70,7 @@ export default class MySnackbar extends React.Component<MySnackbarProps> {
         this.props.onClose && this.props.onClose(event);
     }
     render() {
-        const { classes, className, message, variant, ...other } = this.innerProps;
+        const { classes, className, message, variant, noClose } = this.innerProps;
         const Icon = variantIcon[variant];
         return (
             <Snackbar
@@ -91,15 +92,17 @@ export default class MySnackbar extends React.Component<MySnackbarProps> {
                         </span>
                     }
                     action={[
-                        <IconButton
-                            key="close"
-                            aria-label="Close"
-                            color="inherit"
-                            //className={classes.close}
-                            onClick={this.onClose}
-                        >
-                            <CloseIcon className={classes.icon} />
-                        </IconButton>,
+                        noClose ? null : (
+                            <IconButton
+                                key="close"
+                                aria-label="Close"
+                                color="inherit"
+                                //className={classes.close}
+                                onClick={this.onClose}
+                            >
+                                <CloseIcon className={classes.icon} />
+                            </IconButton>
+                        ),
                     ]}
                 />
             </Snackbar>

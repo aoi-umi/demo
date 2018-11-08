@@ -6,6 +6,8 @@ import { MyDialogButtonType, MyDialogType } from '../components/MyDialog';
 import { extend } from './util';
 type MsgNoticeOptions = {
     type?: 'snackbar' | 'dialog',
+    noClose?: boolean;
+    dialogTitle?: string;
     dialogType?: MyDialogType;
     dialogBtnList?: MyDialogButtonType[]
 }
@@ -15,10 +17,12 @@ export function msgNotice(msg: React.ReactNode, options?: MsgNoticeOptions) {
     let body = document.body;
     let showDom = document.createElement("div");
     body.appendChild(showDom);
-    let close = (event?, type?) => {
-        ReactDom.unmountComponentAtNode(showDom);
-        body.removeChild(showDom);
-        defer.resolve(type);
+    let close = (event?, data?: MyDialogButtonType) => {
+        if (!data || !data.noClose) {
+            ReactDom.unmountComponentAtNode(showDom);
+            body.removeChild(showDom);
+        }
+        defer.resolve(data && data.type);
     }
     try {
         options = extend({
@@ -28,7 +32,9 @@ export function msgNotice(msg: React.ReactNode, options?: MsgNoticeOptions) {
         if (options.type === 'snackbar') {
             dom =
                 <MySnackbar variant="warning"
-                    message={msg} onClose={(event) => {
+                    message={msg}
+                    noClose={options.noClose}
+                    onClose={(event) => {
                         //关闭动画结束后销毁
                         setTimeout(() => {
                             close(event);
@@ -38,7 +44,9 @@ export function msgNotice(msg: React.ReactNode, options?: MsgNoticeOptions) {
         } else {
             dom =
                 <MyDialog
+                    noClose={options.noClose}
                     onClose={close}
+                    title={options.dialogTitle}
                     type={options.dialogType}
                     btnList={options.dialogBtnList}>
                     {msg}

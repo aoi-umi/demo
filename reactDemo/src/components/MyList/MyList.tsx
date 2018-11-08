@@ -17,7 +17,7 @@ import TextField from '@material-ui/core/TextField';
 import { observer, inject } from 'mobx-react';
 
 import MyPagination, { PaginationModel } from '../MyPagination';
-import { ListModel, QueryDataType, QueryResult, QueryModel } from "./model";
+import { ListModel, QueryDataType, QueryResult, Model } from "./model";
 import { withStylesDeco } from "../../helpers/util";
 type ListProps = {
     queryRows?: {
@@ -168,9 +168,7 @@ export default class MyList extends React.Component<ListProps> {
                             }}>查询</Button>
                         </Grid>
                         <Grid item>
-                            <Button variant="contained" onClick={() => {
-
-                            }}>添加</Button>
+                            <Button variant="contained" onClick={this.onAddClick}>添加</Button>
                         </Grid>
                     </Grid>
                 </Grid>
