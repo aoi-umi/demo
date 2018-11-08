@@ -1,6 +1,8 @@
+import { ApiConfigModel, ApiMethodConfigType } from "./modules/api/model";
 import { TestApiConfigType } from "./modules/api";
 
 let config = {
+    title: '开发',
     api: {
         test: {
             defaultArgs: {
