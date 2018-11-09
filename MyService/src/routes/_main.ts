@@ -1,7 +1,7 @@
 import { Request, Response, Express } from 'express';
 import * as common from './_system/common';
 import * as util from './util';
-import { MyEnum, MyEnumInstance } from './_system/myEnum';
+import { Enum } from 'enum-ts';
 import * as auth from './_system/auth';
 import { authConfig } from './_system/auth';
 import * as cache from './_system/cache';
@@ -263,7 +263,7 @@ export let formatViewRes = function (option) {
     return opt;
 };
 
-export let myEnum = MyEnum.createInstance(enumDict, enumChangeDict);
+export let myEnum = Enum.createInstance(enumDict, enumChangeDict);
 
 export let init = function (opt: { viewPath: string }) {
     Date.prototype.toJSON = function () {
