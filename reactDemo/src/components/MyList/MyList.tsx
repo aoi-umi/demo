@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { WithStyles } from "@material-ui/core";
+import { WithStyles, Theme } from "@material-ui/core";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableFooter from "@material-ui/core/TableFooter";
@@ -33,7 +33,7 @@ type ListProps = {
     onAddClick?: () => any;
 }
 
-const styles = theme => ({
+const styles = (theme: Theme) => ({
     tableRoot: {
         marginTop: theme.spacing.unit * 3,
     },
@@ -173,15 +173,19 @@ export default class MyList extends React.Component<ListProps> {
                     </Grid>
                 </Grid>
                 <Paper className={classes.tableRoot}>
+                    <div style={{ overflowX: 'auto' }}>
+                        <Table>
+                            <TableHead>
+                                {header}
+                            </TableHead>
+                            <TableBody>
+                                {
+                                    this.contentRender()
+                                }
+                            </TableBody>
+                        </Table>
+                    </div>
                     <Table>
-                        <TableHead>
-                            {header}
-                        </TableHead>
-                        <TableBody>
-                            {
-                                this.contentRender()
-                            }
-                        </TableBody>
                         <TableFooter>
                             <TableRow>
                                 <MyPagination page={page}></MyPagination>

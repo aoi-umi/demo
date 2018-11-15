@@ -1,10 +1,11 @@
 import * as React from "react";
-import { WithStyles, TextField } from "@material-ui/core";
+import { WithStyles, Theme } from "@material-ui/core";
 import TablePagination from "@material-ui/core/TablePagination";
 import IconButton from "@material-ui/core/IconButton";
 import Button from "@material-ui/core/Button";
 import InputLabel from "@material-ui/core/InputLabel";
-import Input from "@material-ui/core/Input";
+import TextField from "@material-ui/core/TextField";
+import Grid from "@material-ui/core/Grid";
 
 import FirstPageIcon from "@material-ui/icons/FirstPage";
 import LastPageIcon from "@material-ui/icons/LastPage";
@@ -12,9 +13,9 @@ import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 
 import { observer, inject } from 'mobx-react';
+import { observable, action } from "mobx";
 import { PaginationModel } from "./model";
 import { withStylesDeco } from "../../helpers/util";
-import { observable, action } from "mobx";
 type PaginationProps = {
     page?: PaginationModel
 }
@@ -49,20 +50,25 @@ export default class MyPagination extends React.Component<PaginationProps> {
                     pageModel.setPage(0);
                 }}
                 ActionsComponent={TablePaginationActions}
-            >
-            </TablePagination>
+            />
         )
     }
 }
 
-const actionsStyles = theme => ({
+const actionsStyles = (theme: Theme) => ({
     root: {
         flexShrink: 0,
         color: theme.palette.text.secondary,
-        marginLeft: theme.spacing.unit * 2.5,
     },
     totalText: {
         marginLeft: theme.spacing.unit * 2.5
+    },
+    pageBtn:{
+        margin: 2,
+        padding: 5,
+        height: 25,
+        width: 25,
+        minWidth: 25,
     }
 });
 
@@ -121,24 +127,33 @@ class TablePaginationActions extends React.Component<PaginationActionsProps> {
         }
         if (page > maxPageCount && pageEnd - pageStart > maxPageCount) {
             pageStart = pageEnd - maxPageCount + 1;
-        }
+        }        
         return (
             <div className={classes.root}>
                 <InputLabel>{page + 1}/{totalPage + 1}</InputLabel>
                 <InputLabel className={classes.totalText}>共{count}条</InputLabel>
+
                 <IconButton
                     onClick={this.handleFirstPageButtonClick}
                     disabled={page === 0}
                     aria-label="First Page"
+                    className={classes.pageBtn}
                 >
-                    {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
+                    {theme.direction === 'rtl' ?
+                        <LastPageIcon className={classes.pageBtn} /> :
+                        <FirstPageIcon className={classes.pageBtn} />
+                    }
                 </IconButton>
                 <IconButton
                     onClick={this.handleBackButtonClick}
                     disabled={page === 0}
                     aria-label="Previous Page"
+                    className={classes.pageBtn}
                 >
-                    {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
+                    {theme.direction === 'rtl' ?
+                        <KeyboardArrowRight className={classes.pageBtn} /> :
+                        <KeyboardArrowLeft className={classes.pageBtn} />
+                    }
                 </IconButton>
                 {
                     (() => {
@@ -147,13 +162,15 @@ class TablePaginationActions extends React.Component<PaginationActionsProps> {
                             list.push(
                                 <Button
                                     key={i}
-                                    style={{ width: 'auto', minWidth: 20 }}
+                                    className={classes.pageBtn}
                                     color={page == i ? 'primary' : 'default'}
                                     onClick={
                                         (event) => {
                                             this.handlePageButtonClick(event, i);
                                         }
-                                    }>{i + 1}
+                                    }
+
+                                >{i + 1}
                                 </Button>
                             );
                         }
@@ -164,28 +181,39 @@ class TablePaginationActions extends React.Component<PaginationActionsProps> {
                     onClick={this.handleNextButtonClick}
                     disabled={page >= totalPage}
                     aria-label="Next Page"
+                    className={classes.pageBtn}
                 >
-                    {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
+                    {theme.direction === 'rtl' ?
+                        <KeyboardArrowLeft className={classes.pageBtn} /> :
+                        <KeyboardArrowRight className={classes.pageBtn} />}
                 </IconButton>
                 <IconButton
                     onClick={this.handleLastPageButtonClick}
                     disabled={page >= totalPage}
                     aria-label="Last Page"
+                    className={classes.pageBtn}
                 >
-                    {theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}
+                    {theme.direction === 'rtl' ?
+                        <FirstPageIcon className={classes.pageBtn} /> :
+                        <LastPageIcon className={classes.pageBtn} />}
                 </IconButton>
                 <TextField
                     variant="outlined"
                     InputLabelProps={{
                         shrink: false,
                     }}
-                    style={{ width: 55, height: 30, verticalAlign: 'middle' }}
+                    style={{ width: 55, verticalAlign: 'middle' }}
                     onChange={(e) => {
                         this.setInputPage(e.target.value);
                     }}
+                    inputProps={{
+                        style: {
+                            padding: '6px 14px'
+                        }
+                    }}
                 >
                 </TextField>
-                <Button onClick={(e) => {
+                <Button className={classes.pageBtn} onClick={(e) => {
                     let page = parseInt(this.inputPage);
                     this.handlePageButtonClick(e, page - 1);
                 }}>

@@ -66,15 +66,12 @@ export default class MyDialog extends React.Component<MyDialogProps> {
                         <Grid item>
                             {
                                 noClose ? null :
-                                    <IconButton style={{ padding: 0 }}>
-                                        <CloseIcon onClick={this.handleClose} />
+                                    <IconButton style={{ padding: 0 }} onClick={this.handleClose}>
+                                        <CloseIcon/>
                                     </IconButton>
                             }
                         </Grid>
                     </Grid>
-
-
-
                 </DialogTitle>
                 <DialogContent>
                     {this.props.children}

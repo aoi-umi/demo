@@ -4,6 +4,7 @@ import * as Q from 'q';
 import { MySnackbar, MyDialog } from '../components';
 import { MyDialogButtonType, MyDialogType } from '../components/MyDialog';
 import { extend } from './util';
+import { withCustomTheme } from '..';
 type MsgNoticeOptions = {
     type?: 'snackbar' | 'dialog',
     noClose?: boolean;
@@ -52,7 +53,7 @@ export function msgNotice(msg: React.ReactNode, options?: MsgNoticeOptions) {
                     {msg}
                 </MyDialog>;
         }
-
+        dom = withCustomTheme(dom);
         ReactDom.render(dom, showDom);
     } catch (e) {
         defer.reject(e);

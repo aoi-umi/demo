@@ -4,13 +4,16 @@ import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import ErrorIcon from '@material-ui/icons/Error';
 import InfoIcon from '@material-ui/icons/Info';
 import CloseIcon from '@material-ui/icons/Close';
+import WarningIcon from '@material-ui/icons/Warning';
+
+import { Theme } from '@material-ui/core';
 import green from '@material-ui/core/colors/green';
 import amber from '@material-ui/core/colors/amber';
 import IconButton from '@material-ui/core/IconButton';
 import Snackbar, { SnackbarOrigin } from '@material-ui/core/Snackbar';
 import SnackbarContent from '@material-ui/core/SnackbarContent';
-import WarningIcon from '@material-ui/icons/Warning';
 import { WithStyles } from '@material-ui/core';
+
 import { observer, inject } from 'mobx-react';
 import { withStylesDeco } from '../../helpers/util';
 import { MySnackbarModel } from './model';
@@ -22,7 +25,7 @@ const variantIcon = {
     info: InfoIcon,
 };
 
-const styles = theme => ({
+const styles = (theme: Theme) => ({
     success: {
         backgroundColor: green[600],
     },
