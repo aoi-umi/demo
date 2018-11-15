@@ -5,12 +5,21 @@ import TableCell from '@material-ui/core/TableCell';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
+import IconButton from '@material-ui/core/IconButton';
+import Chip from '@material-ui/core/Chip';
+
+import grey from '@material-ui/core/colors/grey';
+import blue from '@material-ui/core/colors/blue';
+
+import CloseIcon from '@material-ui/icons/Close';
+import AddIcon from '@material-ui/icons/Add';
+
 import { observer } from 'mobx-react';
 import { TextAlignProperty } from 'csstype';
 
 import { withRouterDeco, withStylesDeco } from '../../helpers/util';
 import { MyList } from '../../components';
-import { BookmarkQueryModel, BookmarkDetailModel } from './model';
+import { BookmarkQueryModel, BookmarkDetailModel, BookmarkShowTag } from './model';
 import { testApi } from '../api';
 import { ListModel } from '../../components/MyList';
 import { msgNotice } from '../../helpers/common';
@@ -25,14 +34,12 @@ type InnerProps = WithStyles<typeof styles> & {};
 @withRouterDeco
 @withStylesDeco(styles)
 export default class Bookmark extends React.Component {
-    private input: React.RefObject<HTMLInputElement>;
     private get innerProps() {
         return this.props as InnerProps;
     }
     private listModel: ListModel<BookmarkQueryModel>;
     constructor(props, context) {
         super(props, context);
-        this.input = React.createRef();
         this.listModel = new ListModel(new BookmarkQueryModel());
     }
 
@@ -129,17 +136,18 @@ export default class Bookmark extends React.Component {
                         </TableRow>
                     }
                     onRowRender={(ele, idx) => {
-                        return (
+                        let noBorder = { borderWidth: 0 };
+                        return ([
                             <TableRow key={idx}>
-                                <TableCell>
+                                <TableCell style={{ ...noBorder }}>
                                     <a href={ele.url} title={ele.url} target={'_blank'}>
                                         {ele.name}
                                     </a>
                                 </TableCell>
-                                <TableCell>
+                                <TableCell style={{ ...noBorder }}>
                                     {ele.url}
                                 </TableCell>
-                                <TableCell className={classes.operateCol}>
+                                <TableCell className={classes.operateCol} style={{ ...noBorder }}>
                                     <Button onClick={() => {
                                         this.showDetail(ele);
                                     }}>修改</Button>
@@ -147,8 +155,15 @@ export default class Bookmark extends React.Component {
                                         this.onDelClick(ele._id);
                                     }}>删除</Button>
                                 </TableCell>
+                            </TableRow>,
+                            <TableRow key={idx + 'tag'}>
+                                <TableCell colSpan={20}>
+                                    {ele.tagList && ele.tagList.map((ele, idx) => {
+                                        return renderBookmarkTag(ele, idx);
+                                    })}
+                                </TableCell>
                             </TableRow>
-                        );
+                        ]);
                     }}
 
                     onAddClick={() => {
@@ -167,6 +182,41 @@ type DetailProps = {
     onSaveSuccess?: BookmarkDetailOnSaveSuccess;
 }
 
+function renderBookmarkTag(tag: BookmarkShowTag | string, key?: any, onOperate?) {
+    let ele = tag as BookmarkShowTag;
+    let noOperate = false;
+    if (typeof ele === 'string') {
+        noOperate = true;
+        ele = {
+            tag: ele,
+            status: 0,
+            origStatus: 0
+        };
+    }
+    let del = ele.status == -1;
+    let add = ele.status == 1;
+    let color, deleteIcon;
+    if (!noOperate) {
+        if (del) {
+            color = 'secondary';
+            deleteIcon = <AddIcon />;
+        } else if (add) {
+            color = 'primary';
+        }
+    }
+    return (
+        <Chip key={key}
+            label={ele.tag}
+            onDelete={onOperate}
+            deleteIcon={deleteIcon}
+            color={color}
+            style={{
+                marginRight: 5,
+                marginBottom: 5
+            }}
+        />
+    );
+}
 @observer
 class BookmarkDetail extends React.Component<DetailProps>{
     private detailModel: BookmarkDetailModel;
@@ -181,15 +231,78 @@ class BookmarkDetail extends React.Component<DetailProps>{
     }
 
     private onSave = async () => {
+        let { detailModel } = this;
         let loading = msgNotice('保存中', { type: 'dialog', dialogType: 'loading' });
         try {
-            await testApi.bookmarkSave(this.detailModel);
+            let addTagList = [], delTagList = [];
+            detailModel.showTagList.map(ele => {
+                if (1 == ele.status) {
+                    addTagList.push(ele.tag);
+                } else if (0 == ele.origStatus && -1 == ele.status) {
+                    delTagList.push(ele.tag);
+                }
+            })
+            await testApi.bookmarkSave({
+                _id: detailModel._id,
+                name: detailModel.name,
+                url: detailModel.url,
+                addTagList,
+                delTagList,
+            });
             loading.close();
             await this.onSaveSuccess();
         } catch (e) {
             loading.close();
             msgNotice(`保存失败:${e.message}`, { type: 'dialog' });
         }
+    }
+
+    private onTagDelClick = (idx: number) => {
+        let { detailModel } = this;
+        let showTag = detailModel.showTagList[idx];
+        detailModel.changeShowTag({
+            ...showTag,
+            status: -1,
+        }, idx);
+    }
+
+    private onTagAddClick = (idx?: number) => {
+        let { detailModel } = this;
+        let showTag: BookmarkShowTag;
+        if (idx !== undefined) {
+            showTag = detailModel.showTagList[idx];
+        } else {
+            let tag = detailModel.tag && detailModel.tag.trim();
+            if (tag) {
+                idx = detailModel.showTagList.findIndex(ele => ele.tag == tag);
+                let existsShowTag = detailModel.showTagList[idx];
+                showTag = existsShowTag || {
+                    tag,
+                    status: 1,
+                    origStatus: 1,
+                };
+                detailModel.changeValue('tag', '');
+            }
+        }
+        if (showTag) {
+            detailModel.changeShowTag({
+                ...showTag,
+                status: showTag.origStatus
+            }, idx);
+        }
+    }
+
+    renderTag() {
+        let { detailModel } = this;
+        return detailModel.showTagList.map((ele, idx) => {
+            return renderBookmarkTag(ele, idx, () => {
+                if (ele.status == -1) {
+                    this.onTagAddClick(idx);
+                } else {
+                    this.onTagDelClick(idx);
+                }
+            });
+        })
     }
 
     render() {
@@ -212,6 +325,16 @@ class BookmarkDetail extends React.Component<DetailProps>{
                         value={detailModel.url}
                         onChange={(event) => { detailModel.changeValue('url', event.target.value); }}
                     />
+                </Grid>
+                <Grid item container>
+                    {this.renderTag()}
+                    <TextField
+                        label='标签'
+                        style={{ width: 80 }}
+                        value={detailModel.tag}
+                        onChange={(event) => { detailModel.changeValue('tag', event.target.value); }}
+                    />
+                    <Button onClick={() => { this.onTagAddClick(); }}>添加</Button>
                 </Grid>
                 <Grid item container justify={'flex-end'}>
                     <Button onClick={this.onSave}>保存</Button>

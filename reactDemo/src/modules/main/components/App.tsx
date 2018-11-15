@@ -159,7 +159,7 @@ export default class App extends React.Component<AppProps> {
                     >
                         <MenuIcon />
                     </IconButton>
-                    <Typography variant="title" color="inherit" noWrap>
+                    <Typography variant="h6" color="inherit" noWrap>
                         {dataSource.title}
                     </Typography>
                 </Toolbar>
@@ -195,10 +195,14 @@ export default class App extends React.Component<AppProps> {
         return (
             <Switch>
                 {routes.map((ele, i) => {
-                    return <Route key={i} exact={ele.exact === false ? false : true} path={ele.path || null} render={() => {
-                        dataSource.setTitle(ele.title);
-                        return ele.comp;
-                    }}></Route>
+                    return (
+                        <Route key={i}
+                            exact={ele.exact === false ? false : true}
+                            path={ele.path || null}
+                            render={() => {
+                                dataSource.setTitle(ele.title);
+                                return <div style={{ marginBottom: 10 }}>{ele.comp}</div>;
+                            }} />);
                 })}
             </Switch>
 
