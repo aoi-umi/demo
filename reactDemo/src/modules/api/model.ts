@@ -1,11 +1,11 @@
-import { AxiosRequestConfig } from 'axios';
+import { AxiosRequestConfig, AxiosResponse } from 'axios';
 
 import { request, extend, clone } from '../../helpers/util';
-type BeforeRequest = (request: AxiosRequestConfig) => Promise<any>;
-type AfterResponse = (response: any) => Promise<any>;
-export type RequestByConfigOption = {
+type BeforeRequest = (request: AxiosRequestConfig) => any;
+type AfterResponse<T=any> = (data: T, response: AxiosResponse<T>) => any;
+export type RequestByConfigOption<T> = {
     beforeRequest?: BeforeRequest;
-    afterResponse?: AfterResponse;
+    afterResponse?: AfterResponse<T>;
 } & AxiosRequestConfig;
 export class ApiModel<T = ApiMethodConfigType> {
     private beforeRequest: BeforeRequest;
@@ -21,7 +21,7 @@ export class ApiModel<T = ApiMethodConfigType> {
             this.afterResponse = opt.afterResponse;
     }
 
-    protected async requestByConfig<U = any>(config: ApiMethodConfigType, options: RequestByConfigOption) {
+    protected async requestByConfig<U = any>(config: ApiMethodConfigType, options: RequestByConfigOption<U>) {
         let cfg = clone<ApiMethodConfigType>(config as any);
         let args = clone(this.apiConfig.defaultArgs);
         if (!cfg.isUseDefault && cfg.args) {
@@ -38,9 +38,10 @@ export class ApiModel<T = ApiMethodConfigType> {
         if (beforeRequest)
             req = await beforeRequest(req);
         let response = await request(req);
+        let data = response.data;
         if (afterResponse)
-            response = await afterResponse(response);
-        return response as U;
+            data = await afterResponse(data, response);
+        return data as U;
     }
 }
 
