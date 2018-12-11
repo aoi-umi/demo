@@ -12,7 +12,7 @@ export function request(options: AxiosRequestConfig) {
             'Content-Type': 'application/json; charset=UTF-8',
             'Access-Control-Allow-Origin': '*'
         },
-        method: 'POST',
+        method: 'POST',        
     };
     if (options.headers) {
         opt.headers = extend({}, opt.headers, options.headers);
@@ -23,9 +23,7 @@ export function request(options: AxiosRequestConfig) {
     if (opt.method.toLowerCase() == 'get')
         opt.params = opt.data;
 
-    return axios.request(opt).then(t => {
-        return t.data;
-    });
+    return axios.request(opt);
 }
 
 export function extend(...args) {
