@@ -1,11 +1,20 @@
 import { TestApiConfigType } from "./modules/api";
 
-let config = {
+const env = location.hostname === 'www.umi-aoi.xyz' ? 'prod' : 'dev';
+const envConfig = {
+    prod: {
+        host: `//${location.hostname}/api`
+    },
+    dev: {
+        host: '//localhost:8000'
+    }
+};
+const config = {
     title: '开发',
     api: {
         test: {
             defaultArgs: {
-                host: 'http://localhost:8000',
+                host: `${envConfig[env].host}/devMgt`,
             },
             method: {
                 bookmarkQuery: {
