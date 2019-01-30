@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+        "outDir": "./dest",
+        "rootDir": "./src",
+        "typeRoots": [
+            "./node_modules/@types",
+            "./src/typings"
+        ],
+        "sourceMap": false,
+        //"noImplicitAny": false,
+        //"strict": false,
+        "module": "commonjs",
+        "target": "es2018",
+        "lib": [
+            "es6",
+            "es7",         
+        ],
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "strictPropertyInitialization": false,
+        "moduleResolution": "node",        
+    }
+}
