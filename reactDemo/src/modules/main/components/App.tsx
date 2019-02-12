@@ -113,7 +113,7 @@ const styles = (theme: Theme) => createStyles({
     content: {
         flexGrow: 1,
         backgroundColor: theme.palette.background.default,
-        padding: 4 * theme.spacing.unit,
+        padding: 2 * theme.spacing.unit,
         marginTop: theme.mixins.toolbar.minHeight,
         overflow: 'auto'
     },
