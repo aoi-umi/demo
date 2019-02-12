@@ -5,13 +5,8 @@ import TableCell from '@material-ui/core/TableCell';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
-import IconButton from '@material-ui/core/IconButton';
 import Chip from '@material-ui/core/Chip';
 
-import grey from '@material-ui/core/colors/grey';
-import blue from '@material-ui/core/colors/blue';
-
-import CloseIcon from '@material-ui/icons/Close';
 import AddIcon from '@material-ui/icons/Add';
 
 import { observer } from 'mobx-react';

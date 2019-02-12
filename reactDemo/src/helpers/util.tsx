@@ -1,6 +1,7 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import { withStyles } from '@material-ui/core/styles';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import withWidth, { WithWidthOptions } from '@material-ui/core/withWidth';
 import { withRouter } from 'react-router';
 
 export function request(options: AxiosRequestConfig) {
@@ -12,14 +13,14 @@ export function request(options: AxiosRequestConfig) {
             'Content-Type': 'application/json; charset=UTF-8',
             'Access-Control-Allow-Origin': '*'
         },
-        method: 'POST',        
+        method: 'POST',
     };
     if (options.headers) {
         opt.headers = extend({}, opt.headers, options.headers);
         delete options.headers;
     }
     opt = extend(opt, options);
-    
+
     if (opt.method.toLowerCase() == 'get')
         opt.params = opt.data;
 
@@ -53,6 +54,12 @@ export function withStylesDeco<ClassKey extends string, Options extends WithStyl
 
 export function withRouterDeco<T extends { new(...args: any[]): {} }>(constructor: T) {
     return withRouter(constructor as any) as any as T;
+}
+
+export function withWidthDeco(options?: WithWidthOptions) {
+    return function <T extends { new(...args: any[]): {} }>(constructor: T) {
+        return withWidth(options)(constructor as any) as any as T;
+    }
 }
 
 export function error(e, code?) {

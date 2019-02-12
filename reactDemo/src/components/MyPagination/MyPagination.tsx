@@ -1,11 +1,14 @@
 import * as React from "react";
 import { WithStyles, Theme } from "@material-ui/core";
+import { WithWidth, isWidthDown } from "@material-ui/core/withWidth";
 import TablePagination from "@material-ui/core/TablePagination";
 import IconButton from "@material-ui/core/IconButton";
 import Button from "@material-ui/core/Button";
 import InputLabel from "@material-ui/core/InputLabel";
 import TextField from "@material-ui/core/TextField";
-import Grid from "@material-ui/core/Grid";
+import TableCell from "@material-ui/core/TableCell";
+import MenuItem from "@material-ui/core/MenuItem";
+import Select from "@material-ui/core/Select";
 
 import FirstPageIcon from "@material-ui/icons/FirstPage";
 import LastPageIcon from "@material-ui/icons/LastPage";
@@ -15,13 +18,16 @@ import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import { observer, inject } from 'mobx-react';
 import { observable, action } from "mobx";
 import { PaginationModel } from "./model";
-import { withStylesDeco } from "../../helpers/util";
+import { withStylesDeco, withWidthDeco } from "../../helpers/util";
 type PaginationProps = {
-    page?: PaginationModel
+    page?: PaginationModel,
+    colSpan?: number,
 }
-type InnerProps = PaginationProps & {
+type InnerProps = PaginationProps & WithWidth & {
 
 };
+
+@withWidthDeco()
 @observer
 export default class MyPagination extends React.Component<PaginationProps> {
     private get innerProps() {
@@ -35,22 +41,23 @@ export default class MyPagination extends React.Component<PaginationProps> {
 
     render() {
         const pageModel = this.pageModel;
+        let isSm = isWidthDown('sm', this.innerProps.width);
+
         return (
-            <TablePagination
-                labelDisplayedRows={() => ''}
-                labelRowsPerPage={'每页大小:'}
-                count={pageModel.total}
-                page={pageModel.pageIndex}
-                rowsPerPage={pageModel.pageSize}
-                onChangePage={(event, page) => {
-                    pageModel.setPage(page);
-                }}
-                onChangeRowsPerPage={(event) => {
-                    pageModel.setPageSize(event.target.value);
-                    pageModel.setPage(0);
-                }}
-                ActionsComponent={TablePaginationActions}
-            />
+            <TableCell colSpan={this.innerProps.colSpan || 1000} style={{ textAlign: isSm ? 'center' : 'right' }}>
+                <TablePaginationActions
+                    count={pageModel.total}
+                    page={pageModel.pageIndex}
+                    rowsPerPage={pageModel.pageSize}
+                    onChangePage={(event, page) => {
+                        pageModel.setPage(page);
+                    }}
+                    onChangeRowsPerPage={(event) => {
+                        pageModel.setPageSize(event.target.value);
+                        pageModel.setPage(0);
+                    }}
+                ></TablePaginationActions>
+            </TableCell>
         )
     }
 }
@@ -63,25 +70,37 @@ const actionsStyles = (theme: Theme) => ({
     totalText: {
         marginLeft: theme.spacing.unit * 2.5
     },
-    pageBtn:{
+    pageBtn: {
         margin: 2,
         padding: 5,
         height: 25,
         width: 25,
         minWidth: 25,
-    }
+    },
+    goBtn: {
+        width: 60,
+    },
+    selectEmpty: {
+        marginRight: theme.spacing.unit * 2,
+        paddingLeft: theme.spacing.unit,
+        paddingRight: theme.spacing.unit,
+    },
 });
 
 type PaginationActionsProps = {
-}
-type ActionsInnerProps = PaginationActionsProps & WithStyles<typeof actionsStyles, true> & {
     page: number;
     count: number;
     rowsPerPage: number;
-    onChangePage?: (event, page: number) => void;
+    rowsPerPageList?: number[];
+    onChangePage: (event, page: number) => void;
+    onChangeRowsPerPage: (event) => void;
+}
+type ActionsInnerProps = PaginationActionsProps & WithStyles<typeof actionsStyles, true> & WithWidth & {
+
 };
 
 
+@withWidthDeco()
 @withStylesDeco(actionsStyles, { withTheme: true })
 @observer
 class TablePaginationActions extends React.Component<PaginationActionsProps> {
@@ -117,7 +136,12 @@ class TablePaginationActions extends React.Component<PaginationActionsProps> {
     };
 
     render() {
-        const { classes, count, page, rowsPerPage, theme } = this.innerProps;
+        const { classes, count, page, rowsPerPage, theme, width } = this.innerProps;
+        let rowsPerPageList = this.innerProps.rowsPerPageList;
+        if (!rowsPerPageList || !rowsPerPageList.length)
+            rowsPerPageList = [10, 20, 30];
+        let isSm = isWidthDown('sm', width);
+        let isXs = isWidthDown('xs', width);
         let totalPage = Math.ceil(count / rowsPerPage) - 1;
         let pageStart = 0, maxPageCount = 5;
         let pageEnd = totalPage;
@@ -127,11 +151,34 @@ class TablePaginationActions extends React.Component<PaginationActionsProps> {
         }
         if (page > maxPageCount && pageEnd - pageStart > maxPageCount) {
             pageStart = pageEnd - maxPageCount + 1;
-        }        
+        }
+        let newLine = <div style={{ height: 5 }}></div>;
         return (
             <div className={classes.root}>
+                {isSm ? null :
+                    <InputLabel className={classes.totalText}>每页大小:</InputLabel>
+                }
+                <Select
+                    value={this.innerProps.rowsPerPage}
+                    onChange={this.innerProps.onChangeRowsPerPage}
+                    displayEmpty
+                    className={classes.selectEmpty}
+                >
+                    {rowsPerPageList.map((ele, idx) => {
+                        return (
+                            <MenuItem key={idx} value={ele}>
+                                {ele}
+                            </MenuItem>
+                        );
+                    })}
+                </Select>
+
                 <InputLabel>{page + 1}/{totalPage + 1}</InputLabel>
                 <InputLabel className={classes.totalText}>共{count}条</InputLabel>
+                {
+                    isSm ?
+                        newLine : null
+                }
 
                 <IconButton
                     onClick={this.handleFirstPageButtonClick}
@@ -197,6 +244,10 @@ class TablePaginationActions extends React.Component<PaginationActionsProps> {
                         <FirstPageIcon className={classes.pageBtn} /> :
                         <LastPageIcon className={classes.pageBtn} />}
                 </IconButton>
+                {
+                    isXs ?
+                        newLine : null
+                }
                 <TextField
                     variant="outlined"
                     InputLabelProps={{
@@ -213,7 +264,7 @@ class TablePaginationActions extends React.Component<PaginationActionsProps> {
                     }}
                 >
                 </TextField>
-                <Button className={classes.pageBtn} onClick={(e) => {
+                <Button className={`${classes.pageBtn} ${classes.goBtn}`} onClick={(e) => {
                     let page = parseInt(this.inputPage);
                     this.handlePageButtonClick(e, page - 1);
                 }}>

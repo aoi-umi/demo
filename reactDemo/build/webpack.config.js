@@ -59,6 +59,8 @@ module.exports = {
         port: 9000,
         open: true,
         inline: true,
+        disableHostCheck: true,
+        host: '0.0.0.0',
     },
     plugins: [
         new htmlWebpackPlugin({
