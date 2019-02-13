@@ -1,6 +1,6 @@
 const path = require('path');
 var htmlWebpackPlugin = require('html-webpack-plugin');
-module.exports = {
+let config = {
     entry: {
         main: path.resolve(__dirname, '../src/index.tsx'),
     },
@@ -73,3 +73,6 @@ module.exports = {
     },
     devtool: 'cheap-module-source-map',
 };
+
+config.devServer.public = 'localhost:' + config.devServer.port;
+module.exports = config;

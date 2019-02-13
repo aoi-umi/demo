@@ -19,50 +19,8 @@ import { observer, inject } from 'mobx-react';
 import { observable, action } from "mobx";
 import { PaginationModel } from "./model";
 import { withStylesDeco, withWidthDeco } from "../../helpers/util";
-type PaginationProps = {
-    page?: PaginationModel,
-    colSpan?: number,
-}
-type InnerProps = PaginationProps & WithWidth & {
 
-};
-
-@withWidthDeco()
-@observer
-export default class MyPagination extends React.Component<PaginationProps> {
-    private get innerProps() {
-        return this.props as InnerProps;
-    }
-    private pageModel: PaginationModel;
-    constructor(props) {
-        super(props);
-        this.pageModel = this.props.page || new PaginationModel();
-    }
-
-    render() {
-        const pageModel = this.pageModel;
-        let isSm = isWidthDown('sm', this.innerProps.width);
-
-        return (
-            <TableCell colSpan={this.innerProps.colSpan || 1000} style={{ textAlign: isSm ? 'center' : 'right' }}>
-                <TablePaginationActions
-                    count={pageModel.total}
-                    page={pageModel.pageIndex}
-                    rowsPerPage={pageModel.pageSize}
-                    onChangePage={(event, page) => {
-                        pageModel.setPage(page);
-                    }}
-                    onChangeRowsPerPage={(event) => {
-                        pageModel.setPageSize(event.target.value);
-                        pageModel.setPage(0);
-                    }}
-                ></TablePaginationActions>
-            </TableCell>
-        )
-    }
-}
-
-const actionsStyles = (theme: Theme) => ({
+const styles = (theme: Theme) => ({
     root: {
         flexShrink: 0,
         color: theme.palette.text.secondary,
@@ -87,26 +45,28 @@ const actionsStyles = (theme: Theme) => ({
     },
 });
 
-type PaginationActionsProps = {
-    page: number;
-    count: number;
-    rowsPerPage: number;
+type PaginationProps = {
+    page?: PaginationModel;
+    colSpan?: number;
     rowsPerPageList?: number[];
-    onChangePage: (event, page: number) => void;
-    onChangeRowsPerPage: (event) => void;
 }
-type ActionsInnerProps = PaginationActionsProps & WithStyles<typeof actionsStyles, true> & WithWidth & {
+type InnerProps = PaginationProps & WithStyles<typeof styles, true> & WithWidth & {
 
 };
 
-
 @withWidthDeco()
-@withStylesDeco(actionsStyles, { withTheme: true })
+@withStylesDeco(styles, { withTheme: true })
 @observer
-class TablePaginationActions extends React.Component<PaginationActionsProps> {
+export default class MyPagination extends React.Component<PaginationProps> {
     private get innerProps() {
-        return this.props as ActionsInnerProps;
+        return this.props as InnerProps;
     }
+    private pageModel: PaginationModel;
+    constructor(props) {
+        super(props);
+        this.pageModel = this.props.page || new PaginationModel();
+    }
+
     @observable
     private inputPage: string;
     @action
@@ -114,53 +74,75 @@ class TablePaginationActions extends React.Component<PaginationActionsProps> {
         this.inputPage = val;
     }
     handlePageButtonClick = (event, page) => {
-        this.innerProps.onChangePage(event, page);
+        this.onChangePage(event, page);
     }
     handleFirstPageButtonClick = event => {
-        this.innerProps.onChangePage(event, 0);
+        this.onChangePage(event, 1);
     };
 
     handleBackButtonClick = event => {
-        this.innerProps.onChangePage(event, this.innerProps.page - 1);
+        this.onChangePage(event, this.pageModel.pageIndex - 1);
     };
 
     handleNextButtonClick = event => {
-        this.innerProps.onChangePage(event, this.innerProps.page + 1);
+        this.onChangePage(event, this.pageModel.pageIndex + 1);
     };
 
     handleLastPageButtonClick = event => {
-        this.innerProps.onChangePage(
+        this.onChangePage(
             event,
-            Math.max(0, Math.ceil(this.innerProps.count / this.innerProps.rowsPerPage) - 1),
+            Math.max(1, Math.ceil(this.pageModel.total / this.pageModel.pageSize)),
         );
     };
 
-    render() {
-        const { classes, count, page, rowsPerPage, theme, width } = this.innerProps;
+    onChangePage = (event, page: number) => {
+        let { pageModel } = this;
+        pageModel.setPage(page);
+    }
+
+    onChangeRowsPerPage = event => {
+        let { pageModel } = this;
+        pageModel.setPageSize(event.target.value);
+        pageModel.setPage(1);
+    }
+
+    renderPagination() {
+        const pageModel = this.pageModel;
+        let {
+            total: count,
+            pageIndex: page,
+            pageSize: rowsPerPage,
+        } = pageModel;
+        const { classes, theme, width, } = this.innerProps;
         let rowsPerPageList = this.innerProps.rowsPerPageList;
         if (!rowsPerPageList || !rowsPerPageList.length)
             rowsPerPageList = [10, 20, 30];
         let isSm = isWidthDown('sm', width);
         let isXs = isWidthDown('xs', width);
-        let totalPage = Math.ceil(count / rowsPerPage) - 1;
-        let pageStart = 0, maxPageCount = 5;
-        let pageEnd = totalPage;
-        if (totalPage - page > maxPageCount) {
-            pageStart = page;
-            pageEnd = page + maxPageCount;
+        let totalPage = Math.ceil(count / rowsPerPage);
+        let maxPageCount = isXs ? 3 : 5;
+        if (totalPage < maxPageCount)
+            maxPageCount = totalPage;
+        let size = Math.floor(maxPageCount / 2);
+        let pageStart = page - size, pageEnd = page + size;
+        if (pageStart < 1) {
+            pageStart = 1;
         }
-        if (page > maxPageCount && pageEnd - pageStart > maxPageCount) {
-            pageStart = pageEnd - maxPageCount + 1;
-        }
+        if (pageEnd > totalPage)
+            pageEnd = totalPage;
+
+        pageEnd = Math.min(pageStart + maxPageCount - 1, totalPage);
+        pageStart = Math.max(pageEnd - maxPageCount + 1, 1);
+
         let newLine = <div style={{ height: 5 }}></div>;
         return (
             <div className={classes.root}>
-                {isSm ? null :
-                    <InputLabel className={classes.totalText}>每页大小:</InputLabel>
+                {
+                    isSm ? null : <InputLabel className={classes.totalText}>每页大小:</InputLabel>
                 }
                 <Select
-                    value={this.innerProps.rowsPerPage}
-                    onChange={this.innerProps.onChangeRowsPerPage}
+                    value={rowsPerPage}
+                    onChange={this.onChangeRowsPerPage}
                     displayEmpty
                     className={classes.selectEmpty}
                 >
@@ -173,11 +155,10 @@ class TablePaginationActions extends React.Component<PaginationActionsProps> {
                     })}
                 </Select>
 
-                <InputLabel>{page + 1}/{totalPage + 1}</InputLabel>
+                <InputLabel>{page}/{totalPage}</InputLabel>
                 <InputLabel className={classes.totalText}>共{count}条</InputLabel>
                 {
-                    isSm ?
-                        newLine : null
+                    isSm ? newLine : null
                 }
 
                 <IconButton
@@ -217,7 +198,7 @@ class TablePaginationActions extends React.Component<PaginationActionsProps> {
                                         }
                                     }
 
-                                >{i + 1}
+                                >{i}
                                 </Button>
                             );
                         }
@@ -245,8 +226,7 @@ class TablePaginationActions extends React.Component<PaginationActionsProps> {
                         <LastPageIcon className={classes.pageBtn} />}
                 </IconButton>
                 {
-                    isXs ?
-                        newLine : null
+                    isXs ? newLine : null
                 }
                 <TextField
                     variant="outlined"
@@ -266,11 +246,21 @@ class TablePaginationActions extends React.Component<PaginationActionsProps> {
                 </TextField>
                 <Button className={`${classes.pageBtn} ${classes.goBtn}`} onClick={(e) => {
                     let page = parseInt(this.inputPage);
-                    this.handlePageButtonClick(e, page - 1);
+                    this.handlePageButtonClick(e, page);
                 }}>
                     Go
                 </Button>
             </div>
         );
+    }
+
+    render() {
+        let isSm = isWidthDown('sm', this.innerProps.width);
+
+        return (
+            <TableCell colSpan={this.innerProps.colSpan || 1000} style={{ textAlign: isSm ? 'center' : 'right' }}>
+                {this.renderPagination()}
+            </TableCell>
+        )
     }
 }
