@@ -24,7 +24,7 @@ export class PaginationModel {
     }
     @action
     init = () => {
-        this.pageIndex = 0;
+        this.pageIndex = 1;
         this.pageSize = 10;
         this.total = 0;
         this.totalPage = 0;
@@ -37,7 +37,7 @@ export class PaginationModel {
     }
     @action
     setPage = (page: number) => {
-        if (page >= 0) {
+        if (page >= 1) {
             this.pageIndex = page;
             this.onPageChange && this.onPageChange();
         }

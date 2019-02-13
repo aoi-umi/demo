@@ -164,7 +164,7 @@ export default class MyList extends React.Component<ListProps> {
                         </Grid>
                         <Grid item>
                             <Button variant="contained" onClick={() => {
-                                this.onQuery(0);
+                                this.onQuery(1);
                             }}>查询</Button>
                         </Grid>
                         <Grid item>
