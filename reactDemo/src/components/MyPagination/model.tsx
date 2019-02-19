@@ -37,7 +37,9 @@ export class PaginationModel {
         this.totalPage = this.pageSize ? total / this.pageSize : 0;
     }
     @action
-    setPage = (page: number) => {
+    setPage = (page: number | string) => {
+        page = parseInt(page as string);
+        page = isNaN(page) ? 1 : page;
         if (page >= 1) {
             this.pageIndex = page;
             this.onPageChange && this.onPageChange();
