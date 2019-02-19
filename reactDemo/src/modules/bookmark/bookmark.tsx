@@ -1,4 +1,6 @@
 import * as React from 'react';
+import { RouteComponentProps } from 'react-router';
+import { LocationListener } from 'history';
 import { WithStyles } from '@material-ui/core';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
@@ -11,6 +13,7 @@ import AddIcon from '@material-ui/icons/Add';
 
 import { observer } from 'mobx-react';
 import { TextAlignProperty } from 'csstype';
+import * as qs from 'query-string';
 
 import { withRouterDeco, withStylesDeco } from '../../helpers/util';
 import { MyList } from '../../components';
@@ -24,7 +27,7 @@ const styles = () => ({
         textAlign: 'center' as TextAlignProperty
     },
 });
-type InnerProps = WithStyles<typeof styles> & {};
+type InnerProps = RouteComponentProps<{}> & WithStyles<typeof styles> & {};
 
 @withRouterDeco
 @withStylesDeco(styles)
@@ -36,6 +39,39 @@ export default class Bookmark extends React.Component {
     constructor(props, context) {
         super(props, context);
         this.listModel = new ListModel(new BookmarkQueryModel());
+        this.innerProps.history.listen(this.onHistoryListen);
+    }
+
+    componentDidMount() {
+        this.onHistoryListen(this.innerProps.history.location, null);
+    }
+
+    private modelToObj(model?: ListModel<BookmarkQueryModel>) {
+        let { query, page } = model || this.listModel;
+        let queryObj = {
+            name: query.name,
+            url: query.url,
+            anyKey: query.anyKey,
+            page: page.pageIndex,
+            rows: page.pageSize,
+        };
+        return queryObj;
+    }
+
+    private objToModel(obj: any, model?: ListModel<BookmarkQueryModel>) {
+        if (!model)
+            model = this.listModel;
+        ['name', 'url', 'anyKey'].forEach(key => {
+            model.query.changeValue(key, obj[key] || '');
+        });
+        model.page.setPage(obj.page);
+        model.page.setPageSize(obj.rows);
+    }
+
+    private onHistoryListen: LocationListener = (location) => {
+        let obj = qs.parse(location.search);
+        this.objToModel(obj);
+        this.listModel.load();
     }
 
     private refresh = () => {
@@ -112,15 +148,11 @@ export default class Bookmark extends React.Component {
                     }]}
                     listModel={listModel}
                     onQueryClick={async (model: ListModel<BookmarkQueryModel>) => {
-                        let query = model.query;
-                        let page = model.page;
-                        let data = await testApi.bookmarkQuery({
-                            name: query.name,
-                            url: query.url,
-                            anyKey: query.anyKey,
-                            page: page.pageIndex,
-                            rows: page.pageSize,
-                        });
+                        let queryObj = this.modelToObj();
+                        this.innerProps.history.replace({ pathname: this.innerProps.location.pathname, search: qs.stringify(queryObj) });
+                    }}
+                    onQuery={async () => {
+                        let data = await testApi.bookmarkQuery(this.modelToObj());
                         return data;
                     }}
                     header={

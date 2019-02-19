@@ -27,7 +27,8 @@ type ListProps = {
     }[];
     header?: React.ReactNode;
     labelNoData?: React.ReactNode;
-    onQueryClick: (query) => Promise<QueryDataType>;
+    onQueryClick: (query) => any;
+    onQuery: () => Promise<QueryDataType>;
     onRowRender: (ele, idx?: number) => any;
     listModel: ListModel;
     onAddClick?: () => any;
@@ -54,10 +55,9 @@ export default class MyList extends React.Component<ListProps> {
         super(props);
         let { labelNoData, listModel } = this.innerProps;
         this.listModel = listModel;
-        this.listModel.page.onPageChange = this.onQuery.bind(this);
         if (labelNoData)
             this.labelNoData = labelNoData;
-        this.onQuery();
+        this.listModel.onQuery = this.onQuery.bind(this);
     }
 
     async onQuery(page?: number) {
@@ -67,8 +67,7 @@ export default class MyList extends React.Component<ListProps> {
         if (page !== undefined)
             this.listModel.page.setPage(page);
         try {
-            this.listModel.load();
-            result.data = await this.props.onQueryClick(this.listModel);
+            result.data = await this.props.onQuery();
             result.success = true;
         } catch (e) {
             result.msg = e.message;
@@ -95,20 +94,22 @@ export default class MyList extends React.Component<ListProps> {
                 </TableRow>
             );
         }
-        else if (listModel.result) {
-            let msg: any;
-            if (!listModel.result.success)
-                msg = listModel.result.msg || 'Query Fail';
-            else if (listModel.result.success) {
-                if (!listModel.result.data.rows.length)
-                    msg = labelNoData;
-                else {
-                    let list = [];
-                    let idx = 0;
-                    for (let ele of listModel.result.data.rows) {
-                        list.push(this.innerProps.onRowRender(ele, idx++));
+        else {
+            let msg: any = 'No Query';
+            if (listModel.result) {
+                if (!listModel.result.success)
+                    msg = listModel.result.msg || 'Query Fail';
+                else if (listModel.result.success) {
+                    if (!listModel.result.data.rows.length)
+                        msg = labelNoData;
+                    else {
+                        let list = [];
+                        let idx = 0;
+                        for (let ele of listModel.result.data.rows) {
+                            list.push(this.innerProps.onRowRender(ele, idx++));
+                        }
+                        return list;
                     }
-                    return list;
                 }
             }
             return (
@@ -142,7 +143,8 @@ export default class MyList extends React.Component<ListProps> {
                                         }}
                                         onKeyPress={(e) => {
                                             if (e.charCode == 13) {
-                                                this.onQuery();
+                                                this.listModel.page.setPage(1);
+                                                this.innerProps.onQueryClick(this.listModel);
                                             }
                                         }}
                                     >
@@ -164,7 +166,8 @@ export default class MyList extends React.Component<ListProps> {
                         </Grid>
                         <Grid item>
                             <Button variant="contained" onClick={() => {
-                                this.onQuery(1);
+                                this.listModel.page.setPage(1);
+                                this.innerProps.onQueryClick(this.listModel);
                             }}>查询</Button>
                         </Grid>
                         <Grid item>
@@ -188,12 +191,16 @@ export default class MyList extends React.Component<ListProps> {
                     <Table>
                         <TableFooter>
                             <TableRow>
-                                <MyPagination page={page}></MyPagination>
+                                <MyPagination
+                                    page={page}
+                                    onPageClick={() => {
+                                        this.innerProps.onQueryClick(this.listModel);
+                                    }}></MyPagination>
                             </TableRow>
                         </TableFooter>
                     </Table>
                 </Paper>
-            </div>
+            </div >
         )
     }
 }
