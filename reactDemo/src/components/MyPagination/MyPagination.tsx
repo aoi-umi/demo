@@ -49,6 +49,7 @@ type PaginationProps = {
     page?: PaginationModel;
     colSpan?: number;
     rowsPerPageList?: number[];
+    onPageClick?: (pageModel: PaginationModel) => void;
 }
 type InnerProps = PaginationProps & WithStyles<typeof styles, true> & WithWidth & {
 
@@ -98,6 +99,8 @@ export default class MyPagination extends React.Component<PaginationProps> {
     onChangePage = (event, page: number) => {
         let { pageModel } = this;
         pageModel.setPage(page);
+        if (this.innerProps.onPageClick)
+            this.innerProps.onPageClick(pageModel);
     }
 
     onChangeRowsPerPage = event => {
@@ -163,25 +166,19 @@ export default class MyPagination extends React.Component<PaginationProps> {
 
                 <IconButton
                     onClick={this.handleFirstPageButtonClick}
-                    disabled={page === 0}
+                    disabled={page === 1}
                     aria-label="First Page"
                     className={classes.pageBtn}
                 >
-                    {theme.direction === 'rtl' ?
-                        <LastPageIcon className={classes.pageBtn} /> :
-                        <FirstPageIcon className={classes.pageBtn} />
-                    }
+                    <FirstPageIcon className={classes.pageBtn} />
                 </IconButton>
                 <IconButton
                     onClick={this.handleBackButtonClick}
-                    disabled={page === 0}
+                    disabled={page === 1}
                     aria-label="Previous Page"
                     className={classes.pageBtn}
                 >
-                    {theme.direction === 'rtl' ?
-                        <KeyboardArrowRight className={classes.pageBtn} /> :
-                        <KeyboardArrowLeft className={classes.pageBtn} />
-                    }
+                    <KeyboardArrowLeft className={classes.pageBtn} />
                 </IconButton>
                 {
                     (() => {
@@ -211,9 +208,7 @@ export default class MyPagination extends React.Component<PaginationProps> {
                     aria-label="Next Page"
                     className={classes.pageBtn}
                 >
-                    {theme.direction === 'rtl' ?
-                        <KeyboardArrowLeft className={classes.pageBtn} /> :
-                        <KeyboardArrowRight className={classes.pageBtn} />}
+                    <KeyboardArrowRight className={classes.pageBtn} />
                 </IconButton>
                 <IconButton
                     onClick={this.handleLastPageButtonClick}
@@ -221,9 +216,7 @@ export default class MyPagination extends React.Component<PaginationProps> {
                     aria-label="Last Page"
                     className={classes.pageBtn}
                 >
-                    {theme.direction === 'rtl' ?
-                        <FirstPageIcon className={classes.pageBtn} /> :
-                        <LastPageIcon className={classes.pageBtn} />}
+                    <LastPageIcon className={classes.pageBtn} />
                 </IconButton>
                 {
                     isXs ? newLine : null
