@@ -22,10 +22,11 @@ export class PaginationModel {
                 this.onPageChange = opt.onPageChange
         }
     }
+    defaultPageSize = 10;
     @action
     init = () => {
         this.pageIndex = 1;
-        this.pageSize = 10;
+        this.pageSize = this.defaultPageSize;
         this.total = 0;
         this.totalPage = 0;
     }
@@ -44,6 +45,7 @@ export class PaginationModel {
     }
     @action
     setPageSize = (pageSize: number | string) => {
-        this.pageSize = parseInt(pageSize as string);
+        pageSize = parseInt(pageSize as string);
+        this.pageSize = isNaN(pageSize) ? this.defaultPageSize : pageSize;
     }
 }
