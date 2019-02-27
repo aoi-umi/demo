@@ -1,9 +1,10 @@
 import * as React from 'react';
 import classNames from 'classnames';
 
-import { WithStyles, createStyles, createGenerateClassName, jssPreset } from '@material-ui/core/styles';
+import { WithStyles, createStyles } from '@material-ui/core/styles';
 import { Theme } from '@material-ui/core';
 import Drawer from '@material-ui/core/Drawer';
+import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -14,11 +15,13 @@ import List from '@material-ui/core/List';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import { WithWidth, isWidthDown } from "@material-ui/core/withWidth";
+
 import { Route, Switch, RouteComponentProps } from 'react-router-dom';
 import { observer } from 'mobx-react';
 
 import { mailFolderListItems, otherMailFolderListItems } from '../constants/tileData';
-import { withStylesDeco, withRouterDeco } from '../../../helpers/util';
+import { withStylesDeco, withRouterDeco, withWidthDeco } from '../../../helpers/util';
 import { NotMatch } from '../../error';
 import {
     MainSection as TestMainSection,
@@ -70,6 +73,9 @@ const styles = (theme: Theme) => createStyles({
     appBarShift: {
         marginLeft: drawerWidth,
         width: `calc(100% - ${drawerWidth}px)`,
+        [theme.breakpoints.down('sm')]: {
+            width: '100%',
+        },
         transition: theme.transitions.create(['width', 'margin'], {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.enteringScreen,
@@ -82,6 +88,7 @@ const styles = (theme: Theme) => createStyles({
     hide: {
         display: 'none',
     },
+    //侧边栏
     drawerPaper: {
         position: 'relative',
         whiteSpace: 'nowrap',
@@ -97,9 +104,9 @@ const styles = (theme: Theme) => createStyles({
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
         }),
-        width: theme.spacing.unit * 7,
-        [theme.breakpoints.up('sm')]: {
-            width: theme.spacing.unit * 9,
+        width: theme.spacing.unit * 9,
+        [theme.breakpoints.down('sm')]: {
+            width: 0,
         },
     },
     toolbar: {
@@ -122,10 +129,11 @@ const styles = (theme: Theme) => createStyles({
 //#endregion 
 type AppProps = {
 }
-type InnerProps = RouteComponentProps<AppProps> & WithStyles<typeof styles, true> & {
+type InnerProps = RouteComponentProps<AppProps> & WithStyles<typeof styles, true> & WithWidth & {
     test: testModel.Test
 };
 
+@withWidthDeco()
 @withStylesDeco(styles, { withTheme: true })
 @withRouterDeco
 @observer
@@ -167,8 +175,41 @@ export default class App extends React.Component<AppProps> {
         );
     }
     renderMenu() {
-        const { classes, theme, history } = this.innerProps;
+        const { classes, theme, history, width } = this.innerProps;
         const { dataSource } = this;
+        let isSm = isWidthDown('sm', width);
+        let self = this;
+        function render() {
+            return (
+                <div>
+                    <div className={classes.toolbar}>
+                        <IconButton onClick={self.handleDrawerClose}>
+                            <ChevronLeftIcon />
+                        </IconButton>
+                    </div>
+                    <div onClick={() => {
+                        if (isSm)
+                            self.handleDrawerClose();
+                    }}>
+                        <Divider />
+                        <List>{mailFolderListItems(history)}</List>
+                        <Divider />
+                        <List>{otherMailFolderListItems}</List>
+                    </div>
+                </div>
+            );
+        }
+        if (isSm) {
+            return (
+                <SwipeableDrawer
+                    open={dataSource.open}
+                    onOpen={() => { }}
+                    onClose={this.handleDrawerClose}
+                >
+                    {render()}
+                </SwipeableDrawer>
+            )
+        }
         return (
             <Drawer
                 variant="permanent"
@@ -179,7 +220,7 @@ export default class App extends React.Component<AppProps> {
             >
                 <div className={classes.toolbar}>
                     <IconButton onClick={this.handleDrawerClose}>
-                        {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+                        <ChevronLeftIcon />
                     </IconButton>
                 </div>
                 <Divider />
