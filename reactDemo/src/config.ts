@@ -1,6 +1,6 @@
 import { TestApiConfigType } from "./modules/api";
 
-const env = location.hostname === 'www.umi-aoi.xyz' ? 'prod' : 'dev';
+const env = location.hostname.includes('umi-aoi.xyz') ? 'prod' : 'dev';
 const envConfig = {
     prod: {
         host: `//${location.hostname}/api`
