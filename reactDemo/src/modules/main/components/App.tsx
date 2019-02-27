@@ -21,6 +21,7 @@ import { Route, Switch, RouteComponentProps } from 'react-router-dom';
 import { observer } from 'mobx-react';
 
 import { mailFolderListItems, otherMailFolderListItems } from '../constants/tileData';
+import { routeConfig } from '../constants/route';
 import { withStylesDeco, withRouterDeco, withWidthDeco } from '../../../helpers/util';
 import { NotMatch } from '../../error';
 import {
@@ -38,11 +39,15 @@ const routes: {
     title?: string,
     exact?: boolean,
 }[] = [{
-    path: '/',
+    path: routeConfig.index,
     comp: <BookMark />,
     title: '书签',
 }, {
-    path: '/test',
+    path: routeConfig.bookmark,
+    comp: <BookMark />,
+    title: '书签',
+}, {
+    path: routeConfig.test,
     comp: <TestMainSection />,
     title: 'test',
 }, {

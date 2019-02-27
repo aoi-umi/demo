@@ -11,12 +11,16 @@ import MailIcon from '@material-ui/icons/Mail';
 import DeleteIcon from '@material-ui/icons/Delete';
 import ReportIcon from '@material-ui/icons/Report';
 import { History } from 'history';
+import { routeConfig } from './route';
 
 export const mailFolderListItems = (history: History) => {
+    function onClick(path) {
+        if (history.location.pathname != path)
+            history.push(path);
+    }
     return (<div>
         <ListItem button onClick={() => {
-            if (history.location.pathname != '/')
-                history.push('/');
+            onClick(routeConfig.bookmark);
         }} >
             <ListItemIcon>
                 <HomeIcon />
@@ -24,8 +28,7 @@ export const mailFolderListItems = (history: History) => {
             <ListItemText primary="Home" />
         </ListItem>
         <ListItem button onClick={() => {
-            if (history.location.pathname != '/test')
-                history.push('/test');
+            onClick(routeConfig.test);
         }}>
             <ListItemIcon>
                 <StarIcon />
