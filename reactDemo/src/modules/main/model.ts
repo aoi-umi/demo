@@ -5,6 +5,14 @@ export class Main {
 
     @observable
     open: boolean;
+    
+    constructor() {
+        this.init();
+    }
+    @action
+    init = () => {
+        this.open = false;
+    }
 
     @action
     toggleDrawer = (open?: boolean) => {
