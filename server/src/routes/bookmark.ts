@@ -1,21 +1,16 @@
-import * as express from 'express';
 import { RequestHandler } from 'express';
 import { responseHandler, paramsValid } from '../helpers';
 import { BookmarkModel } from '../models/mongo/bookmark';
 import { error } from '../_system/common';
-let router = express.Router();
-export default router;
 
-export let bookmarkQuery: RequestHandler = (req, res) => {
+export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let schema = {};
         let data: {
             name: string;
             url: string;
             anyKey: string;
-            page: number,
-            rows: number,
-        } = req.query;
+        } & ApiListQueryArgs = req.query;
         paramsValid(schema, data, { list: true });
         let query: any = {};
         if (data.anyKey) {
@@ -34,14 +29,14 @@ export let bookmarkQuery: RequestHandler = (req, res) => {
         if (data.url)
             query.url = new RegExp(data.url, 'i');
 
-        let [rows, total] = await BookmarkModel.findAndCountAll({
+        let { rows, total } = await BookmarkModel.findAndCountAll({
             conditions: query,
             sort: { _id: -1 },
             page: data.page,
             rows: data.rows
         });
         return {
-            code: '0',
+            result: true,
             data: {
                 rows,
                 total
@@ -50,7 +45,7 @@ export let bookmarkQuery: RequestHandler = (req, res) => {
     }, req, res);
 };
 
-export let bookmarkSave: RequestHandler = (req, res) => {
+export let save: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let data: {
             _id?: string;
@@ -96,19 +91,19 @@ export let bookmarkSave: RequestHandler = (req, res) => {
             await match.update(update);
         }
         return {
-            code: '0',
-        }
+            result: true,
+        };
     }, req, res);
 }
 
-export let bookmarkDel: RequestHandler = (req, res) => {
+export let del: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let data = req.body;
         let rs = await BookmarkModel.findByIdAndDelete(data._id);
         if (!rs)
             throw error('No Match Data');
         return {
-            code: '0',
-        }
+            result: true,
+        };
     }, req, res);
 }

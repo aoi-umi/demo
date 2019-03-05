@@ -47,6 +47,10 @@ app.set('port', process.env.PORT || config.port);
 
 var server = app.listen(app.get('port'), '0.0.0.0', function () {
     let address = server.address() as AddressInfo;
-    console.log(`${config.name} run at ${address.address}:${address.port},version:${config.version}`);
+    console.log([
+        '#################',
+        `# ${config.name} run at ${address.address}:${address.port},version:${config.version}`,
+        '#################',
+    ].join('\r\n'));
 });
 

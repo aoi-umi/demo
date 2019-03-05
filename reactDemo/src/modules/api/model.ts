@@ -21,19 +21,19 @@ export class ApiModel<T = ApiMethodConfigType> {
             this.afterResponse = opt.afterResponse;
     }
 
-    protected async requestByConfig<U = any>(config: ApiMethodConfigType, options: RequestByConfigOption<U>) {
+    protected async requestByConfig<U = any>(config: ApiMethodConfigType, options?: RequestByConfigOption<U>) {
         let cfg = clone<ApiMethodConfigType>(config as any);
         let args = clone(this.apiConfig.defaultArgs);
         if (!cfg.isUseDefault && cfg.args) {
             args = extend(args, cfg.args);
         }
 
-        let req: AxiosRequestConfig = extend({
+        let req: RequestByConfigOption<U> = extend({
             url: args.host + cfg.url,
             method: cfg.method,
         }, options);
-        let beforeRequest = options.beforeRequest || this.beforeRequest;
-        let afterResponse = options.afterResponse || this.afterResponse;
+        let beforeRequest = req.beforeRequest || this.beforeRequest;
+        let afterResponse = req.afterResponse || this.afterResponse;
 
         if (beforeRequest)
             req = await beforeRequest(req);

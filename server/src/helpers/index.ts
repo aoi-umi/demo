@@ -1,34 +1,8 @@
 import { Request, Response, Express } from 'express';
 import * as Q from 'q';
-import * as Ajv from 'ajv';
-let ajv = new Ajv({ allErrors: true });
+import { ajvInst, refType } from './ajv';
+import { errorConfig } from '../lang/zh';
 
-export let patterns = {
-    price: '(^[1-9]\\d*(\\.\\d{1,2})?$)|(^0(\\.\\d{1,2})?$)', // 价格， 保留2位小数
-    int: '(^[1-9]\\d*$)|(^0$)',
-    objId: '^[0-9a-z]{24}$', // ObjectId 字符串
-    // YYYY-MM-DD 日期
-    date: '^(?:(?!0000)[0-9]{4}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[0-9]{2}(?:0[48]|[2468][048]|[13579][26])|(?:0[48]|[2468][048]|[13579][26])00)-02-29)$',
-    // YYYY-MM-DD HH:mm:ss
-    datetime: '^(?:(?!0000)[0-9]{4}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[0-9]{2}(?:0[48]|[2468][048]|[13579][26])|(?:0[48]|[2468][048]|[13579][26])00)-02-29)\\s(([0-1][0-9])|([2][0-3])):([0-5][0-9]):([0-5][0-9])$',
-    vin: '^[0-9A-HJ-NPR-Z]{17}$',
-    statementNo: '^[0-9]{20}$', // 结算单编号
-    mobile: '^1[1-9][0-9]{9}$',  // 手机号
-    telphone: '(^\\+?[0-9]{3,4}-?[0-9]{7,8}$)|(^\\+?[0-9]{2}-?1[1-9]{1}[0-9]{9}$)',  // 手机号 + 电话  (1(([35][0-9])|(47)|[8][01236789]))[0-9]{8}
-    validationCode: '^[0-9]{4,6}$',  // 验证码
-    password: '^[\\w]{6,16}$',
-    licenseNo: '^[0-9]{1,15}$',  // 道路运输经营许可证
-    socialCode: '^[0-9A-Z]{15}([0-9A-Z]{3})?$', // 营业执照
-    adminCode: '^[0-9]{6}$',
-    // plateNo: '[^' + PROVINCEABBR.join('') + ']' + '[A-Z0-9]{4,5}[A-Z0-9挂学警港澳]$',
-    // unit: '^[' + Object.values(UNITS).join('') + ']{1}$',
-    categoryCode: '^[A-Z]+$',
-    categoryCodeOrEmpty: '^[A-Z]*$',
-    discount: '(^0\\.[0-9]{1,4}$)|(^0$)|(^1\\.0{1,4}$)|(^1$)', //折扣 0-1之间的两位小数
-    //stockOutType: '^[' + Object.keys(settings.STOCKOUTTYPE).join('') + ']{1}$', // 出库类型
-    email: '^[\\w.\\-]+@(?:[a-z0-9]+(?:-[a-z0-9]+)*\\.)+[a-z]{2,3}$',
-    code: '(?:(?!0000)[0-9]{4}(?:(?:0[1-9]|1[0-2])(?:0[1-9]|1[0-9]|2[0-8])|(?:0[13-9]|1[0-2])(?:29|30)|(?:0[13578]|1[02])31)|(?:[0-9]{2}(?:0[48]|[2468][048]|[13579][26])|(?:0[48]|[2468][048]|[13579][26])00)0229)' + '[0-9]{4}$'
-}
 type ResponseHandlerOptType = {
     json?: boolean;
     noSend?: boolean;
@@ -64,20 +38,8 @@ export let responseHandler = function (fn: (opt?: ResponseHandlerOptType) => any
             //log.response = result;
         }
     }).catch(err => {
-        //log.result = true;
-        if (!['401', '403'].includes(err.code))
-            console.error(err);
         let msg = err.msg || err.message;
-        // if (!msg && err.code) {
-        //     let match = codeList.find(ele => ele.code == err.code);
-        //     if (match)
-        //         msg = match.msg;
-        // }
-        let response = { code: err.code || '507000', msg: msg, remark: err.remark };
-        // if (!['401', '403', '107003'].includes(err.code)) {
-        //     log.code = response.code;
-        //     log.response = response;
-        // }
+        let response = { result: false, code: err.code, msg, remark: err.remark };
         res.json(response);
     }).finally(() => {
         // if (log.response)
@@ -98,12 +60,10 @@ export let paramsValid = function (schema, data, opt?: { list?: boolean }) {
     if (opt.list) {
         schema.properties = {
             pageIndex: { // 页码
-                type: "string",
-                pattern: patterns.int,
+                $ref: refType.int
             },
             rows: { // 行数
-                type: "string",
-                pattern: patterns.int,
+                $ref: refType.int
             },
             orderBy: { // 排序字段
                 type: 'string',
@@ -119,14 +79,14 @@ export let paramsValid = function (schema, data, opt?: { list?: boolean }) {
         if (!data.rows)
             data.rows = '10';
     }
-    let validator = ajv.compile(schema);
+    let validator = ajvInst.compile(schema);
     let isValid = validator(data);
     if (!isValid) {
         //console.log(validator.errors);
         let list = validator.errors.map(error => {
             return error.dataPath || error.message;
         });
-        throw { code: '107003', remark: list.join(';') };
+        throw { result: false, code: errorConfig.ARGS_ERROR, remark: list.join(';') };
     }
     if (opt.list) {
         data.page = parseInt(data.page);

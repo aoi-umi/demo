@@ -226,8 +226,8 @@ export let md5 = function (data, option?) {
     var md5 = crypto.createHash('md5');
     if (typeof (data) == 'string')
         data = new Buffer(data, 'utf8');
-    //@ts-ignore
-    var code = md5.update(data).digest(opt.encoding);
+
+    var code = md5.update(data).digest(opt.encoding as any);
     return code;
 };
 export let isInArray = function (obj, list) {
@@ -619,6 +619,10 @@ export let getListDiff = function <T1, T2>(option: {
 
 export let parseBool = function (b) {
     return b && b.toLocaleString() == 'true';
+};
+
+export let escapeRegExp = function (string) {
+    return string.replace(/([.*+?^${}()|\[\]\/\\])/g, "\\$1");
 };
 //#endregion
 

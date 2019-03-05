@@ -1,7 +1,7 @@
 import { Request, Response, Express } from 'express';
+import { Enum } from 'enum-ts';
 import * as common from './_system/common';
 import * as util from './util';
-import { Enum } from 'enum-ts';
 import * as auth from './_system/auth';
 import { authConfig } from './_system/auth';
 import * as cache from './_system/cache';
