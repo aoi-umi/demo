@@ -16,7 +16,7 @@ declare global {
                 methodName?: string
             };
             user: MyDataUser;
-            viewPath: string;
+            viewPath?: string;
             noNav?: boolean;
             autoSignIn?: boolean;
             noLog?: boolean;
@@ -28,7 +28,7 @@ declare global {
         }
 
         interface MyDataUser {
-            id: number;
+            _id: string;
             nickname: string;
             account: string;
             authority: { [key: string]: boolean };

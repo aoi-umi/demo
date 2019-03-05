@@ -16,7 +16,9 @@ let config = {
         options: {
             useNewUrlParser: true,
             autoReconnect: true,
-            dbName: 'devMgt'
+            useFindAndModify: false,
+            dbName: 'devMgt',
+            useCreateIndex: true,
         } as ConnectionOptions
     },
     api: {}

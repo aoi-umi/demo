@@ -17,6 +17,21 @@ const config = {
                 host: `${envConfig[env].host}/devMgt`,
             },
             method: {
+                userSignUp: {
+                    url: '/user/signUp',
+                },
+                userSignIn: {
+                    url: '/user/signIn',
+                },
+                userSignOut: {
+                    url: '/user/signOut',
+                },
+                userInfo: {
+                    url: '/user/info',
+                },
+                userAccountExists: {
+                    url: '/user/accountExists',
+                },
                 bookmarkQuery: {
                     url: '/bookmark/query',
                     method: 'GET',

@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "ajv": "^6.5.4",
+    "ajv-errors": "^1.0.1",
     "axios": "^0.18.0",
     "body-parser": "^1.18.3",
     "cookie-parser": "~1.4.3",
@@ -20,6 +21,7 @@
     "express": "^4.16.4",
     "http-errors": "~1.6.2",
     "ioredis": "^4.2.0",
+    "moment": "^2.24.0",
     "mongoose": "^5.3.7",
     "mongoose-ts-ua": "^0.1.0",
     "morgan": "^1.9.1",
