@@ -12,6 +12,8 @@ import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import List from '@material-ui/core/List';
 import Button from '@material-ui/core/Button';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
@@ -21,19 +23,23 @@ import { WithWidth, isWidthDown } from "@material-ui/core/withWidth";
 import { Route, Switch, RouteComponentProps } from 'react-router-dom';
 import { observer } from 'mobx-react';
 
-import { mailFolderListItems, otherMailFolderListItems } from '../constants/tileData';
-import { routeConfig } from '../constants/route';
 import { withStylesDeco, withRouterDeco, withWidthDeco } from '../../../helpers/util';
-import * as util from '../../../helpers/util';
+import { msgNotice } from '../../../helpers/common';
 import { NotMatch } from '../../error';
+import { testApi } from '../../api';
 import {
     MainSection as TestMainSection,
     model as testModel,
 } from '../../test';
 
+import {
+    SignIn
+} from '../../user';
+
 import BookMark from '../../bookmark';
+import { mailFolderListItems, otherMailFolderListItems } from '../constants/tileData';
+import { routeConfig } from '../constants/route';
 import * as appModel from '../model';
-import { testApi } from '../../api';
 
 export let cacheKey = {
     testUser: 'userCacheKey',
@@ -150,7 +156,7 @@ type InnerProps = RouteComponentProps<AppProps> & WithStyles<typeof styles, true
 @withStylesDeco(styles, { withTheme: true })
 @withRouterDeco
 @observer
-export default class App extends React.Component<AppProps> {
+export default class App extends React.Component<AppProps, { anchorEl?: any }> {
     private get innerProps() {
         return this.props as InnerProps;
     }
@@ -162,6 +168,7 @@ export default class App extends React.Component<AppProps> {
     }
 
     async init() {
+        this.state = {};
         let token = localStorage.getItem(cacheKey.testUser);
         if (token) {
             let user = await testApi.userInfo();
@@ -177,9 +184,30 @@ export default class App extends React.Component<AppProps> {
     handleDrawerClose = () => {
         this.dataSource.toggleDrawer(false);
     };
+
+    handleMenu = event => {
+        this.setState({ anchorEl: event.currentTarget });
+    };
+
+    handleClose = () => {
+        this.setState({ anchorEl: null });
+    };
+
+    signOut = () => {
+        this.handleClose();
+        testApi.userSignOut().then(() => {
+            this.dataSource.user.init();
+            localStorage.removeItem(cacheKey.testUser);
+        }).catch(e => {
+            msgNotice(e.message);
+        });
+    };
+
     renderTop() {
-        const { classes, history } = this.innerProps;
+        const { classes } = this.innerProps;
         const { dataSource } = this;
+        const { anchorEl } = this.state;
+        const open = Boolean(anchorEl);
         return (
             <AppBar
                 position="absolute"
@@ -200,28 +228,55 @@ export default class App extends React.Component<AppProps> {
                     <Typography variant="h6" color="inherit" noWrap>
                         {
                             dataSource.user.isLogin ?
-                                <div style={{ cursor: 'pointer' }}>
-                                    <IconButton
-                                        aria-haspopup="true"
-                                        color="inherit"
-                                        style={{ marginRight: 5 }}
+                                <div style={{ cursor: 'pointer', marginRight: 5 }}>
+                                    <div onClick={this.handleMenu}>
+                                        <IconButton
+                                            aria-haspopup="true"
+                                            color="inherit"
+                                            style={{ marginRight: 5 }}
+                                        >
+                                            <AccountCircle />
+                                        </IconButton>
+                                        {dataSource.user.nickname}
+                                    </div>
+                                    <Menu
+                                        id="menu-appbar"
+                                        anchorEl={anchorEl}
+                                        anchorOrigin={{
+                                            vertical: 'top',
+                                            horizontal: 'right',
+                                        }}
+                                        transformOrigin={{
+                                            vertical: 'top',
+                                            horizontal: 'right',
+                                        }}
+                                        open={open}
+                                        onClose={this.handleClose}
                                     >
-                                        <AccountCircle />
-                                    </IconButton>
-                                    {dataSource.user.nickname}
+                                        <MenuItem onClick={this.signOut}>Log Out</MenuItem>
+                                        {/* <MenuItem onClick={this.handleClose}>My account</MenuItem> */}
+                                    </Menu>
                                 </div> :
                                 <div>
                                     <Button color="inherit" onClick={() => {
-                                        let req = { account: 'test', rand: util.randStr() };
-                                        let token = req.account + util.md5('123456') + JSON.stringify(req);
-
-                                        token = util.md5(token);
-                                        localStorage.setItem(cacheKey.testUser, token);
-                                        testApi.userSignIn(req);
-                                    }}>Login</Button>
+                                        let notice = msgNotice(<SignIn
+                                            user={this.dataSource.user}
+                                            onSignInSuccess={() => {
+                                                notice.close();
+                                            }}
+                                        />, {
+                                                type: 'dialog',
+                                                dialogTitle: '登录',
+                                                dialogBtnList: []
+                                            });
+                                    }}>
+                                        Login
+                                    </Button>
                                     <Button color="inherit" onClick={() => {
                                         testApi.userSignUp({ account: 'test', nickname: 'test', password: '123456' });
-                                    }}>SignUp</Button>
+                                    }}>
+                                        SignUp
+                                    </Button>
                                 </div>
                         }
                     </Typography>

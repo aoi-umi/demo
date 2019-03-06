@@ -1,7 +1,7 @@
 
 import { observable, action, runInAction } from 'mobx';
 
-import { Model } from '../../components/MyList';
+import { Model } from '../../components/Base';
 export class BookmarkQueryModel extends Model {
     @observable
     name: string;

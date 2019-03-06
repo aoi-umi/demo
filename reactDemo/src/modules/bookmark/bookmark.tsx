@@ -17,10 +17,10 @@ import * as qs from 'query-string';
 
 import { withRouterDeco, withStylesDeco } from '../../helpers/util';
 import { MyList } from '../../components';
-import { BookmarkQueryModel, BookmarkDetailModel, BookmarkShowTag } from './model';
-import { testApi } from '../api';
 import { ListModel } from '../../components/MyList';
 import { msgNotice } from '../../helpers/common';
+import { testApi } from '../api';
+import { BookmarkQueryModel, BookmarkDetailModel, BookmarkShowTag } from './model';
 
 const styles = () => ({
     operateCol: {

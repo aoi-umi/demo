@@ -17,7 +17,8 @@ import TextField from '@material-ui/core/TextField';
 import { observer, inject } from 'mobx-react';
 
 import MyPagination, { PaginationModel } from '../MyPagination';
-import { ListModel, QueryDataType, QueryResult, Model } from "./model";
+import { Model } from "../Base";
+import { ListModel, QueryDataType, QueryResult } from "./model";
 import { withStylesDeco } from "../../helpers/util";
 type ListProps = {
     queryRows?: {
@@ -129,7 +130,13 @@ export default class MyList extends React.Component<ListProps> {
                     <Grid container item spacing={16}>
                         {queryRows && queryRows.map((ele, idx) => {
                             return (<Grid item key={idx} xs={12} sm={4} md={3}>
-                                <FormControl fullWidth={true}>
+                                <FormControl fullWidth={true}
+                                    onKeyPress={(e) => {
+                                        if (e.charCode == 13) {
+                                            this.listModel.page.setPage(1);
+                                            this.innerProps.onQueryClick(this.listModel);
+                                        }
+                                    }}>
                                     <TextField
                                         variant="outlined"
                                         InputLabelProps={{
@@ -140,12 +147,6 @@ export default class MyList extends React.Component<ListProps> {
                                         value={listModel.query[ele.id] || ''}
                                         onChange={(e) => {
                                             listModel.query.changeValue(ele.id, e.target.value);
-                                        }}
-                                        onKeyPress={(e) => {
-                                            if (e.charCode == 13) {
-                                                this.listModel.page.setPage(1);
-                                                this.innerProps.onQueryClick(this.listModel);
-                                            }
                                         }}
                                     >
                                     </TextField>
