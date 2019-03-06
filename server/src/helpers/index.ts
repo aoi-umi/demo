@@ -1,7 +1,8 @@
 import { Request, Response, Express } from 'express';
 import * as Q from 'q';
 import { ajvInst, refType } from './ajv';
-import { errorConfig } from '../lang/zh';
+import * as common from '../_system/common';
+import errorConfig from '../_system/errorConfig';
 
 type ResponseHandlerOptType = {
     json?: boolean;
@@ -86,7 +87,7 @@ export let paramsValid = function (schema, data, opt?: { list?: boolean }) {
         let list = validator.errors.map(error => {
             return error.dataPath || error.message;
         });
-        throw { result: false, code: errorConfig.ARGS_ERROR, remark: list.join(';') };
+        throw common.error({ remark: list.join(';') }, errorConfig.ARGS_ERROR);
     }
     if (opt.list) {
         data.page = parseInt(data.page);

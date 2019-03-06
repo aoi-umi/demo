@@ -3,8 +3,8 @@ import * as common from '../_system/common';
 import errorConfig from '../_system/errorConfig';
 import * as cache from '../_system/cache';
 import { responseHandler, paramsValid } from '../helpers';
-import { UserModel, UserMapper } from '../models/mongo/user';
 import { cacheKey, cacheTime } from '../_main';
+import { UserModel, UserMapper } from '../models/mongo/user';
 
 export let accountExists: RequestHandler = (req, res) => {
     responseHandler(async () => {

@@ -1,5 +1,6 @@
 
 import { observable, action, runInAction } from 'mobx';
+import { Model } from '../Base';
 import { PaginationModel } from '../MyPagination';
 type OnQuery = () => any;
 export class ListModel<T extends Model = Model> {
@@ -36,17 +37,6 @@ export class ListModel<T extends Model = Model> {
             this.page.setTotal(value.data.total);
     }
 
-}
-
-export abstract class Model {
-    constructor() {
-        this.init();
-    }
-    abstract init(): void;
-    @action
-    changeValue(key: string, value: any) {
-        this[key] = value;
-    }
 }
 
 export type QueryDataType = { rows: any[], total: number };
