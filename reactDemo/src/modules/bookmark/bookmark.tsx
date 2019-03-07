@@ -336,7 +336,7 @@ class BookmarkDetail extends React.Component<DetailProps>{
         let { detailModel } = this;
         return (
             <Grid container spacing={16}>
-                <Grid item container>
+                <Grid item container justify='center'>
                     <TextField
                         autoFocus
                         required

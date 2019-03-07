@@ -63,9 +63,14 @@ export default class MyPagination extends React.Component<PaginationProps> {
         return this.props as InnerProps;
     }
     private pageModel: PaginationModel;
+    private rowsPerPageList = [10, 20, 30];
     constructor(props) {
         super(props);
         this.pageModel = this.props.page || new PaginationModel();
+
+        let rowsPerPageList = this.innerProps.rowsPerPageList;
+        if (rowsPerPageList && rowsPerPageList.length)
+            this.rowsPerPageList = rowsPerPageList;
     }
 
     @observable
@@ -111,15 +116,14 @@ export default class MyPagination extends React.Component<PaginationProps> {
 
     renderPagination() {
         const pageModel = this.pageModel;
+        const { classes, theme, width, } = this.innerProps;
+        let rowsPerPageList = this.rowsPerPageList;
+
         let {
             total: count,
             pageIndex: page,
             pageSize: rowsPerPage,
         } = pageModel;
-        const { classes, theme, width, } = this.innerProps;
-        let rowsPerPageList = this.innerProps.rowsPerPageList;
-        if (!rowsPerPageList || !rowsPerPageList.length)
-            rowsPerPageList = [10, 20, 30];
         let isSm = isWidthDown('sm', width);
         let isXs = isWidthDown('xs', width);
         let totalPage = Math.ceil(count / rowsPerPage);

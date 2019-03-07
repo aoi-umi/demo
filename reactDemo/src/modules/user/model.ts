@@ -17,3 +17,26 @@ export class SignInModel extends Model {
     init() {
     }
 }
+
+export class SignUpModel extends Model {
+    @observable
+    account: string;
+
+    @observable
+    nickname: string;
+
+    @observable
+    password: string;
+
+    @observable
+    confirmPassword: string;
+
+    constructor() {
+        super();
+        this.init();
+    }
+
+    @action
+    init() {
+    }
+}

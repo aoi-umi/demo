@@ -20,7 +20,7 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import { WithWidth, isWidthDown } from "@material-ui/core/withWidth";
 
-import { Route, Switch, RouteComponentProps } from 'react-router-dom';
+import { Route, Switch, RouteComponentProps, NavLink } from 'react-router-dom';
 import { observer } from 'mobx-react';
 
 import { withStylesDeco, withRouterDeco, withWidthDeco } from '../../../helpers/util';
@@ -33,7 +33,7 @@ import {
 } from '../../test';
 
 import {
-    SignIn
+    SignIn, SignUp
 } from '../../user';
 
 import BookMark from '../../bookmark';
@@ -59,6 +59,10 @@ const routes: {
     path: routeConfig.bookmark,
     comp: <BookMark />,
     title: '书签',
+}, {
+    path: routeConfig.signUp,
+    comp: <SignUp />,
+    title: '注册',
 }, {
     path: routeConfig.test,
     comp: <TestMainSection />,
@@ -204,7 +208,7 @@ export default class App extends React.Component<AppProps, { anchorEl?: any }> {
     };
 
     renderTop() {
-        const { classes } = this.innerProps;
+        const { classes, history } = this.innerProps;
         const { dataSource } = this;
         const { anchorEl } = this.state;
         const open = Boolean(anchorEl);
@@ -273,9 +277,9 @@ export default class App extends React.Component<AppProps, { anchorEl?: any }> {
                                         Login
                                     </Button>
                                     <Button color="inherit" onClick={() => {
-                                        testApi.userSignUp({ account: 'test', nickname: 'test', password: '123456' });
+                                        history.push({ pathname: routeConfig.signUp });
                                     }}>
-                                        SignUp
+                                        注册
                                     </Button>
                                 </div>
                         }

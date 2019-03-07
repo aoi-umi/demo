@@ -2,7 +2,7 @@ import { Request, Response, Express } from 'express';
 import * as Q from 'q';
 import { ajvInst, refType } from './ajv';
 import * as common from '../_system/common';
-import errorConfig from '../_system/errorConfig';
+import errorConfig from '../config/errorConfig';
 
 type ResponseHandlerOptType = {
     json?: boolean;

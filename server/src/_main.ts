@@ -3,7 +3,7 @@ import { Request, Response, Express } from 'express';
 import * as mongo from './_system/dbMongo';
 import * as auth from './_system/auth';
 import * as cache from './_system/cache';
-import { authConfig } from './_system/auth';
+import { authConfig } from './config/authConfig';
 
 
 //#region 访问权限配置

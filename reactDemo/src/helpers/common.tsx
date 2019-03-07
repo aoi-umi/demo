@@ -1,16 +1,23 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import * as Q from 'q';
-import { MySnackbar, MyDialog } from '../components';
-import { MyDialogButtonType, MyDialogType } from '../components/MyDialog';
+import {
+    MySnackbar, MySnackbarVariantType,
+    MyDialog, MyDialogButtonType, MyDialogType
+} from '../components';
 import { extend } from './util';
 import { withCustomTheme } from '..';
 type MsgNoticeOptions = {
     type?: 'snackbar' | 'dialog',
     noClose?: boolean;
+    autoHideDuration?: number;
+
+    snackbarVariant?: MySnackbarVariantType;
+
     dialogTitle?: string;
     dialogType?: MyDialogType;
-    dialogBtnList?: MyDialogButtonType[]
+    dialogBtnList?: MyDialogButtonType[];
+
 }
 export function msgNotice(msg: React.ReactNode, options?: MsgNoticeOptions) {
     let defer = Q.defer();
@@ -32,7 +39,8 @@ export function msgNotice(msg: React.ReactNode, options?: MsgNoticeOptions) {
 
         if (options.type === 'snackbar') {
             dom =
-                <MySnackbar variant="warning"
+                <MySnackbar variant={options.snackbarVariant || "warning"}
+                    autoHideDuration={options.autoHideDuration}
                     message={msg}
                     noClose={options.noClose}
                     onClose={(event) => {

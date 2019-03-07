@@ -7,7 +7,7 @@ import * as bodyParser from 'body-parser';
 import * as cors from 'cors';
 
 import { AddressInfo } from 'net';
-import config from './config';
+import config from './config/config';
 import * as main from './_main';
 
 debug('my-application');
