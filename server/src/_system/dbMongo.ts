@@ -3,7 +3,7 @@ import * as mongoose from 'mongoose';
 import { Model } from 'mongoose';
 import { ClientSession } from 'mongodb';
 
-import config from '../config';
+import config from '../config/config';
 
 export function connect() {
     return mongoose.connect(config.mongoose.uri, config.mongoose.options);

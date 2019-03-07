@@ -51,12 +51,13 @@ const styles = (theme: Theme) => ({
     },
 });
 
+export type MySnackbarVariantType = 'success' | 'warning' | 'error' | 'info';
 type MySnackbarProps = {
     className?: any,
     message?: any,
     noClose?: boolean,
     onClose?: (event) => void,
-    variant?: 'success' | 'warning' | 'error' | 'info',
+    variant?: MySnackbarVariantType,
     autoHideDuration?: number,
 } & Partial<SnackbarOrigin>;
 type InnerProps = MySnackbarProps & WithStyles<typeof styles>;

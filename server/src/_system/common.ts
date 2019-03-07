@@ -9,8 +9,8 @@ import * as crypto from 'crypto';
 import * as Q from 'q';
 import * as zlib from 'zlib';
 import { Request } from 'express';
-import config from '../config';
-import errorConfig from './errorConfig';
+import config from '../config/config';
+import errorConfig from '../config/errorConfig';
 
 
 //#region 前后通用
@@ -263,10 +263,10 @@ export let error = function (msg, code?, option?) {
     if (error) {
         status = error.status;
         if (!msg) {
-            let filepath = `../lang/${opt.lang}`;
+            let filepath = `../config/lang/${opt.lang}`;
             var resolvePath = path.resolve(`${__dirname}/${filepath}.js`);
             var isExist = fs.existsSync(resolvePath);
-            let lang = require(isExist ? filepath : '../lang/zh');
+            let lang = require(isExist ? filepath : '../config/lang/zh');
             msg = lang.errorConfig[code];
             if (typeof opt.format == 'function')
                 msg = opt.format(msg);

@@ -1,7 +1,7 @@
 import * as Redis from 'ioredis';
-import config from '../config';
+import config from '../config/config';
+import errorConfig from '../config/errorConfig';
 import * as common from './common';
-import errorConfig from './errorConfig';
 
 var client = new Redis(config.redis.uri);
 var cachePrefix = config.cachePrefix ? config.cachePrefix + ':' : '';
