@@ -4,14 +4,17 @@ import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 
+import MyButton, { MyButtonModel } from '../../components/MyButton';
+
 import * as util from '../../helpers/util';
 import { withRouterDeco } from '../../helpers/util';
 import { msgNotice } from '../../helpers/common';
+
 import { cacheKey } from '../main/components/App';
+import { routeConfig } from '../main/constants/route';
 import { User } from '../main/model';
 import { testApi } from '../api';
 import { SignInModel, SignUpModel } from './model';
-import { routeConfig } from '../main/constants/route';
 
 type DetailProps = {
     user?: User;
@@ -19,16 +22,19 @@ type DetailProps = {
 }
 export class SignIn extends React.Component<DetailProps>{
     model: SignInModel;
-
+    btnModel: MyButtonModel;
     constructor(props, context) {
         super(props, context);
         this.model = new SignInModel();
+        this.btnModel = new MyButtonModel();
     }
 
     signIn = async () => {
         let { user, onSignInSuccess } = this.props;
+        let { btnModel } = this;
         let { account, password } = this.model;
         try {
+            btnModel.load();
             let req = { account, rand: util.randStr() };
             let token = req.account + util.md5(password) + JSON.stringify(req);
             token = util.md5(token);
@@ -38,11 +44,13 @@ export class SignIn extends React.Component<DetailProps>{
             onSignInSuccess && onSignInSuccess();
         } catch (e) {
             msgNotice(e.message);
+        } finally {
+            btnModel.loaded();
         }
     }
 
     render() {
-        let { model } = this;
+        let { model, btnModel } = this;
         return (
             <Grid container spacing={16}>
                 <Grid item container
@@ -69,9 +77,16 @@ export class SignIn extends React.Component<DetailProps>{
                     />
                 </Grid>
                 <Grid item container xs={12}>
-                    <Button fullWidth={true} onClick={this.signIn}>
-                        登录
-                    </Button>
+                    <MyButton model={btnModel}
+                        btnProps={
+                            {
+                                fullWidth: true,
+                                onClick: this.signIn,
+                                children: '登录'
+                            }
+                        }
+                    >
+                    </MyButton>
                 </Grid>
             </Grid>
         );
@@ -156,7 +171,7 @@ export class SignUp extends React.Component {
                     <Grid item container>
                         <Button fullWidth={true} onClick={this.signUp}>
                             注册
-                    </Button>
+                        </Button>
                     </Grid>
                 </Grid>
             </Grid>
