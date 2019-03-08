@@ -15,9 +15,7 @@ export class ListModel<T extends Model = Model> {
     loading: boolean;
 
     onQuery?: OnQuery;
-    constructor(query: T, opt?: {
-        onQuery?: OnQuery;
-    }) {
+    constructor(query: T) {
         runInAction(() => {
             this.query = query;
         });
@@ -26,7 +24,6 @@ export class ListModel<T extends Model = Model> {
     @action
     async load() {
         this.loading = true;
-        this.onQuery && await this.onQuery();
     }
 
     @action
