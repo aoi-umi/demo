@@ -130,7 +130,6 @@ export class SignUp extends React.Component {
                             onChange={(event) => { model.changeValue('account', event.target.value); }}
                         />
                         <TextField
-                            autoFocus
                             required
                             label="昵称"
                             fullWidth

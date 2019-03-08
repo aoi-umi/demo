@@ -355,6 +355,8 @@ class BookmarkDetail extends React.Component<DetailProps>{
                 </Grid>
                 <Grid item container>
                     {this.renderTag()}
+                </Grid>
+                <Grid item container>
                     <TextField
                         label='标签'
                         style={{ width: 80 }}
