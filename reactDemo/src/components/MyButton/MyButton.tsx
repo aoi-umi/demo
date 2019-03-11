@@ -49,10 +49,20 @@ export default class MyButton extends React.Component<Props> {
     render() {
         const { classes } = this.innerProps;
         const { model } = this;
+        let child: any;
+        if (this.props.btnProps && this.props.btnProps.children) {
+            child = this.props.btnProps.children;
+        }
+        let loading: any;
+        if (model.countDown) {
+            child = model.countDown + ' s';
+        } else if (model.loading) {
+            loading = <CircularProgress size={24} className={classes.buttonProgress} />;
+        }
         return (
             <div style={{ width: '100%' }} className={classes.wrapper}>
-                <Button variant="contained" color="primary" disabled={model.loading} {...this.props.btnProps} />
-                {model.loading && <CircularProgress size={24} className={classes.buttonProgress} />}
+                <Button variant="contained" color="primary" disabled={model.loading || !!model.countDown} {...this.props.btnProps} children={child} />
+                {loading}
             </div>
         );
     }

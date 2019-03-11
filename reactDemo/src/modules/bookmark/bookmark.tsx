@@ -38,7 +38,7 @@ export default class Bookmark extends React.Component {
     private listModel: ListModel<BookmarkQueryModel>;
     constructor(props, context) {
         super(props, context);
-        this.listModel = new ListModel(new BookmarkQueryModel());
+        this.listModel = new ListModel({ query: new BookmarkQueryModel() });
         this.innerProps.history.listen(this.onHistoryListen);
     }
 

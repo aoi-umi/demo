@@ -1,25 +1,22 @@
 import { observable, action, runInAction } from 'mobx';
-type OnLoaded = () => any;
-export class MyButtonModel {
+import { LoadModel, LoadModelOptions } from '../Base';
+export class MyButtonModel extends LoadModel {
     @observable
-    loading: boolean;
+    countDown: number;
 
-    onLoaded: OnLoaded;
-    constructor(opt?: { onLoaded?: OnLoaded }) {
-        if (opt) {
-            this.onLoaded = opt.onLoaded;
-        }
+    constructor(opt?: LoadModelOptions) {
+        super(opt);
     }
 
     @action
-    async load() {
-        this.loading = true;
-    }
-
-    @action
-    async loaded() {
-        this.loading = false;
-        this.onLoaded && this.onLoaded();
+    setCountDown(seconds: number) {
+        this.countDown = seconds;
+        let timer = setInterval(() => {
+            runInAction(() => {
+                if (--this.countDown <= 0)
+                    clearInterval(timer);
+            });
+        }, 1000);
     }
 
 }

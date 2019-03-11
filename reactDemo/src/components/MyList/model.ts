@@ -1,9 +1,8 @@
 
 import { observable, action, runInAction } from 'mobx';
-import { Model } from '../Base';
+import { Model, LoadModel, LoadModelOptions } from '../Base';
 import { PaginationModel } from '../MyPagination';
-type OnQuery = () => any;
-export class ListModel<T extends Model = Model> {
+export class ListModel<T extends Model = Model> extends LoadModel {
     page = new PaginationModel();
 
     query: T;
@@ -11,19 +10,11 @@ export class ListModel<T extends Model = Model> {
     @observable
     result: QueryResult;
 
-    @observable
-    loading: boolean;
-
-    onQuery?: OnQuery;
-    constructor(query: T) {
+    constructor(opt: { query: T } & LoadModelOptions) {
+        super(opt);
         runInAction(() => {
-            this.query = query;
+            this.query = opt.query;
         });
-    }
-
-    @action
-    async load() {
-        this.loading = true;
     }
 
     @action
