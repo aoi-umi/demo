@@ -58,7 +58,11 @@ export default class MyList extends React.Component<ListProps> {
         this.listModel = listModel;
         if (labelNoData)
             this.labelNoData = labelNoData;
-        this.listModel.onQuery = this.onQuery.bind(this);
+        this.listModel.onLoad = this.onQuery.bind(this);
+        this.listModel.onLoaded = (result: QueryResult) => {
+
+            this.listModel.changeResult(result);
+        }
     }
 
     async onQuery(page?: number) {
@@ -73,7 +77,7 @@ export default class MyList extends React.Component<ListProps> {
         } catch (e) {
             result.msg = e.message;
         }
-        this.listModel.changeResult(result);
+        this.listModel.onLoaded(result);
     }
 
     onAddClick = () => {
