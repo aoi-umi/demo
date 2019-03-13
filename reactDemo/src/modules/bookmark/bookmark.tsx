@@ -49,9 +49,7 @@ export default class Bookmark extends React.Component {
     private modelToObj(model?: ListModel<BookmarkQueryModel>) {
         let { query, page } = model || this.listModel;
         let queryObj = {
-            name: query.name,
-            url: query.url,
-            anyKey: query.anyKey,
+            ...query.field,
             page: page.pageIndex,
             rows: page.pageSize,
         };
@@ -262,7 +260,8 @@ class BookmarkDetail extends React.Component<DetailProps>{
         let loading = msgNotice('保存中', { type: 'dialog', dialogType: 'loading' });
         try {
             let addTagList = [], delTagList = [];
-            detailModel.showTagList.map(ele => {
+            let field = detailModel.field;
+            field.showTagList.map(ele => {
                 if (1 == ele.status) {
                     addTagList.push(ele.tag);
                 } else if (0 == ele.origStatus && -1 == ele.status) {
@@ -270,9 +269,9 @@ class BookmarkDetail extends React.Component<DetailProps>{
                 }
             })
             await testApi.bookmarkSave({
-                _id: detailModel._id,
-                name: detailModel.name,
-                url: detailModel.url,
+                _id: field._id,
+                name: field.name,
+                url: field.url,
                 addTagList,
                 delTagList,
             });
@@ -286,7 +285,7 @@ class BookmarkDetail extends React.Component<DetailProps>{
 
     private onTagDelClick = (idx: number) => {
         let { detailModel } = this;
-        let showTag = detailModel.showTagList[idx];
+        let showTag = detailModel.field.showTagList[idx];
         detailModel.changeShowTag({
             ...showTag,
             status: -1,
@@ -295,14 +294,15 @@ class BookmarkDetail extends React.Component<DetailProps>{
 
     private onTagAddClick = (idx?: number) => {
         let { detailModel } = this;
+        let field = detailModel.field;
         let showTag: BookmarkShowTag;
         if (idx !== undefined) {
-            showTag = detailModel.showTagList[idx];
+            showTag = field.showTagList[idx];
         } else {
-            let tag = detailModel.tag && detailModel.tag.trim();
+            let tag = field.tag && field.tag.trim();
             if (tag) {
-                idx = detailModel.showTagList.findIndex(ele => ele.tag == tag);
-                let existsShowTag = detailModel.showTagList[idx];
+                idx = field.showTagList.findIndex(ele => ele.tag == tag);
+                let existsShowTag = field.showTagList[idx];
                 showTag = existsShowTag || {
                     tag,
                     status: 1,
@@ -321,7 +321,7 @@ class BookmarkDetail extends React.Component<DetailProps>{
 
     renderTag() {
         let { detailModel } = this;
-        return detailModel.showTagList.map((ele, idx) => {
+        return detailModel.field.showTagList.map((ele, idx) => {
             return renderBookmarkTag(ele, idx, () => {
                 if (ele.status == -1) {
                     this.onTagAddClick(idx);
@@ -334,6 +334,7 @@ class BookmarkDetail extends React.Component<DetailProps>{
 
     render() {
         let { detailModel } = this;
+        let field = detailModel.field;
         return (
             <Grid container spacing={16}>
                 <Grid item container justify='center'>
@@ -342,14 +343,14 @@ class BookmarkDetail extends React.Component<DetailProps>{
                         required
                         label="Name"
                         fullWidth
-                        value={detailModel.name}
+                        value={field.name}
                         onChange={(event) => { detailModel.changeValue('name', event.target.value); }}
                     />
                     <TextField
                         required
                         label="Url"
                         fullWidth
-                        value={detailModel.url}
+                        value={field.url}
                         onChange={(event) => { detailModel.changeValue('url', event.target.value); }}
                     />
                 </Grid>
@@ -360,7 +361,7 @@ class BookmarkDetail extends React.Component<DetailProps>{
                     <TextField
                         label='标签'
                         style={{ width: 80 }}
-                        value={detailModel.tag}
+                        value={field.tag}
                         onChange={(event) => { detailModel.changeValue('tag', event.target.value); }}
                     />
                     <Button onClick={() => { this.onTagAddClick(); }}>添加</Button>

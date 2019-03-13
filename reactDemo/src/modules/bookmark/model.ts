@@ -2,19 +2,26 @@
 import { observable, action, runInAction } from 'mobx';
 
 import { Model } from '../../components/Base';
-export class BookmarkQueryModel extends Model {
+
+class BookmarkQueryFieldModel {
     @observable
     name: string;
     @observable
     url: string;
     @observable
     anyKey: string;
+}
+export class BookmarkQueryModel extends Model<BookmarkQueryFieldModel> {
+    constructor() {
+        super(new BookmarkQueryFieldModel());
+        this.init();
+    }
 
     @action
     init() {
-        this.name = '';
-        this.url = '';
-        this.anyKey = '';
+        this.field.name = '';
+        this.field.url = '';
+        this.field.anyKey = '';
     }
 }
 
@@ -23,7 +30,8 @@ export type BookmarkShowTag = {
     status: number,/*0, 1 新增, -1 删除,*/
     origStatus: number,
 };
-export class BookmarkDetailModel extends Model {
+
+class BookmarkDetailFieldModel {
     @observable
     _id: string;
     @observable
@@ -37,24 +45,25 @@ export class BookmarkDetailModel extends Model {
 
     @observable
     tag: string;
-
+}
+export class BookmarkDetailModel extends Model<BookmarkDetailFieldModel>{
     constructor() {
-        super();
+        super(new BookmarkDetailFieldModel());
         this.init();
     }
 
     @action
     init(detail?) {
-        this.tag = '';
-        this.tagList = [];
+        this.field.tag = '';
+        this.field.tagList = [];
         ['_id', 'name', 'url'].forEach(key => {
             this[key] = (detail && detail[key]) || '';
         });
         if (detail) {
             if (detail.tagList)
-                this.tagList = detail.tagList;
+                this.field.tagList = detail.tagList;
         }
-        this.showTagList = this.tagList.map(tag => {
+        this.field.showTagList = this.field.tagList.map(tag => {
             return {
                 tag,
                 status: 0,
@@ -66,8 +75,8 @@ export class BookmarkDetailModel extends Model {
     @action
     changeShowTag(val, idx?: number) {
         if (idx === undefined || idx < 0)
-            this.showTagList.push(val);
+            this.field.showTagList.push(val);
         else
-            this.showTagList[idx] = val;
+            this.field.showTagList[idx] = val;
     }
 }
