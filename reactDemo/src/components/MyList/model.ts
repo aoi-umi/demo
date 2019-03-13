@@ -2,7 +2,7 @@
 import { observable, action, runInAction } from 'mobx';
 import { Model, LoadModel, LoadModelOptions } from '../Base';
 import { PaginationModel } from '../MyPagination';
-export class ListModel<T extends Model = Model> extends LoadModel {
+export class ListModel<T extends Model<U>=Model<any>, U=any> extends LoadModel {
     page = new PaginationModel();
 
     query: T;

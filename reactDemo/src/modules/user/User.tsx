@@ -3,13 +3,15 @@ import { RouteComponentProps } from 'react-router';
 import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import FormControl from '@material-ui/core/FormControl';
 
-import MyButton, { MyButtonModel } from '../../components/MyButton';
 
 import * as util from '../../helpers/util';
 import { withRouterDeco } from '../../helpers/util';
 import { msgNotice } from '../../helpers/common';
 
+import MyButton, { MyButtonModel } from '../../components/MyButton';
 import { cacheKey } from '../main/components/App';
 import { routeConfig } from '../main/constants/route';
 import { User } from '../main/model';
@@ -32,7 +34,7 @@ export class SignIn extends React.Component<DetailProps>{
     signIn = async () => {
         let { user, onSignInSuccess } = this.props;
         let { btnModel } = this;
-        let { account, password } = this.model;
+        let { account, password } = this.model.field;
         try {
             btnModel.load();
             let req = { account, rand: util.randStr() };
@@ -51,6 +53,7 @@ export class SignIn extends React.Component<DetailProps>{
 
     render() {
         let { model, btnModel } = this;
+        let field = model.field;
         return (
             <Grid container spacing={16}>
                 <Grid item container
@@ -59,19 +62,20 @@ export class SignIn extends React.Component<DetailProps>{
                             this.signIn();
                         }
                     }}>
-                    <TextField
-                        autoFocus
-                        required
-                        label="账号"
-                        fullWidth
-                        value={model.account}
-                        onChange={(event) => { model.changeValue('account', event.target.value); }}
-                    />
+                    <FormControl error={true} fullWidth>
+                        <TextField
+                            autoFocus
+                            label="账号"
+                            value={field.account}
+                            onChange={(event) => { model.changeValue('account', event.target.value); }}
+                        />
+                        <FormHelperText>You can display an error</FormHelperText>
+                    </FormControl>
                     <TextField
                         required
                         label="密码"
                         fullWidth
-                        value={model.password}
+                        value={field.password}
                         type='password'
                         onChange={(event) => { model.changeValue('password', event.target.value); }}
                     />
@@ -109,7 +113,7 @@ export class SignUp extends React.Component {
 
     signUp = async () => {
         const { history } = this.innerProps;
-        let { account, password, nickname, confirmPassword } = this.model;
+        let { account, password, nickname, confirmPassword } = this.model.field;
         try {
             if (password !== confirmPassword)
                 throw new Error('密码不一致');
@@ -124,6 +128,7 @@ export class SignUp extends React.Component {
 
     render() {
         const { model } = this;
+        let field = model.field;
         return (
             <Grid container
                 direction="row"
@@ -141,21 +146,21 @@ export class SignUp extends React.Component {
                             required
                             label="账号"
                             fullWidth
-                            value={model.account}
+                            value={field.account}
                             onChange={(event) => { model.changeValue('account', event.target.value); }}
                         />
                         <TextField
                             required
                             label="昵称"
                             fullWidth
-                            value={model.nickname}
+                            value={field.nickname}
                             onChange={(event) => { model.changeValue('nickname', event.target.value); }}
                         />
                         <TextField
                             required
                             label="密码"
                             fullWidth
-                            value={model.password}
+                            value={field.password}
                             type='password'
                             onChange={(event) => { model.changeValue('password', event.target.value); }}
                         />
@@ -163,7 +168,7 @@ export class SignUp extends React.Component {
                             required
                             label="确认密码"
                             fullWidth
-                            value={model.confirmPassword}
+                            value={field.confirmPassword}
                             type='password'
                             onChange={(event) => { model.changeValue('confirmPassword', event.target.value); }}
                         />

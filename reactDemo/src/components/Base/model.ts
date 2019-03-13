@@ -1,13 +1,20 @@
 import { observable, action, runInAction } from 'mobx';
 
-export abstract class Model {
-    constructor() {
+export abstract class Model<T> {
+    constructor(field: T) {
+        runInAction(() => {
+            this.field = field;
+        });
         this.init();
     }
     abstract init(): void;
+
+    @observable
+    field: T;
+
     @action
     changeValue(key: string, value: any) {
-        this[key] = value;
+        this.field[key] = value;
     }
 }
 

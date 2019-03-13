@@ -1,15 +1,16 @@
 import { observable, action, runInAction } from 'mobx';
 import { Model } from '../../components/Base';
 
-export class SignInModel extends Model {
+class SignInFieldModel {
     @observable
     account: string;
 
     @observable
     password: string;
-
+}
+export class SignInModel extends Model<SignInFieldModel> {
     constructor() {
-        super();
+        super(new SignInFieldModel());
         this.init();
     }
 
@@ -18,7 +19,7 @@ export class SignInModel extends Model {
     }
 }
 
-export class SignUpModel extends Model {
+class SignUpFieldModel {
     @observable
     account: string;
 
@@ -30,9 +31,11 @@ export class SignUpModel extends Model {
 
     @observable
     confirmPassword: string;
+}
 
+export class SignUpModel extends Model<SignUpFieldModel> {
     constructor() {
-        super();
+        super(new SignUpFieldModel());
         this.init();
     }
 
