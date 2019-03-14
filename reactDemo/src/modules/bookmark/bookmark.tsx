@@ -16,8 +16,7 @@ import { TextAlignProperty } from 'csstype';
 import * as qs from 'query-string';
 
 import { withRouterDeco, withStylesDeco } from '../../helpers/util';
-import { MyList } from '../../components';
-import { ListModel } from '../../components/MyList';
+import { MyList, ListModel } from '../../components';
 import { msgNotice } from '../../helpers/common';
 import { testApi } from '../api';
 import { BookmarkQueryModel, BookmarkDetailModel, BookmarkShowTag } from './model';
