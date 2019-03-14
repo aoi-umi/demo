@@ -1,10 +1,24 @@
 import { observable, action, runInAction } from 'mobx';
 
+type ValidError = { msg: string };
+type Validators<T> = {
+    [key: string]: {
+        name?: string;
+        validator: ((val: any, field: T) => ValidError | void)[];
+    }
+}
 export abstract class Model<T> {
-    constructor(field: T) {
+    validConfig: Validators<T>;
+    constructor(field: T, opt?: {
+        validConfig?: Validators<T>
+    }) {
         runInAction(() => {
             this.field = field;
+            this.fieldErr = {};
         });
+        if (opt) {
+            this.validConfig = opt.validConfig;
+        }
         this.init();
     }
     abstract init(): void;
@@ -12,9 +26,40 @@ export abstract class Model<T> {
     @observable
     field: T;
 
+    @observable
+    fieldErr: { [key: string]: ValidError };
+
     @action
     changeValue(key: string, value: any) {
         this.field[key] = value;
+        this.valid(key);
+    }
+
+    valid(key: string) {
+        let rs = { isVaild: true, err: null as ValidError };
+        let validConfig = this.validConfig && this.validConfig[key];
+        if (validConfig) {
+            for (let ele of validConfig.validator) {
+                runInAction(() => {
+                    rs.err = ele(this.field[key], this.field) || { msg: '' };
+                    if (rs.err.msg)
+                        rs.err.msg = `${(validConfig.name || key)} ${rs.err.msg}`;
+                    this.fieldErr[key] = rs.err;
+                });
+                rs.isVaild = !rs.err.msg;
+            }
+        }
+        return rs;
+    }
+
+    validAll() {
+        let isVaild = true;
+        for (let key in this.field) {
+            let rs = this.valid(key);
+            if (!rs.isVaild)
+                isVaild = false;
+        }
+        return isVaild;
     }
 }
 

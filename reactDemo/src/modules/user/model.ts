@@ -10,12 +10,30 @@ class SignInFieldModel {
 }
 export class SignInModel extends Model<SignInFieldModel> {
     constructor() {
-        super(new SignInFieldModel());
-        this.init();
+        super(new SignInFieldModel(), {
+            validConfig: {
+                account: {
+                    name: '账号',
+                    validator: [(val, field) => {
+                        if (!val || !val.trim())
+                            return { msg: 'required' };
+                    }]
+                },
+
+                password: {
+                    validator: [(val, field) => {
+                        if (!val || !val.trim())
+                            return { msg: 'required' };
+                    }]
+                },
+            }
+        });
     }
 
     @action
     init() {
+        this.field.account = '';
+        this.field.password = '';
     }
 }
 
@@ -35,11 +53,44 @@ class SignUpFieldModel {
 
 export class SignUpModel extends Model<SignUpFieldModel> {
     constructor() {
-        super(new SignUpFieldModel());
-        this.init();
+        super(new SignUpFieldModel(), {
+            validConfig: {
+                account: {
+                    validator: [(val, field) => {
+                        if (!val || !val.trim())
+                            return { msg: 'required' };
+                    }]
+                },
+                nickname: {
+                    validator: [(val, field) => {
+                        if (!val || !val.trim())
+                            return { msg: 'required' };
+                    }]
+                },
+                password: {
+                    validator: [(val, field) => {
+                        if (!val || !val.trim())
+                            return { msg: 'required' };
+                    }]
+                },
+                confirmPassword: {
+                    validator: [(val, field) => {
+                        if (!val || !val.trim())
+                            return { msg: 'required' };
+                        if (val !== field.password)
+                            return { msg: '不一致' };
+
+                    }]
+                },
+            }
+        });
     }
 
     @action
     init() {
+        this.field.account = '';
+        this.field.nickname = '';
+        this.field.password = '';
+        this.field.confirmPassword = '';
     }
 }

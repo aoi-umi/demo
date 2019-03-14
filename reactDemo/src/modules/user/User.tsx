@@ -3,15 +3,16 @@ import { RouteComponentProps } from 'react-router';
 import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import FormControl from '@material-ui/core/FormControl';
 
 
 import * as util from '../../helpers/util';
 import { withRouterDeco } from '../../helpers/util';
 import { msgNotice } from '../../helpers/common';
 
-import MyButton, { MyButtonModel } from '../../components/MyButton';
+import {
+    MyButton, MyButtonModel,
+    MyForm,
+} from '../../components';
 import { cacheKey } from '../main/components/App';
 import { routeConfig } from '../main/constants/route';
 import { User } from '../main/model';
@@ -35,6 +36,9 @@ export class SignIn extends React.Component<DetailProps>{
         let { user, onSignInSuccess } = this.props;
         let { btnModel } = this;
         let { account, password } = this.model.field;
+        let isVaild = this.model.validAll();
+        if (!isVaild)
+            return;
         try {
             btnModel.load();
             let req = { account, rand: util.randStr() };
@@ -62,23 +66,29 @@ export class SignIn extends React.Component<DetailProps>{
                             this.signIn();
                         }
                     }}>
-                    <FormControl error={true} fullWidth>
-                        <TextField
-                            autoFocus
-                            label="账号"
-                            value={field.account}
-                            onChange={(event) => { model.changeValue('account', event.target.value); }}
-                        />
-                        <FormHelperText>You can display an error</FormHelperText>
-                    </FormControl>
-                    <TextField
-                        required
-                        label="密码"
-                        fullWidth
-                        value={field.password}
-                        type='password'
-                        onChange={(event) => { model.changeValue('password', event.target.value); }}
-                    />
+                    <MyForm fieldKey='account' model={model} renderChild={(key) => {
+                        return (
+                            <TextField
+                                autoFocus
+                                required
+                                label="账号"
+                                value={field[key]}
+                                onChange={(event) => { model.changeValue(key, event.target.value); }}
+                            />
+                        );
+                    }} />
+
+                    <MyForm fieldKey='password' model={model} renderChild={(key) => {
+                        return (
+                            <TextField
+                                required
+                                label="密码"
+                                value={field[key]}
+                                type='password'
+                                onChange={(event) => { model.changeValue(key, event.target.value); }}
+                            />
+                        );
+                    }} />
                 </Grid>
                 <Grid item container xs={12}>
                     <MyButton model={btnModel}
@@ -92,7 +102,7 @@ export class SignIn extends React.Component<DetailProps>{
                     >
                     </MyButton>
                 </Grid>
-            </Grid>
+            </Grid >
         );
     }
 }
@@ -115,8 +125,8 @@ export class SignUp extends React.Component {
         const { history } = this.innerProps;
         let { account, password, nickname, confirmPassword } = this.model.field;
         try {
-            if (password !== confirmPassword)
-                throw new Error('密码不一致');
+            if (!this.model.validAll())
+                return;
             await testApi.userSignUp({ account, password, nickname });
             msgNotice('注册成功', { snackbarVariant: 'success' }).waitClose().then(() => {
                 history.push({ pathname: routeConfig.index });
@@ -141,37 +151,57 @@ export class SignUp extends React.Component {
                                 this.signUp();
                             }
                         }}>
-                        <TextField
-                            autoFocus
-                            required
-                            label="账号"
-                            fullWidth
-                            value={field.account}
-                            onChange={(event) => { model.changeValue('account', event.target.value); }}
-                        />
-                        <TextField
-                            required
-                            label="昵称"
-                            fullWidth
-                            value={field.nickname}
-                            onChange={(event) => { model.changeValue('nickname', event.target.value); }}
-                        />
-                        <TextField
-                            required
-                            label="密码"
-                            fullWidth
-                            value={field.password}
-                            type='password'
-                            onChange={(event) => { model.changeValue('password', event.target.value); }}
-                        />
-                        <TextField
-                            required
-                            label="确认密码"
-                            fullWidth
-                            value={field.confirmPassword}
-                            type='password'
-                            onChange={(event) => { model.changeValue('confirmPassword', event.target.value); }}
-                        />
+
+                        <MyForm fieldKey='account' model={model} renderChild={(key) => {
+                            return (
+                                <TextField
+                                    autoFocus
+                                    required
+                                    label="账号"
+                                    value={field[key]}
+                                    onChange={(event) => { model.changeValue(key, event.target.value); }}
+                                />
+                            );
+                        }
+                        } />
+                        <MyForm fieldKey='nickname' model={model} renderChild={(key) => {
+                            return (
+                                <TextField
+                                    required
+                                    label="昵称"
+                                    fullWidth
+                                    value={field[key]}
+                                    onChange={(event) => { model.changeValue(key, event.target.value); }}
+                                />
+                            );
+                        }
+                        } />
+                        <MyForm fieldKey='password' model={model} renderChild={(key) => {
+                            return (
+                                <TextField
+                                    required
+                                    label="密码"
+                                    fullWidth
+                                    value={field[key]}
+                                    type='password'
+                                    onChange={(event) => { model.changeValue(key, event.target.value); }}
+                                />
+                            );
+                        }
+                        } />
+                        <MyForm fieldKey='confirmPassword' model={model} renderChild={(key) => {
+                            return (
+                                <TextField
+                                    required
+                                    label="确认密码"
+                                    fullWidth
+                                    value={field[key]}
+                                    type='password'
+                                    onChange={(event) => { model.changeValue(key, event.target.value); }}
+                                />
+                            );
+                        }
+                        } />
                     </Grid>
                     <Grid item container>
                         <Button fullWidth={true} onClick={this.signUp}>
