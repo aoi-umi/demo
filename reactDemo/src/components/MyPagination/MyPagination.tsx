@@ -32,7 +32,7 @@ const styles = (theme: Theme) => ({
     pageBtn: {
         margin: 2,
         padding: 5,
-        height: 25,
+        // height: 25,
         width: 25,
         minWidth: 25,
     },
@@ -169,22 +169,22 @@ export default class MyPagination extends React.Component<PaginationProps> {
                     isSm ? newLine : null
                 }
 
-                <IconButton
+                <Button
                     onClick={this.handleFirstPageButtonClick}
                     disabled={page === 1}
                     aria-label="First Page"
                     className={classes.pageBtn}
                 >
                     <FirstPageIcon className={classes.pageBtn} />
-                </IconButton>
-                <IconButton
+                </Button>
+                <Button
                     onClick={this.handleBackButtonClick}
                     disabled={page === 1}
                     aria-label="Previous Page"
                     className={classes.pageBtn}
                 >
                     <KeyboardArrowLeft className={classes.pageBtn} />
-                </IconButton>
+                </Button>
                 {
                     (() => {
                         let list = [];
@@ -207,22 +207,22 @@ export default class MyPagination extends React.Component<PaginationProps> {
                         return list;
                     })()
                 }
-                <IconButton
+                <Button
                     onClick={this.handleNextButtonClick}
                     disabled={page >= totalPage}
                     aria-label="Next Page"
                     className={classes.pageBtn}
                 >
                     <KeyboardArrowRight className={classes.pageBtn} />
-                </IconButton>
-                <IconButton
+                </Button>
+                <Button
                     onClick={this.handleLastPageButtonClick}
                     disabled={page >= totalPage}
                     aria-label="Last Page"
                     className={classes.pageBtn}
                 >
                     <LastPageIcon className={classes.pageBtn} />
-                </IconButton>
+                </Button>
                 {
                     isXs ? newLine : null
                 }
@@ -231,7 +231,7 @@ export default class MyPagination extends React.Component<PaginationProps> {
                     InputLabelProps={{
                         shrink: false,
                     }}
-                    style={{ width: 55, verticalAlign: 'middle' }}
+                    style={{ width: 55, verticalAlign: 'middle', margin: '0 5px' }}
                     onChange={(e) => {
                         this.setInputPage(e.target.value);
                     }}
