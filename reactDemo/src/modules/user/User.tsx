@@ -4,10 +4,9 @@ import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 
-
+import lang from '../../lang';
 import * as util from '../../helpers/util';
-import { withRouterDeco } from '../../helpers/util';
-import { msgNotice } from '../../helpers/common';
+import { withRouterDeco, msgNotice } from '../../helpers';
 
 import {
     MyButton, MyButtonModel,
@@ -71,7 +70,7 @@ export class SignIn extends React.Component<DetailProps>{
                             <TextField
                                 autoFocus
                                 required
-                                label="账号"
+                                label={lang.User.account}
                                 value={field[key]}
                                 onChange={(event) => { model.changeValue(key, event.target.value); }}
                             />
@@ -82,7 +81,7 @@ export class SignIn extends React.Component<DetailProps>{
                         return (
                             <TextField
                                 required
-                                label="密码"
+                                label={lang.User.password}
                                 value={field[key]}
                                 type='password'
                                 onChange={(event) => { model.changeValue(key, event.target.value); }}
@@ -96,7 +95,7 @@ export class SignIn extends React.Component<DetailProps>{
                             {
                                 fullWidth: true,
                                 onClick: this.signIn,
-                                children: '登录'
+                                children: lang.User.operate.signIn
                             }
                         }
                     >
@@ -123,12 +122,12 @@ export class SignUp extends React.Component {
 
     signUp = async () => {
         const { history } = this.innerProps;
-        let { account, password, nickname, confirmPassword } = this.model.field;
+        let { account, password, nickname } = this.model.field;
         try {
             if (!this.model.validAll())
                 return;
             await testApi.userSignUp({ account, password, nickname });
-            msgNotice('注册成功', { snackbarVariant: 'success' }).waitClose().then(() => {
+            msgNotice(lang.User.operate.signUpSuccess, { snackbarVariant: 'success' }).waitClose().then(() => {
                 history.push({ pathname: routeConfig.index });
             });
         } catch (e) {
@@ -157,7 +156,7 @@ export class SignUp extends React.Component {
                                 <TextField
                                     autoFocus
                                     required
-                                    label="账号"
+                                    label={lang.User.account}
                                     value={field[key]}
                                     onChange={(event) => { model.changeValue(key, event.target.value); }}
                                 />
@@ -168,7 +167,7 @@ export class SignUp extends React.Component {
                             return (
                                 <TextField
                                     required
-                                    label="昵称"
+                                    label={lang.User.nickname}
                                     fullWidth
                                     value={field[key]}
                                     onChange={(event) => { model.changeValue(key, event.target.value); }}
@@ -180,7 +179,7 @@ export class SignUp extends React.Component {
                             return (
                                 <TextField
                                     required
-                                    label="密码"
+                                    label={lang.User.password}
                                     fullWidth
                                     value={field[key]}
                                     type='password'
@@ -193,7 +192,7 @@ export class SignUp extends React.Component {
                             return (
                                 <TextField
                                     required
-                                    label="确认密码"
+                                    label={lang.User.confirmPassword}
                                     fullWidth
                                     value={field[key]}
                                     type='password'
@@ -205,7 +204,7 @@ export class SignUp extends React.Component {
                     </Grid>
                     <Grid item container>
                         <Button fullWidth={true} onClick={this.signUp}>
-                            注册
+                            {lang.User.operate.signUp}
                         </Button>
                     </Grid>
                 </Grid>

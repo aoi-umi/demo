@@ -22,12 +22,25 @@ let lang = {
         },
     },
     App: {
-        signIn: '登录',
-        signUp: '注册',
         routes: {
             bookmark: '书签',
             signUp: '注册',
             notFound: 'Not Found',
+        }
+    },
+    User: {
+        account: '账号',
+        nickname: '昵称',
+        password: '密码',
+        confirmPassword: '确认密码',
+        operate: {
+            signIn: '登录',
+
+            signUp: '注册',
+            signUpSuccess: '注册成功',
+            passwordNotSame: '密码不一致',
+
+            signOut: '退出',
         }
     },
     Bookmark: {

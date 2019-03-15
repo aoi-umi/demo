@@ -1,5 +1,6 @@
 import { observable, action, runInAction } from 'mobx';
-import { Model } from '../../components/Base';
+import lang from '../../lang';
+import { Model, required } from '../../components/Base';
 
 class SignInFieldModel {
     @observable
@@ -13,18 +14,11 @@ export class SignInModel extends Model<SignInFieldModel> {
         super(new SignInFieldModel(), {
             validConfig: {
                 account: {
-                    name: '账号',
-                    validator: [(val, field) => {
-                        if (!val || !val.trim())
-                            return { msg: 'required' };
-                    }]
+                    validator: [required]
                 },
 
                 password: {
-                    validator: [(val, field) => {
-                        if (!val || !val.trim())
-                            return { msg: 'required' };
-                    }]
+                    validator: [required]
                 },
             }
         });
@@ -56,31 +50,20 @@ export class SignUpModel extends Model<SignUpFieldModel> {
         super(new SignUpFieldModel(), {
             validConfig: {
                 account: {
-                    validator: [(val, field) => {
-                        if (!val || !val.trim())
-                            return { msg: 'required' };
-                    }]
+                    validator: [required]
                 },
                 nickname: {
-                    validator: [(val, field) => {
-                        if (!val || !val.trim())
-                            return { msg: 'required' };
-                    }]
+                    validator: [required]
                 },
                 password: {
-                    validator: [(val, field) => {
-                        if (!val || !val.trim())
-                            return { msg: 'required' };
-                    }]
+                    validator: [required]
                 },
                 confirmPassword: {
-                    validator: [(val, field) => {
-                        if (!val || !val.trim())
-                            return { msg: 'required' };
-                        if (val !== field.password)
-                            return { msg: '不一致' };
-
-                    }]
+                    validator: [required,
+                        (val, field) => {
+                            if (val !== field.password)
+                                return lang.User.operate.passwordNotSame;
+                        }]
                 },
             }
         });
