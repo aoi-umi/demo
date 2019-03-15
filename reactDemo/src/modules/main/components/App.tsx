@@ -258,7 +258,7 @@ export default class App extends React.Component<AppProps, { anchorEl?: any }> {
                                         open={open}
                                         onClose={this.handleClose}
                                     >
-                                        <MenuItem onClick={this.signOut}>Log Out</MenuItem>
+                                        <MenuItem onClick={this.signOut}>{lang.User.operate.signOut}</MenuItem>
                                         {/* <MenuItem onClick={this.handleClose}>My account</MenuItem> */}
                                     </Menu>
                                 </div> :
@@ -271,16 +271,16 @@ export default class App extends React.Component<AppProps, { anchorEl?: any }> {
                                             }}
                                         />, {
                                                 type: 'dialog',
-                                                dialogTitle: lang.App.signIn,
+                                                dialogTitle: lang.User.operate.signIn,
                                                 dialogBtnList: []
                                             });
                                     }}>
-                                        {lang.App.signIn}
+                                        {lang.User.operate.signIn}
                                     </Button>
                                     <Button color="inherit" onClick={() => {
                                         history.push({ pathname: routeConfig.signUp });
                                     }}>
-                                        {lang.App.signUp}
+                                        {lang.User.operate.signUp}
                                     </Button>
                                 </div>
                         }

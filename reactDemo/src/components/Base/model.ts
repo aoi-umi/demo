@@ -1,12 +1,6 @@
 import { observable, action, runInAction } from 'mobx';
 
-type ValidError = { msg: string };
-type Validators<T> = {
-    [key: string]: {
-        name?: string;
-        validator: ((val: any, field: T) => ValidError | void)[];
-    }
-}
+import { ValidError, Validators } from './Valid';
 export abstract class Model<T> {
     validConfig: Validators<T>;
     constructor(field: T, opt?: {
@@ -36,14 +30,17 @@ export abstract class Model<T> {
     }
 
     valid(key: string) {
-        let rs = { isVaild: true, err: null as ValidError };
+        let rs = { isVaild: true, err: { msg: '' } as ValidError };
         let validConfig = this.validConfig && this.validConfig[key];
         if (validConfig) {
             for (let ele of validConfig.validator) {
                 runInAction(() => {
-                    rs.err = ele(this.field[key], this.field) || { msg: '' };
-                    if (rs.err.msg)
-                        rs.err.msg = `${(validConfig.name || key)} ${rs.err.msg}`;
+                    let msg = ele(this.field[key], this.field);
+                    if (typeof msg == 'string') {
+                        rs.err = { msg };
+                    } else if (msg) {
+                        rs.err = msg;
+                    }
                     this.fieldErr[key] = rs.err;
                 });
                 rs.isVaild = !rs.err.msg;

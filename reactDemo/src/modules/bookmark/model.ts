@@ -1,7 +1,7 @@
 
 import { observable, action, runInAction } from 'mobx';
 
-import { Model } from '../../components/Base';
+import { Model, required } from '../../components/Base';
 
 class BookmarkQueryFieldModel {
     @observable
@@ -48,7 +48,17 @@ class BookmarkDetailFieldModel {
 }
 export class BookmarkDetailModel extends Model<BookmarkDetailFieldModel>{
     constructor() {
-        super(new BookmarkDetailFieldModel());
+        super(new BookmarkDetailFieldModel(), {
+            validConfig: {
+                name: {
+                    validator: [required]
+                },
+
+                url: {
+                    validator: [required]
+                },
+            }
+        });
         this.init();
     }
 
@@ -57,7 +67,7 @@ export class BookmarkDetailModel extends Model<BookmarkDetailFieldModel>{
         this.field.tag = '';
         this.field.tagList = [];
         ['_id', 'name', 'url'].forEach(key => {
-            this[key] = (detail && detail[key]) || '';
+            this.field[key] = (detail && detail[key]) || '';
         });
         if (detail) {
             if (detail.tagList)

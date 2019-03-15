@@ -17,7 +17,7 @@ import * as qs from 'query-string';
 
 import lang from '../../lang';
 import { withRouterDeco, withStylesDeco } from '../../helpers/util';
-import { MyList, ListModel } from '../../components';
+import { MyList, ListModel, MyForm, MyButton, MyButtonModel } from '../../components';
 import { msgNotice } from '../../helpers/common';
 import { testApi } from '../api';
 import { BookmarkQueryModel, BookmarkDetailModel, BookmarkShowTag } from './model';
@@ -88,7 +88,7 @@ export default class Bookmark extends React.Component {
                         type: 'dialog', dialogBtnList: [{
                             text: lang.Global.dialog.continue,
                         }, {
-                            text: lang.Global.dialog.continue,
+                            text: lang.Global.dialog.close,
                             type: 'close',
                         }]
                     }).waitClose();
@@ -144,7 +144,8 @@ export default class Bookmark extends React.Component {
                         id: 'url',
                         label: lang.Bookmark.url,
                     }, {
-                        id: 'anyKey'
+                        id: 'anyKey',
+                        label: lang.Bookmark.anyKey,
                     }]}
                     listModel={listModel}
                     onQueryClick={async (model: ListModel<BookmarkQueryModel>) => {
@@ -247,20 +248,25 @@ function renderBookmarkTag(tag: BookmarkShowTag | string, key?: any, onOperate?)
 @observer
 class BookmarkDetail extends React.Component<DetailProps>{
     private detailModel: BookmarkDetailModel;
+    btnModel: MyButtonModel;
     private onSaveSuccess: BookmarkDetailOnSaveSuccess = () => {
         msgNotice(lang.Global.operate.saveSuccess, { type: 'dialog' });
     };
     constructor(props: DetailProps) {
         super(props);
         this.detailModel = props.detail || new BookmarkDetailModel();
+        this.btnModel = new MyButtonModel();
         if (props.onSaveSuccess)
             this.onSaveSuccess = props.onSaveSuccess;
     }
 
     private onSave = async () => {
-        let { detailModel } = this;
-        let loading = msgNotice(lang.Global.operate.saving, { type: 'dialog', dialogType: 'loading' });
+        let { detailModel, btnModel } = this;
+        let isVaild = this.detailModel.validAll();
+        if (!isVaild)
+            return;
         try {
+            btnModel.load();
             let addTagList = [], delTagList = [];
             let field = detailModel.field;
             field.showTagList.map(ele => {
@@ -277,10 +283,10 @@ class BookmarkDetail extends React.Component<DetailProps>{
                 addTagList,
                 delTagList,
             });
-            loading.close();
+            btnModel.loaded();
             await this.onSaveSuccess();
         } catch (e) {
-            loading.close();
+            btnModel.loaded();
             msgNotice(lang.Global.operate.saveFail + `${e.message}`, { type: 'dialog' });
         }
     }
@@ -335,26 +341,34 @@ class BookmarkDetail extends React.Component<DetailProps>{
     }
 
     render() {
-        let { detailModel } = this;
+        let { detailModel, btnModel } = this;
         let field = detailModel.field;
         return (
             <Grid container spacing={16}>
                 <Grid item container justify='center'>
-                    <TextField
-                        autoFocus
-                        required
-                        label={lang.Bookmark.name}
-                        fullWidth
-                        value={field.name}
-                        onChange={(event) => { detailModel.changeValue('name', event.target.value); }}
-                    />
-                    <TextField
-                        required
-                        label={lang.Bookmark.url}
-                        fullWidth
-                        value={field.url}
-                        onChange={(event) => { detailModel.changeValue('url', event.target.value); }}
-                    />
+                    <MyForm fieldKey='name' model={detailModel} renderChild={(key) => {
+                        return (
+                            <TextField
+                                autoFocus
+                                required
+                                label={lang.Bookmark.name}
+                                fullWidth
+                                value={field[key]}
+                                onChange={(event) => { detailModel.changeValue(key, event.target.value); }}
+                            />
+                        );
+                    }} />
+                    <MyForm fieldKey='url' model={detailModel} renderChild={(key) => {
+                        return (
+                            <TextField
+                                required
+                                label={lang.Bookmark.url}
+                                fullWidth
+                                value={field[key]}
+                                onChange={(event) => { detailModel.changeValue(key, event.target.value); }}
+                            />
+                        );
+                    }} />
                 </Grid>
                 <Grid item container>
                     {this.renderTag()}
@@ -369,7 +383,16 @@ class BookmarkDetail extends React.Component<DetailProps>{
                     <Button onClick={() => { this.onTagAddClick(); }}>{lang.Bookmark.operate.tagAdd}</Button>
                 </Grid>
                 <Grid item container justify={'flex-end'}>
-                    <Button onClick={this.onSave}>{lang.Global.operate.save}</Button>
+                    <MyButton model={btnModel}
+                        btnProps={
+                            {
+                                fullWidth: true,
+                                onClick: this.onSave,
+                                children: lang.Global.operate.save
+                            }
+                        }
+                    >
+                    </MyButton>
                 </Grid>
             </Grid>
         );
