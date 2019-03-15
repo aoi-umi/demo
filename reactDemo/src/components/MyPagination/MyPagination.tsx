@@ -1,7 +1,6 @@
 import * as React from "react";
 import { WithStyles, Theme } from "@material-ui/core";
 import { WithWidth, isWidthDown } from "@material-ui/core/withWidth";
-import TablePagination from "@material-ui/core/TablePagination";
 import IconButton from "@material-ui/core/IconButton";
 import Button from "@material-ui/core/Button";
 import InputLabel from "@material-ui/core/InputLabel";
@@ -15,11 +14,13 @@ import LastPageIcon from "@material-ui/icons/LastPage";
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { observable, action } from "mobx";
 
-import { PaginationModel } from "./model";
+import lang from '../../lang';
+import * as util from "../../helpers/util";
 import { withStylesDeco, withWidthDeco } from "../../helpers/util";
+import { PaginationModel } from "./model";
 
 const styles = (theme: Theme) => ({
     root: {
@@ -146,7 +147,7 @@ export default class MyPagination extends React.Component<PaginationProps> {
         return (
             <div className={classes.root}>
                 {
-                    isSm ? null : <InputLabel className={classes.totalText}>每页大小:</InputLabel>
+                    isSm ? null : <InputLabel className={classes.totalText}>{lang.MyPagination.rowsPerPage}</InputLabel>
                 }
                 <Select
                     value={rowsPerPage}
@@ -164,7 +165,7 @@ export default class MyPagination extends React.Component<PaginationProps> {
                 </Select>
 
                 <InputLabel>{page}/{totalPage}</InputLabel>
-                <InputLabel className={classes.totalText}>共{count}条</InputLabel>
+                <InputLabel className={classes.totalText}>{util.stringFormat(lang.MyPagination.totalCount, count)}</InputLabel>
                 {
                     isSm ? newLine : null
                 }
@@ -172,7 +173,6 @@ export default class MyPagination extends React.Component<PaginationProps> {
                 <Button
                     onClick={this.handleFirstPageButtonClick}
                     disabled={page === 1}
-                    aria-label="First Page"
                     className={classes.pageBtn}
                 >
                     <FirstPageIcon className={classes.pageBtn} />
@@ -180,7 +180,6 @@ export default class MyPagination extends React.Component<PaginationProps> {
                 <Button
                     onClick={this.handleBackButtonClick}
                     disabled={page === 1}
-                    aria-label="Previous Page"
                     className={classes.pageBtn}
                 >
                     <KeyboardArrowLeft className={classes.pageBtn} />
@@ -210,7 +209,6 @@ export default class MyPagination extends React.Component<PaginationProps> {
                 <Button
                     onClick={this.handleNextButtonClick}
                     disabled={page >= totalPage}
-                    aria-label="Next Page"
                     className={classes.pageBtn}
                 >
                     <KeyboardArrowRight className={classes.pageBtn} />
@@ -218,7 +216,6 @@ export default class MyPagination extends React.Component<PaginationProps> {
                 <Button
                     onClick={this.handleLastPageButtonClick}
                     disabled={page >= totalPage}
-                    aria-label="Last Page"
                     className={classes.pageBtn}
                 >
                     <LastPageIcon className={classes.pageBtn} />
@@ -246,7 +243,7 @@ export default class MyPagination extends React.Component<PaginationProps> {
                     let page = parseInt(this.inputPage);
                     this.handlePageButtonClick(e, page);
                 }}>
-                    Go
+                    {lang.MyPagination.toPage}
                 </Button>
             </div>
         );

@@ -7,11 +7,12 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
+import Grid from "@material-ui/core/Grid";
 
 import { observer } from 'mobx-react';
 
+import lang from '../../lang';
 import { MyDialogModel } from "./model";
-import { Grid } from "@material-ui/core";
 
 export type MyDialogButtonType = {
     text: string;
@@ -38,8 +39,8 @@ export default class MyDialog extends React.Component<MyDialogProps> {
         let type = this.props.type || 'alert';
         this.btnList = this.props.btnList || {
             loading: [],
-            alert: [{ text: '确认', type: 'accept' }],
-            confirm: [{ text: '取消', type: 'cancel' }, { text: '确认', type: 'accept' }]
+            alert: [{ text: lang.MyDialog.accept, type: 'accept' }],
+            confirm: [{ text: lang.MyDialog.cancel, type: 'cancel' }, { text: lang.MyDialog.accept, type: 'accept' }]
         }[type];
         this.noClose = type == 'loading' ? true : this.props.noClose;
     }
@@ -62,12 +63,12 @@ export default class MyDialog extends React.Component<MyDialogProps> {
             >
                 <DialogTitle id="scroll-dialog-title">
                     <Grid container >
-                        <Grid item xs>{this.props.title || '提示'}</Grid>
+                        <Grid item xs>{this.props.title || lang.MyDialog.title}</Grid>
                         <Grid item>
                             {
                                 noClose ? null :
                                     <IconButton style={{ padding: 0 }} onClick={this.handleClose}>
-                                        <CloseIcon/>
+                                        <CloseIcon />
                                     </IconButton>
                             }
                         </Grid>
