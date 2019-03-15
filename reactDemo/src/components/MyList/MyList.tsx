@@ -14,16 +14,17 @@ import FormControl from '@material-ui/core/FormControl';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import TextField from '@material-ui/core/TextField';
 
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 
-import MyPagination, { PaginationModel } from '../MyPagination';
+import lang from '../../lang';
+import MyPagination from '../MyPagination';
 import { Model } from "../Base";
 import { ListModel, QueryDataType, QueryResult } from "./model";
 import { withStylesDeco } from "../../helpers/util";
 type ListProps = {
     queryRows?: {
         id: string;
-        text?: string;
+        label?: string;
         placeholder?: string;
     }[];
     header?: React.ReactNode;
@@ -51,7 +52,7 @@ export default class MyList extends React.Component<ListProps> {
         return this.props as InnerProps;
     }
     private listModel: ListModel;
-    private labelNoData: React.ReactNode = 'No Data';
+    private labelNoData: React.ReactNode = lang.MyList.noData;
     constructor(props) {
         super(props);
         let { labelNoData, listModel } = this.innerProps;
@@ -100,10 +101,10 @@ export default class MyList extends React.Component<ListProps> {
             );
         }
         else {
-            let msg: any = 'No Query';
+            let msg: any = lang.MyList.noQuery;
             if (listModel.result) {
                 if (!listModel.result.success)
-                    msg = listModel.result.msg || 'Query Fail';
+                    msg = listModel.result.msg || lang.MyList.queryFail;
                 else if (listModel.result.success) {
                     if (!listModel.result.data.rows.length)
                         msg = labelNoData;
@@ -146,7 +147,7 @@ export default class MyList extends React.Component<ListProps> {
                                         InputLabelProps={{
                                             shrink: true,
                                         }}
-                                        label={ele.text || ele.id}
+                                        label={ele.label || ele.id}
                                         placeholder={ele.placeholder}
                                         value={listModel.query[ele.id] || ''}
                                         onChange={(e) => {
@@ -167,16 +168,16 @@ export default class MyList extends React.Component<ListProps> {
                         <Grid item>
                             <Button variant="contained" onClick={() => {
                                 this.onReset();
-                            }}>重置</Button>
+                            }}>{lang.MyList.reset}</Button>
                         </Grid>
                         <Grid item>
                             <Button variant="contained" onClick={() => {
                                 this.listModel.page.setPage(1);
                                 this.innerProps.onQueryClick(this.listModel);
-                            }}>查询</Button>
+                            }}>{lang.MyList.query}</Button>
                         </Grid>
                         <Grid item>
-                            <Button variant="contained" onClick={this.onAddClick}>添加</Button>
+                            <Button variant="contained" onClick={this.onAddClick}>{lang.Global.operate.add}</Button>
                         </Grid>
                     </Grid>
                 </Grid>

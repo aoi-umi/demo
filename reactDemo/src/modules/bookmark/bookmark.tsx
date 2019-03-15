@@ -15,6 +15,7 @@ import { observer } from 'mobx-react';
 import { TextAlignProperty } from 'csstype';
 import * as qs from 'query-string';
 
+import lang from '../../lang';
 import { withRouterDeco, withStylesDeco } from '../../helpers/util';
 import { MyList, ListModel } from '../../components';
 import { msgNotice } from '../../helpers/common';
@@ -83,11 +84,11 @@ export default class Bookmark extends React.Component {
             <BookmarkDetail
                 detail={detailModel}
                 onSaveSuccess={async () => {
-                    let type = await msgNotice(`保存成功`, {
+                    let type = await msgNotice(lang.Global.operate.saveSuccess, {
                         type: 'dialog', dialogBtnList: [{
-                            text: '继续',
+                            text: lang.Global.dialog.continue,
                         }, {
-                            text: '关闭',
+                            text: lang.Global.dialog.continue,
                             type: 'close',
                         }]
                     }).waitClose();
@@ -99,25 +100,25 @@ export default class Bookmark extends React.Component {
             >
             </BookmarkDetail>, {
                 type: 'dialog',
-                dialogTitle: detail ? '修改' : '新增',
+                dialogTitle: detail ? lang.Global.operate.edit : lang.Global.operate.edit,
                 dialogBtnList: []
             });
 
     }
 
     private onDelClick = async (_id: string) => {
-        let obj = msgNotice('确认删除?', { type: 'dialog', dialogType: 'confirm' });
+        let obj = msgNotice(lang.Global.operate.delConfirm, { type: 'dialog', dialogType: 'confirm' });
         let type = await obj.waitClose();
         if (type == 'accept') {
-            let loading = msgNotice('删除中', { type: 'dialog', dialogType: 'loading' });
+            let loading = msgNotice(lang.Global.operate.deleting, { type: 'dialog', dialogType: 'loading' });
             try {
                 await testApi.bookmarkDel(_id);
                 loading.close();
-                let closeType = await msgNotice('删除成功', {
+                let closeType = await msgNotice(lang.Global.operate.delSuccess, {
                     type: 'dialog', dialogBtnList: [{
-                        text: '刷新', type: 'refresh'
+                        text: lang.Global.dialog.refresh, type: 'refresh'
                     }, {
-                        text: '关闭'
+                        text: lang.Global.dialog.close
                     }]
                 }).waitClose();
                 if (closeType == 'refresh') {
@@ -125,7 +126,7 @@ export default class Bookmark extends React.Component {
                 }
             } catch (e) {
                 loading.close();
-                msgNotice(`删除失败:${e.message}`, { type: 'dialog' });
+                msgNotice(lang.Global.operate.delFail + `${e.message}`, { type: 'dialog' });
             }
         }
     }
@@ -137,9 +138,11 @@ export default class Bookmark extends React.Component {
             <div>
                 <MyList
                     queryRows={[{
-                        id: 'name'
+                        id: 'name',
+                        label: lang.Bookmark.name,
                     }, {
-                        id: 'url'
+                        id: 'url',
+                        label: lang.Bookmark.url,
                     }, {
                         id: 'anyKey'
                     }]}
@@ -154,9 +157,9 @@ export default class Bookmark extends React.Component {
                     }}
                     header={
                         <TableRow>
-                            <TableCell>名字</TableCell>
-                            <TableCell>url</TableCell>
-                            <TableCell className={classes.operateCol}>操作</TableCell>
+                            <TableCell>{lang.Bookmark.name}</TableCell>
+                            <TableCell>{lang.Bookmark.url}</TableCell>
+                            <TableCell className={classes.operateCol}>{lang.Bookmark.list.operate}</TableCell>
                         </TableRow>
                     }
                     onRowRender={(ele, idx) => {
@@ -174,10 +177,10 @@ export default class Bookmark extends React.Component {
                                 <TableCell className={classes.operateCol} style={{ ...noBorder }}>
                                     <Button onClick={() => {
                                         this.showDetail(ele);
-                                    }}>修改</Button>
+                                    }}>{lang.Global.operate.edit}</Button>
                                     <Button onClick={() => {
                                         this.onDelClick(ele._id);
-                                    }}>删除</Button>
+                                    }}>{lang.Global.operate.del}</Button>
                                 </TableCell>
                             </TableRow>,
                             <TableRow key={idx + 'tag'}>
@@ -245,7 +248,7 @@ function renderBookmarkTag(tag: BookmarkShowTag | string, key?: any, onOperate?)
 class BookmarkDetail extends React.Component<DetailProps>{
     private detailModel: BookmarkDetailModel;
     private onSaveSuccess: BookmarkDetailOnSaveSuccess = () => {
-        msgNotice(`保存成功`, { type: 'dialog' });
+        msgNotice(lang.Global.operate.saveSuccess, { type: 'dialog' });
     };
     constructor(props: DetailProps) {
         super(props);
@@ -256,7 +259,7 @@ class BookmarkDetail extends React.Component<DetailProps>{
 
     private onSave = async () => {
         let { detailModel } = this;
-        let loading = msgNotice('保存中', { type: 'dialog', dialogType: 'loading' });
+        let loading = msgNotice(lang.Global.operate.saving, { type: 'dialog', dialogType: 'loading' });
         try {
             let addTagList = [], delTagList = [];
             let field = detailModel.field;
@@ -278,7 +281,7 @@ class BookmarkDetail extends React.Component<DetailProps>{
             await this.onSaveSuccess();
         } catch (e) {
             loading.close();
-            msgNotice(`保存失败:${e.message}`, { type: 'dialog' });
+            msgNotice(lang.Global.operate.saveFail + `${e.message}`, { type: 'dialog' });
         }
     }
 
@@ -340,14 +343,14 @@ class BookmarkDetail extends React.Component<DetailProps>{
                     <TextField
                         autoFocus
                         required
-                        label="Name"
+                        label={lang.Bookmark.name}
                         fullWidth
                         value={field.name}
                         onChange={(event) => { detailModel.changeValue('name', event.target.value); }}
                     />
                     <TextField
                         required
-                        label="Url"
+                        label={lang.Bookmark.url}
                         fullWidth
                         value={field.url}
                         onChange={(event) => { detailModel.changeValue('url', event.target.value); }}
@@ -358,15 +361,15 @@ class BookmarkDetail extends React.Component<DetailProps>{
                 </Grid>
                 <Grid item container>
                     <TextField
-                        label='标签'
+                        label={lang.Bookmark.tag}
                         style={{ width: 80 }}
                         value={field.tag}
                         onChange={(event) => { detailModel.changeValue('tag', event.target.value); }}
                     />
-                    <Button onClick={() => { this.onTagAddClick(); }}>添加</Button>
+                    <Button onClick={() => { this.onTagAddClick(); }}>{lang.Bookmark.operate.tagAdd}</Button>
                 </Grid>
                 <Grid item container justify={'flex-end'}>
-                    <Button onClick={this.onSave}>保存</Button>
+                    <Button onClick={this.onSave}>{lang.Global.operate.save}</Button>
                 </Grid>
             </Grid>
         );

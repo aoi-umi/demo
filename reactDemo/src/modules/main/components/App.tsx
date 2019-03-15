@@ -23,6 +23,7 @@ import { WithWidth, isWidthDown } from "@material-ui/core/withWidth";
 import { Route, Switch, RouteComponentProps, NavLink } from 'react-router-dom';
 import { observer } from 'mobx-react';
 
+import lang from '../../../lang';
 import { withStylesDeco, withRouterDeco, withWidthDeco } from '../../../helpers/util';
 import { msgNotice } from '../../../helpers/common';
 import { NotMatch } from '../../error';
@@ -54,22 +55,22 @@ const routes: {
 }[] = [{
     path: routeConfig.index,
     comp: <BookMark />,
-    title: '书签',
+    title: lang.App.routes.bookmark,
 }, {
     path: routeConfig.bookmark,
     comp: <BookMark />,
-    title: '书签',
+    title: lang.App.routes.bookmark,
 }, {
     path: routeConfig.signUp,
     comp: <SignUp />,
-    title: '注册',
+    title: lang.App.routes.signUp,
 }, {
     path: routeConfig.test,
     comp: <TestMainSection />,
     title: 'test',
 }, {
     comp: <NotMatch />,
-    title: 'Not Found',
+    title: lang.App.routes.notFound,
 }];
 //#endregion
 
@@ -270,16 +271,16 @@ export default class App extends React.Component<AppProps, { anchorEl?: any }> {
                                             }}
                                         />, {
                                                 type: 'dialog',
-                                                dialogTitle: '登录',
+                                                dialogTitle: lang.App.signIn,
                                                 dialogBtnList: []
                                             });
                                     }}>
-                                        Login
+                                        {lang.App.signIn}
                                     </Button>
                                     <Button color="inherit" onClick={() => {
                                         history.push({ pathname: routeConfig.signUp });
                                     }}>
-                                        注册
+                                        {lang.App.signUp}
                                     </Button>
                                 </div>
                         }
