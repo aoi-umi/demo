@@ -23,28 +23,23 @@ import { WithWidth, isWidthDown } from "@material-ui/core/withWidth";
 import { Route, Switch, RouteComponentProps, NavLink } from 'react-router-dom';
 import { observer } from 'mobx-react';
 
-import lang from '../../../lang';
-import { withStylesDeco, withRouterDeco, withWidthDeco } from '../../../helpers/util';
-import { msgNotice } from '../../../helpers/common';
-import { NotMatch } from '../../error';
-import { testApi } from '../../api';
+import lang from '../../lang';
+import { withStylesDeco, withRouterDeco, withWidthDeco } from '../../helpers/util';
+import { msgNotice } from '../../helpers/common';
+import { NotMatch } from '../error';
+import { testApi } from '../api';
 import {
     MainSection as TestMainSection,
     model as testModel,
-} from '../../test';
+} from '../test';
 
 import {
     SignIn, SignUp
-} from '../../user';
+} from '../user';
 
-import BookMark from '../../bookmark';
-import { mailFolderListItems, otherMailFolderListItems } from '../constants/tileData';
-import { routeConfig } from '../constants/route';
-import * as appModel from '../model';
-
-export let cacheKey = {
-    testUser: 'userCacheKey',
-};
+import BookMark from '../bookmark';
+import { routeConfig, cacheKey, mainFolderListItems } from './constant';
+import * as appModel from './model';
 
 //#region route
 const routes: {
@@ -307,9 +302,7 @@ export default class App extends React.Component<AppProps, { anchorEl?: any }> {
                             self.handleDrawerClose();
                     }}>
                         <Divider />
-                        <List>{mailFolderListItems(history)}</List>
-                        <Divider />
-                        <List>{otherMailFolderListItems}</List>
+                        <List>{mainFolderListItems(history)}</List>
                     </div>
                 </div>
             );
@@ -333,15 +326,7 @@ export default class App extends React.Component<AppProps, { anchorEl?: any }> {
                 }}
                 open={dataSource.open}
             >
-                <div className={classes.toolbar}>
-                    <IconButton onClick={this.handleDrawerClose}>
-                        <ChevronLeftIcon />
-                    </IconButton>
-                </div>
-                <Divider />
-                <List>{mailFolderListItems(history)}</List>
-                <Divider />
-                <List>{otherMailFolderListItems}</List>
+                {render()}
             </Drawer>
         );
     }

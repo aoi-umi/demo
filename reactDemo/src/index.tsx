@@ -9,7 +9,7 @@ import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
 
 import './styles.css';
 import config from './config';
-import App from './modules/main/components/App';
+import App from './modules/main/App';
 import { Test } from './modules/test/model';
 import { TextTransformProperty } from 'csstype';
 

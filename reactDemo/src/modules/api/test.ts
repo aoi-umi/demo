@@ -1,7 +1,9 @@
+
+import { error } from '../../helpers/util';
+import { cacheKey } from '../main';
+
 import { ApiModel, ApiConfigModel, ApiMethodConfigType } from './model';
 import { ListQueryRequest, ApiMethod } from '.';
-import { error } from '../../helpers/util';
-import { cacheKey } from '../main/components/App';
 
 type TestApiMethod = ApiMethod<ApiMethodConfigType, {
     userSignUp,

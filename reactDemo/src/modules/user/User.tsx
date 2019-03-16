@@ -12,8 +12,7 @@ import {
     MyButton, MyButtonModel,
     MyForm,
 } from '../../components';
-import { cacheKey } from '../main/components/App';
-import { routeConfig } from '../main/constants/route';
+import { routeConfig, cacheKey } from '../main';
 import { User } from '../main/model';
 import { testApi } from '../api';
 import { SignInModel, SignUpModel } from './model';
