@@ -34,13 +34,11 @@ import {
 } from '../test';
 
 import {
-    SignIn, SignUp
+    SignIn, SignUp, Account
 } from '../user';
 
 import BookMark from '../bookmark';
-import { routeConfig, cacheKey, mainFolderListItems } from './constant';
-import * as appModel from './model';
-
+import { main, routeConfig, cacheKey, mainFolderListItems } from './constant';
 //#region route
 const routes: {
     path?: string,
@@ -56,9 +54,13 @@ const routes: {
     comp: <BookMark />,
     title: lang.App.routes.bookmark,
 }, {
-    path: routeConfig.signUp,
+    path: routeConfig.userSignUp,
     comp: <SignUp />,
-    title: lang.App.routes.signUp,
+    title: lang.App.routes.userSignUp,
+}, {
+    path: routeConfig.userAccount,
+    comp: <Account />,
+    title: lang.App.routes.userAccount,
 }, {
     path: routeConfig.test,
     comp: <TestMainSection />,
@@ -160,7 +162,7 @@ export default class App extends React.Component<AppProps, { anchorEl?: any }> {
     private get innerProps() {
         return this.props as InnerProps;
     }
-    dataSource = new appModel.Main();
+    dataSource = main;
 
     constructor(props) {
         super(props);
@@ -202,6 +204,12 @@ export default class App extends React.Component<AppProps, { anchorEl?: any }> {
             msgNotice(e.message);
         });
     };
+
+    toMyAccount = () => {
+        const { history } = this.innerProps;
+        this.handleClose();
+        history.push({ pathname: routeConfig.userAccount });
+    }
 
     renderTop() {
         const { classes, history } = this.innerProps;
@@ -253,18 +261,18 @@ export default class App extends React.Component<AppProps, { anchorEl?: any }> {
                                         open={open}
                                         onClose={this.handleClose}
                                     >
+                                        <MenuItem onClick={this.toMyAccount}>{lang.User.operate.myAccount}</MenuItem>
                                         <MenuItem onClick={this.signOut}>{lang.User.operate.signOut}</MenuItem>
-                                        {/* <MenuItem onClick={this.handleClose}>My account</MenuItem> */}
                                     </Menu>
                                 </div> :
                                 <div>
                                     <Button color="inherit" onClick={() => {
-                                        let notice = msgNotice(<SignIn
-                                            user={this.dataSource.user}
-                                            onSignInSuccess={() => {
-                                                notice.close();
-                                            }}
-                                        />, {
+                                        let notice = msgNotice(
+                                            <SignIn
+                                                onSignInSuccess={() => {
+                                                    notice.close();
+                                                }}
+                                            />, {
                                                 type: 'dialog',
                                                 dialogTitle: lang.User.operate.signIn,
                                                 dialogBtnList: []
@@ -273,7 +281,7 @@ export default class App extends React.Component<AppProps, { anchorEl?: any }> {
                                         {lang.User.operate.signIn}
                                     </Button>
                                     <Button color="inherit" onClick={() => {
-                                        history.push({ pathname: routeConfig.signUp });
+                                        history.push({ pathname: routeConfig.userSignUp });
                                     }}>
                                         {lang.User.operate.signUp}
                                     </Button>

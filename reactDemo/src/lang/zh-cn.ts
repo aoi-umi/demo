@@ -24,7 +24,8 @@ let lang = {
     App: {
         routes: {
             bookmark: '书签',
-            signUp: '注册',
+            userSignUp: '注册',
+            userAccount: '个人中心',
             notFound: 'Not Found',
         }
     },
@@ -41,6 +42,7 @@ let lang = {
             passwordNotSame: '密码不一致',
 
             signOut: '退出',
+            myAccount: '个人中心',
         }
     },
     Bookmark: {
