@@ -350,11 +350,10 @@ export default class App extends React.Component<AppProps, { anchorEl?: any }> {
                             path={ele.path || null}
                             render={() => {
                                 dataSource.setTitle(ele.title);
-                                return <div style={{ marginBottom: 10 }}>{ele.comp}</div>;
+                                return ele.comp;
                             }} />);
                 })}
             </Switch>
-
         );
     }
     render() {
@@ -364,7 +363,9 @@ export default class App extends React.Component<AppProps, { anchorEl?: any }> {
                 {this.renderTop()}
                 {this.renderMenu()}
                 <main className={classes.content}>
-                    {this.renderRoute()}
+                    <div style={{ marginBottom: 10 }}>
+                        {this.renderRoute()}
+                    </div>
                 </main>
             </div>
         );

@@ -8,6 +8,7 @@ import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 import Chip from '@material-ui/core/Chip';
+import Checkbox from '@material-ui/core/Checkbox';
 
 import AddIcon from '@material-ui/icons/Add';
 
@@ -17,7 +18,7 @@ import * as qs from 'query-string';
 
 import lang from '../../lang';
 import { withRouterDeco, withStylesDeco } from '../../helpers/util';
-import { MyList, ListModel, MyForm, MyButton, MyButtonModel } from '../../components';
+import { MyList, ListModel, MyButton, MyButtonModel, MyTextField } from '../../components';
 import { msgNotice } from '../../helpers/common';
 import { testApi } from '../api';
 import { BookmarkQueryModel, BookmarkDetailModel, BookmarkShowTag } from './model';
@@ -36,6 +37,9 @@ export default class Bookmark extends React.Component {
         return this.props as InnerProps;
     }
     private listModel: ListModel<BookmarkQueryModel>;
+    state = {
+        selectedRow: []
+    };
     constructor(props, context) {
         super(props, context);
         this.listModel = new ListModel({ query: new BookmarkQueryModel() });
@@ -59,8 +63,10 @@ export default class Bookmark extends React.Component {
     private objToModel(obj: any, model?: ListModel<BookmarkQueryModel>) {
         if (!model)
             model = this.listModel;
-        ['name', 'url', 'anyKey'].forEach(key => {
-            model.query.changeValue(key, obj[key] || '');
+        model.query.setValue({
+            name: obj.name || '',
+            url: obj.url || '',
+            anyKey: obj.anyKey || '',
         });
         model.page.setPage(obj.page);
         model.page.setPageSize(obj.rows);
@@ -148,7 +154,7 @@ export default class Bookmark extends React.Component {
                         label: lang.Bookmark.anyKey,
                     }]}
                     listModel={listModel}
-                    onQueryClick={async (model: ListModel<BookmarkQueryModel>) => {
+                    onQueryClick={(model: ListModel<BookmarkQueryModel>) => {
                         let queryObj = this.modelToObj();
                         this.innerProps.history.replace({ pathname: this.innerProps.location.pathname, search: qs.stringify(queryObj) });
                     }}
@@ -158,6 +164,7 @@ export default class Bookmark extends React.Component {
                     }}
                     header={
                         <TableRow>
+                            {/* <TableCell padding="checkbox"><Checkbox /></TableCell> */}
                             <TableCell>{lang.Bookmark.name}</TableCell>
                             <TableCell>{lang.Bookmark.url}</TableCell>
                             <TableCell className={classes.operateCol}>{lang.Bookmark.list.operate}</TableCell>
@@ -167,8 +174,14 @@ export default class Bookmark extends React.Component {
                         let noBorder = { borderWidth: 0 };
                         return ([
                             <TableRow key={idx}>
+                                {/* <TableCell rowSpan={2} padding="checkbox"><Checkbox onChange={(event, checked) => {
+                                    let list = this.state.selectedRow;
+                                    list[idx] = checked;
+                                    //this.setState({ selectedRow: list });
+                                }} />
+                                </TableCell> */}
                                 <TableCell style={{ ...noBorder }}>
-                                    <a href={ele.url} title={ele.url} target={'_blank'}>
+                                    <a href={ele.url} title={ele.url} target='_blank'>
                                         {ele.name}
                                     </a>
                                 </TableCell>
@@ -346,29 +359,16 @@ class BookmarkDetail extends React.Component<DetailProps>{
         return (
             <Grid container spacing={16}>
                 <Grid item container justify='center'>
-                    <MyForm fieldKey='name' model={detailModel} renderChild={(key) => {
-                        return (
-                            <TextField
-                                autoFocus
-                                required
-                                label={lang.Bookmark.name}
-                                fullWidth
-                                value={field[key]}
-                                onChange={(event) => { detailModel.changeValue(key, event.target.value); }}
-                            />
-                        );
-                    }} />
-                    <MyForm fieldKey='url' model={detailModel} renderChild={(key) => {
-                        return (
-                            <TextField
-                                required
-                                label={lang.Bookmark.url}
-                                fullWidth
-                                value={field[key]}
-                                onChange={(event) => { detailModel.changeValue(key, event.target.value); }}
-                            />
-                        );
-                    }} />
+                    <MyTextField autoFocus required fullWidth
+                        fieldKey='name'
+                        model={detailModel}
+                        label={lang.Bookmark.name}
+                    />
+                    <MyTextField required fullWidth
+                        fieldKey='url'
+                        model={detailModel}
+                        label={lang.Bookmark.url}
+                    />
                 </Grid>
                 <Grid item container>
                     {this.renderTag()}
@@ -383,15 +383,8 @@ class BookmarkDetail extends React.Component<DetailProps>{
                     <Button onClick={() => { this.onTagAddClick(); }}>{lang.Bookmark.operate.tagAdd}</Button>
                 </Grid>
                 <Grid item container justify={'flex-end'}>
-                    <MyButton model={btnModel}
-                        btnProps={
-                            {
-                                fullWidth: true,
-                                onClick: this.onSave,
-                                children: lang.Global.operate.save
-                            }
-                        }
-                    >
+                    <MyButton model={btnModel} fullWidth={true} onClick={this.onSave}>
+                        {lang.Global.operate.save}
                     </MyButton>
                 </Grid>
             </Grid>

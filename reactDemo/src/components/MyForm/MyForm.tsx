@@ -2,17 +2,17 @@
 import * as React from "react";
 import { ReactNode } from 'react';
 import FormHelperText from '@material-ui/core/FormHelperText';
-import FormControl from '@material-ui/core/FormControl';
+import FormControl, { FormControlProps } from '@material-ui/core/FormControl';
 
 import { observer } from 'mobx-react';
 
 import { Model } from "../Base";
 
-type MyFormProps = {
+export type MyFormProps = {
     fieldKey: string;
     model: Model<any>;
     renderChild: (key: string) => ReactNode;
-}
+} & FormControlProps;
 
 type InnerProps = MyFormProps & {
 
@@ -25,10 +25,10 @@ export default class MyForm extends React.Component<MyFormProps> {
     }
 
     render() {
-        let { renderChild, fieldKey, model } = this.innerProps;
+        let { renderChild, fieldKey, model, ...restProps } = this.innerProps;
         let msg = (model.fieldErr[fieldKey] && model.fieldErr[fieldKey].msg) || '';
         return (
-            <FormControl error={true} fullWidth>
+            <FormControl error={true} fullWidth {...restProps}>
                 {renderChild(fieldKey)}
                 <FormHelperText>{msg}</FormHelperText>
             </FormControl>

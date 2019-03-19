@@ -29,6 +29,14 @@ export abstract class Model<T> {
         this.valid(key);
     }
 
+    @action
+    setValue(obj: any) {
+        for (let key in obj) {
+            this.field[key] = obj[key];
+            this.valid(key);
+        }
+    }
+
     valid(key: string) {
         let rs = { isVaild: true, err: { msg: '' } as ValidError };
         let validConfig = this.validConfig && this.validConfig[key];

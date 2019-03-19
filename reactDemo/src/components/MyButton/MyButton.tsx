@@ -15,6 +15,7 @@ const styles = (theme: Theme) => ({
     wrapper: {
         margin: theme.spacing.unit,
         position: 'relative' as PositionProperty,
+        width: '100%'
     },
     buttonProgress: {
         position: 'absolute' as PositionProperty,
@@ -26,10 +27,8 @@ const styles = (theme: Theme) => ({
 });
 
 type Props = {
-    btnProps?: ButtonProps;
-    loading?: boolean;
     model?: MyButtonModel;
-};
+} & ButtonProps;
 
 type InnerProps = Props & WithStyles<typeof styles> & {
 
@@ -47,11 +46,11 @@ export default class MyButton extends React.Component<Props> {
         this.model = this.props.model || new MyButtonModel();
     }
     render() {
-        const { classes } = this.innerProps;
+        const { classes, ...restProps } = this.innerProps;
         const { model } = this;
         let child: any;
-        if (this.props.btnProps && this.props.btnProps.children) {
-            child = this.props.btnProps.children;
+        if (this.props && this.props.children) {
+            child = this.props.children;
         }
         let loading: any;
         if (model.countDown) {
@@ -60,8 +59,8 @@ export default class MyButton extends React.Component<Props> {
             loading = <CircularProgress size={24} className={classes.buttonProgress} />;
         }
         return (
-            <div style={{ width: '100%' }} className={classes.wrapper}>
-                <Button variant="contained" color="primary" disabled={model.loading || !!model.countDown} {...this.props.btnProps} children={child} />
+            <div className={classes.wrapper}>
+                <Button variant="contained" color="primary" disabled={model.loading || !!model.countDown} {...restProps} children={child} />
                 {loading}
             </div>
         );
