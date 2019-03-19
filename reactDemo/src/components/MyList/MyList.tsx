@@ -10,17 +10,18 @@ import TableHead from "@material-ui/core/TableHead";
 import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
 import Grid from '@material-ui/core/Grid';
-import FormControl from '@material-ui/core/FormControl';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import TextField from '@material-ui/core/TextField';
 
 import { observer } from 'mobx-react';
 
 import lang from '../../lang';
-import MyPagination from '../MyPagination';
-import { Model } from "../Base";
-import { ListModel, QueryDataType, QueryResult } from "./model";
 import { withStylesDeco } from "../../helpers/util";
+
+import MyPagination from '../MyPagination';
+import MyTextField from '../MyTextField';
+import MyButton, { MyButtonModel } from "../MyButton";
+import { ListModel, QueryDataType, QueryResult } from "./model";
 type ListProps = {
     queryRows?: {
         id: string;
@@ -52,6 +53,7 @@ export default class MyList extends React.Component<ListProps> {
         return this.props as InnerProps;
     }
     private listModel: ListModel;
+    private queryBtnModel: MyButtonModel;
     private labelNoData: React.ReactNode = lang.MyList.noData;
     constructor(props) {
         super(props);
@@ -64,6 +66,7 @@ export default class MyList extends React.Component<ListProps> {
         this.listModel.onLoaded = (result: QueryResult) => {
             this.listModel.changeResult(result);
         }
+        this.queryBtnModel = new MyButtonModel();
     }
 
     async onQuery(page?: number) {
@@ -73,10 +76,13 @@ export default class MyList extends React.Component<ListProps> {
         if (page !== undefined)
             this.listModel.page.setPage(page);
         try {
+            this.queryBtnModel.load();
             result.data = await this.props.onQuery();
             result.success = true;
         } catch (e) {
             result.msg = e.message;
+        } finally {
+            this.queryBtnModel.loaded();
         }
         this.listModel.onLoaded(result);
     }
@@ -132,31 +138,23 @@ export default class MyList extends React.Component<ListProps> {
         return (
             <div>
                 <Grid container spacing={16}>
-                    <Grid container item spacing={16}>
+                    <Grid container item spacing={16} onKeyPress={(e) => {
+                        if (e.charCode == 13) {
+                            this.listModel.page.setPage(1);
+                            this.innerProps.onQueryClick(this.listModel);
+                        }
+                    }}>
                         {queryRows && queryRows.map((ele, idx) => {
-                            return (<Grid item key={idx} xs={12} sm={4} md={3}>
-                                <FormControl fullWidth={true}
-                                    onKeyPress={(e) => {
-                                        if (e.charCode == 13) {
-                                            this.listModel.page.setPage(1);
-                                            this.innerProps.onQueryClick(this.listModel);
-                                        }
-                                    }}>
-                                    <TextField
-                                        variant="outlined"
-                                        InputLabelProps={{
-                                            shrink: true,
-                                        }}
+                            return (
+                                <Grid item key={idx} xs={12} sm={4} md={3}>
+                                    <MyTextField
+                                        fieldKey={ele.id}
+                                        model={listModel.query}
                                         label={ele.label || ele.id}
-                                        placeholder={ele.placeholder}
-                                        value={listModel.query[ele.id] || ''}
-                                        onChange={(e) => {
-                                            listModel.query.changeValue(ele.id, e.target.value);
-                                        }}
-                                    >
-                                    </TextField>
-                                </FormControl>
-                            </Grid>);
+                                        placeholder={ele.placeholder}>
+                                    </MyTextField>
+                                </Grid>
+                            );
                         })}
                     </Grid>
                     <Grid container item
@@ -171,10 +169,10 @@ export default class MyList extends React.Component<ListProps> {
                             }}>{lang.MyList.reset}</Button>
                         </Grid>
                         <Grid item>
-                            <Button variant="contained" onClick={() => {
+                            <MyButton variant="contained" model={this.queryBtnModel} onClick={() => {
                                 this.listModel.page.setPage(1);
                                 this.innerProps.onQueryClick(this.listModel);
-                            }}>{lang.MyList.query}</Button>
+                            }}>{lang.MyList.query}</MyButton>
                         </Grid>
                         <Grid item>
                             <Button variant="contained" onClick={this.onAddClick}>{lang.Global.operate.add}</Button>

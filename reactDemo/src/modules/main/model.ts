@@ -1,5 +1,4 @@
 import { observable, action, runInAction } from 'mobx';
-import { userInfo } from 'os';
 export class Main {
     @observable
     title: string;

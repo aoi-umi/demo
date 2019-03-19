@@ -101,7 +101,6 @@ export default class MySnackbar extends React.Component<MySnackbarProps> {
                                 key="close"
                                 aria-label="Close"
                                 color="inherit"
-                                //className={classes.close}
                                 onClick={this.onClose}
                             >
                                 <CloseIcon className={classes.icon} />

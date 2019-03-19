@@ -10,13 +10,14 @@ export class MyButtonModel extends LoadModel {
 
     @action
     setCountDown(seconds: number) {
-        this.countDown = seconds;
-        let timer = setInterval(() => {
-            runInAction(() => {
-                if (--this.countDown <= 0)
-                    clearInterval(timer);
-            });
-        }, 1000);
+        if (!this.countDown || this.countDown < 0) {
+            this.countDown = seconds;
+            let timer = setInterval(() => {
+                runInAction(() => {
+                    if (--this.countDown <= 0)
+                        clearInterval(timer);
+                });
+            }, 1000);
+        }
     }
-
 }

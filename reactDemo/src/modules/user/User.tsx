@@ -15,7 +15,7 @@ import { main } from '../main';
 
 import {
     MyButton, MyButtonModel,
-    MyForm,
+    MyTextField,
 } from '../../components';
 import { routeConfig, cacheKey } from '../main';
 import { User } from '../main/model';
@@ -111,7 +111,6 @@ export class SignIn extends React.Component<SignInProps>{
 
     render() {
         let { model, btnModel } = this;
-        let field = model.field;
         return (
             <Grid container spacing={16}>
                 <Grid item container
@@ -120,40 +119,16 @@ export class SignIn extends React.Component<SignInProps>{
                             this.signIn();
                         }
                     }}>
-                    <MyForm fieldKey='account' model={model} renderChild={(key) => {
-                        return (
-                            <TextField
-                                autoFocus
-                                required
-                                label={lang.User.account}
-                                value={field[key]}
-                                onChange={(event) => { model.changeValue(key, event.target.value); }}
-                            />
-                        );
-                    }} />
+                    <MyTextField fieldKey='account' model={model} autoFocus
+                        required label={lang.User.account} />
 
-                    <MyForm fieldKey='password' model={model} renderChild={(key) => {
-                        return (
-                            <TextField
-                                required
-                                label={lang.User.password}
-                                value={field[key]}
-                                type='password'
-                                onChange={(event) => { model.changeValue(key, event.target.value); }}
-                            />
-                        );
-                    }} />
+                    <MyTextField fieldKey='password' model={model}
+                        required label={lang.User.password}
+                        type='password' />
                 </Grid>
                 <Grid item container xs={12}>
-                    <MyButton model={btnModel}
-                        btnProps={
-                            {
-                                fullWidth: true,
-                                onClick: this.signIn,
-                                children: lang.User.operate.signIn
-                            }
-                        }
-                    >
+                    <MyButton model={btnModel} fullWidth={true} onClick={this.signIn}>
+                        {lang.User.operate.signIn}
                     </MyButton>
                 </Grid>
             </Grid >
@@ -228,56 +203,14 @@ export class SignUp extends React.Component {
         let field = model.field;
         return (
             <Dialog>
-                <MyForm fieldKey='account' model={model} renderChild={(key) => {
-                    return (
-                        <TextField
-                            autoFocus
-                            required
-                            label={lang.User.account}
-                            value={field[key]}
-                            onChange={(event) => { model.changeValue(key, event.target.value); }}
-                        />
-                    );
-                }
-                } />
-                <MyForm fieldKey='nickname' model={model} renderChild={(key) => {
-                    return (
-                        <TextField
-                            required
-                            label={lang.User.nickname}
-                            fullWidth
-                            value={field[key]}
-                            onChange={(event) => { model.changeValue(key, event.target.value); }}
-                        />
-                    );
-                }
-                } />
-                <MyForm fieldKey='password' model={model} renderChild={(key) => {
-                    return (
-                        <TextField
-                            required
-                            label={lang.User.password}
-                            fullWidth
-                            value={field[key]}
-                            type='password'
-                            onChange={(event) => { model.changeValue(key, event.target.value); }}
-                        />
-                    );
-                }
-                } />
-                <MyForm fieldKey='confirmPassword' model={model} renderChild={(key) => {
-                    return (
-                        <TextField
-                            required
-                            label={lang.User.confirmPassword}
-                            fullWidth
-                            value={field[key]}
-                            type='password'
-                            onChange={(event) => { model.changeValue(key, event.target.value); }}
-                        />
-                    );
-                }
-                } />
+                <MyTextField fieldKey='account' model={model}
+                    autoFocus required label={lang.User.account} />
+                <MyTextField fieldKey='nickname' model={model} required
+                    label={lang.User.nickname} fullWidth />
+                <MyTextField fieldKey='password' model={model} required
+                    label={lang.User.password} fullWidth type='password' />
+                <MyTextField fieldKey='confirmPassword' model={model} required
+                    label={lang.User.confirmPassword} fullWidth type='password' />
                 <Button
                     fullWidth
                     variant="contained"
