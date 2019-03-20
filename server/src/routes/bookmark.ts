@@ -1,4 +1,5 @@
 import { RequestHandler } from 'express';
+import { Types } from 'mongoose';
 import { responseHandler, paramsValid } from '../helpers';
 import { BookmarkModel } from '../models/mongo/bookmark';
 import { error } from '../_system/common';
@@ -99,8 +100,8 @@ export let save: RequestHandler = (req, res) => {
 export let del: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let data = req.body;
-        let rs = await BookmarkModel.findByIdAndDelete(data._id);
-        if (!rs)
+        let rs = await BookmarkModel.deleteMany({ _id: { $in: data.idList.map(id => Types.ObjectId(id)) } });
+        if (!rs.n)
             throw error('No Match Data');
         return {
             result: true,

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router';
 import { LocationListener } from 'history';
-import { WithStyles } from '@material-ui/core';
+import { WithStyles, Paper } from '@material-ui/core';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import Button from '@material-ui/core/Button';
@@ -18,9 +18,16 @@ import * as qs from 'query-string';
 
 import lang from '../../lang';
 import { withRouterDeco, withStylesDeco } from '../../helpers/util';
-import { MyList, ListModel, MyButton, MyButtonModel, MyTextField } from '../../components';
+import * as util from '../../helpers/util';
+import {
+    MyList, ListModel,
+    MyButton, MyButtonModel,
+    MyTextField,
+    SelectedObject,
+} from '../../components';
 import { msgNotice } from '../../helpers/common';
 import { testApi } from '../api';
+import BottomAppBar from '../main/BottomAppBar';
 import { BookmarkQueryModel, BookmarkDetailModel, BookmarkShowTag } from './model';
 
 const styles = () => ({
@@ -32,18 +39,18 @@ type InnerProps = RouteComponentProps<{}> & WithStyles<typeof styles> & {};
 
 @withRouterDeco
 @withStylesDeco(styles)
+@observer
 export default class Bookmark extends React.Component {
     private get innerProps() {
         return this.props as InnerProps;
     }
     private listModel: ListModel<BookmarkQueryModel>;
-    state = {
-        selectedRow: []
-    };
+    private selectedRow: SelectedObject;
     constructor(props, context) {
         super(props, context);
         this.listModel = new ListModel({ query: new BookmarkQueryModel() });
         this.innerProps.history.listen(this.onHistoryListen);
+        this.selectedRow = new SelectedObject();
     }
 
     componentDidMount() {
@@ -112,24 +119,19 @@ export default class Bookmark extends React.Component {
 
     }
 
-    private onDelClick = async (_id: string) => {
-        let obj = msgNotice(lang.Global.operate.delConfirm, { type: 'dialog', dialogType: 'confirm' });
+    private onDelClick = async (_id: string | string[]) => {
+        let idList = _id instanceof Array ? _id : [_id];
+        let obj = msgNotice(util.stringFormat(lang.Global.operate.delConfirm, idList.length), { type: 'dialog', dialogType: 'confirm' });
         let type = await obj.waitClose();
         if (type == 'accept') {
             let loading = msgNotice(lang.Global.operate.deleting, { type: 'dialog', dialogType: 'loading' });
             try {
-                await testApi.bookmarkDel(_id);
+                await testApi.bookmarkDel(idList);
                 loading.close();
                 let closeType = await msgNotice(lang.Global.operate.delSuccess, {
-                    type: 'dialog', dialogBtnList: [{
-                        text: lang.Global.dialog.refresh, type: 'refresh'
-                    }, {
-                        text: lang.Global.dialog.close
-                    }]
+                    type: 'dialog',
                 }).waitClose();
-                if (closeType == 'refresh') {
-                    this.refresh();
-                }
+                this.refresh();
             } catch (e) {
                 loading.close();
                 msgNotice(lang.Global.operate.delFail + `${e.message}`, { type: 'dialog' });
@@ -160,11 +162,16 @@ export default class Bookmark extends React.Component {
                     }}
                     onQuery={async () => {
                         let data = await testApi.bookmarkQuery(this.modelToObj());
+                        this.selectedRow.setItems(data.rows);
                         return data;
                     }}
                     header={
                         <TableRow>
-                            {/* <TableCell padding="checkbox"><Checkbox /></TableCell> */}
+                            <TableCell padding="checkbox">
+                                <Checkbox checked={this.selectedRow.selectedAll} onChange={(event, checked) => {
+                                    this.selectedRow.setSelectedAll(checked);
+                                }} />
+                            </TableCell>
                             <TableCell>{lang.Bookmark.name}</TableCell>
                             <TableCell>{lang.Bookmark.url}</TableCell>
                             <TableCell className={classes.operateCol}>{lang.Bookmark.list.operate}</TableCell>
@@ -172,14 +179,14 @@ export default class Bookmark extends React.Component {
                     }
                     onRowRender={(ele, idx) => {
                         let noBorder = { borderWidth: 0 };
+                        let item = this.selectedRow.getItems()[idx];
                         return ([
                             <TableRow key={idx}>
-                                {/* <TableCell rowSpan={2} padding="checkbox"><Checkbox onChange={(event, checked) => {
-                                    let list = this.state.selectedRow;
-                                    list[idx] = checked;
-                                    //this.setState({ selectedRow: list });
-                                }} />
-                                </TableCell> */}
+                                <TableCell rowSpan={2} padding="checkbox">
+                                    <Checkbox checked={!!(item && item.selected)} onChange={(event, checked) => {
+                                        this.selectedRow.setSelected(checked, idx);
+                                    }} />
+                                </TableCell>
                                 <TableCell style={{ ...noBorder }}>
                                     <a href={ele.url} title={ele.url} target='_blank'>
                                         {ele.name}
@@ -212,6 +219,20 @@ export default class Bookmark extends React.Component {
                     }}
                 >
                 </MyList>
+                {this.selectedRow.selected && (
+                    <BottomAppBar>
+                        <MyButton onClick={() => {
+                            let idList = [];
+                            this.selectedRow.getItems().forEach(ele => {
+                                if (ele.selected)
+                                    idList.push(ele.value._id);
+                            });
+                            this.onDelClick(idList);
+                        }}>
+                            {lang.Global.operate.delMulti}
+                        </MyButton>
+                    </BottomAppBar>
+                )}
             </div>
         )
     }

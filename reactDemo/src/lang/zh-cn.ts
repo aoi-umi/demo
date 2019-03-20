@@ -10,7 +10,8 @@ let lang = {
             edit: '修改',
 
             del: '删除',
-            delConfirm: '确认删除?',
+            delMulti: '批量删除',
+            delConfirm: '确认删除{0}项?',
             delSuccess: '删除成功',
             deleting: '删除中',
             delFail: '删除失败:',
