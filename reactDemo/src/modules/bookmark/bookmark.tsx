@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router';
+import classNames from 'classnames';
 import { LocationListener } from 'history';
 import { WithStyles, Paper } from '@material-ui/core';
 import TableRow from '@material-ui/core/TableRow';
@@ -34,6 +35,9 @@ const styles = () => ({
     operateCol: {
         textAlign: 'center' as TextAlignProperty
     },
+    noBorder: {
+        borderWidth: 0
+    }
 });
 type InnerProps = RouteComponentProps<{}> & WithStyles<typeof styles> & {};
 
@@ -180,22 +184,23 @@ export default class Bookmark extends React.Component {
                     onRowRender={(ele, idx) => {
                         let noBorder = { borderWidth: 0 };
                         let item = this.selectedRow.getItems()[idx];
-                        return ([
+                        let existsTag = ele.tagList && ele.tagList.length;
+                        let renderRow = [
                             <TableRow key={idx}>
-                                <TableCell rowSpan={2} padding="checkbox">
+                                <TableCell rowSpan={existsTag ? 2 : 1} padding="checkbox">
                                     <Checkbox checked={!!(item && item.selected)} onChange={(event, checked) => {
                                         this.selectedRow.setSelected(checked, idx);
                                     }} />
                                 </TableCell>
-                                <TableCell style={{ ...noBorder }}>
+                                <TableCell className={classNames(existsTag && classes.noBorder)}>
                                     <a href={ele.url} title={ele.url} target='_blank'>
                                         {ele.name}
                                     </a>
                                 </TableCell>
-                                <TableCell style={{ ...noBorder }}>
+                                <TableCell className={classNames(existsTag && classes.noBorder)}>
                                     {ele.url}
                                 </TableCell>
-                                <TableCell className={classes.operateCol} style={{ ...noBorder }}>
+                                <TableCell className={classNames(classes.operateCol, existsTag && classes.noBorder)}>
                                     <Button onClick={() => {
                                         this.showDetail(ele);
                                     }}>{lang.Global.operate.edit}</Button>
@@ -203,15 +208,20 @@ export default class Bookmark extends React.Component {
                                         this.onDelClick(ele._id);
                                     }}>{lang.Global.operate.del}</Button>
                                 </TableCell>
-                            </TableRow>,
-                            <TableRow key={idx + 'tag'}>
-                                <TableCell colSpan={20}>
-                                    {ele.tagList && ele.tagList.map((ele, idx) => {
-                                        return renderBookmarkTag(ele, idx);
-                                    })}
-                                </TableCell>
                             </TableRow>
-                        ]);
+                        ];
+                        if (existsTag) {
+                            renderRow.push(
+                                <TableRow key={idx + 'tag'}>
+                                    <TableCell colSpan={20}>
+                                        {ele.tagList.map((ele, idx) => {
+                                            return renderBookmarkTag(ele, idx);
+                                        })}
+                                    </TableCell>
+                                </TableRow>
+                            );
+                        }
+                        return renderRow;
                     }}
 
                     onAddClick={() => {
