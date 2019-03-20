@@ -72,87 +72,114 @@ const routes: {
 //#endregion
 
 //#region style 
-const drawerWidth = 240;
 
-const styles = (theme: Theme) => createStyles({
-    root: {
-        flexGrow: 1,
-        height: '100%',
-        zIndex: 1,
-        overflow: 'hidden',
-        position: 'relative',
-        display: 'flex',
-    },
-    appBar: {
-        zIndex: theme.zIndex.drawer + 1,
-        transition: theme.transitions.create(['width', 'margin'], {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
-        }),
-        paddingRight: theme.spacing.unit * 2
-    },
-    appBarShift: {
-        marginLeft: drawerWidth,
-        width: `calc(100% - ${drawerWidth}px)`,
-        [theme.breakpoints.down('sm')]: {
-            width: '100%',
+const styles = (theme: Theme) => {
+    const drawerWidth = main.drawerWidth;
+
+    return createStyles({
+        root: {
+            flexGrow: 1,
+            height: '100%',
+            zIndex: 1,
+            overflow: 'hidden',
+            position: 'relative',
+            display: 'flex',
         },
-        transition: theme.transitions.create(['width', 'margin'], {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.enteringScreen,
-        }),
-    },
-    menuButton: {
-        marginLeft: 12,
-        marginRight: 36,
-    },
-    hide: {
-        display: 'none',
-    },
-    //侧边栏
-    drawerPaper: {
-        position: 'relative',
-        whiteSpace: 'nowrap',
-        width: drawerWidth,
-        transition: theme.transitions.create('width', {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.enteringScreen,
-        }),
-    },
-    drawerPaperClose: {
-        overflowX: 'hidden',
-        transition: theme.transitions.create('width', {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
-        }),
-        width: theme.spacing.unit * 9,
-        [theme.breakpoints.down('sm')]: {
-            width: 0,
+        appBar: {
+            zIndex: theme.zIndex.drawer + 1,
+            transition: theme.transitions.create(['width', 'margin'], {
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.leavingScreen,
+            }),
+            paddingRight: theme.spacing.unit * 2
         },
-    },
-    toolbar: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'flex-end',
-        padding: '0 8px',
-        ...theme.mixins.toolbar,
-        backgroundColor: theme.palette.primary.main
-    },
-    content: {
-        flexGrow: 1,
-        backgroundColor: theme.palette.background.default,
-        padding: `${4 * theme.spacing.unit}px ${2 * theme.spacing.unit}px`,
-        marginTop: theme.mixins.toolbar.minHeight,
-        overflow: 'auto',
-    },
-});
+        appBarShift: {
+            marginLeft: drawerWidth,
+            width: `calc(100% - ${drawerWidth}px)`,
+            [theme.breakpoints.down('sm')]: {
+                width: '100%',
+            },
+            transition: theme.transitions.create(['width', 'margin'], {
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.enteringScreen,
+            }),
+        },
+        bottomAppBar: {
+            top: 'auto',
+            bottom: 0,
+            position: 'fixed',
+            paddingRight: theme.spacing.unit * 2,
+            transition: theme.transitions.create(['width', 'margin'], {
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.leavingScreen,
+            }),
+            width: `calc(100% - ${theme.spacing.unit * 9}px)`,
+            [theme.breakpoints.down('sm')]: {
+                width: '100%',
+            },
+            padding: `${1 * theme.spacing.unit}px ${2 * theme.spacing.unit}px`
+        },
+        bottomAppBarShift: {
+            marginLeft: drawerWidth,
+            width: `calc(100% - ${drawerWidth}px)`,
+            [theme.breakpoints.down('sm')]: {
+                width: '100%',
+            },
+            transition: theme.transitions.create(['width', 'margin'], {
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.enteringScreen,
+            }),
+        },
+        menuButton: {
+            marginLeft: 12,
+            marginRight: 36,
+        },
+        hide: {
+            display: 'none',
+        },
+        //侧边栏
+        drawerPaper: {
+            position: 'relative',
+            whiteSpace: 'nowrap',
+            width: drawerWidth,
+            transition: theme.transitions.create('width', {
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.enteringScreen,
+            }),
+        },
+        drawerPaperClose: {
+            overflowX: 'hidden',
+            transition: theme.transitions.create('width', {
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.leavingScreen,
+            }),
+            width: theme.spacing.unit * 9,
+            [theme.breakpoints.down('sm')]: {
+                width: 0,
+            },
+        },
+        toolbar: {
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+            padding: '0 8px',
+            ...theme.mixins.toolbar,
+            backgroundColor: theme.palette.primary.main
+        },
+        content: {
+            flexGrow: 1,
+            backgroundColor: theme.palette.background.default,
+            padding: `${4 * theme.spacing.unit}px ${2 * theme.spacing.unit}px`,
+            marginTop: theme.mixins.toolbar.minHeight,
+            overflow: 'auto',
+        },
+    });
+};
 
 //#endregion 
 type AppProps = {
 }
-type InnerProps = RouteComponentProps<AppProps> & WithStyles<typeof styles, true> & WithWidth & {
-    test: testModel.Test
-};
+type InnerProps = RouteComponentProps<AppProps> & WithStyles<typeof styles, true> & WithWidth;
 
 @withWidthDeco()
 @withStylesDeco(styles, { withTheme: true })
@@ -358,6 +385,7 @@ export default class App extends React.Component<AppProps, { anchorEl?: any }> {
     }
     render() {
         const { classes } = this.innerProps;
+        const { dataSource } = this;
         return (
             <div className={classes.root}>
                 {this.renderTop()}
@@ -371,3 +399,36 @@ export default class App extends React.Component<AppProps, { anchorEl?: any }> {
         );
     }
 }
+
+const bottomAppBarStyles = (theme: Theme) => {
+    const drawerWidth = main.drawerWidth;
+
+    return createStyles({
+        bottomAppBar: {
+            top: 'auto',
+            bottom: 0,
+            position: 'fixed',
+            paddingRight: theme.spacing.unit * 2,
+            transition: theme.transitions.create(['width', 'margin'], {
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.leavingScreen,
+            }),
+            width: `calc(100% - ${theme.spacing.unit * 9}px)`,
+            [theme.breakpoints.down('sm')]: {
+                width: '100%',
+            },
+            padding: `${1 * theme.spacing.unit}px ${2 * theme.spacing.unit}px`
+        },
+        bottomAppBarShift: {
+            marginLeft: drawerWidth,
+            width: `calc(100% - ${drawerWidth}px)`,
+            [theme.breakpoints.down('sm')]: {
+                width: '100%',
+            },
+            transition: theme.transitions.create(['width', 'margin'], {
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.enteringScreen,
+            }),
+        },
+    });
+};

@@ -1,3 +1,4 @@
+export * from './Base';
 export { default as MySnackbar } from './MySnackbar';
 export * from './MySnackbar';
 export { default as MyDialog } from './MyDialog';

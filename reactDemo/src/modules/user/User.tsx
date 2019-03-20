@@ -244,7 +244,7 @@ export class Account extends React.Component {
             return (
                 <Paper style={{ padding: 10 }}>
                     <Grid container direction="row">
-                        <Grid container item xs={1} justify="flex-end" className={classes.firstCol}>
+                        <Grid container item xs={2} sm={1} justify="flex-end" className={classes.firstCol}>
                             {lang.User.account}
                         </Grid>
                         <Grid item>
@@ -253,7 +253,7 @@ export class Account extends React.Component {
                     </Grid>
 
                     <Grid container direction="row">
-                        <Grid container item xs={1} justify="flex-end" className={classes.firstCol}>
+                        <Grid container item xs={2} sm={1} justify="flex-end" className={classes.firstCol}>
                             {lang.User.nickname}
                         </Grid>
                         <Grid item>

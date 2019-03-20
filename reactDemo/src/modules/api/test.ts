@@ -16,6 +16,17 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
     bookmarkDel,
 }>;
 export type TestApiConfigType = ApiConfigModel<TestApiMethod>;
+
+export type Result<T=any> = {
+    result: boolean;
+    msg?: string;
+    data: T;
+};
+
+export type ListResult<T=any> = {
+    total: number;
+    rows: T[];
+};
 export class TestApi extends ApiModel<TestApiMethod> {
     constructor(apiConfig: TestApiConfigType) {
         super(apiConfig, {
@@ -27,7 +38,7 @@ export class TestApi extends ApiModel<TestApiMethod> {
                     req.headers[cacheKey.testUser] = token;
                 return req;
             },
-            afterResponse: async (res) => {
+            afterResponse: async (res: Result) => {
                 if (!res.result)
                     throw error(res.msg);
                 return res.data;
@@ -54,13 +65,13 @@ export class TestApi extends ApiModel<TestApiMethod> {
 
     //#region bookmark 
     async bookmarkQuery(data?: { name?, url?, anyKey?} & ListQueryRequest) {
-        return this.requestByConfig(this.apiConfig.method.bookmarkQuery, { data });
+        return this.requestByConfig<ListResult>(this.apiConfig.method.bookmarkQuery, { data });
     }
     async bookmarkSave(data) {
         return this.requestByConfig(this.apiConfig.method.bookmarkSave, { data });
     }
-    async bookmarkDel(_id: string) {
-        return this.requestByConfig(this.apiConfig.method.bookmarkDel, { data: { _id } });
+    async bookmarkDel(idList: string[]) {
+        return this.requestByConfig(this.apiConfig.method.bookmarkDel, { data: { idList } });
     }
     //#endregion
 }

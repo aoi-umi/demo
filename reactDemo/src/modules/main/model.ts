@@ -9,6 +9,8 @@ export class Main {
     @observable
     user: User;
 
+    drawerWidth = 240;
+
     constructor() {
         this.init();
     }
