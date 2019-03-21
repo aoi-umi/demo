@@ -103,33 +103,7 @@ const styles = (theme: Theme) => {
                 easing: theme.transitions.easing.sharp,
                 duration: theme.transitions.duration.enteringScreen,
             }),
-        },
-        bottomAppBar: {
-            top: 'auto',
-            bottom: 0,
-            position: 'fixed',
-            paddingRight: theme.spacing.unit * 2,
-            transition: theme.transitions.create(['width', 'margin'], {
-                easing: theme.transitions.easing.sharp,
-                duration: theme.transitions.duration.leavingScreen,
-            }),
-            width: `calc(100% - ${theme.spacing.unit * 9}px)`,
-            [theme.breakpoints.down('sm')]: {
-                width: '100%',
-            },
-            padding: `${1 * theme.spacing.unit}px ${2 * theme.spacing.unit}px`
-        },
-        bottomAppBarShift: {
-            marginLeft: drawerWidth,
-            width: `calc(100% - ${drawerWidth}px)`,
-            [theme.breakpoints.down('sm')]: {
-                width: '100%',
-            },
-            transition: theme.transitions.create(['width', 'margin'], {
-                easing: theme.transitions.easing.sharp,
-                duration: theme.transitions.duration.enteringScreen,
-            }),
-        },
+        },        
         menuButton: {
             marginLeft: 12,
             marginRight: 36,
@@ -399,36 +373,3 @@ export default class App extends React.Component<AppProps, { anchorEl?: any }> {
         );
     }
 }
-
-const bottomAppBarStyles = (theme: Theme) => {
-    const drawerWidth = main.drawerWidth;
-
-    return createStyles({
-        bottomAppBar: {
-            top: 'auto',
-            bottom: 0,
-            position: 'fixed',
-            paddingRight: theme.spacing.unit * 2,
-            transition: theme.transitions.create(['width', 'margin'], {
-                easing: theme.transitions.easing.sharp,
-                duration: theme.transitions.duration.leavingScreen,
-            }),
-            width: `calc(100% - ${theme.spacing.unit * 9}px)`,
-            [theme.breakpoints.down('sm')]: {
-                width: '100%',
-            },
-            padding: `${1 * theme.spacing.unit}px ${2 * theme.spacing.unit}px`
-        },
-        bottomAppBarShift: {
-            marginLeft: drawerWidth,
-            width: `calc(100% - ${drawerWidth}px)`,
-            [theme.breakpoints.down('sm')]: {
-                width: '100%',
-            },
-            transition: theme.transitions.create(['width', 'margin'], {
-                easing: theme.transitions.easing.sharp,
-                duration: theme.transitions.duration.enteringScreen,
-            }),
-        },
-    });
-};

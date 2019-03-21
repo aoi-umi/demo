@@ -1,6 +1,8 @@
 
 import * as React from 'react';
 
+import classNames from 'classnames';
+
 import { PositionProperty } from 'csstype';
 import { WithStyles, Theme } from "@material-ui/core";
 import Button, { ButtonProps } from '@material-ui/core/Button';
@@ -12,10 +14,12 @@ import { withStylesDeco } from '../../helpers/util';
 import { MyButtonModel } from './model';
 
 const styles = (theme: Theme) => ({
+    fullWidth: {
+        width: '100%'
+    },
     wrapper: {
         margin: theme.spacing.unit,
         position: 'relative' as PositionProperty,
-        width: '100%'
     },
     buttonProgress: {
         position: 'absolute' as PositionProperty,
@@ -28,6 +32,7 @@ const styles = (theme: Theme) => ({
 
 type Props = {
     model?: MyButtonModel;
+    fullWidth?: boolean;
 } & ButtonProps;
 
 type InnerProps = Props & WithStyles<typeof styles> & {
@@ -59,7 +64,7 @@ export default class MyButton extends React.Component<Props> {
             loading = <CircularProgress size={24} className={classes.buttonProgress} />;
         }
         return (
-            <div className={classes.wrapper}>
+            <div className={classNames(classes.wrapper, restProps.fullWidth && classes.fullWidth)}>
                 <Button variant="contained" color="primary" disabled={model.loading || !!model.countDown} {...restProps} children={child} />
                 {loading}
             </div>
