@@ -90,7 +90,7 @@ export default class Bookmark extends React.Component {
     }
 
     private refresh = () => {
-        this.listModel.page.setPage(this.listModel.page.pageIndex);
+        this.listModel.load();
     }
 
     private showDetail = (detail?) => {

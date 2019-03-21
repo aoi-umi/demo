@@ -114,6 +114,8 @@ export default class MyPagination extends React.Component<PaginationProps> {
         let { pageModel } = this;
         pageModel.setPageSize(event.target.value);
         pageModel.setPage(1);
+        if (this.innerProps.onPageClick)
+            this.innerProps.onPageClick(pageModel);
     }
 
     renderPagination() {
