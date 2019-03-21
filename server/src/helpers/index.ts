@@ -1,5 +1,8 @@
 import { Request, Response, Express } from 'express';
 import * as Q from 'q';
+import * as moment from 'moment';
+import { MongooseDocument, Error } from 'mongoose';
+
 import { ajvInst, refType } from './ajv';
 import * as common from '../_system/common';
 import errorConfig from '../config/errorConfig';
@@ -53,11 +56,11 @@ export let paramsValid = function (schema, data, opt?: { list?: boolean }) {
         ...opt,
     }
     //删除空
-    Object.keys(data).forEach(function (ele) {
-        if (data[ele] === '' || data[ele] === null) {
-            delete data[ele];
-        }
-    });
+    // Object.keys(data).forEach(function (ele) {
+    //     if (data[ele] === '' || data[ele] === null) {
+    //         delete data[ele];
+    //     }
+    // });
     if (opt.list) {
         schema.properties = {
             pageIndex: { // 页码
@@ -95,4 +98,60 @@ export let paramsValid = function (schema, data, opt?: { list?: boolean }) {
         if (data.rows > 50)
             data.rows = 50;
     }
+}
+
+/**
+ * mongoose数据模型验证
+ */
+export let mongooseValid = function (dict: { [key: string]: MongooseDocument }) {
+    let list = [];
+    let invaild = false;
+    for (let key in dict) {
+        let ele = dict[key];
+        let err: any = ele.validateSync();
+        if (err && err.errors) {
+            invaild = true;
+            let subList = [];
+            for (let errorKey in err.errors) {
+                let error: Error.ValidatorError = err.errors[errorKey];
+                subList.push(`${error.path}`);
+            }
+            list.push(`[${key}] errors:` + subList.join(';'));
+        }
+    }
+    if (invaild) {
+        throw common.error({ remark: list.join('#') }, errorConfig.ARGS_ERROR);
+    }
+}
+
+/**
+ * mongo 日期范围匹配
+ */
+export let dbDateMatch = function (dateFrom, dateTo) {
+    let mongoDate, sqlDate;
+    if (dateFrom || dateTo) {
+        mongoDate = {};
+        sqlDate = {};
+        if (dateFrom) {
+            if (typeof dateFrom == 'string' && dateFrom.includes('T')) {
+                dateFrom = new Date(dateFrom)
+            }
+            let from = moment(dateFrom, 'YYYY-MM-DD').toDate();
+
+            mongoDate.$gte = from;
+            // sqlDate[Op.gte] = from;
+        }
+        if (dateTo) {
+            if (typeof dateTo == 'string' && dateTo.includes('T')) {
+                dateTo = new Date(dateTo)
+            }
+            let to = moment(dateTo, 'YYYY-MM-DD').add({ day: 1 }).toDate();
+            mongoDate.$lt = to;
+            // sqlDate[Op.lt] = to;
+        }
+    }
+    return {
+        mongoDate,
+        sqlDate,
+    };
 }

@@ -241,7 +241,7 @@ export default class MyPagination extends React.Component<PaginationProps> {
                     }}
                 >
                 </TextField>
-                <Button className={`${classes.pageBtn} ${classes.goBtn}`} onClick={(e) => {
+                <Button variant="contained" size="small" className={`${classes.pageBtn} ${classes.goBtn}`} onClick={(e) => {
                     let page = parseInt(this.inputPage);
                     this.handlePageButtonClick(e, page);
                 }}>
