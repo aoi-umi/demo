@@ -182,7 +182,6 @@ export default class Bookmark extends React.Component {
                         </TableRow>
                     }
                     onRowRender={(ele, idx) => {
-                        let noBorder = { borderWidth: 0 };
                         let item = this.selectedRow.getItems()[idx];
                         let existsTag = ele.tagList && ele.tagList.length;
                         let renderRow = [
@@ -229,20 +228,16 @@ export default class Bookmark extends React.Component {
                     }}
                 >
                 </MyList>
-                {this.selectedRow.selected && (
-                    <BottomAppBar>
-                        <MyButton onClick={() => {
-                            let idList = [];
-                            this.selectedRow.getItems().forEach(ele => {
-                                if (ele.selected)
-                                    idList.push(ele.value._id);
-                            });
-                            this.onDelClick(idList);
-                        }}>
-                            {lang.Global.operate.delMulti}
-                        </MyButton>
-                    </BottomAppBar>
-                )}
+                <BottomAppBar in={this.selectedRow.selected}>
+                    <MyButton onClick={() => {
+                        let idList = this.selectedRow.selectedItems.map(ele => {
+                            return ele.value._id;
+                        });
+                        this.onDelClick(idList);
+                    }}>
+                        {lang.Global.operate.delMulti}
+                    </MyButton>
+                </BottomAppBar>
             </div>
         )
     }
