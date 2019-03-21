@@ -32,7 +32,7 @@
     "@types/cookie-parser": "^1.4.1",
     "@types/express": "^4.16.0",
     "@types/ioredis": "^4.0.3",
-    "@types/mongoose": "^5.2.20",
+    "@types/mongoose": "^5.3.23",
     "@types/morgan": "^1.7.35",
     "@types/q": "^1.5.1"
   }

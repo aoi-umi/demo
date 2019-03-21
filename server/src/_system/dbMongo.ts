@@ -1,10 +1,43 @@
 import * as Q from 'q';
 import * as mongoose from 'mongoose';
 import { Model } from 'mongoose';
-import { ClientSession } from 'mongodb';
+import * as mongodb from 'mongodb';
+import { ClientSession, MongoClient, CommonOptions } from 'mongodb';
 
 import config from '../config/config';
+require('mongoose').Promise = Q.Promise;
+declare module 'mongoose' {
+    type Promise<T> = Q.Promise<T>;
 
+    //补充
+    interface Document {
+        remove(opt?: CommonOptions, fn?: (err: any, product: this) => void): Promise<this>;
+    }
+    interface Model<T extends Document, QueryHelpers = {}> {
+        deleteMany(conditions: any, opt?: CommonOptions, callback?: (err: any) => void): Query<mongodb.WriteOpResult['result']> & QueryHelpers;
+
+        findByIdAndDelete(id: any, options?: CommonOptions & {
+            /** if multiple docs are found by the conditions, sets the sort order to choose which doc to update */
+            sort?: any;
+            /** sets the document fields to return */
+            select?: any;
+        }): DocumentQuery<T | null, T> & QueryHelpers;
+
+        findOneAndRemove(conditions: any, options: CommonOptions & {
+			/**
+			 * if multiple docs are found by the conditions, sets the sort order to choose
+			 * which doc to update
+			 */
+            sort?: any;
+            /** puts a time limit on the query - requires mongodb >= 2.6.0 */
+            maxTimeMS?: number;
+            /** sets the document fields to return */
+            select?: any;
+        }): DocumentQuery<T | null, T> & QueryHelpers;
+
+        bulkWrite(writes: any[], options?: CommonOptions): Promise<mongodb.BulkWriteOpResultObject>;
+    }
+}
 export function connect() {
     return mongoose.connect(config.mongoose.uri, config.mongoose.options);
 }
