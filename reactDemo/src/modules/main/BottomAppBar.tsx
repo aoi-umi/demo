@@ -6,6 +6,7 @@ import { WithStyles, createStyles } from '@material-ui/core/styles';
 import { Theme } from '@material-ui/core';
 
 import AppBar from '@material-ui/core/AppBar';
+import Slide from '@material-ui/core/Slide';
 
 import { withStylesDeco } from '../../helpers/util';
 
@@ -44,18 +45,23 @@ const styles = (theme: Theme) => {
     });
 };
 
-type InnerProps = WithStyles<typeof styles, true>;
+type BottomAppBarProps = {
+    in?: boolean;
+}
+type InnerProps = BottomAppBarProps & WithStyles<typeof styles, true>;
 @withStylesDeco(styles, { withTheme: true })
-export default class BottomAppBar extends React.Component {
+export default class BottomAppBar extends React.Component<BottomAppBarProps> {
     private get innerProps() {
         return this.props as InnerProps;
     }
     render() {
         let { classes } = this.innerProps;
         return (
-            <AppBar color="inherit" className={classNames(classes.bottomAppBar, main.open && classes.bottomAppBarShift)}>
-                {this.props.children}
-            </AppBar>
+            <Slide direction="up" in={this.props.in} mountOnEnter unmountOnExit>
+                <AppBar color="inherit" className={classNames(classes.bottomAppBar, main.open && classes.bottomAppBarShift)}>
+                    {this.props.children}
+                </AppBar>
+            </Slide>
         );
     }
 }

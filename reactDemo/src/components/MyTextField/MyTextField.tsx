@@ -18,13 +18,16 @@ export default class MyTextField extends React.Component<Props> {
         let { fieldKey, model, ...restProps } = this.innerProps;
         return (
             <MyForm style={{ marginTop: 15 }} fieldKey={fieldKey} model={model} renderChild={(key) => {
+                let val = model.getValue(key);
+                if (![0, false].includes(val) && !val)
+                    val = '';
                 return (
                     <TextField
                         variant="outlined"
                         InputLabelProps={{
                             shrink: true,
                         }}
-                        value={model.field[key] || ''}
+                        value={val}
                         onChange={(e) => {
                             model.changeValue(key, e.target.value);
                         }}

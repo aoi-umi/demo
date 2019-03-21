@@ -25,16 +25,44 @@ export abstract class Model<T> {
 
     @action
     changeValue(key: string, value: any) {
-        this.field[key] = value;
+        this._setValue(key, value);
         this.valid(key);
     }
 
     @action
     setValue(obj: any) {
         for (let key in obj) {
-            this.field[key] = obj[key];
+            this._setValue(key, obj[key]);
             this.valid(key);
         }
+    }
+
+    _setValue(key: string, val: any) {
+        let list = key.split('.');
+        let lastKey = list.pop();
+        let obj = this.field;
+        if (obj) {
+            for (let idx in list) {
+                obj = obj[list[idx]];
+                if (!obj)
+                    break;
+            }
+        }
+        if (obj && lastKey)
+            obj[lastKey] = val;
+    }
+
+    getValue(key: string) {
+        let list = key.split('.');
+        let obj = this.field;
+        if (obj) {
+            for (let idx in list) {
+                obj = obj[list[idx]];
+                if (!obj)
+                    return obj;
+            }
+        }
+        return obj;
     }
 
     valid(key: string) {
@@ -43,7 +71,7 @@ export abstract class Model<T> {
         if (validConfig) {
             for (let ele of validConfig.validator) {
                 runInAction(() => {
-                    let msg = ele(this.field[key], this.field);
+                    let msg = ele(this.getValue(key), this.field);
                     if (typeof msg == 'string') {
                         rs.err = { msg };
                     } else if (msg) {
@@ -123,6 +151,11 @@ export class SelectedObject<T=any> {
     @computed
     get selected() {
         return this.getItems().findIndex(ele => ele.selected) >= 0;
+    }
+
+    @computed
+    get selectedItems() {
+        return this.getItems().filter(ele => ele.selected);
     }
 
     @observable
