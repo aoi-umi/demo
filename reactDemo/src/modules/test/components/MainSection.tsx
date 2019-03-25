@@ -3,6 +3,9 @@ import { NavLink, RouteComponentProps } from 'react-router-dom';
 import Button from '@material-ui/core/Button';
 import Input from '@material-ui/core/Input';
 import { observer, inject } from 'mobx-react';
+import * as anime from 'animejs';
+//@ts-ignore
+anime = anime['default'];
 import { Test } from '../model';
 import { withRouterDeco } from '../../../helpers/util';
 import { msgNotice } from '../../../helpers/common';
@@ -18,14 +21,25 @@ type InnerProps = MainSectionProps & RouteComponentProps<any> & {
 @inject('test')
 @observer
 export default class MainSection extends React.Component<MainSectionProps> {
+    content: any;
     private get innerProps() {
         return this.props as InnerProps;
     }
     constructor(props) {
         super(props);
     }
+
+    componentDidUpdate() {
+        anime({
+            targets: this.content,
+            translateX: 300,
+            duration: 1000,
+            easing: 'linear'
+        })
+    }
     public render() {
         const { history, test } = this.innerProps;
+
         return (
             <div>
                 <h4 onClick={() => { test.setText(test.input) }}> Hello {test.text} </h4>
@@ -41,6 +55,9 @@ export default class MainSection extends React.Component<MainSectionProps> {
                         console.log(t);
                     });
                 }}>msg notice</Button>
+                <div style={{ height: 500, width: 500, background: '#0ff', opacity: 0.6 }}>
+                    <div ref={el => { this.content = el; }}>12345</div>
+                </div>
             </div>
         )
     }
