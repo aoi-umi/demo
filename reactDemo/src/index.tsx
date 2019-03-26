@@ -12,7 +12,7 @@ import config from './config';
 import App from './modules/main/App';
 import { Test } from './modules/test/model';
 
-configure({ enforceActions: 'always' });
+// configure({ enforceActions: 'always' });
 document.title = config.title;
 const store = {
     test: new Test()
