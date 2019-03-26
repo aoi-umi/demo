@@ -93,3 +93,15 @@ export let stringFormat = function (formatString: string, ...args) {
     });
     return result;
 };
+
+export const stopAnimation = (animations: anime.AnimeInstance | anime.AnimeInstance[]) => {
+    const stop = (anim: anime.AnimeInstance) => {
+        if (anim) {
+            const { duration, remaining } = anim;
+            if (remaining === 1) anim.seek(duration);
+            else anim.pause();
+        }
+    };
+    if (Array.isArray(animations)) animations.forEach(anim => stop(anim));
+    else stop(animations);
+};

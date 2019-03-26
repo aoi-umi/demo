@@ -348,7 +348,7 @@ export default class App extends React.Component<AppProps, { anchorEl?: any }> {
                     return (
                         <Route key={i}
                             exact={ele.exact === false ? false : true}
-                            path={ele.path || null}
+                            path={ele.path || null}                            
                             render={() => {
                                 dataSource.setTitle(ele.title);
                                 return ele.comp;
