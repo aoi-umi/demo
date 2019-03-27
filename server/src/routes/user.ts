@@ -16,10 +16,7 @@ export let accountExists: RequestHandler = (req, res) => {
         } = req.body;
         paramsValid(schema, data);
         let rs = await UserMapper.accountExists(data.account);
-        return {
-            result: true,
-            data: rs
-        };
+        return rs && { _id: rs._id };
     }, req, res);
 };
 
@@ -41,11 +38,8 @@ export let signUp: RequestHandler = (req, res) => {
         let user = await UserModel.create(data);
 
         return {
-            result: true,
-            data: {
-                _id: user._id,
-                account: user.account
-            }
+            _id: user._id,
+            account: user.account
         };
     }, req, res);
 };
@@ -72,10 +66,7 @@ export let signIn: RequestHandler = (req, res) => {
         let userInfoKey = cacheKey.user + token;
         let returnUser = { _id: user._id, account: user.account, nickname: user.nickname, key: token };
         await cache.set(userInfoKey, returnUser, cacheTime.user);
-        return {
-            result: true,
-            data: returnUser
-        };
+        return returnUser;
     }, req, res);
 };
 
@@ -85,18 +76,27 @@ export let signOut: RequestHandler = (req, res) => {
         if (user) {
             await cache.del(user.key);
         }
-        return {
-            result: true,
-        };
     }, req, res);
 };
 
 export let info: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        return {
-            result: true,
-            data: user
-        };
+        return user;
     }, req, res);
 };
+
+export let list: RequestHandler = (req, res) => {
+    responseHandler(async () => {
+        let data = req.query;
+        paramsValid({}, data, { list: true });
+        let { rows, total } = await UserModel.findAndCountAll({
+            projection: { password: 0 },
+            page: data.page, rows: data.rows
+        });
+        return {
+            rows,
+            total
+        };
+    }, req, res);
+}

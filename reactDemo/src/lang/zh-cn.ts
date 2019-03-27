@@ -27,7 +27,12 @@ let lang = {
             bookmark: '书签',
             userSignUp: '注册',
             userAccount: '个人中心',
+            adminUser: '用户管理',
             notFound: 'Not Found',
+        },
+        menu: {
+            home: 'Home',
+            user: 'User',
         }
     },
     User: {
@@ -35,6 +40,9 @@ let lang = {
         nickname: '昵称',
         password: '密码',
         confirmPassword: '确认密码',
+        createdAt: '创建时间',
+
+        accountExists: '账号已存在',
         operate: {
             signIn: '登录',
 

@@ -21,6 +21,7 @@ const styles = (theme: Theme) => ({
         margin: theme.spacing.unit,
         position: 'relative' as PositionProperty,
     },
+    button: {},
     buttonProgress: {
         position: 'absolute' as PositionProperty,
         top: '50%',
@@ -65,7 +66,7 @@ export default class MyButton extends React.Component<Props> {
         }
         return (
             <div className={classNames(classes.wrapper, restProps.fullWidth && classes.fullWidth)}>
-                <Button variant="contained" color="primary" disabled={model.loading || !!model.countDown} {...restProps} children={child} />
+                <Button className={classes.button} variant="contained" color="primary" disabled={model.loading || !!model.countDown} {...restProps} children={child} />
                 {loading}
             </div>
         );

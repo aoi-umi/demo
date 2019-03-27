@@ -11,6 +11,7 @@ type ResponseHandlerOptType = {
     json?: boolean;
     noSend?: boolean;
     sendAsFile?: boolean;
+    originRes?: boolean;
 }
 export let responseHandler = function (fn: (opt?: ResponseHandlerOptType) => any, req: Request, res: Response, next?) {
     let opt: ResponseHandlerOptType = {
@@ -38,6 +39,12 @@ export let responseHandler = function (fn: (opt?: ResponseHandlerOptType) => any
             res.end(result.fileBuff);
         }
         else {
+            if (!opt.originRes) {
+                result = {
+                    result: true,
+                    data: result,
+                }
+            }
             res.json(result);
             //log.response = result;
         }

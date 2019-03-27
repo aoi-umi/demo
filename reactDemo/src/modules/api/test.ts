@@ -11,6 +11,7 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
     userSignOut,
     userInfo,
     userAccountExists,
+    adminUserList,
     bookmarkQuery,
     bookmarkSave,
     bookmarkDel,
@@ -60,6 +61,10 @@ export class TestApi extends ApiModel<TestApiMethod> {
     }
     async userAccountExists(account: string) {
         return this.requestByConfig(this.apiConfig.method.userAccountExists, { data: { account } });
+    }
+
+    async adminUserList(data?) {
+        return this.requestByConfig(this.apiConfig.method.adminUserList, { data });
     }
     //#endregion
 

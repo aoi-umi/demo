@@ -37,11 +37,8 @@ export let query: RequestHandler = (req, res) => {
             rows: data.rows
         });
         return {
-            result: true,
-            data: {
-                rows,
-                total
-            }
+            rows,
+            total
         };
     }, req, res);
 };
@@ -91,9 +88,6 @@ export let save: RequestHandler = (req, res) => {
                 update.tagList = match.tagList;
             await match.update(update);
         }
-        return {
-            result: true,
-        };
     }, req, res);
 }
 
@@ -103,8 +97,5 @@ export let del: RequestHandler = (req, res) => {
         let rs = await BookmarkModel.deleteMany({ _id: { $in: data.idList.map(id => Types.ObjectId(id)) } });
         if (!rs.n)
             throw error('No Match Data');
-        return {
-            result: true,
-        };
     }, req, res);
 }
