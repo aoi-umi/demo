@@ -15,7 +15,7 @@ import { Test } from './modules/test/model';
 
 // configure({ enforceActions: 'always' });
 document.title = config.title;
-const store = {
+const storage = {
     test: new Test()
 }
 
@@ -39,7 +39,7 @@ export function withCustomTheme(child) {
     );
 }
 render((
-    <Provider {...store}>
+    <Provider {...storage}>
         <Router>
             {withCustomTheme(<App />)}
         </Router>
