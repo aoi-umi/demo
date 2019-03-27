@@ -24,8 +24,10 @@ export class Base extends Model<Base> {
         let query = self.find(options.conditions, options.projection);
         if (!options.getAll)
             query.skip((options.page - 1) * options.rows).limit(options.rows);
-        if (options.sort)
-            query.sort(options.sort);
+        let sort = options.sort || {};
+        if (!sort._id)
+            sort._id = -1;
+        query.sort(sort);
         let rs = await Q.all([
             query.exec(),
             options.getAll ? null : self.find(options.conditions).countDocuments().exec(),
