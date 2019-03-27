@@ -28,7 +28,7 @@ import {
 } from '../../components';
 import { msgNotice } from '../../helpers/common';
 import { testApi } from '../api';
-import BottomAppBar from '../main/BottomAppBar';
+import { BottomAppBar } from '../components';
 import { BookmarkQueryModel, BookmarkDetailModel, BookmarkShowTag } from './model';
 
 const styles = () => ({
@@ -301,7 +301,7 @@ class BookmarkDetail extends React.Component<DetailProps>{
 
     private onSave = async () => {
         let { detailModel, btnModel } = this;
-        let isVaild = this.detailModel.validAll();
+        let isVaild = await this.detailModel.validAll();
         if (!isVaild)
             return;
         try {

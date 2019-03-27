@@ -11,6 +11,7 @@ const envConfig = {
 };
 const config = {
     title: '开发',
+    dateFormat: 'YYYY-MM-DD HH:mm:ss',
     api: {
         test: {
             defaultArgs: {
@@ -28,6 +29,10 @@ const config = {
                 },
                 userInfo: {
                     url: '/user/info',
+                },
+                adminUserList: {
+                    url: '/admin/user/list',
+                    method: 'get',
                 },
                 userAccountExists: {
                     url: '/user/accountExists',

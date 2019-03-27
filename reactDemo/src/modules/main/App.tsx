@@ -30,11 +30,12 @@ import { NotMatch } from '../error';
 import { testApi } from '../api';
 import {
     MainSection as TestMainSection,
-    model as testModel,
 } from '../test';
 
+import { DialogPage } from '../components';
 import {
-    SignIn, SignUp, Account
+    SignIn, SignUp, Account,
+    AdminUser
 } from '../user';
 
 import BookMark from '../bookmark';
@@ -45,6 +46,7 @@ const routes: {
     comp: JSX.Element,
     title?: string,
     exact?: boolean,
+    authority?: string[],
 }[] = [{
     path: routeConfig.index,
     comp: <BookMark />,
@@ -61,6 +63,12 @@ const routes: {
     path: routeConfig.userAccount,
     comp: <Account />,
     title: lang.App.routes.userAccount,
+    authority: ['login'],
+}, {
+    path: routeConfig.adminUser,
+    comp: <AdminUser />,
+    title: lang.App.routes.adminUser,
+    authority: ['login'],
 }, {
     path: routeConfig.test,
     comp: <TestMainSection />,
@@ -103,7 +111,7 @@ const styles = (theme: Theme) => {
                 easing: theme.transitions.easing.sharp,
                 duration: theme.transitions.duration.enteringScreen,
             }),
-        },        
+        },
         menuButton: {
             marginLeft: 12,
             marginRight: 36,
@@ -348,9 +356,15 @@ export default class App extends React.Component<AppProps, { anchorEl?: any }> {
                     return (
                         <Route key={i}
                             exact={ele.exact === false ? false : true}
-                            path={ele.path || null}                            
+                            path={ele.path || null}
                             render={() => {
                                 dataSource.setTitle(ele.title);
+                                if (ele.authority && ele.authority.includes('login') && !main.user.isLogin) {
+                                    return (
+                                        <DialogPage>
+                                            <SignIn />
+                                        </DialogPage>);
+                                }
                                 return ele.comp;
                             }} />);
                 })}

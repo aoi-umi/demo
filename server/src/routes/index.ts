@@ -9,6 +9,7 @@ router.post('/user/signUp', user.signUp);
 router.post('/user/signIn', user.signIn);
 router.post('/user/signOut', user.signOut);
 router.post('/user/info', user.info);
+router.get('/admin/user/list', user.list);
 //#endregion
 
 //#region bookmark 

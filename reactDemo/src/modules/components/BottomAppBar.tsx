@@ -11,7 +11,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 
 import { withStylesDeco } from '../../helpers/util';
 
-import { main } from './constant';
+import { main } from '../main/constant';
 
 const styles = (theme: Theme) => {
     const drawerWidth = main.drawerWidth;
@@ -60,7 +60,7 @@ type BottomAppBarProps = {
 }
 type InnerProps = BottomAppBarProps & WithStyles<typeof styles, true>;
 @withStylesDeco(styles, { withTheme: true })
-export default class BottomAppBar extends React.Component<BottomAppBarProps> {
+export class BottomAppBar extends React.Component<BottomAppBarProps> {
     private get innerProps() {
         return this.props as InnerProps;
     }

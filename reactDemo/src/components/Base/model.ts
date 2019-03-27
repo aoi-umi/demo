@@ -65,30 +65,28 @@ export abstract class Model<T> {
         return obj;
     }
 
-    valid(key: string) {
+    async valid(key: string) {
         let rs = { isVaild: true, err: { msg: '' } as ValidError };
         let validConfig = this.validConfig && this.validConfig[key];
         if (validConfig) {
             for (let ele of validConfig.validator) {
-                runInAction(() => {
-                    let msg = ele(this.getValue(key), this.field);
-                    if (typeof msg == 'string') {
-                        rs.err = { msg };
-                    } else if (msg) {
-                        rs.err = msg;
-                    }
-                    this.fieldErr[key] = rs.err;
-                });
+                let msg = await ele(this.getValue(key), this.field, this);
+                if (typeof msg == 'string') {
+                    rs.err = { msg };
+                } else if (msg) {
+                    rs.err = msg;
+                }
+                this.fieldErr[key] = rs.err;
                 rs.isVaild = !rs.err.msg;
             }
         }
         return rs;
     }
 
-    validAll() {
+    async validAll() {
         let isVaild = true;
         for (let key in this.field) {
-            let rs = this.valid(key);
+            let rs = await this.valid(key);
             if (!rs.isVaild)
                 isVaild = false;
         }

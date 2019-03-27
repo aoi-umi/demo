@@ -46,11 +46,14 @@ class SignUpFieldModel {
 }
 
 export class SignUpModel extends Model<SignUpFieldModel> {
+    accountExistsErr: string;
     constructor() {
         super(new SignUpFieldModel(), {
             validConfig: {
                 account: {
-                    validator: [required]
+                    validator: [required, (val, field, model: SignUpModel) => {
+                        return model.accountExistsErr;
+                    }]
                 },
                 nickname: {
                     validator: [required]

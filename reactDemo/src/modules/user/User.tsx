@@ -1,77 +1,33 @@
 import * as React from 'react';
-import { ReactNode } from 'react';
 import { RouteComponentProps } from 'react-router';
+import { LocationListener } from 'history';
 import Grid from '@material-ui/core/Grid';
-import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
+import TableRow from '@material-ui/core/TableRow';
+import TableCell from '@material-ui/core/TableCell';
+
 import { WithStyles, Theme } from '@material-ui/core';
 
+import { observer } from 'mobx-react';
+import * as qs from 'query-string';
+import * as moment from 'moment';
 
 import lang from '../../lang';
+import config from '../../config';
 import * as util from '../../helpers/util';
 import { withRouterDeco, withStylesDeco, msgNotice } from '../../helpers';
 import { main } from '../main';
 
 import {
+    MyList, ListModel,
     MyButton, MyButtonModel,
     MyTextField,
 } from '../../components';
+import { DialogPage } from '../components';
 import { routeConfig, cacheKey } from '../main';
-import { User } from '../main/model';
 import { testApi } from '../api';
 import { SignInModel, SignUpModel } from './model';
-
-const dialogStyles = (theme: Theme) => ({
-    main: {
-        width: 'auto',
-        display: 'block' as any, // Fix IE 11 issue.
-        [theme.breakpoints.up(400 + theme.spacing.unit * 3 * 2)]: {
-            width: 400,
-            marginLeft: 'auto',
-            marginRight: 'auto',
-        },
-    },
-    paper: {
-        marginTop: theme.spacing.unit * 8,
-        display: 'flex' as any,
-        flexDirection: 'column' as any,
-        alignItems: 'center' as any,
-        padding: `${theme.spacing.unit * 2}px ${theme.spacing.unit * 3}px ${theme.spacing.unit * 3}px`,
-    },
-    avatar: {
-        margin: theme.spacing.unit,
-        backgroundColor: theme.palette.secondary.main,
-    },
-    form: {
-        width: '100%', // Fix IE 11 issue.
-        marginTop: theme.spacing.unit,
-    },
-});
-type DialogProps = {
-    children: ReactNode;
-}
-type DialogInnerProps = DialogProps & WithStyles<typeof dialogStyles>;
-
-
-@withStylesDeco(dialogStyles)
-class Dialog extends React.Component<DialogProps> {
-    private get innerProps() {
-        return this.props as DialogInnerProps;
-    }
-    render() {
-        const { classes } = this.innerProps;
-        return (
-            <main className={classes.main}>
-                <Paper className={classes.paper}>
-                    <form className={classes.form}>
-                        {this.innerProps.children}
-                    </form>
-                </Paper>
-            </main>
-        );
-    }
-}
 
 type SignInProps = {
     onSignInSuccess?: () => void;
@@ -90,7 +46,7 @@ export class SignIn extends React.Component<SignInProps>{
         let { onSignInSuccess } = this.props;
         let { btnModel } = this;
         let { account, password } = this.model.field;
-        let isVaild = this.model.validAll();
+        let isVaild = await this.model.validAll();
         if (!isVaild)
             return;
         try {
@@ -113,12 +69,11 @@ export class SignIn extends React.Component<SignInProps>{
         let { model, btnModel } = this;
         return (
             <Grid container spacing={16}>
-                <Grid item container
-                    onKeyPress={(e) => {
-                        if (e.charCode == 13) {
-                            this.signIn();
-                        }
-                    }}>
+                <Grid item container onKeyPress={(e) => {
+                    if (e.charCode == 13) {
+                        this.signIn();
+                    }
+                }}>
                     <MyTextField fieldKey='account' model={model} autoFocus
                         required label={lang.User.account} />
 
@@ -162,9 +117,6 @@ const signUpStyles = (theme: Theme) => ({
         width: '100%', // Fix IE 11 issue.
         marginTop: theme.spacing.unit,
     },
-    submit: {
-        marginTop: theme.spacing.unit * 3,
-    },
 });
 
 type SignUpInnerProps = RouteComponentProps<{}> & WithStyles<typeof signUpStyles>;
@@ -172,6 +124,7 @@ type SignUpInnerProps = RouteComponentProps<{}> & WithStyles<typeof signUpStyles
 @withStylesDeco(signUpStyles)
 @withRouterDeco
 export class SignUp extends React.Component {
+    btnModel: MyButtonModel;
     private get innerProps() {
         return this.props as SignUpInnerProps;
     }
@@ -180,19 +133,25 @@ export class SignUp extends React.Component {
     constructor(props, context) {
         super(props, context);
         this.model = new SignUpModel();
+        this.btnModel = new MyButtonModel();
     }
 
     signUp = async () => {
         const { history } = this.innerProps;
         let { account, password, nickname } = this.model.field;
         try {
-            if (!this.model.validAll())
+            this.btnModel.load();
+            let isVaild = await this.model.validAll();
+            if (!isVaild) {
+                this.btnModel.loaded();
                 return;
+            }
             await testApi.userSignUp({ account, password, nickname });
             msgNotice(lang.User.operate.signUpSuccess, { snackbarVariant: 'success', autoHideDuration: 3000 }).waitClose().then(() => {
                 history.push({ pathname: routeConfig.index });
             });
         } catch (e) {
+            this.btnModel.loaded();
             msgNotice(e.message);
         }
     }
@@ -200,26 +159,34 @@ export class SignUp extends React.Component {
     render() {
         const { classes } = this.innerProps;
         const { model } = this;
-        let field = model.field;
         return (
-            <Dialog>
+            <DialogPage onSubmit={this.signUp}>
                 <MyTextField fieldKey='account' model={model}
-                    autoFocus required label={lang.User.account} />
+                    autoFocus required label={lang.User.account}
+                    onBlur={async () => {
+                        let account = model.field.account;
+                        let rs: any;
+                        if (account) {
+                            rs = await testApi.userAccountExists(account);
+                        }
+                        model.accountExistsErr = rs ? lang.User.accountExists : '';
+                        model.valid('account');
+                    }} />
                 <MyTextField fieldKey='nickname' model={model} required
                     label={lang.User.nickname} fullWidth />
                 <MyTextField fieldKey='password' model={model} required
                     label={lang.User.password} fullWidth type='password' />
                 <MyTextField fieldKey='confirmPassword' model={model} required
                     label={lang.User.confirmPassword} fullWidth type='password' />
-                <Button
+                <MyButton
                     fullWidth
                     variant="contained"
                     color="primary"
-                    className={classes.submit}
-                    onClick={this.signUp}>
+                    model={this.btnModel}
+                    onClick={this.signUp} type="submit">
                     {lang.User.operate.signUp}
-                </Button>
-            </Dialog>
+                </MyButton>
+            </DialogPage>
         );
     }
 }
@@ -240,34 +207,119 @@ export class Account extends React.Component {
 
     render() {
         let { classes } = this.innerProps;
-        if (main.user.isLogin) {
-            return (
-                <Paper style={{ padding: 10 }}>
-                    <Grid container direction="row">
-                        <Grid container item xs={2} sm={1} justify="flex-end" className={classes.firstCol}>
-                            {lang.User.account}
-                        </Grid>
-                        <Grid item>
-                            {main.user.account}
-                        </Grid>
+        return (
+            <Paper style={{ padding: 10 }}>
+                <Grid container direction="row">
+                    <Grid container item xs={2} sm={1} justify="flex-end" className={classes.firstCol}>
+                        {lang.User.account}
                     </Grid>
+                    <Grid item>
+                        {main.user.account}
+                    </Grid>
+                </Grid>
 
-                    <Grid container direction="row">
-                        <Grid container item xs={2} sm={1} justify="flex-end" className={classes.firstCol}>
-                            {lang.User.nickname}
-                        </Grid>
-                        <Grid item>
-                            {main.user.nickname}
-                        </Grid>
+                <Grid container direction="row">
+                    <Grid container item xs={2} sm={1} justify="flex-end" className={classes.firstCol}>
+                        {lang.User.nickname}
                     </Grid>
-                </Paper>
-            );
-        } else {
-            return (
-                <Dialog>
-                    <SignIn />
-                </Dialog>
-            );
-        }
+                    <Grid item>
+                        {main.user.nickname}
+                    </Grid>
+                </Grid>
+            </Paper>
+        );
+    }
+}
+
+
+const adminUserStyles = () => ({
+});
+
+type InnerProps = RouteComponentProps<{}> & WithStyles<typeof adminUserStyles> & {};
+@withRouterDeco
+@observer
+export class AdminUser extends React.Component {
+    private get innerProps() {
+        return this.props as InnerProps;
+    }
+    private listModel: ListModel;
+    constructor(props, context) {
+        super(props, context);
+        this.listModel = new ListModel({ query: {} as any });
+        this.innerProps.history.listen(this.onHistoryListen);
+    }
+
+    componentDidMount() {
+        this.onHistoryListen(this.innerProps.history.location, null);
+    }
+
+    private modelToObj(model?: ListModel) {
+        let { query, page } = model || this.listModel;
+        let queryObj = {
+            //...query.field,
+            page: page.pageIndex,
+            rows: page.pageSize,
+        };
+        return queryObj;
+    }
+
+    private objToModel(obj: any, model?: ListModel) {
+        if (!model)
+            model = this.listModel;
+
+        model.page.setPage(obj.page);
+        model.page.setPageSize(obj.rows);
+    }
+
+    private onHistoryListen: LocationListener = (location) => {
+        let obj = qs.parse(location.search);
+        this.objToModel(obj);
+        this.listModel.load();
+    }
+
+    public render() {
+        const { listModel } = this;
+        const { classes } = this.innerProps;
+        return (
+            <div>
+                <MyList
+                    queryRows={[]}
+                    hideBtn={{ add: true }}
+                    listModel={listModel}
+                    onQueryClick={(model: ListModel) => {
+                        let queryObj = this.modelToObj();
+                        this.innerProps.history.replace({ pathname: this.innerProps.location.pathname, search: qs.stringify(queryObj) });
+                    }}
+                    onQuery={async () => {
+                        let data = await testApi.adminUserList(this.modelToObj());
+                        return data;
+                    }}
+                    header={
+                        <TableRow>
+                            <TableCell>{lang.User.account}</TableCell>
+                            <TableCell>{lang.User.nickname}</TableCell>
+                            <TableCell>{lang.User.createdAt}</TableCell>
+                        </TableRow>
+                    }
+                    onRowRender={(ele, idx) => {
+                        let renderRow = [
+                            <TableRow key={idx}>
+                                <TableCell>
+                                    {ele.account}
+                                </TableCell>
+                                <TableCell>
+                                    {ele.nickname}
+                                </TableCell>
+                                <TableCell>
+                                    {moment(ele.createdAt).format(config.dateFormat)}
+                                </TableCell>
+                            </TableRow>
+                        ];
+                        return renderRow;
+                    }}
+                >
+                </MyList>
+            </div>
+        )
     }
 }

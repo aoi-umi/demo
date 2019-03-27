@@ -35,6 +35,12 @@ type ListProps = {
     onRowRender: (ele, idx?: number) => any;
     listModel: ListModel;
     onAddClick?: () => any;
+    hideBtn?: {
+        all?: boolean;
+        add?: boolean;
+        reset?: boolean;
+        query?: boolean;
+    }
 }
 
 const styles = (theme: Theme) => ({
@@ -132,7 +138,7 @@ export default class MyList extends React.Component<ListProps> {
         }
     }
     render() {
-        const { queryRows, header, classes } = this.innerProps;
+        const { queryRows, header, classes, hideBtn } = this.innerProps;
         const { listModel } = this;
         const { page } = listModel;
         return (
@@ -163,20 +169,29 @@ export default class MyList extends React.Component<ListProps> {
                         alignItems="center"
                         spacing={16}
                     >
-                        <Grid item>
-                            <Button variant="contained" onClick={() => {
-                                this.onReset();
-                            }}>{lang.MyList.reset}</Button>
-                        </Grid>
-                        <Grid item>
-                            <MyButton variant="contained" model={this.queryBtnModel} onClick={() => {
-                                this.listModel.page.setPage(1);
-                                this.innerProps.onQueryClick(this.listModel);
-                            }}>{lang.MyList.query}</MyButton>
-                        </Grid>
-                        <Grid item>
-                            <Button variant="contained" onClick={this.onAddClick}>{lang.Global.operate.add}</Button>
-                        </Grid>
+                        {
+                            (!hideBtn || (!hideBtn.all && !hideBtn.reset)) &&
+                            <Grid item>
+                                <Button variant="contained" onClick={() => {
+                                    this.onReset();
+                                }}>{lang.MyList.reset}</Button>
+                            </Grid>
+                        }
+                        {
+                            (!hideBtn || (!hideBtn.all && !hideBtn.query)) &&
+                            <Grid item>
+                                <MyButton variant="contained" model={this.queryBtnModel} onClick={() => {
+                                    this.listModel.page.setPage(1);
+                                    this.innerProps.onQueryClick(this.listModel);
+                                }}>{lang.MyList.query}</MyButton>
+                            </Grid>
+                        }
+                        {
+                            (!hideBtn || (!hideBtn.all && !hideBtn.add)) &&
+                            <Grid item>
+                                <Button variant="contained" onClick={this.onAddClick}>{lang.Global.operate.add}</Button>
+                            </Grid>
+                        }
                     </Grid>
                 </Grid>
                 <Paper className={classes.tableRoot}>
