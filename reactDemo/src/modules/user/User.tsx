@@ -14,9 +14,10 @@ import * as qs from 'query-string';
 import * as moment from 'moment';
 
 import lang from '../../lang';
-import config from '../../config';
+import * as config from '../../config/config';
 import * as util from '../../helpers/util';
 import { withRouterDeco, withStylesDeco, msgNotice } from '../../helpers';
+import { testApi } from '../../api';
 import { main } from '../main';
 
 import {
@@ -25,8 +26,6 @@ import {
     MyTextField,
 } from '../../components';
 import { DialogPage } from '../components';
-import { routeConfig, cacheKey } from '../main';
-import { testApi } from '../api';
 import { SignInModel, SignUpModel } from './model';
 
 type SignInProps = {
@@ -54,7 +53,7 @@ export class SignIn extends React.Component<SignInProps>{
             let req = { account, rand: util.randStr() };
             let token = req.account + util.md5(password) + JSON.stringify(req);
             token = util.md5(token);
-            localStorage.setItem(cacheKey.testUser, token);
+            localStorage.setItem(config.cacheKey.testUser, token);
             let t = await testApi.userSignIn(req);
             user && user.init(t);
             onSignInSuccess && onSignInSuccess();
@@ -148,7 +147,7 @@ export class SignUp extends React.Component {
             }
             await testApi.userSignUp({ account, password, nickname });
             msgNotice(lang.User.operate.signUpSuccess, { snackbarVariant: 'success', autoHideDuration: 3000 }).waitClose().then(() => {
-                history.push({ pathname: routeConfig.index });
+                history.push({ pathname: config.routeConfig.index });
             });
         } catch (e) {
             this.btnModel.loaded();

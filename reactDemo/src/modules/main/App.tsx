@@ -26,8 +26,10 @@ import { observer } from 'mobx-react';
 import lang from '../../lang';
 import { withStylesDeco, withRouterDeco, withWidthDeco } from '../../helpers/util';
 import { msgNotice } from '../../helpers/common';
+import { testApi } from '../../api';
+import * as config from '../../config/config';
+import authorityConfig from '../../config/authority';
 import { NotMatch } from '../error';
-import { testApi } from '../api';
 import {
     MainSection as TestMainSection,
 } from '../test';
@@ -39,8 +41,9 @@ import {
 } from '../user';
 
 import BookMark from '../bookmark';
-import { main, routeConfig, cacheKey, mainFolderListItems } from './constant';
+import { main, mainFolderListItems } from './constant';
 //#region route
+let { routeConfig } = config;
 const routes: {
     path?: string,
     comp: JSX.Element,
@@ -63,12 +66,12 @@ const routes: {
     path: routeConfig.userAccount,
     comp: <Account />,
     title: lang.App.routes.userAccount,
-    authority: ['login'],
+    authority: [authorityConfig.Login],
 }, {
     path: routeConfig.adminUser,
     comp: <AdminUser />,
     title: lang.App.routes.adminUser,
-    authority: ['login'],
+    authority: [authorityConfig.Login],
 }, {
     path: routeConfig.test,
     comp: <TestMainSection />,
@@ -180,7 +183,7 @@ export default class App extends React.Component<AppProps, { anchorEl?: any }> {
 
     async init() {
         this.state = {};
-        let token = localStorage.getItem(cacheKey.testUser);
+        let token = localStorage.getItem(config.cacheKey.testUser);
         if (token) {
             let user = await testApi.userInfo();
             if (user)
@@ -208,7 +211,7 @@ export default class App extends React.Component<AppProps, { anchorEl?: any }> {
         this.handleClose();
         testApi.userSignOut().then(() => {
             this.dataSource.user.init();
-            localStorage.removeItem(cacheKey.testUser);
+            localStorage.removeItem(config.cacheKey.testUser);
         }).catch(e => {
             msgNotice(e.message);
         });
@@ -359,7 +362,7 @@ export default class App extends React.Component<AppProps, { anchorEl?: any }> {
                             path={ele.path || null}
                             render={() => {
                                 dataSource.setTitle(ele.title);
-                                if (ele.authority && ele.authority.includes('login') && !main.user.isLogin) {
+                                if (ele.authority && ele.authority.includes(authorityConfig.Login) && !main.user.isLogin) {
                                     return (
                                         <DialogPage>
                                             <SignIn />

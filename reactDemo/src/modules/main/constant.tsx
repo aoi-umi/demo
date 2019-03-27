@@ -9,23 +9,9 @@ import { History } from 'history';
 
 import lang from '../../lang';
 import { Main } from './model';
+import { routeConfig } from '../../config/config';
 
 export const main = new Main();
-
-export const routeConfig = {
-    index: '/',
-    //个人中心
-    userAccount: '/user/account',
-    userSignUp: '/user/signUp',
-    //管理
-    adminUser: '/user',
-    bookmark: '/bookmark',
-    test: '/test',
-};
-
-export const cacheKey = {
-    testUser: 'userCacheKey',
-};
 
 export const mainFolderListItems = (history: History) => {
     function onClick(path) {

@@ -1,4 +1,4 @@
-import { TestApiConfigType } from "./modules/api";
+import { TestApiConfigType } from "../api";
 
 const env = location.hostname.includes('umi-aoi.xyz') ? 'prod' : 'dev';
 const envConfig = {
@@ -11,7 +11,6 @@ const envConfig = {
 };
 const config = {
     title: '开发',
-    dateFormat: 'YYYY-MM-DD HH:mm:ss',
     api: {
         test: {
             defaultArgs: {

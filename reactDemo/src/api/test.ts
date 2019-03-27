@@ -1,6 +1,6 @@
 
-import { error } from '../../helpers/util';
-import { cacheKey } from '../main';
+import { error } from '../helpers/util';
+import { cacheKey } from '../config/config';
 
 import { ApiModel, ApiConfigModel, ApiMethodConfigType } from './model';
 import { ListQueryRequest, ApiMethod } from '.';
