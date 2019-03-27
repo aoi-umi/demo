@@ -27,7 +27,7 @@ import {
     SelectedObject,
 } from '../../components';
 import { msgNotice } from '../../helpers/common';
-import { testApi } from '../api';
+import { testApi } from '../../api';
 import { BottomAppBar } from '../components';
 import { BookmarkQueryModel, BookmarkDetailModel, BookmarkShowTag } from './model';
 

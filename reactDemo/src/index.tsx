@@ -6,10 +6,9 @@ import { Provider } from 'mobx-react';
 import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
 import { TextTransformProperty } from 'csstype';
-import * as moment from 'moment';
 
 import './styles.css';
-import config from './config';
+import config from './config/env';
 import App from './modules/main/App';
 import { Test } from './modules/test/model';
 

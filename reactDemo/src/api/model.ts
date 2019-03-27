@@ -1,6 +1,6 @@
 import { AxiosRequestConfig, AxiosResponse } from 'axios';
 
-import { request, extend, clone } from '../../helpers/util';
+import { request, extend, clone } from '../helpers/util';
 type BeforeRequest = (request: AxiosRequestConfig) => any;
 type AfterResponse<T=any> = (data: T, response: AxiosResponse<T>) => any;
 export type RequestByConfigOption<T> = {

@@ -1,4 +1,4 @@
-import config from '../../config';
+import config from '../config/env';
 
 export type ListQueryRequest = {
     page?: number,
