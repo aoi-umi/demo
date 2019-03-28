@@ -314,7 +314,7 @@ export class AdminUser extends React.Component<AdminUserProps>{
                         content: lang.User.createdAt,
                     }]}
 
-                    ondefaultRowRender={(ele, idx) => {
+                    onDefaultRowRender={(ele, idx) => {
                         return {
                             ...ele,
                             createdAt: moment(ele.createdAt).format(config.dateFormat)

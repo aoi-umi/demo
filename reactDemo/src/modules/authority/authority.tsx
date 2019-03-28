@@ -186,7 +186,7 @@ export default class Authority extends React.Component<Props> {
                         content: lang.Authority.list.operate,
                         operate: true,
                     }]}
-                    ondefaultRowRender={(ele, idx) => {
+                    onDefaultRowRender={(ele, idx) => {
                         return {
                             ...ele,
                             status: myEnum.authorityStatus.getKey(ele.status),
