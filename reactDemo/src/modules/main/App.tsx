@@ -29,6 +29,7 @@ import { msgNotice } from '../../helpers/common';
 import { testApi } from '../../api';
 import * as config from '../../config/config';
 import authorityConfig from '../../config/authority';
+import { RouteConfigType } from '../../config/config';
 import { NotMatch } from '../error';
 import {
     MainSection as TestMainSection,
@@ -46,39 +47,36 @@ import { main, mainFolderListItems } from './constant';
 //#region route
 let { routeConfig } = config;
 const routes: {
-    path?: string,
+    routeConfig?: RouteConfigType,
     comp: JSX.Element,
     title?: string,
     exact?: boolean,
-    authority?: string[],
 }[] = [{
-    path: routeConfig.index,
-    comp: <BookMark listenUrl={routeConfig.index} />,
+    routeConfig: routeConfig.index,
+    comp: <BookMark listenUrl={routeConfig.index.path} />,
     title: lang.App.routes.bookmark,
 }, {
-    path: routeConfig.bookmark,
-    comp: <BookMark listenUrl={routeConfig.bookmark} />,
+    routeConfig: routeConfig.bookmark,
+    comp: <BookMark listenUrl={routeConfig.bookmark.path} />,
     title: lang.App.routes.bookmark,
 }, {
-    path: routeConfig.authority,
-    comp: <Authority listenUrl={routeConfig.authority} />,
+    routeConfig: routeConfig.authority,
+    comp: <Authority listenUrl={routeConfig.authority.path} />,
     title: lang.App.routes.authority,
 }, {
-    path: routeConfig.userSignUp,
+    routeConfig: routeConfig.userSignUp,
     comp: <SignUp />,
     title: lang.App.routes.userSignUp,
 }, {
-    path: routeConfig.userAccount,
+    routeConfig: routeConfig.userAccount,
     comp: <Account />,
     title: lang.App.routes.userAccount,
-    authority: [authorityConfig.Login],
 }, {
-    path: routeConfig.adminUser,
-    comp: <AdminUser listenUrl={routeConfig.adminUser} />,
+    routeConfig: routeConfig.adminUser,
+    comp: <AdminUser listenUrl={routeConfig.adminUser.path} />,
     title: lang.App.routes.adminUser,
-    authority: [authorityConfig.Login],
 }, {
-    path: routeConfig.test,
+    routeConfig: routeConfig.test,
     comp: <TestMainSection />,
     title: 'test',
 }, {
@@ -225,7 +223,7 @@ export default class App extends React.Component<AppProps, { anchorEl?: any }> {
     toMyAccount = () => {
         const { history } = this.innerProps;
         this.handleClose();
-        history.push({ pathname: routeConfig.userAccount });
+        history.push({ pathname: routeConfig.userAccount.path });
     }
 
     renderTop() {
@@ -298,7 +296,7 @@ export default class App extends React.Component<AppProps, { anchorEl?: any }> {
                                         {lang.User.operate.signIn}
                                     </Button>
                                     <Button color="inherit" onClick={() => {
-                                        history.push({ pathname: routeConfig.userSignUp });
+                                        history.push({ pathname: routeConfig.userSignUp.path });
                                     }}>
                                         {lang.User.operate.signUp}
                                     </Button>
@@ -364,10 +362,11 @@ export default class App extends React.Component<AppProps, { anchorEl?: any }> {
                     return (
                         <Route key={i}
                             exact={ele.exact === false ? false : true}
-                            path={ele.path || null}
+                            path={(ele.routeConfig && ele.routeConfig.path) || null}
                             render={() => {
                                 dataSource.setTitle(ele.title);
-                                if (ele.authority && ele.authority.includes(authorityConfig.Login) && !main.user.isLogin) {
+                                let authority = ele.routeConfig && ele.routeConfig.authority;
+                                if (authority && authority.includes(authorityConfig.Login) && !main.user.isLogin) {
                                     return (
                                         <DialogPage>
                                             <SignIn />

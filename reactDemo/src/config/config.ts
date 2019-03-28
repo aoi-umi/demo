@@ -1,14 +1,30 @@
+
+import authorityConfig from './authority';
+
 export const dateFormat = 'YYYY-MM-DD HH:mm:ss';
+export type RouteConfigType = {
+    path: string;
+    authority?: string[]
+};
 export const routeConfig = {
-    index: '/',
+    index: { path: '/' },
     //个人中心
-    userAccount: '/user/account',
-    userSignUp: '/user/signUp',
+    userAccount: {
+        path: '/user/account',
+        authority: [authorityConfig.Login],
+    },
+    userSignUp: { path: '/user/signUp' },
     //管理
-    adminUser: '/user',
-    bookmark: '/bookmark',
-    authority: '/authority',
-    test: '/test',
+    adminUser: {
+        path: '/user',
+        authority: [authorityConfig.Login],
+    },
+    bookmark: { path: '/bookmark' },
+    authority: {
+        path: '/authority',
+        authority: [authorityConfig.Login],
+    },
+    test: { path: '/test' },
 };
 
 export const cacheKey = {

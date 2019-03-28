@@ -123,7 +123,7 @@ export default class Bookmark extends React.Component<Props> {
             >
             </BookmarkDetail>, {
                 type: 'dialog',
-                dialogTitle: detail ? lang.Global.operate.edit : lang.Global.operate.edit,
+                dialogTitle: detail ? lang.Global.operate.edit : lang.Global.operate.add,
                 dialogBtnList: []
             });
 
