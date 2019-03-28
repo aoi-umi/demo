@@ -15,6 +15,7 @@ import * as moment from 'moment';
 
 import lang from '../../lang';
 import * as config from '../../config/config';
+import { routeConfig } from '../../config/config';
 import * as util from '../../helpers/util';
 import { withRouterDeco, withStylesDeco, msgNotice } from '../../helpers';
 import { testApi } from '../../api';
@@ -147,7 +148,7 @@ export class SignUp extends React.Component {
             }
             await testApi.userSignUp({ account, password, nickname });
             msgNotice(lang.User.operate.signUpSuccess, { snackbarVariant: 'success', autoHideDuration: 3000 }).waitClose().then(() => {
-                history.push({ pathname: config.routeConfig.index });
+                history.push({ pathname: routeConfig.index });
             });
         } catch (e) {
             this.btnModel.loaded();
@@ -242,14 +243,19 @@ export class AdminUser extends React.Component {
         return this.props as InnerProps;
     }
     private listModel: ListModel;
+    private unlisten: any;
     constructor(props, context) {
         super(props, context);
         this.listModel = new ListModel({ query: {} as any });
-        this.innerProps.history.listen(this.onHistoryListen);
+        this.unlisten = this.innerProps.history.listen(this.onHistoryListen);
     }
 
     componentDidMount() {
         this.onHistoryListen(this.innerProps.history.location, null);
+    }
+
+    componentWillUnmount() {
+        this.unlisten && this.unlisten();
     }
 
     private modelToObj(model?: ListModel) {
@@ -271,6 +277,8 @@ export class AdminUser extends React.Component {
     }
 
     private onHistoryListen: LocationListener = (location) => {
+        if (location.pathname != routeConfig.adminUser)
+            return;
         let obj = qs.parse(location.search);
         this.objToModel(obj);
         this.listModel.load();

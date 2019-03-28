@@ -19,15 +19,15 @@ import {
     MyList, ListModel,
     MyButton, MyButtonModel,
     MyTextField,
-    SelectedObject,
 } from '../../components';
 import { msgNotice } from '../../helpers/common';
 import { testApi } from '../../api';
 import { AuthorityQueryModel, AuthorityDetailModel } from './model';
+import { routeConfig } from '../../config/config';
 
 const styles = () => ({
     operateCol: {
-        textAlign: 'center' as TextAlignProperty
+        textAlign: 'center' as any
     },
     noBorder: {
         borderWidth: 0
@@ -42,15 +42,20 @@ export default class Authority extends React.Component {
     private get innerProps() {
         return this.props as InnerProps;
     }
+    private unlisten: any;
     private listModel: ListModel<AuthorityQueryModel>;
     constructor(props, context) {
         super(props, context);
         this.listModel = new ListModel({ query: new AuthorityQueryModel() });
-        this.innerProps.history.listen(this.onHistoryListen);
+        this.unlisten = this.innerProps.history.listen(this.onHistoryListen);
     }
 
     componentDidMount() {
         this.onHistoryListen(this.innerProps.history.location, null);
+    }
+
+    componentWillUnmount() {
+        this.unlisten && this.unlisten();
     }
 
     private modelToObj(model?: ListModel<AuthorityQueryModel>) {
@@ -76,6 +81,8 @@ export default class Authority extends React.Component {
     }
 
     private onHistoryListen: LocationListener = (location) => {
+        if (location.pathname != routeConfig.authority)
+            return;
         let obj = qs.parse(location.search);
         this.objToModel(obj);
         this.listModel.load();
