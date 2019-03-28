@@ -33,12 +33,15 @@ const styles = () => ({
         borderWidth: 0
     }
 });
-type InnerProps = RouteComponentProps<{}> & WithStyles<typeof styles> & {};
+type Props = {
+    listenUrl?: string;
+};
+type InnerProps = RouteComponentProps<{}> & WithStyles<typeof styles> & Props;
 
 @withRouterDeco
 @withStylesDeco(styles)
 @observer
-export default class Authority extends React.Component {
+export default class Authority extends React.Component<Props> {
     private get innerProps() {
         return this.props as InnerProps;
     }
@@ -81,7 +84,7 @@ export default class Authority extends React.Component {
     }
 
     private onHistoryListen: LocationListener = (location) => {
-        if (location.pathname != routeConfig.authority)
+        if (location.pathname != this.props.listenUrl)
             return;
         let obj = qs.parse(location.search);
         this.objToModel(obj);
