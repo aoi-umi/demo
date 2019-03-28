@@ -17,10 +17,11 @@ export class PaginationModel {
         onPageChange?: onPageChangeHandler;
     }) {
         this.init();
-        if (opt) {
-            if (opt.onPageChange)
-                this.onPageChange = opt.onPageChange
+        opt = {
+            ...opt
         }
+        if (opt.onPageChange)
+            this.onPageChange = opt.onPageChange
     }
     defaultPageSize = 10;
     @action

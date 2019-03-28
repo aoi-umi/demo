@@ -28,6 +28,7 @@ import {
 import { msgNotice } from '../../helpers/common';
 import { testApi } from '../../api';
 import { BookmarkQueryModel, BookmarkDetailModel, BookmarkShowTag } from './model';
+import { routeConfig } from '../../config/config';
 
 const styles = () => ({
     operateCol: {
@@ -47,14 +48,19 @@ export default class Bookmark extends React.Component {
         return this.props as InnerProps;
     }
     private listModel: ListModel<BookmarkQueryModel>;
+    private unlisten: any;
     constructor(props, context) {
         super(props, context);
         this.listModel = new ListModel({ query: new BookmarkQueryModel() });
-        this.innerProps.history.listen(this.onHistoryListen);
+        this.unlisten = this.innerProps.history.listen(this.onHistoryListen);
     }
 
     componentDidMount() {
         this.onHistoryListen(this.innerProps.history.location, null);
+    }
+
+    componentWillUnmount() {
+        this.unlisten && this.unlisten();
     }
 
     private modelToObj(model?: ListModel<BookmarkQueryModel>) {
@@ -80,6 +86,8 @@ export default class Bookmark extends React.Component {
     }
 
     private onHistoryListen: LocationListener = (location) => {
+        if (location.pathname != routeConfig.bookmark)
+            return;
         let obj = qs.parse(location.search);
         this.objToModel(obj);
         this.listModel.load();

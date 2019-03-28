@@ -78,8 +78,7 @@ export default class MyList extends React.Component<ListProps> {
         this.listModel = listModel;
         if (labelNoData)
             this.labelNoData = labelNoData;
-        this.listModel.page.onPageChange =
-            this.listModel.onLoad = this.onQuery.bind(this);
+        this.listModel.onLoad = this.onQuery.bind(this);
         this.listModel.onLoaded = (result: QueryResult) => {
             this.listModel.changeResult(result);
         }
