@@ -34,7 +34,7 @@ type ListProps = {
     onRowRender?: (ele, idx?: number) => any;
 
     defaultHeader?: { colName: string, content: any, operate?: boolean }[];
-    ondefaultRowRender?: (ele, idx?: number) => any;
+    onDefaultRowRender?: (ele, idx?: number) => any;
 
     labelNoData?: React.ReactNode;
     showCheckBox?: boolean;
@@ -145,8 +145,8 @@ export default class MyList extends React.Component<ListProps> {
                             if (this.innerProps.onRowRender)
                                 list.push(this.innerProps.onRowRender(ele, idx));
                             else {
-                                let obj = this.innerProps.ondefaultRowRender ?
-                                    this.innerProps.ondefaultRowRender(ele, idx) : ele;
+                                let obj = this.innerProps.onDefaultRowRender ?
+                                    this.innerProps.onDefaultRowRender(ele, idx) : ele;
                                 let item = selectedRow.getItems()[idx];
                                 list.push(
                                     <TableRow key={idx}>
