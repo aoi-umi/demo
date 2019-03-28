@@ -53,15 +53,15 @@ const routes: {
     authority?: string[],
 }[] = [{
     path: routeConfig.index,
-    comp: <BookMark />,
+    comp: <BookMark listenUrl={routeConfig.index} />,
     title: lang.App.routes.bookmark,
 }, {
     path: routeConfig.bookmark,
-    comp: <BookMark />,
+    comp: <BookMark listenUrl={routeConfig.bookmark} />,
     title: lang.App.routes.bookmark,
 }, {
     path: routeConfig.authority,
-    comp: <Authority />,
+    comp: <Authority listenUrl={routeConfig.authority} />,
     title: lang.App.routes.authority,
 }, {
     path: routeConfig.userSignUp,
@@ -74,7 +74,7 @@ const routes: {
     authority: [authorityConfig.Login],
 }, {
     path: routeConfig.adminUser,
-    comp: <AdminUser />,
+    comp: <AdminUser listenUrl={routeConfig.adminUser} />,
     title: lang.App.routes.adminUser,
     authority: [authorityConfig.Login],
 }, {

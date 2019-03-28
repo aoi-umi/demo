@@ -28,7 +28,6 @@ import {
 import { msgNotice } from '../../helpers/common';
 import { testApi } from '../../api';
 import { BookmarkQueryModel, BookmarkDetailModel, BookmarkShowTag } from './model';
-import { routeConfig } from '../../config/config';
 
 const styles = () => ({
     operateCol: {
@@ -38,12 +37,15 @@ const styles = () => ({
         borderWidth: 0
     }
 });
-type InnerProps = RouteComponentProps<{}> & WithStyles<typeof styles> & {};
+type Props = {
+    listenUrl?: string;
+};
+type InnerProps = RouteComponentProps<{}> & WithStyles<typeof styles> & Props;
 
 @withRouterDeco
 @withStylesDeco(styles)
 @observer
-export default class Bookmark extends React.Component {
+export default class Bookmark extends React.Component<Props> {
     private get innerProps() {
         return this.props as InnerProps;
     }
@@ -86,7 +88,7 @@ export default class Bookmark extends React.Component {
     }
 
     private onHistoryListen: LocationListener = (location) => {
-        if (location.pathname != routeConfig.bookmark)
+        if (location.pathname != this.props.listenUrl)
             return;
         let obj = qs.parse(location.search);
         this.objToModel(obj);

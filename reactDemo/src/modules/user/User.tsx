@@ -234,13 +234,15 @@ export class Account extends React.Component {
 
 const adminUserStyles = () => ({
 });
-
-type InnerProps = RouteComponentProps<{}> & WithStyles<typeof adminUserStyles> & {};
+type AdminUserProps = {
+    listenUrl?: string;
+};
+type AdminUserInnerProps = RouteComponentProps<{}> & WithStyles<typeof adminUserStyles> & AdminUserProps;
 @withRouterDeco
 @observer
-export class AdminUser extends React.Component {
+export class AdminUser extends React.Component<AdminUserProps>{
     private get innerProps() {
-        return this.props as InnerProps;
+        return this.props as AdminUserInnerProps;
     }
     private listModel: ListModel;
     private unlisten: any;
@@ -277,7 +279,7 @@ export class AdminUser extends React.Component {
     }
 
     private onHistoryListen: LocationListener = (location) => {
-        if (location.pathname != routeConfig.adminUser)
+        if (location.pathname != this.props.listenUrl)
             return;
         let obj = qs.parse(location.search);
         this.objToModel(obj);
