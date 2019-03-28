@@ -15,7 +15,7 @@ import { routeConfig } from '../../config/config';
 export const main = new Main();
 
 export const mainFolderListItems = (history: History) => {
-    function onClick(path) {
+    function onClick(path: string) {
         if (history.location.pathname != path)
             history.push(path);
     }
@@ -37,7 +37,7 @@ export const mainFolderListItems = (history: History) => {
             }].map((ele, idx) => {
                 return (
                     <ListItem key={idx} button onClick={() => {
-                        onClick(ele.route);
+                        onClick(ele.route.path);
                     }} >
                         <ListItemIcon>
                             {ele.icon}

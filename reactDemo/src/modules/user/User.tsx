@@ -148,7 +148,7 @@ export class SignUp extends React.Component {
             }
             await testApi.userSignUp({ account, password, nickname });
             msgNotice(lang.User.operate.signUpSuccess, { snackbarVariant: 'success', autoHideDuration: 3000 }).waitClose().then(() => {
-                history.push({ pathname: routeConfig.index });
+                history.push({ pathname: routeConfig.index.path });
             });
         } catch (e) {
             this.btnModel.loaded();

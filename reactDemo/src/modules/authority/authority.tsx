@@ -23,7 +23,6 @@ import {
 import { msgNotice } from '../../helpers/common';
 import { testApi } from '../../api';
 import { AuthorityQueryModel, AuthorityDetailModel } from './model';
-import { routeConfig } from '../../config/config';
 
 const styles = () => ({
     operateCol: {
@@ -119,7 +118,7 @@ export default class Authority extends React.Component<Props> {
             >
             </AuthorityDetail>, {
                 type: 'dialog',
-                dialogTitle: detail ? lang.Global.operate.edit : lang.Global.operate.edit,
+                dialogTitle: detail ? lang.Global.operate.edit : lang.Global.operate.add,
                 dialogBtnList: []
             });
 
