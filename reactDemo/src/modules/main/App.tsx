@@ -41,6 +41,7 @@ import {
 } from '../user';
 
 import BookMark from '../bookmark';
+import Authority from '../authority';
 import { main, mainFolderListItems } from './constant';
 //#region route
 let { routeConfig } = config;
@@ -58,6 +59,10 @@ const routes: {
     path: routeConfig.bookmark,
     comp: <BookMark />,
     title: lang.App.routes.bookmark,
+}, {
+    path: routeConfig.authority,
+    comp: <Authority />,
+    title: lang.App.routes.authority,
 }, {
     path: routeConfig.userSignUp,
     comp: <SignUp />,

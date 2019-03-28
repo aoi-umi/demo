@@ -36,6 +36,7 @@ const config = {
                 userAccountExists: {
                     url: '/user/accountExists',
                 },
+
                 bookmarkQuery: {
                     url: '/bookmark/query',
                     method: 'GET',
@@ -45,6 +46,20 @@ const config = {
                 },
                 bookmarkDel: {
                     url: '/bookmark/del',
+                },
+
+                authorityQuery: {
+                    url: '/authority/query',
+                    method: 'GET',
+                },
+                authoritySave: {
+                    url: '/authority/save',
+                },
+                authorityUpdate: {
+                    url: '/authority/update',
+                },
+                authorityDel: {
+                    url: '/authority/del',
                 },
             }
         } as TestApiConfigType

@@ -12,9 +12,15 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
     userInfo,
     userAccountExists,
     adminUserList,
+
     bookmarkQuery,
     bookmarkSave,
     bookmarkDel,
+
+    authorityQuery,
+    authoritySave,
+    authorityUpdate,
+    authorityDel,
 }>;
 export type TestApiConfigType = ApiConfigModel<TestApiMethod>;
 
@@ -77,6 +83,21 @@ export class TestApi extends ApiModel<TestApiMethod> {
     }
     async bookmarkDel(idList: string[]) {
         return this.requestByConfig(this.apiConfig.method.bookmarkDel, { data: { idList } });
+    }
+    //#endregion
+
+    //#region authority 
+    async authorityQuery(data?: { name?, code?, anyKey?} & ListQueryRequest) {
+        return this.requestByConfig<ListResult>(this.apiConfig.method.authorityQuery, { data });
+    }
+    async authoritySave(data) {
+        return this.requestByConfig(this.apiConfig.method.authoritySave, { data });
+    }
+    async authorityUpdate(data) {
+        return this.requestByConfig(this.apiConfig.method.authorityUpdate, { data });
+    }
+    async authorityDel(idList: string[]) {
+        return this.requestByConfig(this.apiConfig.method.authorityDel, { data: { idList } });
     }
     //#endregion
 }

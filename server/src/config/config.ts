@@ -21,7 +21,8 @@ let config = {
             useCreateIndex: true,
         } as ConnectionOptions
     },
-    api: {}
+    api: {},
+    urlPrefix: '/devMgt'
 };
 
 export default config;

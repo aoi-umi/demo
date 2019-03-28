@@ -1,10 +1,12 @@
 import * as Q from 'q';
 import * as mongoose from 'mongoose';
 import { Model } from 'mongoose';
+import { config as mongooseTsConfig } from 'mongoose-ts-ua';
 import * as mongodb from 'mongodb';
 import { ClientSession, MongoClient, CommonOptions } from 'mongodb';
 
 import config from '../config/config';
+mongooseTsConfig.schemaOptions = { timestamps: true };
 require('mongoose').Promise = Q.Promise;
 declare module 'mongoose' {
     type Promise<T> = Q.Promise<T>;

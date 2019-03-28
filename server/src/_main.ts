@@ -3,7 +3,7 @@ import { Request, Response, Express } from 'express';
 import * as mongo from './_system/dbMongo';
 import * as auth from './_system/auth';
 import * as cache from './_system/cache';
-import { authConfig } from './config/authConfig';
+import config from './config/config';
 
 
 //#region 访问权限配置
@@ -32,7 +32,8 @@ export let cacheTime = {
 export async function init() {
     await mongo.connect();
     auth.init({
-        accessableUrlConfig: accessableUrlConfig
+        accessableUrlConfig,
+        accessableIfNoExists: true
     });
 }
 
@@ -69,6 +70,6 @@ export let register = function (app: Express) {
     //检查路由权限
     // app.use(auth.check);
 
-    app.use('/devMgt', routes);
+    app.use(config.urlPrefix, routes);
 }
 

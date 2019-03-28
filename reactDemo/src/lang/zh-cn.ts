@@ -22,17 +22,20 @@ let lang = {
             saveFail: '保存失败:',
         },
     },
+    //#region module 
     App: {
         routes: {
             bookmark: '书签',
             userSignUp: '注册',
             userAccount: '个人中心',
             adminUser: '用户管理',
+            authority: '权限',
             notFound: 'Not Found',
         },
         menu: {
             home: 'Home',
             user: 'User',
+            authority: 'Authority',
         }
     },
     User: {
@@ -66,6 +69,17 @@ let lang = {
             tagAdd: '添加',
         },
     },
+    Authority: {
+        name: '名字',
+        code: '编码',
+        status: '状态',
+        anyKey: 'anyKey',
+        list: {
+            operate: '操作',
+        },
+    },
+    //#endregion
+    //#region component 
     MyDialog: {
         title: '提示',
         accept: '确认',
@@ -85,6 +99,7 @@ let lang = {
         totalCount: '共{0}条',
         toPage: 'Go',
     }
+    //#endregion
 };
 
 export default lang;

@@ -24,11 +24,9 @@ import {
     MyList, ListModel,
     MyButton, MyButtonModel,
     MyTextField,
-    SelectedObject,
 } from '../../components';
 import { msgNotice } from '../../helpers/common';
 import { testApi } from '../../api';
-import { BottomAppBar } from '../components';
 import { BookmarkQueryModel, BookmarkDetailModel, BookmarkShowTag } from './model';
 
 const styles = () => ({
@@ -49,12 +47,10 @@ export default class Bookmark extends React.Component {
         return this.props as InnerProps;
     }
     private listModel: ListModel<BookmarkQueryModel>;
-    private selectedRow: SelectedObject;
     constructor(props, context) {
         super(props, context);
         this.listModel = new ListModel({ query: new BookmarkQueryModel() });
         this.innerProps.history.listen(this.onHistoryListen);
-        this.selectedRow = new SelectedObject();
     }
 
     componentDidMount() {
@@ -146,10 +142,11 @@ export default class Bookmark extends React.Component {
     public render() {
         const { listModel } = this;
         const { classes } = this.innerProps;
+        let selectedRow = this.listModel.selectedRow;
         return (
             <div>
                 <MyList
-                    queryRows={[{
+                    queryArgs={[{
                         id: 'name',
                         label: lang.Bookmark.name,
                     }, {
@@ -166,14 +163,14 @@ export default class Bookmark extends React.Component {
                     }}
                     onQuery={async () => {
                         let data = await testApi.bookmarkQuery(this.modelToObj());
-                        this.selectedRow.setItems(data.rows);
+                        selectedRow.setItems(data.rows);
                         return data;
                     }}
                     header={
                         <TableRow>
                             <TableCell padding="checkbox">
-                                <Checkbox checked={this.selectedRow.selectedAll} onChange={(event, checked) => {
-                                    this.selectedRow.setSelectedAll(checked);
+                                <Checkbox checked={selectedRow.selectedAll} onChange={(event, checked) => {
+                                    selectedRow.setSelectedAll(checked);
                                 }} />
                             </TableCell>
                             <TableCell>{lang.Bookmark.name}</TableCell>
@@ -182,13 +179,13 @@ export default class Bookmark extends React.Component {
                         </TableRow>
                     }
                     onRowRender={(ele, idx) => {
-                        let item = this.selectedRow.getItems()[idx];
+                        let item = selectedRow.getItems()[idx];
                         let existsTag = ele.tagList && ele.tagList.length;
                         let renderRow = [
                             <TableRow key={idx}>
                                 <TableCell rowSpan={existsTag ? 2 : 1} padding="checkbox">
                                     <Checkbox checked={!!(item && item.selected)} onChange={(event, checked) => {
-                                        this.selectedRow.setSelected(checked, idx);
+                                        selectedRow.setSelected(checked, idx);
                                     }} />
                                 </TableCell>
                                 <TableCell className={classNames(existsTag && classes.noBorder)}>
@@ -226,18 +223,15 @@ export default class Bookmark extends React.Component {
                     onAddClick={() => {
                         this.showDetail();
                     }}
-                >
-                </MyList>
-                <BottomAppBar in={this.selectedRow.selected}>
-                    <MyButton onClick={() => {
-                        let idList = this.selectedRow.selectedItems.map(ele => {
+
+                    onBottomDelClick={() => {
+                        let idList = selectedRow.selectedItems.map(ele => {
                             return ele.value._id;
                         });
                         this.onDelClick(idList);
-                    }}>
-                        {lang.Global.operate.delMulti}
-                    </MyButton>
-                </BottomAppBar>
+                    }}
+                >
+                </MyList>
             </div>
         )
     }

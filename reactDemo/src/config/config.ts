@@ -7,6 +7,7 @@ export const routeConfig = {
     //管理
     adminUser: '/user',
     bookmark: '/bookmark',
+    authority: '/authority',
     test: '/test',
 };
 

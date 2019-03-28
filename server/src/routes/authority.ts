@@ -1,36 +1,38 @@
 import { RequestHandler } from 'express';
 import { Types } from 'mongoose';
 import { responseHandler, paramsValid } from '../helpers';
-import { BookmarkModel, BookmarkInstanceType } from '../models/mongo/bookmark';
+import { AuthorityModel, AuthorityInstanceType } from '../models/mongo/authority';
 import { error } from '../_system/common';
 
 export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let schema = {};
         let data: {
+            code: string;
             name: string;
-            url: string;
+            status: string;
             anyKey: string;
         } & ApiListQueryArgs = req.query;
         paramsValid(schema, data, { list: true });
         let query: any = {};
         if (data.anyKey) {
             delete data.name;
-            delete data.url;
+            delete data.code;
             let anykey = new RegExp(data.anyKey, 'i');
             query.$or = [
-                { url: anykey },
+                { code: anykey },
                 { name: anykey },
-                { tagList: anykey }
             ];
         }
 
         if (data.name)
             query.name = new RegExp(data.name, 'i');
-        if (data.url)
-            query.url = new RegExp(data.url, 'i');
+        if (data.code)
+            query.code = new RegExp(data.code, 'i');
+        if (data.status)
+            query.status = data.status;
 
-        let { rows, total } = await BookmarkModel.findAndCountAll({
+        let { rows, total } = await AuthorityModel.findAndCountAll({
             conditions: query,
             sort: { _id: -1 },
             page: data.page,
@@ -48,46 +50,47 @@ export let save: RequestHandler = (req, res) => {
         let data: {
             _id?: string;
             name?: string;
-            url?: string;
-            addTagList?: string[];
-            delTagList?: string[];
+            code?: string;
+            status?: string;
         } = req.body;
-        let model: BookmarkInstanceType;
+        let model: AuthorityInstanceType;
         if (!data._id) {
             delete data._id;
-            model = await BookmarkModel.create({
+            model = await AuthorityModel.create({
                 ...data,
-                tagList: data.addTagList
             });
         } else {
-            model = await BookmarkModel.findById(data._id);
+            model = await AuthorityModel.findById(data._id);
             if (!model)
                 throw error('not exists');
             let update: any = {};
-            ['name', 'url'].forEach(key => {
+            ['name', 'code', 'status'].forEach(key => {
                 update[key] = data[key];
             });
-            let updateTag = false;
-            if (data.delTagList && model.tagList && model.tagList.length) {
-                updateTag = true;
-                for (let idx = model.tagList.length - 1; idx >= 0; idx--) {
-                    let ele = model.tagList[idx];
-                    if (data.delTagList.includes(ele))
-                        model.tagList.splice(idx, 1);
-                }
-            }
-            if (data.addTagList) {
-                updateTag = true;
-                if (!model.tagList)
-                    model.tagList = data.addTagList;
-                else {
-                    model.tagList = [...model.tagList, ...data.addTagList];
-                }
-            }
-            if (updateTag)
-                update.tagList = model.tagList;
             await model.update(update);
         }
+        return {
+            _id: model._id
+        };
+    }, req, res);
+}
+
+export let update: RequestHandler = (req, res) => {
+    responseHandler(async () => {
+        let data: {
+            _id: string;
+            status?: string;
+        } = req.body;
+        let model = await AuthorityModel.findById(data._id);
+        if (!model)
+            throw error('not exists');
+        let update: any = {};
+        ['status'].forEach(key => {
+            if (data[key])
+                update[key] = data[key];
+        });
+        await model.update(update);
+
         return {
             _id: model._id
         };
@@ -97,7 +100,7 @@ export let save: RequestHandler = (req, res) => {
 export let del: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let data = req.body;
-        let rs = await BookmarkModel.deleteMany({ _id: { $in: data.idList.map(id => Types.ObjectId(id)) } });
+        let rs = await AuthorityModel.deleteMany({ _id: { $in: data.idList.map(id => Types.ObjectId(id)) } });
         if (!rs.n)
             throw error('No Match Data');
     }, req, res);
