@@ -74,7 +74,7 @@ export default class MyList extends React.Component<ListProps> {
     private labelNoData: React.ReactNode = lang.MyList.noData;
     constructor(props) {
         super(props);
-        let { labelNoData, listModel, header, defaultHeader, onRowRender, ondefaultRowRender } = this.innerProps;
+        let { labelNoData, listModel, header, defaultHeader, onRowRender } = this.innerProps;
         this.listModel = listModel;
         if (labelNoData)
             this.labelNoData = labelNoData;
@@ -83,7 +83,7 @@ export default class MyList extends React.Component<ListProps> {
             this.listModel.changeResult(result);
         }
         this.queryBtnModel = new MyButtonModel();
-        if (!(header && onRowRender) && !(defaultHeader && ondefaultRowRender))
+        if ((!header || !onRowRender) && !(defaultHeader))
             throw new Error('props error');
     }
 
@@ -145,7 +145,8 @@ export default class MyList extends React.Component<ListProps> {
                             if (this.innerProps.onRowRender)
                                 list.push(this.innerProps.onRowRender(ele, idx));
                             else {
-                                let obj = this.innerProps.ondefaultRowRender(ele, idx);
+                                let obj = this.innerProps.ondefaultRowRender ?
+                                    this.innerProps.ondefaultRowRender(ele, idx) : ele;
                                 let item = selectedRow.getItems()[idx];
                                 list.push(
                                     <TableRow key={idx}>

@@ -303,28 +303,22 @@ export class AdminUser extends React.Component<AdminUserProps>{
                         let data = await testApi.adminUserList(this.modelToObj());
                         return data;
                     }}
-                    header={
-                        <TableRow>
-                            <TableCell>{lang.User.account}</TableCell>
-                            <TableCell>{lang.User.nickname}</TableCell>
-                            <TableCell>{lang.User.createdAt}</TableCell>
-                        </TableRow>
-                    }
-                    onRowRender={(ele, idx) => {
-                        let renderRow = [
-                            <TableRow key={idx}>
-                                <TableCell>
-                                    {ele.account}
-                                </TableCell>
-                                <TableCell>
-                                    {ele.nickname}
-                                </TableCell>
-                                <TableCell>
-                                    {moment(ele.createdAt).format(config.dateFormat)}
-                                </TableCell>
-                            </TableRow>
-                        ];
-                        return renderRow;
+                    defaultHeader={[{
+                        colName: 'account',
+                        content: lang.User.account,
+                    }, {
+                        colName: 'nickname',
+                        content: lang.User.nickname,
+                    }, {
+                        colName: 'createdAt',
+                        content: lang.User.createdAt,
+                    }]}
+
+                    ondefaultRowRender={(ele, idx) => {
+                        return {
+                            ...ele,
+                            createdAt: moment(ele.createdAt).format(config.dateFormat)
+                        };
                     }}
                 >
                 </MyList>

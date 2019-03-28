@@ -2,9 +2,11 @@ import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import * as Q from 'q';
 import {
-    MySnackbar, MySnackbarVariantType,
-    MyDialog, MyDialogButtonType, MyDialogType
+    MySnackbarVariantType,
+    MyDialogButtonType, MyDialogType
 } from '../components';
+import MySnackbar from '../components/MySnackbar';
+import MyDialog from '../components/MyDialog';
 import { extend } from './util';
 import { withCustomTheme } from '..';
 type MsgNoticeOptions = {
