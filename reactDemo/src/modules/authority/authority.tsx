@@ -187,10 +187,9 @@ export default class Authority extends React.Component<Props> {
                         operate: true,
                     }]}
                     ondefaultRowRender={(ele, idx) => {
-                        let item = selectedRow.getItems()[idx];
                         return {
-                            ...item.value,
-                            status: myEnum.authorityStatus.getKey(item.value.status),
+                            ...ele,
+                            status: myEnum.authorityStatus.getKey(ele.status),
                             operate:
                                 <div>
                                     <Button onClick={() => {
