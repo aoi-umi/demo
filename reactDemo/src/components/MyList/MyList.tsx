@@ -1,6 +1,7 @@
 import * as React from "react";
+import classNames from 'classnames';
 
-import { WithStyles, Theme } from "@material-ui/core";
+import { WithStyles, Theme, } from "@material-ui/core";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableFooter from "@material-ui/core/TableFooter";
@@ -11,7 +12,7 @@ import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
 import Grid from '@material-ui/core/Grid';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import TextField from '@material-ui/core/TextField';
+import Checkbox from '@material-ui/core/Checkbox';
 
 import { observer } from 'mobx-react';
 
@@ -22,19 +23,26 @@ import MyPagination from '../MyPagination';
 import MyTextField from '../MyTextField';
 import MyButton, { MyButtonModel } from "../MyButton";
 import { ListModel, QueryDataType, QueryResult } from "./model";
+import { BottomAppBar } from "../../modules/components";
 type ListProps = {
-    queryRows?: {
+    queryArgs?: {
         id: string;
         label?: string;
         placeholder?: string;
     }[];
     header?: React.ReactNode;
+    onRowRender?: (ele, idx?: number) => any;
+
+    defaultHeader?: { colName: string, content: any, operate?: boolean }[];
+    ondefaultRowRender?: (ele, idx?: number) => any;
+
     labelNoData?: React.ReactNode;
+    showCheckBox?: boolean;
     onQueryClick: (query) => any;
     onQuery: () => Promise<QueryDataType>;
-    onRowRender: (ele, idx?: number) => any;
     listModel: ListModel;
     onAddClick?: () => any;
+    onBottomDelClick?: () => any;
     hideBtn?: {
         all?: boolean;
         add?: boolean;
@@ -47,6 +55,9 @@ const styles = (theme: Theme) => ({
     tableRoot: {
         marginTop: theme.spacing.unit * 3,
     },
+    operateCol: {
+        textAlign: 'center' as any
+    }
 });
 type InnerProps = ListProps & WithStyles<typeof styles> & {
 
@@ -63,7 +74,7 @@ export default class MyList extends React.Component<ListProps> {
     private labelNoData: React.ReactNode = lang.MyList.noData;
     constructor(props) {
         super(props);
-        let { labelNoData, listModel } = this.innerProps;
+        let { labelNoData, listModel, header, defaultHeader, onRowRender, ondefaultRowRender } = this.innerProps;
         this.listModel = listModel;
         if (labelNoData)
             this.labelNoData = labelNoData;
@@ -73,6 +84,8 @@ export default class MyList extends React.Component<ListProps> {
             this.listModel.changeResult(result);
         }
         this.queryBtnModel = new MyButtonModel();
+        if (!(header && onRowRender) && !(defaultHeader && ondefaultRowRender))
+            throw new Error('props error');
     }
 
     async onQuery(page?: number) {
@@ -97,12 +110,18 @@ export default class MyList extends React.Component<ListProps> {
         this.innerProps.onAddClick && this.innerProps.onAddClick();
     }
 
+    onDelClick = () => {
+        this.innerProps.onBottomDelClick && this.innerProps.onBottomDelClick();
+    }
+
     onReset() {
         this.listModel.query.init();
     }
 
     private contentRender() {
-        let { listModel, labelNoData } = this;
+        let { listModel, labelNoData, } = this;
+        let { showCheckBox, defaultHeader, classes } = this.innerProps;
+        let { selectedRow } = listModel;
         if (listModel.loading) {
             return (
                 <TableRow title={'loading'}>
@@ -124,7 +143,31 @@ export default class MyList extends React.Component<ListProps> {
                         let list = [];
                         let idx = 0;
                         for (let ele of listModel.result.data.rows) {
-                            list.push(this.innerProps.onRowRender(ele, idx++));
+                            if (this.innerProps.onRowRender)
+                                list.push(this.innerProps.onRowRender(ele, idx));
+                            else {
+                                let obj = this.innerProps.ondefaultRowRender(ele, idx);
+                                let item = selectedRow.getItems()[idx];
+                                list.push(
+                                    <TableRow key={idx}>
+                                        {showCheckBox &&
+                                            <TableCell padding="checkbox">
+                                                <Checkbox checked={!!(item && item.selected)} onChange={(event, checked) => {
+                                                    selectedRow.setSelected(checked, idx);
+                                                }} />
+                                            </TableCell>
+                                        }
+                                        {
+                                            defaultHeader.map((header, colIdx) => {
+                                                return (
+                                                    <TableCell key={colIdx} className={classNames(header.operate && classes.operateCol)}>{obj && obj[header.colName] || ''}</TableCell>
+                                                )
+                                            })
+                                        }
+                                    </TableRow>
+                                );
+                            }
+                            ++idx;
                         }
                         return list;
                     }
@@ -138,9 +181,9 @@ export default class MyList extends React.Component<ListProps> {
         }
     }
     render() {
-        const { queryRows, header, classes, hideBtn } = this.innerProps;
+        const { queryArgs, header, defaultHeader, classes, hideBtn, showCheckBox } = this.innerProps;
         const { listModel } = this;
-        const { page } = listModel;
+        const { page, selectedRow } = listModel;
         return (
             <div>
                 <Grid container spacing={16}>
@@ -150,7 +193,7 @@ export default class MyList extends React.Component<ListProps> {
                             this.innerProps.onQueryClick(this.listModel);
                         }
                     }}>
-                        {queryRows && queryRows.map((ele, idx) => {
+                        {queryArgs && queryArgs.map((ele, idx) => {
                             return (
                                 <Grid item key={idx} xs={12} sm={4} md={3}>
                                     <MyTextField
@@ -198,7 +241,22 @@ export default class MyList extends React.Component<ListProps> {
                     <div style={{ overflowX: 'auto' }}>
                         <Table>
                             <TableHead>
-                                {header}
+                                {header || (defaultHeader &&
+                                    <TableRow>
+                                        {showCheckBox && (
+                                            <TableCell padding="checkbox">
+                                                <Checkbox checked={selectedRow.selectedAll} onChange={(event, checked) => {
+                                                    selectedRow.setSelectedAll(checked);
+                                                }} />
+                                            </TableCell>
+                                        )}
+                                        {defaultHeader.map((ele, idx) => {
+                                            return (
+                                                <TableCell key={idx} className={classNames(ele.operate && classes.operateCol)}>{ele.content}</TableCell>
+                                            );
+                                        })}
+                                    </TableRow>
+                                )}
                             </TableHead>
                             <TableBody>
                                 {
@@ -219,6 +277,12 @@ export default class MyList extends React.Component<ListProps> {
                         </TableFooter>
                     </Table>
                 </Paper>
+
+                <BottomAppBar in={selectedRow.selected}>
+                    <MyButton onClick={this.onDelClick}>
+                        {lang.Global.operate.delMulti}
+                    </MyButton>
+                </BottomAppBar>
             </div >
         )
     }

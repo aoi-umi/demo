@@ -282,7 +282,7 @@ export class AdminUser extends React.Component {
         return (
             <div>
                 <MyList
-                    queryRows={[]}
+                    queryArgs={[]}
                     hideBtn={{ add: true }}
                     listModel={listModel}
                     onQueryClick={(model: ListModel) => {

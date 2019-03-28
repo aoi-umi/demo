@@ -8,12 +8,7 @@ export type BookmarkInstanceType = InstanceType<Bookmark>;
 export type BookmarkModelType = ModelType<Bookmark, typeof Bookmark>;
 export type BookmarkDocType = DocType<BookmarkInstanceType>;
 @setSchema({
-    schemaOptions: {
-        timestamps: true,
-        toObject: {
-            virtuals: true
-        }
-    }
+    schemaOptions: {}
 })
 export class Bookmark extends Base {
     @prop()

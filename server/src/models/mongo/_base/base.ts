@@ -46,7 +46,8 @@ export class Base extends Model<Base> {
  	* @param model
  	* @param pipeline 列表计数共用，过滤条件
  	* @param opt.extraPipeline 仅列表，排序等
- 	*/
+     */
+    @setStatic
     static async aggregatePaginate<U = { total: any }>(pipeline: any[], opt?: {
         extraPipeline?: any[];
 
@@ -119,4 +120,8 @@ export class Base extends Model<Base> {
             groupRs: groupRs as { [key in keyof U]: number } & { _id: any, total: number },
         }
     }
+}
+
+export class Public { 
+    
 }

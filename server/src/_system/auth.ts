@@ -14,11 +14,14 @@ export type AccessableUrlConfigType = {
 type AuthorityType = string | AuthConfigType;
 
 export let accessableUrlConfig: AccessableUrlConfigType[] = [];
-
+let accessableIfNoExists = false;
 export let init = function (opt: {
-    accessableUrlConfig: AccessableUrlConfigType[]
+    accessableUrlConfig: AccessableUrlConfigType[],
+    accessableIfNoExists?: boolean,    
 }) {
+    opt = common.extend({ accessableIfNoExists: false }, opt);
     accessableUrlConfig = opt.accessableUrlConfig;
+    accessableIfNoExists = opt.accessableIfNoExists;
 };
 
 export let check = function (req: Request, res: Response, next) {
@@ -91,12 +94,15 @@ export let getAccessableUrl = function (user: Express.MyDataUser, pathname?: str
         }
     });
     if (pathname) {
-        if (!isUrlExist)
-            throw common.error('', errorConfig.NOT_FOUND, {
-                format: function (msg) {
-                    return msg + ':' + pathname;
-                }
-            });
+        if (!accessableIfNoExists) {
+            if (!isUrlExist)
+                throw common.error('', errorConfig.NOT_FOUND, {
+                    format: function (msg) {
+                        return msg + ':' + pathname;
+                    }
+                });
+        } else
+            accessable = true;
         if (!accessable)
             throw common.error('', authConfig.accessable.errCode);
     }

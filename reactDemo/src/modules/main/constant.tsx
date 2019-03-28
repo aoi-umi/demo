@@ -5,6 +5,7 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import HomeIcon from '@material-ui/icons/Home';
 import PeopleIcon from '@material-ui/icons/People';
+import LockIcon from '@material-ui/icons/Lock';
 import { History } from 'history';
 
 import lang from '../../lang';
@@ -18,22 +19,32 @@ export const mainFolderListItems = (history: History) => {
         if (history.location.pathname != path)
             history.push(path);
     }
-    return (<div>
-        <ListItem button onClick={() => {
-            onClick(routeConfig.bookmark);
-        }} >
-            <ListItemIcon>
-                <HomeIcon />
-            </ListItemIcon>
-            <ListItemText primary={lang.App.menu.home} />
-        </ListItem>
-        <ListItem button onClick={() => {
-            onClick(routeConfig.adminUser);
-        }} >
-            <ListItemIcon>
-                <PeopleIcon />
-            </ListItemIcon>
-            <ListItemText primary={lang.App.menu.user} />
-        </ListItem>
-    </div>);
+
+    return (
+        <div>
+            {[{
+                route: routeConfig.bookmark,
+                icon: <HomeIcon />,
+                primary: lang.App.menu.home
+            }, {
+                route: routeConfig.adminUser,
+                icon: <PeopleIcon />,
+                primary: lang.App.menu.user
+            }, {
+                route: routeConfig.authority,
+                icon: <LockIcon />,
+                primary: lang.App.menu.authority
+            }].map((ele, idx) => {
+                return (
+                    <ListItem key={idx} button onClick={() => {
+                        onClick(ele.route);
+                    }} >
+                        <ListItemIcon>
+                            {ele.icon}
+                        </ListItemIcon>
+                        <ListItemText primary={ele.primary} />
+                    </ListItem>
+                );
+            })}
+        </div>);
 };
