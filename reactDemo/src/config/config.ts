@@ -24,6 +24,10 @@ export const routeConfig = {
         path: '/authority',
         authority: [authorityConfig.Login],
     },
+    role: {
+        path: '/role',
+        authority: [authorityConfig.Login],
+    },
     test: { path: '/test' },
 };
 

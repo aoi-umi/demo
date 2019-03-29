@@ -22,7 +22,17 @@ router.post('/bookmark/del', bookmark.del);
 //#region authority 
 import * as authority from './authority';
 router.get('/authority/query', authority.query);
+router.post('/authority/codeExists', authority.codeExists);
 router.post('/authority/save', authority.save);
 router.post('/authority/update', authority.update);
 router.post('/authority/del', authority.del);
+//#endregion
+
+//#region role 
+import * as role from './role';
+router.get('/role/query', role.query);
+router.post('/role/codeExists', role.codeExists);
+router.post('/role/save', role.save);
+router.post('/role/update', role.update);
+router.post('/role/del', role.del);
 //#endregion

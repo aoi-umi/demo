@@ -293,7 +293,7 @@ export class AdminUser extends React.Component<AdminUserProps>{
             <div>
                 <MyList
                     queryArgs={[]}
-                    hideBtn={{ add: true }}
+                    hideQueryBtn={{ add: true }}
                     listModel={listModel}
                     onQueryClick={(model: ListModel) => {
                         let queryObj = this.modelToObj();

@@ -2,41 +2,14 @@ import { RequestHandler } from 'express';
 import { Types } from 'mongoose';
 import { responseHandler, paramsValid } from '../helpers';
 import { error } from '../_system/common';
-import { AuthorityModel, AuthorityInstanceType, AuthorityMapper } from '../models/mongo/authority';
+import { RoleModel, RoleInstanceType, RoleMapper, RoleQueryArgs } from '../models/mongo/role';
 
 export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let schema = {};
-        let data: {
-            code: string;
-            name: string;
-            status: string;
-            anyKey: string;
-        } & ApiListQueryArgs = req.query;
+        let data: RoleQueryArgs = req.query;
         paramsValid(schema, data, { list: true });
-        let query: any = {};
-        if (data.anyKey) {
-            delete data.name;
-            delete data.code;
-            let anykey = new RegExp(data.anyKey, 'i');
-            query.$or = [
-                { code: anykey },
-                { name: anykey },
-            ];
-        }
-
-        if (data.name)
-            query.name = new RegExp(data.name, 'i');
-        if (data.code)
-            query.code = new RegExp(data.code, 'i');
-        if (data.status)
-            query.status = data.status;
-
-        let { rows, total } = await AuthorityModel.findAndCountAll({
-            conditions: query,
-            page: data.page,
-            rows: data.rows
-        });
+        let { rows, total } = await RoleMapper.query(data);
         return {
             rows,
             total
@@ -54,7 +27,7 @@ export let codeExists: RequestHandler = (req, res) => {
             code: string;
         } = req.body;
         paramsValid(schema, data);
-        let rs = await AuthorityMapper.codeExists(data.code, data._id);
+        let rs = await RoleMapper.codeExists(data.code, data._id);
         return rs && { _id: rs._id };
     }, req, res);
 };
@@ -67,21 +40,21 @@ export let save: RequestHandler = (req, res) => {
             code?: string;
             status?: string;
         } = req.body;
-        let model: AuthorityInstanceType;
-        let rs = await AuthorityMapper.codeExists(data.code, data._id);
+        let model: RoleInstanceType;
+        let rs = await RoleMapper.codeExists(data.code, data._id);
         if (rs)
             throw error('code已存在');
         if (!data._id) {
             delete data._id;
-            model = await AuthorityModel.create({
+            model = await RoleModel.create({
                 ...data,
             });
         } else {
-            model = await AuthorityModel.findById(data._id);
+            model = await RoleModel.findById(data._id);
             if (!model)
                 throw error('not exists');
             let update: any = {};
-            ['name', 'code', 'status'].forEach(key => {
+            ['name', 'code', 'status', 'authorityList'].forEach(key => {
                 update[key] = data[key];
             });
             await model.update(update);
@@ -98,7 +71,7 @@ export let update: RequestHandler = (req, res) => {
             _id: string;
             status?: string;
         } & Object = req.body;
-        let model = await AuthorityModel.findById(data._id);
+        let model = await RoleModel.findById(data._id);
         if (!model)
             throw error('not exists');
         let update: any = {};
@@ -117,7 +90,7 @@ export let update: RequestHandler = (req, res) => {
 export let del: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let data = req.body;
-        let rs = await AuthorityModel.deleteMany({ _id: { $in: data.idList.map(id => Types.ObjectId(id)) } });
+        let rs = await RoleModel.deleteMany({ _id: { $in: data.idList.map(id => Types.ObjectId(id)) } });
         if (!rs.n)
             throw error('No Match Data');
     }, req, res);

@@ -185,7 +185,7 @@ export default class Bookmark extends React.Component<Props> {
                             </TableCell>
                             <TableCell>{lang.Bookmark.name}</TableCell>
                             <TableCell>{lang.Bookmark.url}</TableCell>
-                            <TableCell className={classes.operateCol}>{lang.Bookmark.list.operate}</TableCell>
+                            <TableCell className={classes.operateCol}>{lang.Global.list.operate}</TableCell>
                         </TableRow>
                     }
                     onRowRender={(ele, idx) => {
@@ -290,28 +290,28 @@ function renderBookmarkTag(tag: BookmarkShowTag | string, key?: any, onOperate?)
 }
 @observer
 class BookmarkDetail extends React.Component<DetailProps>{
-    private detailModel: BookmarkDetailModel;
+    private model: BookmarkDetailModel;
     btnModel: MyButtonModel;
     private onSaveSuccess: BookmarkDetailOnSaveSuccess = () => {
         msgNotice(lang.Global.operate.saveSuccess, { type: 'dialog' });
     };
     constructor(props: DetailProps) {
         super(props);
-        this.detailModel = props.detail || new BookmarkDetailModel();
+        this.model = props.detail || new BookmarkDetailModel();
         this.btnModel = new MyButtonModel();
         if (props.onSaveSuccess)
             this.onSaveSuccess = props.onSaveSuccess;
     }
 
     private onSave = async () => {
-        let { detailModel, btnModel } = this;
-        let isVaild = await this.detailModel.validAll();
+        let { model, btnModel } = this;
+        let isVaild = await this.model.validAll();
         if (!isVaild)
             return;
         try {
             btnModel.load();
             let addTagList = [], delTagList = [];
-            let field = detailModel.field;
+            let field = model.field;
             field.showTagList.map(ele => {
                 if (1 == ele.status) {
                     addTagList.push(ele.tag);
@@ -335,17 +335,17 @@ class BookmarkDetail extends React.Component<DetailProps>{
     }
 
     private onTagDelClick = (idx: number) => {
-        let { detailModel } = this;
-        let showTag = detailModel.field.showTagList[idx];
-        detailModel.changeShowTag({
+        let { model } = this;
+        let showTag = model.field.showTagList[idx];
+        model.changeShowTag({
             ...showTag,
             status: -1,
         }, idx);
     }
 
     private onTagAddClick = (idx?: number) => {
-        let { detailModel } = this;
-        let field = detailModel.field;
+        let { model } = this;
+        let field = model.field;
         let showTag: BookmarkShowTag;
         if (idx !== undefined) {
             showTag = field.showTagList[idx];
@@ -363,7 +363,7 @@ class BookmarkDetail extends React.Component<DetailProps>{
             }
         }
         if (showTag) {
-            detailModel.changeShowTag({
+            model.changeShowTag({
                 ...showTag,
                 status: showTag.origStatus
             }, idx);
@@ -371,7 +371,7 @@ class BookmarkDetail extends React.Component<DetailProps>{
     }
 
     renderTag() {
-        let { detailModel } = this;
+        let { model: detailModel } = this;
         return detailModel.field.showTagList.map((ele, idx) => {
             return renderBookmarkTag(ele, idx, () => {
                 if (ele.status == -1) {
@@ -384,7 +384,7 @@ class BookmarkDetail extends React.Component<DetailProps>{
     }
 
     render() {
-        let { detailModel, btnModel } = this;
+        let { model: detailModel, btnModel } = this;
         let field = detailModel.field;
         return (
             <Grid container spacing={16}>

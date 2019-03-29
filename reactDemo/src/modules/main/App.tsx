@@ -43,6 +43,7 @@ import {
 
 import BookMark from '../bookmark';
 import Authority from '../authority';
+import Role from '../role';
 import { main, mainFolderListItems } from './constant';
 //#region route
 let { routeConfig } = config;
@@ -63,6 +64,10 @@ const routes: {
     routeConfig: routeConfig.authority,
     comp: <Authority listenUrl={routeConfig.authority.path} />,
     title: lang.App.routes.authority,
+}, {
+    routeConfig: routeConfig.role,
+    comp: <Role listenUrl={routeConfig.role.path} />,
+    title: lang.App.routes.role,
 }, {
     routeConfig: routeConfig.userSignUp,
     comp: <SignUp />,

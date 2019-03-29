@@ -15,8 +15,6 @@ export let query: RequestHandler = (req, res) => {
         paramsValid(schema, data, { list: true });
         let query: any = {};
         if (data.anyKey) {
-            delete data.name;
-            delete data.url;
             let anykey = new RegExp(data.anyKey, 'i');
             query.$or = [
                 { url: anykey },

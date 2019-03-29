@@ -2,9 +2,9 @@ import { observable, action, runInAction, computed } from 'mobx';
 
 import { ValidError, Validators } from './Valid';
 export abstract class Model<T> {
-    validConfig: Validators<T>;
+    validConfig: Validators;
     constructor(field: T, opt?: {
-        validConfig?: Validators<T>
+        validConfig?: Validators
     }) {
         runInAction(() => {
             this.field = field;
@@ -70,7 +70,7 @@ export abstract class Model<T> {
         let validConfig = this.validConfig && this.validConfig[key];
         if (validConfig) {
             for (let ele of validConfig.validator) {
-                let msg = await ele(this.getValue(key), this.field, this);
+                let msg = await ele(this.getValue(key), this);
                 if (typeof msg == 'string') {
                     rs.err = { msg };
                 } else if (msg) {

@@ -52,6 +52,9 @@ const config = {
                     url: '/authority/query',
                     method: 'GET',
                 },
+                authorityCodeExists: {
+                    url: '/authority/codeExists',
+                },
                 authoritySave: {
                     url: '/authority/save',
                 },
@@ -60,6 +63,23 @@ const config = {
                 },
                 authorityDel: {
                     url: '/authority/del',
+                },
+
+                roleQuery: {
+                    url: '/role/query',
+                    method: 'GET',
+                },
+                roleCodeExists: {
+                    url: '/role/codeExists',
+                },
+                roleSave: {
+                    url: '/role/save',
+                },
+                roleUpdate: {
+                    url: '/role/update',
+                },
+                roleDel: {
+                    url: '/role/del',
                 },
             }
         } as TestApiConfigType

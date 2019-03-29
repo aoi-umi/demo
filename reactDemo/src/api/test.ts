@@ -3,7 +3,7 @@ import { error } from '../helpers/util';
 import { cacheKey } from '../config/config';
 
 import { ApiModel, ApiConfigModel, ApiMethodConfigType } from './model';
-import { ListQueryRequest, ApiMethod } from '.';
+import { ApiListQueryArgs, ApiMethod } from '.';
 
 type TestApiMethod = ApiMethod<ApiMethodConfigType, {
     userSignUp,
@@ -18,9 +18,16 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
     bookmarkDel,
 
     authorityQuery,
+    authorityCodeExists,
     authoritySave,
     authorityUpdate,
     authorityDel,
+
+    roleQuery,
+    roleCodeExists,
+    roleSave,
+    roleUpdate,
+    roleDel,
 }>;
 export type TestApiConfigType = ApiConfigModel<TestApiMethod>;
 
@@ -75,7 +82,7 @@ export class TestApi extends ApiModel<TestApiMethod> {
     //#endregion
 
     //#region bookmark 
-    async bookmarkQuery(data?: { name?, url?, anyKey?} & ListQueryRequest) {
+    async bookmarkQuery(data?: { name?, url?, anyKey?} & ApiListQueryArgs) {
         return this.requestByConfig<ListResult>(this.apiConfig.method.bookmarkQuery, { data });
     }
     async bookmarkSave(data) {
@@ -87,17 +94,38 @@ export class TestApi extends ApiModel<TestApiMethod> {
     //#endregion
 
     //#region authority 
-    async authorityQuery(data?: { name?, code?, anyKey?} & ListQueryRequest) {
+    async authorityQuery(data?: { name?, code?, anyKey?} & ApiListQueryArgs) {
         return this.requestByConfig<ListResult>(this.apiConfig.method.authorityQuery, { data });
     }
     async authoritySave(data) {
         return this.requestByConfig(this.apiConfig.method.authoritySave, { data });
+    }
+    async authorityCodeExists(data) {
+        return this.requestByConfig(this.apiConfig.method.authorityCodeExists, { data });
     }
     async authorityUpdate(data) {
         return this.requestByConfig(this.apiConfig.method.authorityUpdate, { data });
     }
     async authorityDel(idList: string[]) {
         return this.requestByConfig(this.apiConfig.method.authorityDel, { data: { idList } });
+    }
+    //#endregion
+
+    //#region role 
+    async roleQuery(data?: { name?, code?, anyKey?} & ApiListQueryArgs) {
+        return this.requestByConfig<ListResult>(this.apiConfig.method.roleQuery, { data });
+    }
+    async roleSave(data) {
+        return this.requestByConfig(this.apiConfig.method.roleSave, { data });
+    }
+    async roleCodeExists(data) {
+        return this.requestByConfig(this.apiConfig.method.roleCodeExists, { data });
+    }
+    async roleUpdate(data) {
+        return this.requestByConfig(this.apiConfig.method.roleUpdate, { data });
+    }
+    async roleDel(idList: string[]) {
+        return this.requestByConfig(this.apiConfig.method.roleDel, { data: { idList } });
     }
     //#endregion
 }
