@@ -136,12 +136,13 @@ export default class MyList extends React.Component<ListProps> {
                 if (!listModel.result.success)
                     msg = listModel.result.msg || lang.MyList.queryFail;
                 else if (listModel.result.success) {
-                    if (!listModel.result.data.rows.length)
+                    let rows = listModel.result.data.rows;
+                    if (!rows.length)
                         msg = labelNoData;
                     else {
                         let list = [];
-                        let idx = 0;
-                        for (let ele of listModel.result.data.rows) {
+                        for (let idx = 0; idx < rows.length; idx++) {
+                            let ele = rows[idx];
                             if (this.innerProps.onRowRender)
                                 list.push(this.innerProps.onRowRender(ele, idx));
                             else {
@@ -161,13 +162,12 @@ export default class MyList extends React.Component<ListProps> {
                                             defaultHeader.map((header, colIdx) => {
                                                 return (
                                                     <TableCell key={colIdx} className={classNames(header.operate && classes.operateCol)}>{obj && obj[header.colName] || ''}</TableCell>
-                                                )
+                                                );
                                             })
                                         }
                                     </TableRow>
                                 );
                             }
-                            ++idx;
                         }
                         return list;
                     }

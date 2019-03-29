@@ -1,14 +1,14 @@
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router';
-import classNames from 'classnames';
 import { LocationListener } from 'history';
-import { WithStyles, Paper } from '@material-ui/core';
+import { WithStyles } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Switch from '@material-ui/core/Switch';
 
 
 import { observer } from 'mobx-react';
-import { TextAlignProperty } from 'csstype';
 import * as qs from 'query-string';
 
 import lang from '../../lang';
@@ -144,6 +144,21 @@ export default class Authority extends React.Component<Props> {
         }
     }
 
+    onStatusUpdateClick = async (ele) => {
+        let loading = msgNotice(lang.Global.operate.updating, { type: 'dialog', dialogType: 'loading' });
+        try {
+            await testApi.authorityUpdate({
+                _id: ele._id,
+                status: ele.status == myEnum.authorityStatus.启用 ? myEnum.authorityStatus.禁用 : myEnum.authorityStatus.启用
+            });
+            loading.close();
+            this.refresh();
+        } catch (e) {
+            loading.close();
+            msgNotice(lang.Global.operate.updateFail + `${e.message}`, { type: 'dialog' });
+        }
+    }
+
     public render() {
         const { listModel } = this;
         const { classes } = this.innerProps;
@@ -192,6 +207,11 @@ export default class Authority extends React.Component<Props> {
                             status: myEnum.authorityStatus.getKey(ele.status),
                             operate:
                                 <div>
+                                    <Button onClick={() => {
+                                        this.onStatusUpdateClick(ele);
+                                    }}>
+                                        {ele.status == myEnum.authorityStatus.启用 ? lang.Global.operate.disable : lang.Global.operate.enable}
+                                    </Button>
                                     <Button onClick={() => {
                                         this.showDetail(ele);
                                     }}>{lang.Global.operate.edit}</Button>
@@ -248,12 +268,15 @@ class AuthorityDetail extends React.Component<DetailProps>{
         try {
             btnModel.load();
             let field = detailModel.field;
-            await testApi.authoritySave({
+            let obj: any = {
                 _id: field._id,
                 name: field.name,
-                code: field.code,
                 status: field.status,
-            });
+            };
+            if (!field._id) {
+                obj.code = field.code;
+            }
+            await testApi.authoritySave(obj);
             btnModel.loaded();
             await this.onSaveSuccess();
         } catch (e) {
@@ -267,16 +290,28 @@ class AuthorityDetail extends React.Component<DetailProps>{
         let field = detailModel.field;
         return (
             <Grid container spacing={16}>
-                <Grid item container justify='center'>
+                <Grid item container justify="flex-start">
                     <MyTextField autoFocus required fullWidth
                         fieldKey='name'
                         model={detailModel}
                         label={lang.Authority.name}
                     />
-                    <MyTextField required fullWidth
-                        fieldKey='code'
-                        model={detailModel}
-                        label={lang.Authority.code}
+                    {!field._id &&
+                        <MyTextField required fullWidth
+                            fieldKey='code'
+                            model={detailModel}
+                            label={lang.Authority.code}
+                        />
+                    }
+
+                    <FormControlLabel labelPlacement="start" label={lang.Authority.status}
+                        control={
+                            <Switch checked={field.status == myEnum.authorityStatus.启用}
+                                onChange={(event, checked) => {
+                                    field.status = checked ? myEnum.authorityStatus.启用 : myEnum.authorityStatus.禁用;
+                                }}
+                            />
+                        }
                     />
                 </Grid>
                 <Grid item container justify={'flex-end'}>

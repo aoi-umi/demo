@@ -20,6 +20,11 @@ let lang = {
             saveSuccess: '保存成功',
             saving: '保存中',
             saveFail: '保存失败:',
+
+            enable: '启用',
+            disable: '禁用',
+            updating: '修改中',
+            updateFail: '修改失败',
         },
     },
     //#region module 

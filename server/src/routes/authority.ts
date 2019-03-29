@@ -64,7 +64,7 @@ export let save: RequestHandler = (req, res) => {
             if (!model)
                 throw error('not exists');
             let update: any = {};
-            ['name', 'code', 'status'].forEach(key => {
+            ['name', 'status'].forEach(key => {
                 update[key] = data[key];
             });
             await model.update(update);
@@ -80,13 +80,13 @@ export let update: RequestHandler = (req, res) => {
         let data: {
             _id: string;
             status?: string;
-        } = req.body;
+        } & Object = req.body;
         let model = await AuthorityModel.findById(data._id);
         if (!model)
             throw error('not exists');
         let update: any = {};
         ['status'].forEach(key => {
-            if (data[key])
+            if (data.hasOwnProperty(key))
                 update[key] = data[key];
         });
         await model.update(update);

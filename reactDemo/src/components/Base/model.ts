@@ -140,6 +140,8 @@ export class SelectedItem<T=any>{
 }
 
 export class SelectedObject<T=any> {
+    //单选
+    single = false;
     @computed
     get selectedAll() {
         let items = this.getItems();
@@ -182,6 +184,10 @@ export class SelectedObject<T=any> {
     setSelected(selected: boolean, startIdx: number, endIdx?: number) {
         if (isNaN(endIdx))
             endIdx = startIdx;
+        if (this.single && endIdx - startIdx > 0) {
+            console.warn('you can select one only, if single is true');
+            endIdx = startIdx;
+        }
         let items = this.getItems();
         for (let i = startIdx; i <= endIdx; i++) {
             if (items[i])
