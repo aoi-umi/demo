@@ -4,7 +4,7 @@ import { observable, action, runInAction } from 'mobx';
 import { Model, required } from '../../components/Base';
 import { myEnum } from '../../config/enum';
 
-class AuthorityQueryFieldModel {
+class RoleQueryFieldModel {
     @observable
     name: string;
     @observable
@@ -12,9 +12,9 @@ class AuthorityQueryFieldModel {
     @observable
     anyKey: string;
 }
-export class AuthorityQueryModel extends Model<AuthorityQueryFieldModel> {
+export class RoleQueryModel extends Model<RoleQueryFieldModel> {
     constructor() {
-        super(new AuthorityQueryFieldModel());
+        super(new RoleQueryFieldModel());
         this.init();
     }
 
@@ -26,7 +26,7 @@ export class AuthorityQueryModel extends Model<AuthorityQueryFieldModel> {
     }
 }
 
-class AuthorityDetailFieldModel {
+class RoleDetailFieldModel {
     @observable
     _id: string;
     @observable
@@ -36,17 +36,17 @@ class AuthorityDetailFieldModel {
     @observable
     status: number;
 }
-export class AuthorityDetailModel extends Model<AuthorityDetailFieldModel>{
+export class RoleDetailModel extends Model<RoleDetailFieldModel>{
     codeExistsErr: string;
     constructor() {
-        super(new AuthorityDetailFieldModel(), {
+        super(new RoleDetailFieldModel(), {
             validConfig: {
                 name: {
                     validator: [required]
                 },
 
                 code: {
-                    validator: [required, (val, model: AuthorityDetailModel) => {
+                    validator: [required, (val, model: RoleDetailModel) => {
                         return model.codeExistsErr;
                     }]
                 },
@@ -58,9 +58,10 @@ export class AuthorityDetailModel extends Model<AuthorityDetailFieldModel>{
     @action
     init(detail?) {
         let defaultVal = {
-            status: myEnum.authorityStatus.启用
+            status: myEnum.roleStatus.启用,
+            authorityList: []
         };
-        ['_id', 'name', 'code', 'status'].forEach(key => {
+        ['_id', 'name', 'code', 'status', 'authorityList'].forEach(key => {
             let value = defaultVal[key] || '';
             if (detail && detail.hasOwnProperty(key))
                 value = detail[key];

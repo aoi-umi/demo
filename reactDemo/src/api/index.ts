@@ -1,8 +1,10 @@
 import config from '../config/env';
 
-export type ListQueryRequest = {
+export type ApiListQueryArgs = {
     page?: number,
     rows?: number,
+    orderBy?: string;
+    sortOrder?: string;
 }
 
 export type ApiMethod<U, T> = {

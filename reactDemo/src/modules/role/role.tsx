@@ -6,6 +6,7 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
+import TextField from '@material-ui/core/TextField';
 
 
 import { observer } from 'mobx-react';
@@ -22,7 +23,7 @@ import {
 } from '../../components';
 import { msgNotice } from '../../helpers/common';
 import { testApi } from '../../api';
-import { AuthorityQueryModel, AuthorityDetailModel } from './model';
+import { RoleQueryModel, RoleDetailModel } from './model';
 
 const styles = () => ({
     operateCol: {
@@ -40,15 +41,15 @@ type InnerProps = RouteComponentProps<{}> & WithStyles<typeof styles> & Props;
 @withRouterDeco
 @withStylesDeco(styles)
 @observer
-export default class Authority extends React.Component<Props> {
+export default class Role extends React.Component<Props> {
     private get innerProps() {
         return this.props as InnerProps;
     }
     private unlisten: any;
-    private listModel: ListModel<AuthorityQueryModel>;
+    private listModel: ListModel<RoleQueryModel>;
     constructor(props, context) {
         super(props, context);
-        this.listModel = new ListModel({ query: new AuthorityQueryModel() });
+        this.listModel = new ListModel({ query: new RoleQueryModel() });
         this.unlisten = this.innerProps.history.listen(this.onHistoryListen);
     }
 
@@ -60,7 +61,7 @@ export default class Authority extends React.Component<Props> {
         this.unlisten && this.unlisten();
     }
 
-    private modelToObj(model?: ListModel<AuthorityQueryModel>) {
+    private modelToObj(model?: ListModel<RoleQueryModel>) {
         let { query, page } = model || this.listModel;
         let queryObj = {
             ...query.field,
@@ -70,7 +71,7 @@ export default class Authority extends React.Component<Props> {
         return queryObj;
     }
 
-    private objToModel(obj: any, model?: ListModel<AuthorityQueryModel>) {
+    private objToModel(obj: any, model?: ListModel<RoleQueryModel>) {
         if (!model)
             model = this.listModel;
         model.query.setValue({
@@ -95,11 +96,11 @@ export default class Authority extends React.Component<Props> {
     }
 
     private showDetail = (detail?) => {
-        let detailModel = new AuthorityDetailModel();
+        let detailModel = new RoleDetailModel();
         if (detail)
             detailModel.init(detail);
         let notice = msgNotice(
-            <AuthorityDetail
+            <RoleDetail
                 detail={detailModel}
                 onSaveSuccess={async () => {
                     let type = await msgNotice(lang.Global.operate.saveSuccess, {
@@ -116,7 +117,7 @@ export default class Authority extends React.Component<Props> {
                     }
                 }}
             >
-            </AuthorityDetail>, {
+            </RoleDetail>, {
                 type: 'dialog',
                 dialogTitle: detail ? lang.Global.operate.edit : lang.Global.operate.add,
                 dialogBtnList: []
@@ -131,7 +132,7 @@ export default class Authority extends React.Component<Props> {
         if (type == 'accept') {
             let loading = msgNotice(lang.Global.operate.deleting, { type: 'dialog', dialogType: 'loading' });
             try {
-                await testApi.authorityDel(idList);
+                await testApi.roleDel(idList);
                 loading.close();
                 let closeType = await msgNotice(lang.Global.operate.delSuccess, {
                     type: 'dialog',
@@ -147,9 +148,9 @@ export default class Authority extends React.Component<Props> {
     onStatusUpdateClick = async (ele) => {
         let loading = msgNotice(lang.Global.operate.updating, { type: 'dialog', dialogType: 'loading' });
         try {
-            await testApi.authorityUpdate({
+            await testApi.roleUpdate({
                 _id: ele._id,
-                status: ele.status == myEnum.authorityStatus.启用 ? myEnum.authorityStatus.禁用 : myEnum.authorityStatus.启用
+                status: ele.status == myEnum.roleStatus.启用 ? myEnum.roleStatus.禁用 : myEnum.roleStatus.启用
             });
             loading.close();
             this.refresh();
@@ -168,34 +169,34 @@ export default class Authority extends React.Component<Props> {
                 <MyList
                     queryArgs={[{
                         id: 'name',
-                        label: lang.Authority.name,
+                        label: lang.Role.name,
                     }, {
                         id: 'code',
-                        label: lang.Authority.code,
+                        label: lang.Role.code,
                     }, {
                         id: 'anyKey',
-                        label: lang.Authority.anyKey,
+                        label: lang.Role.anyKey,
                     }]}
                     listModel={listModel}
-                    onQueryClick={(model: ListModel<AuthorityQueryModel>) => {
+                    onQueryClick={(model: ListModel<RoleQueryModel>) => {
                         let queryObj = this.modelToObj();
                         this.innerProps.history.replace({ pathname: this.innerProps.location.pathname, search: qs.stringify(queryObj) });
                     }}
                     onQuery={async () => {
-                        let data = await testApi.authorityQuery(this.modelToObj());
+                        let data = await testApi.roleQuery(this.modelToObj());
                         selectedRow.setItems(data.rows);
                         return data;
                     }}
                     showCheckBox={true}
                     defaultHeader={[{
                         colName: 'name',
-                        content: lang.Authority.name,
+                        content: lang.Role.name,
                     }, {
                         colName: 'code',
-                        content: lang.Authority.code,
+                        content: lang.Role.code,
                     }, {
                         colName: 'status',
-                        content: lang.Authority.status,
+                        content: lang.Role.status,
                     }, {
                         colName: 'operate',
                         content: lang.Global.list.operate,
@@ -204,13 +205,13 @@ export default class Authority extends React.Component<Props> {
                     onDefaultRowRender={(ele, idx) => {
                         return {
                             ...ele,
-                            status: myEnum.authorityStatus.getKey(ele.status),
+                            status: myEnum.roleStatus.getKey(ele.status),
                             operate:
                                 <div>
                                     <Button onClick={() => {
                                         this.onStatusUpdateClick(ele);
                                     }}>
-                                        {ele.status == myEnum.authorityStatus.启用 ? lang.Global.operate.disable : lang.Global.operate.enable}
+                                        {ele.status == myEnum.roleStatus.启用 ? lang.Global.operate.disable : lang.Global.operate.enable}
                                     </Button>
                                     <Button onClick={() => {
                                         this.showDetail(ele);
@@ -239,22 +240,22 @@ export default class Authority extends React.Component<Props> {
     }
 }
 
-type AuthorityDetailOnSaveSuccess = () => void;
+type RoleDetailOnSaveSuccess = () => void;
 type DetailProps = {
-    detail?: AuthorityDetailModel;
-    onSaveSuccess?: AuthorityDetailOnSaveSuccess;
+    detail?: RoleDetailModel;
+    onSaveSuccess?: RoleDetailOnSaveSuccess;
 };
 
 @observer
-class AuthorityDetail extends React.Component<DetailProps>{
-    private model: AuthorityDetailModel;
+class RoleDetail extends React.Component<DetailProps>{
+    private model: RoleDetailModel;
     btnModel: MyButtonModel;
-    private onSaveSuccess: AuthorityDetailOnSaveSuccess = () => {
+    private onSaveSuccess: RoleDetailOnSaveSuccess = () => {
         msgNotice(lang.Global.operate.saveSuccess, { type: 'dialog' });
     };
     constructor(props: DetailProps) {
         super(props);
-        this.model = props.detail || new AuthorityDetailModel();
+        this.model = props.detail || new RoleDetailModel();
         this.btnModel = new MyButtonModel();
         if (props.onSaveSuccess)
             this.onSaveSuccess = props.onSaveSuccess;
@@ -274,7 +275,7 @@ class AuthorityDetail extends React.Component<DetailProps>{
                 status: field.status,
                 code: field.code,
             };
-            await testApi.authoritySave(obj);
+            await testApi.roleSave(obj);
             btnModel.loaded();
             await this.onSaveSuccess();
         } catch (e) {
@@ -289,34 +290,43 @@ class AuthorityDetail extends React.Component<DetailProps>{
         return (
             <Grid container spacing={16}>
                 <Grid item container justify="flex-start">
+                    <FormControlLabel labelPlacement="start" label={lang.Role.status}
+                        control={
+                            <Switch color="primary" checked={field.status == myEnum.roleStatus.启用}
+                                onChange={(event, checked) => {
+                                    field.status = checked ? myEnum.roleStatus.启用 : myEnum.roleStatus.禁用;
+                                }}
+                            />
+                        }
+                    />
                     <MyTextField autoFocus required fullWidth
                         fieldKey='name'
                         model={model}
-                        label={lang.Authority.name}
+                        label={lang.Role.name}
                     />
                     <MyTextField required fullWidth
                         fieldKey='code'
                         model={model}
-                        label={lang.Authority.code}
+                        label={lang.Role.code}
                         onBlur={async () => {
                             let code = model.field.code;
                             let rs: any;
                             if (code) {
-                                rs = await testApi.authorityCodeExists({ code, _id: field._id });
+                                rs = await testApi.roleCodeExists({ code, _id: field._id });
                             }
-                            model.codeExistsErr = rs ? lang.Authority.codeExists : '';
+                            model.codeExistsErr = rs ? lang.Role.codeExists : '';
                             model.valid('code');
                         }}
                     />
-
-                    <FormControlLabel labelPlacement="start" label={lang.Authority.status}
-                        control={
-                            <Switch color="primary" checked={field.status == myEnum.authorityStatus.启用}
-                                onChange={(event, checked) => {
-                                    field.status = checked ? myEnum.authorityStatus.启用 : myEnum.authorityStatus.禁用;
-                                }}
-                            />
-                        }
+                </Grid>
+                <Grid item container >
+                    {/* {this.renderTag()} */}
+                    <TextField
+                        label={lang.Role.authority}
+                        variant="standard"
+                        onChange={(event) => {
+                            let val = event.target.value;
+                        }}
                     />
                 </Grid>
                 <Grid item container justify={'flex-end'}>

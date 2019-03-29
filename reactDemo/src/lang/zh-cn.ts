@@ -5,6 +5,9 @@ let lang = {
             close: '关闭',
             refresh: '刷新',
         },
+        list: {
+            operate: '操作',
+        },
         operate: {
             add: '添加',
             edit: '修改',
@@ -34,13 +37,15 @@ let lang = {
             userSignUp: '注册',
             userAccount: '个人中心',
             adminUser: '用户管理',
-            authority: '权限',
+            authority: '权限管理',
+            role: '角色管理',
             notFound: 'Not Found',
         },
         menu: {
             home: 'Home',
             user: 'User',
             authority: 'Authority',
+            role: 'Role',
         }
     },
     User: {
@@ -67,9 +72,6 @@ let lang = {
         url: 'url',
         tag: '标签',
         anyKey: 'anyKey',
-        list: {
-            operate: '操作',
-        },
         operate: {
             tagAdd: '添加',
         },
@@ -79,9 +81,17 @@ let lang = {
         code: '编码',
         status: '状态',
         anyKey: 'anyKey',
-        list: {
-            operate: '操作',
-        },
+
+        codeExists: '编码已存在',
+    },
+    Role: {
+        name: '名字',
+        code: '编码',
+        status: '状态',
+        authority: '权限',
+        anyKey: 'anyKey',
+
+        codeExists: '编码已存在',
     },
     //#endregion
     //#region component 

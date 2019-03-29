@@ -6,4 +6,6 @@ type ErrorConfigType = {
 type ApiListQueryArgs = {
     page?: number;
     rows?: number;
+    orderBy?: string;
+    sortOrder?: string;
 }

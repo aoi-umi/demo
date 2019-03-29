@@ -43,11 +43,16 @@ type ListProps = {
     listModel: ListModel;
     onAddClick?: () => any;
     onBottomDelClick?: () => any;
-    hideBtn?: {
+    bottomBtnList?: React.ReactNode[];
+    hideQueryBtn?: {
         all?: boolean;
         add?: boolean;
         reset?: boolean;
         query?: boolean;
+    };
+    hideBottomBtn?: {
+        all?: boolean;
+        del?: boolean;
     }
 }
 
@@ -181,7 +186,7 @@ export default class MyList extends React.Component<ListProps> {
         }
     }
     render() {
-        const { queryArgs, header, defaultHeader, classes, hideBtn, showCheckBox } = this.innerProps;
+        const { queryArgs, header, defaultHeader, classes, hideQueryBtn, showCheckBox, hideBottomBtn } = this.innerProps;
         const { listModel } = this;
         const { page, selectedRow } = listModel;
         return (
@@ -213,7 +218,7 @@ export default class MyList extends React.Component<ListProps> {
                         spacing={16}
                     >
                         {
-                            (!hideBtn || (!hideBtn.all && !hideBtn.reset)) &&
+                            (!hideQueryBtn || (!hideQueryBtn.all && !hideQueryBtn.reset)) &&
                             <Grid item>
                                 <Button variant="contained" onClick={() => {
                                     this.onReset();
@@ -221,7 +226,7 @@ export default class MyList extends React.Component<ListProps> {
                             </Grid>
                         }
                         {
-                            (!hideBtn || (!hideBtn.all && !hideBtn.query)) &&
+                            (!hideQueryBtn || (!hideQueryBtn.all && !hideQueryBtn.query)) &&
                             <Grid item>
                                 <MyButton variant="contained" model={this.queryBtnModel} onClick={() => {
                                     this.listModel.page.setPage(1);
@@ -230,7 +235,7 @@ export default class MyList extends React.Component<ListProps> {
                             </Grid>
                         }
                         {
-                            (!hideBtn || (!hideBtn.all && !hideBtn.add)) &&
+                            (!hideQueryBtn || (!hideQueryBtn.all && !hideQueryBtn.add)) &&
                             <Grid item>
                                 <Button variant="contained" onClick={this.onAddClick}>{lang.Global.operate.add}</Button>
                             </Grid>
@@ -279,9 +284,13 @@ export default class MyList extends React.Component<ListProps> {
                 </Paper>
 
                 <BottomAppBar in={selectedRow.selected}>
-                    <MyButton onClick={this.onDelClick}>
-                        {lang.Global.operate.delMulti}
-                    </MyButton>
+                    {
+                        (!hideBottomBtn || (!hideBottomBtn.all && !hideBottomBtn.del)) &&
+                        <MyButton onClick={this.onDelClick}>
+                            {lang.Global.operate.delMulti}
+                        </MyButton>
+                    }
+                    {this.innerProps.bottomBtnList}
                 </BottomAppBar>
             </div >
         )

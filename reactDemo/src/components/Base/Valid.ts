@@ -1,10 +1,10 @@
 export type ValidError = { msg: string };
 type ValidatorResult = ValidError | string | void;
-export type Validator<T=any> = (val: any, field: T, model: any) => ValidatorResult | Promise<ValidatorResult>;
-export type Validators<T> = {
+export type Validator = (val: any, model: any) => ValidatorResult | Promise<ValidatorResult>;
+export type Validators = {
     [key: string]: {
         name?: string;
-        validator: Validator<T>[];
+        validator: Validator[];
     }
 }
 

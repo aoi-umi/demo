@@ -6,6 +6,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import HomeIcon from '@material-ui/icons/Home';
 import PeopleIcon from '@material-ui/icons/People';
 import LockIcon from '@material-ui/icons/Lock';
+import PermIdentityIcon from '@material-ui/icons/PermIdentity';
 import { History } from 'history';
 
 import lang from '../../lang';
@@ -30,6 +31,10 @@ export const mainFolderListItems = (history: History) => {
                 route: routeConfig.adminUser,
                 icon: <PeopleIcon />,
                 primary: lang.App.menu.user
+            }, {
+                route: routeConfig.role,
+                icon: <PermIdentityIcon />,
+                primary: lang.App.menu.role
             }, {
                 route: routeConfig.authority,
                 icon: <LockIcon />,

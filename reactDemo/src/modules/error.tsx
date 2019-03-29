@@ -1,9 +1,10 @@
 import * as React from 'react';
+import Typography from '@material-ui/core/Typography';
 export class NotMatch extends React.Component {
     public render() {
         return (
-            <div>
-                404
+            <div style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                <Typography variant="h1">404</Typography>
             </div>
         );
     }
