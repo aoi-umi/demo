@@ -359,7 +359,7 @@ class BookmarkDetail extends React.Component<DetailProps>{
                     status: 1,
                     origStatus: 1,
                 };
-                detailModel.changeValue('tag', '');
+                field.tag = '';
             }
         }
         if (showTag) {
@@ -400,15 +400,14 @@ class BookmarkDetail extends React.Component<DetailProps>{
                         label={lang.Bookmark.url}
                     />
                 </Grid>
-                <Grid item container>
+                <Grid item container >
                     {this.renderTag()}
-                </Grid>
-                <Grid item container>
-                    <TextField
+                    <MyTextField
+                        fieldKey='tag'
+                        model={detailModel}
                         label={lang.Bookmark.tag}
                         style={{ width: 80 }}
-                        value={field.tag}
-                        onChange={(event) => { detailModel.changeValue('tag', event.target.value); }}
+                        variant="standard"
                     />
                     <Button onClick={() => { this.onTagAddClick(); }}>{lang.Bookmark.operate.tagAdd}</Button>
                 </Grid>
