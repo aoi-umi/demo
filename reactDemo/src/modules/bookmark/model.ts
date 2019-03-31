@@ -2,6 +2,7 @@
 import { observable, action, runInAction } from 'mobx';
 
 import { Model, required } from '../../components/Base';
+import { TagType } from '../components';
 
 class BookmarkQueryFieldModel {
     @observable
@@ -25,12 +26,6 @@ export class BookmarkQueryModel extends Model<BookmarkQueryFieldModel> {
     }
 }
 
-export type BookmarkShowTag = {
-    tag: string,
-    status: number,/*0, 1 新增, -1 删除,*/
-    origStatus: number,
-};
-
 class BookmarkDetailFieldModel {
     @observable
     _id: string;
@@ -41,7 +36,7 @@ class BookmarkDetailFieldModel {
 
     tagList: string[];
     @observable
-    showTagList: BookmarkShowTag[];
+    showTagList: TagType[];
 
     @observable
     tag: string;

@@ -3,6 +3,7 @@ import { observable, action, runInAction } from 'mobx';
 
 import { Model, required } from '../../components/Base';
 import { myEnum } from '../../config/enum';
+import { AuthorityDetailFieldModel } from '../authority/model';
 
 class RoleQueryFieldModel {
     @observable
@@ -35,6 +36,10 @@ class RoleDetailFieldModel {
     code: string;
     @observable
     status: number;
+    @observable
+    authority: string;
+    @observable
+    authorityList: AuthorityDetailFieldModel[];
 }
 export class RoleDetailModel extends Model<RoleDetailFieldModel>{
     codeExistsErr: string;
@@ -62,7 +67,7 @@ export class RoleDetailModel extends Model<RoleDetailFieldModel>{
             authorityList: []
         };
         ['_id', 'name', 'code', 'status', 'authorityList'].forEach(key => {
-            let value = defaultVal[key] || '';
+            let value = defaultVal.hasOwnProperty(key) ? defaultVal[key] : '';
             if (detail && detail.hasOwnProperty(key))
                 value = detail[key];
             this.field[key] = value;

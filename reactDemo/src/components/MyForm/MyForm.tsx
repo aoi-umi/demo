@@ -25,11 +25,12 @@ export default class MyForm extends React.Component<MyFormProps> {
     }
 
     render() {
-        let { renderChild, fieldKey, model, ...restProps } = this.innerProps;
+        let { renderChild, fieldKey, model, children, ...restProps } = this.innerProps;
         let msg = (model.fieldErr[fieldKey] && model.fieldErr[fieldKey].msg) || '';
         return (
             <FormControl error={true} fullWidth {...restProps}>
                 {renderChild(fieldKey)}
+                {children}
                 <FormHelperText>{msg}</FormHelperText>
             </FormControl>
         )

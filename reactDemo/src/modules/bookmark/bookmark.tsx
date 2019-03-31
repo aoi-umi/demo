@@ -27,7 +27,8 @@ import {
 } from '../../components';
 import { msgNotice } from '../../helpers/common';
 import { testApi } from '../../api';
-import { BookmarkQueryModel, BookmarkDetailModel, BookmarkShowTag } from './model';
+import { Tag, TagType as BookmarkShowTag } from '../components';
+import { BookmarkQueryModel, BookmarkDetailModel } from './model';
 
 const styles = () => ({
     operateCol: {
@@ -254,39 +255,7 @@ type DetailProps = {
 }
 
 function renderBookmarkTag(tag: BookmarkShowTag | string, key?: any, onOperate?) {
-    let ele = tag as BookmarkShowTag;
-    let noOperate = false;
-    if (typeof ele === 'string') {
-        noOperate = true;
-        ele = {
-            tag: ele,
-            status: 0,
-            origStatus: 0
-        };
-    }
-    let del = ele.status == -1;
-    let add = ele.status == 1;
-    let color, deleteIcon;
-    if (!noOperate) {
-        if (del) {
-            color = 'secondary';
-            deleteIcon = <AddIcon />;
-        } else if (add) {
-            color = 'primary';
-        }
-    }
-    return (
-        <Chip key={key}
-            label={ele.tag}
-            onDelete={onOperate}
-            deleteIcon={deleteIcon}
-            color={color}
-            style={{
-                marginRight: 5,
-                marginBottom: 5
-            }}
-        />
-    );
+    return Tag.render(tag, key, onOperate);
 }
 @observer
 class BookmarkDetail extends React.Component<DetailProps>{

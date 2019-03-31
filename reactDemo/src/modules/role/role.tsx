@@ -20,9 +20,11 @@ import {
     MyList, ListModel,
     MyButton, MyButtonModel,
     MyTextField,
+    MySelect,
 } from '../../components';
 import { msgNotice } from '../../helpers/common';
 import { testApi } from '../../api';
+import { Tag, TagType } from '../components';
 import { RoleQueryModel, RoleDetailModel } from './model';
 
 const styles = () => ({
@@ -198,6 +200,9 @@ export default class Role extends React.Component<Props> {
                         colName: 'status',
                         content: lang.Role.status,
                     }, {
+                        colName: 'authorityList',
+                        content: lang.Role.authority,
+                    }, {
                         colName: 'operate',
                         content: lang.Global.list.operate,
                         operate: true,
@@ -274,6 +279,7 @@ class RoleDetail extends React.Component<DetailProps>{
                 name: field.name,
                 status: field.status,
                 code: field.code,
+                authorityList: field.authorityList.map(ele => ele.code),
             };
             await testApi.roleSave(obj);
             btnModel.loaded();
@@ -320,12 +326,20 @@ class RoleDetail extends React.Component<DetailProps>{
                     />
                 </Grid>
                 <Grid item container >
-                    {/* {this.renderTag()} */}
-                    <TextField
+                    <MyTextField
+                        fullWidth
+                        fieldKey='authority'
+                        model={model}
                         label={lang.Role.authority}
-                        variant="standard"
-                        onChange={(event) => {
-                            let val = event.target.value;
+                        myAutoComplete={{
+                            isAsync: true,
+                            asyncGetOptions: async (val) => {
+                                let rs = await testApi.authorityQuery({ anyKey: val, status: myEnum.authorityStatus.启用 });
+                                return rs.rows.map(ele => { return { label: `${ele.name}(${ele.code})`, value: ele } });
+                            },
+                            onChange: (e) => {
+                                let val = e.value;
+                            }
                         }}
                     />
                 </Grid>
