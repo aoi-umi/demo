@@ -12,3 +12,5 @@ export { default as MyForm } from './MyForm';
 export * from './MyForm';
 export { default as MyTextField } from './MyTextField';
 export * from './MyTextField';
+export { default as MySelect } from './MySelect';
+export * from './MySelect';

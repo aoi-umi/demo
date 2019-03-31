@@ -94,7 +94,7 @@ export class TestApi extends ApiModel<TestApiMethod> {
     //#endregion
 
     //#region authority 
-    async authorityQuery(data?: { name?, code?, anyKey?} & ApiListQueryArgs) {
+    async authorityQuery(data?: { name?, code?, status?, anyKey?} & ApiListQueryArgs) {
         return this.requestByConfig<ListResult>(this.apiConfig.method.authorityQuery, { data });
     }
     async authoritySave(data) {

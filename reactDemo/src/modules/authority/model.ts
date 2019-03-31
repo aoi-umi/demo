@@ -26,7 +26,7 @@ export class AuthorityQueryModel extends Model<AuthorityQueryFieldModel> {
     }
 }
 
-class AuthorityDetailFieldModel {
+export class AuthorityDetailFieldModel {
     @observable
     _id: string;
     @observable
