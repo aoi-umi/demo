@@ -1,7 +1,7 @@
 
 import { observable, action, runInAction } from 'mobx';
 
-import { Model, required } from '../../components/Base';
+import { Model, required, SelectedObject } from '../../components/Base';
 import { myEnum } from '../../config/enum';
 
 class AuthorityQueryFieldModel {
@@ -13,6 +13,7 @@ class AuthorityQueryFieldModel {
     anyKey: string;
 }
 export class AuthorityQueryModel extends Model<AuthorityQueryFieldModel> {
+    selectedStatus: SelectedObject<{ key: string, value: any }>;
     constructor() {
         super(new AuthorityQueryFieldModel());
         this.init();
@@ -23,6 +24,8 @@ export class AuthorityQueryModel extends Model<AuthorityQueryFieldModel> {
         this.field.name = '';
         this.field.code = '';
         this.field.anyKey = '';
+        this.selectedStatus = new SelectedObject<{ key: string, value: any }>();
+        this.selectedStatus.setItems(myEnum.authorityStatus.toArray());
     }
 }
 

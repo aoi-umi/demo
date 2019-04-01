@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router';
 import { LocationListener } from 'history';
-import { WithStyles } from '@material-ui/core';
+import { WithStyles, Checkbox } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -21,10 +21,11 @@ import {
     MyButton, MyButtonModel,
     MyTextField,
     MySelect,
+    SelectedObject,
 } from '../../components';
 import { msgNotice } from '../../helpers/common';
 import { testApi } from '../../api';
-import { Tag, TagType } from '../components';
+import { TagModel, TagType } from '../components';
 import { RoleQueryModel, RoleDetailModel } from './model';
 
 const styles = () => ({
@@ -64,9 +65,11 @@ export default class Role extends React.Component<Props> {
     }
 
     private modelToObj(model?: ListModel<RoleQueryModel>) {
-        let { query, page } = model || this.listModel;
+        let { query, page, } = model || this.listModel;
+        let { selectedStatus } = query;
         let queryObj = {
             ...query.field,
+            status: selectedStatus.selectedItems.map(ele => ele.value.value).join(','),
             page: page.pageIndex,
             rows: page.pageSize,
         };
@@ -76,11 +79,20 @@ export default class Role extends React.Component<Props> {
     private objToModel(obj: any, model?: ListModel<RoleQueryModel>) {
         if (!model)
             model = this.listModel;
+        let { selectedStatus } = model.query;
         model.query.setValue({
             name: obj.name || '',
             code: obj.code || '',
             anyKey: obj.anyKey || '',
         });
+        selectedStatus.setSelectedAll(false);
+        if (obj.status) {
+            (obj.status as string).split(',').map(ele => {
+                let idx = selectedStatus.getItems().findIndex(item => item.value.value == ele);
+                if (idx >= 0)
+                    selectedStatus.setSelected(true, idx);
+            });
+        }
         model.page.setPage(obj.page);
         model.page.setPageSize(obj.rows);
     }
@@ -164,6 +176,7 @@ export default class Role extends React.Component<Props> {
 
     public render() {
         const { listModel } = this;
+        const { selectedStatus } = listModel.query;
         const { classes } = this.innerProps;
         let selectedRow = this.listModel.selectedRow;
         return (
@@ -179,6 +192,24 @@ export default class Role extends React.Component<Props> {
                         id: 'anyKey',
                         label: lang.Role.anyKey,
                     }]}
+                    customQueryNode={
+                        <Grid item>
+                            {selectedStatus.getItems().map((item, idx) => {
+                                return (
+                                    <FormControlLabel
+                                        key={idx}
+                                        control={
+                                            <Checkbox checked={!!(item && item.selected)} />
+                                        }
+                                        label={item.value.key}
+                                        onChange={(event, checked) => {
+                                            selectedStatus.setSelected(checked, idx);
+                                        }}
+                                    />
+                                );
+                            })}
+                        </Grid>
+                    }
                     listModel={listModel}
                     onQueryClick={(model: ListModel<RoleQueryModel>) => {
                         let queryObj = this.modelToObj();
@@ -210,6 +241,13 @@ export default class Role extends React.Component<Props> {
                     onDefaultRowRender={(ele, idx) => {
                         return {
                             ...ele,
+                            authorityList: ele.authorityList.map((auth, authIdx) => {
+                                return TagModel.render({
+                                    label: auth.name,
+                                    id: auth.code,
+                                    disabled: auth.status !== myEnum.authorityStatus.启用
+                                }, authIdx);
+                            }),
                             status: myEnum.roleStatus.getKey(ele.status),
                             operate:
                                 <div>
@@ -274,12 +312,21 @@ class RoleDetail extends React.Component<DetailProps>{
         try {
             btnModel.load();
             let field = model.field;
+            let addAuthList = [], delAuthList = [];
+            model.tagModel.tagList.map(ele => {
+                if (1 == ele.status) {
+                    addAuthList.push(ele.id);
+                } else if (0 == ele.origStatus && -1 == ele.status) {
+                    delAuthList.push(ele.id);
+                }
+            })
             let obj: any = {
                 _id: field._id,
                 name: field.name,
                 status: field.status,
                 code: field.code,
-                authorityList: field.authorityList.map(ele => ele.code),
+                addAuthList,
+                delAuthList,
             };
             await testApi.roleSave(obj);
             btnModel.loaded();
@@ -290,9 +337,14 @@ class RoleDetail extends React.Component<DetailProps>{
         }
     }
 
+    addTag = (idx?: number, val?: any) => {
+        let { model } = this;
+        model.tagModel.addTag(idx, val);
+    }
+
     render() {
         let { model, btnModel } = this;
-        let field = model.field;
+        let { field, tagModel } = model;
         return (
             <Grid container spacing={16}>
                 <Grid item container justify="flex-start">
@@ -305,11 +357,15 @@ class RoleDetail extends React.Component<DetailProps>{
                             />
                         }
                     />
+                </Grid>
+                <Grid item container xs={6}>
                     <MyTextField autoFocus required fullWidth
                         fieldKey='name'
                         model={model}
                         label={lang.Role.name}
                     />
+                </Grid>
+                <Grid item container xs={6}>
                     <MyTextField required fullWidth
                         fieldKey='code'
                         model={model}
@@ -326,6 +382,15 @@ class RoleDetail extends React.Component<DetailProps>{
                     />
                 </Grid>
                 <Grid item container >
+                    {tagModel.tagList.map((ele, idx) => {
+                        return TagModel.render(ele, idx, () => {
+                            if (ele.status == -1) {
+                                this.addTag(idx);
+                            } else {
+                                model.tagModel.delTag(idx);
+                            }
+                        });
+                    })}
                     <MyTextField
                         fullWidth
                         fieldKey='authority'
@@ -338,7 +403,8 @@ class RoleDetail extends React.Component<DetailProps>{
                                 return rs.rows.map(ele => { return { label: `${ele.name}(${ele.code})`, value: ele } });
                             },
                             onChange: (e) => {
-                                let val = e.value;
+                                this.addTag(null, { label: e.value.name, id: e.value.code });
+                                model.field.authority = '';
                             }
                         }}
                     />

@@ -2,7 +2,7 @@
 import { observable, action, runInAction } from 'mobx';
 
 import { Model, required } from '../../components/Base';
-import { TagType } from '../components';
+import { TagType, TagModel } from '../components';
 
 class BookmarkQueryFieldModel {
     @observable
@@ -35,13 +35,13 @@ class BookmarkDetailFieldModel {
     url: string;
 
     tagList: string[];
-    @observable
-    showTagList: TagType[];
 
     @observable
     tag: string;
 }
 export class BookmarkDetailModel extends Model<BookmarkDetailFieldModel>{
+
+    tagModel: TagModel;
     constructor() {
         super(new BookmarkDetailFieldModel(), {
             validConfig: {
@@ -68,20 +68,10 @@ export class BookmarkDetailModel extends Model<BookmarkDetailFieldModel>{
             if (detail.tagList)
                 this.field.tagList = detail.tagList;
         }
-        this.field.showTagList = this.field.tagList.map(tag => {
+        this.tagModel = new TagModel(this.field.tagList.map(tag => {
             return {
-                tag,
-                status: 0,
-                origStatus: 0
+                label: tag,
             };
-        });
-    }
-
-    @action
-    changeShowTag(val, idx?: number) {
-        if (idx === undefined || idx < 0)
-            this.field.showTagList.push(val);
-        else
-            this.field.showTagList[idx] = val;
+        }));
     }
 }

@@ -1,5 +1,7 @@
 import { Types } from 'mongoose';
 import { RoleModel } from ".";
+import { AuthorityModel } from '../authority';
+import { myEnum, getEnumValueByStr } from '../../../config/enum';
 
 export class RoleMapper {
     static async codeExists(code: string, _id?: any) {
@@ -13,6 +15,7 @@ export class RoleMapper {
 
     static async query(data: RoleQueryArgs) {
         let query: any = {};
+        let query2: any = {};
         let noTotal = false;
         if (data._id) {
             query._id = Types.ObjectId(data._id);
@@ -20,23 +23,40 @@ export class RoleMapper {
         }
         if (data.anyKey) {
             let anykey = new RegExp(data.anyKey, 'i');
-            query.$or = [
+            query2.$or = [
                 { code: anykey },
                 { name: anykey },
-            ];
+                { 'authorityList.code': anykey },
+                { 'authorityList.name': anykey },
+            ]
         }
 
         if (data.name)
             query.name = new RegExp(data.name, 'i');
         if (data.code)
             query.code = new RegExp(data.code, 'i');
-        let status = parseInt(data.status);
-        if (!isNaN(status))
-            query.status = status;
+        if (data.status) {
+            let status = getEnumValueByStr(myEnum.roleStatus, data.status);
+            if (status.length) {
+                query.status = { $in: status };
+            }
+        }
 
-        let pipeline: any[] = [{
-            $match: query,
-        }];
+        let pipeline: any[] = [
+            {
+                $match: query,
+            },
+            {
+                $lookup: {
+                    from: AuthorityModel.collection.collectionName,
+                    localField: 'authorityList',
+                    foreignField: 'code', as: 'authorityList'
+                }
+            },
+            {
+                $match: query2,
+            },
+        ];
         let rs = await RoleModel.aggregatePaginate(pipeline, {
             page: data.page,
             rows: data.rows,

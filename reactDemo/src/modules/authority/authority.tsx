@@ -1,11 +1,12 @@
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router';
 import { LocationListener } from 'history';
-import { WithStyles } from '@material-ui/core';
+import { WithStyles, } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
+import Checkbox from '@material-ui/core/Checkbox';
 
 
 import { observer } from 'mobx-react';
@@ -62,8 +63,10 @@ export default class Authority extends React.Component<Props> {
 
     private modelToObj(model?: ListModel<AuthorityQueryModel>) {
         let { query, page } = model || this.listModel;
+        let { selectedStatus } = query;
         let queryObj = {
             ...query.field,
+            status: selectedStatus.selectedItems.map(ele => ele.value.value).join(','),
             page: page.pageIndex,
             rows: page.pageSize,
         };
@@ -73,11 +76,20 @@ export default class Authority extends React.Component<Props> {
     private objToModel(obj: any, model?: ListModel<AuthorityQueryModel>) {
         if (!model)
             model = this.listModel;
+        let { selectedStatus } = model.query;
         model.query.setValue({
             name: obj.name || '',
             code: obj.code || '',
             anyKey: obj.anyKey || '',
         });
+        selectedStatus.setSelectedAll(false);
+        if (obj.status) {
+            (obj.status as string).split(',').map(ele => {
+                let idx = selectedStatus.getItems().findIndex(item => item.value.value == ele);
+                if (idx >= 0)
+                    selectedStatus.setSelected(true, idx);
+            });
+        }
         model.page.setPage(obj.page);
         model.page.setPageSize(obj.rows);
     }
@@ -161,6 +173,7 @@ export default class Authority extends React.Component<Props> {
 
     public render() {
         const { listModel } = this;
+        const { selectedStatus } = listModel.query;
         const { classes } = this.innerProps;
         let selectedRow = this.listModel.selectedRow;
         return (
@@ -176,6 +189,24 @@ export default class Authority extends React.Component<Props> {
                         id: 'anyKey',
                         label: lang.Authority.anyKey,
                     }]}
+                    customQueryNode={
+                        <Grid item>
+                            {selectedStatus.getItems().map((item, idx) => {
+                                return (
+                                    <FormControlLabel
+                                        key={idx}
+                                        control={
+                                            <Checkbox checked={!!(item && item.selected)} />
+                                        }
+                                        label={item.value.key}
+                                        onChange={(event, checked) => {
+                                            selectedStatus.setSelected(checked, idx);
+                                        }}
+                                    />
+                                );
+                            })}
+                        </Grid>
+                    }
                     listModel={listModel}
                     onQueryClick={(model: ListModel<AuthorityQueryModel>) => {
                         let queryObj = this.modelToObj();
@@ -289,11 +320,24 @@ class AuthorityDetail extends React.Component<DetailProps>{
         return (
             <Grid container spacing={16}>
                 <Grid item container justify="flex-start">
+                    <FormControlLabel labelPlacement="start" label={lang.Authority.status}
+                        control={
+                            <Switch color="primary" checked={field.status == myEnum.authorityStatus.启用}
+                                onChange={(event, checked) => {
+                                    field.status = checked ? myEnum.authorityStatus.启用 : myEnum.authorityStatus.禁用;
+                                }}
+                            />
+                        }
+                    />
+                </Grid>
+                <Grid item container xs={6}>
                     <MyTextField autoFocus required fullWidth
                         fieldKey='name'
                         model={model}
                         label={lang.Authority.name}
                     />
+                </Grid>
+                <Grid item container xs={6}>
                     <MyTextField required fullWidth
                         fieldKey='code'
                         model={model}
@@ -309,15 +353,6 @@ class AuthorityDetail extends React.Component<DetailProps>{
                         }}
                     />
 
-                    <FormControlLabel labelPlacement="start" label={lang.Authority.status}
-                        control={
-                            <Switch color="primary" checked={field.status == myEnum.authorityStatus.启用}
-                                onChange={(event, checked) => {
-                                    field.status = checked ? myEnum.authorityStatus.启用 : myEnum.authorityStatus.禁用;
-                                }}
-                            />
-                        }
-                    />
                 </Grid>
                 <Grid item container justify={'flex-end'}>
                     <MyButton model={btnModel} fullWidth={true} onClick={this.onSave}>
