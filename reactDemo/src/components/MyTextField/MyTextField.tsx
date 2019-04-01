@@ -72,10 +72,10 @@ export default class MyTextField extends React.Component<Props> {
         }
     }
     render() {
-        let { fieldKey, model, myAutoComplete, classes, ...restProps } = this.innerProps;
+        let { fieldKey, model, myAutoComplete, classes, fullWidth, ...restProps } = this.innerProps;
         let { anchorEl } = this.state;
         return (
-            <MyForm style={{ marginTop: 15 }} fieldKey={fieldKey} model={model}
+            <MyForm style={{ marginTop: 15 }} fieldKey={fieldKey} model={model} fullWidth={fullWidth}
                 renderChild={(key) => {
                     let val = model.getValue(key);
                     if (![0, false].includes(val) && !val)
@@ -86,6 +86,7 @@ export default class MyTextField extends React.Component<Props> {
                             InputLabelProps={{
                                 shrink: true,
                             }}
+                            fullWidth={fullWidth}
                             value={val}
                             onChange={(e) => {
                                 let val = e.target.value

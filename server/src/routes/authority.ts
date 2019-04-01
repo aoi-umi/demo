@@ -30,7 +30,7 @@ export let query: RequestHandler = (req, res) => {
         if (data.code)
             query.code = new RegExp(data.code, 'i');
         if (data.status)
-            query.status = data.status;
+            query.status = { $in: data.status.split(',') };
 
         let { rows, total } = await AuthorityModel.findAndCountAll({
             conditions: query,

@@ -1,9 +1,10 @@
 
 import { observable, action, runInAction } from 'mobx';
 
-import { Model, required } from '../../components/Base';
+import { Model, required, SelectedObject } from '../../components/Base';
 import { myEnum } from '../../config/enum';
 import { AuthorityDetailFieldModel } from '../authority/model';
+import { TagModel } from '../components';
 
 class RoleQueryFieldModel {
     @observable
@@ -14,6 +15,7 @@ class RoleQueryFieldModel {
     anyKey: string;
 }
 export class RoleQueryModel extends Model<RoleQueryFieldModel> {
+    selectedStatus: SelectedObject<{ key: string, value: any }>;
     constructor() {
         super(new RoleQueryFieldModel());
         this.init();
@@ -24,6 +26,8 @@ export class RoleQueryModel extends Model<RoleQueryFieldModel> {
         this.field.name = '';
         this.field.code = '';
         this.field.anyKey = '';
+        this.selectedStatus = new SelectedObject<{ key: string, value: any }>();
+        this.selectedStatus.setItems(myEnum.roleStatus.toArray());
     }
 }
 
@@ -43,6 +47,7 @@ class RoleDetailFieldModel {
 }
 export class RoleDetailModel extends Model<RoleDetailFieldModel>{
     codeExistsErr: string;
+    tagModel: TagModel;
     constructor() {
         super(new RoleDetailFieldModel(), {
             validConfig: {
@@ -72,5 +77,14 @@ export class RoleDetailModel extends Model<RoleDetailFieldModel>{
                 value = detail[key];
             this.field[key] = value;
         });
+
+
+        this.tagModel = new TagModel(this.field.authorityList.map(authority => {
+            return {
+                label: authority.name,
+                id: authority.code,
+                disabled: authority.status !== myEnum.authorityStatus.启用
+            };
+        }));
     }
 }

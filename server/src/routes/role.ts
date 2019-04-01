@@ -2,6 +2,7 @@ import { RequestHandler } from 'express';
 import { Types } from 'mongoose';
 import { responseHandler, paramsValid } from '../helpers';
 import { error } from '../_system/common';
+import { transaction } from '../_system/dbMongo';
 import { RoleModel, RoleInstanceType, RoleMapper, RoleQueryArgs } from '../models/mongo/role';
 
 export let query: RequestHandler = (req, res) => {
@@ -39,6 +40,8 @@ export let save: RequestHandler = (req, res) => {
             name?: string;
             code?: string;
             status?: string;
+            delAuthList?: string[];
+            addAuthList?: string[];
         } = req.body;
         let model: RoleInstanceType;
         let rs = await RoleMapper.codeExists(data.code, data._id);
@@ -48,16 +51,26 @@ export let save: RequestHandler = (req, res) => {
             delete data._id;
             model = await RoleModel.create({
                 ...data,
+                authorityList: data.addAuthList,
             });
         } else {
             model = await RoleModel.findById(data._id);
             if (!model)
                 throw error('not exists');
             let update: any = {};
-            ['name', 'code', 'status', 'authorityList'].forEach(key => {
+            ['name', 'code', 'status'].forEach(key => {
                 update[key] = data[key];
             });
-            await model.update(update);
+
+            if (data.delAuthList && data.delAuthList.length) {
+                update.$pull = { authorityList: { $in: data.delAuthList } };
+            }
+            await transaction(async (session) => {
+                await model.update(update, { session });
+                if (data.addAuthList && data.addAuthList.length) {
+                    await model.update({ $push: { authorityList: { $each: data.addAuthList } } }, { session });
+                }
+            });
         }
         return {
             _id: model._id

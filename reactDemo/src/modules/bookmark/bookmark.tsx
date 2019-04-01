@@ -27,7 +27,7 @@ import {
 } from '../../components';
 import { msgNotice } from '../../helpers/common';
 import { testApi } from '../../api';
-import { Tag, TagType as BookmarkShowTag } from '../components';
+import { TagModel, TagType as BookmarkShowTag } from '../components';
 import { BookmarkQueryModel, BookmarkDetailModel } from './model';
 
 const styles = () => ({
@@ -255,12 +255,13 @@ type DetailProps = {
 }
 
 function renderBookmarkTag(tag: BookmarkShowTag | string, key?: any, onOperate?) {
-    return Tag.render(tag, key, onOperate);
+    return TagModel.render(tag, key, onOperate);
 }
 @observer
 class BookmarkDetail extends React.Component<DetailProps>{
     private model: BookmarkDetailModel;
     btnModel: MyButtonModel;
+    tag: TagModel;
     private onSaveSuccess: BookmarkDetailOnSaveSuccess = () => {
         msgNotice(lang.Global.operate.saveSuccess, { type: 'dialog' });
     };
@@ -268,6 +269,7 @@ class BookmarkDetail extends React.Component<DetailProps>{
         super(props);
         this.model = props.detail || new BookmarkDetailModel();
         this.btnModel = new MyButtonModel();
+        this.tag = new TagModel();
         if (props.onSaveSuccess)
             this.onSaveSuccess = props.onSaveSuccess;
     }
@@ -279,15 +281,15 @@ class BookmarkDetail extends React.Component<DetailProps>{
             return;
         try {
             btnModel.load();
-            let addTagList = [], delTagList = [];
             let field = model.field;
-            field.showTagList.map(ele => {
+            let addTagList = [], delTagList = [];
+            model.tagModel.tagList.map(ele => {
                 if (1 == ele.status) {
-                    addTagList.push(ele.tag);
+                    addTagList.push(ele.id);
                 } else if (0 == ele.origStatus && -1 == ele.status) {
-                    delTagList.push(ele.tag);
+                    delTagList.push(ele.id);
                 }
-            })
+            });
             await testApi.bookmarkSave({
                 _id: field._id,
                 name: field.name,
@@ -303,50 +305,20 @@ class BookmarkDetail extends React.Component<DetailProps>{
         }
     }
 
-    private onTagDelClick = (idx: number) => {
+    private addTag = (idx?: number) => {
         let { model } = this;
-        let showTag = model.field.showTagList[idx];
-        model.changeShowTag({
-            ...showTag,
-            status: -1,
-        }, idx);
-    }
-
-    private onTagAddClick = (idx?: number) => {
-        let { model } = this;
-        let field = model.field;
-        let showTag: BookmarkShowTag;
-        if (idx !== undefined) {
-            showTag = field.showTagList[idx];
-        } else {
-            let tag = field.tag && field.tag.trim();
-            if (tag) {
-                idx = field.showTagList.findIndex(ele => ele.tag == tag);
-                let existsShowTag = field.showTagList[idx];
-                showTag = existsShowTag || {
-                    tag,
-                    status: 1,
-                    origStatus: 1,
-                };
-                field.tag = '';
-            }
-        }
-        if (showTag) {
-            model.changeShowTag({
-                ...showTag,
-                status: showTag.origStatus
-            }, idx);
-        }
+        model.tagModel.addTag(idx, model.field.tag);
+        model.field.tag = '';
     }
 
     renderTag() {
-        let { model: detailModel } = this;
-        return detailModel.field.showTagList.map((ele, idx) => {
+        let { model } = this;
+        return model.tagModel.tagList.map((ele, idx) => {
             return renderBookmarkTag(ele, idx, () => {
                 if (ele.status == -1) {
-                    this.onTagAddClick(idx);
+                    this.addTag(idx);
                 } else {
-                    this.onTagDelClick(idx);
+                    model.tagModel.delTag(idx);
                 }
             });
         })
@@ -369,16 +341,23 @@ class BookmarkDetail extends React.Component<DetailProps>{
                         label={lang.Bookmark.url}
                     />
                 </Grid>
-                <Grid item container >
+                <Grid item container>
                     {this.renderTag()}
+                </Grid>
+                <Grid item container>
                     <MyTextField
                         fieldKey='tag'
                         model={detailModel}
                         label={lang.Bookmark.tag}
-                        style={{ width: 80 }}
+                        style={{ width: 120 }}
                         variant="standard"
+                        fullWidth={false}
+                        onKeyPress={(e) => {
+                            if (e.charCode == 13) {
+                                this.addTag();
+                            }
+                        }}
                     />
-                    <Button onClick={() => { this.onTagAddClick(); }}>{lang.Bookmark.operate.tagAdd}</Button>
                 </Grid>
                 <Grid item container justify={'flex-end'}>
                     <MyButton model={btnModel} fullWidth={true} onClick={this.onSave}>

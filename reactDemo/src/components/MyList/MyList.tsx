@@ -30,6 +30,7 @@ type ListProps = {
         label?: string;
         placeholder?: string;
     }[];
+    customQueryNode?: React.ReactNode;
     header?: React.ReactNode;
     onRowRender?: (ele, idx?: number) => any;
 
@@ -185,22 +186,27 @@ export default class MyList extends React.Component<ListProps> {
             );
         }
     }
+
+    onQueryPress = (e) => {
+        if (e.charCode == 13) {
+            this.listModel.page.setPage(1);
+            this.innerProps.onQueryClick(this.listModel);
+        }
+    }
     render() {
-        const { queryArgs, header, defaultHeader, classes, hideQueryBtn, showCheckBox, hideBottomBtn } = this.innerProps;
+        const {
+            queryArgs, customQueryNode,
+            header, defaultHeader, classes, hideQueryBtn, showCheckBox, hideBottomBtn
+        } = this.innerProps;
         const { listModel } = this;
         const { page, selectedRow } = listModel;
         return (
             <div>
                 <Grid container spacing={16}>
-                    <Grid container item spacing={16} onKeyPress={(e) => {
-                        if (e.charCode == 13) {
-                            this.listModel.page.setPage(1);
-                            this.innerProps.onQueryClick(this.listModel);
-                        }
-                    }}>
+                    <Grid container item spacing={16} onKeyPress={this.onQueryPress}>
                         {queryArgs && queryArgs.map((ele, idx) => {
                             return (
-                                <Grid item key={idx} xs={12} sm={4} md={3}>
+                                <Grid item key={'queryArgs' + idx} xs={12} sm={4} md={3}>
                                     <MyTextField
                                         fieldKey={ele.id}
                                         model={listModel.query}
@@ -210,6 +216,9 @@ export default class MyList extends React.Component<ListProps> {
                                 </Grid>
                             );
                         })}
+                    </Grid>
+                    <Grid container item spacing={16} onKeyPress={this.onQueryPress}>
+                        {customQueryNode}
                     </Grid>
                     <Grid container item
                         direction="row"

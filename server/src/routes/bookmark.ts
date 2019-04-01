@@ -1,8 +1,9 @@
 import { RequestHandler } from 'express';
 import { Types } from 'mongoose';
 import { responseHandler, paramsValid } from '../helpers';
-import { BookmarkModel, BookmarkInstanceType } from '../models/mongo/bookmark';
 import { error } from '../_system/common';
+import { transaction } from '../_system/dbMongo';
+import { BookmarkModel, BookmarkInstanceType } from '../models/mongo/bookmark';
 
 export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {
@@ -65,26 +66,16 @@ export let save: RequestHandler = (req, res) => {
             ['name', 'url'].forEach(key => {
                 update[key] = data[key];
             });
-            let updateTag = false;
-            if (data.delTagList && model.tagList && model.tagList.length) {
-                updateTag = true;
-                for (let idx = model.tagList.length - 1; idx >= 0; idx--) {
-                    let ele = model.tagList[idx];
-                    if (data.delTagList.includes(ele))
-                        model.tagList.splice(idx, 1);
-                }
+            if (data.delTagList && data.delTagList.length) {
+                update.$pull = { tagList: { $in: data.delTagList } };
             }
-            if (data.addTagList) {
-                updateTag = true;
-                if (!model.tagList)
-                    model.tagList = data.addTagList;
-                else {
-                    model.tagList = [...model.tagList, ...data.addTagList];
+            await transaction(async (session) => {
+                await model.update(update, { session });
+                if (data.addTagList && data.addTagList.length) {
+                    await model.update({ $push: { tagList: { $each: data.addTagList } } }, { session });
                 }
-            }
-            if (updateTag)
-                update.tagList = model.tagList;
-            await model.update(update);
+            });
+
         }
         return {
             _id: model._id
