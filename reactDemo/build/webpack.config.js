@@ -5,7 +5,7 @@ let config = {
         main: path.resolve(__dirname, '../src/index.tsx'),
     },
     output: {
-        filename: 'js/[name].bundle.js',
+        filename: 'js/[name]-[chunkhash].bundle.js',
         path: path.resolve(__dirname, '../dest'),
         //publicPath: '',
     },
