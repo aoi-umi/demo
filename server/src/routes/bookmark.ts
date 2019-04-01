@@ -1,7 +1,7 @@
 import { RequestHandler } from 'express';
 import { Types } from 'mongoose';
 import { responseHandler, paramsValid } from '../helpers';
-import { error } from '../_system/common';
+import { error, escapeRegExp } from '../_system/common';
 import { transaction } from '../_system/dbMongo';
 import { BookmarkModel, BookmarkInstanceType } from '../models/mongo/bookmark';
 
@@ -16,7 +16,7 @@ export let query: RequestHandler = (req, res) => {
         paramsValid(schema, data, { list: true });
         let query: any = {};
         if (data.anyKey) {
-            let anykey = new RegExp(data.anyKey, 'i');
+            let anykey = new RegExp(escapeRegExp(data.anyKey), 'i');
             query.$or = [
                 { url: anykey },
                 { name: anykey },
@@ -25,9 +25,9 @@ export let query: RequestHandler = (req, res) => {
         }
 
         if (data.name)
-            query.name = new RegExp(data.name, 'i');
+            query.name = new RegExp(escapeRegExp(data.name), 'i');
         if (data.url)
-            query.url = new RegExp(data.url, 'i');
+            query.url = new RegExp(escapeRegExp(data.url), 'i');
 
         let { rows, total } = await BookmarkModel.findAndCountAll({
             conditions: query,

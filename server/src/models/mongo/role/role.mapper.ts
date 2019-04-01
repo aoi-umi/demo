@@ -2,6 +2,7 @@ import { Types } from 'mongoose';
 import { RoleModel } from ".";
 import { AuthorityModel } from '../authority';
 import { myEnum, getEnumValueByStr } from '../../../config/enum';
+import { escapeRegExp } from '../../../_system/common';
 
 export class RoleMapper {
     static async codeExists(code: string, _id?: any) {
@@ -22,7 +23,7 @@ export class RoleMapper {
             noTotal = true;
         }
         if (data.anyKey) {
-            let anykey = new RegExp(data.anyKey, 'i');
+            let anykey = new RegExp(escapeRegExp(data.anyKey), 'i');
             query2.$or = [
                 { code: anykey },
                 { name: anykey },
@@ -32,9 +33,9 @@ export class RoleMapper {
         }
 
         if (data.name)
-            query.name = new RegExp(data.name, 'i');
+            query.name = new RegExp(escapeRegExp(data.name), 'i');
         if (data.code)
-            query.code = new RegExp(data.code, 'i');
+            query.code = new RegExp(escapeRegExp(data.code), 'i');
         if (data.status) {
             let status = getEnumValueByStr(myEnum.roleStatus, data.status);
             if (status.length) {

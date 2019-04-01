@@ -329,7 +329,11 @@ class BookmarkDetail extends React.Component<DetailProps>{
         let field = detailModel.field;
         return (
             <Grid container spacing={16}>
-                <Grid item container justify='center'>
+                <Grid item container justify='center' onKeyPress={(e) => {
+                    if (e.charCode == 13) {
+                        this.onSave();
+                    }
+                }}>
                     <MyTextField autoFocus required fullWidth
                         fieldKey='name'
                         model={detailModel}
@@ -349,9 +353,8 @@ class BookmarkDetail extends React.Component<DetailProps>{
                         fieldKey='tag'
                         model={detailModel}
                         label={lang.Bookmark.tag}
-                        style={{ width: 120 }}
                         variant="standard"
-                        fullWidth={false}
+                        placeholder={lang.Bookmark.operate.tagPlaceholder}
                         onKeyPress={(e) => {
                             if (e.charCode == 13) {
                                 this.addTag();

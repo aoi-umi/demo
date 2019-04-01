@@ -74,6 +74,7 @@ let lang = {
         anyKey: 'anyKey',
         operate: {
             tagAdd: '添加',
+            tagPlaceholder: '按下回车添加标签',
         },
     },
     Authority: {

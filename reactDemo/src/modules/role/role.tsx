@@ -341,7 +341,11 @@ class RoleDetail extends React.Component<DetailProps>{
         let { model } = this;
         model.tagModel.addTag(idx, val);
     }
-
+    onEnterPressSave = (e) => {
+        if (e.charCode == 13) {
+            this.onSave();
+        }
+    }
     render() {
         let { model, btnModel } = this;
         let { field, tagModel } = model;
@@ -358,14 +362,14 @@ class RoleDetail extends React.Component<DetailProps>{
                         }
                     />
                 </Grid>
-                <Grid item container xs={6}>
+                <Grid item container xs={6} onKeyPress={this.onEnterPressSave}>
                     <MyTextField autoFocus required fullWidth
                         fieldKey='name'
                         model={model}
                         label={lang.Role.name}
                     />
                 </Grid>
-                <Grid item container xs={6}>
+                <Grid item container xs={6} onKeyPress={this.onEnterPressSave}>
                     <MyTextField required fullWidth
                         fieldKey='code'
                         model={model}
