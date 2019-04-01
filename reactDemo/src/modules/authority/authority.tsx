@@ -318,7 +318,11 @@ class AuthorityDetail extends React.Component<DetailProps>{
         let { model, btnModel } = this;
         let field = model.field;
         return (
-            <Grid container spacing={16}>
+            <Grid container spacing={16} onKeyPress={(e) => {
+                if (e.charCode == 13) {
+                    this.onSave();
+                }
+            }}>
                 <Grid item container justify="flex-start">
                     <FormControlLabel labelPlacement="start" label={lang.Authority.status}
                         control={

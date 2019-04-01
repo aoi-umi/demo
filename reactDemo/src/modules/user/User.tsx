@@ -86,7 +86,7 @@ export class SignIn extends React.Component<SignInProps>{
                         {lang.User.operate.signIn}
                     </MyButton>
                 </Grid>
-            </Grid >
+            </Grid>
         );
     }
 }

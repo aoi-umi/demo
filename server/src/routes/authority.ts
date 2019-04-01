@@ -1,7 +1,7 @@
 import { RequestHandler } from 'express';
 import { Types } from 'mongoose';
-import { responseHandler, paramsValid } from '../helpers';
-import { error } from '../_system/common';
+import { responseHandler, paramsValid, } from '../helpers';
+import { error, escapeRegExp } from '../_system/common';
 import { AuthorityModel, AuthorityInstanceType, AuthorityMapper } from '../models/mongo/authority';
 
 export let query: RequestHandler = (req, res) => {
@@ -18,7 +18,7 @@ export let query: RequestHandler = (req, res) => {
         if (data.anyKey) {
             delete data.name;
             delete data.code;
-            let anykey = new RegExp(data.anyKey, 'i');
+            let anykey = new RegExp(escapeRegExp(data.anyKey), 'i');
             query.$or = [
                 { code: anykey },
                 { name: anykey },
@@ -26,9 +26,9 @@ export let query: RequestHandler = (req, res) => {
         }
 
         if (data.name)
-            query.name = new RegExp(data.name, 'i');
+            query.name = new RegExp(escapeRegExp(data.name), 'i');
         if (data.code)
-            query.code = new RegExp(data.code, 'i');
+            query.code = new RegExp(escapeRegExp(data.code), 'i');
         if (data.status)
             query.status = { $in: data.status.split(',') };
 
