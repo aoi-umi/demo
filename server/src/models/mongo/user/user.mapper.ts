@@ -5,4 +5,15 @@ export class UserMapper {
         let rs = await UserModel.findOne({ account });
         return rs;
     }
+
+    static async query(data: UserQueryArgs) { }
 }
+
+export type UserQueryArgs = {
+    _id?: string;
+    account?: string;
+    nickname?: string;
+    authority?: string;
+    role?: string;
+    anyKey?: string;
+} & ApiListQueryArgs;

@@ -28,6 +28,16 @@ export class User extends Base {
         required: true
     })
     password: string;
+
+    @arrayProp({
+        type: String,
+    })
+    authorityList: string[];
+
+    @arrayProp({
+        type: String,
+    })
+    roleList: string[];
 }
 
 export const UserModel = getModelForClass<User, typeof User>(User);
