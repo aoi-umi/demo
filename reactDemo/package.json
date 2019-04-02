@@ -8,7 +8,7 @@
     "@material-ui/icons": "3.0.1",
     "animejs": "2.2.0",
     "axios": "0.18.0",
-    "enum-ts": "1.1.0",
+    "enum-ts": "1.1.1",
     "mobx": "5.5.0",
     "mobx-react": "5.2.8",
     "moment": "2.24.0",
