@@ -38,7 +38,7 @@ import {
 import { DialogPage } from '../components';
 import {
     SignIn, SignUp, Account,
-    AdminUser
+    UserMgt
 } from '../user';
 
 import BookMark from '../bookmark';
@@ -78,7 +78,7 @@ const routes: {
     title: lang.App.routes.userAccount,
 }, {
     routeConfig: routeConfig.adminUser,
-    comp: <AdminUser listenUrl={routeConfig.adminUser.path} />,
+    comp: <UserMgt listenUrl={routeConfig.adminUser.path} />,
     title: lang.App.routes.adminUser,
 }, {
     routeConfig: routeConfig.test,

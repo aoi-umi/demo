@@ -31,7 +31,7 @@ export class RoleQueryModel extends Model<RoleQueryFieldModel> {
     }
 }
 
-class RoleDetailFieldModel {
+export class RoleDetailFieldModel {
     @observable
     _id: string;
     @observable
@@ -47,7 +47,7 @@ class RoleDetailFieldModel {
 }
 export class RoleDetailModel extends Model<RoleDetailFieldModel>{
     codeExistsErr: string;
-    tagModel: TagModel;
+    authorityTagModel: TagModel;
     constructor() {
         super(new RoleDetailFieldModel(), {
             validConfig: {
@@ -62,7 +62,6 @@ export class RoleDetailModel extends Model<RoleDetailFieldModel>{
                 },
             }
         });
-        this.init();
     }
 
     @action
@@ -78,8 +77,9 @@ export class RoleDetailModel extends Model<RoleDetailFieldModel>{
             this.field[key] = value;
         });
 
-
-        this.tagModel = new TagModel(this.field.authorityList.map(authority => {
+        if (!this.authorityTagModel)
+            this.authorityTagModel = new TagModel();
+        this.authorityTagModel.setTagList(this.field.authorityList.map(authority => {
             return {
                 label: authority.name,
                 id: authority.code,

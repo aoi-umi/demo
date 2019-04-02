@@ -15,7 +15,7 @@ export abstract class Model<T> {
         }
         this.init();
     }
-    abstract init(): void;
+    abstract init(...args): void;
 
     @observable
     field: T;

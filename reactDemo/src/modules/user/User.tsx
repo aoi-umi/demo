@@ -1,17 +1,9 @@
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router';
-import { LocationListener } from 'history';
 import Grid from '@material-ui/core/Grid';
-import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
-import TableRow from '@material-ui/core/TableRow';
-import TableCell from '@material-ui/core/TableCell';
 
 import { WithStyles, Theme } from '@material-ui/core';
-
-import { observer } from 'mobx-react';
-import * as qs from 'query-string';
-import * as moment from 'moment';
 
 import lang from '../../lang';
 import * as config from '../../config/config';
@@ -22,7 +14,6 @@ import { testApi } from '../../api';
 import { main } from '../main';
 
 import {
-    MyList, ListModel,
     MyButton, MyButtonModel,
     MyTextField,
 } from '../../components';
@@ -228,101 +219,5 @@ export class Account extends React.Component {
                 </Grid>
             </Paper>
         );
-    }
-}
-
-
-const adminUserStyles = () => ({
-});
-type AdminUserProps = {
-    listenUrl?: string;
-};
-type AdminUserInnerProps = RouteComponentProps<{}> & WithStyles<typeof adminUserStyles> & AdminUserProps;
-@withRouterDeco
-@observer
-export class AdminUser extends React.Component<AdminUserProps>{
-    private get innerProps() {
-        return this.props as AdminUserInnerProps;
-    }
-    private listModel: ListModel;
-    private unlisten: any;
-    constructor(props, context) {
-        super(props, context);
-        this.listModel = new ListModel({ query: {} as any });
-        this.unlisten = this.innerProps.history.listen(this.onHistoryListen);
-    }
-
-    componentDidMount() {
-        this.onHistoryListen(this.innerProps.history.location, null);
-    }
-
-    componentWillUnmount() {
-        this.unlisten && this.unlisten();
-    }
-
-    private modelToObj(model?: ListModel) {
-        let { query, page } = model || this.listModel;
-        let queryObj = {
-            //...query.field,
-            page: page.pageIndex,
-            rows: page.pageSize,
-        };
-        return queryObj;
-    }
-
-    private objToModel(obj: any, model?: ListModel) {
-        if (!model)
-            model = this.listModel;
-
-        model.page.setPage(obj.page);
-        model.page.setPageSize(obj.rows);
-    }
-
-    private onHistoryListen: LocationListener = (location) => {
-        if (location.pathname != this.props.listenUrl)
-            return;
-        let obj = qs.parse(location.search);
-        this.objToModel(obj);
-        this.listModel.load();
-    }
-
-    public render() {
-        const { listModel } = this;
-        const { classes } = this.innerProps;
-        return (
-            <div>
-                <MyList
-                    queryArgs={[]}
-                    hideQueryBtn={{ add: true }}
-                    listModel={listModel}
-                    onQueryClick={(model: ListModel) => {
-                        let queryObj = this.modelToObj();
-                        this.innerProps.history.replace({ pathname: this.innerProps.location.pathname, search: qs.stringify(queryObj) });
-                    }}
-                    onQuery={async () => {
-                        let data = await testApi.adminUserList(this.modelToObj());
-                        return data;
-                    }}
-                    defaultHeader={[{
-                        colName: 'account',
-                        content: lang.User.account,
-                    }, {
-                        colName: 'nickname',
-                        content: lang.User.nickname,
-                    }, {
-                        colName: 'createdAt',
-                        content: lang.User.createdAt,
-                    }]}
-
-                    onDefaultRowRender={(ele, idx) => {
-                        return {
-                            ...ele,
-                            createdAt: moment(ele.createdAt).format(config.dateFormat)
-                        };
-                    }}
-                >
-                </MyList>
-            </div>
-        )
     }
 }

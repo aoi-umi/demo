@@ -67,6 +67,10 @@ let lang = {
             myAccount: '个人中心',
         }
     },
+    UserMgt: {
+        role: '角色',
+        authority: '权限',
+    },
     Bookmark: {
         name: '名字',
         url: 'url',

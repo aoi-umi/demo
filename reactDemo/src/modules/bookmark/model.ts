@@ -54,21 +54,23 @@ export class BookmarkDetailModel extends Model<BookmarkDetailFieldModel>{
                 },
             }
         });
-        this.init();
     }
 
     @action
     init(detail?) {
         this.field.tag = '';
-        this.field.tagList = [];
-        ['_id', 'name', 'url'].forEach(key => {
-            this.field[key] = (detail && detail[key]) || '';
+        let defaultVal = {
+            tagList: []
+        };
+        ['_id', 'name', 'url', 'tagList'].forEach(key => {
+            let value = defaultVal.hasOwnProperty(key) ? defaultVal[key] : '';
+            if (detail && detail.hasOwnProperty(key))
+                value = detail[key];
+            this.field[key] = value;
         });
-        if (detail) {
-            if (detail.tagList)
-                this.field.tagList = detail.tagList;
-        }
-        this.tagModel = new TagModel(this.field.tagList.map(tag => {
+        if (!this.tagModel)
+            this.tagModel = new TagModel();
+        this.tagModel.setTagList(this.field.tagList.map(tag => {
             return {
                 label: tag,
             };
