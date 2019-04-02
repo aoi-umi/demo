@@ -222,7 +222,7 @@ export default class Bookmark extends React.Component<Props> {
                                 <TableRow key={idx + 'tag'}>
                                     <TableCell colSpan={20}>
                                         {ele.tagList.map((ele, idx) => {
-                                            return renderBookmarkTag(ele, idx);
+                                            return TagModel.render(ele, idx);
                                         })}
                                     </TableCell>
                                 </TableRow>
@@ -254,14 +254,10 @@ type DetailProps = {
     onSaveSuccess?: BookmarkDetailOnSaveSuccess;
 }
 
-function renderBookmarkTag(tag: BookmarkShowTag | string, key?: any, onOperate?) {
-    return TagModel.render(tag, key, onOperate);
-}
 @observer
 class BookmarkDetail extends React.Component<DetailProps>{
     private model: BookmarkDetailModel;
     btnModel: MyButtonModel;
-    tag: TagModel;
     private onSaveSuccess: BookmarkDetailOnSaveSuccess = () => {
         msgNotice(lang.Global.operate.saveSuccess, { type: 'dialog' });
     };
@@ -269,7 +265,6 @@ class BookmarkDetail extends React.Component<DetailProps>{
         super(props);
         this.model = props.detail || new BookmarkDetailModel();
         this.btnModel = new MyButtonModel();
-        this.tag = new TagModel();
         if (props.onSaveSuccess)
             this.onSaveSuccess = props.onSaveSuccess;
     }
@@ -305,28 +300,16 @@ class BookmarkDetail extends React.Component<DetailProps>{
         }
     }
 
-    private addTag = (idx?: number) => {
-        let { model } = this;
-        model.tagModel.addTag(idx, model.field.tag);
-        model.field.tag = '';
-    }
-
     renderTag() {
         let { model } = this;
         return model.tagModel.tagList.map((ele, idx) => {
-            return renderBookmarkTag(ele, idx, () => {
-                if (ele.status == -1) {
-                    this.addTag(idx);
-                } else {
-                    model.tagModel.delTag(idx);
-                }
-            });
+            return model.tagModel.render(ele, idx, 'default');
         })
     }
 
     render() {
-        let { model: detailModel, btnModel } = this;
-        let field = detailModel.field;
+        let { model, btnModel } = this;
+        let field = model.field;
         return (
             <Grid container spacing={16}>
                 <Grid item container justify='center' onKeyPress={(e) => {
@@ -336,12 +319,12 @@ class BookmarkDetail extends React.Component<DetailProps>{
                 }}>
                     <MyTextField autoFocus required fullWidth
                         fieldKey='name'
-                        model={detailModel}
+                        model={model}
                         label={lang.Bookmark.name}
                     />
                     <MyTextField required fullWidth
                         fieldKey='url'
-                        model={detailModel}
+                        model={model}
                         label={lang.Bookmark.url}
                     />
                 </Grid>
@@ -351,13 +334,14 @@ class BookmarkDetail extends React.Component<DetailProps>{
                 <Grid item container>
                     <MyTextField
                         fieldKey='tag'
-                        model={detailModel}
+                        model={model}
                         label={lang.Bookmark.tag}
                         variant="standard"
                         placeholder={lang.Bookmark.operate.tagPlaceholder}
                         onKeyPress={(e) => {
                             if (e.charCode == 13) {
-                                this.addTag();
+                                model.tagModel.addTag(null, model.field.tag);
+                                model.field.tag = '';
                             }
                         }}
                     />
