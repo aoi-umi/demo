@@ -136,7 +136,6 @@ export default class Role extends React.Component<Props> {
                 dialogTitle: detail ? lang.Global.operate.edit : lang.Global.operate.add,
                 dialogBtnList: []
             });
-
     }
 
     private onDelClick = async (_id: string | string[]) => {
@@ -312,21 +311,14 @@ class RoleDetail extends React.Component<DetailProps>{
         try {
             btnModel.load();
             let field = model.field;
-            let addAuthList = [], delAuthList = [];
-            model.tagModel.tagList.map(ele => {
-                if (1 == ele.status) {
-                    addAuthList.push(ele.id);
-                } else if (0 == ele.origStatus && -1 == ele.status) {
-                    delAuthList.push(ele.id);
-                }
-            })
+            let { addTagList, delTagList } = model.authorityTagModel.getChangeTag('id');
             let obj: any = {
                 _id: field._id,
                 name: field.name,
                 status: field.status,
                 code: field.code,
-                addAuthList,
-                delAuthList,
+                addAuthList: addTagList,
+                delAuthList: delTagList,
             };
             await testApi.roleSave(obj);
             btnModel.loaded();
@@ -337,10 +329,6 @@ class RoleDetail extends React.Component<DetailProps>{
         }
     }
 
-    addTag = (idx?: number, val?: any) => {
-        let { model } = this;
-        model.tagModel.addTag(idx, val);
-    }
     onEnterPressSave = (e) => {
         if (e.charCode == 13) {
             this.onSave();
@@ -348,7 +336,7 @@ class RoleDetail extends React.Component<DetailProps>{
     }
     render() {
         let { model, btnModel } = this;
-        let { field, tagModel } = model;
+        let { field, authorityTagModel: tagModel } = model;
         return (
             <Grid container spacing={16}>
                 <Grid item container justify="flex-start">
@@ -387,14 +375,9 @@ class RoleDetail extends React.Component<DetailProps>{
                 </Grid>
                 <Grid item container >
                     {tagModel.tagList.map((ele, idx) => {
-                        return TagModel.render(ele, idx, () => {
-                            if (ele.status == -1) {
-                                this.addTag(idx);
-                            } else {
-                                model.tagModel.delTag(idx);
-                            }
-                        });
-                    })}
+                        return tagModel.render(ele, idx, 'default');
+                    })
+                    }
                     <MyTextField
                         fullWidth
                         fieldKey='authority'
@@ -407,8 +390,8 @@ class RoleDetail extends React.Component<DetailProps>{
                                 return rs.rows.map(ele => { return { label: `${ele.name}(${ele.code})`, value: ele } });
                             },
                             onChange: (e) => {
-                                this.addTag(null, { label: e.value.name, id: e.value.code });
-                                model.field.authority = '';
+                                tagModel.addTag(null, { label: e.value.name, id: e.value.code });
+                                field.authority = '';
                             }
                         }}
                     />

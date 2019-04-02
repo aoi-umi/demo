@@ -10,6 +10,7 @@ export type TagType = {
     status: number,/*0原有, 1 新增, -1 删除,*/
     origStatus: number,
     id?: string,
+    value?: any,
     disabled?: boolean;
 };
 
@@ -19,12 +20,37 @@ export class TagModel {
     tagList: TagType[];
 
     constructor(tagList?: Partial<TagType>[]) {
-        this.tagList = tagList || [] as any;
-        this.tagList.forEach(ele => {
-            TagModel.initTag(ele);
-            if (!ele.id)
-                ele.id = ele.label;
+        this.tagList = [];
+        this.setTagList(tagList);
+    }
+
+    getChangeTag(key?: string) {
+        type returnType = TagType | any;
+        let addTagList: returnType[] = [], delTagList: returnType[] = [];
+        this.tagList.map(ele => {
+            if (1 == ele.status) {
+                addTagList.push(key ? ele[key] : ele);
+            } else if (0 == ele.origStatus && -1 == ele.status) {
+                addTagList.push(key ? ele[key] : ele);
+            }
         });
+        return {
+            addTagList,
+            delTagList,
+        }
+    }
+
+    @action
+    setTagList(tagList: Partial<TagType>[]) {
+        this.tagList.splice(0, this.tagList.length);
+        if (tagList) {
+            tagList.forEach((ele: any) => {
+                TagModel.initTag(ele);
+                if (!ele.id)
+                    ele.id = ele.label;
+                this.tagList.push(ele);
+            });
+        }
     }
 
     @action
@@ -43,7 +69,7 @@ export class TagModel {
         }, idx);
     }
 
-    addTag = (idx?: number, tag?: string | { label: string; id: string }) => {
+    addTag = (idx?: number, tag?: string | { label: string; id: string, value?: any }) => {
         let showTag: TagType;
         let tagList = this.tagList;
         idx = parseInt(idx as any);
@@ -61,13 +87,16 @@ export class TagModel {
             tagLabel = tagLabel && tagLabel.trim();
             if (id) {
                 idx = tagList.findIndex(ele => ele.id == id);
-                let existsShowTag = tagList[idx];
-                showTag = existsShowTag || {
-                    label: tagLabel,
-                    id,
-                    status: 1,
-                    origStatus: 1,
-                };
+                if (idx >= 0) {
+                    showTag = tagList[idx];
+                } else {
+                    showTag = {
+                        label: tagLabel,
+                        id,
+                        status: 1,
+                        origStatus: 1,
+                    };
+                }
             }
         }
         if (showTag) {
@@ -76,6 +105,20 @@ export class TagModel {
                 status: showTag.origStatus
             }, idx);
         }
+    }
+
+    render(tag: Partial<TagType>, idx?: number, onOperate?: (() => any) | 'default') {
+        return TagModel.render(tag, idx,
+            onOperate == 'default' ?
+                () => {
+                    if (tag.status == -1) {
+                        this.addTag(idx);
+                    } else {
+                        this.delTag(idx);
+                    }
+                } :
+                onOperate
+        );
     }
 
     static defaultVal = {
@@ -89,7 +132,7 @@ export class TagModel {
                 ele[key] = defaultVal[key];
         }
     }
-    static render(tag: Partial<TagType> | string, key?: any, onOperate?) {
+    static render(tag: Partial<TagType> | string, key?: any, onOperate?: () => any) {
         let ele = tag as TagType;
         let noOperate = false;
         let { defaultVal } = TagModel;

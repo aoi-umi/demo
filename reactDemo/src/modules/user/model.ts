@@ -1,6 +1,10 @@
 import { observable, action, runInAction } from 'mobx';
 import lang from '../../lang';
 import { Model, required } from '../../components/Base';
+import { TagModel } from '../components';
+import { AuthorityDetailFieldModel } from '../authority/model';
+import { myEnum } from '../../config/enum';
+import { RoleDetailFieldModel } from '../role/model';
 
 class SignInFieldModel {
     @observable
@@ -78,5 +82,59 @@ export class SignUpModel extends Model<SignUpFieldModel> {
         this.field.nickname = '';
         this.field.password = '';
         this.field.confirmPassword = '';
+    }
+}
+
+
+class UserMgtDetailFieldModel {
+    @observable
+    _id: string;
+    @observable
+    nickname: string;
+    @observable
+    account: string;
+
+    @observable
+    authority: string;
+    @observable
+    authorityList: AuthorityDetailFieldModel[];
+
+    @observable
+    role: string;
+    @observable
+    roleList: RoleDetailFieldModel[];
+}
+
+export class UserMgtDetailModel extends Model<UserMgtDetailFieldModel>{
+    authorityTagModel: TagModel;
+    roleTagModel: TagModel;
+    constructor() {
+        super(new UserMgtDetailFieldModel());
+        this.authorityTagModel = new TagModel();
+        this.roleTagModel = new TagModel();
+    }
+
+    @action
+    init(detail) {
+        if (detail) {
+            ['_id', 'nickname', 'roleList', 'authorityList'].forEach(key => {
+                let value = detail[key];
+                this.field[key] = value;
+            });
+            this.authorityTagModel.setTagList(this.field.authorityList.map(authority => {
+                return {
+                    label: authority.name,
+                    id: authority.code,
+                    disabled: authority.status !== myEnum.authorityStatus.启用
+                };
+            }));
+            this.roleTagModel.setTagList(this.field.roleList.map(role => {
+                return {
+                    label: role.name,
+                    id: role.code,
+                    disabled: role.status !== myEnum.roleStatus.启用
+                };
+            }));
+        }
     }
 }

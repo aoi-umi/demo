@@ -11,7 +11,8 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
     userSignOut,
     userInfo,
     userAccountExists,
-    adminUserList,
+    userMgtList,
+    userMgtSave,
 
     bookmarkQuery,
     bookmarkSave,
@@ -76,8 +77,11 @@ export class TestApi extends ApiModel<TestApiMethod> {
         return this.requestByConfig(this.apiConfig.method.userAccountExists, { data: { account } });
     }
 
-    async adminUserList(data?) {
-        return this.requestByConfig(this.apiConfig.method.adminUserList, { data });
+    async userMgtList(data?) {
+        return this.requestByConfig(this.apiConfig.method.userMgtList, { data });
+    }
+    async userMgtSave(data?) {
+        return this.requestByConfig(this.apiConfig.method.userMgtSave, { data });
     }
     //#endregion
 
@@ -112,7 +116,7 @@ export class TestApi extends ApiModel<TestApiMethod> {
     //#endregion
 
     //#region role 
-    async roleQuery(data?: { name?, code?, anyKey?} & ApiListQueryArgs) {
+    async roleQuery(data?: { name?, code?, status?, anyKey?} & ApiListQueryArgs) {
         return this.requestByConfig<ListResult>(this.apiConfig.method.roleQuery, { data });
     }
     async roleSave(data) {

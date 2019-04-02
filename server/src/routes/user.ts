@@ -87,14 +87,11 @@ export let info: RequestHandler = (req, res) => {
     }, req, res);
 };
 
-export let list: RequestHandler = (req, res) => {
+export let mgtList: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let data = req.query;
         paramsValid({}, data, { list: true });
-        let { rows, total } = await UserModel.findAndCountAll({
-            projection: { password: 0 },
-            page: data.page, rows: data.rows
-        });
+        let { rows, total } = await UserMapper.query(data);
         return {
             rows,
             total
@@ -102,11 +99,10 @@ export let list: RequestHandler = (req, res) => {
     }, req, res);
 }
 
-export let save: RequestHandler = (req, res) => {
+export let mgtSave: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let data: {
             _id?: string;
-            nickname?: string;
             delAuthList?: string[];
             addAuthList?: string[];
             delRoleList?: string[];
@@ -115,9 +111,6 @@ export let save: RequestHandler = (req, res) => {
         paramsValid({}, data);
         let detail = await UserModel.findById(data._id);
         let update: any = {};
-        ['nickname'].forEach(key => {
-            update[key] = data[key];
-        });
 
         let pull: any = {};
         if (data.delAuthList && data.delAuthList.length) {

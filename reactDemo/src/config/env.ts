@@ -29,12 +29,16 @@ const config = {
                 userInfo: {
                     url: '/user/info',
                 },
-                adminUserList: {
-                    url: '/admin/user/list',
-                    method: 'get',
-                },
                 userAccountExists: {
                     url: '/user/accountExists',
+                },
+                
+                userMgtList: {
+                    url: '/user/mgt/list',
+                    method: 'get',
+                },
+                userMgtSave: {
+                    url: '/user/mgt/save',
                 },
 
                 bookmarkQuery: {

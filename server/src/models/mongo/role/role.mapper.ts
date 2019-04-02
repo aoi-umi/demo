@@ -50,8 +50,24 @@ export class RoleMapper {
             {
                 $lookup: {
                     from: AuthorityModel.collection.collectionName,
-                    localField: 'authorityList',
-                    foreignField: 'code', as: 'authorityList'
+                    let: {
+                        authorityList: '$authorityList'
+                    },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: { $in: ['$code', '$$authorityList'] }
+                            }
+                        },
+                        {
+                            $project: {
+                                name: 1,
+                                code: 1,
+                                status: 1,
+                            }
+                        }
+                    ],
+                    as: 'authorityList'
                 }
             },
             {

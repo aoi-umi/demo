@@ -1,1 +1,1 @@
-export { default } from './bookmark';
+export { default } from './Bookmark';
