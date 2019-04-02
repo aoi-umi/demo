@@ -1,1 +1,1 @@
-export { default } from './authority';
+export { default } from './Authority';

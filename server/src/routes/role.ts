@@ -43,19 +43,19 @@ export let save: RequestHandler = (req, res) => {
             delAuthList?: string[];
             addAuthList?: string[];
         } = req.body;
-        let model: RoleInstanceType;
+        let detail: RoleInstanceType;
         let rs = await RoleMapper.codeExists(data.code, data._id);
         if (rs)
             throw error('code已存在');
         if (!data._id) {
             delete data._id;
-            model = await RoleModel.create({
+            detail = await RoleModel.create({
                 ...data,
                 authorityList: data.addAuthList,
             });
         } else {
-            model = await RoleModel.findById(data._id);
-            if (!model)
+            detail = await RoleModel.findById(data._id);
+            if (!detail)
                 throw error('not exists');
             let update: any = {};
             ['name', 'code', 'status'].forEach(key => {
@@ -66,14 +66,14 @@ export let save: RequestHandler = (req, res) => {
                 update.$pull = { authorityList: { $in: data.delAuthList } };
             }
             await transaction(async (session) => {
-                await model.update(update, { session });
+                await detail.update(update, { session });
                 if (data.addAuthList && data.addAuthList.length) {
-                    await model.update({ $push: { authorityList: { $each: data.addAuthList } } }, { session });
+                    await detail.update({ $push: { authorityList: { $each: data.addAuthList } } }, { session });
                 }
             });
         }
         return {
-            _id: model._id
+            _id: detail._id
         };
     }, req, res);
 }

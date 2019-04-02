@@ -2,9 +2,10 @@ import { RequestHandler } from 'express';
 import * as common from '../_system/common';
 import errorConfig from '../config/errorConfig';
 import * as cache from '../_system/cache';
-import { responseHandler, paramsValid } from '../helpers';
+import { responseHandler, paramsValid, } from '../helpers';
 import { cacheKey, cacheTime } from '../_main';
 import { UserModel, UserMapper } from '../models/mongo/user';
+import { transaction } from '../_system/dbMongo';
 
 export let accountExists: RequestHandler = (req, res) => {
     responseHandler(async () => {
@@ -97,6 +98,51 @@ export let list: RequestHandler = (req, res) => {
         return {
             rows,
             total
+        };
+    }, req, res);
+}
+
+export let save: RequestHandler = (req, res) => {
+    responseHandler(async () => {
+        let data: {
+            _id?: string;
+            nickname?: string;
+            delAuthList?: string[];
+            addAuthList?: string[];
+            delRoleList?: string[];
+            addRoleList?: string[];
+        } = req.body;
+        paramsValid({}, data);
+        let detail = await UserModel.findById(data._id);
+        let update: any = {};
+        ['nickname'].forEach(key => {
+            update[key] = data[key];
+        });
+
+        let pull: any = {};
+        if (data.delAuthList && data.delAuthList.length) {
+            pull.authorityList = { $in: data.delAuthList };
+        }
+        if (data.delRoleList && data.delRoleList.length) {
+            pull.roleList = { $in: data.delRoleList };
+        }
+        if (!common.isObjectEmpty(pull))
+            update.$pull = pull;
+
+        let push: any = {};
+        if (data.addAuthList && data.addAuthList.length) {
+            push.authorityList = { $each: data.addAuthList };
+        }
+        if (data.addRoleList && data.addRoleList.length) {
+            push.roleList = { $each: data.addRoleList };
+        }
+        await transaction(async (session) => {
+            await detail.update(update, { session });
+            if (!common.isObjectEmpty(push))
+                await detail.update({ $push: push }, { session });
+        });
+        return {
+            _id: detail._id,
         };
     }, req, res);
 }

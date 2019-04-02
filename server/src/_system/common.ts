@@ -624,6 +624,17 @@ export let parseBool = function (b) {
 export let escapeRegExp = function (string) {
     return string.replace(/([.*+?^${}()|\[\]\/\\])/g, "\\$1");
 };
+
+export let isObjectEmpty = function (obj) {
+    let empty = true;
+    if (obj) {
+        for (let key in obj) {
+            empty = false;
+            break;
+        }
+    }
+    return empty;
+}
 //#endregion
 
 //删除require
