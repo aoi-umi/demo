@@ -36,6 +36,11 @@ export class UserMapper {
         if (data.account)
             query.account = new RegExp(escapeRegExp(data.account), 'i');
 
+        let authProject = {
+            name: 1,
+            code: 1,
+            status: 1,
+        };
         let pipeline: any[] = [
             {
                 $match: query,
@@ -58,11 +63,7 @@ export class UserMapper {
                             }
                         },
                         {
-                            $project: {
-                                name: 1,
-                                code: 1,
-                                status: 1,
-                            }
+                            $project: authProject
                         }
                     ],
                     as: 'authorityList'
@@ -81,10 +82,30 @@ export class UserMapper {
                             }
                         },
                         {
+                            $lookup: {
+                                from: AuthorityModel.collection.collectionName,
+                                let: {
+                                    authorityList: '$authorityList'
+                                },
+                                pipeline: [
+                                    {
+                                        $match: {
+                                            $expr: { $in: ['$code', '$$authorityList'] }
+                                        }
+                                    },
+                                    {
+                                        $project: authProject
+                                    }
+                                ],
+                                as: 'authorityList'
+                            }
+                        },
+                        {
                             $project: {
                                 name: 1,
                                 code: 1,
                                 status: 1,
+                                authorityList: 1,
                             }
                         }
                     ],

@@ -3,8 +3,9 @@ import { RouteComponentProps } from 'react-router';
 import { LocationListener } from 'history';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
+import Tooltip from '@material-ui/core/Tooltip';
 
-import { WithStyles, Theme } from '@material-ui/core';
+import { WithStyles, Theme, } from '@material-ui/core';
 
 import { observer } from 'mobx-react';
 import * as qs from 'query-string';
@@ -153,11 +154,16 @@ export class UserMgt extends React.Component<UserMgtProps>{
                         return {
                             ...ele,
                             roleList: ele.roleList.map((role, authIdx) => {
-                                return TagModel.render({
-                                    label: role.name,
-                                    id: role.code,
-                                    disabled: role.status !== myEnum.roleStatus.启用
-                                }, authIdx);
+                                return (
+                                    <Tooltip title="test" key={authIdx} placement="bottom">
+                                        {
+                                            TagModel.render({
+                                                label: role.name,
+                                                id: role.code,
+                                                disabled: role.status !== myEnum.roleStatus.启用
+                                            })
+                                        }
+                                    </Tooltip>);
                             }),
                             authorityList: ele.authorityList.map((auth, authIdx) => {
                                 return TagModel.render({
