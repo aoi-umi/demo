@@ -26,13 +26,25 @@ import { UserMgtDetailModel } from './model';
 import { myEnum } from '../../config/enum';
 import { TagModel } from '../components';
 
-const userMgtStyles = () => ({
+const userMgtStyles = (theme: Theme) => ({
+    htmlTooltip: {
+        backgroundColor: 'white',
+        color: 'rgba(0, 0, 0, 0.9)',
+        // maxWidth: 220,
+        fontSize: theme.typography.pxToRem(12),
+        paddingTop: 10,
+        border: '1px solid #dadde9',
+        '& b': {
+            fontWeight: theme.typography.fontWeightMedium,
+        },
+    },
 });
 type UserMgtProps = {
     listenUrl?: string;
 };
 type UserMgtInnerProps = RouteComponentProps<{}> & WithStyles<typeof userMgtStyles> & UserMgtProps;
 @withRouterDeco
+@withStylesDeco(userMgtStyles)
 @observer
 export class UserMgt extends React.Component<UserMgtProps>{
     private get innerProps() {
@@ -153,17 +165,33 @@ export class UserMgt extends React.Component<UserMgtProps>{
                     onDefaultRowRender={(ele, idx) => {
                         return {
                             ...ele,
-                            roleList: ele.roleList.map((role, authIdx) => {
-                                return (
-                                    <Tooltip title="test" key={authIdx} placement="bottom">
-                                        {
-                                            TagModel.render({
-                                                label: role.name,
-                                                id: role.code,
-                                                disabled: role.status !== myEnum.roleStatus.启用
-                                            })
+                            roleList: ele.roleList.map((role, roleIdx) => {
+                                let roleTag = TagModel.render({
+                                    label: role.name,
+                                    id: role.code,
+                                    disabled: role.status !== myEnum.roleStatus.启用
+                                }, roleIdx);
+                                return role.authorityList && role.authorityList.length ?
+                                    <Tooltip
+                                        classes={{
+                                            // popper: classes.htmlPopper,
+                                            tooltip: classes.htmlTooltip,
+                                        }}
+                                        title={
+                                            <React.Fragment>
+                                                {role.authorityList.map((auth, authIdx) => {
+                                                    return TagModel.render({
+                                                        label: auth.name,
+                                                        id: auth.code,
+                                                        disabled: auth.status !== myEnum.authorityStatus.启用
+                                                    }, authIdx)
+                                                })}
+                                            </React.Fragment>
                                         }
-                                    </Tooltip>);
+                                        key={roleIdx} placement="bottom">
+                                        {roleTag}
+                                    </Tooltip>
+                                    : roleTag;
                             }),
                             authorityList: ele.authorityList.map((auth, authIdx) => {
                                 return TagModel.render({
