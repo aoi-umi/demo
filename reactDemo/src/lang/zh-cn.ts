@@ -70,6 +70,7 @@ let lang = {
     UserMgt: {
         role: '角色',
         authority: '权限',
+        enableAuthority: '可用权限',
     },
     Bookmark: {
         name: '名字',

@@ -232,7 +232,7 @@ export default class App extends React.Component<AppProps, { anchorEl?: any }> {
     }
 
     renderTop() {
-        const { classes, history } = this.innerProps;
+        const { classes, history, width } = this.innerProps;
         const { dataSource } = this;
         const { anchorEl } = this.state;
         const open = Boolean(anchorEl);
@@ -295,7 +295,8 @@ export default class App extends React.Component<AppProps, { anchorEl?: any }> {
                                             />, {
                                                 type: 'dialog',
                                                 dialogTitle: lang.User.operate.signIn,
-                                                dialogBtnList: []
+                                                dialogBtnList: [],
+                                                dialogFullScreenIfSmall: true
                                             });
                                     }}>
                                         {lang.User.operate.signIn}

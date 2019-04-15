@@ -19,6 +19,7 @@ type MsgNoticeOptions = {
     dialogTitle?: string;
     dialogType?: MyDialogType;
     dialogBtnList?: MyDialogButtonType[];
+    dialogFullScreenIfSmall?: boolean;
 
 }
 export function msgNotice(msg: React.ReactNode, options?: MsgNoticeOptions) {
@@ -59,7 +60,9 @@ export function msgNotice(msg: React.ReactNode, options?: MsgNoticeOptions) {
                     onClose={close}
                     title={options.dialogTitle}
                     type={options.dialogType}
-                    btnList={options.dialogBtnList}>
+                    btnList={options.dialogBtnList}
+                    fullScreenIfSmall={options.dialogFullScreenIfSmall}
+                >
                     {msg}
                 </MyDialog>;
         }
