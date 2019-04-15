@@ -4,9 +4,9 @@ import {
 } from 'mongoose-ts-ua';
 import { Base } from '../_base';
 
-export type BookmarkInstanceType = InstanceType<User>;
-export type BookmarkModelType = ModelType<User, typeof User>;
-export type BookmarkDocType = DocType<BookmarkInstanceType>;
+export type UserInstanceType = InstanceType<User>;
+export type UserModelType = ModelType<User, typeof User>;
+export type UserDocType = DocType<UserInstanceType>;
 @setSchema({
     schemaOptions: {}
 })

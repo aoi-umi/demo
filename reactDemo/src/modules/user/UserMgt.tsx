@@ -1,11 +1,14 @@
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router';
+import classNames from 'classnames';
 import { LocationListener } from 'history';
+
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import Tooltip from '@material-ui/core/Tooltip';
-
-import { WithStyles, Theme, } from '@material-ui/core';
+import TableRow from '@material-ui/core/TableRow';
+import TableCell from '@material-ui/core/TableCell';
+import { WithStyles, Theme } from '@material-ui/core';
 
 import { observer } from 'mobx-react';
 import * as qs from 'query-string';
@@ -25,6 +28,7 @@ import {
 import { UserMgtDetailModel } from './model';
 import { myEnum } from '../../config/enum';
 import { TagModel } from '../components';
+import { observable } from 'mobx';
 
 const userMgtStyles = (theme: Theme) => ({
     htmlTooltip: {
@@ -38,6 +42,12 @@ const userMgtStyles = (theme: Theme) => ({
             fontWeight: theme.typography.fontWeightMedium,
         },
     },
+    operateCol: {
+        textAlign: 'center' as any
+    },
+    hidden: {
+        display: 'none'
+    }
 });
 type UserMgtProps = {
     listenUrl?: string;
@@ -52,6 +62,9 @@ export class UserMgt extends React.Component<UserMgtProps>{
     }
     private listModel: ListModel;
     private unlisten: any;
+    @observable
+    enableAuthToggle: any = {};
+
     constructor(props, context) {
         super(props, context);
         this.listModel = new ListModel({ query: {} as any });
@@ -134,6 +147,7 @@ export class UserMgt extends React.Component<UserMgtProps>{
                     hideQueryBtn={{ add: true }}
                     listModel={listModel}
                     onQueryClick={(model: ListModel) => {
+                        this.enableAuthToggle = {};
                         let queryObj = this.modelToObj();
                         this.innerProps.history.replace({ pathname: this.innerProps.location.pathname, search: qs.stringify(queryObj) });
                     }}
@@ -162,53 +176,138 @@ export class UserMgt extends React.Component<UserMgtProps>{
                         operate: true,
                     }]}
 
-                    onDefaultRowRender={(ele, idx) => {
-                        return {
-                            ...ele,
-                            roleList: ele.roleList.map((role, roleIdx) => {
-                                let roleTag = TagModel.render({
-                                    label: role.name,
-                                    id: role.code,
-                                    disabled: role.status !== myEnum.roleStatus.启用
-                                }, roleIdx);
-                                return role.authorityList && role.authorityList.length ?
-                                    <Tooltip
-                                        classes={{
-                                            // popper: classes.htmlPopper,
-                                            tooltip: classes.htmlTooltip,
-                                        }}
-                                        title={
-                                            <React.Fragment>
-                                                {role.authorityList.map((auth, authIdx) => {
-                                                    return TagModel.render({
-                                                        label: auth.name,
-                                                        id: auth.code,
-                                                        disabled: auth.status !== myEnum.authorityStatus.启用
-                                                    }, authIdx)
-                                                })}
-                                            </React.Fragment>
-                                        }
-                                        key={roleIdx} placement="bottom">
-                                        {roleTag}
-                                    </Tooltip>
-                                    : roleTag;
-                            }),
-                            authorityList: ele.authorityList.map((auth, authIdx) => {
-                                return TagModel.render({
-                                    label: auth.name,
-                                    id: auth.code,
-                                    disabled: auth.status !== myEnum.authorityStatus.启用
-                                }, authIdx);
-                            }),
-                            createdAt: moment(ele.createdAt).format(config.dateFormat),
-                            operate:
-                                <div>
+                    // onDefaultRowRender={(ele, idx) => {
+                    //     return {
+                    //         ...ele,
+                    //         roleList: ele.roleList.map((role, roleIdx) => {
+                    //             let roleTag = TagModel.render({
+                    //                 label: role.name,
+                    //                 id: role.code,
+                    //                 disabled: role.status !== myEnum.roleStatus.启用
+                    //             }, roleIdx);
+                    //             return role.authorityList && role.authorityList.length ?
+                    //                 <Tooltip
+                    //                     classes={{
+                    //                         // popper: classes.htmlPopper,
+                    //                         tooltip: classes.htmlTooltip,
+                    //                     }}
+                    //                     title={
+                    //                         <React.Fragment>
+                    //                             {role.authorityList.map((auth, authIdx) => {
+                    //                                 return TagModel.render({
+                    //                                     label: auth.name,
+                    //                                     id: auth.code,
+                    //                                     disabled: auth.status !== myEnum.authorityStatus.启用
+                    //                                 }, authIdx)
+                    //                             })}
+                    //                         </React.Fragment>
+                    //                     }
+                    //                     key={roleIdx} placement="bottom">
+                    //                     {roleTag}
+                    //                 </Tooltip>
+                    //                 : roleTag;
+                    //         }),
+                    //         authorityList: ele.authorityList.map((auth, authIdx) => {
+                    //             return TagModel.render({
+                    //                 label: auth.name,
+                    //                 id: auth.code,
+                    //                 disabled: auth.status !== myEnum.authorityStatus.启用
+                    //             }, authIdx);
+                    //         }),
+                    //         createdAt: moment(ele.createdAt).format(config.dateFormat),
+                    //         operate:
+                    //             <div>
+                    //                 <Button onClick={() => {
+                    //                     this.showDetail(ele);
+                    //                 }}>{lang.Global.operate.edit}</Button>
+                    //             </div>
+                    //     };
+                    // }}
+
+                    onRowRender={((ele, idx) => {
+                        let enableAuth = [];
+                        let enableAuthRowKey = 'enableAuth' + idx;
+                        for (let key in ele.auth) {
+                            let auth = ele.auth[key];
+                            enableAuth.push(TagModel.render({
+                                label: auth.name,
+                                id: auth.code,
+                            }, key));
+                        }
+                        return ([
+                            <TableRow key={idx}>
+                                <TableCell rowSpan={2}>
+                                    {ele.account}
+                                </TableCell>
+                                <TableCell rowSpan={2}>
+                                    {ele.nickname}
+                                </TableCell>
+                                <TableCell>
+                                    {
+                                        ele.roleList.map((role, roleIdx) => {
+                                            let roleTag = TagModel.render({
+                                                label: role.name,
+                                                id: role.code,
+                                                disabled: role.status !== myEnum.roleStatus.启用
+                                            }, roleIdx);
+                                            return role.authorityList.length ?
+                                                <Tooltip
+                                                    classes={{
+                                                        // popper: classes.htmlPopper,
+                                                        tooltip: classes.htmlTooltip,
+                                                    }}
+                                                    title={
+                                                        <React.Fragment>
+                                                            {role.authorityList.map((auth, authIdx) => {
+                                                                return TagModel.render({
+                                                                    label: auth.name,
+                                                                    id: auth.code,
+                                                                    disabled: auth.status !== myEnum.authorityStatus.启用
+                                                                }, authIdx)
+                                                            })}
+                                                        </React.Fragment>
+                                                    }
+                                                    key={roleIdx} placement="bottom">
+                                                    {roleTag}
+                                                </Tooltip>
+                                                : roleTag;
+                                        })
+                                    }
+                                </TableCell>
+                                <TableCell>
+                                    {
+                                        ele.authorityList.map((auth, authIdx) => {
+                                            return TagModel.render({
+                                                label: auth.name,
+                                                id: auth.code,
+                                                disabled: auth.status !== myEnum.authorityStatus.启用
+                                            }, authIdx);
+                                        })
+                                    }
+                                </TableCell>
+                                <TableCell rowSpan={2}>
+                                    {moment(ele.createdAt).format(config.dateFormat)}
+                                </TableCell>
+                                <TableCell rowSpan={2} className={classes.operateCol}>
+                                    <div>
+                                        <Button onClick={() => {
+                                            this.showDetail(ele);
+                                        }}>{lang.Global.operate.edit}</Button>
+                                    </div>
+                                </TableCell>
+                            </TableRow>,
+                            <TableRow key={enableAuthRowKey}>
+                                <TableCell colSpan={2}>
                                     <Button onClick={() => {
-                                        this.showDetail(ele);
-                                    }}>{lang.Global.operate.edit}</Button>
-                                </div>
-                        };
-                    }}
+                                        this.enableAuthToggle[enableAuthRowKey] = !this.enableAuthToggle[enableAuthRowKey];
+                                    }}>{lang.UserMgt.enableAuthority}</Button>
+                                    <div className={classNames(!this.enableAuthToggle[enableAuthRowKey] && classes.hidden)} style={{ margin: 5 }}>
+                                        {enableAuth}
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        ]);
+                    })}
                 >
                 </MyList>
             </div>

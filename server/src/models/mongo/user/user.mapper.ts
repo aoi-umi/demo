@@ -4,6 +4,7 @@ import { escapeRegExp } from '../../../_system/common';
 import { AuthorityModel } from '../authority';
 import { RoleModel } from '../role';
 import { UserModel } from ".";
+import { myEnum } from '../../../config/enum';
 
 export class UserMapper {
     static async accountExists(account: string) {
@@ -120,6 +121,23 @@ export class UserMapper {
             page: data.page,
             rows: data.rows,
             noTotal,
+        });
+        rs.rows.forEach((ele) => {
+            //可用权限
+            let auth = {};
+            ele.authorityList.forEach(authority => {
+                if (authority.status == myEnum.authorityStatus.启用)
+                    auth[authority.code] = authority;
+            });
+            ele.roleList.forEach(role => {
+                if (role.status == myEnum.roleStatus.启用) {
+                    role.authorityList.forEach(authority => {
+                        if (authority.status == myEnum.authorityStatus.启用)
+                            auth[authority.code] = authority;
+                    });
+                }
+            });
+            ele.auth = auth;
         });
         return rs;
     }

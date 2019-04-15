@@ -48,7 +48,7 @@ export class Base extends Model<Base> {
  	* @param opt.extraPipeline 仅列表，排序等
      */
     @setStatic
-    static async aggregatePaginate<U = { total: any }>(pipeline: any[], opt?: {
+    static async aggregatePaginate<T = any, U = { total: any }>(pipeline: any[], opt?: {
         extraPipeline?: any[];
 
         //只按其中一个排序
@@ -106,7 +106,7 @@ export class Base extends Model<Base> {
             group = { ...group, ...opt.groupCondition };
         }
         let [rows, totalRs] = await Promise.all([
-            model.aggregate([...pipeline, ...extraPipeline]).exec() as any[],
+            model.aggregate([...pipeline, ...extraPipeline]).exec() as T[],
             !opt.groupCondition && (noTotal || getAll) ?
                 [] :
                 model.aggregate([...pipeline, {
@@ -122,6 +122,6 @@ export class Base extends Model<Base> {
     }
 }
 
-export class Public { 
-    
+export class Public {
+
 }
