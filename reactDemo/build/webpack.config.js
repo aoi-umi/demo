@@ -17,6 +17,22 @@ let config = {
         }, {
             test: /\.css$/,
             loader: 'style-loader!css-loader'
+        }, {
+            test: /\.js$/,
+            include: [
+                ...[
+                    'enum-ts', 'node-forge',
+                    'query-string', 'strict-uri-encode'
+                ].map(node_modules => {
+                    return path.resolve(__dirname, "../node_modules/" + node_modules);
+                }),
+            ],
+            use: {
+                loader: 'babel-loader',
+                options: {
+                    presets: ['babel-preset-env']
+                }
+            }
         }]
     },
     resolve: {
