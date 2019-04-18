@@ -63,7 +63,7 @@ export class UserMgt extends React.Component<UserMgtProps>{
     private listModel: ListModel;
     private unlisten: any;
     @observable
-    enableAuthToggle: any = {};
+    enableAuthToggle: any[] = [];
 
     constructor(props, context) {
         super(props, context);
@@ -147,12 +147,12 @@ export class UserMgt extends React.Component<UserMgtProps>{
                     hideQueryBtn={{ add: true }}
                     listModel={listModel}
                     onQueryClick={(model: ListModel) => {
-                        this.enableAuthToggle = {};
                         let queryObj = this.modelToObj();
                         this.innerProps.history.replace({ pathname: this.innerProps.location.pathname, search: qs.stringify(queryObj) });
                     }}
                     onQuery={async () => {
                         let data = await testApi.userMgtList(this.modelToObj());
+                        this.enableAuthToggle = new Array((data && data.rows && data.rows.length) || 0);
                         return data;
                     }}
                     defaultHeader={[{
@@ -299,9 +299,9 @@ export class UserMgt extends React.Component<UserMgtProps>{
                             <TableRow key={enableAuthRowKey}>
                                 <TableCell colSpan={2}>
                                     <Button onClick={() => {
-                                        this.enableAuthToggle[enableAuthRowKey] = !this.enableAuthToggle[enableAuthRowKey];
+                                        this.enableAuthToggle[idx] = !this.enableAuthToggle[idx];
                                     }}>{lang.UserMgt.enableAuthority}</Button>
-                                    <div className={classNames(!this.enableAuthToggle[enableAuthRowKey] && classes.hidden)} style={{ margin: 5 }}>
+                                    <div className={classNames(!this.enableAuthToggle[idx] && classes.hidden)} style={{ margin: 5 }}>
                                         {enableAuth}
                                     </div>
                                 </TableCell>
