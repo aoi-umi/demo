@@ -1,6 +1,9 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
+import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
+import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
 import * as Q from 'q';
+
 import {
     MySnackbarVariantType,
     MyDialogButtonType, MyDialogType
@@ -8,7 +11,16 @@ import {
 import MySnackbar from '../components/MySnackbar';
 import MyDialog from '../components/MyDialog';
 import { extend } from './util';
-import { withCustomTheme } from '..';
+import { customTheme } from '../modules/main/constant';
+
+export function withCustomTheme(child) {
+    return (
+        <MuiThemeProvider theme={createMuiTheme(customTheme)}>
+            {child}
+        </MuiThemeProvider>
+    );
+}
+
 type MsgNoticeOptions = {
     type?: 'snackbar' | 'dialog',
     noClose?: boolean;

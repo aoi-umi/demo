@@ -15,6 +15,19 @@ import { routeConfig } from '../../config/config';
 
 export const main = new Main();
 
+export const customTheme = {
+    typography: {
+        useNextVariants: true,
+    },
+    overrides: {
+        MuiButton: {
+            root: {
+                textTransform: 'none' as any
+            }
+        }
+    }
+};
+
 export const mainFolderListItems = (history: History) => {
     function onClick(path: string) {
         if (history.location.pathname != path)
