@@ -33,21 +33,40 @@ export default class MainSection extends React.Component<MainSectionProps> {
 
     componentDidUpdate() {
         let width = this.board.offsetWidth;
+        let height = this.board.offsetHeight;
         let v = 1;
         let transXReg = /\.*translateX\((.*)px\)/i;
         this.contents.forEach((ele, idx) => {
             let dom = this.dom[idx];
             if (dom && !ele.animeInst) {
-                let top = 0;
+                let topLevelDict = { 0: 0 };
                 this.dom.forEach((d, idx2) => {
                     if (idx != idx2 && d) {
                         let x = Math.abs(parseFloat(transXReg.exec(d.style.transform)[1]));
-                        if (!isNaN(x) && x < d.offsetWidth && d.offsetTop >= top) {
-                            top = d.offsetHeight + d.offsetTop;
+                        if (!isNaN(x) && x < d.offsetWidth) {
+                            let top = d.offsetTop;
+                            if (!topLevelDict[top])
+                                topLevelDict[top] = 0;
+                            topLevelDict[top]++;
+                            let newTop = d.offsetHeight + d.offsetTop;
+                            if (newTop + dom.offsetHeight >= height)
+                                newTop = 0;
+                            if (!topLevelDict[newTop])
+                                topLevelDict[newTop] = 0;
                         }
                     }
                 });
                 let s = width + dom.offsetWidth;
+                let top = 0;
+                let minLevel = -1;
+                // console.log(topLevelDict);
+                for (let key in topLevelDict) {
+                    let level = topLevelDict[key];
+                    if (minLevel < 0 || level < minLevel) {
+                        minLevel = level;
+                        top = parseFloat(key);
+                    }
+                }
                 if (top)
                     dom.style.top = top + 'px';
                 let duration = s * 10 / v;

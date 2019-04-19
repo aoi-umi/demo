@@ -134,7 +134,8 @@ export default class Role extends React.Component<Props> {
             </RoleDetail>, {
                 type: 'dialog',
                 dialogTitle: detail ? lang.Global.operate.edit : lang.Global.operate.add,
-                dialogBtnList: []
+                dialogBtnList: [],
+                dialogFullScreenIfSmall: true,
             });
     }
 
