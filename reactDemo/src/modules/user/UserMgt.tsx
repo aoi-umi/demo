@@ -133,7 +133,8 @@ export class UserMgt extends React.Component<UserMgtProps>{
             </UserMgtDetail>, {
                 type: 'dialog',
                 dialogTitle: detail ? lang.Global.operate.edit : lang.Global.operate.add,
-                dialogBtnList: []
+                dialogBtnList: [],
+                dialogFullScreenIfSmall: true,
             });
 
     }

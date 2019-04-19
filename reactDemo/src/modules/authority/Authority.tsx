@@ -131,7 +131,8 @@ export default class Authority extends React.Component<Props> {
             </AuthorityDetail>, {
                 type: 'dialog',
                 dialogTitle: detail ? lang.Global.operate.edit : lang.Global.operate.add,
-                dialogBtnList: []
+                dialogBtnList: [],
+                dialogFullScreenIfSmall: true,
             });
 
     }
