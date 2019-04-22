@@ -5,9 +5,9 @@ import Input from '@material-ui/core/Input';
 import { observer, inject } from 'mobx-react';
 import * as anime from 'animejs';
 import { runInAction, observable } from 'mobx';
-import { Test } from '../model';
-import { withRouterDeco } from '../../../helpers/util';
-import { msgNotice } from '../../../helpers/common';
+import { Test } from './model';
+import { withRouterDeco } from '../../helpers/util';
+import { msgNotice } from '../../helpers/common';
 
 interface MainSectionProps {
 };
@@ -21,9 +21,17 @@ type InnerProps = MainSectionProps & RouteComponentProps<any> & {
 @observer
 export default class MainSection extends React.Component<MainSectionProps> {
     @observable
-    contents: any[] = [];
-    dom: HTMLElement[] = [];
+    contents: {
+        idx: number,
+        msg: string,
+        animeInst?: anime.AnimeInstance,
+        finished?: boolean,
+        dom?: HTMLElement,
+    }[] = [];
     board: HTMLElement;
+
+    @observable
+    danmaku = '';
     private get innerProps() {
         return this.props as InnerProps;
     }
@@ -36,11 +44,13 @@ export default class MainSection extends React.Component<MainSectionProps> {
         let height = this.board.offsetHeight;
         let v = 1;
         let transXReg = /\.*translateX\((.*)px\)/i;
-        this.contents.forEach((ele, idx) => {
-            let dom = this.dom[idx];
+        let { contents } = this;
+        contents.forEach((ele, idx) => {
+            let dom = ele.dom;
             if (dom && !ele.animeInst) {
                 let topLevelDict = { 0: 0 };
-                this.dom.forEach((d, idx2) => {
+                contents.forEach((cont, idx2) => {
+                    let d = cont.dom;
                     if (idx != idx2 && d) {
                         let x = Math.abs(parseFloat(transXReg.exec(d.style.transform)[1]));
                         if (!isNaN(x) && x < d.offsetWidth) {
@@ -75,46 +85,67 @@ export default class MainSection extends React.Component<MainSectionProps> {
                     translateX: -s,
                     duration,
                     easing: 'linear'
-                })
+                });
+                ele.animeInst.finished.then(() => {
+                    let content = contents[idx];
+                    if (content)
+                        content.finished = true;
+                });
             }
         });
+        //移除已结束
+        // for (let idx = contents.length - 1; idx >= 0; idx--) {
+        //     let ele = contents[idx];
+        //     if (ele.finished)
+        //         contents.splice(idx, 1);
+        // }
     }
     public render() {
         const { history, test } = this.innerProps;
+        let { contents } = this;
         //marquee
         return (
             <div>
-                <h4 onClick={() => { test.setText(test.input) }}> Hello {test.text} </h4>
-                <Button onClick={test.addCount}>click me({test.count})</Button>
-                <Button onClick={() => { history.goBack() }}>back</Button>
-                <Input onChange={(e) => { test.input = e.target.value; }} defaultValue={test.input} />
-                <NavLink to="/test2">Test2</NavLink>
-                <Button onClick={() => {
-                    msgNotice('测试');
-                }}>msg notice</Button>
-                <Button onClick={() => {
-                    msgNotice('测试', { type: 'dialog', dialogBtnList: [{ text: '确认', type: 'accept' }] }).waitClose().then(t => {
-                        console.log(t);
-                    });
-                }}>msg notice</Button>
-                <Button onClick={() => {
-                    let idx = this.contents.length;
-                    this.contents.push({ idx, msg: `${idx}: 123456` });
-                }}>anime</Button>
-                <Button onClick={() => { this.contents = []; }}>clear anime</Button>
+                <div>
+                    <Input onChange={(e) => { test.text = e.target.value; }} defaultValue={test.text} />
+                    <h4> Hello {test.getText()} </h4>
+                    <Button onClick={test.addCount}>click me({test.count})</Button>
+                    <Button onClick={() => { history.goBack() }}>back</Button>
+                </div>
+                <div>
+                    <Button onClick={() => {
+                        msgNotice('测试');
+                    }}>msg notice</Button>
+                    <Button onClick={() => {
+                        msgNotice('测试', { type: 'dialog', dialogBtnList: [{ text: '确认', type: 'accept' }] }).waitClose().then(t => {
+                            console.log(t);
+                        });
+                    }}>msg notice</Button>
+                </div>
+                <div>
+                    <Input value={this.danmaku} onChange={(e) => { this.danmaku = e.target.value; }} />
+                    <Button onClick={() => {
+                        if (this.danmaku && this.danmaku.length) {
+                            let idx = contents.length;
+                            contents.push({ idx, msg: this.danmaku });
+                            this.danmaku = '';
+                        }
+                    }}>danmaku</Button>
+                    <Button onClick={() => { this.contents = []; }}>clear anime</Button>
+                </div>
                 <div ref={(el) => { this.board = el; }} style={{ height: 500, width: 500, background: '#f7f7f7', overflow: 'hidden', position: 'absolute' }}>
                     {
-                        this.contents.map(ele => {
+                        contents.map(ele => {
                             let idx = ele.idx;
                             return (
                                 <div key={idx} ref={(el) => {
-                                    if (this.contents.length > idx) {
-                                        let match = this.contents[idx];
+                                    if (contents.length > idx) {
+                                        let match = contents[idx];
                                         if (match)
-                                            this.dom[idx] = el;
+                                            match.dom = el;
                                     }
                                 }} style={{ display: 'inline-block', position: 'absolute', left: '100%', whiteSpace: 'nowrap' }}>
-                                    {idx}: 1234567890987654321
+                                    {ele.msg}
                                 </div>);
                         })
                     }

@@ -3,14 +3,11 @@ import { observable, action, runInAction } from 'mobx';
 export class Test {
     @observable
     text: string;
-    
-    input: string;
 
     @observable
     count: number;
     constructor() {
         this.init();
-        this.setText();
     }
     @action
     init = () => {
@@ -28,7 +25,7 @@ export class Test {
         this.count++;
     };
     @action
-    setText = (text?: string) => {
-        this.text = text || 'world';
+    getText = () => {
+        return this.text || 'world';
     };
 }
