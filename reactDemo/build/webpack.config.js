@@ -1,4 +1,7 @@
-const path = require('path');
+const
+    path = require('path'),
+    webpack = require('webpack');
+
 var htmlWebpackPlugin = require('html-webpack-plugin');
 let config = {
     entry: {
@@ -48,18 +51,19 @@ let config = {
                     chunks: "all",
                     priority: 10,
                 },
-                react: {
-                    test: /node_modules[\\/]react/,
-                    name: "react",
-                    chunks: "all",
-                    priority: 30,
-                },
-                materialUI: {
-                    test: /node_modules[\\/]@material-ui/,
-                    name: "material-ui",
-                    chunks: "all",
-                    priority: 20,
-                }
+                ...(() => {
+                    let modules = {};
+                    let priority = 30;
+                    ['react', '@material-ui', 'babel'].forEach(key => {
+                        modules[key] = {
+                            test: new RegExp(`node_modules[\\\\/]${key}`),
+                            name: key,
+                            chunks: "all",
+                            priority: priority--,
+                        }
+                    });
+                    return modules;
+                })(),
                 // styles: {
                 //     name: 'styles',
                 //     test: /\.(scss|css)$/,
@@ -82,7 +86,11 @@ let config = {
         new htmlWebpackPlugin({
             filename: 'index.html',
             template: './src/index.html',
-        })
+        }),
+        new webpack.ContextReplacementPlugin(
+            /moment[/\\]locale$/,
+            /zh-cn/,
+        ),
     ],
     performance: {
         hints: false

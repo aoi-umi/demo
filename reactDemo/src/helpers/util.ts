@@ -3,7 +3,7 @@ import { withStyles } from '@material-ui/core/styles';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import withWidth, { WithWidthOptions } from '@material-ui/core/withWidth';
 import { withRouter } from 'react-router';
-import * as forge from 'node-forge';
+import md from 'node-forge/lib/md';
 
 export function request(options: AxiosRequestConfig) {
     if (!options.url)
@@ -74,7 +74,7 @@ export function randStr() {
 }
 
 export function md5(str: string) {
-    let md5 = forge.md.md5.create();
+    let md5 = md.md5.create();
     md5.update(str);
     return md5.digest().toHex();
 }

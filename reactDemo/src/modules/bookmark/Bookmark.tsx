@@ -6,12 +6,9 @@ import { WithStyles, Paper } from '@material-ui/core';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
-import Chip from '@material-ui/core/Chip';
 import Checkbox from '@material-ui/core/Checkbox';
 
-import AddIcon from '@material-ui/icons/Add';
 
 import { observer } from 'mobx-react';
 import { TextAlignProperty } from 'csstype';
@@ -27,7 +24,7 @@ import {
 } from '../../components';
 import { msgNotice } from '../../helpers/common';
 import { testApi } from '../../api';
-import { TagModel, TagType as BookmarkShowTag } from '../components';
+import { TagModel } from '../components';
 import { BookmarkQueryModel, BookmarkDetailModel } from './model';
 
 const styles = () => ({
