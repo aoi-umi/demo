@@ -235,12 +235,14 @@ export class UserMgt extends React.Component<UserMgtProps>{
                                 id: auth.code,
                             }, key));
                         }
-                        return ([
+                        let existsAuth = enableAuth.length > 0;
+                        let rowSpan = existsAuth ? 2 : 1;
+                        let rows = [
                             <TableRow key={idx}>
-                                <TableCell rowSpan={2}>
+                                <TableCell rowSpan={rowSpan}>
                                     {ele.account}
                                 </TableCell>
-                                <TableCell rowSpan={2}>
+                                <TableCell rowSpan={rowSpan}>
                                     {ele.nickname}
                                 </TableCell>
                                 <TableCell>
@@ -286,10 +288,10 @@ export class UserMgt extends React.Component<UserMgtProps>{
                                         })
                                     }
                                 </TableCell>
-                                <TableCell rowSpan={2}>
+                                <TableCell rowSpan={rowSpan}>
                                     {moment(ele.createdAt).format(config.dateFormat)}
                                 </TableCell>
-                                <TableCell rowSpan={2} className={classes.operateCol}>
+                                <TableCell rowSpan={rowSpan} className={classes.operateCol}>
                                     <div>
                                         <Button onClick={() => {
                                             this.showDetail(ele);
@@ -297,21 +299,26 @@ export class UserMgt extends React.Component<UserMgtProps>{
                                     </div>
                                 </TableCell>
                             </TableRow>,
-                            <TableRow key={enableAuthRowKey}>
-                                <TableCell colSpan={2}>
-                                    <Button onClick={() => {
-                                        this.enableAuthToggle[idx] = !this.enableAuthToggle[idx];
-                                    }}>{lang.UserMgt.enableAuthority}</Button>
-                                    <div className={classNames(!this.enableAuthToggle[idx] && classes.hidden)} style={{ margin: 5 }}>
-                                        {enableAuth}
-                                    </div>
-                                </TableCell>
-                            </TableRow>
-                        ]);
+                        ];
+                        if (existsAuth) {
+                            rows.push(
+                                <TableRow key={enableAuthRowKey}>
+                                    <TableCell colSpan={2}>
+                                        <Button onClick={() => {
+                                            this.enableAuthToggle[idx] = !this.enableAuthToggle[idx];
+                                        }}>{lang.UserMgt.enableAuthority}</Button>
+                                        <div className={classNames(!this.enableAuthToggle[idx] && classes.hidden)} style={{ margin: 5 }}>
+                                            {enableAuth}
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            );
+                        }
+                        return rows;
                     })}
                 >
                 </MyList>
-            </div>
+            </div >
         )
     }
 }
