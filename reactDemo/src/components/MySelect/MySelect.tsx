@@ -174,9 +174,6 @@ const components = {
 type MyOptionType = { label: string; value: any };
 type SelectOptionsType<OptionType = MyOptionType> = GroupedOptionsType<OptionType> | OptionsType<OptionType>;
 type Props = SelectProps<MyOptionType> & {
-    label?: string,
-    isAsync?: boolean;
-    asyncGetOptions?: (val: string) => Promise<SelectOptionsType>;
 };
 type InnerProps = WithStyles<typeof styles, true> & Props;
 @withStylesDeco(styles, { withTheme: true })
@@ -189,36 +186,15 @@ export default class MySelect extends React.Component<Props>{
     @observable
     options: SelectOptionsType;
 
-    @observable
-    isLoading = false;
-
-    queryKey: string = null;
-
     constructor(props) {
         super(props);
         this.options = this.innerProps.options;
-    }
-    onLoad = async (event: string) => {
-        const {
-            isAsync, asyncGetOptions,
-        } = this.innerProps;
-        try {
-            let key = event && event.trim();
-            if (((this.queryKey === null && !this.options)
-                || (this.queryKey !== key))
-                && isAsync && asyncGetOptions) {
-                this.queryKey = key;
-                this.isLoading = true;
-                this.options = await asyncGetOptions(key);
-            }
-        } finally {
-            this.isLoading = false;
-        }
     }
     render() {
         const {
             classes, theme, label,
             isAsync, asyncGetOptions,
+            options,
             ...restProps
         } = this.innerProps;
 
@@ -245,15 +221,8 @@ export default class MySelect extends React.Component<Props>{
                                 shrink: true,
                             },
                         }}
-                        onFocus={() => {
-                            this.onLoad(this.queryKey);
-                        }}
-                        onInputChange={(event) => {
-                            this.onLoad(event);
-                        }}
                         isClearable={true}
                         options={this.options}
-                        isLoading={this.isLoading}
                         {...restProps}
                     />
                 </NoSsr>

@@ -54,7 +54,7 @@ let config = {
                 ...(() => {
                     let modules = {};
                     let priority = 30;
-                    ['react', '@material-ui', 'babel'].forEach(key => {
+                    ['react', '@material-ui', 'babel', 'mobx', 'moment'].forEach(key => {
                         modules[key] = {
                             test: new RegExp(`node_modules[\\\\/]${key}`),
                             name: key,

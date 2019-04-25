@@ -20,8 +20,6 @@ import {
     MyList, ListModel,
     MyButton, MyButtonModel,
     MyTextField,
-    MySelect,
-    SelectedObject,
 } from '../../components';
 import { msgNotice } from '../../helpers/common';
 import { testApi } from '../../api';

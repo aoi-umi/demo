@@ -2,12 +2,23 @@ import * as React from 'react';
 import { NavLink, RouteComponentProps } from 'react-router-dom';
 import Button from '@material-ui/core/Button';
 import Input from '@material-ui/core/Input';
+import Select from '@material-ui/core/Select';
+import TextField from '@material-ui/core/TextField';
+import MenuItem from '@material-ui/core/MenuItem';
+import Menu from '@material-ui/core/Menu';
+import Paper from '@material-ui/core/Paper';
+import MenuList from '@material-ui/core/MenuList';
+import Popper from '@material-ui/core/Popper';
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
+
 import { observer, inject } from 'mobx-react';
 import * as anime from 'animejs';
 import { runInAction, observable } from 'mobx';
+
 import { Test } from './model';
 import { withRouterDeco } from '../../helpers/util';
 import { msgNotice } from '../../helpers/common';
+import { MyTextField, MySelect } from '../../components';
 
 interface MainSectionProps {
 };
@@ -32,6 +43,15 @@ export default class MainSection extends React.Component<MainSectionProps> {
 
     @observable
     danmaku = '';
+
+    @observable
+    poperOpen = false;
+    poperAnchorEl;
+
+    @observable
+    menuOpen = false;
+    menuAnchorEl;
+
     private get innerProps() {
         return this.props as InnerProps;
     }
@@ -103,6 +123,10 @@ export default class MainSection extends React.Component<MainSectionProps> {
     public render() {
         const { history, test } = this.innerProps;
         let { contents } = this;
+        let list = [];
+        for (let i = 0; i <= 10; i++) {
+            list.push({ label: 'label' + i, value: 'value' + i })
+        }
         //marquee
         return (
             <div>
@@ -121,6 +145,44 @@ export default class MainSection extends React.Component<MainSectionProps> {
                             console.log(t);
                         });
                     }}>msg notice</Button>
+                </div>
+                <div>
+                    <MySelect options={list}></MySelect>
+                    <TextField select fullWidth value=''>
+                        {list.map(option => (
+                            <MenuItem key={option.value} value={option.value}>
+                                {option.label}
+                            </MenuItem>
+                        ))}
+                    </TextField>
+                </div>
+                <div>
+                    <Button buttonRef={node => {
+                        this.poperAnchorEl = node;
+                    }} onClick={() => { this.poperOpen = !this.poperOpen; }}>popper</Button>
+                    <Popper open={this.poperOpen} anchorEl={this.poperAnchorEl} style={{ zIndex: 1 }}>
+                        <Paper>
+                            <ClickAwayListener onClickAway={() => { this.poperOpen = false; }}>
+                                <MenuList>
+                                    {list.map(option => (
+                                        <MenuItem key={option.value} value={option.value}>
+                                            {option.label}
+                                        </MenuItem>
+                                    ))}
+                                </MenuList>
+                            </ClickAwayListener>
+                        </Paper>
+                    </Popper>
+                    <Button buttonRef={node => {
+                        this.menuAnchorEl = node;
+                    }} onClick={() => { this.menuOpen = !this.menuOpen }}>menu</Button>
+                    <Menu open={this.menuOpen} anchorEl={this.menuAnchorEl} onClose={() => { this.menuOpen = false }}>
+                        {list.map(option => (
+                            <MenuItem key={option.value} value={option.value}>
+                                {option.label}
+                            </MenuItem>
+                        ))}
+                    </Menu>
                 </div>
                 <div>
                     <Input value={this.danmaku} onChange={(e) => { this.danmaku = e.target.value; }} />
