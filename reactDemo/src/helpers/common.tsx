@@ -2,7 +2,6 @@ import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
-import * as Q from 'q';
 
 import {
     MySnackbarVariantType,
@@ -11,6 +10,7 @@ import {
 import MySnackbar from '../components/MySnackbar';
 import MyDialog from '../components/MyDialog';
 import { extend } from './util';
+import * as util from './util';
 import { customTheme } from '../modules/main/constant';
 
 export function withCustomTheme(child) {
@@ -35,7 +35,7 @@ type MsgNoticeOptions = {
 
 }
 export function msgNotice(msg: React.ReactNode, options?: MsgNoticeOptions) {
-    let defer = Q.defer();
+    let defer = util.defer();
     let dom: any;
     let body = document.body;
     let showDom = document.createElement("div");

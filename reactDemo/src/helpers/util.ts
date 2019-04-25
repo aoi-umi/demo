@@ -3,7 +3,7 @@ import { withStyles } from '@material-ui/core/styles';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import withWidth, { WithWidthOptions } from '@material-ui/core/withWidth';
 import { withRouter } from 'react-router';
-import md from 'node-forge/lib/md';
+import * as md from 'node-forge/lib/md.all';
 
 export function request(options: AxiosRequestConfig) {
     if (!options.url)
@@ -105,3 +105,17 @@ export const stopAnimation = (animations: anime.AnimeInstance | anime.AnimeInsta
     if (Array.isArray(animations)) animations.forEach(anim => stop(anim));
     else stop(animations);
 };
+
+export function defer<T = any>() {
+    let resolve: (value?: T | PromiseLike<T>) => void,
+        reject: (reason?: any) => void;
+    let promise = new Promise<T>((reso, reje) => {
+        resolve = reso;
+        reject = reje;
+    });
+    return {
+        promise,
+        resolve,
+        reject,
+    };
+}
