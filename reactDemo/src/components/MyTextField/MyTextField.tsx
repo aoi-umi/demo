@@ -13,8 +13,6 @@ import MyForm, { MyFormProps } from '../MyForm';
 import { Model } from "../Base";
 import { withStylesDeco } from "../../helpers";
 import { WithStyles } from "@material-ui/core";
-import { observable } from "mobx";
-import { async } from "q";
 
 type MyOptionType = { label: string; value: any };
 type SelectOptionsType<OptionType = MyOptionType> = GroupedOptionsType<OptionType> | OptionsType<OptionType>;
@@ -89,7 +87,7 @@ export default class MyTextField extends React.Component<Props> {
                             fullWidth={fullWidth}
                             value={val}
                             onChange={(e) => {
-                                let val = e.target.value
+                                let val = e.target.value;
                                 model.changeValue(key, val);
                                 this.setState({
                                     anchorEl: e.currentTarget,

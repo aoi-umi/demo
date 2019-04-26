@@ -39,7 +39,7 @@ const styles = (theme: Theme) => ({
         backgroundColor: amber[700],
     },
     icon: {
-        fontSize: 20,
+        fontSize: 15,
     },
     iconVariant: {
         opacity: 0.9,
@@ -85,6 +85,7 @@ export default class MySnackbar extends React.Component<MySnackbarProps> {
                 open={this.model.open}
                 autoHideDuration={this.props.autoHideDuration || 6000}
                 onClose={this.onClose}
+                style={{ margin: 5 }}
             >
                 <SnackbarContent
                     className={classNames(classes[variant], className)}

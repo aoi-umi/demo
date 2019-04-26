@@ -3,6 +3,8 @@ import { withStyles } from '@material-ui/core/styles';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import withWidth, { WithWidthOptions } from '@material-ui/core/withWidth';
 import { withRouter } from 'react-router';
+import { withSnackbar } from 'notistack';
+
 import * as md from 'node-forge/lib/md.all';
 
 export function request(options: AxiosRequestConfig) {
@@ -47,10 +49,16 @@ export function clone<T>(obj: T): T {
     return JSON.parse(JSON.stringify(obj));
 }
 
-export function withStylesDeco<ClassKey extends string, Options extends WithStylesOptions<ClassKey> = {}>(style, options?: Options) {
+function getDeco(fn: (constructor) => any) {
     return function <T extends { new(...args: any[]): {} }>(constructor: T) {
-        return withStyles(style, options)(constructor as any) as any as T;
+        return fn(constructor);
     }
+}
+
+export function withStylesDeco<ClassKey extends string, Options extends WithStylesOptions<ClassKey> = {}>(style, options?: Options) {
+    return getDeco((constructor) => {
+        return withStyles(style, options)(constructor);
+    });
 }
 
 export function withRouterDeco<T extends { new(...args: any[]): {} }>(constructor: T) {
@@ -58,9 +66,13 @@ export function withRouterDeco<T extends { new(...args: any[]): {} }>(constructo
 }
 
 export function withWidthDeco(options?: WithWidthOptions) {
-    return function <T extends { new(...args: any[]): {} }>(constructor: T) {
-        return withWidth(options)(constructor as any) as any as T;
-    }
+    return getDeco((constructor) => {
+        return withWidth(options)(constructor);
+    });
+}
+
+export function withSnackbarDeco<T extends { new(...args: any[]): {} }>(constructor: T) {
+    return withSnackbar(constructor as any) as any as T;
 }
 
 export function error(e, code?) {
