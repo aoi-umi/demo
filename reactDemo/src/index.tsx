@@ -4,6 +4,9 @@ import { render } from 'react-dom';
 import { HashRouter as Router } from 'react-router-dom';
 import { configure } from 'mobx';
 import { Provider } from 'mobx-react';
+import { SnackbarProvider } from 'notistack';
+import DateMomentUtils from "@date-io/moment";
+import { MuiPickersUtilsProvider, } from "material-ui-pickers";
 
 import './styles.css';
 import config from './config/env';
@@ -20,7 +23,11 @@ const storage = {
 render((
     <Provider {...storage}>
         <Router>
-            {withCustomTheme(<App />)}
+            <MuiPickersUtilsProvider utils={DateMomentUtils}>
+                <SnackbarProvider maxSnack={5}>
+                    {withCustomTheme(<App />)}
+                </SnackbarProvider>
+            </MuiPickersUtilsProvider>
         </Router>
     </Provider>
 ), document.getElementById('main'));

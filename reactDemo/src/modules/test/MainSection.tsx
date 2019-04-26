@@ -14,20 +14,22 @@ import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import { observer, inject } from 'mobx-react';
 import * as anime from 'animejs';
 import { runInAction, observable } from 'mobx';
+import { WithSnackbarProps } from 'notistack';
 
 import { Test } from './model';
-import { withRouterDeco } from '../../helpers/util';
+import { withRouterDeco, withSnackbarDeco } from '../../helpers/util';
 import { msgNotice } from '../../helpers/common';
 import { MyTextField, MySelect } from '../../components';
 
 interface MainSectionProps {
 };
 
-type InnerProps = MainSectionProps & RouteComponentProps<any> & {
+type InnerProps = MainSectionProps & RouteComponentProps<any> & WithSnackbarProps & {
     test: Test
 };
 
 @withRouterDeco
+@withSnackbarDeco
 @inject('test')
 @observer
 export default class MainSection extends React.Component<MainSectionProps> {
@@ -145,6 +147,9 @@ export default class MainSection extends React.Component<MainSectionProps> {
                             console.log(t);
                         });
                     }}>msg notice</Button>
+                    <Button onClick={() => {
+                        this.innerProps.enqueueSnackbar('test', { variant: 'info' });
+                    }}>notistack</Button>
                 </div>
                 <div>
                     <MySelect options={list}></MySelect>

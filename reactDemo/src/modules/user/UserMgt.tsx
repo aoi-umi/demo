@@ -13,6 +13,7 @@ import { WithStyles, Theme } from '@material-ui/core';
 import { observer } from 'mobx-react';
 import * as qs from 'query-string';
 import * as moment from 'moment';
+import { DateTimePicker } from 'material-ui-pickers';
 
 import lang from '../../lang';
 import * as config from '../../config/config';
@@ -64,6 +65,11 @@ export class UserMgt extends React.Component<UserMgtProps>{
     private unlisten: any;
     @observable
     enableAuthToggle: any[] = [];
+
+    @observable
+    data = {
+        date: null as Date
+    };
 
     constructor(props, context) {
         super(props, context);
@@ -145,6 +151,12 @@ export class UserMgt extends React.Component<UserMgtProps>{
             <div>
                 <MyList
                     queryArgs={[]}
+                    customQueryNode={
+                        <Grid item xs={12} sm={4} md={3}>
+                            <DateTimePicker value={this.data.date} label='createdAtFrom' onChange={(e) => { this.data.date = e; }} clearable >
+                            </DateTimePicker>
+                        </Grid>
+                    }
                     hideQueryBtn={{ add: true }}
                     listModel={listModel}
                     onQueryClick={(model: ListModel) => {
@@ -176,54 +188,6 @@ export class UserMgt extends React.Component<UserMgtProps>{
                         content: lang.Global.list.operate,
                         operate: true,
                     }]}
-
-                    // onDefaultRowRender={(ele, idx) => {
-                    //     return {
-                    //         ...ele,
-                    //         roleList: ele.roleList.map((role, roleIdx) => {
-                    //             let roleTag = TagModel.render({
-                    //                 label: role.name,
-                    //                 id: role.code,
-                    //                 disabled: role.status !== myEnum.roleStatus.启用
-                    //             }, roleIdx);
-                    //             return role.authorityList && role.authorityList.length ?
-                    //                 <Tooltip
-                    //                     classes={{
-                    //                         // popper: classes.htmlPopper,
-                    //                         tooltip: classes.htmlTooltip,
-                    //                     }}
-                    //                     title={
-                    //                         <React.Fragment>
-                    //                             {role.authorityList.map((auth, authIdx) => {
-                    //                                 return TagModel.render({
-                    //                                     label: auth.name,
-                    //                                     id: auth.code,
-                    //                                     disabled: auth.status !== myEnum.authorityStatus.启用
-                    //                                 }, authIdx)
-                    //                             })}
-                    //                         </React.Fragment>
-                    //                     }
-                    //                     key={roleIdx} placement="bottom">
-                    //                     {roleTag}
-                    //                 </Tooltip>
-                    //                 : roleTag;
-                    //         }),
-                    //         authorityList: ele.authorityList.map((auth, authIdx) => {
-                    //             return TagModel.render({
-                    //                 label: auth.name,
-                    //                 id: auth.code,
-                    //                 disabled: auth.status !== myEnum.authorityStatus.启用
-                    //             }, authIdx);
-                    //         }),
-                    //         createdAt: moment(ele.createdAt).format(config.dateFormat),
-                    //         operate:
-                    //             <div>
-                    //                 <Button onClick={() => {
-                    //                     this.showDetail(ele);
-                    //                 }}>{lang.Global.operate.edit}</Button>
-                    //             </div>
-                    //     };
-                    // }}
 
                     onRowRender={((ele, idx) => {
                         let enableAuth = [];
