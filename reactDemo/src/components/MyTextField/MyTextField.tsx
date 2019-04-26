@@ -8,11 +8,11 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Fade from "@material-ui/core/Fade";
 import Paper from "@material-ui/core/Paper";
 import CircularProgress from '@material-ui/core/CircularProgress';
+import { WithStyles } from "@material-ui/core";
 
 import MyForm, { MyFormProps } from '../MyForm';
 import { Model } from "../Base";
 import { withStylesDeco } from "../../helpers";
-import { WithStyles } from "@material-ui/core";
 
 type MyOptionType = { label: string; value: any };
 type SelectOptionsType<OptionType = MyOptionType> = GroupedOptionsType<OptionType> | OptionsType<OptionType>;

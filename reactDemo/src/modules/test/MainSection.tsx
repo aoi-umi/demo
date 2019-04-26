@@ -10,6 +10,10 @@ import Paper from '@material-ui/core/Paper';
 import MenuList from '@material-ui/core/MenuList';
 import Popper from '@material-ui/core/Popper';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
+import { Formik, Field, Form } from 'formik';
+import {
+    TextField as FormikTextField,
+} from 'formik-material-ui';
 
 import { observer, inject } from 'mobx-react';
 import * as anime from 'animejs';
@@ -200,6 +204,45 @@ export default class MainSection extends React.Component<MainSectionProps> {
                     }}>danmaku</Button>
                     <Button onClick={() => { this.contents = []; }}>clear anime</Button>
                 </div>
+                <Formik
+                    initialValues={{
+                        test: '',
+                    }}
+
+                    validate={values => {
+                        const errors: any = {};
+                        if (!values.test) {
+                            errors.test = 'Required';
+                        }
+                        return errors;
+                    }}
+                    onSubmit={(values, { setSubmitting }) => {
+                        setTimeout(() => {
+                            setSubmitting(false);
+                            alert(JSON.stringify(values, null, 2));
+                        }, 500);
+                    }}
+                    render={({ submitForm, isSubmitting, values, setFieldValue }) => (
+                        <Form>
+                            <Field
+                                name="test"
+                                label="Test"
+                                component={FormikTextField}
+                            />
+                            <Button
+                                variant="raised"
+                                color="primary"
+                                disabled={isSubmitting}
+                                onClick={submitForm}
+                            >
+                                Submit
+                      </Button>
+
+                        </Form>
+                    )}
+                >
+
+                </Formik>
                 <div ref={(el) => { this.board = el; }} style={{ height: 500, width: 500, background: '#f7f7f7', overflow: 'hidden', position: 'absolute' }}>
                     {
                         contents.map(ele => {
