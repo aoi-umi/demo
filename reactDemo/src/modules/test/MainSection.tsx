@@ -193,17 +193,6 @@ export default class MainSection extends React.Component<MainSectionProps> {
                         ))}
                     </Menu>
                 </div>
-                <div>
-                    <Input value={this.danmaku} onChange={(e) => { this.danmaku = e.target.value; }} />
-                    <Button onClick={() => {
-                        if (this.danmaku && this.danmaku.length) {
-                            let idx = contents.length;
-                            contents.push({ idx, msg: this.danmaku });
-                            this.danmaku = '';
-                        }
-                    }}>danmaku</Button>
-                    <Button onClick={() => { this.contents = []; }}>clear anime</Button>
-                </div>
                 <Formik
                     initialValues={{
                         test: '',
@@ -236,13 +225,23 @@ export default class MainSection extends React.Component<MainSectionProps> {
                                 onClick={submitForm}
                             >
                                 Submit
-                      </Button>
-
+                            </Button>
                         </Form>
                     )}
                 >
 
                 </Formik>
+                <div>
+                    <Input value={this.danmaku} onChange={(e) => { this.danmaku = e.target.value; }} />
+                    <Button onClick={() => {
+                        if (this.danmaku && this.danmaku.length) {
+                            let idx = contents.length;
+                            contents.push({ idx, msg: this.danmaku });
+                            this.danmaku = '';
+                        }
+                    }}>danmaku</Button>
+                    <Button onClick={() => { this.contents = []; }}>clear anime</Button>
+                </div>
                 <div ref={(el) => { this.board = el; }} style={{ height: 500, width: 500, background: '#f7f7f7', overflow: 'hidden', position: 'absolute' }}>
                     {
                         contents.map(ele => {
