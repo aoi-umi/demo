@@ -1,19 +1,47 @@
-import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
+import { Component, Vue, Watch, Prop } from "vue-property-decorator";
 
+import * as router from './router';
+const routeConfig = router.routerConfig;
+import "./App.less";
 import {
     Button, Drawer,
     Menu, MenuItem, Submenu, MenuGroup,
-    Icon,
-} from './components/iview';
+    Icon, Content, Sider, Layout, Header
+} from "./components/iview";
 
 @Component
 export default class App extends Vue {
     drawerOpen = false;
-    theme1 = 'light' as any;
+    isCollapsed = true;
+    theme = "light" as any;
+    title = '';
+
+    protected created() {
+        this.setTitle();
+    }
+    get menuitemClasses() {
+        return ["menu-item", this.isCollapsed ? "collapsed-menu" : ""];
+    }
+
+    setTitle() {
+        let cfg = router.getConfigByPath(location.pathname);
+        this.title = (cfg && cfg.title) || '';
+    }
+    collapsedSider() {
+        (this.$refs.side1 as any).toggleCollapse();
+    }
+
     renderTopNav() {
         return (
-            <div>
-                <Menu mode="horizontal" theme={this.theme1} active-name="1">
+            <div style={{ position: 'fixed' }}>
+                <Menu
+                    mode="horizontal"
+                    // theme={this.theme}
+                    active-name="1"
+                >
+                    <MenuItem>
+                        <Icon type="md-menu" />
+                    </MenuItem>
                     <MenuItem name="1">
                         <Icon type="ios-paper" />
                         内容管理
@@ -42,27 +70,92 @@ export default class App extends Vue {
                         综合设置
                     </MenuItem>
                 </Menu>
-            </div >
+            </div>
         );
     }
+
+    renderMenu(data) {
+        return (
+            <MenuItem name={data.name} to={data.to}>
+                <Icon type={data.icon} />
+                <span>{data.text}</span>
+            </MenuItem>
+        );
+    }
+
+    @Watch('$route')
+    route(to, from) {
+        this.setTitle();
+    }
+
     render() {
         return (
-            <div id="app">
-                {this.renderTopNav()}
-                <div>
-                    <Button onClick={() => { this.drawerOpen = !this.drawerOpen }} type="primary">Open</Button>
-                    <Drawer title="Basic Drawer" placement="left" closable={false} value={this.drawerOpen}>
-                        <p>Some contents...</p>
-                        <p>Some contents...</p>
-                        <p>Some contents...</p>
-                    </Drawer>
-                </div >
-                <div id="nav">
-                    <router-link to="/">Home</router-link> |
-                    <router-link to="/about">About</router-link>
-                </div>
-                <router-view />
-            </div >
+            // <div id="app">
+            //     {this.renderTopNav()}
+            //     <div>
+            //         <Button onClick={() => { this.drawerOpen = !this.drawerOpen }} type="primary">Open</Button>
+            //         <Drawer title="Basic Drawer" placement="left" closable={false} value={this.drawerOpen}>
+            //             <p>Some contents...</p>
+            //             <p>Some contents...</p>
+            //             <p>Some contents...</p>
+            //         </Drawer>
+            //     </div >
+            //     <div id="nav">
+            //         <router-link to="/">Home</router-link> |
+            //         <router-link to="/about">About</router-link>
+            //     </div>
+            //     <router-view />
+            // </div >
+            <Layout class="layout">
+                <Header style={{ padding: 0 }} class="layout-header-bar">
+                    <Icon
+                        onClick={this.collapsedSider}
+                        class="menu-icon"
+                        style={{ margin: "0 20px" }}
+                        type="md-menu"
+                        size="24"
+                    />
+                    <span>{this.title}</span>
+                </Header>
+                <Layout>
+                    <Sider
+                        ref="side1"
+                        hide-trigger
+                        collapsible
+                        collapsed-width="78"
+                        v-model={this.isCollapsed}
+                    >
+                        <Menu
+                            active-name={location.pathname}
+                            theme={"dark"}
+                            width="auto"
+                            class={this.menuitemClasses}
+                        >
+                            {
+                                [{
+                                    name: routeConfig.home.path,
+                                    to: routeConfig.home.path,
+                                    icon: 'ios-home',
+                                    text: routeConfig.home.title
+                                }, {
+                                    name: routeConfig.test.path,
+                                    to: routeConfig.test.path,
+                                    icon: 'ios-search',
+                                    text: routeConfig.test.title
+                                }, {
+                                    name: routeConfig.test2.path,
+                                    to: routeConfig.test2.path,
+                                    icon: 'ios-settings',
+                                    text: routeConfig.test2.title
+                                },].map(data => { return this.renderMenu(data) })
+                            }
+                        </Menu>
+                    </Sider>
+                    <Content style={{ margin: "20px", background: "#fff", minHeight: "260px" }}>
+                        Content
+                    </Content>
+                </Layout>
+            </Layout>
         );
     }
 }
