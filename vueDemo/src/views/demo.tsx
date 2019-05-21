@@ -3,7 +3,6 @@ import { Component, Vue, Watch } from 'vue-property-decorator';
 import { Input } from '../components/iview';
 
 
-import DemoComp from '../components/demoComp';
 @Component
 export default class App extends Vue {
     public value = '';
@@ -51,9 +50,6 @@ export default class App extends Vue {
                 <button class='class2' onClick={this.handleClick}>
                     点我
                 </button>
-                <div>
-                    <DemoComp msg='u see see u' />
-                </div>
                 {this.list.map(ele => {
                     return <Input v-model={ele.test}></Input>
                 })}

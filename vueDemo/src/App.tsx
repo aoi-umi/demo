@@ -143,16 +143,16 @@ export default class App extends Vue {
                                     icon: 'ios-search',
                                     text: routeConfig.test.title
                                 }, {
-                                    name: routeConfig.test2.path,
-                                    to: routeConfig.test2.path,
+                                    name: routeConfig.bookmark.path,
+                                    to: routeConfig.bookmark.path,
                                     icon: 'ios-settings',
-                                    text: routeConfig.test2.title
+                                    text: routeConfig.bookmark.title
                                 },].map(data => { return this.renderMenu(data) })
                             }
                         </Menu>
                     </Sider>
-                    <Content style={{ margin: "20px", background: "#fff", minHeight: "260px" }}>
-                        Content
+                    <Content style={{ margin: "20px", background: "#fff", minHeight: "260px", padding: '5px' }}>
+                        <router-view></router-view>
                     </Content>
                 </Layout>
             </Layout>
