@@ -2,17 +2,23 @@ import Vue from 'vue';
 import Router from 'vue-router';
 
 Vue.use(Router);
+type RouterConfig = {
+  path: string;
+  title?: string;
+  component?: any;
+};
 export const routerConfig = {
   home: {
     path: '/',
     title: 'Home',
   },
+  bookmark: {
+    path: '/bookmark',
+    title: '书签',
+    component: () => import('./views/bookmark')
+  },
   test: {
     path: '/test',
-    title: 'Test',
-  },
-  test2: {
-    path: '/test2',
     title: 'Test',
   }
 };
@@ -21,25 +27,11 @@ export const getConfigByPath = (path) => {
   for (let key in routerConfig) {
     let cfg = routerConfig[key];
     if (cfg.path == path)
-      return cfg;
+      return cfg as RouterConfig;
   }
 }
 export default new Router({
   mode: 'history',
   base: process.env.BASE_URL,
-  routes: [
-    // {
-    //   path: '/',
-    //   name: 'home',
-    //   component: Home,
-    // },
-    // {
-    //   path: '/about',
-    //   name: 'about',
-    //   // route level code-splitting
-    //   // this generates a separate chunk (about.[hash].js) for this route
-    //   // which is lazy-loaded when the route is visited.
-    //   component: () => import(/* webpackChunkName: "about" */ './views/About.vue'),
-    // },
-  ],
+  routes: Object.values(routerConfig),
 });
