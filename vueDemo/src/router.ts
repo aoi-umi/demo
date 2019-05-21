@@ -4,22 +4,25 @@ import Router from 'vue-router';
 Vue.use(Router);
 type RouterConfig = {
   path: string;
-  title?: string;
+  text: string;
+  meta?: {
+    title?: string;
+  }
   component?: any;
 };
 export const routerConfig = {
   home: {
     path: '/',
-    title: 'Home',
+    text: 'Home',
   },
   bookmark: {
     path: '/bookmark',
-    title: '书签',
+    text: '书签',
     component: () => import('./views/bookmark')
   },
   test: {
     path: '/test',
-    title: 'Test',
+    text: 'Test',
   }
 };
 
@@ -30,8 +33,18 @@ export const getConfigByPath = (path) => {
       return cfg as RouterConfig;
   }
 }
+
+let routes: RouterConfig[] = Object.values(routerConfig);
+routes.forEach(ele => {
+  if (!ele.meta) {
+    ele.meta = {};
+  }
+  if (!ele.meta.title) {
+    ele.meta.title = ele.text;
+  }
+});
 export default new Router({
   mode: 'history',
   base: process.env.BASE_URL,
-  routes: Object.values(routerConfig),
+  routes
 });

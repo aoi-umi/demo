@@ -24,8 +24,7 @@ export default class App extends Vue {
     }
 
     setTitle() {
-        let cfg = router.getConfigByPath(location.pathname);
-        this.title = (cfg && cfg.title) || '';
+        this.title = this.$route.meta.title || '';
     }
     collapsedSider() {
         (this.$refs.side1 as any).toggleCollapse();
@@ -136,17 +135,17 @@ export default class App extends Vue {
                                     name: routeConfig.home.path,
                                     to: routeConfig.home.path,
                                     icon: 'ios-home',
-                                    text: routeConfig.home.title
+                                    text: routeConfig.home.text
                                 }, {
                                     name: routeConfig.test.path,
                                     to: routeConfig.test.path,
                                     icon: 'ios-search',
-                                    text: routeConfig.test.title
+                                    text: routeConfig.test.text
                                 }, {
                                     name: routeConfig.bookmark.path,
                                     to: routeConfig.bookmark.path,
                                     icon: 'ios-settings',
-                                    text: routeConfig.bookmark.title
+                                    text: routeConfig.bookmark.text
                                 },].map(data => { return this.renderMenu(data) })
                             }
                         </Menu>
