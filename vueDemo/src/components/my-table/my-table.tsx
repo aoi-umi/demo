@@ -6,6 +6,7 @@ import {
 } from '@/components/iview';
 import './my-table.less';
 import { MyTableModel } from './model';
+import { ListResult } from '@/api';
 
 @Component
 class MyTable extends Vue {
@@ -17,36 +18,50 @@ class MyTable extends Vue {
 
     @Prop()
     queryArgs?: {
-        id: string;
+        key: string;
         label?: string;
         placeholder?: string;
     }[];
 
-    onQuery?: (query) => any;
+    @Prop()
+    queryFn?: (query: MyTableModel<any>) => ListResult | Promise<ListResult>;
+
+    protected created() {
+        this._onQueryClick();
+    }
+
     private async _onQueryClick() {
         this.loading = true;
         try {
-            // console.log(this.model)
-            // let rs = this.queryFn && await this.queryFn(this.model);
-
+            this.result.success = true;
+            this.result.msg = '暂无数据';
+            let rs = this.queryFn && await this.queryFn(this.model);
+            this.result.data = rs.rows;
+            this.result.total = rs.total;
         } catch (e) {
-
+            this.result.success = false;
+            this.result.data = [];
+            this.result.msg = e.message;
         } finally {
             this.loading = false;
         }
     }
+
     private _onQueryPress(e) {
         if (e.charCode == 13) {
             this._onQueryClick();
         }
     }
-    private test() {
-        console.log(arguments);
-    }
 
     showQuery = true;
     loading = false;
     model = new MyTableModel();
+    result = {
+        success: true,
+        total: 0,
+        msg: '',
+        data: []
+    };
 
     render() {
         return (
@@ -58,13 +73,13 @@ class MyTable extends Vue {
                             <Icon type={this.showQuery ? 'ios-arrow-up' : 'ios-arrow-down'} />
                         </div>
                     </div>
-                    <div class={this.showQuery ? '' : 'hidden'}>
-                        <Row gutter={5} onKeyPress={this._onQueryPress}>
+                    <div class={this.showQuery ? '' : 'hidden'} onKeypress={this._onQueryPress}>
+                        <Row gutter={5}>
                             {this.queryArgs && this.queryArgs.map(ele => {
                                 return (
                                     <Col style={{ marginBottom: '5px' }} xs={24} sm={8} md={6}>
-                                        {ele.label}
-                                        <Input placeholder={ele.placeholder}></Input>
+                                        {ele.label || ele.key}
+                                        <Input placeholder={ele.placeholder} v-model={this.model.query[ele.key]}></Input>
                                     </Col>
                                 );
                             })}
@@ -80,8 +95,11 @@ class MyTable extends Vue {
                     </div>
                 </Card>
                 <div style={{ position: 'relative' }}>
-                    <Table style={{ marginTop: '10px' }} stripe columns={this.columns} data={this.data}></Table>
-                    <Page class="page" total={100} show-elevator show-sizer
+                    <Table style={{ marginTop: '10px' }} stripe columns={this.columns}
+                        data={this.result.data} no-data-text={this.result.msg}>
+                    </Table>
+                    <Page class="page" total={this.result.total}
+                        show-total show-elevator show-sizer
                         on-on-change={(page) => {
                             this.model.page.index = page;
                             this._onQueryClick();

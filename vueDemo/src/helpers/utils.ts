@@ -4,7 +4,7 @@ export function convertToClass<typeofT, T = {}>(t) {
     return t as {
         new(props: Partial<typeofT & T> & {
             onClick?: () => any;
-            onKeyPress?: (e) => any;
+            onKeypress?: (e) => any;
             ref?: any;
             class?: any;
             style?: { [key: string]: any };
