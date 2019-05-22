@@ -89,22 +89,6 @@ export default class App extends Vue {
 
     render() {
         return (
-            // <div id="app">
-            //     {this.renderTopNav()}
-            //     <div>
-            //         <Button onClick={() => { this.drawerOpen = !this.drawerOpen }} type="primary">Open</Button>
-            //         <Drawer title="Basic Drawer" placement="left" closable={false} value={this.drawerOpen}>
-            //             <p>Some contents...</p>
-            //             <p>Some contents...</p>
-            //             <p>Some contents...</p>
-            //         </Drawer>
-            //     </div >
-            //     <div id="nav">
-            //         <router-link to="/">Home</router-link> |
-            //         <router-link to="/about">About</router-link>
-            //     </div>
-            //     <router-view />
-            // </div >
             <Layout class="layout">
                 <Header style={{ padding: 0 }} class="layout-header-bar">
                     <Icon
@@ -132,25 +116,20 @@ export default class App extends Vue {
                         >
                             {
                                 [{
-                                    name: routeConfig.home.path,
-                                    to: routeConfig.home.path,
+                                    name: routeConfig.bookmark.path,
+                                    to: routeConfig.bookmark.path,
                                     icon: 'ios-home',
-                                    text: routeConfig.home.text
+                                    text: routeConfig.bookmark.text
                                 }, {
                                     name: routeConfig.test.path,
                                     to: routeConfig.test.path,
                                     icon: 'ios-search',
                                     text: routeConfig.test.text
-                                }, {
-                                    name: routeConfig.bookmark.path,
-                                    to: routeConfig.bookmark.path,
-                                    icon: 'ios-settings',
-                                    text: routeConfig.bookmark.text
                                 },].map(data => { return this.renderMenu(data) })
                             }
                         </Menu>
                     </Sider>
-                    <Content style={{ margin: "20px", background: "#fff", minHeight: "260px", padding: '5px' }}>
+                    <Content style={{ margin: "20px", minHeight: "260px", padding: '5px' }}>
                         <router-view></router-view>
                     </Content>
                 </Layout>

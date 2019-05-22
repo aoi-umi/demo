@@ -1,6 +1,6 @@
 import { Component, Vue, Watch } from 'vue-property-decorator';
 
-import { Input } from '../components/iview';
+import { Input } from '@/components/iview';
 
 
 @Component
