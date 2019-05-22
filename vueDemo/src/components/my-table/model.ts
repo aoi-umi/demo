@@ -1,8 +1,8 @@
 
-export class MyTableModel<T extends object = object> {
+export class MyTableModel<T = any> {
     page = {
         index: 1,
         size: 10
     };
-    query = {} as T;
+    query: T = {} as any;
 }

@@ -8,39 +8,44 @@ export default class Bookmark extends Vue {
         return (
             <div>
                 <MyTable
-                    queryArgs={[...new Array(10).keys()].map(ele => {
-                        return {
-                            id: 'name',
-                            label: '名字',
+                    queryArgs={[{
+                        key: 'name',
+                        label: '名字',
+                    }, {
+                        key: 'url',
+                    }]}
+                    columns={[{
+                        title: '名字',
+                        key: 'name'
+                    }, {
+                        title: 'url',
+                        key: 'url',
+                        render: (h, params) => {
+                            return (<a href={params.row.url}>{params.row.url}</a>);
                         }
-                    })}
-                    columns={
-                        [{
-                            title: '名字',
-                            key: 'name'
-                        }, {
-                            title: 'url',
-                            key: 'url',
-                            render: (h, params) => {
-                                return (<a href={params.row.url}>{params.row.url}</a>);
-                            }
-                        }, {
-                            title: '操作',
-                            key: 'action',
-                            fixed: 'right',
-                            width: 120,
-                            render: (h, params) => {
-                                return (
-                                    <div>测试{params.row.name}</div>
-                                );
-                            }
-                        }]
-                    }
+                    }, {
+                        title: '操作',
+                        key: 'action',
+                        fixed: 'right',
+                        width: 120,
+                        render: (h, params) => {
+                            return (
+                                <div>
+                                    <a>编辑</a>
+                                    <a>删除</a>
+                                </div>
+                            );
+                        }
+                    }]}
                     data={[{ name: 1, url: 222 }]}
 
-                    onQuery={async (model) => {
-                        console.log(model);
-                        let rs = await testApi.bookmarkQuery();
+                    queryFn={async (model) => {
+                        let rs = await testApi.bookmarkQuery({
+                            name: model.query.name,
+                            url: model.query.url,
+                            page: model.page.index,
+                            rows: model.page.size
+                        });
                         return rs;
                     }}
                 ></MyTable>
