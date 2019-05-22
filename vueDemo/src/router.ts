@@ -1,15 +1,10 @@
 import Vue from 'vue';
-import Router from 'vue-router';
+import Router, { RouteConfig } from 'vue-router';
+
+import { errConfig } from './config/error';
 
 Vue.use(Router);
-type RouterConfig = {
-  path: string;
-  text: string;
-  meta?: {
-    title?: string;
-  }
-  component?: any;
-};
+type MyRouteConfig = RouteConfig & { text?: string; };
 export const routerConfig = {
   home: {
     path: '/',
@@ -23,18 +18,31 @@ export const routerConfig = {
   test: {
     path: '/test',
     text: 'Test',
-  }
+  },
+
+  error: {
+    path: '/error',
+    text: '出错啦',
+    component: () => import('./views/error')
+  },
+  notFound: {
+    path: "*",
+    redirect: {
+      path: '/error',
+      query: { code: errConfig.NotFound.code }
+    }
+  },
 };
 
 export const getConfigByPath = (path) => {
   for (let key in routerConfig) {
     let cfg = routerConfig[key];
     if (cfg.path == path)
-      return cfg as RouterConfig;
+      return cfg as MyRouteConfig;
   }
 }
 
-let routes: RouterConfig[] = Object.values(routerConfig);
+let routes: MyRouteConfig[] = Object.values(routerConfig);
 routes.forEach(ele => {
   if (!ele.meta) {
     ele.meta = {};
@@ -43,8 +51,17 @@ routes.forEach(ele => {
     ele.meta.title = ele.text;
   }
 });
-export default new Router({
+
+const router = new Router({
   mode: 'history',
   base: process.env.BASE_URL,
-  routes
+  routes,
 });
+router.beforeEach((to, from, next) => {
+  if (to.path == routerConfig.home.path) {
+    next(routerConfig.bookmark.path);
+  } else {
+    next();
+  }
+});
+export default router;
