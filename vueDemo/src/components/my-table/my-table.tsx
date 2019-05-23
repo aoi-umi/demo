@@ -8,39 +8,52 @@ import './my-table.less';
 import { MyTableModel } from './model';
 import { ListResult } from '@/api';
 
-@Component
-class MyTable extends Vue {
-    @Prop()
-    columns!: { title: string, key: string, fixed?: string; width?: number; render?: (h: any, params: { row: any }) => any }[];
-
-    @Prop()
-    data?: object[];
-
-    @Prop()
-    queryArgs?: {
-        key: string;
+type QueryArgsType = {
+    [key: string]: {
         label?: string;
         placeholder?: string;
+    }
+}
+@Component
+class MyTable<QueryArgs extends QueryArgsType> extends Vue {
+    @Prop()
+    columns!: {
+        title?: string,
+        key?: string,
+        fixed?: string;
+        width?: number;
+        type?: string;
+        align?: string;
+        render?: (h: any, params: { row: any }) => any
     }[];
 
     @Prop()
-    queryFn?: (query: MyTableModel<any>) => ListResult | Promise<ListResult>;
+    queryArgs?: QueryArgs;
+
+    @Prop()
+    queryFn?: (query: MyTableModel<{ [k in keyof QueryArgs]: any }>) => ListResult | Promise<ListResult>;
 
     protected created() {
-        this._onQueryClick();
+        this.$emit('created', this);
     }
 
+    public query() {
+        this._onQueryClick();
+    }
     private async _onQueryClick() {
         this.loading = true;
         try {
             this.result.success = true;
+            this.result.data = [];
+            this.result.total = 0;
             this.result.msg = '暂无数据';
             let rs = this.queryFn && await this.queryFn(this.model);
-            this.result.data = rs.rows;
-            this.result.total = rs.total;
+            if (rs) {
+                this.result.data = rs.rows;
+                this.result.total = rs.total;
+            }
         } catch (e) {
             this.result.success = false;
-            this.result.data = [];
             this.result.msg = e.message;
         } finally {
             this.loading = false;
@@ -55,7 +68,7 @@ class MyTable extends Vue {
 
     showQuery = true;
     loading = false;
-    model = new MyTableModel();
+    model = new MyTableModel<QueryArgs>();
     result = {
         success: true,
         total: 0,
@@ -75,11 +88,13 @@ class MyTable extends Vue {
                     </div>
                     <div class={this.showQuery ? '' : 'hidden'} onKeypress={this._onQueryPress}>
                         <Row gutter={5}>
-                            {this.queryArgs && this.queryArgs.map(ele => {
+                            {this.queryArgs && Object.entries(this.queryArgs).map(entry => {
+                                let key = entry[0];
+                                let ele = entry[1];
                                 return (
                                     <Col style={{ marginBottom: '5px' }} xs={24} sm={8} md={6}>
-                                        {ele.label || ele.key}
-                                        <Input placeholder={ele.placeholder} v-model={this.model.query[ele.key]}></Input>
+                                        {ele.label || key}
+                                        <Input placeholder={ele.placeholder} v-model={this.model.query[key]}></Input>
                                     </Col>
                                 );
                             })}
@@ -94,7 +109,7 @@ class MyTable extends Vue {
                         </Row>
                     </div>
                 </Card>
-                <div style={{ position: 'relative' }}>
+                <div style={{ position: 'relative', }}>
                     <Table style={{ marginTop: '10px' }} stripe columns={this.columns}
                         data={this.result.data} no-data-text={this.result.msg}>
                     </Table>
@@ -115,6 +130,6 @@ class MyTable extends Vue {
 }
 
 const MyTableView = MyTable as {
-    new(props: Partial<MyTable>): any;
+    new <T extends QueryArgsType>(props: Partial<MyTable<T>> & VueComponentOptions): any;
 }
 export default MyTableView;

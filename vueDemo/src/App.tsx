@@ -118,13 +118,23 @@ export default class App extends Vue {
                                 [{
                                     name: routeConfig.bookmark.path,
                                     to: routeConfig.bookmark.path,
-                                    icon: 'ios-home',
+                                    icon: 'md-home',
                                     text: routeConfig.bookmark.text
                                 }, {
-                                    name: routeConfig.test.path,
-                                    to: routeConfig.test.path,
-                                    icon: 'ios-search',
-                                    text: routeConfig.test.text
+                                    name: routeConfig.user.path,
+                                    to: routeConfig.user.path,
+                                    icon: 'md-people',
+                                    text: routeConfig.user.text
+                                }, {
+                                    name: routeConfig.role.path,
+                                    to: routeConfig.role.path,
+                                    icon: 'md-person',
+                                    text: routeConfig.role.text
+                                }, {
+                                    name: routeConfig.authority.path,
+                                    to: routeConfig.authority.path,
+                                    icon: 'md-lock',
+                                    text: routeConfig.authority.text
                                 },].map(data => { return this.renderMenu(data) })
                             }
                         </Menu>
