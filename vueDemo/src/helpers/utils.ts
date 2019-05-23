@@ -2,13 +2,7 @@ import axios, { AxiosRequestConfig } from 'axios';
 
 export function convertToClass<typeofT, T = {}>(t) {
     return t as {
-        new(props: Partial<typeofT & T> & {
-            onClick?: () => any;
-            onKeypress?: (e) => any;
-            ref?: any;
-            class?: any;
-            style?: { [key: string]: any };
-        }): any
+        new(props: Partial<typeofT & T> & VueComponentOptions): any
     };
 }
 
