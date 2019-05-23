@@ -92,7 +92,7 @@ export default class App extends Vue {
             <Layout class="layout">
                 <Header style={{ padding: 0 }} class="layout-header-bar">
                     <Icon
-                        onClick={this.collapsedSider}
+                        on-click={this.collapsedSider}
                         class="menu-icon"
                         style={{ margin: "0 20px" }}
                         type="md-menu"

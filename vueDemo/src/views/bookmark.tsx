@@ -29,14 +29,13 @@ class BookmarkDetail extends Vue {
     private get innerRefs() {
         return this.$refs as { formVaild: IForm }
     }
-
     render() {
         let detail = this.innerDetail;
         return (
             <div>
                 <h3>{detail._id ? '修改' : '新增'}</h3>
                 <br />
-                <Form label-width={50} ref="formVaild" model={detail} rules={this.rules} on-input={() => { /**不加这个会报错 */ }}>
+                <Form label-width={50} ref="formVaild" props={{ model: detail }} rules={this.rules}>
                     <FormItem label="名字" prop="name">
                         <Input v-model={detail.name} />
                     </FormItem>
@@ -44,7 +43,7 @@ class BookmarkDetail extends Vue {
                         <Input v-model={detail.url} />
                     </FormItem>
                     <FormItem>
-                        <Button type="primary" onClick={() => {
+                        <Button type="primary" on-click={() => {
                             this.innerRefs.formVaild.validate((valid) => {
                                 if (valid) {
                                     this.$Message.success('Success!');
@@ -72,7 +71,7 @@ export default class Bookmark extends Vue {
         return (
             <div>
                 <Modal v-model={this.detailShow} footer-hide mask-closable={false}>
-                    <BookmarkDetailView detail={this.detail}></BookmarkDetailView>
+                    <BookmarkDetailView detail={this.detail} />
                 </Modal>
                 <MyTable
                     on-created={(table) => {

@@ -102,7 +102,7 @@ class MyTable<QueryArgs extends QueryArgsType> extends Vue {
                         <Divider size='small' />
                         <Row gutter={5} type="flex" justify="end">
                             <Col>
-                                <Button type="primary" loading={this.loading} onClick={() => {
+                                <Button type="primary" loading={this.loading} on-click={() => {
                                     this._onQueryClick();
                                 }}>查询</Button>
                             </Col>
