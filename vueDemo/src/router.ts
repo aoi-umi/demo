@@ -15,9 +15,17 @@ export const routerConfig = {
     text: '书签',
     component: () => import('./views/bookmark')
   },
-  test: {
-    path: '/test',
-    text: 'Test',
+  user: {
+    path: '/user',
+    text: '用户',
+  },
+  role: {
+    path: '/role',
+    text: '角色',
+  },
+  authority: {
+    path: '/authority',
+    text: '权限',
   },
 
   error: {
