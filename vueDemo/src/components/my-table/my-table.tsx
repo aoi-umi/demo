@@ -14,6 +14,10 @@ type QueryArgsType = {
         placeholder?: string;
     }
 }
+
+const event = {
+    addClick: 'add-click'
+};
 @Component
 class MyTable<QueryArgs extends QueryArgsType> extends Vue {
     @Prop()
@@ -31,11 +35,18 @@ class MyTable<QueryArgs extends QueryArgsType> extends Vue {
     queryArgs?: QueryArgs;
 
     @Prop()
-    queryFn?: (query: MyTableModel<{ [k in keyof QueryArgs]: any }>) => ListResult | Promise<ListResult>;
+    hideQueryBtn?: {
+        all?: boolean;
+        add?: boolean;
+        reset?: boolean;
+        query?: boolean;
+    };
 
-    protected created() {
-        this.$emit('created', this);
-    }
+    @Prop()
+    customOperateView: any;
+
+    @Prop()
+    queryFn?: (query: MyTableModel<{ [k in keyof QueryArgs]: any }>) => ListResult | Promise<ListResult>;
 
     public query() {
         this._onQueryClick();
@@ -66,17 +77,18 @@ class MyTable<QueryArgs extends QueryArgsType> extends Vue {
         }
     }
 
-    showQuery = true;
-    loading = false;
-    model = new MyTableModel<QueryArgs>();
-    result = {
+    private showQuery = true;
+    private loading = false;
+    private model = new MyTableModel<{ [k in keyof QueryArgs]: any }>();
+    private result = {
         success: true,
         total: 0,
         msg: '',
         data: []
     };
 
-    render() {
+    protected render() {
+        let hideQueryBtn = this.hideQueryBtn || {};
         return (
             <div>
                 <Card>
@@ -86,7 +98,7 @@ class MyTable<QueryArgs extends QueryArgsType> extends Vue {
                             <Icon type={this.showQuery ? 'ios-arrow-up' : 'ios-arrow-down'} />
                         </div>
                     </div>
-                    <div class={this.showQuery ? '' : 'hidden'} onKeypress={this._onQueryPress}>
+                    <div class={this.showQuery ? '' : 'hidden'} on-keypress={this._onQueryPress}>
                         <Row gutter={5}>
                             {this.queryArgs && Object.entries(this.queryArgs).map(entry => {
                                 let key = entry[0];
@@ -94,18 +106,39 @@ class MyTable<QueryArgs extends QueryArgsType> extends Vue {
                                 return (
                                     <Col style={{ marginBottom: '5px' }} xs={24} sm={8} md={6}>
                                         {ele.label || key}
-                                        <Input placeholder={ele.placeholder} v-model={this.model.query[key]}></Input>
+                                        <Input placeholder={ele.placeholder} v-model={this.model.query[key]} />
                                     </Col>
                                 );
                             })}
                         </Row>
                         <Divider size='small' />
                         <Row gutter={5} type="flex" justify="end">
-                            <Col>
-                                <Button type="primary" loading={this.loading} on-click={() => {
-                                    this._onQueryClick();
-                                }}>查询</Button>
-                            </Col>
+                            {(!hideQueryBtn.all && !hideQueryBtn.reset) &&
+                                <Col>
+                                    <Button on-click={() => {
+                                        if (this.queryArgs) {
+                                            for (let key in this.queryArgs) {
+                                                this.model.query[key] = '';
+                                            }
+                                        }
+                                    }}>重置</Button>
+                                </Col>
+                            }
+                            {(!hideQueryBtn.all && !hideQueryBtn.query) &&
+                                <Col>
+                                    <Button type="primary" loading={this.loading} on-click={() => {
+                                        this._onQueryClick();
+                                    }}>查询</Button>
+                                </Col>
+                            }
+                            {(!hideQueryBtn.all && !hideQueryBtn.add) &&
+                                <Col>
+                                    <Button on-click={() => {
+                                        this.$emit(event.addClick);
+                                    }}>新增</Button>
+                                </Col>
+                            }
+                            {this.customOperateView}
                         </Row>
                     </div>
                 </Card>
@@ -129,6 +162,7 @@ class MyTable<QueryArgs extends QueryArgsType> extends Vue {
     }
 }
 
+export interface IMyTable<T extends QueryArgsType> extends MyTable<T> { }
 const MyTableView = MyTable as {
     new <T extends QueryArgsType>(props: Partial<MyTable<T>> & VueComponentOptions): any;
 }

@@ -1,1 +1,0 @@
-export { default as MyTable } from './my-table';
