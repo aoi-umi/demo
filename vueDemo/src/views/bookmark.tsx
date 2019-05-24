@@ -178,7 +178,7 @@ export default class Bookmark extends Vue {
                         title: 'url',
                         key: 'url',
                         render: (h, params) => {
-                            return (<a href={params.row.url}>{params.row.url}</a>);
+                            return (<a target="_blank" href={params.row.url}>{params.row.url}</a>);
                         }
                     }, {
                         title: '操作',
