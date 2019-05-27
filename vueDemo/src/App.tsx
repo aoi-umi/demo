@@ -4,9 +4,8 @@ import * as router from './router';
 const routeConfig = router.routerConfig;
 import "./App.less";
 import {
-    Button, Drawer,
     Menu, MenuItem, Submenu, MenuGroup,
-    Icon, Content, Sider, Layout, Header
+    Icon, Content, Sider, Layout, Header,
 } from "./components/iview";
 
 @Component

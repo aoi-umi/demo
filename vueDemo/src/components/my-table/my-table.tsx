@@ -54,6 +54,7 @@ class MyTable<QueryArgs extends QueryArgsType> extends Vue {
     private async _onQueryClick() {
         this.loading = true;
         try {
+            this.selectedRows = [];
             this.result.success = true;
             this.result.data = [];
             this.result.total = 0;
@@ -76,6 +77,16 @@ class MyTable<QueryArgs extends QueryArgsType> extends Vue {
             this._onQueryClick();
         }
     }
+
+
+    private selectedRows = [];
+    private setSelectedRows(selection) {
+        this.selectedRows = selection;
+    }
+
+    //批量操作
+    @Prop({ default: () => [] })
+    multiOperateBtnList: { text: string; onClick: (selection: any[]) => void }[];
 
     private showQuery = true;
     private loading = false;
@@ -144,7 +155,8 @@ class MyTable<QueryArgs extends QueryArgsType> extends Vue {
                 </Card>
                 <div style={{ position: 'relative', }}>
                     <Table style={{ marginTop: '10px' }} stripe columns={this.columns}
-                        data={this.result.data} no-data-text={this.result.msg}>
+                        data={this.result.data} no-data-text={this.result.msg}
+                        on-on-selection-change={this.setSelectedRows}>
                     </Table>
                     <Page class="page" total={this.result.total}
                         show-total show-elevator show-sizer
@@ -157,6 +169,15 @@ class MyTable<QueryArgs extends QueryArgsType> extends Vue {
                         }} />
                     {this.loading && <Spin size="large" fix></Spin>}
                 </div>
+                {this.multiOperateBtnList.length > 0 && this.selectedRows.length > 0 &&
+                    <Card class="bottom-bar">
+                        {this.multiOperateBtnList.map(ele => {
+                            return (
+                                <Button on-click={() => { ele.onClick && ele.onClick(this.selectedRows) }}>{ele.text}</Button>
+                            );
+                        })}
+                    </Card>
+                }
             </div>
         );
     }

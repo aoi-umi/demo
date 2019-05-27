@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig } from 'axios';
 
-export function convertToClass<typeofT, T = {}>(t) {
+export function convClass<typeofT, T = {}>(t) {
     return t as {
         new(props: Partial<typeofT & T> & VueComponentOptions): any
     };
