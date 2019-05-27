@@ -4,6 +4,7 @@ import { testApi } from '@/api';
 import { Tag, Modal, Input, Row, Col, Form, FormItem, Button } from '@/components/iview';
 import { MyTable, IMyTable } from '@/components/my-table';
 import { MyTagModel, myTag } from '@/components/my-tag';
+import { MyConfirm } from '@/components/my-confirm';
 
 type DetailDataType = {
     _id?: string;
@@ -129,12 +130,26 @@ const BookmarkDetailView = BookmarkDetail as {
 @Component
 export default class Bookmark extends Vue {
     detailShow = false;
+    delShow = false;
     detail: any;
     get innerRefs() {
         return this.$refs as { table: IMyTable<any> };
     }
     mounted() {
         this.innerRefs.table.query();
+    }
+
+    delIds = [];
+    async delClick() {
+        try {
+            await testApi.bookmarkDel(this.delIds);
+            this.$Message.info('删除成功');
+            this.delIds = [];
+            this.delShow = false;
+            this.innerRefs.table.query();
+        } catch (e) {
+            this.$Message.error('删除失败:' + e.message);
+        }
     }
     protected render() {
         return (
@@ -144,6 +159,17 @@ export default class Bookmark extends Vue {
                         this.detailShow = false;
                         this.innerRefs.table.query();
                     }} />
+                </Modal>
+                <Modal v-model={this.delShow} footer-hide>
+                    <MyConfirm title='确认删除?' loading={true}
+                        cancel={() => {
+                            this.delShow = false;
+                        }}
+                        ok={async () => {
+                            await this.delClick();
+                        }}>
+                        {`将要删除${this.delIds.length}项`}
+                    </MyConfirm>
                 </Modal>
                 <MyTable
                     ref="table"
@@ -192,22 +218,9 @@ export default class Bookmark extends Vue {
                                         this.detail = params.row;
                                         this.detailShow = true;
                                     }}>编辑</a>
-                                    <a on-click={async () => {
-                                        this.$Modal.confirm({
-                                            title: '确认删除?',
-                                            loading: true,
-                                            onOk: async () => {
-                                                try {
-                                                    await testApi.bookmarkDel([params.row._id]);
-                                                    this.$Message.info('删除成功');
-                                                    this.$Modal.remove();
-                                                    this.innerRefs.table.query();
-                                                } catch (e) {
-                                                    this.$Message.error('删除失败:' + e.message);
-                                                } finally {
-                                                }
-                                            }
-                                        });
+                                    <a on-click={() => {
+                                        this.delIds = [params.row._id];
+                                        this.delShow = true;
                                     }}>删除</a>
                                 </div>
                             );
@@ -235,6 +248,14 @@ export default class Bookmark extends Vue {
                         this.detail = null;
                         this.detailShow = true;
                     }}
+
+                    multiOperateBtnList={[{
+                        text: '批量删除',
+                        onClick: (selection) => {
+                            this.delIds = selection.map(ele => ele._id);
+                            this.delShow = true;
+                        }
+                    }]}
                 ></MyTable>
             </div>
         );
