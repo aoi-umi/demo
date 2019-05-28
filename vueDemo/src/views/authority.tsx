@@ -112,9 +112,15 @@ export default class Authority extends Vue {
     get innerRefs() {
         return this.$refs as { table: IMyTable<any> };
     }
-    mounted() {
+    protected created() {
+        this.statusList = myEnum.authorityStatus.toArray().map(ele => {
+            ele['checked'] = false;
+            return ele;
+        });
+
+    }
+    protected mounted() {
         this.innerRefs.table.query();
-        this.statusList = myEnum.authorityStatus.toArray();
     }
 
     delIds = [];
@@ -241,6 +247,12 @@ export default class Authority extends Vue {
                         this.detailShow = true;
                     }}
 
+                    on-reset-click={() => {
+                        this.statusList.forEach(ele => {
+                            ele.checked = false;
+                        });
+                    }}
+
                     multiOperateBtnList={[{
                         text: '批量删除',
                         onClick: (selection) => {
@@ -248,7 +260,8 @@ export default class Authority extends Vue {
                             this.delShow = true;
                         }
                     }]}
-                ></MyTable>
+                >
+                </MyTable>
             </div>
         );
     }
