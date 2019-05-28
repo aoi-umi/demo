@@ -35,6 +35,9 @@ class MyTable<QueryArgs extends QueryArgsType> extends Vue {
     queryArgs?: QueryArgs;
 
     @Prop()
+    customQueryNode?: any;
+
+    @Prop()
     hideQueryBtn?: {
         all?: boolean;
         add?: boolean;
@@ -98,6 +101,14 @@ class MyTable<QueryArgs extends QueryArgsType> extends Vue {
         data: []
     };
 
+    private get bottomBarClass() {
+        let cls = ['bottom-bar'];
+        if (this.multiOperateBtnList.length && this.selectedRows.length) {
+            cls.push('active');
+        }
+        return cls;
+    }
+
     protected render() {
         let hideQueryBtn = this.hideQueryBtn || {};
         return (
@@ -122,6 +133,7 @@ class MyTable<QueryArgs extends QueryArgsType> extends Vue {
                                 );
                             })}
                         </Row>
+                        {this.customQueryNode}
                         <Divider size='small' />
                         <Row gutter={5} type="flex" justify="end">
                             {(!hideQueryBtn.all && !hideQueryBtn.reset) &&
@@ -159,25 +171,25 @@ class MyTable<QueryArgs extends QueryArgsType> extends Vue {
                         on-on-selection-change={this.setSelectedRows}>
                     </Table>
                     <Page class="page" total={this.result.total}
+                        current={this.model.page.index}
                         show-total show-elevator show-sizer
                         on-on-change={(page) => {
                             this.model.page.index = page;
                             this._onQueryClick();
                         }}
                         on-on-page-size-change={(size) => {
+                            this.model.page.index = 1;
                             this.model.page.size = size;
                         }} />
                     {this.loading && <Spin size="large" fix></Spin>}
                 </div>
-                {this.multiOperateBtnList.length > 0 && this.selectedRows.length > 0 &&
-                    <Card class="bottom-bar">
-                        {this.multiOperateBtnList.map(ele => {
-                            return (
-                                <Button on-click={() => { ele.onClick && ele.onClick(this.selectedRows) }}>{ele.text}</Button>
-                            );
-                        })}
-                    </Card>
-                }
+                <Card class={this.bottomBarClass}>
+                    {this.multiOperateBtnList.map(ele => {
+                        return (
+                            <Button on-click={() => { ele.onClick && ele.onClick(this.selectedRows) }}>{ele.text}</Button>
+                        );
+                    })}
+                </Card>
             </div>
         );
     }

@@ -7,6 +7,7 @@ export const BackTop = convClass<iviewTypes.BackTop>(iview.BackTop);
 export const Button = convClass<iviewTypes.Button>(iview.Button);
 export const Content = convClass<iviewTypes.Content>(iview.Content);
 export const Card = convClass<iviewTypes.Card>(iview.Card);
+export const Checkbox = convClass<iviewTypes.Checkbox>(iview.Checkbox);
 export const Drawer = convClass<iviewTypes.Drawer>(iview.Drawer);
 export const Divider = convClass<iviewTypes.Divider>(iview.Divider);
 export const Form = convClass<iviewTypes.Form>(iview.Form);
