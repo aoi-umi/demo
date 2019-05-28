@@ -32,5 +32,6 @@ export const Submenu = convClass<any>(iview.Submenu);
 
 export const Sider = convClass<any>(iview.Sider);
 export const Spin = convClass<iviewTypes.Spin>(iview.Spin);
+export const Switch = convClass<iviewTypes.Switch>(iview.Switch);
 export const Table = convClass<iviewTypes.Table>(iview.Table);
 export const Tag = convClass<iviewTypes.Tag>(iview.Tag);

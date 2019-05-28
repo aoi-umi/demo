@@ -2,9 +2,8 @@ import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { Form as IForm } from 'iview';
 import { testApi } from '@/api';
 import { myEnum } from '@/config/enum';
-import { Tag, Modal, Input, Row, Col, Form, FormItem, Button, Checkbox } from '@/components/iview';
+import { Modal, Input, Form, FormItem, Button, Checkbox, Switch } from '@/components/iview';
 import { MyTable, IMyTable } from '@/components/my-table';
-import { MyTagModel, myTag } from '@/components/my-tag';
 import { MyConfirm } from '@/components/my-confirm';
 import { convClass } from '@/helpers';
 
@@ -21,7 +20,8 @@ class AuthorityDetail extends Vue {
 
     @Watch('detail')
     updateDetail(newVal) {
-        this.innerDetail = newVal || this.getDetailData();
+        let data = newVal || this.getDetailData();
+        this.initDetail(data);
     }
     private innerDetail: DetailDataType = {};
     private getDetailData() {
@@ -31,6 +31,10 @@ class AuthorityDetail extends Vue {
             code: '',
             status: myEnum.authorityStatus.启用
         };
+    }
+
+    private initDetail(data) {
+        this.innerDetail = data;
     }
 
     private rules = {
@@ -54,8 +58,10 @@ class AuthorityDetail extends Vue {
                 _id: detail._id,
                 name: detail.name,
                 code: detail.code,
+                status: detail.status,
             });
             this.$emit('save-success', rs);
+            this.initDetail(this.getDetailData());
         } catch (e) {
             this.$Message.error('出错了:' + e.message);
         } finally {
@@ -70,6 +76,9 @@ class AuthorityDetail extends Vue {
                 <h3>{detail._id ? '修改' : '新增'}</h3>
                 <br />
                 <Form label-width={50} ref="formVaild" props={{ model: detail }} rules={this.rules}>
+                    <FormItem label="状态" prop="status">
+                        <Switch v-model={detail.status} true-value={myEnum.authorityStatus.启用} false-value={myEnum.authorityStatus.禁用} />
+                    </FormItem>
                     <FormItem label="名字" prop="name">
                         <Input v-model={detail.name} />
                     </FormItem>
@@ -119,6 +128,16 @@ export default class Authority extends Vue {
             this.innerRefs.table.query();
         } catch (e) {
             this.$Message.error('删除失败:' + e.message);
+        }
+    }
+    private async updateStatus(detail: DetailDataType) {
+        try {
+            let toStatus = detail.status == myEnum.authorityStatus.启用 ? myEnum.authorityStatus.禁用 : myEnum.authorityStatus.启用;
+            await testApi.authorityUpdate({ _id: detail._id, status: toStatus });
+            detail.status = toStatus;
+            this.$Message.info('修改成功');
+        } catch (e) {
+            this.$Message.error('修改失败:' + e.message);
         }
     }
     protected render() {
@@ -184,16 +203,20 @@ export default class Authority extends Vue {
                         title: '操作',
                         key: 'action',
                         fixed: 'right',
-                        width: 120,
+                        width: 150,
                         render: (h, params) => {
+                            let detail = params.row;
                             return (
                                 <div class="action-box">
                                     <a on-click={() => {
-                                        this.detail = params.row;
+                                        this.updateStatus(detail);
+                                    }}>{detail.status == myEnum.authorityStatus.启用 ? '禁用' : '启用'}</a>
+                                    <a on-click={() => {
+                                        this.detail = detail;
                                         this.detailShow = true;
                                     }}>编辑</a>
                                     <a on-click={() => {
-                                        this.delIds = [params.row._id];
+                                        this.delIds = [detail._id];
                                         this.delShow = true;
                                     }}>删除</a>
                                 </div>
