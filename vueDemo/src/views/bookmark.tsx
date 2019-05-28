@@ -23,8 +23,8 @@ class BookmarkDetail extends Vue {
 
     @Watch('detail')
     updateDetail(newVal) {
-        this.innerDetail = newVal || this.getDetailData();
-        this.tagModel = new MyTagModel(this.innerDetail.tagList);
+        let data = newVal || this.getDetailData();
+        this.initDetail(data);
     }
     private innerDetail: DetailDataType = {};
     private getDetailData() {
@@ -34,6 +34,11 @@ class BookmarkDetail extends Vue {
             url: '',
             tagList: []
         };
+    }
+
+    private initDetail(data) {
+        this.innerDetail = data;
+        this.tagModel = new MyTagModel(this.innerDetail.tagList);
     }
 
     private rules = {
@@ -77,6 +82,7 @@ class BookmarkDetail extends Vue {
                 delTagList,
             });
             this.$emit('save-success', rs);
+            this.initDetail(this.getDetailData());
         } catch (e) {
             this.$Message.error('出错了:' + e.message);
         } finally {
