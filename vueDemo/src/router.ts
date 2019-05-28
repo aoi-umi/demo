@@ -26,6 +26,7 @@ export const routerConfig = {
   authority: {
     path: '/authority',
     text: '权限',
+    component: () => import('./views/authority')
   },
 
   error: {

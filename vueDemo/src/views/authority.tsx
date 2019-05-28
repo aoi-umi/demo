@@ -1,7 +1,8 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { Form as IForm } from 'iview';
 import { testApi } from '@/api';
-import { Tag, Modal, Input, Row, Col, Form, FormItem, Button } from '@/components/iview';
+import { myEnum } from '@/config/enum';
+import { Tag, Modal, Input, Row, Col, Form, FormItem, Button, Checkbox } from '@/components/iview';
 import { MyTable, IMyTable } from '@/components/my-table';
 import { MyTagModel, myTag } from '@/components/my-tag';
 import { MyConfirm } from '@/components/my-confirm';
@@ -10,29 +11,25 @@ import { convClass } from '@/helpers';
 type DetailDataType = {
     _id?: string;
     name?: string;
-    url?: string;
-    tagList?: string[];
+    code?: string;
+    status?: number;
 }
 @Component
-class BookmarkDetail extends Vue {
+class AuthorityDetail extends Vue {
     @Prop()
     detail: any;
-
-    tag = '';
-    tagModel: MyTagModel;
 
     @Watch('detail')
     updateDetail(newVal) {
         this.innerDetail = newVal || this.getDetailData();
-        this.tagModel = new MyTagModel(this.innerDetail.tagList);
     }
     private innerDetail: DetailDataType = {};
     private getDetailData() {
         return {
             _id: '',
             name: '',
-            url: '',
-            tagList: []
+            code: '',
+            status: myEnum.authorityStatus.启用
         };
     }
 
@@ -40,7 +37,7 @@ class BookmarkDetail extends Vue {
         name: [
             { required: true, trigger: 'blur' }
         ],
-        url: [
+        code: [
             { required: true, trigger: 'blur' }
         ],
     };
@@ -48,33 +45,15 @@ class BookmarkDetail extends Vue {
         return this.$refs as { formVaild: IForm }
     }
 
-    addTag() {
-        let tag = this.tag && this.tag.trim();
-        if (tag) {
-            this.tagModel.addTag(tag);
-            this.tag = '';
-        }
-    }
-
     saving = false;
     async save() {
         this.saving = true;
         let detail = this.innerDetail;
         try {
-            let addTagList = [], delTagList = [];
-            this.tagModel.tagList.map(ele => {
-                if (ele.add && ele.selected) {
-                    addTagList.push(ele.tag);
-                } else if (!ele.add && !ele.selected) {
-                    delTagList.push(ele.tag);
-                }
-            });
-            let rs = await testApi.bookmarkSave({
+            let rs = await testApi.authoritySave({
                 _id: detail._id,
                 name: detail.name,
-                url: detail.url,
-                addTagList,
-                delTagList,
+                code: detail.code,
             });
             this.$emit('save-success', rs);
         } catch (e) {
@@ -94,18 +73,8 @@ class BookmarkDetail extends Vue {
                     <FormItem label="名字" prop="name">
                         <Input v-model={detail.name} />
                     </FormItem>
-                    <FormItem label="url" prop="url">
-                        <Input v-model={detail.url} />
-                    </FormItem>
-                    <FormItem label="标签" >
-                        {this.tagModel && this.tagModel.renderTag()}
-                        <br />
-                        <Row gutter={10}>
-                            <Col span={20}>
-                                <Input placeholder="回车或点及按钮添加" v-model={this.tag} on-on-enter={this.addTag} />
-                            </Col>
-                            <Col span={4}><Button on-click={this.addTag}>添加</Button></Col>
-                        </Row>
+                    <FormItem label="编码" prop="code">
+                        <Input v-model={detail.code} />
                     </FormItem>
                     <FormItem>
                         <Button type="primary" on-click={() => {
@@ -124,11 +93,10 @@ class BookmarkDetail extends Vue {
     }
 }
 
-const BookmarkDetailView = convClass<BookmarkDetail>(BookmarkDetail);
-
+const AuthorityDetailView = convClass<AuthorityDetail>(AuthorityDetail);
 
 @Component
-export default class Bookmark extends Vue {
+export default class Authority extends Vue {
     detailShow = false;
     delShow = false;
     detail: any;
@@ -137,12 +105,14 @@ export default class Bookmark extends Vue {
     }
     mounted() {
         this.innerRefs.table.query();
+        this.statusList = myEnum.authorityStatus.toArray();
     }
 
     delIds = [];
+    statusList: { key: string; value: any, checked?: boolean }[] = [];
     async delClick() {
         try {
-            await testApi.bookmarkDel(this.delIds);
+            await testApi.authorityDel(this.delIds);
             this.$Message.info('删除成功');
             this.delIds = [];
             this.delShow = false;
@@ -155,7 +125,7 @@ export default class Bookmark extends Vue {
         return (
             <div>
                 <Modal v-model={this.detailShow} footer-hide mask-closable={false}>
-                    <BookmarkDetailView detail={this.detail} on-save-success={() => {
+                    <AuthorityDetailView detail={this.detail} on-save-success={() => {
                         this.detailShow = false;
                         this.innerRefs.table.query();
                     }} />
@@ -177,34 +147,38 @@ export default class Bookmark extends Vue {
                         name: {
                             label: '名字',
                         },
-                        url: {},
+                        code: {
+                            label: '编码',
+                        },
                         anyKey: {
                             label: '任意字'
                         }
                     }}
+                    customQueryNode={this.statusList.map(ele => {
+                        return (
+                            <label style={{ marginRight: '5px' }}>
+                                <Checkbox v-model={ele.checked} />{ele.key}
+                            </label>
+                        );
+                    })}
+
                     columns={[{
                         key: '_selection',
                         type: 'selection',
                         width: 60,
                         align: 'center'
                     }, {
-                        key: '_expand',
-                        type: 'expand',
-                        width: 30,
-                        render: (h, params) => {
-                            let tagList = params.row.tagList
-                            if (tagList && tagList.length) {
-                                return myTag.renderTag(tagList);
-                            }
-                        }
-                    }, {
                         title: '名字',
                         key: 'name'
                     }, {
-                        title: 'url',
-                        key: 'url',
+                        title: '编码',
+                        key: 'code',
+                    }, {
+                        title: '状态',
+                        key: 'status',
                         render: (h, params) => {
-                            return (<a target="_blank" href={params.row.url}>{params.row.url}</a>);
+                            let text = myEnum.authorityStatus.getKey(params.row.status);
+                            return <span>{text}</span>;
                         }
                     }, {
                         title: '操作',
@@ -229,18 +203,13 @@ export default class Bookmark extends Vue {
 
                     queryFn={async (model) => {
                         let q = { ...model.query };
-                        let rs = await testApi.bookmarkQuery({
+                        let rs = await testApi.authorityQuery({
                             ...q,
+                            status: this.statusList.filter(ele => ele.checked).map(ele => ele.value).join(','),
                             page: model.page.index,
                             rows: model.page.size
                         });
 
-                        rs.rows.forEach(ele => {
-                            if (!ele.tagList || !ele.tagList.length)
-                                ele._disableExpand = true;
-                            else
-                                ele._expanded = true;
-                        });
                         return rs;
                     }}
 
