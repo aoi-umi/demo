@@ -16,7 +16,8 @@ type QueryArgsType = {
 }
 
 const event = {
-    addClick: 'add-click'
+    addClick: 'add-click',
+    resetClick: 'reset-click'
 };
 @Component
 class MyTable<QueryArgs extends QueryArgsType> extends Vue {
@@ -109,6 +110,14 @@ class MyTable<QueryArgs extends QueryArgsType> extends Vue {
         return cls;
     }
 
+    private resetQueryArgs() {
+        if (this.queryArgs) {
+            for (let key in this.queryArgs) {
+                this.$set(this.model.query, key, '');
+            }
+        }
+    }
+
     protected render() {
         let hideQueryBtn = this.hideQueryBtn || {};
         return (
@@ -139,11 +148,8 @@ class MyTable<QueryArgs extends QueryArgsType> extends Vue {
                             {(!hideQueryBtn.all && !hideQueryBtn.reset) &&
                                 <Col>
                                     <Button on-click={() => {
-                                        if (this.queryArgs) {
-                                            for (let key in this.queryArgs) {
-                                                this.model.query[key] = '';
-                                            }
-                                        }
+                                        this.resetQueryArgs();
+                                        this.$emit(event.resetClick);
                                     }}>重置</Button>
                                 </Col>
                             }

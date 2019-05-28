@@ -27,7 +27,6 @@ class MyConfirm extends Vue {
 
     private get innerBtnList() {
         return this.btnList || [{
-            loading: false,
             text: '取消',
             onClick: (e) => {
                 this.cancel && this.cancel(e);
