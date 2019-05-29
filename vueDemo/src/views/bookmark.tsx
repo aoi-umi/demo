@@ -3,7 +3,7 @@ import { Form as IForm } from 'iview';
 import { testApi } from '@/api';
 import { Tag, Modal, Input, Row, Col, Form, FormItem, Button } from '@/components/iview';
 import { MyTable, IMyTable, Const as MyTableConst } from '@/components/my-table';
-import { MyTagModel, myTag } from '@/components/my-tag';
+import { MyTagModel } from '@/components/my-tag';
 import { MyConfirm } from '@/components/my-confirm';
 import { convClass } from '@/helpers';
 
@@ -66,14 +66,7 @@ class BookmarkDetail extends Vue {
         this.saving = true;
         let detail = this.innerDetail;
         try {
-            let addTagList = [], delTagList = [];
-            this.tagModel.tagList.map(ele => {
-                if (ele.add && ele.selected) {
-                    addTagList.push(ele.tag);
-                } else if (!ele.add && !ele.selected) {
-                    delTagList.push(ele.tag);
-                }
-            });
+            let { addTagList, delTagList } = this.tagModel.getChangeTag('key');
             let rs = await testApi.bookmarkSave({
                 _id: detail._id,
                 name: detail.name,
@@ -108,7 +101,7 @@ class BookmarkDetail extends Vue {
                         <br />
                         <Row gutter={10}>
                             <Col span={20}>
-                                <Input placeholder="回车或点及按钮添加" v-model={this.tag} on-on-enter={this.addTag} />
+                                <Input placeholder="回车或点击按钮添加" v-model={this.tag} on-on-enter={this.addTag} />
                             </Col>
                             <Col span={4}><Button on-click={this.addTag}>添加</Button></Col>
                         </Row>
@@ -200,7 +193,7 @@ export default class Bookmark extends Vue {
                         render: (h, params) => {
                             let tagList = params.row.tagList
                             if (tagList && tagList.length) {
-                                return myTag.renderTag(tagList);
+                                return MyTagModel.renderTag(tagList);
                             }
                         }
                     }, {

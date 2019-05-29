@@ -274,14 +274,8 @@ class BookmarkDetail extends React.Component<DetailProps>{
         try {
             btnModel.load();
             let field = model.field;
-            let addTagList = [], delTagList = [];
-            model.tagModel.tagList.map(ele => {
-                if (1 == ele.status) {
-                    addTagList.push(ele.id);
-                } else if (0 == ele.origStatus && -1 == ele.status) {
-                    delTagList.push(ele.id);
-                }
-            });
+            
+            let { addTagList, delTagList } = model.tagModel.getChangeTag('id');            
             await testApi.bookmarkSave({
                 _id: field._id,
                 name: field.name,

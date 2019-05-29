@@ -1,7 +1,7 @@
 import { Vue } from 'vue-property-decorator';
 import { Tag } from '@/components/iview';
 import { TagType } from './model';
-class MyTag extends Vue {
+export class MyTag extends Vue {
     renderTag(tagList: (string | TagType)[]) {
         return tagList.map(ele => {
             if (typeof ele === 'string') {
@@ -16,5 +16,3 @@ class MyTag extends Vue {
         });
     }
 }
-
-export const myTag = new MyTag();
