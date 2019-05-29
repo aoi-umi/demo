@@ -7,8 +7,9 @@ class MyTag extends Vue {
             if (typeof ele === 'string') {
                 return <Tag color="blue">{ele}</Tag>
             }
+            let checkable = (ele as Object).hasOwnProperty('checkable') ? ele.checkable : false;
             return (
-                <Tag color="blue" checkable checked={ele.selected} on-on-change={(checked) => {
+                <Tag color={ele.color as any || "blue"} checkable={checkable} checked={ele.selected} on-on-change={(checked) => {
                     ele.selected = checked;
                 }}> {ele.tag} </Tag>
             )

@@ -3,7 +3,7 @@ import { Form as IForm } from 'iview';
 import { testApi } from '@/api';
 import { myEnum } from '@/config/enum';
 import { Modal, Input, Form, FormItem, Button, Checkbox, Switch } from '@/components/iview';
-import { MyTable, IMyTable } from '@/components/my-table';
+import { MyTable, IMyTable, Const as MyTableConst } from '@/components/my-table';
 import { MyConfirm } from '@/components/my-confirm';
 import { convClass } from '@/helpers';
 
@@ -213,7 +213,7 @@ export default class Authority extends Vue {
                         render: (h, params) => {
                             let detail = params.row;
                             return (
-                                <div class="action-box">
+                                <div class={MyTableConst.clsPrefix + "action-box"}>
                                     <a on-click={() => {
                                         this.updateStatus(detail);
                                     }}>{detail.status == myEnum.authorityStatus.启用 ? '禁用' : '启用'}</a>

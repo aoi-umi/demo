@@ -3,6 +3,7 @@ const iview = require("iview");
 
 import { convClass } from "../helpers";
 
+export const AutoComplete = convClass<iviewTypes.AutoComplete>(iview.AutoComplete);
 export const BackTop = convClass<iviewTypes.BackTop>(iview.BackTop);
 export const Button = convClass<iviewTypes.Button>(iview.Button);
 export const Content = convClass<iviewTypes.Content>(iview.Content);
@@ -28,8 +29,10 @@ export const Menu = convClass<iviewTypes.Menu>(iview.Menu);
 export const MenuGroup = convClass<iviewTypes.MenuGroup>(iview.MenuGroup);
 export const MenuItem = convClass<iviewTypes.MenuItem>(iview.MenuItem);
 export const MenuSub = convClass<iviewTypes.MenuSub>(iview.MenuSub);
+export const Option = convClass<iviewTypes.Option>(iview.Option);
 export const Submenu = convClass<any>(iview.Submenu);
 
+export const Select = convClass<iviewTypes.Select>(iview.Select);
 export const Sider = convClass<any>(iview.Sider);
 export const Spin = convClass<iviewTypes.Spin>(iview.Spin);
 export const Switch = convClass<iviewTypes.Switch>(iview.Switch);

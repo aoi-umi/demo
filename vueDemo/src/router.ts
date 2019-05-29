@@ -22,6 +22,7 @@ export const routerConfig = {
   role: {
     path: '/role',
     text: '角色',
+    component: () => import('./views/role')
   },
   authority: {
     path: '/authority',

@@ -1,5 +1,4 @@
 import Vue, { VNode } from 'vue';
-import * as iviewTypes from 'iview';
 
 declare global {
   namespace JSX {
