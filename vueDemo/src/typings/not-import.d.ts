@@ -1,4 +1,4 @@
-interface VueComponentOptions {    
+interface VueComponentOptions {
     ref?: any;
     class?: any;
     style?: { [key: string]: any };

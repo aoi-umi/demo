@@ -19,6 +19,11 @@ const event = {
     addClick: 'add-click',
     resetClick: 'reset-click'
 };
+const clsPrefix = 'my-table-';
+
+export const Const = {
+    clsPrefix
+};
 @Component
 class MyTable<QueryArgs extends QueryArgsType> extends Vue {
     @Prop()
@@ -176,7 +181,7 @@ class MyTable<QueryArgs extends QueryArgsType> extends Vue {
                         data={this.result.data} no-data-text={this.result.msg}
                         on-on-selection-change={this.setSelectedRows}>
                     </Table>
-                    <Page class="page" total={this.result.total}
+                    <Page class={clsPrefix + "page"} total={this.result.total}
                         current={this.model.page.index}
                         show-total show-elevator show-sizer
                         on-on-change={(page) => {
@@ -189,7 +194,7 @@ class MyTable<QueryArgs extends QueryArgsType> extends Vue {
                         }} />
                     {this.loading && <Spin size="large" fix></Spin>}
                 </div>
-                <Card class={this.bottomBarClass}>
+                <Card class={clsPrefix + this.bottomBarClass}>
                     {this.multiOperateBtnList.map(ele => {
                         return (
                             <Button on-click={() => { ele.onClick && ele.onClick(this.selectedRows) }}>{ele.text}</Button>
