@@ -6,7 +6,7 @@ import { Modal, Input, Form, FormItem, Button, Checkbox, Switch, Select } from '
 import { MyTable, IMyTable, Const as MyTableConst } from '@/components/my-table';
 import { MyConfirm } from '@/components/my-confirm';
 import { convClass } from '@/helpers';
-import { myTag, MyTagModel } from '@/components/my-tag';
+import { MyTagModel } from '@/components/my-tag';
 
 type DetailDataType = {
     _id?: string;
@@ -68,11 +68,14 @@ class RoleDetail extends Vue {
         this.saving = true;
         let detail = this.innerDetail;
         try {
+            let { addTagList, delTagList } = this.tagModel.getChangeTag('key');
             let rs = await testApi.roleSave({
                 _id: detail._id,
                 name: detail.name,
                 code: detail.code,
                 status: detail.status,
+                addAuthList: addTagList,
+                delAuthList: delTagList,
             });
             this.$emit('save-success', rs);
             this.initDetail(this.getDetailData());
@@ -261,7 +264,7 @@ export default class Role extends Vue {
                         render: (h, params) => {
                             let authorityList = params.row.authorityList
                             if (authorityList && authorityList.length) {
-                                return myTag.renderTag(authorityList.map(ele => {
+                                return MyTagModel.renderTag(authorityList.map(ele => {
                                     return {
                                         tag: `${ele.name}(${ele.code})`,
                                         color: ele.status == myEnum.authorityStatus.启用 ? '' : 'default'

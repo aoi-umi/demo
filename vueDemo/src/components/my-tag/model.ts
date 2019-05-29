@@ -1,5 +1,5 @@
-import { myTag } from './my-tag';
-
+import { MyTag } from './my-tag';
+const myTag = new MyTag();
 export type TagType = {
     add: boolean;
     key: string;
@@ -84,5 +84,25 @@ export class MyTagModel {
 
     renderTag() {
         return myTag.renderTag(this.tagList);
+    }
+
+    static renderTag(tagList: (string | TagType)[]) {
+        return myTag.renderTag(tagList);
+    }
+
+    getChangeTag(key?: string) {
+        type returnType = TagType | any;
+        let addTagList: returnType[] = [], delTagList: returnType[] = [];
+        this.tagList.map(ele => {
+            if (ele.add && ele.selected) {
+                addTagList.push(key ? ele[key] : ele);
+            } else if (!ele.add && !ele.selected) {
+                delTagList.push(key ? ele[key] : ele);
+            }
+        });
+        return {
+            addTagList,
+            delTagList,
+        }
     }
 }

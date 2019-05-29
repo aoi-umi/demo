@@ -31,7 +31,7 @@ export class TagModel {
             if (1 == ele.status) {
                 addTagList.push(key ? ele[key] : ele);
             } else if (0 == ele.origStatus && -1 == ele.status) {
-                addTagList.push(key ? ele[key] : ele);
+                delTagList.push(key ? ele[key] : ele);
             }
         });
         return {
