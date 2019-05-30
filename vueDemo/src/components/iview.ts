@@ -38,3 +38,4 @@ export const Spin = convClass<iviewTypes.Spin>(iview.Spin);
 export const Switch = convClass<iviewTypes.Switch>(iview.Switch);
 export const Table = convClass<iviewTypes.Table>(iview.Table);
 export const Tag = convClass<iviewTypes.Tag>(iview.Tag);
+export const Tooltip = convClass<iviewTypes.Tooltip>(iview.Tooltip);

@@ -1,4 +1,4 @@
-import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
+import { Component, Vue, Prop } from 'vue-property-decorator';
 
 import {
     Table, Page, Row, Col,

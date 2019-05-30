@@ -2,11 +2,12 @@ import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { Form as IForm } from 'iview';
 import { testApi } from '@/api';
 import { myEnum } from '@/config/enum';
-import { Modal, Input, Form, FormItem, Button, Checkbox, Switch, Select } from '@/components/iview';
+import { convClass } from '@/helpers';
+import { Modal, Input, Form, FormItem, Button, Checkbox, Switch } from '@/components/iview';
 import { MyTable, IMyTable, Const as MyTableConst } from '@/components/my-table';
 import { MyConfirm } from '@/components/my-confirm';
-import { convClass } from '@/helpers';
 import { MyTagModel } from '@/components/my-tag';
+import { MyInput } from '@/components/my-input';
 
 type DetailDataType = {
     _id?: string;
@@ -38,6 +39,7 @@ class RoleDetail extends Vue {
 
     private initDetail(data) {
         this.innerDetail = data;
+        this.authority = '';
         this.tagModel = new MyTagModel(this.innerDetail.authorityList.map(ele => {
             return {
                 tag: `${ele.name}(${ele.code})`,
@@ -60,7 +62,7 @@ class RoleDetail extends Vue {
 
     private authority = '';
     private tagModel: MyTagModel;
-    private searchAuth = [];
+    private authSearchData = [];
 
 
     private saving = false;
@@ -87,11 +89,11 @@ class RoleDetail extends Vue {
     }
 
     private searching = false;
-    private async search() {
+    private async search(query) {
         try {
             this.searching = true;
-            let rs = await testApi.authorityQuery({ anyKey: this.authority });
-            this.searchAuth = rs.rows;
+            let rs = await testApi.authorityQuery({ anyKey: query, status: myEnum.authorityStatus.启用 });
+            this.authSearchData = rs.rows;
         } catch (e) {
             this.$Message.error(e.message);
         } finally {
@@ -122,33 +124,24 @@ class RoleDetail extends Vue {
                     <FormItem label="权限">
                         {this.tagModel && this.tagModel.renderTag()}
                         <br />
-                        <Select v-model={this.authority} clearable filterable remote
+                        <MyInput v-model={this.authority} clearable
                             loading={this.searching}
-                            on-input={(v) => {
-                                console.log(v)
-                            }}
-                            on-on-clear={() => {
-                                this.authority = '';
-                            }}
-                            remote-method={this.search}
-                            // on-on-focus={this.search}
-                            on-on-change={(val) => {
+                            on-on-search={this.search}
+                            on-on-select={(val) => {
                                 if (!val)
                                     return;
-                                let match = this.searchAuth.find(e => e.code == val);
+                                let match = this.authSearchData.find(e => e.code == val);
                                 this.tagModel.addTag({ key: match.code, tag: this.getTagText(match), data: match });
-                                this.authority = '';
+                                this.$forceUpdate();
                             }}
                         >
-                            {this.searchAuth.map(ele => {
+                            {this.authSearchData.map(ele => {
                                 return (
                                     //@ts-ignore
-                                    <Option value={ele.code} on-on-click={() => {
-                                        console.log(arguments);
-                                    }}>{this.getTagText(ele)}</Option>
+                                    <Option value={ele.code}>{this.getTagText(ele)}</Option>
                                 );
                             })}
-                        </Select>
+                        </MyInput>
                     </FormItem>
                     <FormItem>
                         <Button type="primary" on-click={() => {

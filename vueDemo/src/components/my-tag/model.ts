@@ -1,10 +1,11 @@
-import { MyTag } from './my-tag';
+import { Vue } from 'vue-property-decorator';
+import { MyTag, RenderTagType } from './my-tag';
 const myTag = new MyTag();
 export type TagType = {
-    add: boolean;
-    key: string;
-    tag: string;
-    selected: boolean;
+    add?: boolean;
+    key?: string;
+    tag?: string;
+    selected?: boolean;
     color?: string;
     checkable?: boolean;
     data?: any;
@@ -17,7 +18,7 @@ type TagObjType = {
 };
 type OutTagType = TagObjType | string;
 export class MyTagModel {
-    tagList: TagType[];
+    tagList: TagType[] = [];
 
     constructor(tagList: OutTagType[]) {
         if (tagList && tagList.length) {
@@ -86,7 +87,7 @@ export class MyTagModel {
         return myTag.renderTag(this.tagList);
     }
 
-    static renderTag(tagList: (string | TagType)[]) {
+    static renderTag(tagList: RenderTagType | (RenderTagType[])) {
         return myTag.renderTag(tagList);
     }
 
