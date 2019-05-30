@@ -1,12 +1,11 @@
 import { Component, Vue, Watch, Prop } from "vue-property-decorator";
-
-import * as router from './router';
-const routeConfig = router.routerConfig;
-import "./App.less";
+import * as router from '@/router';
 import {
     Menu, MenuItem, Submenu, MenuGroup,
-    Icon, Content, Sider, Layout, Header,
-} from "./components/iview";
+    Icon, Content, Sider, Layout, Header, Button, Row, Col,
+} from "@/components/iview";
+const routeConfig = router.routerConfig;
+import "./App.less";
 
 @Component
 export default class App extends Vue {
@@ -14,7 +13,9 @@ export default class App extends Vue {
     isCollapsed = true;
     theme = "light" as any;
     title = '';
-
+    private get innerRefs() {
+        return this.$refs as { sider: any }
+    }
     protected created() {
         this.setTitle();
     }
@@ -26,50 +27,7 @@ export default class App extends Vue {
         this.title = this.$route.meta.title || '';
     }
     collapsedSider() {
-        (this.$refs.side1 as any).toggleCollapse();
-    }
-
-    renderTopNav() {
-        return (
-            <div style={{ position: 'fixed' }}>
-                <Menu
-                    mode="horizontal"
-                    // theme={this.theme}
-                    active-name="1"
-                >
-                    <MenuItem>
-                        <Icon type="md-menu" />
-                    </MenuItem>
-                    <MenuItem name="1">
-                        <Icon type="ios-paper" />
-                        内容管理
-                    </MenuItem>
-                    <MenuItem name="2">
-                        <Icon type="ios-people" />
-                        用户管理
-                    </MenuItem>
-                    <Submenu name="3">
-                        <template slot="title">
-                            <Icon type="ios-stats" />
-                            统计分析
-                        </template>
-                        <MenuGroup title="使用">
-                            <MenuItem name="3-1">新增和启动</MenuItem>
-                            <MenuItem name="3-2">活跃分析</MenuItem>
-                            <MenuItem name="3-3">时段分析</MenuItem>
-                        </MenuGroup>
-                        <MenuGroup title="留存">
-                            <MenuItem name="3-4">用户留存</MenuItem>
-                            <MenuItem name="3-5">流失用户</MenuItem>
-                        </MenuGroup>
-                    </Submenu>
-                    <MenuItem name="4">
-                        <Icon type="ios-construct" />
-                        综合设置
-                    </MenuItem>
-                </Menu>
-            </div>
-        );
+        this.innerRefs.sider.toggleCollapse();
     }
 
     renderMenu(data) {
@@ -98,10 +56,21 @@ export default class App extends Vue {
                         size="24"
                     />
                     <span>{this.title}</span>
+                    <div class="layout-header-right">
+                        {this.$store.state.user ?
+                            <span>{this.$store.state.user.nickname}</span> :
+                            [
+                                <Button type="primary" on-click={() => {
+                                    this.$store.commit('setUser', { nickname: 'test' });
+                                }}>登录</Button>,
+                                <Button>注册</Button>
+                            ]
+                        }
+                    </div>
                 </Header>
                 <Layout>
                     <Sider
-                        ref="side1"
+                        ref="sider"
                         hide-trigger
                         collapsible
                         collapsed-width="78"
