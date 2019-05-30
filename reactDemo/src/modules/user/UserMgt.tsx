@@ -164,7 +164,7 @@ export class UserMgt extends React.Component<UserMgtProps>{
                         this.innerProps.history.replace({ pathname: this.innerProps.location.pathname, search: qs.stringify(queryObj) });
                     }}
                     onQuery={async () => {
-                        let data = await testApi.userMgtList(this.modelToObj());
+                        let data = await testApi.userMgtQuery(this.modelToObj());
                         this.enableAuthToggle = new Array((data && data.rows && data.rows.length) || 0);
                         return data;
                     }}
