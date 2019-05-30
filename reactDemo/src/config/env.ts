@@ -3,7 +3,7 @@ import { TestApiConfigType } from "../api";
 const env = location.hostname.includes('umi-aoi.xyz') ? 'prod' : 'dev';
 const envConfig = {
     prod: {
-        host: `//${location.hostname}/api`
+        host: `//api.${location.hostname}`
     },
     dev: {
         host: '//localhost:8000'
@@ -32,9 +32,9 @@ const config = {
                 userAccountExists: {
                     url: '/user/accountExists',
                 },
-                
-                userMgtList: {
-                    url: '/user/mgt/list',
+
+                userMgtQuery: {
+                    url: '/user/mgt/query',
                     method: 'get',
                 },
                 userMgtSave: {
