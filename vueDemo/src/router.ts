@@ -16,8 +16,9 @@ export const routerConfig = {
     component: () => import('./views/bookmark')
   },
   user: {
-    path: '/user',
+    path: '/userMgt',
     text: '用户',
+    component: () => import('./views/user-mgt')
   },
   role: {
     path: '/role',

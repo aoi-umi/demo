@@ -33,8 +33,8 @@ const config = {
                     url: '/user/accountExists',
                 },
                 
-                userMgtList: {
-                    url: '/user/mgt/list',
+                userMgtQuery: {
+                    url: '/user/mgt/query',
                     method: 'get',
                 },
                 userMgtSave: {

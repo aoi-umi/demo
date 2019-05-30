@@ -11,7 +11,7 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
     userSignOut,
     userInfo,
     userAccountExists,
-    userMgtList,
+    userMgtQuery,
     userMgtSave,
 
     bookmarkQuery,
@@ -77,8 +77,8 @@ export class TestApi extends ApiModel<TestApiMethod> {
         return this.requestByConfig(this.apiConfig.method.userAccountExists, { data: { account } });
     }
 
-    async userMgtList(data?) {
-        return this.requestByConfig(this.apiConfig.method.userMgtList, { data });
+    async userMgtQuery(data?) {
+        return this.requestByConfig(this.apiConfig.method.userMgtQuery, { data });
     }
     async userMgtSave(data?) {
         return this.requestByConfig(this.apiConfig.method.userMgtSave, { data });

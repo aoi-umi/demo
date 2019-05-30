@@ -87,7 +87,7 @@ export let info: RequestHandler = (req, res) => {
     }, req, res);
 };
 
-export let mgtList: RequestHandler = (req, res) => {
+export let mgtQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let data = req.query;
         paramsValid({}, data, { list: true });
