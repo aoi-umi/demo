@@ -35,6 +35,12 @@ export default class App extends Vue {
         if (token) {
             let user = await testApi.userInfo();
             this.$store.commit('setUser', user);
+            if (user) {
+                if (location.pathname === routeConfig.userSignIn.path) {
+                    let to = (this.$route.query.to as string) || routeConfig.index.path;
+                    this.$router.push(to);
+                }
+            }
         }
     }
     collapsedSider() {

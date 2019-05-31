@@ -1,15 +1,15 @@
 import Vue from 'vue';
 import Router, { RouteConfig } from 'vue-router';
 
-import { authority, error } from './config';
+import { authority, error, dev } from './config';
 import store from './store';
 
 Vue.use(Router);
 type MyRouteConfig = RouteConfig & { text?: string; };
 
 export const routerConfig = {
-  home: {
-    path: '/',
+  index: {
+    path: dev.routeConfig.index.path,
     text: 'Home',
   },
   bookmark: {
@@ -18,57 +18,57 @@ export const routerConfig = {
     component: () => import('./views/bookmark')
   },
   user: {
-    path: '/userMgt',
+    path: dev.routeConfig.userMgt.path,
     text: '用户',
     meta: {
-      authority: [authority.Login],
+      authority: dev.routeConfig.userMgt.authority,
     },
     component: () => import('./views/user-mgt')
   },
   userInfo: {
-    path: '/user/info',
+    path: dev.routeConfig.userInfo.path,
     text: '个人主页',
     meta: {
-      authority: [authority.Login],
+      authority: dev.routeConfig.userInfo.authority,
     },
     component: () => import('./views/user')
   },
   userSignIn: {
-    path: '/user/signIn',
+    path: dev.routeConfig.userSignIn.path,
     text: '登录',
     component: () => import('./views/user').then(t => t.SignInView)
   },
   userSignUp: {
-    path: '/user/signUp',
+    path: dev.routeConfig.userSignUp.path,
     text: '注册',
     component: () => import('./views/user-mgt')
   },
   role: {
-    path: '/role',
+    path: dev.routeConfig.role.path,
     text: '角色',
     meta: {
-      authority: [authority.Login],
+      authority: dev.routeConfig.role.authority,
     },
     component: () => import('./views/role')
   },
   authority: {
-    path: '/authority',
+    path: dev.routeConfig.authority.path,
     text: '权限',
     meta: {
-      authority: [authority.Login],
+      authority: dev.routeConfig.authority.authority,
     },
     component: () => import('./views/authority')
   },
 
   error: {
-    path: '/error',
+    path: dev.routeConfig.error.path,
     text: '出错啦',
     component: () => import('./views/error')
   },
   notFound: {
     path: "*",
     redirect: {
-      path: '/error',
+      path: dev.routeConfig.error.path,
       query: { code: error.NotFound.code }
     }
   },
@@ -108,12 +108,12 @@ const router = new Router({
   routes,
 });
 router.beforeEach((to, from, next) => {
-  if (to.path == routerConfig.home.path) {
+  if (to.path == routerConfig.index.path) {
     return next(routerConfig.bookmark.path);
   }
   let auth = to.meta && to.meta.authority;
   if (auth && auth.includes(authority.Login) && !store.state.user) {
-    return next(routerConfig.userSignIn);
+    return next({ path: routerConfig.userSignIn.path, query: { to: to.path } });
   }
   next();
 
