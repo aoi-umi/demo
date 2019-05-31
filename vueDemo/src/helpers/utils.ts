@@ -1,4 +1,7 @@
 import axios, { AxiosRequestConfig } from 'axios';
+import { AnimeInstance } from 'animejs';
+import * as md from 'node-forge/lib/md.all';
+
 
 export function convClass<typeofT, T = {}>(t) {
     return t as {
@@ -58,4 +61,55 @@ export function error(e, code?) {
     if (!(e instanceof Error))
         e = new Error(e);
     return e;
+}
+
+export function randStr() {
+    return Math.random().toString(36).substr(2, 15);
+}
+
+export function md5(str: string) {
+    let md5 = md.md5.create();
+    md5.update(str);
+    return md5.digest().toHex();
+}
+
+export let stringFormat = function (formatString: string, ...args) {
+    if (!formatString)
+        formatString = '';
+    let reg = /(\{(\d)\})/g;
+    if (typeof args[0] === 'object') {
+        args = args[0];
+        reg = /(\{([^{}]+)\})/g;
+    }
+    let result = formatString.replace(reg, function () {
+        let match = arguments[2];
+        return args[match] || '';
+    });
+    return result;
+};
+
+export const stopAnimation = (animations: AnimeInstance | AnimeInstance[]) => {
+    const stop = (anim: AnimeInstance) => {
+        if (anim) {
+            const { duration, remaining } = anim;
+            if (remaining === 1) anim.seek(duration);
+            else anim.pause();
+        }
+    };
+    if (Array.isArray(animations)) animations.forEach(anim => stop(anim));
+    else stop(animations);
+};
+
+export function defer<T = any>() {
+    let resolve: (value?: T | PromiseLike<T>) => void,
+        reject: (reason?: any) => void;
+    let promise = new Promise<T>((reso, reje) => {
+        resolve = reso;
+        reject = reje;
+    });
+    return {
+        promise,
+        resolve,
+        reject,
+    };
 }

@@ -1,11 +1,14 @@
 import { Component, Vue, Watch, Prop } from "vue-property-decorator";
 import * as router from '@/router';
 import {
-    Menu, MenuItem, Submenu, MenuGroup,
-    Icon, Content, Sider, Layout, Header, Button, Row, Col,
+    Menu, MenuItem, Option,
+    Icon, Content, Sider, Layout, Header, Button, Row, Col, Poptip, Avatar, Modal,
 } from "@/components/iview";
+import { testApi } from './api';
+import { dev } from './config';
 const routeConfig = router.routerConfig;
 import "./App.less";
+import { SignInView } from './views/user';
 
 @Component
 export default class App extends Vue {
@@ -18,6 +21,7 @@ export default class App extends Vue {
     }
     protected created() {
         this.setTitle();
+        this.getUserInfo();
     }
     get menuitemClasses() {
         return ["menu-item", this.isCollapsed ? "collapsed-menu" : ""];
@@ -25,6 +29,13 @@ export default class App extends Vue {
 
     setTitle() {
         this.title = this.$route.meta.title || '';
+    }
+    async getUserInfo() {
+        let token = localStorage.getItem(dev.cacheKey.testUser);
+        if (token) {
+            let user = await testApi.userInfo();
+            this.$store.commit('setUser', user);
+        }
     }
     collapsedSider() {
         this.innerRefs.sider.toggleCollapse();
@@ -44,9 +55,24 @@ export default class App extends Vue {
         this.setTitle();
     }
 
+    signInShow = false;
+    signOut() {
+        let token = localStorage.getItem(dev.cacheKey.testUser);
+        if (token) {
+            testApi.userSignOut();
+        }
+        this.$store.commit('setUser', null);
+        localStorage.removeItem(dev.cacheKey.testUser);
+    }
+
     render() {
         return (
             <Layout class="layout">
+                <Modal v-model={this.signInShow} footer-hide>
+                    <SignInView on-success={() => {
+                        this.signInShow = false;
+                    }}></SignInView>
+                </Modal>
                 <Header style={{ padding: 0 }} class="layout-header-bar">
                     <Icon
                         on-click={this.collapsedSider}
@@ -58,12 +84,23 @@ export default class App extends Vue {
                     <span>{this.title}</span>
                     <div class="layout-header-right">
                         {this.$store.state.user ?
-                            <span>{this.$store.state.user.nickname}</span> :
+                            <Poptip trigger="hover">
+                                <Avatar icon="md-person" style={{ marginRight: '10px' }} />
+                                <span>{this.$store.state.user.nickname}</span>
+                                <div slot="content">
+                                    <p class="ivu-select-item" on-click={() => {
+                                        this.$router.push(routeConfig.userInfo.path);
+                                    }}>主页</p>
+                                    <p class="ivu-select-item" on-click={this.signOut}>退出</p>
+                                </div>
+                            </Poptip> :
                             [
                                 <Button type="primary" on-click={() => {
-                                    this.$store.commit('setUser', { nickname: 'test' });
+                                    this.signInShow = true;
                                 }}>登录</Button>,
-                                <Button>注册</Button>
+                                <Button on-click={() => {
+                                    this.$router.push(routeConfig.userSignUp.path);
+                                }}>注册</Button>
                             ]
                         }
                     </div>
@@ -107,7 +144,7 @@ export default class App extends Vue {
                             }
                         </Menu>
                     </Sider>
-                    <Content style={{ margin: "20px", minHeight: "260px", padding: '5px' }}>
+                    <Content class="main-content">
                         <router-view></router-view>
                     </Content>
                 </Layout>

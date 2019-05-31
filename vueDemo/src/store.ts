@@ -1,11 +1,11 @@
 import Vue from 'vue';
-import Vuex from 'vuex';
+import Vuex, { Store } from 'vuex';
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    user: null,
+    user: null as UserInfo,
   },
   mutations: {
     setUser(state, user) {
@@ -13,6 +13,5 @@ export default new Vuex.Store({
     }
   },
   actions: {
-
   },
 });

@@ -5,10 +5,10 @@ Vue.use(iView);
 import App from './App';
 import router from './router';
 import store from './store';
-import config from './config/env';
+import { env } from './config';
 
 Vue.config.productionTip = false;
-document.title = config.title;
+document.title = env.title;
 new Vue({
   router,
   store,

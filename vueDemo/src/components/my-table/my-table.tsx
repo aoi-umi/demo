@@ -81,7 +81,7 @@ class MyTable<QueryArgs extends QueryArgsType> extends Vue {
         }
     }
 
-    private _onQueryPress(e) {
+    private handlePress(e) {
         if (e.charCode == 13) {
             this._onQueryClick();
         }
@@ -134,7 +134,7 @@ class MyTable<QueryArgs extends QueryArgsType> extends Vue {
                             <Icon type={this.showQuery ? 'ios-arrow-up' : 'ios-arrow-down'} />
                         </div>
                     </div>
-                    <div class={this.showQuery ? '' : 'hidden'} on-keypress={this._onQueryPress}>
+                    <div class={this.showQuery ? '' : 'hidden'} on-keypress={this.handlePress}>
                         <Row gutter={5}>
                             {this.queryArgs && Object.entries(this.queryArgs).map(entry => {
                                 let key = entry[0];

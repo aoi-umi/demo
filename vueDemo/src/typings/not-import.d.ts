@@ -6,3 +6,10 @@ interface VueComponentOptions {
     slot?: string;
     name?: string;
 }
+
+interface UserInfo {
+    _id: string;
+    account: string;
+    nickname: string;
+    key: string;
+}

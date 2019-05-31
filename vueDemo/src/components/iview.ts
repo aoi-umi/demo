@@ -4,6 +4,7 @@ const iview = require("iview");
 import { convClass } from "../helpers";
 
 export const AutoComplete = convClass<iviewTypes.AutoComplete>(iview.AutoComplete);
+export const Avatar = convClass<iviewTypes.Avatar>(iview.Avatar);
 export const BackTop = convClass<iviewTypes.BackTop>(iview.BackTop);
 export const Button = convClass<iviewTypes.Button>(iview.Button);
 export const Content = convClass<iviewTypes.Content>(iview.Content);
@@ -24,6 +25,7 @@ export const Layout = convClass<iviewTypes.Layout>(iview.Layout);
 export const Modal = convClass<iviewTypes.Modal>(iview.Modal);
 
 export const Page = convClass<iviewTypes.Page>(iview.Page);
+export const Poptip = convClass<iviewTypes.Poptip>(iview.Poptip);
 
 export const Menu = convClass<iviewTypes.Menu>(iview.Menu);
 export const MenuGroup = convClass<iviewTypes.MenuGroup>(iview.MenuGroup);
