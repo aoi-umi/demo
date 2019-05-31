@@ -1,7 +1,7 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { Form as IForm } from 'iview';
 import { testApi } from '@/api';
-import { myEnum } from '@/config/enum';
+import { myEnum } from '@/config';
 import { Modal, Input, Form, FormItem, Button, Checkbox, Switch } from '@/components/iview';
 import { MyTable, IMyTable, Const as MyTableConst } from '@/components/my-table';
 import { MyConfirm } from '@/components/my-confirm';

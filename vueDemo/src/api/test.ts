@@ -1,6 +1,6 @@
 
 import { error } from '../helpers/utils';
-import { cacheKey } from '../config/config';
+import { dev } from '../config';
 
 import { ApiModel, ApiConfigModel, ApiMethodConfigType } from './model';
 import { ApiListQueryArgs, ApiMethod } from '.';
@@ -46,11 +46,11 @@ export class TestApi extends ApiModel<TestApiMethod> {
     constructor(apiConfig: TestApiConfigType) {
         super(apiConfig, {
             beforeRequest: (req) => {
-                let token = localStorage.getItem(cacheKey.testUser);
+                let token = localStorage.getItem(dev.cacheKey.testUser);
                 if (!req.headers)
                     req.headers = {};
                 if (token)
-                    req.headers[cacheKey.testUser] = token;
+                    req.headers[dev.cacheKey.testUser] = token;
                 return req;
             },
             afterResponse: async (res: Result) => {

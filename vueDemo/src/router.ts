@@ -1,10 +1,12 @@
 import Vue from 'vue';
 import Router, { RouteConfig } from 'vue-router';
 
-import { errConfig } from './config/error';
+import { authority, error } from './config';
+import store from './store';
 
 Vue.use(Router);
 type MyRouteConfig = RouteConfig & { text?: string; };
+
 export const routerConfig = {
   home: {
     path: '/',
@@ -18,16 +20,43 @@ export const routerConfig = {
   user: {
     path: '/userMgt',
     text: '用户',
+    meta: {
+      authority: [authority.Login],
+    },
+    component: () => import('./views/user-mgt')
+  },
+  userInfo: {
+    path: '/user/info',
+    text: '个人主页',
+    meta: {
+      authority: [authority.Login],
+    },
+    component: () => import('./views/user')
+  },
+  userSignIn: {
+    path: '/user/signIn',
+    text: '登录',
+    component: () => import('./views/user').then(t => t.SignInView)
+  },
+  userSignUp: {
+    path: '/user/signUp',
+    text: '注册',
     component: () => import('./views/user-mgt')
   },
   role: {
     path: '/role',
     text: '角色',
+    meta: {
+      authority: [authority.Login],
+    },
     component: () => import('./views/role')
   },
   authority: {
     path: '/authority',
     text: '权限',
+    meta: {
+      authority: [authority.Login],
+    },
     component: () => import('./views/authority')
   },
 
@@ -40,7 +69,7 @@ export const routerConfig = {
     path: "*",
     redirect: {
       path: '/error',
-      query: { code: errConfig.NotFound.code }
+      query: { code: error.NotFound.code }
     }
   },
 };
@@ -61,6 +90,16 @@ routes.forEach(ele => {
   if (!ele.meta.title) {
     ele.meta.title = ele.text;
   }
+  // if (ele.component) {
+  //   let component: any = ele.component;
+  //   ele.component = () => {
+  //     let auth = ele.meta && ele.meta.authority;
+  //     if (auth && auth.includes(authority.Login) && !store.state.user) {
+  //       return import('./views/user').then(t => t.SignInView);
+  //     }
+  //     return typeof component === 'function' ? component() : component;
+  //   }
+  // }
 });
 
 const router = new Router({
@@ -70,9 +109,13 @@ const router = new Router({
 });
 router.beforeEach((to, from, next) => {
   if (to.path == routerConfig.home.path) {
-    next(routerConfig.bookmark.path);
-  } else {
-    next();
+    return next(routerConfig.bookmark.path);
   }
+  let auth = to.meta && to.meta.authority;
+  if (auth && auth.includes(authority.Login) && !store.state.user) {
+    return next(routerConfig.userSignIn);
+  }
+  next();
+
 });
 export default router;
