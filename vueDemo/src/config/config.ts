@@ -9,14 +9,15 @@ export type RouteConfigType = {
 export const routeConfig = {
     index: { path: '/' },
     //个人中心
-    userAccount: {
-        path: '/user/account',
+    userInfo: {
+        path: '/user/info',
         authority: [authorityConfig.Login],
     },
+    userSignIn: { path: '/user/signIn' },
     userSignUp: { path: '/user/signUp' },
     //管理
-    adminUser: {
-        path: '/user',
+    userMgt: {
+        path: '/userMgt',
         authority: [authorityConfig.Login],
     },
     bookmark: { path: '/bookmark' },
@@ -29,6 +30,7 @@ export const routeConfig = {
         authority: [authorityConfig.Login],
     },
     test: { path: '/test' },
+    error: { path: '/error' },
 };
 
 export const cacheKey = {

@@ -5,6 +5,7 @@ import * as helpers from '@/helpers';
 import { dev } from '@/config';
 import { testApi } from '@/api';
 import { Tag, Modal, Input, Row, Col, Form, FormItem, Button } from '@/components/iview';
+import { routeConfig } from '@/config/config';
 
 type SignInDataType = {
     account?: string;
@@ -48,6 +49,8 @@ class SignIn extends Vue {
             this.$store.commit('setUser', rs);
             this.innerDetail = this.getDetailData();
             this.$emit('success');
+            if (this.to)
+                this.$router.push(this.to);
         } catch (e) {
             this.$Message.error(e.message);
         }
@@ -69,6 +72,12 @@ class SignIn extends Vue {
         })
     }
 
+    to = '';
+    mounted() {
+        if (location.pathname === routeConfig.userSignIn.path) {
+            this.to = (this.$route.query.to as string) || routeConfig.index.path;
+        }
+    }
     render() {
         let detail = this.innerDetail;
         return (
