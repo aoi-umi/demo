@@ -15,8 +15,17 @@
   right: 0;
   z-index: 5;
   transform: translateY(100%);
+
+  &.active {
+    transform: translateY(0%);
+  }
 }
 
-.@{prefix}bottom-bar.active {
-  transform: translateY(0%);
+.@{prefix}query-args-box {
+  transition: max-height 0.3s ease;
+  overflow: hidden;
+  max-height: 300px;
+  &.collapsed {
+    max-height: 0;
+  }
 }

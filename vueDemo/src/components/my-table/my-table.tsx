@@ -108,7 +108,7 @@ class MyTable<QueryArgs extends QueryArgsType> extends Vue {
     };
 
     private get bottomBarClass() {
-        let cls = ['bottom-bar'];
+        let cls = [clsPrefix + 'bottom-bar'];
         if (this.multiOperateBtnList.length && this.selectedRows.length) {
             cls.push('active');
         }
@@ -134,7 +134,7 @@ class MyTable<QueryArgs extends QueryArgsType> extends Vue {
                             <Icon type={this.showQuery ? 'ios-arrow-up' : 'ios-arrow-down'} />
                         </div>
                     </div>
-                    <div class={this.showQuery ? '' : 'hidden'} on-keypress={this.handlePress}>
+                    <div class={[clsPrefix + 'query-args-box'].concat(this.showQuery ? '' : 'collapsed')} on-keypress={this.handlePress}>
                         <Row gutter={5}>
                             {this.queryArgs && Object.entries(this.queryArgs).map(entry => {
                                 let key = entry[0];
@@ -194,7 +194,7 @@ class MyTable<QueryArgs extends QueryArgsType> extends Vue {
                         }} />
                     {this.loading && <Spin size="large" fix></Spin>}
                 </div>
-                <Card class={clsPrefix + this.bottomBarClass}>
+                <Card class={this.bottomBarClass}>
                     {this.multiOperateBtnList.map(ele => {
                         return (
                             <Button on-click={() => { ele.onClick && ele.onClick(this.selectedRows) }}>{ele.text}</Button>
