@@ -41,7 +41,7 @@ export const routerConfig = {
   userSignUp: {
     path: dev.routeConfig.userSignUp.path,
     text: '注册',
-    component: () => import('./views/user-mgt')
+    component: () => import('./views/user').then(t => t.SignUpView)
   },
   role: {
     path: dev.routeConfig.role.path,

@@ -1,39 +1,40 @@
 import * as express from 'express';
 let router = express.Router();
 export default router;
+import * as userAuth from '../middleware/userAuth';
 
 //#region user 
 import * as user from './user';
-router.post('/user/accountExists', user.accountExists);
-router.post('/user/signUp', user.signUp);
-router.post('/user/signIn', user.signIn);
-router.post('/user/signOut', user.signOut);
-router.post('/user/info', user.info);
-router.get('/user/mgt/query', user.mgtQuery);
-router.post('/user/mgt/save', user.mgtSave);
+router.post('/user/accountExists', userAuth.normal, user.accountExists);
+router.post('/user/signUp', userAuth.normal, user.signUp);
+router.post('/user/signIn', userAuth.normal, user.signIn);
+router.post('/user/signOut', userAuth.normal, user.signOut);
+router.post('/user/info', userAuth.normal, user.info);
+router.get('/user/mgt/query', userAuth.normal, user.mgtQuery);
+router.post('/user/mgt/save', userAuth.normal, user.mgtSave);
 //#endregion
 
 //#region bookmark 
 import * as bookmark from './bookmark';
-router.get('/bookmark/query', bookmark.query);
-router.post('/bookmark/save', bookmark.save);
-router.post('/bookmark/del', bookmark.del);
+router.get('/bookmark/query', userAuth.normal, bookmark.query);
+router.post('/bookmark/save', userAuth.normal, bookmark.save);
+router.post('/bookmark/del', userAuth.normal, bookmark.del);
 //#endregion
 
 //#region authority 
 import * as authority from './authority';
-router.get('/authority/query', authority.query);
-router.post('/authority/codeExists', authority.codeExists);
-router.post('/authority/save', authority.save);
-router.post('/authority/update', authority.update);
-router.post('/authority/del', authority.del);
+router.get('/authority/query', userAuth.normal, authority.query);
+router.post('/authority/codeExists', userAuth.normal, authority.codeExists);
+router.post('/authority/save', userAuth.normal, authority.save);
+router.post('/authority/update', userAuth.normal, authority.update);
+router.post('/authority/del', userAuth.normal, authority.del);
 //#endregion
 
 //#region role 
 import * as role from './role';
-router.get('/role/query', role.query);
-router.post('/role/codeExists', role.codeExists);
-router.post('/role/save', role.save);
-router.post('/role/update', role.update);
-router.post('/role/del', role.del);
+router.get('/role/query', userAuth.normal, role.query);
+router.post('/role/codeExists', userAuth.normal, role.codeExists);
+router.post('/role/save', userAuth.normal, role.save);
+router.post('/role/update', userAuth.normal, role.update);
+router.post('/role/del', userAuth.normal, role.del);
 //#endregion
