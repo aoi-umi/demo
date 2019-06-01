@@ -102,7 +102,113 @@ class SignIn extends Vue {
 
 export const SignInView = convClass<SignIn>(SignIn);
 
+type SignUpDataType = {
+    account: string;
+    nickname: string;
+    password: string;
+    passwordRepeat: string;
+}
 
+@Component
+class SignUp extends Vue {
+
+    private innerDetail: SignUpDataType = this.getDetailData();
+    private getDetailData() {
+        return {
+            account: '',
+            nickname: '',
+            password: '',
+            passwordRepeat: '',
+        };
+    }
+
+    private rules = {
+        account: [
+            { required: true, trigger: 'blur' }
+        ],
+        nickname: [
+            { required: true, trigger: 'blur' }
+        ],
+        password: [
+            { required: true, trigger: 'blur' }
+        ],
+        passwordRepeat: [{
+            required: true, trigger: 'blur'
+        }, {
+            validator: (rule, value, callback) => {
+                if (value !== this.innerDetail.password) {
+                    callback(new Error('两次输入密码不一致'))
+                } else {
+                    callback()
+                }
+            },
+            trigger: 'blur'
+        }],
+    };
+
+    private get innerRefs() {
+        return this.$refs as { formVaild: IForm }
+    }
+
+    private loading = false;
+
+    private async signUp() {
+        try {
+            let rs = await testApi.userSignUp(this.innerDetail);
+            this.innerDetail = this.getDetailData();
+            this.$emit('success');
+            this.$Message.success('注册成功');
+            this.$router.push(routeConfig.userSignIn.path);
+        } catch (e) {
+            this.$Message.error(e.message);
+        }
+    }
+
+    private handlePress(e) {
+        if (e.charCode == 13) {
+            this.handleSignUp();
+        }
+    }
+
+    private handleSignUp() {
+        this.innerRefs.formVaild.validate((valid) => {
+            if (!valid) {
+                this.$Message.error('参数有误');
+            } else {
+                this.signUp();
+            }
+        })
+    }
+
+    render() {
+        let detail = this.innerDetail;
+        return (
+            <div on-keypress={this.handlePress}>
+                <h3>登录</h3>
+                <br />
+                <Form label-width={100} ref="formVaild" props={{ model: detail }} rules={this.rules}>
+                    <FormItem label="账号" prop="account">
+                        <Input v-model={detail.account} />
+                    </FormItem>
+                    <FormItem label="昵称" prop="nickname">
+                        <Input v-model={detail.nickname} />
+                    </FormItem>
+                    <FormItem label="密码" prop="password">
+                        <Input v-model={detail.password} type="password" />
+                    </FormItem>
+                    <FormItem label="确认密码" prop="passwordRepeat">
+                        <Input v-model={detail.passwordRepeat} type="password" />
+                    </FormItem>
+                    <FormItem>
+                        <Button type="primary" on-click={this.handleSignUp} loading={this.loading}>注册</Button>
+                    </FormItem>
+                </Form>
+            </div >
+        );
+    }
+}
+
+export const SignUpView = convClass<SignUp>(SignUp);
 @Component
 export default class UserInfo extends Vue {
     render() {

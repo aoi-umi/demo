@@ -3,7 +3,7 @@ import * as common from '../_system/common';
 import errorConfig from '../config/errorConfig';
 import * as cache from '../_system/cache';
 import { responseHandler, paramsValid, } from '../helpers';
-import { cacheKey, cacheTime } from '../_main';
+import { dev } from '../config';
 import { UserModel, UserMapper } from '../models/mongo/user';
 import { transaction } from '../_system/dbMongo';
 
@@ -55,7 +55,7 @@ export let signIn: RequestHandler = (req, res) => {
             rand: string;
         } = req.body;
         paramsValid(schema, data);
-        let token = req.header(cacheKey.user);
+        let token = req.header(dev.cacheKey.user);
         let user = await UserMapper.accountExists(data.account);
         if (!user)
             throw common.error('账号不存在');
@@ -64,9 +64,9 @@ export let signIn: RequestHandler = (req, res) => {
         let checkToken = common.createToken(data.account + user.password + reqBody);
         if (token !== checkToken)
             throw common.error('', errorConfig.TOKEN_WRONG);
-        let userInfoKey = cacheKey.user + token;
+        let userInfoKey = dev.cacheKey.user + token;
         let returnUser = { _id: user._id, account: user.account, nickname: user.nickname, key: token };
-        await cache.set(userInfoKey, returnUser, cacheTime.user);
+        await cache.set(userInfoKey, returnUser, dev.cacheTime.user);
         return returnUser;
     }, req, res);
 };
@@ -83,7 +83,7 @@ export let signOut: RequestHandler = (req, res) => {
 export let info: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        return user;
+        return user.key ? user : null;
     }, req, res);
 };
 
