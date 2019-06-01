@@ -81,7 +81,7 @@ class SignIn extends Vue {
     render() {
         let detail = this.innerDetail;
         return (
-            <div on-keypress={this.handlePress}>
+            <div class="dialog-view" on-keypress={this.handlePress}>
                 <h3>登录</h3>
                 <br />
                 <Form label-width={50} ref="formVaild" props={{ model: detail }} rules={this.rules}>
@@ -92,7 +92,7 @@ class SignIn extends Vue {
                         <Input v-model={detail.password} type="password" />
                     </FormItem>
                     <FormItem>
-                        <Button type="primary" on-click={this.handleSignIn} loading={this.loading}>登录</Button>
+                        <Button type="primary" long on-click={this.handleSignIn} loading={this.loading}>登录</Button>
                     </FormItem>
                 </Form>
             </div >
@@ -183,8 +183,8 @@ class SignUp extends Vue {
     render() {
         let detail = this.innerDetail;
         return (
-            <div on-keypress={this.handlePress}>
-                <h3>登录</h3>
+            <div class="dialog-view" on-keypress={this.handlePress}>
+                <h3>注册</h3>
                 <br />
                 <Form label-width={100} ref="formVaild" props={{ model: detail }} rules={this.rules}>
                     <FormItem label="账号" prop="account">
@@ -200,7 +200,7 @@ class SignUp extends Vue {
                         <Input v-model={detail.passwordRepeat} type="password" />
                     </FormItem>
                     <FormItem>
-                        <Button type="primary" on-click={this.handleSignUp} loading={this.loading}>注册</Button>
+                        <Button type="primary" long on-click={this.handleSignUp} loading={this.loading}>注册</Button>
                     </FormItem>
                 </Form>
             </div >
