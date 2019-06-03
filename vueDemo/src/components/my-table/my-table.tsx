@@ -188,14 +188,19 @@ class MyTable<QueryArgs extends QueryArgsType> extends Vue {
                     </Table>
                     <Page class={clsPrefix + "page"} total={this.result.total}
                         current={this.model.page.index}
+                        page-size={this.model.page.size}
                         show-total show-elevator show-sizer
                         on-on-change={(page) => {
                             this.model.page.index = page;
                             this.handleQuery();
                         }}
                         on-on-page-size-change={(size) => {
+                            let oldIdx = this.model.page.index;
                             this.model.page.index = 1;
                             this.model.page.size = size;
+                            if (oldIdx == 1) {
+                                this.handleQuery();
+                            }
                         }} />
                     {this.loading && <Spin size="large" fix></Spin>}
                 </div>
