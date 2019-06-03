@@ -135,7 +135,23 @@ export default class Bookmark extends Vue {
         return this.$refs as { table: IMyTable<any> };
     }
     mounted() {
-        this.innerRefs.table.query();
+        this.query();
+    }
+
+    @Watch('$route')
+    route(to, from) {
+        this.query();
+    }
+
+    query() {
+        let table = this.innerRefs.table;
+        let query = this.$route.query;
+        ['name', 'url', 'anyKey'].forEach(key => {
+            if (query[key])
+                this.$set(table.model.query, key, query[key]);
+        });
+        table.model.setPage({ index: query.page, size: query.rows });
+        this.innerRefs.table.query(query);
     }
 
     delIds = [];
@@ -226,13 +242,8 @@ export default class Bookmark extends Vue {
                         }
                     },]}
 
-                    queryFn={async (model) => {
-                        let q = { ...model.query };
-                        let rs = await testApi.bookmarkQuery({
-                            ...q,
-                            page: model.page.index,
-                            rows: model.page.size
-                        });
+                    queryFn={async (data) => {
+                        let rs = await testApi.bookmarkQuery(data);
 
                         rs.rows.forEach(ele => {
                             if (!ele.tagList || !ele.tagList.length)
@@ -241,6 +252,18 @@ export default class Bookmark extends Vue {
                                 ele._expanded = true;
                         });
                         return rs;
+                    }}
+
+                    on-query={(model) => {
+                        let q = { ...model.query };
+                        this.$router.push({
+                            path: this.$route.path,
+                            query: {
+                                ...q,
+                                page: model.page.index,
+                                rows: model.page.size
+                            }
+                        })
                     }}
 
                     on-add-click={() => {

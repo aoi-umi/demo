@@ -17,7 +17,8 @@ type QueryArgsType = {
 
 const event = {
     addClick: 'add-click',
-    resetClick: 'reset-click'
+    resetClick: 'reset-click',
+    query: 'query'
 };
 const clsPrefix = 'my-table-';
 
@@ -55,12 +56,12 @@ class MyTable<QueryArgs extends QueryArgsType> extends Vue {
     customOperateView: any;
 
     @Prop()
-    queryFn?: (query: MyTableModel<{ [k in keyof QueryArgs]: any }>) => ListResult | Promise<ListResult>;
+    queryFn?: (data: any) => ListResult | Promise<ListResult>;
 
-    public query() {
-        this._onQueryClick();
+    public query(data?: any) {
+        this._handleQuery(data);
     }
-    private async _onQueryClick() {
+    private async _handleQuery(data?: any) {
         this.loading = true;
         try {
             this.selectedRows = [];
@@ -68,7 +69,7 @@ class MyTable<QueryArgs extends QueryArgsType> extends Vue {
             this.result.data = [];
             this.result.total = 0;
             this.result.msg = '暂无数据';
-            let rs = this.queryFn && await this.queryFn(this.model);
+            let rs = this.queryFn && await this.queryFn(data);
             if (rs) {
                 this.result.data = rs.rows;
                 this.result.total = rs.total;
@@ -81,9 +82,13 @@ class MyTable<QueryArgs extends QueryArgsType> extends Vue {
         }
     }
 
+    private handleQuery() {
+        this.$emit('query', this.model);
+    }
+
     private handlePress(e) {
         if (e.charCode == 13) {
-            this._onQueryClick();
+            this.handleQuery();
         }
     }
 
@@ -99,7 +104,7 @@ class MyTable<QueryArgs extends QueryArgsType> extends Vue {
 
     private showQuery = true;
     private loading = false;
-    private model = new MyTableModel<{ [k in keyof QueryArgs]: any }>();
+    model = new MyTableModel<{ [k in keyof QueryArgs]: any }>();
     private result = {
         success: true,
         total: 0,
@@ -161,7 +166,7 @@ class MyTable<QueryArgs extends QueryArgsType> extends Vue {
                             {(!hideQueryBtn.all && !hideQueryBtn.query) &&
                                 <Col>
                                     <Button type="primary" loading={this.loading} on-click={() => {
-                                        this._onQueryClick();
+                                        this.handleQuery();
                                     }}>查询</Button>
                                 </Col>
                             }
@@ -186,7 +191,7 @@ class MyTable<QueryArgs extends QueryArgsType> extends Vue {
                         show-total show-elevator show-sizer
                         on-on-change={(page) => {
                             this.model.page.index = page;
-                            this._onQueryClick();
+                            this.handleQuery();
                         }}
                         on-on-page-size-change={(size) => {
                             this.model.page.index = 1;
