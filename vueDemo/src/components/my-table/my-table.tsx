@@ -182,7 +182,7 @@ class MyTable<QueryArgs extends QueryArgsType> extends Vue {
                     </div>
                 </Card>
                 <div style={{ position: 'relative', }}>
-                    <Table style={{ marginTop: '10px' }} stripe columns={this.columns}
+                    <Table style={{ marginTop: '10px' }} columns={this.columns}
                         data={this.result.data} no-data-text={this.result.msg}
                         on-on-selection-change={this.setSelectedRows}>
                     </Table>
