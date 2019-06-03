@@ -192,8 +192,24 @@ export default class UserMgt extends Vue {
     get innerRefs() {
         return this.$refs as { table: IMyTable<any> };
     }
-    protected mounted() {
-        this.innerRefs.table.query();
+    mounted() {
+        this.query();
+    }
+
+    @Watch('$route')
+    route(to, from) {
+        this.query();
+    }
+
+    query() {
+        let table = this.innerRefs.table;
+        let query = this.$route.query;
+        [].forEach(key => {
+            if (query[key])
+                this.$set(table.model.query, key, query[key]);
+        });
+        table.model.setPage({ index: query.page, size: query.rows });
+        this.innerRefs.table.query(query);
     }
 
     private renderAuth(authorityList) {
@@ -287,13 +303,8 @@ export default class UserMgt extends Vue {
                         }
                     },]}
 
-                    queryFn={async (model) => {
-                        let q = { ...model.query };
-                        let rs = await testApi.userMgtQuery({
-                            ...q,
-                            page: model.page.index,
-                            rows: model.page.size
-                        });
+                    queryFn={async (data) => {
+                        let rs = await testApi.userMgtQuery(data);
 
                         rs.rows.forEach(ele => {
                             if (!ele.auth || !Object.keys(ele.auth).length)
@@ -303,6 +314,18 @@ export default class UserMgt extends Vue {
                         });
 
                         return rs;
+                    }}
+
+                    on-query={(model) => {
+                        let q = { ...model.query };
+                        this.$router.push({
+                            path: this.$route.path,
+                            query: {
+                                ...q,
+                                page: model.page.index,
+                                rows: model.page.size
+                            }
+                        })
                     }}
                 >
                 </MyTable>

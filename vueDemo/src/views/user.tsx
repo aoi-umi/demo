@@ -50,7 +50,7 @@ class SignIn extends Vue {
             this.innerDetail = this.getDetailData();
             this.$emit('success');
             if (this.to)
-                this.$router.push(this.to);
+                this.$router.push({ path: this.to, query: this.toQuery });
         } catch (e) {
             this.$Message.error(e.message);
         }
@@ -73,9 +73,12 @@ class SignIn extends Vue {
     }
 
     to = '';
+    toQuery = null;
     mounted() {
         if (location.pathname === routeConfig.userSignIn.path) {
-            this.to = (this.$route.query.to as string) || routeConfig.index.path;
+            let { to, ...query } = this.$route.query;
+            this.to = (to as string) || routeConfig.index.path;
+            this.toQuery = query;
         }
     }
     render() {

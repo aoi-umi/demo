@@ -177,8 +177,29 @@ export default class Role extends Vue {
         });
 
     }
-    protected mounted() {
-        this.innerRefs.table.query();
+    mounted() {
+        this.query();
+    }
+
+    @Watch('$route')
+    route(to, from) {
+        this.query();
+    }
+
+    query() {
+        let table = this.innerRefs.table;
+        let query = this.$route.query;
+        ['name', 'code', 'anyKey'].forEach(key => {
+            if (query[key])
+                this.$set(table.model.query, key, query[key]);
+        });
+        let status = query.status as string;
+        let statusList = status ? status.split(',') : [];
+        this.statusList.forEach(ele => {
+            ele.checked = statusList.includes(ele.value.toString());
+        });
+        table.model.setPage({ index: query.page, size: query.rows });
+        this.innerRefs.table.query(query);
     }
 
     delIds = [];
@@ -303,14 +324,8 @@ export default class Role extends Vue {
                         }
                     },]}
 
-                    queryFn={async (model) => {
-                        let q = { ...model.query };
-                        let rs = await testApi.roleQuery({
-                            ...q,
-                            status: this.statusList.filter(ele => ele.checked).map(ele => ele.value).join(','),
-                            page: model.page.index,
-                            rows: model.page.size
-                        });
+                    queryFn={async (data) => {
+                        let rs = await testApi.roleQuery(data);
 
                         rs.rows.forEach(ele => {
                             if (!ele.authorityList || !ele.authorityList.length)
@@ -320,6 +335,19 @@ export default class Role extends Vue {
                         });
 
                         return rs;
+                    }}
+
+                    on-query={(model) => {
+                        let q = { ...model.query };
+                        this.$router.push({
+                            path: this.$route.path,
+                            query: {
+                                ...q,
+                                status: this.statusList.filter(ele => ele.checked).map(ele => ele.value).join(','),
+                                page: model.page.index,
+                                rows: model.page.size
+                            }
+                        })
                     }}
 
                     on-add-click={() => {
