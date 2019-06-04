@@ -4,7 +4,7 @@ import { testApi } from '@/api';
 import { myEnum } from '@/config';
 import { convClass } from '@/helpers';
 import { Modal, Input, Form, FormItem, Button, Checkbox, Switch } from '@/components/iview';
-import { MyList, IMyTable, Const as MyTableConst } from '@/components/my-list';
+import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
 import { MyConfirm } from '@/components/my-confirm';
 import { MyTagModel } from '@/components/my-tag';
 import { MyInput } from '@/components/my-input';
@@ -168,15 +168,19 @@ export default class Role extends Vue {
     delShow = false;
     detail: any;
     get innerRefs() {
-        return this.$refs as { table: IMyTable<any> };
+        return this.$refs as { table: IMyList<any> };
     }
+    
+    page: any;
     protected created() {
         this.statusList = myEnum.roleStatus.toArray().map(ele => {
             ele['checked'] = false;
             return ele;
         });
-
+        let query = this.$route.query;
+        this.page = { index: query.page, size: query.rows };
     }
+
     mounted() {
         this.query();
     }
@@ -247,6 +251,8 @@ export default class Role extends Vue {
                 </Modal>
                 <MyList
                     ref="table"
+                    current={this.page.index}
+                    pageSize={this.page.size}
                     queryArgs={{
                         name: {
                             label: '名字',

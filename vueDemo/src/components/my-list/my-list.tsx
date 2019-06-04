@@ -54,7 +54,7 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
     customRenderFn?: (result: ResultType) => any;
 
     @Prop()
-    'page-size': number | string;
+    pageSize: number | string;
 
     @Prop()
     current?: number | string;
@@ -94,8 +94,7 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
         } else {
             this.result.msg = '暂无数据';
         }
-        //不绑定
-        this.model.page.size = 0;
+        this.model.setPage({ index: this.current, size: this.pageSize });
     }
     public query(data?: any) {
         this._handleQuery(data);
@@ -261,7 +260,7 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
     }
 }
 
-export interface IMyTable<T extends QueryArgsType> extends MyList<T> { }
+export interface IMyList<T extends QueryArgsType> extends MyList<T> { }
 const MyListView = MyList as {
     new <T extends QueryArgsType>(props: Partial<MyList<T>> & VueComponentOptions): any;
 }

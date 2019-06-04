@@ -3,7 +3,7 @@ import { Form as IForm } from 'iview';
 import { testApi } from '@/api';
 import { myEnum } from '@/config';
 import { Modal, Input, Form, FormItem, Button, Checkbox, Switch } from '@/components/iview';
-import { MyList, IMyTable, Const as MyTableConst } from '@/components/my-list';
+import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
 import { MyConfirm } from '@/components/my-confirm';
 import { convClass } from '@/helpers';
 
@@ -110,15 +110,19 @@ export default class Authority extends Vue {
     delShow = false;
     detail: any;
     get innerRefs() {
-        return this.$refs as { table: IMyTable<any> };
+        return this.$refs as { table: IMyList<any> };
     }
+
+    page: any;
     protected created() {
         this.statusList = myEnum.authorityStatus.toArray().map(ele => {
             ele['checked'] = false;
             return ele;
         });
-
+        let query = this.$route.query;
+        this.page = { index: query.page, size: query.rows };
     }
+
     mounted() {
         this.query();
     }
@@ -189,6 +193,8 @@ export default class Authority extends Vue {
                 </Modal>
                 <MyList
                     ref="table"
+                    current={this.page.index}
+                    pageSize={this.page.size}
                     queryArgs={{
                         name: {
                             label: '名字',
