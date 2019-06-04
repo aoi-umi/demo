@@ -4,7 +4,7 @@ import { testApi } from '@/api';
 import { myEnum } from '@/config';
 import { convClass } from '@/helpers';
 import { Modal, Input, Form, FormItem, Button, Checkbox, Switch } from '@/components/iview';
-import { MyTable, IMyTable, Const as MyTableConst } from '@/components/my-table';
+import { MyTable, IMyTable, Const as MyTableConst } from '@/components/my-list';
 import { MyConfirm } from '@/components/my-confirm';
 import { MyTagModel } from '@/components/my-tag';
 import { MyInput } from '@/components/my-input';

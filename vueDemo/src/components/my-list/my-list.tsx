@@ -4,7 +4,7 @@ import {
     Table, Page, Row, Col,
     Input, Button, Divider, Card, Icon, Spin
 } from '@/components/iview';
-import './my-table.less';
+import './my-list.less';
 import { MyTableModel } from './model';
 import { ListResult } from '@/api';
 
@@ -20,15 +20,15 @@ const event = {
     resetClick: 'reset-click',
     query: 'query'
 };
-const clsPrefix = 'my-table-';
+const clsPrefix = 'my-list-';
 
 export const Const = {
     clsPrefix
 };
 @Component
-class MyTable<QueryArgs extends QueryArgsType> extends Vue {
+class MyList<QueryArgs extends QueryArgsType> extends Vue {
     @Prop()
-    columns!: {
+    columns?: {
         title?: string,
         key?: string,
         fixed?: string;
@@ -58,6 +58,9 @@ class MyTable<QueryArgs extends QueryArgsType> extends Vue {
     @Prop()
     queryFn?: (data: any) => ListResult | Promise<ListResult>;
 
+    protected created() {
+
+    }
     public query(data?: any) {
         this._handleQuery(data);
     }
@@ -216,8 +219,8 @@ class MyTable<QueryArgs extends QueryArgsType> extends Vue {
     }
 }
 
-export interface IMyTable<T extends QueryArgsType> extends MyTable<T> { }
-const MyTableView = MyTable as {
-    new <T extends QueryArgsType>(props: Partial<MyTable<T>> & VueComponentOptions): any;
+export interface IMyTable<T extends QueryArgsType> extends MyList<T> { }
+const MyTableView = MyList as {
+    new <T extends QueryArgsType>(props: Partial<MyList<T>> & VueComponentOptions): any;
 }
 export default MyTableView;
