@@ -114,6 +114,8 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
     }
 
     private handleQuery() {
+        //防止页面不跳转
+        this.model.query._t = Date.now();
         this.$emit('query', this.model);
     }
 

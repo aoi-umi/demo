@@ -14,28 +14,52 @@ export class UserMapper {
 
     static async query(data: UserQueryArgs) {
         let query: any = {};
-        let query2: any = {};
         let noTotal = false;
         if (data._id) {
             query._id = Types.ObjectId(data._id);
             noTotal = true;
-        }
-        if (data.anyKey) {
-            let anykey = new RegExp(escapeRegExp(data.anyKey), 'i');
-            query2.$or = [
-                { nickname: anykey },
-                { account: anykey },
-                { 'authorityList.code': anykey },
-                { 'authorityList.name': anykey },
-                { 'roleList.code': anykey },
-                { 'roleList.name': anykey },
-            ]
         }
 
         if (data.nickname)
             query.nickname = new RegExp(escapeRegExp(data.nickname), 'i');
         if (data.account)
             query.account = new RegExp(escapeRegExp(data.account), 'i');
+
+        let query2: any = {};
+        let and2 = [];
+        if (data.anyKey) {
+            let anykey = new RegExp(escapeRegExp(data.anyKey), 'i');
+            and2 = [...and2, {
+                $or: [
+                    { nickname: anykey },
+                    { account: anykey },
+                    { 'authorityList.code': anykey },
+                    { 'authorityList.name': anykey },
+                    { 'roleList.code': anykey },
+                    { 'roleList.name': anykey },
+                ]
+            }];
+        }
+        if (data.role) {
+            let role = new RegExp(escapeRegExp(data.role), 'i');
+            and2 = [...and2, {
+                $or: [
+                    { 'roleList.code': role },
+                    { 'roleList.name': role },
+                ]
+            }];
+        }
+        if (data.authority) {
+            let authority = new RegExp(escapeRegExp(data.authority), 'i');
+            and2 = [...and2, {
+                $or: [
+                    { 'authorityList.code': authority },
+                    { 'authorityList.name': authority },
+                ]
+            }];
+        }
+        if (and2.length)
+            query2.$and = and2;
 
         let authProject = {
             name: 1,

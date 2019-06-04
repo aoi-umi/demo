@@ -204,7 +204,7 @@ export default class UserMgt extends Vue {
     query() {
         let table = this.innerRefs.table;
         let query = this.$route.query;
-        [].forEach(key => {
+        ['account', 'nickname', 'role', 'authority', 'anykey'].forEach(key => {
             if (query[key])
                 this.$set(table.model.query, key, query[key]);
         });
@@ -234,6 +234,24 @@ export default class UserMgt extends Vue {
                 </Modal>
                 <MyList
                     ref="table"
+
+                    queryArgs={{
+                        account: {
+                            label: '账号'
+                        },
+                        nickname: {
+                            label: '昵称'
+                        },
+                        role: {
+                            label: '角色'
+                        },
+                        authority: {
+                            label: '权限'
+                        },
+                        anykey: {
+                            label: '任意字'
+                        },
+                    }}
                     hideQueryBtn={{ add: true, reset: true }}
 
                     columns={[{
@@ -325,7 +343,7 @@ export default class UserMgt extends Vue {
                                 page: model.page.index,
                                 rows: model.page.size
                             }
-                        })
+                        });
                     }}
                 >
                 </MyList>
