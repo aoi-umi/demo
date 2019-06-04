@@ -2,7 +2,7 @@ import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { Form as IForm } from 'iview';
 import { testApi } from '@/api';
 import { Tag, Modal, Input, Row, Col, Form, FormItem, Button } from '@/components/iview';
-import { MyList, IMyTable, Const as MyTableConst } from '@/components/my-list';
+import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
 import { MyTagModel } from '@/components/my-tag';
 import { MyConfirm } from '@/components/my-confirm';
 import { convClass } from '@/helpers';
@@ -132,7 +132,12 @@ export default class Bookmark extends Vue {
     delShow = false;
     detail: any;
     get innerRefs() {
-        return this.$refs as { table: IMyTable<any> };
+        return this.$refs as { table: IMyList<any> };
+    }
+    page: any;
+    created() {
+        let query = this.$route.query;
+        this.page = { index: query.page, size: query.rows };
     }
     mounted() {
         this.query();
@@ -188,6 +193,8 @@ export default class Bookmark extends Vue {
                 </Modal>
                 <MyList
                     ref="table"
+                    current={this.page.index}
+                    pageSize={this.page.size}
                     queryArgs={{
                         name: {
                             label: '名字',
