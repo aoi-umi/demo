@@ -60,6 +60,12 @@ export const routerConfig = {
     component: () => import('./views/authority')
   },
 
+  test: {
+    path: '/test',
+    text: '测试',
+    component: () => import('./views/demo')
+  },
+
   error: {
     path: dev.routeConfig.error.path,
     text: '出错啦',

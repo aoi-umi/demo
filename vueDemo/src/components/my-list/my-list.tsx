@@ -25,8 +25,20 @@ const clsPrefix = 'my-list-';
 export const Const = {
     clsPrefix
 };
+
+type ResultType = {
+    success: boolean,
+    total: number,
+    msg: string,
+    data: any[]
+}
 @Component
 class MyList<QueryArgs extends QueryArgsType> extends Vue {
+    @Prop({
+        default: 'table'
+    })
+    type: 'table' | 'custom';
+
     @Prop()
     columns?: {
         title?: string,
@@ -37,6 +49,12 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
         align?: string;
         render?: (h: any, params: { row: any }) => any
     }[];
+
+    @Prop()
+    customRenderFn?: (result: ResultType) => any;
+
+    @Prop()
+    data: any[];
 
     @Prop()
     queryArgs?: QueryArgs;
@@ -59,7 +77,17 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
     queryFn?: (data: any) => ListResult | Promise<ListResult>;
 
     protected created() {
-
+        if (this.type == 'table' && !this.columns) {
+            throw new Error(`type 'table' require 'columns'!`);
+        } else if (this.type == 'custom' && !this.customRenderFn) {
+            throw new Error(`type 'custom' require 'customRenderFn'!`);
+        }
+        if (this.data) {
+            this.result.data = this.data;
+            this.result.total = this.data.length;
+        } else {
+            this.result.msg = '暂无数据';
+        }
     }
     public query(data?: any) {
         this._handleQuery(data);
@@ -108,7 +136,7 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
     private showQuery = true;
     private loading = false;
     model = new MyTableModel<{ [k in keyof QueryArgs]: any }>();
-    private result = {
+    private result: ResultType = {
         success: true,
         total: 0,
         msg: '',
@@ -185,10 +213,14 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
                     </div>
                 </Card>
                 <div style={{ position: 'relative', }}>
-                    <Table style={{ marginTop: '10px' }} columns={this.columns}
-                        data={this.result.data} no-data-text={this.result.msg}
-                        on-on-selection-change={this.setSelectedRows}>
-                    </Table>
+                    {this.$slots.default}
+                    {this.type == 'table' ?
+                        <Table style={{ marginTop: '10px' }} columns={this.columns}
+                            data={this.result.data} no-data-text={this.result.msg}
+                            on-on-selection-change={this.setSelectedRows}>
+                        </Table> :
+                        this.customRenderFn(this.result)
+                    }
                     <Page class={clsPrefix + "page"} total={this.result.total}
                         current={this.model.page.index}
                         page-size={this.model.page.size}
@@ -220,7 +252,7 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
 }
 
 export interface IMyTable<T extends QueryArgsType> extends MyList<T> { }
-const MyTableView = MyList as {
+const MyListView = MyList as {
     new <T extends QueryArgsType>(props: Partial<MyList<T>> & VueComponentOptions): any;
 }
-export default MyTableView;
+export default MyListView;

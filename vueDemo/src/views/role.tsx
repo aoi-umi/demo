@@ -4,7 +4,7 @@ import { testApi } from '@/api';
 import { myEnum } from '@/config';
 import { convClass } from '@/helpers';
 import { Modal, Input, Form, FormItem, Button, Checkbox, Switch } from '@/components/iview';
-import { MyTable, IMyTable, Const as MyTableConst } from '@/components/my-list';
+import { MyList, IMyTable, Const as MyTableConst } from '@/components/my-list';
 import { MyConfirm } from '@/components/my-confirm';
 import { MyTagModel } from '@/components/my-tag';
 import { MyInput } from '@/components/my-input';
@@ -245,7 +245,7 @@ export default class Role extends Vue {
                         {`将要删除${this.delIds.length}项`}
                     </MyConfirm>
                 </Modal>
-                <MyTable
+                <MyList
                     ref="table"
                     queryArgs={{
                         name: {
@@ -369,7 +369,7 @@ export default class Role extends Vue {
                         }
                     }]}
                 >
-                </MyTable>
+                </MyList>
             </div>
         );
     }

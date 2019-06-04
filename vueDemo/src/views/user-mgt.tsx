@@ -4,7 +4,7 @@ import { testApi } from '@/api';
 import { myEnum } from '@/config';
 import { convClass } from '@/helpers';
 import { Modal, Form, FormItem, Button, Tooltip } from '@/components/iview';
-import { MyTable, IMyTable, Const as MyTableConst } from '@/components/my-list';
+import { MyList, IMyTable, Const as MyTableConst } from '@/components/my-list';
 import { MyTagModel } from '@/components/my-tag';
 import { MyInput } from '@/components/my-input';
 
@@ -232,7 +232,7 @@ export default class UserMgt extends Vue {
                         this.innerRefs.table.query();
                     }} />
                 </Modal>
-                <MyTable
+                <MyList
                     ref="table"
                     hideQueryBtn={{ add: true, reset: true }}
 
@@ -328,7 +328,7 @@ export default class UserMgt extends Vue {
                         })
                     }}
                 >
-                </MyTable>
+                </MyList>
             </div>
         );
     }
