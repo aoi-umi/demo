@@ -54,7 +54,13 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
     customRenderFn?: (result: ResultType) => any;
 
     @Prop()
-    data: any[];
+    'page-size': number | string;
+
+    @Prop()
+    current?: number | string;
+
+    @Prop()
+    data?: any[];
 
     @Prop()
     queryArgs?: QueryArgs;
@@ -88,6 +94,8 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
         } else {
             this.result.msg = '暂无数据';
         }
+        //不绑定
+        this.model.page.size = 0;
     }
     public query(data?: any) {
         this._handleQuery(data);
