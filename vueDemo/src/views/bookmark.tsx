@@ -2,7 +2,7 @@ import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { Form as IForm } from 'iview';
 import { testApi } from '@/api';
 import { Tag, Modal, Input, Row, Col, Form, FormItem, Button } from '@/components/iview';
-import { MyTable, IMyTable, Const as MyTableConst } from '@/components/my-table';
+import { MyTable, IMyTable, Const as MyTableConst } from '@/components/my-list';
 import { MyTagModel } from '@/components/my-tag';
 import { MyConfirm } from '@/components/my-confirm';
 import { convClass } from '@/helpers';
