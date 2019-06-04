@@ -3,7 +3,7 @@ import { Form as IForm } from 'iview';
 import { testApi } from '@/api';
 import { myEnum } from '@/config';
 import { Modal, Input, Form, FormItem, Button, Checkbox, Switch } from '@/components/iview';
-import { MyTable, IMyTable, Const as MyTableConst } from '@/components/my-list';
+import { MyList, IMyTable, Const as MyTableConst } from '@/components/my-list';
 import { MyConfirm } from '@/components/my-confirm';
 import { convClass } from '@/helpers';
 
@@ -187,7 +187,7 @@ export default class Authority extends Vue {
                         {`将要删除${this.delIds.length}项`}
                     </MyConfirm>
                 </Modal>
-                <MyTable
+                <MyList
                     ref="table"
                     queryArgs={{
                         name: {
@@ -288,7 +288,7 @@ export default class Authority extends Vue {
                         }
                     }]}
                 >
-                </MyTable>
+                </MyList>
             </div>
         );
     }

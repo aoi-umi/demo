@@ -2,7 +2,7 @@ import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { Form as IForm } from 'iview';
 import { testApi } from '@/api';
 import { Tag, Modal, Input, Row, Col, Form, FormItem, Button } from '@/components/iview';
-import { MyTable, IMyTable, Const as MyTableConst } from '@/components/my-list';
+import { MyList, IMyTable, Const as MyTableConst } from '@/components/my-list';
 import { MyTagModel } from '@/components/my-tag';
 import { MyConfirm } from '@/components/my-confirm';
 import { convClass } from '@/helpers';
@@ -186,7 +186,7 @@ export default class Bookmark extends Vue {
                         {`将要删除${this.delIds.length}项`}
                     </MyConfirm>
                 </Modal>
-                <MyTable
+                <MyList
                     ref="table"
                     queryArgs={{
                         name: {
@@ -278,7 +278,7 @@ export default class Bookmark extends Vue {
                             this.delShow = true;
                         }
                     }]}
-                ></MyTable>
+                ></MyList>
             </div>
         );
     }
