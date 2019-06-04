@@ -189,9 +189,11 @@ export default class UserMgt extends Vue {
     detailShow = false;
     delShow = false;
     detail: any;
+    page: any;
     get innerRefs() {
         return this.$refs as { table: IMyTable<any> };
     }
+
     mounted() {
         this.query();
     }
