@@ -221,13 +221,16 @@ export default class Authority extends Vue {
                         align: 'center'
                     }, {
                         title: '名字',
-                        key: 'name'
+                        key: 'name',
+                        minWidth: 120,
                     }, {
                         title: '编码',
                         key: 'code',
+                        minWidth: 120,
                     }, {
                         title: '状态',
                         key: 'status',
+                        minWidth: 80,
                         render: (h, params) => {
                             let text = myEnum.authorityStatus.getKey(params.row.status);
                             return <span>{text}</span>;

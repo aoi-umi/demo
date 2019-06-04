@@ -170,7 +170,7 @@ export default class Role extends Vue {
     get innerRefs() {
         return this.$refs as { table: IMyList<any> };
     }
-    
+
     page: any;
     protected created() {
         this.statusList = myEnum.roleStatus.toArray().map(ele => {
@@ -294,13 +294,16 @@ export default class Role extends Vue {
                         }
                     }, {
                         title: '名字',
-                        key: 'name'
+                        key: 'name',
+                        minWidth: 120,
                     }, {
                         title: '编码',
                         key: 'code',
+                        minWidth: 120,
                     }, {
                         title: '状态',
                         key: 'status',
+                        minWidth: 80,
                         render: (h, params) => {
                             let text = myEnum.roleStatus.getKey(params.row.status);
                             return <span>{text}</span>;

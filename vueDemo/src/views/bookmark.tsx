@@ -221,10 +221,12 @@ export default class Bookmark extends Vue {
                         }
                     }, {
                         title: '名字',
-                        key: 'name'
+                        key: 'name',
+                        minWidth: 120,
                     }, {
                         title: 'url',
                         key: 'url',
+                        minWidth: 200,
                         render: (h, params) => {
                             return (<a target="_blank" href={params.row.url}>{params.row.url}</a>);
                         }
