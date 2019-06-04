@@ -260,7 +260,7 @@ export default class UserMgt extends Vue {
                             label: '任意字'
                         },
                     }}
-                    hideQueryBtn={{ add: true, reset: true }}
+                    hideQueryBtn={{ add: true, }}
 
                     columns={[{
                         key: '_expand',
@@ -280,13 +280,16 @@ export default class UserMgt extends Vue {
                         }
                     }, {
                         title: '账号',
-                        key: 'account'
+                        key: 'account',
+                        minWidth: 120,
                     }, {
                         title: '昵称',
-                        key: 'nickname'
+                        key: 'nickname',
+                        minWidth: 120,
                     }, {
                         title: '角色',
                         key: 'roleList',
+                        minWidth: 120,
                         render: (h, params) => {
                             let roleList = params.row.roleList
                             if (roleList && roleList.length) {
@@ -308,6 +311,7 @@ export default class UserMgt extends Vue {
                     }, {
                         title: '权限',
                         key: 'authorityList',
+                        minWidth: 120,
                         render: (h, params) => {
                             return this.renderAuth(params.row.authorityList);
                         }

@@ -41,13 +41,23 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
 
     @Prop()
     columns?: {
+        type?: string;
         title?: string,
         key?: string,
-        fixed?: string;
         width?: number;
-        type?: string;
+        minWidth?: number;
+        maxWidth?: number;
         align?: string;
-        render?: (h: any, params: { row: any }) => any
+        className?: string;
+        fixed?: string;
+        ellipsis?: boolean;
+        tooltip?: boolean;
+        render?: (h: any, params: { row: any; column: any }) => any;
+        renderHeader?: (h: any, params: { column: any }) => any;
+        indexMethod?: () => any;
+        sortable?: boolean | 'custom';
+        sortMethod?: () => any;
+        sortType?: 'asc' | 'desc';
     }[];
 
     @Prop()
