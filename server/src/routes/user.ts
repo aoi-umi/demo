@@ -65,8 +65,7 @@ export let signIn: RequestHandler = (req, res) => {
         if (token !== checkToken)
             throw common.error('', errorConfig.TOKEN_WRONG);
         let userInfoKey = dev.cacheKey.user + token;
-        let userRs = await UserMapper.query({ _id: user._id });
-        let userDetail = userRs.rows[0];
+        let userDetail = await UserMapper.detail(user._id);
         let auth = {};
         for (let key in userDetail.auth) {
             auth[key] = 1;
@@ -90,6 +89,14 @@ export let info: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
         return user.key ? user : null;
+    }, req, res);
+};
+
+export let detail: RequestHandler = (req, res) => {
+    responseHandler(async () => {
+        let user = req.myData.user;
+        let userDetail = await UserMapper.detail(user._id);
+        return userDetail;
     }, req, res);
 };
 

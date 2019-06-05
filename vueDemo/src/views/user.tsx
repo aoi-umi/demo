@@ -1,11 +1,17 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { Form as IForm } from 'iview';
+import { getModule } from 'vuex-module-decorators';
+import moment from 'moment';
+
 import { convClass } from '@/helpers';
 import * as helpers from '@/helpers';
 import { dev } from '@/config';
 import { testApi } from '@/api';
-import { Tag, Modal, Input, Row, Col, Form, FormItem, Button } from '@/components/iview';
-import { routeConfig } from '@/config/config';
+import { Tag, Modal, Input, Row, Col, Form, FormItem, Button, Spin, Card } from '@/components/iview';
+import LoginUserStore from '@/store/loginUser';
+import { MyTagModel } from '@/components/my-tag';
+import { DetailDataType as UserDetailDataType } from './user-mgt';
+
 
 type SignInDataType = {
     account?: string;
@@ -32,10 +38,10 @@ class SignIn extends Vue {
         ],
     };
 
-    private get innerRefs() {
-        return this.$refs as { formVaild: IForm }
+    $refs: { formVaild: IForm };
+    get storeUser() {
+        return getModule(LoginUserStore, this.$store);
     }
-
     private loading = false;
 
     private async signIn() {
@@ -46,7 +52,7 @@ class SignIn extends Vue {
             token = helpers.md5(token);
             localStorage.setItem(dev.cacheKey.testUser, token);
             let rs = await testApi.userSignIn(req);
-            this.$store.commit('setUser', rs);
+            this.storeUser.setUser(rs);
             this.innerDetail = this.getDetailData();
             this.$emit('success');
             if (this.to)
@@ -63,7 +69,7 @@ class SignIn extends Vue {
     }
 
     private handleSignIn() {
-        this.innerRefs.formVaild.validate((valid) => {
+        this.$refs.formVaild.validate((valid) => {
             if (!valid) {
                 this.$Message.error('参数有误');
             } else {
@@ -75,9 +81,9 @@ class SignIn extends Vue {
     to = '';
     toQuery = null;
     mounted() {
-        if (location.pathname === routeConfig.userSignIn.path) {
+        if (location.pathname === dev.routeConfig.userSignIn.path) {
             let { to, ...query } = this.$route.query;
-            this.to = (to as string) || routeConfig.index.path;
+            this.to = (to as string) || dev.routeConfig.index.path;
             this.toQuery = query;
         }
     }
@@ -149,9 +155,7 @@ class SignUp extends Vue {
         }],
     };
 
-    private get innerRefs() {
-        return this.$refs as { formVaild: IForm }
-    }
+    $refs: { formVaild: IForm };
 
     private loading = false;
 
@@ -161,7 +165,7 @@ class SignUp extends Vue {
             this.innerDetail = this.getDetailData();
             this.$emit('success');
             this.$Message.success('注册成功');
-            this.$router.push(routeConfig.userSignIn.path);
+            this.$router.push(dev.routeConfig.userSignIn.path);
         } catch (e) {
             this.$Message.error(e.message);
         }
@@ -174,7 +178,7 @@ class SignUp extends Vue {
     }
 
     private handleSignUp() {
-        this.innerRefs.formVaild.validate((valid) => {
+        this.$refs.formVaild.validate((valid) => {
             if (!valid) {
                 this.$Message.error('参数有误');
             } else {
@@ -214,17 +218,58 @@ class SignUp extends Vue {
 export const SignUpView = convClass<SignUp>(SignUp);
 @Component
 export default class UserInfo extends Vue {
+    get storeUser() {
+        return getModule(LoginUserStore, this.$store);
+    }
+    loading = false;
+    detail: UserDetailDataType = {
+        auth: {}
+    };
+    mounted() {
+        this.getUserDetail();
+    }
+
+    async getUserDetail() {
+        if (!this.detail._id) {
+            this.loading = true;
+            try {
+                this.detail = await testApi.userDetail();
+                if (!this.detail)
+                    throw new Error('用户不存在');
+            } catch (e) {
+                this.$router.push({ path: dev.routeConfig.error.path, query: { msg: '获取用户出错:' + e.message } });
+            } finally {
+                this.loading = false;
+            }
+        }
+    }
+
     render() {
         return (
-            <div>
-                <Form label-width={50}>
-                    <FormItem label="账号" prop="account">
-                        {this.$store.state.user.account}
-                    </FormItem>
-                    <FormItem label="昵称" prop="nickname">
-                        {this.$store.state.user.nickname}
-                    </FormItem>
-                </Form>
+            <div style={{ position: 'relative', }}>
+                <Card>
+                    <Form label-width={60}>
+                        <FormItem label="账号">
+                            {this.detail.account}
+                        </FormItem>
+                        <FormItem label="昵称">
+                            {this.detail.nickname}
+                        </FormItem>
+                        <FormItem label="角色">
+                            {MyTagModel.renderRoleTag(this.detail.roleList)}
+                        </FormItem>
+                        <FormItem label="权限">
+                            {MyTagModel.renderAuthorityTag(this.detail.authorityList)}
+                        </FormItem>
+                        <FormItem label="可用权限">
+                            {MyTagModel.renderAuthorityTag(Object.values(this.detail.auth))}
+                        </FormItem>
+                        <FormItem label="创建时间">
+                            {this.detail.createdAt && moment(this.detail.createdAt).format(dev.dateFormat)}
+                        </FormItem>
+                    </Form>
+                </Card>
+                {this.loading && <Spin size="large" fix></Spin>}
             </div>
         );
     }

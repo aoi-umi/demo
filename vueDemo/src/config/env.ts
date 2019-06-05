@@ -28,11 +28,16 @@ const config = {
                 },
                 userInfo: {
                     url: '/user/info',
+                    method: 'get',
+                },
+                userDetail: {
+                    url: '/user/detail',
+                    method: 'get',
                 },
                 userAccountExists: {
                     url: '/user/accountExists',
                 },
-                
+
                 userMgtQuery: {
                     url: '/user/mgt/query',
                     method: 'get',

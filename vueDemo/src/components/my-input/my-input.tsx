@@ -44,10 +44,8 @@ class MyInput extends Vue {
 
     @Prop()
     loading?: boolean;
+    $refs: { select: any, input: any };
 
-    private get innerRefs() {
-        return this.$refs as { select: any, input: any }
-    }
     private currentValue = this.value;
     private disableEmitChange = false;
 
@@ -78,7 +76,7 @@ class MyInput extends Vue {
 
     @Watch('currentValue')
     watchCurrentValue(val) {
-        this.innerRefs.select.setQuery(val);
+        this.$refs.select.setQuery(val);
         this.$emit('input', val);
         if (this.disableEmitChange) {
             this.disableEmitChange = false;
@@ -113,7 +111,7 @@ class MyInput extends Vue {
         if (this.currentValue !== '')
             this.$emit('on-search', '');
         this.currentValue = '';
-        this.innerRefs.select['reset']();
+        this.$refs.select['reset']();
         this.$emit('on-clear');
     }
     protected render() {

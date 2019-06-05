@@ -9,6 +9,8 @@ import { dev } from './config';
 const routeConfig = router.routerConfig;
 import "./App.less";
 import { SignInView } from './views/user';
+import { getModule } from 'vuex-module-decorators';
+import LoginUserStore from './store/loginUser';
 
 @Component
 export default class App extends Vue {
@@ -16,15 +18,18 @@ export default class App extends Vue {
     isCollapsed = true;
     theme = "light" as any;
     title = '';
-    private get innerRefs() {
-        return this.$refs as { sider: any }
-    }
+    $refs: { sider: any };
+
     protected created() {
         this.setTitle();
         this.getUserInfo();
     }
     get menuitemClasses() {
         return ["menu-item", this.isCollapsed ? "collapsed-menu" : ""];
+    }
+
+    get storeUser() {
+        return getModule(LoginUserStore, this.$store);
     }
 
     setTitle() {
@@ -34,7 +39,7 @@ export default class App extends Vue {
         let token = localStorage.getItem(dev.cacheKey.testUser);
         if (token) {
             let user = await testApi.userInfo();
-            this.$store.commit('setUser', user);
+            this.storeUser.setUser(user);
             if (user) {
                 if (location.pathname === routeConfig.userSignIn.path) {
                     let { to, ...query } = this.$route.query;
@@ -46,7 +51,7 @@ export default class App extends Vue {
         }
     }
     collapsedSider() {
-        this.innerRefs.sider.toggleCollapse();
+        this.$refs.sider.toggleCollapse();
     }
 
     renderMenu(data) {
@@ -69,7 +74,7 @@ export default class App extends Vue {
         if (token) {
             testApi.userSignOut();
         }
-        this.$store.commit('setUser', null);
+        this.storeUser.setUser(null);
         localStorage.removeItem(dev.cacheKey.testUser);
     }
 
@@ -91,10 +96,10 @@ export default class App extends Vue {
                     />
                     <span>{this.title}</span>
                     <div class="layout-header-right">
-                        {this.$store.state.user ?
-                            <Poptip trigger="hover">
+                        {this.storeUser.user ?
+                            <Poptip trigger="hover" style={{ cursor: 'pointer' }}>
                                 <Avatar icon="md-person" style={{ marginRight: '10px' }} />
-                                <span>{this.$store.state.user.nickname}</span>
+                                <span>{this.storeUser.user.nickname}</span>
                                 <div slot="content">
                                     <p class="ivu-select-item" on-click={() => {
                                         this.$router.push(routeConfig.userInfo.path);

@@ -165,6 +165,12 @@ export class UserMapper {
         });
         return rs;
     }
+
+    static async detail(_id) {
+        let userRs = await UserMapper.query({ _id });
+        let userDetail = userRs.rows[0];
+        return userDetail;
+    }
 }
 
 export type UserQueryArgs = {
