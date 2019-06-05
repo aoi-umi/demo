@@ -45,9 +45,7 @@ class AuthorityDetail extends Vue {
             { required: true, trigger: 'blur' }
         ],
     };
-    private get innerRefs() {
-        return this.$refs as { formVaild: IForm }
-    }
+    $ref: { formVaild: IForm };
 
     saving = false;
     async save() {
@@ -87,7 +85,7 @@ class AuthorityDetail extends Vue {
                     </FormItem>
                     <FormItem>
                         <Button type="primary" on-click={() => {
-                            this.innerRefs.formVaild.validate((valid) => {
+                            this.$ref.formVaild.validate((valid) => {
                                 if (!valid) {
                                     this.$Message.error('参数有误');
                                 } else {
@@ -109,9 +107,7 @@ export default class Authority extends Vue {
     detailShow = false;
     delShow = false;
     detail: any;
-    get innerRefs() {
-        return this.$refs as { table: IMyList<any> };
-    }
+    $refs: { table: IMyList<any> };
 
     page: any;
     protected created() {
@@ -133,7 +129,7 @@ export default class Authority extends Vue {
     }
 
     query() {
-        let table = this.innerRefs.table;
+        let table = this.$refs.table;
         let query = this.$route.query;
         ['name', 'code', 'anyKey'].forEach(key => {
             if (query[key])
@@ -145,7 +141,7 @@ export default class Authority extends Vue {
             ele.checked = statusList.includes(ele.value.toString());
         });
         table.model.setPage({ index: query.page, size: query.rows });
-        this.innerRefs.table.query(query);
+        this.$refs.table.query(query);
     }
 
     delIds = [];
@@ -156,7 +152,7 @@ export default class Authority extends Vue {
             this.$Message.info('删除成功');
             this.delIds = [];
             this.delShow = false;
-            this.innerRefs.table.query();
+            this.$refs.table.query();
         } catch (e) {
             this.$Message.error('删除失败:' + e.message);
         }
@@ -177,7 +173,7 @@ export default class Authority extends Vue {
                 <Modal v-model={this.detailShow} footer-hide mask-closable={false}>
                     <AuthorityDetailView detail={this.detail} on-save-success={() => {
                         this.detailShow = false;
-                        this.innerRefs.table.query();
+                        this.$refs.table.query();
                     }} />
                 </Modal>
                 <Modal v-model={this.delShow} footer-hide>

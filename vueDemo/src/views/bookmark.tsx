@@ -49,9 +49,8 @@ class BookmarkDetail extends Vue {
             { required: true, trigger: 'blur' }
         ],
     };
-    private get innerRefs() {
-        return this.$refs as { formVaild: IForm }
-    }
+
+    $refs: { formVaild: IForm };
 
     addTag() {
         let tag = this.tag && this.tag.trim();
@@ -108,7 +107,7 @@ class BookmarkDetail extends Vue {
                     </FormItem>
                     <FormItem>
                         <Button type="primary" on-click={() => {
-                            this.innerRefs.formVaild.validate((valid) => {
+                            this.$refs.formVaild.validate((valid) => {
                                 if (!valid) {
                                     this.$Message.error('参数有误');
                                 } else {
@@ -131,9 +130,8 @@ export default class Bookmark extends Vue {
     detailShow = false;
     delShow = false;
     detail: any;
-    get innerRefs() {
-        return this.$refs as { table: IMyList<any> };
-    }
+    $refs: { table: IMyList<any> };
+
     page: any;
     created() {
         let query = this.$route.query;
@@ -149,14 +147,14 @@ export default class Bookmark extends Vue {
     }
 
     query() {
-        let table = this.innerRefs.table;
+        let table = this.$refs.table;
         let query = this.$route.query;
         ['name', 'url', 'anyKey'].forEach(key => {
             if (query[key])
                 this.$set(table.model.query, key, query[key]);
         });
         table.model.setPage({ index: query.page, size: query.rows });
-        this.innerRefs.table.query(query);
+        this.$refs.table.query(query);
     }
 
     delIds = [];
@@ -166,7 +164,7 @@ export default class Bookmark extends Vue {
             this.$Message.info('删除成功');
             this.delIds = [];
             this.delShow = false;
-            this.innerRefs.table.query();
+            this.$refs.table.query();
         } catch (e) {
             this.$Message.error('删除失败:' + e.message);
         }
@@ -177,7 +175,7 @@ export default class Bookmark extends Vue {
                 <Modal v-model={this.detailShow} footer-hide mask-closable={false}>
                     <BookmarkDetailView detail={this.detail} on-save-success={() => {
                         this.detailShow = false;
-                        this.innerRefs.table.query();
+                        this.$refs.table.query();
                     }} />
                 </Modal>
                 <Modal v-model={this.delShow} footer-hide>

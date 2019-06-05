@@ -1,3 +1,11 @@
 export default {
-    Login: 'login'
-}
+    Login: 'login',
+
+    AuthorityQuery: 'authorityQuery',
+    AuthorityDel: 'authorityDel',
+    AuthoritySave: 'authoritySave',
+    
+    RoleQuery: 'roleQuery',
+    RoleDel: 'roleDel',
+    RoleSave: 'roleSave',
+};

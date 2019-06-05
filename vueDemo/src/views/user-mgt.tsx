@@ -8,13 +8,14 @@ import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
 import { MyTagModel } from '@/components/my-tag';
 import { MyInput } from '@/components/my-input';
 
-type DetailDataType = {
+export type DetailDataType = {
     _id?: string;
     account?: string;
     nickname?: string;
     roleList?: { code: string; name: string }[];
     authorityList?: { code: string; name: string }[];
-    auth?: { [code: string]: any }
+    auth?: { [code: string]: any };
+    createdAt?: string;
 }
 @Component
 class RoleDetail extends Vue {
@@ -48,9 +49,8 @@ class RoleDetail extends Vue {
 
     private rules = {
     };
-    private get innerRefs() {
-        return this.$refs as { formVaild: IForm }
-    }
+    $refs: { formVaild: IForm };
+
 
     private authority = '';
     private role = '';
@@ -166,7 +166,7 @@ class RoleDetail extends Vue {
                     </FormItem>
                     <FormItem>
                         <Button type="primary" on-click={() => {
-                            // this.innerRefs.formVaild.validate((valid) => {
+                            // this.$refs.formVaild.validate((valid) => {
                             //     if (!valid) {
                             //         this.$Message.error('参数有误');
                             //     } else {
@@ -189,9 +189,7 @@ export default class UserMgt extends Vue {
     detailShow = false;
     delShow = false;
     detail: any;
-    get innerRefs() {
-        return this.$refs as { table: IMyList<any> };
-    }
+    $refs: { table: IMyList<any> };
 
     page: any;
     created() {
@@ -208,25 +206,14 @@ export default class UserMgt extends Vue {
     }
 
     query() {
-        let table = this.innerRefs.table;
+        let table = this.$refs.table;
         let query = this.$route.query;
         ['account', 'nickname', 'role', 'authority', 'anykey'].forEach(key => {
             if (query[key])
                 this.$set(table.model.query, key, query[key]);
         });
         table.model.setPage({ index: query.page, size: query.rows });
-        this.innerRefs.table.query(query);
-    }
-
-    private renderAuth(authorityList) {
-        if (authorityList && authorityList.length) {
-            return MyTagModel.renderTag(authorityList.map(ele => {
-                return {
-                    tag: `${ele.name}(${ele.code})`,
-                    color: ele.status == myEnum.authorityStatus.启用 ? '' : 'default'
-                }
-            }));
-        }
+        this.$refs.table.query(query);
     }
 
     protected render() {
@@ -235,7 +222,7 @@ export default class UserMgt extends Vue {
                 <Modal v-model={this.detailShow} footer-hide mask-closable={false}>
                     <RoleDetailView detail={this.detail} on-save-success={() => {
                         this.detailShow = false;
-                        this.innerRefs.table.query();
+                        this.$refs.table.query();
                     }} />
                 </Modal>
                 <MyList
@@ -268,15 +255,8 @@ export default class UserMgt extends Vue {
                         width: 30,
                         render: (h, params) => {
                             let auth = params.row.auth;
-                            let enableAuthList: any[] = auth ? Object.values(auth) : [];
-                            if (enableAuthList.length) {
-                                return MyTagModel.renderTag(enableAuthList.map(ele => {
-                                    return {
-                                        tag: `${ele.name}(${ele.code})`,
-                                        color: ele.status == myEnum.authorityStatus.启用 ? '' : 'default'
-                                    }
-                                }));
-                            }
+                            let enableAuthList: any[] = Object.values(auth);
+                            return MyTagModel.renderAuthorityTag(enableAuthList);
                         }
                     }, {
                         title: '账号',
@@ -292,28 +272,14 @@ export default class UserMgt extends Vue {
                         minWidth: 120,
                         render: (h, params) => {
                             let roleList = params.row.roleList
-                            if (roleList && roleList.length) {
-                                return roleList.map(ele => {
-                                    return (
-                                        <Tooltip theme="light" max-width="250" disabled={!ele.authorityList || !ele.authorityList.length}>
-                                            <div slot="content">
-                                                {this.renderAuth(ele.authorityList)}
-                                            </div>
-                                            {MyTagModel.renderTag({
-                                                tag: `${ele.name}(${ele.code})`,
-                                                color: ele.status == myEnum.roleStatus.启用 ? '' : 'default'
-                                            })}
-                                        </Tooltip>
-                                    );
-                                });
-                            }
+                            return MyTagModel.renderRoleTag(roleList);
                         }
                     }, {
                         title: '权限',
                         key: 'authorityList',
                         minWidth: 120,
                         render: (h, params) => {
-                            return this.renderAuth(params.row.authorityList);
+                            return MyTagModel.renderAuthorityTag(params.row.authorityList);
                         }
                     }, {
                         title: '操作',

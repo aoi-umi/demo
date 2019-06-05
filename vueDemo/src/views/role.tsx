@@ -56,9 +56,8 @@ class RoleDetail extends Vue {
             { required: true, trigger: 'blur' }
         ],
     };
-    private get innerRefs() {
-        return this.$refs as { formVaild: IForm }
-    }
+    $refs: { formVaild: IForm };
+
 
     private authority = '';
     private tagModel: MyTagModel;
@@ -145,7 +144,7 @@ class RoleDetail extends Vue {
                     </FormItem>
                     <FormItem>
                         <Button type="primary" on-click={() => {
-                            this.innerRefs.formVaild.validate((valid) => {
+                            this.$refs.formVaild.validate((valid) => {
                                 if (!valid) {
                                     this.$Message.error('参数有误');
                                 } else {
@@ -167,9 +166,8 @@ export default class Role extends Vue {
     detailShow = false;
     delShow = false;
     detail: any;
-    get innerRefs() {
-        return this.$refs as { table: IMyList<any> };
-    }
+    $refs: { table: IMyList<any> };
+
 
     page: any;
     protected created() {
@@ -191,7 +189,7 @@ export default class Role extends Vue {
     }
 
     query() {
-        let table = this.innerRefs.table;
+        let table = this.$refs.table;
         let query = this.$route.query;
         ['name', 'code', 'anyKey'].forEach(key => {
             if (query[key])
@@ -203,7 +201,7 @@ export default class Role extends Vue {
             ele.checked = statusList.includes(ele.value.toString());
         });
         table.model.setPage({ index: query.page, size: query.rows });
-        this.innerRefs.table.query(query);
+        this.$refs.table.query(query);
     }
 
     delIds = [];
@@ -214,7 +212,7 @@ export default class Role extends Vue {
             this.$Message.info('删除成功');
             this.delIds = [];
             this.delShow = false;
-            this.innerRefs.table.query();
+            this.$refs.table.query();
         } catch (e) {
             this.$Message.error('删除失败:' + e.message);
         }
@@ -235,7 +233,7 @@ export default class Role extends Vue {
                 <Modal v-model={this.detailShow} footer-hide mask-closable={false}>
                     <RoleDetailView detail={this.detail} on-save-success={() => {
                         this.detailShow = false;
-                        this.innerRefs.table.query();
+                        this.$refs.table.query();
                     }} />
                 </Modal>
                 <Modal v-model={this.delShow} footer-hide>
@@ -283,14 +281,7 @@ export default class Role extends Vue {
                         width: 30,
                         render: (h, params) => {
                             let authorityList = params.row.authorityList
-                            if (authorityList && authorityList.length) {
-                                return MyTagModel.renderTag(authorityList.map(ele => {
-                                    return {
-                                        tag: `${ele.name}(${ele.code})`,
-                                        color: ele.status == myEnum.authorityStatus.启用 ? '' : 'default'
-                                    }
-                                }));
-                            }
+                            return MyTagModel.renderAuthorityTag(authorityList);
                         }
                     }, {
                         title: '名字',

@@ -3,6 +3,8 @@ import Router, { RouteConfig } from 'vue-router';
 
 import { authority, error, dev } from './config';
 import store from './store';
+import { getModule } from 'vuex-module-decorators';
+import LoginUserStore from './store/loginUser';
 
 Vue.use(Router);
 type MyRouteConfig = RouteConfig & { text?: string; };
@@ -118,7 +120,8 @@ router.beforeEach((to, from, next) => {
     return next(routerConfig.bookmark.path);
   }
   let auth = to.meta && to.meta.authority;
-  if (auth && auth.includes(authority.Login) && !store.state.user) {
+  let mod = getModule(LoginUserStore, store);
+  if (auth && auth.includes(authority.Login) && !mod.user) {
     return next({ path: routerConfig.userSignIn.path, query: { to: to.path, ...to.query } });
   }
   next();
