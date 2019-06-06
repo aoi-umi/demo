@@ -23,3 +23,5 @@ export let cacheTime = {
     captcha: 10 * 60
 };
 //#endregion
+
+export let rootRole = 'root';
