@@ -1,10 +1,12 @@
 import { Types } from 'mongoose';
 
 import { escapeRegExp } from '../../../_system/common';
+import { myEnum } from '../../../config/enum';
+import { dev } from '../../../config';
+
 import { AuthorityModel } from '../authority';
 import { RoleModel } from '../role';
 import { UserModel } from ".";
-import { myEnum } from '../../../config/enum';
 
 export class UserMapper {
     static async accountExists(account: string) {
@@ -204,6 +206,12 @@ export class UserMapper {
     static async detail(_id) {
         let userRs = await UserMapper.query({ _id });
         let userDetail = userRs.rows[0];
+        if (userDetail && userDetail.roleList.find(r => r.code == dev.rootRole)) {
+            let authList = await AuthorityModel.find({ status: myEnum.authorityStatus.启用 });
+            authList.forEach(ele => {
+                userDetail.auth[ele.code] = ele;
+            });
+        }
         return userDetail;
     }
 }

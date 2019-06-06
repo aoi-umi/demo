@@ -65,11 +65,12 @@ export let signIn: RequestHandler = (req, res) => {
         if (token !== checkToken)
             throw common.error('', errorConfig.TOKEN_WRONG);
         let userInfoKey = dev.cacheKey.user + token;
-        let userDetail = await UserMapper.detail(user._id);
         let auth = {};
+        let userDetail = await UserMapper.detail(user._id);
         for (let key in userDetail.auth) {
             auth[key] = 1;
         }
+
         let returnUser = { _id: user._id, account: user.account, nickname: user.nickname, key: token, authority: auth };
         await cache.set(userInfoKey, returnUser, dev.cacheTime.user);
         return returnUser;
