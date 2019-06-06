@@ -3,7 +3,7 @@ import { Form as IForm } from 'iview';
 import { testApi } from '@/api';
 import { myEnum } from '@/config';
 import { convClass } from '@/helpers';
-import { Modal, Form, FormItem, Button, Tooltip } from '@/components/iview';
+import { Modal, Form, FormItem, Button } from '@/components/iview';
 import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
 import { MyTagModel } from '@/components/my-tag';
 import { MyInput } from '@/components/my-input';
@@ -12,8 +12,8 @@ export type DetailDataType = {
     _id?: string;
     account?: string;
     nickname?: string;
-    roleList?: { code: string; name: string }[];
-    authorityList?: { code: string; name: string }[];
+    roleList?: { code: string; name: string; isDel: boolean; }[];
+    authorityList?: { code: string; name: string; isDel: boolean }[];
     auth?: { [code: string]: any };
     createdAt?: string;
 }
@@ -34,15 +34,19 @@ class RoleDetail extends Vue {
         this.role = '';
         this.authority = '';
         this.authModel = new MyTagModel(this.innerDetail.authorityList.map(ele => {
+            let tag = ele.isDel ? ele.code : `${ele.name}(${ele.code})`;
             return {
-                tag: `${ele.name}(${ele.code})`,
-                key: ele.code
+                tag: tag,
+                key: ele.code,
+                isDel: ele.isDel,
             };
         }));
         this.roleModel = new MyTagModel(this.innerDetail.roleList.map(ele => {
+            let tag = ele.isDel ? ele.code : `${ele.name}(${ele.code})`;
             return {
-                tag: `${ele.name}(${ele.code})`,
-                key: ele.code
+                tag: tag,
+                key: ele.code,
+                isDel: ele.isDel,
             };
         }));
     }
@@ -208,7 +212,7 @@ export default class UserMgt extends Vue {
     query() {
         let table = this.$refs.table;
         let query = this.$route.query;
-        ['account', 'nickname', 'role', 'authority', 'anykey'].forEach(key => {
+        ['account', 'nickname', 'role', 'authority', 'anyKey'].forEach(key => {
             if (query[key])
                 this.$set(table.model.query, key, query[key]);
         });
@@ -243,7 +247,7 @@ export default class UserMgt extends Vue {
                         authority: {
                             label: '权限'
                         },
-                        anykey: {
+                        anyKey: {
                             label: '任意字'
                         },
                     }}

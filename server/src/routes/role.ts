@@ -10,7 +10,7 @@ export let query: RequestHandler = (req, res) => {
         let schema = {};
         let data: RoleQueryArgs = req.query;
         paramsValid(schema, data, { list: true });
-        let { rows, total } = await RoleMapper.query(data);
+        let { rows, total } = await RoleMapper.query({ ...data, includeDelAuth: true });
         return {
             rows,
             total

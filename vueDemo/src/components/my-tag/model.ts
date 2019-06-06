@@ -12,12 +12,14 @@ export type TagType = {
     color?: string;
     checkable?: boolean;
     data?: any;
+    isDel?: boolean;
 };
 
 type TagObjType = {
     key: string;
     tag: string;
     data?: any;
+    isDel?: boolean;
 };
 type OutTagType = TagObjType | string;
 export class MyTagModel {
@@ -26,14 +28,15 @@ export class MyTagModel {
     constructor(tagList: OutTagType[]) {
         if (tagList && tagList.length) {
             this.tagList = tagList.map(ele => {
-                let { key, tag, data } = this.getTag(ele);
+                let newTag = this.getTag(ele);
                 return {
                     add: false,
-                    key,
-                    tag,
+                    key: newTag.key,
+                    tag: newTag.tag,
                     selected: true,
                     checkable: true,
-                    data,
+                    data: newTag.data,
+                    isDel: newTag.isDel
                 }
             });
         } else {
@@ -42,18 +45,20 @@ export class MyTagModel {
     }
 
     private getTag(ele: OutTagType) {
-        let key = '', tag = '', data;
+        let key = '', tag = '', data, isDel = false;
         if (typeof ele === 'string')
             data = key = tag = ele;
         else {
             key = ele.key;
             tag = ele.tag;
             data = ele.data;
+            isDel = ele.isDel;
         }
         return {
             key,
             tag,
             data,
+            isDel
         };
     }
 

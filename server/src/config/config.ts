@@ -22,7 +22,11 @@ let config = {
         } as ConnectionOptions
     },
     api: {},
-    urlPrefix: '/devMgt'
+    urlPrefix: '/devMgt',
+    logger: {
+        name: 'devMgt',
+        appenders: { type: 'stdout' }
+    }
 };
 
 export default config;
