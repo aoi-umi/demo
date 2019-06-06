@@ -3,9 +3,10 @@ import * as Q from 'q';
 import * as moment from 'moment';
 import { MongooseDocument, Error } from 'mongoose';
 
-import { ajvInst, refType } from './ajv';
 import * as common from '../_system/common';
 import errorConfig from '../config/errorConfig';
+import { logger } from '../_main';
+import { ajvInst, refType } from './ajv';
 
 type ResponseHandlerOptType = {
     json?: boolean;
@@ -51,6 +52,7 @@ export let responseHandler = function (fn: (opt?: ResponseHandlerOptType) => any
     }).catch(err => {
         let msg = err.msg || err.message;
         let response = { result: false, code: err.code, msg, remark: err.remark };
+        logger.error(err);
         res.json(response);
     }).finally(() => {
         // if (log.response)

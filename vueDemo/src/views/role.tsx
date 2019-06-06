@@ -14,7 +14,7 @@ type DetailDataType = {
     name?: string;
     code?: string;
     status?: number;
-    authorityList?: { code: string; name: string }[];
+    authorityList?: { code: string; name: string, isDel: boolean; }[];
 }
 @Component
 class RoleDetail extends Vue {
@@ -41,9 +41,11 @@ class RoleDetail extends Vue {
         this.innerDetail = data;
         this.authority = '';
         this.tagModel = new MyTagModel(this.innerDetail.authorityList.map(ele => {
+            let tag = ele.isDel ? ele.code : `${ele.name}(${ele.code})`;
             return {
-                tag: `${ele.name}(${ele.code})`,
-                key: ele.code
+                tag: tag,
+                key: ele.code,
+                isDel: ele.isDel,
             };
         }));
     }
@@ -257,6 +259,9 @@ export default class Role extends Vue {
                         },
                         code: {
                             label: '编码',
+                        },
+                        authority: {
+                            label: '权限',
                         },
                         anyKey: {
                             label: '任意字'

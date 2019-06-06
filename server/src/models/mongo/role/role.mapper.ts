@@ -1,8 +1,9 @@
 import { Types } from 'mongoose';
-import { RoleModel } from ".";
-import { AuthorityModel } from '../authority';
 import { myEnum, getEnumValueByStr } from '../../../config/enum';
 import { escapeRegExp } from '../../../_system/common';
+import { AuthorityModel } from '../authority';
+import { UserMapper } from '../user';
+import { RoleModel } from ".";
 
 export class RoleMapper {
     static async codeExists(code: string, _id?: any) {
@@ -16,20 +17,10 @@ export class RoleMapper {
 
     static async query(data: RoleQueryArgs) {
         let query: any = {};
-        let query2: any = {};
         let noTotal = false;
         if (data._id) {
             query._id = Types.ObjectId(data._id);
             noTotal = true;
-        }
-        if (data.anyKey) {
-            let anykey = new RegExp(escapeRegExp(data.anyKey), 'i');
-            query2.$or = [
-                { code: anykey },
-                { name: anykey },
-                { 'authorityList.code': anykey },
-                { 'authorityList.name': anykey },
-            ]
         }
 
         if (data.name)
@@ -42,6 +33,33 @@ export class RoleMapper {
                 query.status = { $in: status };
             }
         }
+
+        let query2: any = {};
+        let and2 = [];
+        if (data.anyKey) {
+            let anykey = new RegExp(escapeRegExp(data.anyKey), 'i');
+            and2 = [...and2, {
+                $or: [
+                    { code: anykey },
+                    { name: anykey },
+                    { 'authorityList': anykey },
+                    { 'newAuthorityList.code': anykey },
+                    { 'newAuthorityList.name': anykey },
+                ]
+            }]
+        }
+        if (data.authority) {
+            let authority = new RegExp(escapeRegExp(data.authority), 'i');
+            and2 = [...and2, {
+                $or: [
+                    { 'authorityList': authority },
+                    { 'newAuthorityList.code': authority },
+                    { 'newAuthorityList.name': authority },
+                ]
+            }];
+        }
+        if (and2.length)
+            query2.$and = and2;
 
         let pipeline: any[] = [
             {
@@ -67,7 +85,7 @@ export class RoleMapper {
                             }
                         }
                     ],
-                    as: 'authorityList'
+                    as: 'newAuthorityList'
                 }
             },
             {
@@ -79,6 +97,14 @@ export class RoleMapper {
             rows: data.rows,
             noTotal,
         });
+        rs.rows.forEach(ele => {
+            let authorityList = ele.newAuthorityList;
+            delete ele.newAuthorityList;
+            if (data.includeDelAuth) {
+                UserMapper.setDelAuthOrRole(authorityList, ele.authorityList);
+            }
+            ele.authorityList = authorityList;
+        });
         return rs;
     }
 }
@@ -88,5 +114,7 @@ export type RoleQueryArgs = {
     code?: string;
     name?: string;
     status?: string;
+    authority?: string;
     anyKey?: string;
+    includeDelAuth?: boolean;
 } & ApiListQueryArgs;

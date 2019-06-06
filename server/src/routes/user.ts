@@ -104,7 +104,9 @@ export let mgtQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let data = req.query;
         paramsValid({}, data, { list: true });
-        let { rows, total } = await UserMapper.query(data);
+        let { rows, total } = await UserMapper.query({
+            ...data, includeDelAuth: true
+        });
         return {
             rows,
             total

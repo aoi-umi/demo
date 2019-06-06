@@ -33,10 +33,11 @@ export class UserMapper {
                 $or: [
                     { nickname: anykey },
                     { account: anykey },
-                    { 'authorityList.code': anykey },
-                    { 'authorityList.name': anykey },
-                    { 'roleList.code': anykey },
-                    { 'roleList.name': anykey },
+                    { 'authorityList': anykey },
+                    { 'newAuthorityList.code': anykey },
+                    { 'newAuthorityList.name': anykey },
+                    { 'newRoleList.code': anykey },
+                    { 'newRoleList.name': anykey },
                 ]
             }];
         }
@@ -44,8 +45,9 @@ export class UserMapper {
             let role = new RegExp(escapeRegExp(data.role), 'i');
             and2 = [...and2, {
                 $or: [
-                    { 'roleList.code': role },
-                    { 'roleList.name': role },
+                    { 'roleList': role },
+                    { 'newRoleList.code': role },
+                    { 'newRoleList.name': role },
                 ]
             }];
         }
@@ -53,8 +55,9 @@ export class UserMapper {
             let authority = new RegExp(escapeRegExp(data.authority), 'i');
             and2 = [...and2, {
                 $or: [
-                    { 'authorityList.code': authority },
-                    { 'authorityList.name': authority },
+                    { 'authorityList': authority },
+                    { 'newAuthorityList.code': authority },
+                    { 'newAuthorityList.name': authority },
                 ]
             }];
         }
@@ -91,7 +94,7 @@ export class UserMapper {
                             $project: authProject
                         }
                     ],
-                    as: 'authorityList'
+                    as: 'newAuthorityList'
                 }
             },
             {
@@ -122,7 +125,7 @@ export class UserMapper {
                                         $project: authProject
                                     }
                                 ],
-                                as: 'authorityList'
+                                as: 'newAuthorityList'
                             }
                         },
                         {
@@ -131,10 +134,11 @@ export class UserMapper {
                                 code: 1,
                                 status: 1,
                                 authorityList: 1,
+                                newAuthorityList: 1,
                             }
                         }
                     ],
-                    as: 'roleList'
+                    as: 'newRoleList'
                 }
             },
             {
@@ -149,21 +153,52 @@ export class UserMapper {
         rs.rows.forEach((ele) => {
             //可用权限
             let auth = {};
-            ele.authorityList.forEach(authority => {
+            let authorityList = ele.newAuthorityList;
+            delete ele.newAuthorityList;
+            authorityList.forEach(authority => {
                 if (authority.status == myEnum.authorityStatus.启用)
                     auth[authority.code] = authority;
             });
-            ele.roleList.forEach(role => {
+            if (data.includeDelAuth) {
+                UserMapper.setDelAuthOrRole(authorityList, ele.authorityList);
+            }
+            ele.authorityList = authorityList;
+
+            let roleList = ele.newRoleList;
+            delete ele.newRoleList;
+            roleList.forEach(role => {
                 if (role.status == myEnum.roleStatus.启用) {
-                    role.authorityList.forEach(authority => {
+                    let roleAuthorityList = role.newAuthorityList;
+                    delete role.newAuthorityList;
+                    roleAuthorityList.forEach(authority => {
                         if (authority.status == myEnum.authorityStatus.启用)
                             auth[authority.code] = authority;
                     });
+
+                    if (data.includeDelAuth) {
+                        UserMapper.setDelAuthOrRole(roleAuthorityList, role.authorityList);
+                    }
+                    role.authorityList = roleAuthorityList;
                 }
             });
+            if (data.includeDelAuth) {
+                UserMapper.setDelAuthOrRole(roleList, ele.roleList);
+            }
+            ele.roleList = roleList;
             ele.auth = auth;
         });
         return rs;
+    }
+
+    static setDelAuthOrRole(list, codeList) {
+        codeList.forEach(auth => {
+            if (!list.find(e => e.code == auth)) {
+                list.push({
+                    code: auth,
+                    isDel: true
+                });
+            }
+        });
     }
 
     static async detail(_id) {
@@ -180,4 +215,6 @@ export type UserQueryArgs = {
     authority?: string;
     role?: string;
     anyKey?: string;
+    //包含已删除的权限角色
+    includeDelAuth?: boolean;
 } & ApiListQueryArgs;
