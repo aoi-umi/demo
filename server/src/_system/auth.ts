@@ -6,33 +6,34 @@ import * as common from './common';
 import errorConfig from '../config/errorConfig';
 import { authConfig, AuthConfigType } from '../config/authConfig';
 
-export type AccessableUrlConfigType = {
+export type AccessUrlConfigType = {
     url: string;
     auth?: AuthorityType | AuthorityType[] | AuthorityType[][];
 }
 
 type AuthorityType = string | AuthConfigType;
 
-export let accessableUrlConfig: AccessableUrlConfigType[] = [];
-let accessableIfNoExists = false;
+export let accessUrlConfig: AccessUrlConfigType[] = [];
+let accessableIfNotExists = false;
 export let init = function (opt: {
-    accessableUrlConfig: AccessableUrlConfigType[],
-    accessableIfNoExists?: boolean,    
+    accessUrlConfig: AccessUrlConfigType[],
+    //accessUrlConfig中不存在时能否访问
+    accessableIfNotExists?: boolean,
 }) {
     opt = common.extend({ accessableIfNoExists: false }, opt);
-    accessableUrlConfig = opt.accessableUrlConfig;
-    accessableIfNoExists = opt.accessableIfNoExists;
+    accessUrlConfig = opt.accessUrlConfig;
+    accessableIfNotExists = opt.accessableIfNotExists;
 };
 
 export let check = function (req: Request, res: Response, next) {
     //url权限认证
     var user = req.myData.user;
-    var pathname = req._parsedUrl.pathname;
+    var pathname = req.originalUrl;
     req.myData.accessableUrl = getAccessableUrl(user, pathname);
     next();
 };
 
-export let isHadAuthority = function (user: Express.MyDataUser, authData: AuthorityType | AuthorityType[] | AuthorityType[][], opt?: IsExistAuthorityOption) {
+export let hasAuthority = function (user: Express.MyDataUser, authData: AuthorityType | AuthorityType[] | AuthorityType[][], opt?: IsExistAuthorityOption) {
     if (!Array.isArray(authData))
         authData = [authData];
     for (var i = 0; i < authData.length; i++) {
@@ -77,11 +78,11 @@ export let getAccessableUrl = function (user: Express.MyDataUser, pathname?: str
     var url = {};
     var accessable = false;
     var isUrlExist = false;
-    accessableUrlConfig.forEach(function (item) {
+    accessUrlConfig.forEach(function (item) {
         var opt = { notExistAuthority: null };
         var result = !item.auth
             || (Array.isArray(item.auth) && !item.auth.length)
-            || isHadAuthority(user, item.auth, opt);
+            || hasAuthority(user, item.auth, opt);
         var isExist = item.url == pathname;
         if (isExist) isUrlExist = true;
         if (result) {
@@ -94,7 +95,7 @@ export let getAccessableUrl = function (user: Express.MyDataUser, pathname?: str
         }
     });
     if (pathname) {
-        if (!accessableIfNoExists) {
+        if (!accessableIfNotExists) {
             if (!isUrlExist)
                 throw common.error('', errorConfig.NOT_FOUND, {
                     format: function (msg) {

@@ -11,10 +11,10 @@ import { LoginUserType, LoginUser } from '@/model/user';
 
 @Module({ name: 'user' })
 export default class LoginUserStore extends VuexModule {
-    user: LoginUserType = null;
+    user: LoginUserType = LoginUser.create(null);
 
     @Mutation
     setUser(user) {
-        this.user = user && LoginUser.create(user);
+        this.user = LoginUser.create(user);
     }
 }

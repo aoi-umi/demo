@@ -1,9 +1,8 @@
 import { RequestHandler } from 'express';
 import * as common from '../_system/common';
-import errorConfig from '../config/errorConfig';
 import * as cache from '../_system/cache';
 import { responseHandler, paramsValid, } from '../helpers';
-import { dev } from '../config';
+import { dev, error, auth } from '../config';
 import { UserModel, UserMapper } from '../models/mongo/user';
 import { transaction } from '../_system/dbMongo';
 
@@ -63,15 +62,17 @@ export let signIn: RequestHandler = (req, res) => {
         let reqBody = JSON.stringify(data);
         let checkToken = common.createToken(data.account + user.password + reqBody);
         if (token !== checkToken)
-            throw common.error('', errorConfig.TOKEN_WRONG);
+            throw common.error('', error.TOKEN_WRONG);
         let userInfoKey = dev.cacheKey.user + token;
-        let auth = {};
+        let userAuth = {
+            [auth.login.code]: 1
+        };
         let userDetail = await UserMapper.detail(user._id);
         for (let key in userDetail.auth) {
-            auth[key] = 1;
+            userAuth[key] = 1;
         }
 
-        let returnUser = { _id: user._id, account: user.account, nickname: user.nickname, key: token, authority: auth };
+        let returnUser = { _id: user._id, account: user.account, nickname: user.nickname, key: token, authority: userAuth };
         await cache.set(userInfoKey, returnUser, dev.cacheTime.user);
         return returnUser;
     }, req, res);

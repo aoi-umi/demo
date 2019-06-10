@@ -8,6 +8,9 @@ declare global {
             myData: MyData;
             _parsedUrl: {
                 pathname: string;
+            },
+            _parsedOriginalUrl: {
+                pathname: string;
             }
         }
 
@@ -39,9 +42,6 @@ declare global {
         }
 
         interface Response {
-            mySend(err, detail?, opt?);
-
-            myRender(view: string, options?: Object): void;
         }
     }
 }

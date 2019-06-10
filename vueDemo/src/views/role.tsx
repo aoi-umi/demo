@@ -1,13 +1,15 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { Form as IForm } from 'iview';
+import { getModule } from 'vuex-module-decorators';
 import { testApi } from '@/api';
-import { myEnum } from '@/config';
+import { myEnum, authority } from '@/config';
 import { convClass } from '@/helpers';
 import { Modal, Input, Form, FormItem, Button, Checkbox, Switch } from '@/components/iview';
 import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
 import { MyConfirm } from '@/components/my-confirm';
 import { MyTagModel } from '@/components/my-tag';
 import { MyInput } from '@/components/my-input';
+import LoginUserStore from '@/store/loginUser';
 
 type DetailDataType = {
     _id?: string;
@@ -169,7 +171,9 @@ export default class Role extends Vue {
     delShow = false;
     detail: any;
     $refs: { table: IMyList<any> };
-
+    get storeUser() {
+        return getModule(LoginUserStore, this.$store);
+    }
 
     page: any;
     protected created() {
@@ -275,6 +279,10 @@ export default class Role extends Vue {
                         );
                     })}
 
+                    hideQueryBtn={{
+                        add: !this.storeUser.user.hasAuth(authority.roleSave)
+                    }}
+
                     columns={[{
                         key: '_selection',
                         type: 'selection',
@@ -313,17 +321,21 @@ export default class Role extends Vue {
                             let detail = params.row;
                             return (
                                 <div class={MyTableConst.clsPrefix + "action-box"}>
-                                    <a on-click={() => {
-                                        this.updateStatus(detail);
-                                    }}>{detail.status == myEnum.roleStatus.启用 ? '禁用' : '启用'}</a>
-                                    <a on-click={() => {
-                                        this.detail = detail;
-                                        this.detailShow = true;
-                                    }}>编辑</a>
-                                    <a on-click={() => {
-                                        this.delIds = [detail._id];
-                                        this.delShow = true;
-                                    }}>删除</a>
+                                    {this.storeUser.user.hasAuth(authority.roleSave) && [
+                                        <a on-click={() => {
+                                            this.updateStatus(detail);
+                                        }}>{detail.status == myEnum.roleStatus.启用 ? '禁用' : '启用'}</a>,
+                                        <a on-click={() => {
+                                            this.detail = detail;
+                                            this.detailShow = true;
+                                        }}>编辑</a>
+                                    ]}
+                                    {this.storeUser.user.hasAuth(authority.roleDel) &&
+                                        <a on-click={() => {
+                                            this.delIds = [detail._id];
+                                            this.delShow = true;
+                                        }}>删除</a>
+                                    }
                                 </div>
                             );
                         }

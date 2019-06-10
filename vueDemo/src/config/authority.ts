@@ -1,11 +1,14 @@
 export default {
-    Login: 'login',
+    login: 'login',
 
-    AuthorityQuery: 'authorityQuery',
-    AuthorityDel: 'authorityDel',
-    AuthoritySave: 'authoritySave',
-    
-    RoleQuery: 'roleQuery',
-    RoleDel: 'roleDel',
-    RoleSave: 'roleSave',
+    userMgtQuery: 'userMgtQuery',
+    userMgtEdit: 'userMgtEdit',
+
+    authorityQuery: 'authorityQuery',
+    authorityDel: 'authorityDel',
+    authoritySave: 'authoritySave',
+
+    roleQuery: 'roleQuery',
+    roleDel: 'roleDel',
+    roleSave: 'roleSave',
 };

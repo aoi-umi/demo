@@ -36,7 +36,7 @@ app.use(function (req, res, next) {
 });
 
 /// error handlers
-//app.use(main.errorHandler);
+app.use(main.errorHandler);
 
 process.on('unhandledRejection', function (e) {
     console.error('unhandledRejection');

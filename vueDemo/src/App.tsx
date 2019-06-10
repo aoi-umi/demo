@@ -1,15 +1,15 @@
 import { Component, Vue, Watch, Prop } from "vue-property-decorator";
+import { getModule } from 'vuex-module-decorators';
 import * as router from '@/router';
 import {
     Menu, MenuItem, Option,
     Icon, Content, Sider, Layout, Header, Button, Row, Col, Poptip, Avatar, Modal,
 } from "@/components/iview";
 import { testApi } from './api';
-import { dev } from './config';
+import { dev, authority } from './config';
 const routeConfig = router.routerConfig;
 import "./App.less";
 import { SignInView } from './views/user';
-import { getModule } from 'vuex-module-decorators';
 import LoginUserStore from './store/loginUser';
 
 @Component
@@ -96,7 +96,7 @@ export default class App extends Vue {
                     />
                     <span>{this.title}</span>
                     <div class="layout-header-right">
-                        {this.storeUser.user ?
+                        {this.storeUser.user.isLogin ?
                             <Poptip trigger="hover" style={{ cursor: 'pointer' }}>
                                 <Avatar icon="md-person" style={{ marginRight: '10px' }} />
                                 <span>{this.storeUser.user.nickname}</span>
@@ -137,23 +137,32 @@ export default class App extends Vue {
                                     name: routeConfig.bookmark.path,
                                     to: routeConfig.bookmark.path,
                                     icon: 'md-home',
-                                    text: routeConfig.bookmark.text
+                                    text: routeConfig.bookmark.text,
                                 }, {
                                     name: routeConfig.user.path,
                                     to: routeConfig.user.path,
                                     icon: 'md-people',
-                                    text: routeConfig.user.text
+                                    text: routeConfig.user.text,
+                                    show: this.storeUser.user.hasAuth(authority.userMgtQuery)
                                 }, {
                                     name: routeConfig.role.path,
                                     to: routeConfig.role.path,
                                     icon: 'md-person',
-                                    text: routeConfig.role.text
+                                    text: routeConfig.role.text,
+                                    show: this.storeUser.user.hasAuth(authority.roleQuery)
                                 }, {
                                     name: routeConfig.authority.path,
                                     to: routeConfig.authority.path,
                                     icon: 'md-lock',
-                                    text: routeConfig.authority.text
-                                },].map(data => { return this.renderMenu(data) })
+                                    text: routeConfig.authority.text,
+                                    show: this.storeUser.user.hasAuth(authority.authorityQuery)
+                                },].filter((ele: any) => {
+                                    let show = ele.show;
+                                    if (!ele.hasOwnProperty('show')) {
+                                        show = true;
+                                    }
+                                    return show;
+                                }).map(data => { return this.renderMenu(data) })
                             }
                         </Menu>
                     </Sider>
