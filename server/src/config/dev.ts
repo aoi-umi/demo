@@ -1,13 +1,19 @@
 
-import { AccessableUrlConfigType } from '../_system/auth';
+import { AccessUrlConfigType } from '../_system/auth';
+import { authConfig as auth } from './authConfig';
 
 //#region 访问权限配置
-export let accessableUrlConfig: AccessableUrlConfigType[] = [
-    { url: '/devMgt/user/signUp' },
-    { url: '/devMgt/user/signIn' },
-    { url: '/devMgt/user/signOut' },
-    { url: '/devMgt/user/accountExists' },
-    { url: '/devMgt/bookmark/query' },
+export let accessUrlConfig: AccessUrlConfigType[] = [
+    { url: '/devMgt/user/mgt/query', auth: [auth.userMgtQuery] },
+    { url: '/devMgt/user/mgt/save', auth: [auth.userMgtEdit] },
+
+    { url: '/devMgt/role/query', auth: [auth.roleQuery] },
+    { url: '/devMgt/role/save', auth: [auth.roleSave] },
+    { url: '/devMgt/role/del', auth: [auth.roleDel] },
+
+    { url: '/devMgt/authority/query', auth: [auth.authorityQuery] },
+    { url: '/devMgt/authority/save', auth: [auth.authoritySave] },
+    { url: '/devMgt/authority/del', auth: [auth.authorityDel] },
 ];
 //#endregion
 

@@ -1,12 +1,14 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { Form as IForm } from 'iview';
+import { getModule } from 'vuex-module-decorators';
 import { testApi } from '@/api';
-import { myEnum } from '@/config';
+import { myEnum, authority } from '@/config';
 import { convClass } from '@/helpers';
 import { Modal, Form, FormItem, Button } from '@/components/iview';
 import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
 import { MyTagModel } from '@/components/my-tag';
 import { MyInput } from '@/components/my-input';
+import LoginUserStore from '@/store/loginUser';
 
 export type DetailDataType = {
     _id?: string;
@@ -194,6 +196,9 @@ export default class UserMgt extends Vue {
     delShow = false;
     detail: any;
     $refs: { table: IMyList<any> };
+    get storeUser() {
+        return getModule(LoginUserStore, this.$store);
+    }
 
     page: any;
     created() {
@@ -294,10 +299,12 @@ export default class UserMgt extends Vue {
                             let detail = params.row;
                             return (
                                 <div class={MyTableConst.clsPrefix + "action-box"}>
-                                    <a on-click={() => {
-                                        this.detail = detail;
-                                        this.detailShow = true;
-                                    }}>编辑</a>
+                                    {this.storeUser.user.hasAuth(authority.userMgtEdit) &&
+                                        <a on-click={() => {
+                                            this.detail = detail;
+                                            this.detailShow = true;
+                                        }}>编辑</a>
+                                    }
                                 </div>
                             );
                         }

@@ -121,7 +121,7 @@ router.beforeEach((to, from, next) => {
   }
   let auth = to.meta && to.meta.authority;
   let mod = getModule(LoginUserStore, store);
-  if (auth && auth.includes(authority.Login) && !mod.user) {
+  if (auth && auth.includes(authority.login) && !mod.user.isLogin) {
     return next({ path: routerConfig.userSignIn.path, query: { to: to.path, ...to.query } });
   }
   next();

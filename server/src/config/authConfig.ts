@@ -26,6 +26,32 @@ export const authConfig = {
         errCode: errorConfig.NO_PERMISSIONS,
     },
 
+    userMgtQuery: {
+        code: 'userMgtQuery',
+    },
+    userMgtEdit: {
+        code: 'userMgtEdit',
+    },
+
+    roleQuery: {
+        code: 'roleQuery',
+    },
+    roleSave: {
+        code: 'roleSave',
+    },
+    roleDel: {
+        code: 'roleDel',
+    },
+    authorityQuery: {
+        code: 'authorityQuery',
+    },
+    authoritySave: {
+        code: 'authorityQuery',
+    },
+    authorityDel: {
+        code: 'authorityDel',
+    },
+
     mainContentQuery: {
         code: 'mainContentQuery'
     },

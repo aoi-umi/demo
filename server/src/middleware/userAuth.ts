@@ -1,5 +1,6 @@
 import { RequestHandler } from "express";
 import * as cache from '../_system/cache';
+import * as auth from '../_system/auth';
 import * as config from '../config';
 
 export const normal: RequestHandler = async (req, res, next) => {
@@ -24,7 +25,7 @@ export const normal: RequestHandler = async (req, res, next) => {
                 req.myData.user = user;
         }
 
-        next();
+        auth.check(req, res, next);
     } catch (e) {
         next(e);
     }

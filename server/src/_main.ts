@@ -4,6 +4,7 @@ import { configure, getLogger } from 'log4js';
 import * as mongo from './_system/dbMongo';
 import * as auth from './_system/auth';
 import * as config from './config';
+import * as helpers from './helpers';
 
 export const logger = getLogger();
 
@@ -24,8 +25,8 @@ configure({
 export async function init() {
     await mongo.connect();
     auth.init({
-        accessableUrlConfig: config.dev.accessableUrlConfig,
-        accessableIfNoExists: true
+        accessUrlConfig: config.dev.accessUrlConfig,
+        accessableIfNotExists: true
     });
 }
 
@@ -36,4 +37,10 @@ export let register = function (app: Express) {
 
     app.use(config.env.urlPrefix, routes);
 }
+
+export let errorHandler = function (err, req: Request, res: Response, next) {
+    helpers.responseHandler(() => {
+        throw err;
+    }, req, res);
+};
 

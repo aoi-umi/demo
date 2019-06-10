@@ -11,23 +11,23 @@ export const routeConfig = {
     //个人中心
     userInfo: {
         path: '/user/info',
-        authority: [authorityConfig.Login],
+        authority: [authorityConfig.login],
     },
     userSignIn: { path: '/user/signIn' },
     userSignUp: { path: '/user/signUp' },
     //管理
     userMgt: {
         path: '/userMgt',
-        authority: [authorityConfig.Login],
+        authority: [authorityConfig.login],
     },
     bookmark: { path: '/bookmark' },
     authority: {
         path: '/authority',
-        authority: [authorityConfig.Login],
+        authority: [authorityConfig.login],
     },
     role: {
         path: '/role',
-        authority: [authorityConfig.Login],
+        authority: [authorityConfig.login],
     },
     test: { path: '/test' },
     error: { path: '/error' },
