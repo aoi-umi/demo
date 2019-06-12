@@ -12,6 +12,7 @@ export let query: RequestHandler = (req, res) => {
             name: string;
             status: string;
             anyKey: string;
+            getAll: string;
         } & ApiListQueryArgs = req.query;
         paramsValid(schema, data, { list: true });
         let query: any = {};
@@ -35,7 +36,8 @@ export let query: RequestHandler = (req, res) => {
         let { rows, total } = await AuthorityModel.findAndCountAll({
             conditions: query,
             page: data.page,
-            rows: data.rows
+            rows: data.rows,
+            getAll: data.getAll,
         });
         return {
             rows,

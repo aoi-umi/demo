@@ -102,7 +102,7 @@ export class TestApi extends ApiModel<TestApiMethod> {
     //#endregion
 
     //#region authority 
-    async authorityQuery(data?: { name?, code?, status?, anyKey?} & ApiListQueryArgs) {
+    async authorityQuery(data?: { name?, code?, status?, anyKey?, getAll?: boolean } & ApiListQueryArgs) {
         return this.requestByConfig<ListResult>(this.apiConfig.method.authorityQuery, { data });
     }
     async authoritySave(data) {
@@ -120,7 +120,7 @@ export class TestApi extends ApiModel<TestApiMethod> {
     //#endregion
 
     //#region role 
-    async roleQuery(data?: { name?, code?, status?, anyKey?} & ApiListQueryArgs) {
+    async roleQuery(data?: { name?, code?, status?, anyKey?, getAll?: boolean } & ApiListQueryArgs) {
         return this.requestByConfig<ListResult>(this.apiConfig.method.roleQuery, { data });
     }
     async roleSave(data) {
