@@ -5,6 +5,7 @@ import {
 import * as Q from 'q';
 import * as mongoose from 'mongoose';
 import { Document } from 'mongoose';
+import { parseBool } from '../../../_system/common';
 
 export type BaseInstanceType = InstanceType<Base>;
 export type BaseModelType = ModelType<Base, typeof Base>;
@@ -18,11 +19,12 @@ export class Base extends Model<Base> {
         sort?: any,
         page?: number,
         rows?: number,
-        getAll?: boolean,
+        getAll?: boolean | string,
     }) {
         let self = this as BaseModelType;
         let query = self.find(options.conditions, options.projection);
-        if (!options.getAll)
+        let getAll = parseBool(options.getAll);
+        if (!getAll)
             query.skip((options.page - 1) * options.rows).limit(options.rows);
         let sort = options.sort || {};
         if (!sort._id)
@@ -30,10 +32,10 @@ export class Base extends Model<Base> {
         query.sort(sort);
         let rs = await Q.all([
             query.exec(),
-            options.getAll ? null : self.find(options.conditions).countDocuments().exec(),
+            getAll ? null : self.find(options.conditions).countDocuments().exec(),
         ]);
         let rows = rs[0] as any as T[];
-        let total = options.getAll ? rows.length : rs[1];
+        let total = getAll ? rows.length : rs[1];
         return {
             docs: rows,
             rows,
@@ -85,6 +87,7 @@ export class Base extends Model<Base> {
             { $sort: sortCondition }
         ];
         let { getAll } = opt;
+        getAll = parseBool(getAll);
         //分页
         if (!opt.page || !opt.rows) {
             getAll = true;

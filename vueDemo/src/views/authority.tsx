@@ -3,8 +3,9 @@ import { Form as IForm } from 'iview';
 import { getModule } from 'vuex-module-decorators';
 import { testApi } from '@/api';
 import { myEnum, authority } from '@/config';
-import { Modal, Input, Form, FormItem, Button, Checkbox, Switch } from '@/components/iview';
+import { Modal, Input, Form, FormItem, Button, Checkbox, Switch, Transfer } from '@/components/iview';
 import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
+import { MyTransfer, IMyTransfer } from '@/components/my-transfer';
 import { MyConfirm } from '@/components/my-confirm';
 import { convClass } from '@/helpers';
 import LoginUserStore from '@/store/loginUser';
@@ -14,6 +15,7 @@ type DetailDataType = {
     name?: string;
     code?: string;
     status?: number;
+    isDel?: boolean;
 }
 @Component
 class AuthorityDetail extends Vue {
@@ -47,7 +49,7 @@ class AuthorityDetail extends Vue {
             { required: true, trigger: 'blur' }
         ],
     };
-    $ref: { formVaild: IForm };
+    $refs: { formVaild: IForm };
 
     saving = false;
     async save() {
@@ -87,7 +89,7 @@ class AuthorityDetail extends Vue {
                     </FormItem>
                     <FormItem>
                         <Button type="primary" on-click={() => {
-                            this.$ref.formVaild.validate((valid) => {
+                            this.$refs.formVaild.validate((valid) => {
                                 if (!valid) {
                                     this.$Message.error('参数有误');
                                 } else {
@@ -189,7 +191,7 @@ export default class Authority extends Vue {
                         ok={async () => {
                             await this.delClick();
                         }}>
-                        {`将要删除${this.delIds.length}项`}
+                        将要删除{this.delIds.length}项
                     </MyConfirm>
                 </Modal>
                 <MyList
@@ -311,3 +313,52 @@ export default class Authority extends Vue {
         );
     }
 }
+
+@Component
+class AuthorityTransfer extends Vue {
+    @Prop()
+    selectedData: DetailDataType[];
+
+    @Watch('selectedData')
+    private updateSelectedData(newVal: DetailDataType[]) {
+        this.insideSelectedData = newVal ? newVal.map(ele => this.dataConverter(ele)) : [];
+    }
+
+    $refs: { transfer: IMyTransfer };
+    private insideSelectedData = [];    
+
+    getChangeData(key?: string) {
+        return this.$refs.transfer.getChangeData(key);
+    }
+
+    protected mounted() {
+        this.$refs.transfer.loadData();
+    }
+
+    private dataConverter(ele: DetailDataType) {
+        return {
+            key: ele.code,
+            label: ele.isDel ? `${ele.code}[已删除]` : `${ele.name}(${ele.code})`,
+            data: ele
+        };
+    }
+    private async loadData() {
+        let rs = await testApi.authorityQuery({ status: myEnum.authorityStatus.启用, getAll: true });
+        return rs.rows.map(ele => {
+            return this.dataConverter(ele);
+        });
+    }
+    protected render() {
+        return (
+            <MyTransfer
+                ref='transfer'
+                getDataFn={this.loadData}
+                selectedData={this.insideSelectedData}
+            >
+            </MyTransfer>
+        );
+    }
+}
+
+export interface IAuthorityTransfer extends AuthorityTransfer { }
+export const AuthorityTransferView = convClass<AuthorityTransfer>(AuthorityTransfer);

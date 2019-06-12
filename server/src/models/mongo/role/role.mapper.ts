@@ -117,4 +117,5 @@ export type RoleQueryArgs = {
     authority?: string;
     anyKey?: string;
     includeDelAuth?: boolean;
+    getAll?: boolean;
 } & ApiListQueryArgs;

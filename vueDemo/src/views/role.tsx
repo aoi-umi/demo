@@ -8,8 +8,11 @@ import { Modal, Input, Form, FormItem, Button, Checkbox, Switch } from '@/compon
 import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
 import { MyConfirm } from '@/components/my-confirm';
 import { MyTagModel } from '@/components/my-tag';
-import { MyInput } from '@/components/my-input';
+import { IMyTransfer, MyTransfer } from '@/components/my-transfer';
+
 import LoginUserStore from '@/store/loginUser';
+
+import { AuthorityTransferView, IAuthorityTransfer } from './authority';
 
 type DetailDataType = {
     _id?: string;
@@ -17,6 +20,7 @@ type DetailDataType = {
     code?: string;
     status?: number;
     authorityList?: { code: string; name: string, isDel: boolean; }[];
+    isDel?: boolean;
 }
 @Component
 class RoleDetail extends Vue {
@@ -41,15 +45,6 @@ class RoleDetail extends Vue {
 
     private initDetail(data) {
         this.innerDetail = data;
-        this.authority = '';
-        this.tagModel = new MyTagModel(this.innerDetail.authorityList.map(ele => {
-            let tag = ele.isDel ? ele.code : `${ele.name}(${ele.code})`;
-            return {
-                tag: tag,
-                key: ele.code,
-                isDel: ele.isDel,
-            };
-        }));
     }
 
     private rules = {
@@ -60,27 +55,21 @@ class RoleDetail extends Vue {
             { required: true, trigger: 'blur' }
         ],
     };
-    $refs: { formVaild: IForm };
-
-
-    private authority = '';
-    private tagModel: MyTagModel;
-    private authSearchData = [];
-
+    $refs: { formVaild: IForm, authTransfer: IAuthorityTransfer };
 
     private saving = false;
     private async save() {
         this.saving = true;
         let detail = this.innerDetail;
         try {
-            let { addTagList, delTagList } = this.tagModel.getChangeTag('key');
+            let { addList, delList } = this.$refs.authTransfer.getChangeData('key');
             let rs = await testApi.roleSave({
                 _id: detail._id,
                 name: detail.name,
                 code: detail.code,
                 status: detail.status,
-                addAuthList: addTagList,
-                delAuthList: delTagList,
+                addAuthList: addList,
+                delAuthList: delList,
             });
             this.$emit('save-success', rs);
             this.initDetail(this.getDetailData());
@@ -89,23 +78,6 @@ class RoleDetail extends Vue {
         } finally {
             this.saving = false;
         }
-    }
-
-    private searching = false;
-    private async search(query) {
-        try {
-            this.searching = true;
-            let rs = await testApi.authorityQuery({ anyKey: query, status: myEnum.authorityStatus.启用 });
-            this.authSearchData = rs.rows;
-        } catch (e) {
-            this.$Message.error(e.message);
-        } finally {
-            this.searching = false;
-        }
-    }
-
-    private getTagText(ele) {
-        return `${ele.name}(${ele.code})`;
     }
 
     protected render() {
@@ -125,26 +97,7 @@ class RoleDetail extends Vue {
                         <Input v-model={detail.code} />
                     </FormItem>
                     <FormItem label="权限">
-                        {this.tagModel && this.tagModel.renderTag()}
-                        <br />
-                        <MyInput v-model={this.authority} clearable
-                            loading={this.searching}
-                            on-on-search={this.search}
-                            on-on-select={(val) => {
-                                if (!val)
-                                    return;
-                                let match = this.authSearchData.find(e => e.code == val);
-                                this.tagModel.addTag({ key: match.code, tag: this.getTagText(match), data: match });
-                                this.$forceUpdate();
-                            }}
-                        >
-                            {this.authSearchData.map(ele => {
-                                return (
-                                    //@ts-ignore
-                                    <Option value={ele.code}>{this.getTagText(ele)}</Option>
-                                );
-                            })}
-                        </MyInput>
+                        <AuthorityTransferView ref="authTransfer" selectedData={detail.authorityList} />
                     </FormItem>
                     <FormItem>
                         <Button type="primary" on-click={() => {
@@ -391,3 +344,52 @@ export default class Role extends Vue {
         );
     }
 }
+
+@Component
+class RoleTransfer extends Vue {
+    @Prop()
+    selectedData: DetailDataType[];
+
+    @Watch('selectedData')
+    private updateSelectedData(newVal: DetailDataType[]) {
+        this.insideSelectedData = newVal ? newVal.map(ele => this.dataConverter(ele)) : [];
+    }
+
+    $refs: { transfer: IMyTransfer };
+    private insideSelectedData = [];
+
+    getChangeData(key?: string) {
+        return this.$refs.transfer.getChangeData(key);
+    }
+
+    protected mounted() {
+        this.$refs.transfer.loadData();
+    }
+
+    private dataConverter(ele: DetailDataType) {
+        return {
+            key: ele.code,
+            label: ele.isDel ? `${ele.code}[已删除]` : `${ele.name}(${ele.code})`,
+            data: ele
+        };
+    }
+    private async loadData() {
+        let rs = await testApi.roleQuery({ status: myEnum.roleStatus.启用, getAll: true });
+        return rs.rows.map(ele => {
+            return this.dataConverter(ele);
+        });
+    }
+    protected render() {
+        return (
+            <MyTransfer
+                ref='transfer'
+                getDataFn={this.loadData}
+                selectedData={this.insideSelectedData}
+            >
+            </MyTransfer>
+        );
+    }
+}
+
+export interface IRoleTransfer extends RoleTransfer { }
+export const RoleTransferView = convClass<RoleTransfer>(RoleTransfer);

@@ -618,7 +618,7 @@ export let getListDiff = function <T1, T2>(option: {
 };
 
 export let parseBool = function (b) {
-    return b && b.toLocaleString() == 'true';
+    return b && (b == 1 || b.toLocaleString() == 'true');
 };
 
 export let escapeRegExp = function (string) {

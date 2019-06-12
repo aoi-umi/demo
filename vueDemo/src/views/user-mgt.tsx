@@ -9,6 +9,8 @@ import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
 import { MyTagModel } from '@/components/my-tag';
 import { MyInput } from '@/components/my-input';
 import LoginUserStore from '@/store/loginUser';
+import { AuthorityTransferView, IAuthorityTransfer } from './authority';
+import { IRoleTransfer } from './role';
 
 export type DetailDataType = {
     _id?: string;
@@ -33,45 +35,19 @@ class RoleDetail extends Vue {
 
     private initDetail(data) {
         this.innerDetail = data;
-        this.role = '';
-        this.authority = '';
-        this.authModel = new MyTagModel(this.innerDetail.authorityList.map(ele => {
-            let tag = ele.isDel ? ele.code : `${ele.name}(${ele.code})`;
-            return {
-                tag: tag,
-                key: ele.code,
-                isDel: ele.isDel,
-            };
-        }));
-        this.roleModel = new MyTagModel(this.innerDetail.roleList.map(ele => {
-            let tag = ele.isDel ? ele.code : `${ele.name}(${ele.code})`;
-            return {
-                tag: tag,
-                key: ele.code,
-                isDel: ele.isDel,
-            };
-        }));
     }
 
     private rules = {
     };
-    $refs: { formVaild: IForm };
-
-
-    private authority = '';
-    private role = '';
-    private authModel: MyTagModel;
-    private roleModel: MyTagModel;
-    private authSearchData = [];
-    private roleSearchData = [];
+    $refs: { formVaild: IForm; roleTransfer: IRoleTransfer, authTransfer: IAuthorityTransfer };
 
     private saving = false;
     private async save() {
         this.saving = true;
         let detail = this.innerDetail;
         try {
-            let { addTagList: addAuthList, delTagList: delAuthList } = this.authModel.getChangeTag('key');
-            let { addTagList: addRoleList, delTagList: delRoleList } = this.roleModel.getChangeTag('key');
+            let { addList: addAuthList, delList: delAuthList } = this.$refs.authTransfer.getChangeData('key');
+            let { addList: addRoleList, delList: delRoleList } = this.$refs.roleTransfer.getChangeData('key');
             let rs = await testApi.userMgtSave({
                 _id: detail._id,
                 addAuthList,
@@ -87,36 +63,6 @@ class RoleDetail extends Vue {
         }
     }
 
-    private roleSearching = false;
-    private async roleSearch(query) {
-        try {
-            this.roleSearching = true;
-            let rs = await testApi.roleQuery({ anyKey: query, status: myEnum.roleStatus.启用 });
-            this.roleSearchData = rs.rows;
-        } catch (e) {
-            this.$Message.error(e.message);
-        } finally {
-            this.roleSearching = false;
-        }
-    }
-
-    private authSearching = false;
-    private async authSearch(query) {
-        try {
-            this.authSearching = true;
-            let rs = await testApi.authorityQuery({ anyKey: query, status: myEnum.authorityStatus.启用 });
-            this.authSearchData = rs.rows;
-        } catch (e) {
-            this.$Message.error(e.message);
-        } finally {
-            this.authSearching = false;
-        }
-    }
-
-    private getTagText(ele) {
-        return `${ele.name}(${ele.code})`;
-    }
-
     protected render() {
         let detail = this.innerDetail;
         return (
@@ -124,51 +70,12 @@ class RoleDetail extends Vue {
                 <h3>{'修改'}</h3>
                 <br />
                 <Form label-width={50} ref="formVaild" props={{ model: detail }} rules={this.rules}>
-                    <FormItem label="账号">{detail.account}</FormItem>
-                    <FormItem label="昵称">{detail.nickname}</FormItem>
+                    <FormItem label="账号">{detail.account}({detail.nickname})</FormItem>
                     <FormItem label="角色">
-                        {this.roleModel && this.roleModel.renderTag()}
-                        <br />
-                        <MyInput v-model={this.role} clearable
-                            loading={this.roleSearching}
-                            on-on-search={this.roleSearch}
-                            on-on-select={(val) => {
-                                if (!val)
-                                    return;
-                                let match = this.roleSearchData.find(e => e.code == val);
-                                this.roleModel.addTag({ key: match.code, tag: this.getTagText(match), data: match });
-                                this.$forceUpdate();
-                            }}
-                        >
-                            {this.roleSearchData.map(ele => {
-                                return (
-                                    //@ts-ignore
-                                    <Option value={ele.code}>{this.getTagText(ele)}</Option>
-                                );
-                            })}
-                        </MyInput>
+                        <AuthorityTransferView ref="roleTransfer" selectedData={detail.roleList} />
                     </FormItem>
                     <FormItem label="权限">
-                        {this.authModel && this.authModel.renderTag()}
-                        <br />
-                        <MyInput v-model={this.authority} clearable
-                            loading={this.authSearching}
-                            on-on-search={this.authSearch}
-                            on-on-select={(val) => {
-                                if (!val)
-                                    return;
-                                let match = this.authSearchData.find(e => e.code == val);
-                                this.authModel.addTag({ key: match.code, tag: this.getTagText(match), data: match });
-                                this.$forceUpdate();
-                            }}
-                        >
-                            {this.authSearchData.map(ele => {
-                                return (
-                                    //@ts-ignore
-                                    <Option value={ele.code}>{this.getTagText(ele)}</Option>
-                                );
-                            })}
-                        </MyInput>
+                        <AuthorityTransferView ref="authTransfer" selectedData={detail.authorityList} />
                     </FormItem>
                     <FormItem>
                         <Button type="primary" on-click={() => {
