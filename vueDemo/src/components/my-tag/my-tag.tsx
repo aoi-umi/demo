@@ -8,7 +8,7 @@ export class MyTag extends Vue {
         let list = tagList instanceof Array ? tagList : [tagList];
         return list.map(ele => {
             if (typeof ele === 'string') {
-                return <Tag color="blue">{ele}</Tag>
+                return <Tag color="blue">{ele}</Tag>;
             }
             let checkable = (ele as Object).hasOwnProperty('checkable') ? ele.checkable : false;
             return (
@@ -22,13 +22,13 @@ export class MyTag extends Vue {
                         ele.tag
                     }
                 </Tag>
-            )
+            );
         });
     }
 
     renderAuthorityTag(list) {
         let newList = list ? list.map(ele => {
-            let color = ''
+            let color = '';
             let tag = ele.code;
             if (ele.isDel || ele.status !== myEnum.authorityStatus.启用) {
                 color = 'default';
@@ -48,7 +48,7 @@ export class MyTag extends Vue {
         if (!list)
             list = [];
         return list.map(ele => {
-            let color = ''
+            let color = '';
             let tag = ele.code;
             if (ele.isDel || ele.status !== myEnum.roleStatus.启用) {
                 color = 'default';
@@ -68,7 +68,7 @@ export class MyTag extends Vue {
                         })
                     }
                 </Tooltip>
-            )
+            );
         });
     }
 }

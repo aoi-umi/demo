@@ -95,7 +95,7 @@ class AuthorityDetail extends Vue {
                                 } else {
                                     this.save();
                                 }
-                            })
+                            });
                         }} loading={this.saving}>保存</Button>
                     </FormItem>
                 </Form>
@@ -286,7 +286,7 @@ export default class Authority extends Vue {
                                 page: model.page.index,
                                 rows: model.page.size
                             }
-                        })
+                        });
                     }}
 
                     on-add-click={() => {

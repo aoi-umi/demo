@@ -43,7 +43,7 @@ class MyTransfer extends Vue {
         return {
             addList,
             delList,
-        }
+        };
     }
     private targetKeys = [];
     private loading = false;

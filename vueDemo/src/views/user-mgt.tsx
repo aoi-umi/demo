@@ -187,7 +187,7 @@ export default class UserMgt extends Vue {
                         key: 'roleList',
                         minWidth: 120,
                         render: (h, params) => {
-                            let roleList = params.row.roleList
+                            let roleList = params.row.roleList;
                             return MyTagModel.renderRoleTag(roleList);
                         }
                     }, {
