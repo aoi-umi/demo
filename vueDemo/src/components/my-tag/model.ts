@@ -37,7 +37,7 @@ export class MyTagModel {
                     checkable: true,
                     data: newTag.data,
                     isDel: newTag.isDel
-                }
+                };
             });
         } else {
             this.tagList = [];
@@ -108,7 +108,7 @@ export class MyTagModel {
         return {
             addTagList,
             delTagList,
-        }
+        };
     }
 
     static renderTag(tagList: RenderTagType | (RenderTagType[])) {

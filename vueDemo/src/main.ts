@@ -10,7 +10,7 @@ import { env } from './config';
 Vue.config.productionTip = false;
 document.title = env.title;
 new Vue({
-  router,
-  store,
-  render: (h) => h(App),
+    router,
+    store,
+    render: (h) => h(App),
 }).$mount('#app');
