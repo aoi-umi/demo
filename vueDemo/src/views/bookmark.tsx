@@ -113,7 +113,7 @@ class BookmarkDetail extends Vue {
                                 } else {
                                     this.save();
                                 }
-                            })
+                            });
                         }} loading={this.saving}>保存</Button>
                     </FormItem>
                 </Form>
@@ -212,7 +212,7 @@ export default class Bookmark extends Vue {
                         type: 'expand',
                         width: 30,
                         render: (h, params) => {
-                            let tagList = params.row.tagList
+                            let tagList = params.row.tagList;
                             if (tagList && tagList.length) {
                                 return MyTagModel.renderTag(tagList);
                             }
@@ -270,7 +270,7 @@ export default class Bookmark extends Vue {
                                 page: model.page.index,
                                 rows: model.page.size
                             }
-                        })
+                        });
                     }}
 
                     on-add-click={() => {

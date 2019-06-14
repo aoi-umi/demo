@@ -162,7 +162,7 @@ export default class App extends Vue {
                                         show = true;
                                     }
                                     return show;
-                                }).map(data => { return this.renderMenu(data) })
+                                }).map(data => { return this.renderMenu(data); })
                             }
                         </Menu>
                     </Sider>

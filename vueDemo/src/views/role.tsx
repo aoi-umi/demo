@@ -107,7 +107,7 @@ class RoleDetail extends Vue {
                                 } else {
                                     this.save();
                                 }
-                            })
+                            });
                         }} loading={this.saving}>保存</Button>
                     </FormItem>
                 </Form>
@@ -246,7 +246,7 @@ export default class Role extends Vue {
                         type: 'expand',
                         width: 30,
                         render: (h, params) => {
-                            let authorityList = params.row.authorityList
+                            let authorityList = params.row.authorityList;
                             return MyTagModel.renderAuthorityTag(authorityList);
                         }
                     }, {
@@ -317,7 +317,7 @@ export default class Role extends Vue {
                                 page: model.page.index,
                                 rows: model.page.size
                             }
-                        })
+                        });
                     }}
 
                     on-add-click={() => {

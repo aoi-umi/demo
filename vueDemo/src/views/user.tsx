@@ -75,7 +75,7 @@ class SignIn extends Vue {
             } else {
                 this.signIn();
             }
-        })
+        });
     }
 
     to = '';
@@ -146,9 +146,9 @@ class SignUp extends Vue {
         }, {
             validator: (rule, value, callback) => {
                 if (value !== this.innerDetail.password) {
-                    callback(new Error('两次输入密码不一致'))
+                    callback(new Error('两次输入密码不一致'));
                 } else {
-                    callback()
+                    callback();
                 }
             },
             trigger: 'blur'
@@ -184,7 +184,7 @@ class SignUp extends Vue {
             } else {
                 this.signUp();
             }
-        })
+        });
     }
 
     render() {

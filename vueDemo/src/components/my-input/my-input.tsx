@@ -152,7 +152,7 @@ class MyInput extends Vue {
                 {this.$slots.default ||
                     this.filteredData.map(item => {
                         //@ts-ignore
-                        return <Option value={item} key={item}>{item}</Option>
+                        return <Option value={item} key={item}>{item}</Option>;
                     })
                 }
             </Select >

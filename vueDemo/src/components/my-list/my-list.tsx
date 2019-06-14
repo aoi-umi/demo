@@ -261,7 +261,7 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
                 <Card class={this.bottomBarClass}>
                     {this.multiOperateBtnList.map(ele => {
                         return (
-                            <Button on-click={() => { ele.onClick && ele.onClick(this.selectedRows) }}>{ele.text}</Button>
+                            <Button on-click={() => { ele.onClick && ele.onClick(this.selectedRows); }}>{ele.text}</Button>
                         );
                     })}
                 </Card>
@@ -273,5 +273,5 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
 export interface IMyList<T extends QueryArgsType> extends MyList<T> { }
 const MyListView = MyList as {
     new <T extends QueryArgsType>(props: Partial<MyList<T>> & VueComponentOptions): any;
-}
+};
 export default MyListView;
