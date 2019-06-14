@@ -93,5 +93,5 @@ const config = {
             }
         } as TestApiConfigType
     }
-}
+};
 export default config;

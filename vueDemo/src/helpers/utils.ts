@@ -54,7 +54,7 @@ export function clone<T>(obj: T): T {
 function getDeco(fn: (constructor) => any) {
     return function <T extends { new(...args: any[]): {} }>(constructor: T) {
         return fn(constructor);
-    }
+    };
 }
 
 export function error(e, code?) {
