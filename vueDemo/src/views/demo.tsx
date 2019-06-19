@@ -119,12 +119,22 @@ export default class App extends Vue {
         // }
     }
 
+    sendDanmaku() {
+        let contents = this.contents;
+        let danmaku = this.danmaku && this.danmaku.trim();
+        if (danmaku) {
+            let idx = contents.length;
+            contents.push({ idx, msg: danmaku, refName: Date.now() + '' });
+            this.danmaku = '';
+        }
+    }
+
     protected render() {
         let contents = this.contents;
         return (
             <div>
                 <MyList columns={[{ title: 'test', key: 'test' }]} data={this.list}></MyList>
-                <MyList data={this.list} type="custom" customRenderFn={(rs) => {
+                <MyList data={this.list} type="custom" hideSearchBox customRenderFn={(rs) => {
                     if (!rs.success || !rs.total) {
                         return <Card style={{ marginTop: '10px' }}>{rs.msg}</Card>;
                     } else {
@@ -135,17 +145,19 @@ export default class App extends Vue {
                 }}></MyList>
 
                 <div>
-                    <Input v-model={this.danmaku} />
-                    <Button on-click={() => {
-                        if (this.danmaku && this.danmaku.length) {
-                            let idx = contents.length;
-                            contents.push({ idx, msg: this.danmaku, refName: Date.now() + '' });
-                            this.danmaku = '';
+                    <Input v-model={this.danmaku} on-on-keypress={(e) => {
+                        if (e.charCode == 13) {
+                            this.sendDanmaku();
                         }
-                    }}>danmaku</Button>
+                    }} />
+                    <Button on-click={this.sendDanmaku}>danmaku</Button>
                     <Button on-click={() => { this.contents = []; }}>clear anime</Button>
                 </div>
-                <div ref='board' style={{ height: '500px', width: '500px', background: '#f7f7f7', overflow: 'hidden', position: 'relative' }}>
+                <div ref='board' style={{
+                    height: '500px', width: '500px', background: '#f7f7f7', overflow: 'hidden', position: 'relative',
+                    fontSize: '35px', color: 'white',
+                    textStroke: '0.5px #000',
+                }}>
                     {
                         contents.map(ele => {
                             let idx = ele.idx;

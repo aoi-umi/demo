@@ -87,6 +87,13 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
     };
 
     @Prop()
+    hideSearchBox?: boolean;
+
+    //todo 实现下拉刷新
+    @Prop()
+    infiniteScroll?: boolean;
+
+    @Prop()
     customOperateView: any;
 
     @Prop()
@@ -119,9 +126,13 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
             this.result.msg = '暂无数据';
             let rs = this.queryFn && await this.queryFn(data);
             if (rs) {
-                this.result.data = rs.rows;
+                if (this.infiniteScroll && this.model.page.index !== 1)
+                    this.result.data = [...this.result.data, ...rs.rows];
+                else
+                    this.result.data = rs.rows;
                 this.result.total = rs.total;
             }
+            this.loadedAll = this.result.total <= (this.model.page.index - 1) * this.model.page.size + this.result.data.length;
         } catch (e) {
             this.result.success = false;
             this.result.msg = e.message;
@@ -132,7 +143,7 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
 
     private handleQuery() {
         //防止页面不跳转
-        this.model.query._t = Date.now();
+        (this.model.query as any)._t = Date.now();
         this.$emit('query', this.model);
     }
 
@@ -161,6 +172,7 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
         msg: '',
         data: []
     };
+    loadedAll = false;
 
     private get bottomBarClass() {
         let cls = [clsPrefix + 'bottom-bar'];
@@ -182,55 +194,57 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
         let hideQueryBtn = this.hideQueryBtn || {};
         return (
             <div>
-                <Card>
-                    <div style={{ justifyContent: 'flex-end', display: 'flex' }}>
-                        <div style={{ cursor: 'pointer' }} onClick={() => { this.showQuery = !this.showQuery; }}>
-                            {this.showQuery ? '隐藏' : '展开'}筛选
+                {!this.hideSearchBox &&
+                    <Card>
+                        <div style={{ justifyContent: 'flex-end', display: 'flex' }}>
+                            <div style={{ cursor: 'pointer' }} onClick={() => { this.showQuery = !this.showQuery; }}>
+                                {this.showQuery ? '隐藏' : '展开'}筛选
                             <Icon type={this.showQuery ? 'ios-arrow-up' : 'ios-arrow-down'} />
+                            </div>
                         </div>
-                    </div>
-                    <div class={[clsPrefix + 'query-args-box'].concat(this.showQuery ? '' : 'collapsed')} on-keypress={this.handlePress}>
-                        <Row gutter={5}>
-                            {this.queryArgs && Object.entries(this.queryArgs).map(entry => {
-                                let key = entry[0];
-                                let ele = entry[1];
-                                return (
-                                    <Col style={{ marginBottom: '5px' }} xs={24} sm={8} md={6}>
-                                        {ele.label || key}
-                                        <Input placeholder={ele.placeholder} v-model={this.model.query[key]} />
+                        <div class={[clsPrefix + 'query-args-box'].concat(this.showQuery ? '' : 'collapsed')} on-keypress={this.handlePress}>
+                            <Row gutter={5}>
+                                {this.queryArgs && Object.entries(this.queryArgs).map(entry => {
+                                    let key = entry[0];
+                                    let ele = entry[1];
+                                    return (
+                                        <Col style={{ marginBottom: '5px' }} xs={24} sm={8} md={6}>
+                                            {ele.label || key}
+                                            <Input placeholder={ele.placeholder} v-model={this.model.query[key]} />
+                                        </Col>
+                                    );
+                                })}
+                            </Row>
+                            {this.customQueryNode}
+                            <Divider size='small' />
+                            <Row gutter={5} type="flex" justify="end">
+                                {(!hideQueryBtn.all && !hideQueryBtn.reset) &&
+                                    <Col>
+                                        <Button on-click={() => {
+                                            this.resetQueryArgs();
+                                            this.$emit(event.resetClick);
+                                        }}>重置</Button>
                                     </Col>
-                                );
-                            })}
-                        </Row>
-                        {this.customQueryNode}
-                        <Divider size='small' />
-                        <Row gutter={5} type="flex" justify="end">
-                            {(!hideQueryBtn.all && !hideQueryBtn.reset) &&
-                                <Col>
-                                    <Button on-click={() => {
-                                        this.resetQueryArgs();
-                                        this.$emit(event.resetClick);
-                                    }}>重置</Button>
-                                </Col>
-                            }
-                            {(!hideQueryBtn.all && !hideQueryBtn.query) &&
-                                <Col>
-                                    <Button type="primary" loading={this.loading} on-click={() => {
-                                        this.handleQuery();
-                                    }}>查询</Button>
-                                </Col>
-                            }
-                            {(!hideQueryBtn.all && !hideQueryBtn.add) &&
-                                <Col>
-                                    <Button on-click={() => {
-                                        this.$emit(event.addClick);
-                                    }}>新增</Button>
-                                </Col>
-                            }
-                            {this.customOperateView}
-                        </Row>
-                    </div>
-                </Card>
+                                }
+                                {(!hideQueryBtn.all && !hideQueryBtn.query) &&
+                                    <Col>
+                                        <Button type="primary" loading={this.loading} on-click={() => {
+                                            this.handleQuery();
+                                        }}>查询</Button>
+                                    </Col>
+                                }
+                                {(!hideQueryBtn.all && !hideQueryBtn.add) &&
+                                    <Col>
+                                        <Button on-click={() => {
+                                            this.$emit(event.addClick);
+                                        }}>新增</Button>
+                                    </Col>
+                                }
+                                {this.customOperateView}
+                            </Row>
+                        </div>
+                    </Card>
+                }
                 <div style={{ position: 'relative', }}>
                     {this.$slots.default}
                     {this.type == 'table' ?
@@ -240,22 +254,24 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
                         </Table> :
                         this.customRenderFn(this.result)
                     }
-                    <Page class={clsPrefix + "page"} total={this.result.total}
-                        current={this.model.page.index}
-                        page-size={this.model.page.size}
-                        show-total show-elevator show-sizer
-                        on-on-change={(page) => {
-                            this.model.page.index = page;
-                            this.handleQuery();
-                        }}
-                        on-on-page-size-change={(size) => {
-                            let oldIdx = this.model.page.index;
-                            this.model.page.index = 1;
-                            this.model.page.size = size;
-                            if (oldIdx == 1) {
+                    {!this.infiniteScroll &&
+                        <Page class={clsPrefix + "page"} total={this.result.total}
+                            current={this.model.page.index}
+                            page-size={this.model.page.size}
+                            show-total show-elevator show-sizer
+                            on-on-change={(page) => {
+                                this.model.page.index = page;
                                 this.handleQuery();
-                            }
-                        }} />
+                            }}
+                            on-on-page-size-change={(size) => {
+                                let oldIdx = this.model.page.index;
+                                this.model.page.index = 1;
+                                this.model.page.size = size;
+                                if (oldIdx == 1) {
+                                    this.handleQuery();
+                                }
+                            }} />
+                    }
                     {this.loading && <Spin size="large" fix></Spin>}
                 </div>
                 <Card class={this.bottomBarClass}>
