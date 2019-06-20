@@ -1,11 +1,13 @@
 html,
 body {
-  height: 100%;
+  // height: 100%;
+  background: #f5f7f9;
 }
+@headerHeight: 64px;
 .layout {
   height: 100%;
-  border: 1px solid #d7dde4;
-  background: #f5f7f9;
+  // border: 1px solid #d7dde4;
+  // background: #f5f7f9;
   position: relative;
   border-radius: 4px;
   overflow: hidden;
@@ -13,6 +15,11 @@ body {
 .layout-header-bar {
   background: #fff;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  padding: 0;
+  position: fixed;
+  z-index: 1000;
+  width: 100%;
+  top: 0;
 }
 .layout-header-right {
   float: right;
@@ -60,14 +67,33 @@ body {
   display: none;
 }
 
+.side-menu-blank {
+  flex: 0 0 78px;
+  position: relative;
+  transition: all .2s ease-in-out;
+  &.side-open {
+    flex: 0 0 200px;
+  }
+}
+
+@mainContentMargin: 20px;
 .main-content {
-  margin: 20px;
+  margin: @mainContentMargin;
   padding: 5px;
   margin-right: 0;
   margin-bottom: 0;
+  margin-top: calc(@headerHeight + @mainContentMargin);
   padding-right: 25px;
   padding-bottom: 25px;
   min-height: 260px;
+  height: 100%;
+}
+
+.side-menu {
+  top: @headerHeight;
+  position: fixed;
+  height: 100%;
+  z-index: 900;
 }
 
 .dialog-view {

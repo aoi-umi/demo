@@ -112,6 +112,19 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
             this.result.msg = '暂无数据';
         }
         this.model.setPage({ index: this.current, size: this.pageSize });
+
+        window.addEventListener('scroll', () => {
+            if (this.infiniteScroll && !this.loadedLastPage && this.isScrollEnd()) {
+                
+            }
+        });
+    }
+
+    private isScrollEnd() {
+        let scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        let clientHeight = document.documentElement.clientHeight || document.body.clientHeight;
+        let scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
+        return scrollTop + clientHeight == scrollHeight;
     }
     public query(data?: any) {
         this._handleQuery(data);
@@ -132,7 +145,8 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
                     this.result.data = rs.rows;
                 this.result.total = rs.total;
             }
-            this.loadedAll = this.result.total <= (this.model.page.index - 1) * this.model.page.size + this.result.data.length;
+            let lastPage = Math.ceil(this.result.total / this.model.page.size);
+            this.loadedLastPage = this.model.page.index >= lastPage;
         } catch (e) {
             this.result.success = false;
             this.result.msg = e.message;
@@ -172,7 +186,7 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
         msg: '',
         data: []
     };
-    loadedAll = false;
+    loadedLastPage = false;
 
     private get bottomBarClass() {
         let cls = [clsPrefix + 'bottom-bar'];
