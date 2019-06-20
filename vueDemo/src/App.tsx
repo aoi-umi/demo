@@ -86,7 +86,7 @@ export default class App extends Vue {
                         this.signInShow = false;
                     }}></SignInView>
                 </Modal>
-                <Header style={{ padding: 0 }} class="layout-header-bar">
+                <Header class="layout-header-bar">
                     <Icon
                         on-click={this.collapsedSider}
                         class="menu-icon"
@@ -120,6 +120,7 @@ export default class App extends Vue {
                 </Header>
                 <Layout>
                     <Sider
+                        class="side-menu"
                         ref="sider"
                         hide-trigger
                         collapsible
@@ -166,6 +167,8 @@ export default class App extends Vue {
                             }
                         </Menu>
                     </Sider>
+                    {/* 占位 */}
+                    <Content class={["side-menu-blank", this.isCollapsed ? '' : 'side-open']}></Content>
                     <Content class="main-content">
                         <router-view></router-view>
                     </Content>

@@ -27,7 +27,6 @@ export default class App extends Vue {
     $refs: { board: HTMLElement; }
 
     public created() {
-        console.log('created.');
         this.setList();
     }
 
@@ -37,17 +36,11 @@ export default class App extends Vue {
     }
 
     setList() {
-        this.list = [{
-            test: '1'
-        }, {
-            test: '2'
-        }, {
-            test: '3'
-        }, {
-            test: '4'
-        }, {
-            test: '5'
-        }];
+        this.list = new Array(10).fill('').map((e, i) => {
+            return {
+                test: i + 1 + '',
+            }
+        });
     }
 
     @Watch('value')
@@ -105,9 +98,7 @@ export default class App extends Vue {
                     easing: 'linear'
                 });
                 ele.animeInst.finished.then(() => {
-                    let content = contents[idx];
-                    if (content)
-                        content.finished = true;
+                    ele.finished = true;
                 });
             }
         });
@@ -133,17 +124,6 @@ export default class App extends Vue {
         let contents = this.contents;
         return (
             <div>
-                <MyList columns={[{ title: 'test', key: 'test' }]} data={this.list}></MyList>
-                <MyList data={this.list} type="custom" hideSearchBox customRenderFn={(rs) => {
-                    if (!rs.success || !rs.total) {
-                        return <Card style={{ marginTop: '10px' }}>{rs.msg}</Card>;
-                    } else {
-                        return rs.data.map(ele => {
-                            return <Card style={{ marginTop: '10px' }}>{ele.test}</Card>;
-                        });
-                    }
-                }}></MyList>
-
                 <div>
                     <Input v-model={this.danmaku} on-on-keypress={(e) => {
                         if (e.charCode == 13) {
@@ -168,6 +148,16 @@ export default class App extends Vue {
                         })
                     }
                 </div>
+
+                <MyList data={this.list} type="custom" hideSearchBox infiniteScroll customRenderFn={(rs) => {
+                    if (!rs.success || !rs.total) {
+                        return <Card style={{ marginTop: '10px' }}>{rs.msg}</Card>;
+                    } else {
+                        return rs.data.map(ele => {
+                            return <Card style={{ marginTop: '10px' }}>{ele.test}</Card>;
+                        });
+                    }
+                }}></MyList>
             </div>
         );
     }
