@@ -89,7 +89,7 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
     @Prop()
     hideSearchBox?: boolean;
 
-    //todo 实现下拉刷新
+    //下拉刷新
     @Prop()
     infiniteScroll?: boolean;
 
@@ -114,8 +114,8 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
         this.model.setPage({ index: this.current, size: this.pageSize });
 
         window.addEventListener('scroll', () => {
-            if (this.infiniteScroll && !this.loadedLastPage && this.isScrollEnd()) {
-                
+            if (this.infiniteScroll && this.isScrollEnd()) {
+                this.scrollEndHandler();
             }
         });
     }
@@ -126,44 +126,66 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
         let scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
         return scrollTop + clientHeight == scrollHeight;
     }
-    public query(data?: any) {
-        this._handleQuery(data);
+
+    private scrollEndHandler() {
+        if (!this.loadedLastPage && !this.loading) {
+            this.handleQuery({ noClear: true });
+        }
     }
-    private async _handleQuery(data?: any) {
+    public query(data?: any, noClear?: boolean) {
+        this._handleQuery(data, noClear);
+    }
+    private async _handleQuery(data?: any, noClear?: boolean) {
         this.loading = true;
         try {
             this.selectedRows = [];
             this.result.success = true;
-            this.result.data = [];
+            if (!noClear)
+                this.result.data = [];
             this.result.total = 0;
-            this.result.msg = '暂无数据';
+            this.result.msg = '加载中';
             let rs = this.queryFn && await this.queryFn(data);
             if (rs) {
-                if (this.infiniteScroll && this.model.page.index !== 1)
+                if (this.infiniteScroll)
                     this.result.data = [...this.result.data, ...rs.rows];
                 else
                     this.result.data = rs.rows;
                 this.result.total = rs.total;
             }
+            if (!this.result.data)
+                this.result.msg = '暂无数据';
             let lastPage = Math.ceil(this.result.total / this.model.page.size);
             this.loadedLastPage = this.model.page.index >= lastPage;
+            if (this.infiniteScroll && !this.loadedLastPage) {
+                this.model.page.index++;
+            }
         } catch (e) {
             this.result.success = false;
             this.result.msg = e.message;
+            if (this.infiniteScroll)
+                this.$Message.error(this.result.msg);
         } finally {
             this.loading = false;
         }
     }
 
-    private handleQuery() {
-        //防止页面不跳转
+    private handleQuery(opt?: {
+        noClear?: boolean;
+        resetPage?: boolean;
+    }) {
+        opt = {
+            ...opt
+        };
+        //防止使用router的时候页面不跳转
         (this.model.query as any)._t = Date.now();
-        this.$emit('query', this.model);
+        if (opt.resetPage)
+            this.model.page.index = 1;
+        this.$emit('query', this.model, opt.noClear);
     }
 
     private handlePress(e) {
         if (e.charCode == 13) {
-            this.handleQuery();
+            this.handleQuery({ resetPage: true });
         }
     }
 
@@ -243,7 +265,7 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
                                 {(!hideQueryBtn.all && !hideQueryBtn.query) &&
                                     <Col>
                                         <Button type="primary" loading={this.loading} on-click={() => {
-                                            this.handleQuery();
+                                            this.handleQuery({ resetPage: true });
                                         }}>查询</Button>
                                     </Col>
                                 }
@@ -286,7 +308,15 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
                                 }
                             }} />
                     }
-                    {this.loading && <Spin size="large" fix></Spin>}
+                    {this.loading &&
+                        (!this.infiniteScroll ?
+                            <Spin size="large" fix></Spin> :
+                            <div class={clsPrefix + 'bottom-loading'}>
+                                <Card>加载中
+                                    <Spin size="large" fix></Spin>
+                                </Card>
+                            </div>
+                        )}
                 </div>
                 <Card class={this.bottomBarClass}>
                     {this.multiOperateBtnList.map(ele => {

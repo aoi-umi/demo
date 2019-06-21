@@ -2,7 +2,7 @@ import { Component, Vue, Watch } from 'vue-property-decorator';
 import anime from 'animejs';
 
 import { Input, Card, Button } from '@/components/iview';
-import { MyList } from '@/components/my-list';
+import { MyList, IMyList } from '@/components/my-list';
 
 
 @Component
@@ -24,10 +24,14 @@ export default class App extends Vue {
         dom?: HTMLElement,
         refName?: string;
     }[] = [];
-    $refs: { board: HTMLElement; }
+    $refs: { board: HTMLElement; list: IMyList<any>; }
 
     public created() {
         this.setList();
+    }
+
+    mounted() {
+        this.$refs.list.query();
     }
 
     public handleClick() {
@@ -35,10 +39,10 @@ export default class App extends Vue {
         this.setList();
     }
 
-    setList() {
-        this.list = new Array(10).fill('').map((e, i) => {
+    setList(start = 0, size = 10) {
+        this.list = new Array(size).fill('').map((e, i) => {
             return {
-                test: i + 1 + '',
+                test: i + start + 1 + '',
             }
         });
     }
@@ -148,16 +152,37 @@ export default class App extends Vue {
                         })
                     }
                 </div>
+                <MyList ref="list" type="custom" infiniteScroll
+                    on-query={(model, noClear) => {
+                        let q = { ...model.query };
+                        this.$refs.list.query(q, noClear);
+                    }}
 
-                <MyList data={this.list} type="custom" hideSearchBox infiniteScroll customRenderFn={(rs) => {
-                    if (!rs.success || !rs.total) {
-                        return <Card style={{ marginTop: '10px' }}>{rs.msg}</Card>;
-                    } else {
-                        return rs.data.map(ele => {
+                    queryFn={() => {
+                        let page = this.$refs.list.model.page;
+                        let total = 25;
+                        let start = (page.index - 1) * page.size;
+
+                        let size = start + page.size > total ? total - start : page.size;
+                        this.setList((page.index - 1) * page.size, size);
+                        return new Promise((resolve, reject) => {
+                            setTimeout(() => {
+                                if (Date.now() % 2)
+                                    return reject(new Error('test'));
+                                resolve({
+                                    rows: this.list,
+                                    total
+                                });
+                            }, 2000);
+                        });
+                    }}
+
+                    customRenderFn={(rs) => {
+                        let list = rs.data.map(ele => {
                             return <Card style={{ marginTop: '10px' }}>{ele.test}</Card>;
                         });
-                    }
-                }}></MyList>
+                        return list;
+                    }}></MyList>
             </div>
         );
     }
