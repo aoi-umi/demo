@@ -130,7 +130,7 @@ export default class Bookmark extends Vue {
     detailShow = false;
     delShow = false;
     detail: any;
-    $refs: { table: IMyList<any> };
+    $refs: { list: IMyList<any> };
 
     page: any;
     created() {
@@ -147,14 +147,14 @@ export default class Bookmark extends Vue {
     }
 
     query() {
-        let table = this.$refs.table;
+        let table = this.$refs.list;
         let query = this.$route.query;
         ['name', 'url', 'anyKey'].forEach(key => {
             if (query[key])
                 this.$set(table.model.query, key, query[key]);
         });
         table.model.setPage({ index: query.page, size: query.rows });
-        this.$refs.table.query(query);
+        this.$refs.list.query(query);
     }
 
     delIds = [];
@@ -164,7 +164,7 @@ export default class Bookmark extends Vue {
             this.$Message.info('删除成功');
             this.delIds = [];
             this.delShow = false;
-            this.$refs.table.query();
+            this.$refs.list.query();
         } catch (e) {
             this.$Message.error('删除失败:' + e.message);
         }
@@ -175,7 +175,7 @@ export default class Bookmark extends Vue {
                 <Modal v-model={this.detailShow} footer-hide mask-closable={false}>
                     <BookmarkDetailView detail={this.detail} on-save-success={() => {
                         this.detailShow = false;
-                        this.$refs.table.query();
+                        this.$refs.list.query();
                     }} />
                 </Modal>
                 <Modal v-model={this.delShow} footer-hide>
@@ -190,7 +190,7 @@ export default class Bookmark extends Vue {
                     </MyConfirm>
                 </Modal>
                 <MyList
-                    ref="table"
+                    ref="list"
                     current={this.page.index}
                     pageSize={this.page.size}
                     queryArgs={{
