@@ -174,7 +174,82 @@ export default class Authority extends Vue {
             this.$Message.error('修改失败:' + e.message);
         }
     }
+
+    private get multiOperateBtnList() {
+        let list = [];
+        if (this.storeUser.user.hasAuth(authority.authorityDel)) {
+            list.push({
+                text: '批量删除',
+                onClick: (selection) => {
+                    this.delIds = selection.map(ele => ele._id);
+                    this.delShow = true;
+                }
+            });
+        }
+        return list;
+    }
+
+    private getColumns() {
+        let columns = [];
+        if (this.multiOperateBtnList.length) {
+            columns = [...columns, {
+                key: '_selection',
+                type: 'selection',
+                width: 60,
+                align: 'center',
+            }];
+        }
+        columns = [...columns, {
+            title: '名字',
+            key: 'name',
+            minWidth: 120,
+        }, {
+            title: '编码',
+            key: 'code',
+            minWidth: 120,
+        }, {
+            title: '状态',
+            key: 'status',
+            minWidth: 80,
+            render: (h, params) => {
+                let text = myEnum.authorityStatus.getKey(params.row.status);
+                return <span>{text}</span>;
+            }
+        },];
+        if (this.storeUser.user.existsAuth([authority.authoritySave, authority.authorityDel])) {
+            columns = [...columns, {
+                title: '操作',
+                key: 'action',
+                fixed: 'right',
+                width: 150,
+                render: (h, params) => {
+                    let detail = params.row;
+                    return (
+                        <div class={MyTableConst.clsPrefix + "action-box"}>
+                            {this.storeUser.user.hasAuth(authority.authoritySave) && [
+                                <a on-click={() => {
+                                    this.updateStatus(detail);
+                                }}>{detail.status == myEnum.authorityStatus.启用 ? '禁用' : '启用'}</a>,
+                                <a on-click={() => {
+                                    this.detail = detail;
+                                    this.detailShow = true;
+                                }}>编辑</a>
+                            ]}
+                            {this.storeUser.user.hasAuth(authority.authorityDel) &&
+                                <a on-click={() => {
+                                    this.delIds = [detail._id];
+                                    this.delShow = true;
+                                }}>删除</a>
+                            }
+                        </div>
+                    );
+                }
+            }];
+        }
+        return columns;
+    }
     protected render() {
+
         return (
             <div>
                 <Modal v-model={this.detailShow} footer-hide mask-closable={false}>
@@ -221,55 +296,7 @@ export default class Authority extends Vue {
                         add: !this.storeUser.user.hasAuth(authority.authoritySave)
                     }}
 
-                    columns={[{
-                        key: '_selection',
-                        type: 'selection',
-                        width: 60,
-                        align: 'center'
-                    }, {
-                        title: '名字',
-                        key: 'name',
-                        minWidth: 120,
-                    }, {
-                        title: '编码',
-                        key: 'code',
-                        minWidth: 120,
-                    }, {
-                        title: '状态',
-                        key: 'status',
-                        minWidth: 80,
-                        render: (h, params) => {
-                            let text = myEnum.authorityStatus.getKey(params.row.status);
-                            return <span>{text}</span>;
-                        }
-                    }, {
-                        title: '操作',
-                        key: 'action',
-                        fixed: 'right',
-                        width: 150,
-                        render: (h, params) => {
-                            let detail = params.row;
-                            return (
-                                <div class={MyTableConst.clsPrefix + "action-box"}>
-                                    {this.storeUser.user.hasAuth(authority.authoritySave) && [
-                                        <a on-click={() => {
-                                            this.updateStatus(detail);
-                                        }}>{detail.status == myEnum.authorityStatus.启用 ? '禁用' : '启用'}</a>,
-                                        <a on-click={() => {
-                                            this.detail = detail;
-                                            this.detailShow = true;
-                                        }}>编辑</a>
-                                    ]}
-                                    {this.storeUser.user.hasAuth(authority.authorityDel) &&
-                                        <a on-click={() => {
-                                            this.delIds = [detail._id];
-                                            this.delShow = true;
-                                        }}>删除</a>
-                                    }
-                                </div>
-                            );
-                        }
-                    },]}
+                    columns={this.getColumns()}
 
                     queryFn={async (data) => {
                         let rs = await testApi.authorityQuery(data);
@@ -300,13 +327,7 @@ export default class Authority extends Vue {
                         });
                     }}
 
-                    multiOperateBtnList={[{
-                        text: '批量删除',
-                        onClick: (selection) => {
-                            this.delIds = selection.map(ele => ele._id);
-                            this.delShow = true;
-                        }
-                    }]}
+                    multiOperateBtnList={this.multiOperateBtnList}
                 >
                 </MyList>
             </div>
@@ -325,7 +346,7 @@ class AuthorityTransfer extends Vue {
     }
 
     $refs: { transfer: IMyTransfer };
-    private insideSelectedData = [];    
+    private insideSelectedData = [];
 
     getChangeData(key?: string) {
         return this.$refs.transfer.getChangeData(key);

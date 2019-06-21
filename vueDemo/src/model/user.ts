@@ -15,7 +15,22 @@ export class LoginUser {
         return user as LoginUserType;
     }
 
-    hasAuth(this: LoginUserType, auth: string) {
-        return this.authority && this.authority[auth];
+    hasAuth(this: LoginUserType, auth: string | string[]) {
+        let authList = auth instanceof Array ? auth : [auth];
+        let rs = false;
+        for (let ele of authList) {
+            if (!this.authority || !this.authority[ele])
+                return false;
+        }
+        return true;
+    }
+
+    existsAuth(this: LoginUserType, auth: string | string[]) {
+        let authList = auth instanceof Array ? auth : [auth];
+        for (let ele of authList) {
+            if (this.authority && this.authority[ele])
+                return true;
+        }
+        return false;
     }
 }

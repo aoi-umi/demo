@@ -17,7 +17,7 @@ body {
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
   padding: 0;
   position: fixed;
-  z-index: 1000;
+  z-index: 4;
   width: 100%;
   top: 0;
 }
@@ -70,7 +70,7 @@ body {
 .side-menu-blank {
   flex: 0 0 78px;
   position: relative;
-  transition: all .2s ease-in-out;
+  transition: all 0.2s ease-in-out;
   &.side-open {
     flex: 0 0 200px;
   }
@@ -93,7 +93,7 @@ body {
   top: @headerHeight;
   position: fixed;
   height: 100%;
-  z-index: 900;
+  z-index: 3;
 }
 
 .dialog-view {
