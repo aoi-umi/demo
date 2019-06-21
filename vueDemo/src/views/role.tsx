@@ -186,6 +186,89 @@ export default class Role extends Vue {
             this.$Message.error('修改失败:' + e.message);
         }
     }
+
+    private get multiOperateBtnList() {
+        let list = [];
+        if (this.storeUser.user.hasAuth(authority.roleDel)) {
+            list.push({
+                text: '批量删除',
+                onClick: (selection) => {
+                    this.delIds = selection.map(ele => ele._id);
+                    this.delShow = true;
+                }
+            });
+        }
+        return list;
+    }
+
+    private getColumns() {
+        let columns = [];
+        if (this.multiOperateBtnList.length) {
+            columns = [...columns, {
+                key: '_selection',
+                type: 'selection',
+                width: 60,
+                align: 'center',
+            }];
+        }
+        columns = [...columns, {
+            key: '_expand',
+            type: 'expand',
+            width: 30,
+            render: (h, params) => {
+                let authorityList = params.row.authorityList;
+                return MyTagModel.renderAuthorityTag(authorityList);
+            }
+        }, {
+            title: '名字',
+            key: 'name',
+            minWidth: 120,
+        }, {
+            title: '编码',
+            key: 'code',
+            minWidth: 120,
+        }, {
+            title: '状态',
+            key: 'status',
+            minWidth: 80,
+            render: (h, params) => {
+                let text = myEnum.roleStatus.getKey(params.row.status);
+                return <span>{text}</span>;
+            }
+        },];
+        if (this.storeUser.user.existsAuth([authority.roleSave, authority.roleDel])) {
+            columns = [...columns, {
+                title: '操作',
+                key: 'action',
+                fixed: 'right',
+                width: 150,
+                render: (h, params) => {
+                    let detail = params.row;
+                    return (
+                        <div class={MyTableConst.clsPrefix + "action-box"}>
+                            {this.storeUser.user.hasAuth(authority.roleSave) && [
+                                <a on-click={() => {
+                                    this.updateStatus(detail);
+                                }}>{detail.status == myEnum.roleStatus.启用 ? '禁用' : '启用'}</a>,
+                                <a on-click={() => {
+                                    this.detail = detail;
+                                    this.detailShow = true;
+                                }}>编辑</a>
+                            ]}
+                            {this.storeUser.user.hasAuth(authority.roleDel) &&
+                                <a on-click={() => {
+                                    this.delIds = [detail._id];
+                                    this.delShow = true;
+                                }}>删除</a>
+                            }
+                        </div>
+                    );
+                }
+            },];
+        }
+        return columns;
+    }
+
     protected render() {
         return (
             <div>
@@ -236,63 +319,7 @@ export default class Role extends Vue {
                         add: !this.storeUser.user.hasAuth(authority.roleSave)
                     }}
 
-                    columns={[{
-                        key: '_selection',
-                        type: 'selection',
-                        width: 60,
-                        align: 'center'
-                    }, {
-                        key: '_expand',
-                        type: 'expand',
-                        width: 30,
-                        render: (h, params) => {
-                            let authorityList = params.row.authorityList;
-                            return MyTagModel.renderAuthorityTag(authorityList);
-                        }
-                    }, {
-                        title: '名字',
-                        key: 'name',
-                        minWidth: 120,
-                    }, {
-                        title: '编码',
-                        key: 'code',
-                        minWidth: 120,
-                    }, {
-                        title: '状态',
-                        key: 'status',
-                        minWidth: 80,
-                        render: (h, params) => {
-                            let text = myEnum.roleStatus.getKey(params.row.status);
-                            return <span>{text}</span>;
-                        }
-                    }, {
-                        title: '操作',
-                        key: 'action',
-                        fixed: 'right',
-                        width: 150,
-                        render: (h, params) => {
-                            let detail = params.row;
-                            return (
-                                <div class={MyTableConst.clsPrefix + "action-box"}>
-                                    {this.storeUser.user.hasAuth(authority.roleSave) && [
-                                        <a on-click={() => {
-                                            this.updateStatus(detail);
-                                        }}>{detail.status == myEnum.roleStatus.启用 ? '禁用' : '启用'}</a>,
-                                        <a on-click={() => {
-                                            this.detail = detail;
-                                            this.detailShow = true;
-                                        }}>编辑</a>
-                                    ]}
-                                    {this.storeUser.user.hasAuth(authority.roleDel) &&
-                                        <a on-click={() => {
-                                            this.delIds = [detail._id];
-                                            this.delShow = true;
-                                        }}>删除</a>
-                                    }
-                                </div>
-                            );
-                        }
-                    },]}
+                    columns={this.getColumns()}
 
                     queryFn={async (data) => {
                         let rs = await testApi.roleQuery(data);
@@ -331,13 +358,7 @@ export default class Role extends Vue {
                         });
                     }}
 
-                    multiOperateBtnList={[{
-                        text: '批量删除',
-                        onClick: (selection) => {
-                            this.delIds = selection.map(ele => ele._id);
-                            this.delShow = true;
-                        }
-                    }]}
+                    multiOperateBtnList={this.multiOperateBtnList}
                 >
                 </MyList>
             </div>

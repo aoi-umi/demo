@@ -132,6 +132,65 @@ export default class UserMgt extends Vue {
         this.$refs.table.query(query);
     }
 
+    private getColumns() {
+        let columns = [];
+        columns = [...columns, {
+            key: '_expand',
+            type: 'expand',
+            width: 30,
+            render: (h, params) => {
+                let auth = params.row.auth;
+                let enableAuthList: any[] = Object.values(auth);
+                return MyTagModel.renderAuthorityTag(enableAuthList);
+            }
+        }, {
+            title: '账号',
+            key: 'account',
+            minWidth: 120,
+        }, {
+            title: '昵称',
+            key: 'nickname',
+            minWidth: 120,
+        }, {
+            title: '角色',
+            key: 'roleList',
+            minWidth: 120,
+            render: (h, params) => {
+                let roleList = params.row.roleList;
+                return MyTagModel.renderRoleTag(roleList);
+            }
+        }, {
+            title: '权限',
+            key: 'authorityList',
+            minWidth: 120,
+            render: (h, params) => {
+                return MyTagModel.renderAuthorityTag(params.row.authorityList);
+            }
+        },];
+        if (this.storeUser.user.existsAuth([authority.userMgtEdit])) {
+            columns = [...columns, {
+                title: '操作',
+                key: 'action',
+                fixed: 'right',
+                width: 150,
+                render: (h, params) => {
+                    let detail = params.row;
+                    return (
+                        <div class={MyTableConst.clsPrefix + "action-box"}>
+                            {this.storeUser.user.hasAuth(authority.userMgtEdit) &&
+                                <a on-click={() => {
+                                    this.detail = detail;
+                                    this.detailShow = true;
+                                }}>编辑</a>
+                            }
+                        </div>
+                    );
+                }
+            },];
+        }
+        return columns;
+    }
+
     protected render() {
         return (
             <div>
@@ -165,57 +224,7 @@ export default class UserMgt extends Vue {
                     }}
                     hideQueryBtn={{ add: true, }}
 
-                    columns={[{
-                        key: '_expand',
-                        type: 'expand',
-                        width: 30,
-                        render: (h, params) => {
-                            let auth = params.row.auth;
-                            let enableAuthList: any[] = Object.values(auth);
-                            return MyTagModel.renderAuthorityTag(enableAuthList);
-                        }
-                    }, {
-                        title: '账号',
-                        key: 'account',
-                        minWidth: 120,
-                    }, {
-                        title: '昵称',
-                        key: 'nickname',
-                        minWidth: 120,
-                    }, {
-                        title: '角色',
-                        key: 'roleList',
-                        minWidth: 120,
-                        render: (h, params) => {
-                            let roleList = params.row.roleList;
-                            return MyTagModel.renderRoleTag(roleList);
-                        }
-                    }, {
-                        title: '权限',
-                        key: 'authorityList',
-                        minWidth: 120,
-                        render: (h, params) => {
-                            return MyTagModel.renderAuthorityTag(params.row.authorityList);
-                        }
-                    }, {
-                        title: '操作',
-                        key: 'action',
-                        fixed: 'right',
-                        width: 150,
-                        render: (h, params) => {
-                            let detail = params.row;
-                            return (
-                                <div class={MyTableConst.clsPrefix + "action-box"}>
-                                    {this.storeUser.user.hasAuth(authority.userMgtEdit) &&
-                                        <a on-click={() => {
-                                            this.detail = detail;
-                                            this.detailShow = true;
-                                        }}>编辑</a>
-                                    }
-                                </div>
-                            );
-                        }
-                    },]}
+                    columns={this.getColumns()}
 
                     queryFn={async (data) => {
                         let rs = await testApi.userMgtQuery(data);

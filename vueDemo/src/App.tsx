@@ -18,6 +18,7 @@ export default class App extends Vue {
     isCollapsed = true;
     theme = "light" as any;
     title = '';
+    activeName = location.pathname;
     $refs: { sider: any };
 
     protected created() {
@@ -66,6 +67,7 @@ export default class App extends Vue {
     @Watch('$route')
     route(to, from) {
         this.setTitle();
+        this.activeName = location.pathname;
     }
 
     signInShow = false;
@@ -128,7 +130,7 @@ export default class App extends Vue {
                         v-model={this.isCollapsed}
                     >
                         <Menu
-                            active-name={location.pathname}
+                            active-name={this.activeName}
                             theme={"dark"}
                             width="auto"
                             class={this.menuitemClasses}
