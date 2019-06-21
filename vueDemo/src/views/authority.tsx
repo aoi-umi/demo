@@ -190,16 +190,13 @@ export default class Authority extends Vue {
     }
 
     private getColumns() {
-        let columns = [];
-        if (this.multiOperateBtnList.length) {
-            columns = [...columns, {
-                key: '_selection',
-                type: 'selection',
-                width: 60,
-                align: 'center',
-            }];
-        }
-        columns = [...columns, {
+        let columns = [{
+            key: '_selection',
+            type: 'selection',
+            width: 60,
+            align: 'center',
+            hide: !this.multiOperateBtnList.length
+        }, {
             title: '名字',
             key: 'name',
             minWidth: 120,
@@ -215,39 +212,38 @@ export default class Authority extends Vue {
                 let text = myEnum.authorityStatus.getKey(params.row.status);
                 return <span>{text}</span>;
             }
-        },];
-        if (this.storeUser.user.existsAuth([authority.authoritySave, authority.authorityDel])) {
-            columns = [...columns, {
-                title: '操作',
-                key: 'action',
-                fixed: 'right',
-                width: 150,
-                render: (h, params) => {
-                    let detail = params.row;
-                    return (
-                        <div class={MyTableConst.clsPrefix + "action-box"}>
-                            {this.storeUser.user.hasAuth(authority.authoritySave) && [
-                                <a on-click={() => {
-                                    this.updateStatus(detail);
-                                }}>{detail.status == myEnum.authorityStatus.启用 ? '禁用' : '启用'}</a>,
-                                <a on-click={() => {
-                                    this.detail = detail;
-                                    this.detailShow = true;
-                                }}>编辑</a>
-                            ]}
-                            {this.storeUser.user.hasAuth(authority.authorityDel) &&
-                                <a on-click={() => {
-                                    this.delIds = [detail._id];
-                                    this.delShow = true;
-                                }}>删除</a>
-                            }
-                        </div>
-                    );
-                }
-            }];
-        }
+        }, {
+            title: '操作',
+            key: 'action',
+            fixed: 'right',
+            width: 150,
+            hide: !this.storeUser.user.existsAuth([authority.authoritySave, authority.authorityDel]),
+            render: (h, params) => {
+                let detail = params.row;
+                return (
+                    <div class={MyTableConst.clsPrefix + "action-box"}>
+                        {this.storeUser.user.hasAuth(authority.authoritySave) && [
+                            <a on-click={() => {
+                                this.updateStatus(detail);
+                            }}>{detail.status == myEnum.authorityStatus.启用 ? '禁用' : '启用'}</a>,
+                            <a on-click={() => {
+                                this.detail = detail;
+                                this.detailShow = true;
+                            }}>编辑</a>
+                        ]}
+                        {this.storeUser.user.hasAuth(authority.authorityDel) &&
+                            <a on-click={() => {
+                                this.delIds = [detail._id];
+                                this.delShow = true;
+                            }}>删除</a>
+                        }
+                    </div>
+                );
+            }
+        }];
         return columns;
     }
+
     protected render() {
 
         return (

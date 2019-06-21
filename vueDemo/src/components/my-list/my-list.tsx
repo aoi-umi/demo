@@ -58,6 +58,9 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
         sortable?: boolean | 'custom';
         sortMethod?: () => any;
         sortType?: 'asc' | 'desc';
+
+        //自定义字段
+        hide?: boolean;
     }[];
 
     @Prop()
@@ -284,7 +287,7 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
                 <div style={{ position: 'relative', }}>
                     {this.$slots.default}
                     {this.type == 'table' ?
-                        <Table style={{ marginTop: '10px' }} columns={this.columns}
+                        <Table style={{ marginTop: '10px' }} columns={this.columns.filter(ele => !ele.hide)}
                             data={this.result.data} no-data-text={this.result.msg}
                             on-on-selection-change={this.setSelectedRows}>
                         </Table> :
