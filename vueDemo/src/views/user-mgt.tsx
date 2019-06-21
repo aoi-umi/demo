@@ -133,8 +133,7 @@ export default class UserMgt extends Vue {
     }
 
     private getColumns() {
-        let columns = [];
-        columns = [...columns, {
+        let columns = [{
             key: '_expand',
             type: 'expand',
             width: 30,
@@ -166,28 +165,26 @@ export default class UserMgt extends Vue {
             render: (h, params) => {
                 return MyTagModel.renderAuthorityTag(params.row.authorityList);
             }
-        },];
-        if (this.storeUser.user.existsAuth([authority.userMgtEdit])) {
-            columns = [...columns, {
-                title: '操作',
-                key: 'action',
-                fixed: 'right',
-                width: 150,
-                render: (h, params) => {
-                    let detail = params.row;
-                    return (
-                        <div class={MyTableConst.clsPrefix + "action-box"}>
-                            {this.storeUser.user.hasAuth(authority.userMgtEdit) &&
-                                <a on-click={() => {
-                                    this.detail = detail;
-                                    this.detailShow = true;
-                                }}>编辑</a>
-                            }
-                        </div>
-                    );
-                }
-            },];
-        }
+        }, {
+            title: '操作',
+            key: 'action',
+            fixed: 'right',
+            width: 150,
+            hide: !this.storeUser.user.existsAuth([authority.userMgtEdit]),
+            render: (h, params) => {
+                let detail = params.row;
+                return (
+                    <div class={MyTableConst.clsPrefix + "action-box"}>
+                        {this.storeUser.user.hasAuth(authority.userMgtEdit) &&
+                            <a on-click={() => {
+                                this.detail = detail;
+                                this.detailShow = true;
+                            }}>编辑</a>
+                        }
+                    </div>
+                );
+            }
+        }];
         return columns;
     }
 
