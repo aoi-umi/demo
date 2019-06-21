@@ -1,7 +1,7 @@
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import anime from 'animejs';
 
-import { Input, Card, Button } from '@/components/iview';
+import { Input, Card, Button, ColorPicker, Row, Col } from '@/components/iview';
 import { MyList, IMyList } from '@/components/my-list';
 
 
@@ -10,6 +10,7 @@ export default class App extends Vue {
     public value = '';
     public msg = '';
     public list: { test: string }[] = [];
+    color = 'white';
     public get valueLength() {
         return this.value.length;
     }
@@ -19,6 +20,7 @@ export default class App extends Vue {
     contents: {
         idx: number,
         msg: string,
+        color?: string;
         animeInst?: anime.AnimeInstance,
         finished?: boolean,
         dom?: HTMLElement,
@@ -119,7 +121,7 @@ export default class App extends Vue {
         let danmaku = this.danmaku && this.danmaku.trim();
         if (danmaku) {
             let idx = contents.length;
-            contents.push({ idx, msg: danmaku, refName: Date.now() + '' });
+            contents.push({ idx, msg: danmaku, refName: Date.now() + '', color: this.color });
             this.danmaku = '';
         }
     }
@@ -128,30 +130,39 @@ export default class App extends Vue {
         let contents = this.contents;
         return (
             <div>
-                <div>
-                    <Input v-model={this.danmaku} on-on-keypress={(e) => {
-                        if (e.charCode == 13) {
-                            this.sendDanmaku();
+                <div style={{ width: '500px' }}>
+                    <div ref='board' style={{
+                        height: '400px', background: 'black', overflow: 'hidden', position: 'relative',
+                        fontSize: '30px', color: 'white',
+                        textStroke: '0.5px #000',
+                    }}>
+                        {
+                            contents.map(ele => {
+                                let idx = ele.idx;
+                                return (
+                                    <div key={idx} ref={ele.refName} style={{ display: 'inline-block', position: 'absolute', left: '100%', whiteSpace: 'nowrap', color: ele.color }}>
+                                        {ele.msg}
+                                    </div>);
+                            })
                         }
-                    }} />
-                    <Button on-click={this.sendDanmaku}>danmaku</Button>
-                    <Button on-click={() => { this.contents = []; }}>clear anime</Button>
+                    </div>
+                    <div>
+                        <Row >
+                            <Col span={21}>
+                                <Input v-model={this.danmaku} on-on-keypress={(e) => {
+                                    if (e.charCode == 13) {
+                                        this.sendDanmaku();
+                                    }
+                                }} search enter-button="danmaku" on-on-search={this.sendDanmaku} />
+                            </Col>
+                            <Col span={3}>
+                                <ColorPicker v-model={this.color} />
+                            </Col>
+                        </Row>
+                        <Button on-click={() => { this.contents = []; }}>clear anime</Button>
+                    </div>
                 </div>
-                <div ref='board' style={{
-                    height: '500px', width: '500px', background: '#f7f7f7', overflow: 'hidden', position: 'relative',
-                    fontSize: '35px', color: 'white',
-                    textStroke: '0.5px #000',
-                }}>
-                    {
-                        contents.map(ele => {
-                            let idx = ele.idx;
-                            return (
-                                <div key={idx} ref={ele.refName} style={{ display: 'inline-block', position: 'absolute', left: '100%', whiteSpace: 'nowrap' }}>
-                                    {ele.msg}
-                                </div>);
-                        })
-                    }
-                </div>
+
                 <MyList ref="list" type="custom" infiniteScroll
                     on-query={(model, noClear) => {
                         let q = { ...model.query };
