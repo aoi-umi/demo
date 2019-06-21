@@ -17,6 +17,7 @@ export const FormItem = convClass<iviewTypes.FormItem>(iview.FormItem);
 
 export const Row = convClass<iviewTypes.Row>(iview.Row);
 export const Col = convClass<iviewTypes.Col>(iview.Col);
+export const ColorPicker = convClass<iviewTypes.ColorPicker>(iview.ColorPicker);
 
 export const Header = convClass<iviewTypes.Header>(iview.Header);
 export const Icon = convClass<iviewTypes.Icon>(iview.Icon);
