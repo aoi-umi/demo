@@ -1,22 +1,16 @@
 import { Server } from 'http';
-export let onlineCount = 0;
-export let onlineUser = {};
-interface Socket extends SocketIO.Socket {
-}
+import { SocketOnConnect } from '../typings/libs';
 
-export let io: Server = null;
-export let init = function (optIO: Server, onConnect?: (socket: Socket) => void) {
+export let io: SocketIO.Server = null;
+export let init = function (optIO: SocketIO.Server, onConnect?: SocketOnConnect) {
     io = optIO;
     io.on('connection', function (socket: Socket) {
-        onConnect && onConnect(socket);
-        // socket.on('disconnect', function () {
-
-        // });
+        onConnect && onConnect(socket, io);
     });
     return io;
 };
 
-function tryFn(socket: Socket, fn) {
+export function tryFn(socket: Socket, fn: () => void) {
     try {
         fn();
     } catch (e) {

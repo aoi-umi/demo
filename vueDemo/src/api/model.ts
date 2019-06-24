@@ -2,7 +2,7 @@ import { AxiosRequestConfig, AxiosResponse } from 'axios';
 
 import { request, extend, clone } from '../helpers/utils';
 type BeforeRequest = (request: AxiosRequestConfig) => any;
-type AfterResponse<T=any> = (data: T, response: AxiosResponse<T>) => any;
+type AfterResponse<T = any> = (data: T, response: AxiosResponse<T>) => any;
 export type RequestByConfigOption<T> = {
     beforeRequest?: BeforeRequest;
     afterResponse?: AfterResponse<T>;
@@ -58,4 +58,13 @@ type ApiMethodType<MethodT, T extends ApiDefaultArgsType> = {
 export type ApiConfigModel<MethodT extends { [key: string]: any }, T extends ApiDefaultArgsType = ApiDefaultArgsType> = {
     defaultArgs: T,
     method: ApiMethodType<MethodT, T>,
+}
+
+
+import * as socketio from 'socket.io-client';
+export class Socket {
+    socket: SocketIOClient.Socket;
+    constructor(uri: string, opts?: SocketIOClient.ConnectOpts) {
+        this.socket = socketio.connect(uri, opts);
+    }
 }

@@ -1,10 +1,12 @@
 import { Component, Vue, Watch, Prop } from "vue-property-decorator";
 import { getModule } from 'vuex-module-decorators';
+
 import * as router from '@/router';
 import {
     Menu, MenuItem, Option,
     Icon, Content, Sider, Layout, Header, Button, Row, Col, Poptip, Avatar, Modal,
 } from "@/components/iview";
+
 import { testApi } from './api';
 import { dev, authority } from './config';
 const routeConfig = router.routerConfig;
@@ -51,6 +53,7 @@ export default class App extends Vue {
             }
         }
     }
+
     collapsedSider() {
         this.$refs.sider.toggleCollapse();
     }

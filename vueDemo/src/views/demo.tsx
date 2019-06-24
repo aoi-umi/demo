@@ -3,7 +3,7 @@ import anime from 'animejs';
 
 import { Input, Card, Button, ColorPicker, Row, Col, Checkbox } from '@/components/iview';
 import { MyList, IMyList } from '@/components/my-list';
-
+import { testSocket } from '@/api';
 
 @Component
 export default class App extends Vue {
@@ -30,6 +30,7 @@ export default class App extends Vue {
 
     public created() {
         this.setList();
+        testSocket.bindDanmakuRecv(this.recvDanmaku);
     }
 
     mounted() {
@@ -121,9 +122,17 @@ export default class App extends Vue {
         let danmaku = this.danmaku && this.danmaku.trim();
         if (danmaku) {
             let idx = contents.length;
-            contents.push({ idx, msg: danmaku, refName: Date.now() + '', color: this.color });
+            let data = { msg: danmaku, color: this.color };
+            contents.push({ idx, refName: Date.now() + '', ...data });
+            testSocket.danmakuSend(data);
             this.danmaku = '';
         }
+    }
+
+    recvDanmaku(data) {
+        let contents = this.contents;
+        let idx = contents.length;
+        contents.push({ idx, refName: Date.now() + '', ...data });
     }
 
     fail = false;

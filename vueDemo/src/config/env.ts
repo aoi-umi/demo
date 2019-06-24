@@ -7,11 +7,17 @@ const envConfig = {
         host: `//api.${host}`
     },
     dev: {
-        host: '//localhost:8000'
+        host: `//${location.hostname}:8000`
     }
 };
 const config = {
     title: '开发',
+    socket: {
+        test: {
+            host: `${envConfig[env].host}`,
+            path: '/devMgt/socket.io'
+        }
+    },
     api: {
         test: {
             defaultArgs: {

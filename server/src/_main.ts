@@ -31,10 +31,8 @@ export async function init() {
 }
 
 import routes from './routes';
+import { SocketOnConnect } from './typings/libs';
 export let register = function (app: Express) {
-    //检查路由权限
-    // app.use(auth.check);
-
     app.use(config.env.urlPrefix, routes);
 }
 
@@ -42,5 +40,11 @@ export let errorHandler = function (err, req: Request, res: Response, next) {
     helpers.responseHandler(() => {
         throw err;
     }, req, res);
+};
+
+export let initSocket: SocketOnConnect = function (socket) {
+    socket.on(config.myEnum.socket.弹幕发送, (msg) => {
+        socket.broadcast.emit(config.myEnum.socket.弹幕接收, msg);
+    });
 };
 

@@ -164,3 +164,11 @@ export let dbDateMatch = function (dateFrom, dateTo) {
         sqlDate,
     };
 }
+
+export let tryFn = function (fn) {
+    try {
+        fn();
+    } catch (e) {
+        console.error('出错了', e);
+    }
+};

@@ -9,3 +9,6 @@ type ApiListQueryArgs = {
     orderBy?: string;
     sortOrder?: string;
 }
+
+interface Socket extends SocketIO.Socket {
+}

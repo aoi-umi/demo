@@ -1,9 +1,9 @@
 import Vue from 'vue';
 import Router, { RouteConfig } from 'vue-router';
+import { getModule } from 'vuex-module-decorators';
 
 import { authority, error, dev } from './config';
 import store from './store';
-import { getModule } from 'vuex-module-decorators';
 import LoginUserStore from './store/loginUser';
 
 Vue.use(Router);
