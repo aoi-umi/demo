@@ -45,3 +45,7 @@ declare global {
         }
     }
 }
+
+
+import { Server } from 'http';
+type SocketOnConnect = (socket: Socket, io: SocketIO.Server) => void;

@@ -15,3 +15,9 @@ import { TestApi } from './test';
 export * from './test';
 
 export const testApi = new TestApi(env.api.test);
+
+
+import { TestSocket } from './testSocket';
+export const testSocket = new TestSocket(env.socket.test.host, {
+    path: env.socket.test.path,
+});
