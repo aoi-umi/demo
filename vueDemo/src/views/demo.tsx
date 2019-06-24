@@ -1,7 +1,7 @@
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import anime from 'animejs';
 
-import { Input, Card, Button, ColorPicker, Row, Col } from '@/components/iview';
+import { Input, Card, Button, ColorPicker, Row, Col, Checkbox } from '@/components/iview';
 import { MyList, IMyList } from '@/components/my-list';
 
 
@@ -126,6 +126,7 @@ export default class App extends Vue {
         }
     }
 
+    fail = false;
     protected render() {
         let contents = this.contents;
         return (
@@ -164,6 +165,11 @@ export default class App extends Vue {
                 </div>
 
                 <MyList ref="list" type="custom" infiniteScroll
+                    customQueryNode={
+                        <label>
+                            <Checkbox v-model={this.fail} />失败
+                        </label>
+                    }
                     on-query={(model, noClear) => {
                         let q = { ...model.query };
                         this.$refs.list.query(q, noClear);
@@ -178,7 +184,7 @@ export default class App extends Vue {
                         this.setList((page.index - 1) * page.size, size);
                         return new Promise((resolve, reject) => {
                             setTimeout(() => {
-                                if (Date.now() % 2)
+                                if (this.fail)
                                     return reject(new Error('test'));
                                 resolve({
                                     rows: this.list,

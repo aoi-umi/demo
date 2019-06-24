@@ -311,15 +311,21 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
                                 }
                             }} />
                     }
-                    {this.loading &&
-                        (!this.infiniteScroll ?
-                            <Spin size="large" fix></Spin> :
-                            <div class={clsPrefix + 'bottom-loading'}>
-                                <Card>加载中
-                                    <Spin size="large" fix></Spin>
-                                </Card>
-                            </div>
-                        )}
+                    {!this.infiniteScroll ?
+                        this.loading && <Spin size="large" fix /> :
+                        <div class={(() => {
+                            let cls = [clsPrefix + 'bottom-loading'];
+                            if (this.loading || !this.result.success) {
+                            } else {
+                                cls.push('invisibility');
+                            }
+                            return cls;
+                        })()}>
+                            <Card>{this.result.msg}
+                                {this.loading && <Spin size="large" fix />}
+                            </Card>
+                        </div>
+                    }
                 </div>
                 <Card class={this.bottomBarClass}>
                     {this.multiOperateBtnList.map(ele => {
