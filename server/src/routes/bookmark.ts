@@ -1,19 +1,17 @@
 import { RequestHandler } from 'express';
 import { Types } from 'mongoose';
-import { responseHandler, paramsValid } from '../helpers';
+import { plainToClass } from 'class-transformer';
+
+import { responseHandler, paramsValidV2 } from '../helpers';
 import { error, escapeRegExp } from '../_system/common';
 import { transaction } from '../_system/dbMongo';
 import { BookmarkModel, BookmarkInstanceType } from '../models/mongo/bookmark';
+import * as VaildSchema from '../vaild-schema/class-vaild';
 
 export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let schema = {};
-        let data: {
-            name: string;
-            url: string;
-            anyKey: string;
-        } & ApiListQueryArgs = req.query;
-        paramsValid(schema, data, { list: true });
+        let data = plainToClass(VaildSchema.BookmarkQuery, req.query);
+        paramsValidV2(data);
         let query: any = {};
         if (data.anyKey) {
             let anykey = new RegExp(escapeRegExp(data.anyKey), 'i');
@@ -44,13 +42,8 @@ export let query: RequestHandler = (req, res) => {
 
 export let save: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let data: {
-            _id?: string;
-            name?: string;
-            url?: string;
-            addTagList?: string[];
-            delTagList?: string[];
-        } = req.body;
+        let data = plainToClass(VaildSchema.BookmarkSave, req.body);
+        paramsValidV2(data);
         let model: BookmarkInstanceType;
         if (!data._id) {
             delete data._id;
@@ -85,7 +78,8 @@ export let save: RequestHandler = (req, res) => {
 
 export let del: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let data = req.body;
+        let data = plainToClass(VaildSchema.BookmarkDel, req.body);
+        paramsValidV2(data);
         let rs = await BookmarkModel.deleteMany({ _id: { $in: data.idList.map(id => Types.ObjectId(id)) } });
         if (!rs.n)
             throw error('No Match Data');

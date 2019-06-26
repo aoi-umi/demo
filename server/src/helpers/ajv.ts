@@ -14,7 +14,7 @@ export let patterns = {
     time: `^${time.source}$`,
     // YYYY-MM-DD HH:mm:ss
     datetime: `^${date.source}(\\s${time.source})?$`,
-}
+};
 
 export const ajvInst = new Ajv({ allErrors: true, jsonPointers: true });
 
@@ -52,6 +52,17 @@ ajvInst.addKeyword('myPattern', {
     compile: (sch, parentSchema) => {
         return function (val) {
             return new RegExp(sch).test(val);
+        };
+    },
+});
+
+ajvInst.addKeyword('convert', {
+    type: ['string', 'boolean', 'number'],
+    compile: function (sch, parentSchema) {
+        return function (val, dataPath, parentData, parentDataProperty) {
+            let convert = sch;
+            parentData[parentDataProperty] = convert(val);
+            return true;
         };
     },
 });

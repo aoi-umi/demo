@@ -3,6 +3,7 @@ import { Types } from 'mongoose';
 import { escapeRegExp } from '../../../_system/common';
 import { myEnum } from '../../../config/enum';
 import { dev } from '../../../config';
+import * as VaildSchema from '../../../vaild-schema/class-vaild';
 
 import { AuthorityModel } from '../authority';
 import { RoleModel } from '../role';
@@ -14,7 +15,7 @@ export class UserMapper {
         return rs;
     }
 
-    static async query(data: UserQueryArgs) {
+    static async query(data: VaildSchema.UserMgtQuery) {
         let query: any = {};
         let noTotal = false;
         if (data._id) {
@@ -215,14 +216,3 @@ export class UserMapper {
         return userDetail;
     }
 }
-
-export type UserQueryArgs = {
-    _id?: string;
-    account?: string;
-    nickname?: string;
-    authority?: string;
-    role?: string;
-    anyKey?: string;
-    //包含已删除的权限角色
-    includeDelAuth?: boolean;
-} & ApiListQueryArgs;

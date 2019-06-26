@@ -1,6 +1,8 @@
 import { Types } from 'mongoose';
 import { myEnum, getEnumValueByStr } from '../../../config/enum';
 import { escapeRegExp } from '../../../_system/common';
+import * as VaildSchema from '../../../vaild-schema/class-vaild';
+
 import { AuthorityModel } from '../authority';
 import { UserMapper } from '../user';
 import { RoleModel } from ".";
@@ -15,7 +17,7 @@ export class RoleMapper {
         return rs;
     }
 
-    static async query(data: RoleQueryArgs) {
+    static async query(data: VaildSchema.RoleQuery) {
         let query: any = {};
         let noTotal = false;
         if (data._id) {
@@ -108,14 +110,3 @@ export class RoleMapper {
         return rs;
     }
 }
-
-export type RoleQueryArgs = {
-    _id?: string;
-    code?: string;
-    name?: string;
-    status?: string;
-    authority?: string;
-    anyKey?: string;
-    includeDelAuth?: boolean;
-    getAll?: boolean;
-} & ApiListQueryArgs;

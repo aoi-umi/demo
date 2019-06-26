@@ -246,6 +246,7 @@ export let error = function (msg, code?, option?) {
     var opt = {
         lang: 'zh',
         format: null,
+        remark: null
     };
     var status = null;
     if (option)
@@ -275,6 +276,9 @@ export let error = function (msg, code?, option?) {
     if (!msg) msg = '';
     if (typeof msg == 'object') msg = JSON.stringify(msg);
     var err: any = new Error(msg);
+    let remark = opt.remark;
+    if (remark)
+        err.remark = remark instanceof Array ? remark.join('#') : remark;
     err.code = code;
     err.status = status;
     return err;

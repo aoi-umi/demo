@@ -28,6 +28,7 @@ const config = {
                 },
                 userInfo: {
                     url: '/user/info',
+                    method: 'get',
                 },
                 userAccountExists: {
                     url: '/user/accountExists',
