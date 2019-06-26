@@ -1,15 +1,17 @@
 import { RequestHandler } from 'express';
 import { Types } from 'mongoose';
-import { responseHandler, paramsValid } from '../helpers';
+import { plainToClass } from 'class-transformer';
+
+import { responseHandler, paramsValidV2 } from '../helpers';
 import { error } from '../_system/common';
 import { transaction } from '../_system/dbMongo';
-import { RoleModel, RoleInstanceType, RoleMapper, RoleQueryArgs } from '../models/mongo/role';
+import { RoleModel, RoleInstanceType, RoleMapper } from '../models/mongo/role';
+import * as VaildSchema from '../vaild-schema/class-vaild';
 
 export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let schema = {};
-        let data: RoleQueryArgs = req.query;
-        paramsValid(schema, data, { list: true });
+        let data = plainToClass(VaildSchema.RoleQuery, req.query);
+        paramsValidV2(data);
         let { rows, total } = await RoleMapper.query({ ...data, includeDelAuth: true });
         return {
             rows,
@@ -20,14 +22,8 @@ export let query: RequestHandler = (req, res) => {
 
 export let codeExists: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let schema = {
-            required: ['code']
-        };
-        let data: {
-            _id?: string;
-            code: string;
-        } = req.body;
-        paramsValid(schema, data);
+        let data = plainToClass(VaildSchema.RoleCodeExists, req.body);
+        paramsValidV2(data);
         let rs = await RoleMapper.codeExists(data.code, data._id);
         return rs && { _id: rs._id };
     }, req, res);
@@ -102,7 +98,8 @@ export let update: RequestHandler = (req, res) => {
 
 export let del: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let data = req.body;
+        let data = plainToClass(VaildSchema.RoleDel, req.body);
+        paramsValidV2(data);
         let rs = await RoleModel.deleteMany({ _id: { $in: data.idList.map(id => Types.ObjectId(id)) } });
         if (!rs.n)
             throw error('No Match Data');

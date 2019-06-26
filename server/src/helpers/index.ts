@@ -6,7 +6,9 @@ import { MongooseDocument, Error } from 'mongoose';
 import * as common from '../_system/common';
 import errorConfig from '../config/errorConfig';
 import { logger } from '../_main';
+import * as VaildSchema from '../vaild-schema/class-vaild';
 import { ajvInst, refType } from './ajv';
+import { vaild } from './class-vaild';
 
 type ResponseHandlerOptType = {
     json?: boolean;
@@ -64,12 +66,6 @@ export let paramsValid = function (schema, data, opt?: { list?: boolean }) {
     opt = {
         ...opt,
     }
-    //删除空
-    // Object.keys(data).forEach(function (ele) {
-    //     if (data[ele] === '' || data[ele] === null) {
-    //         delete data[ele];
-    //     }
-    // });
     if (opt.list) {
         schema.properties = {
             pageIndex: { // 页码
@@ -108,6 +104,23 @@ export let paramsValid = function (schema, data, opt?: { list?: boolean }) {
             data.rows = 50;
     }
 }
+
+export function paramsValidV2(data) {
+    let err = vaild(data);
+    if (err.length)
+        throw common.error('', errorConfig.ARGS_ERROR, { remark: err.join(';') });
+
+    if (data instanceof VaildSchema.ListBase) {
+        if (!data.page)
+            data.page = 1;
+        if (!data.rows)
+            data.rows = 10;
+
+        let maxRows = 100;
+        if (data.rows > maxRows)
+            data.rows = maxRows;
+    }
+};
 
 /**
  * mongoose数据模型验证
