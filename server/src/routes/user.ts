@@ -7,7 +7,7 @@ import { transaction } from '../_system/dbMongo';
 import { responseHandler, paramsValidV2, } from '../helpers';
 import { dev, error, auth } from '../config';
 import { UserModel, UserMapper } from '../models/mongo/user';
-import * as VaildSchema from '../vaild-schema/class-vaild';
+import * as VaildSchema from '../vaild-schema/class-valid';
 
 export let accountExists: RequestHandler = (req, res) => {
     responseHandler(async () => {

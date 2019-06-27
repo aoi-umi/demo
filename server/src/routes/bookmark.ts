@@ -6,7 +6,7 @@ import { responseHandler, paramsValidV2 } from '../helpers';
 import { error, escapeRegExp } from '../_system/common';
 import { transaction } from '../_system/dbMongo';
 import { BookmarkModel, BookmarkInstanceType } from '../models/mongo/bookmark';
-import * as VaildSchema from '../vaild-schema/class-vaild';
+import * as VaildSchema from '../vaild-schema/class-valid';
 
 export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {

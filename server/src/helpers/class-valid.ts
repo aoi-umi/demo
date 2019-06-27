@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import { validate, ValidationError, validateSync } from "class-validator";
+import { ValidationTypes, ValidationError, validateSync } from "class-validator";
 
 function getError(e: ValidationError, parent?: string) {
     let property = e.property;
@@ -20,7 +20,7 @@ function getError(e: ValidationError, parent?: string) {
     return l;
 }
 
-export function vaild(data) {
+export function valid(data) {
     let errors = validateSync(data, { skipMissingProperties: true });
     // console.log(errors)
     let msg = errors.map(e => {
@@ -28,4 +28,15 @@ export function vaild(data) {
         return `${l.join(';')}`;
     });
     return msg;
+}
+
+//本地化
+const _getMessage = ValidationTypes.getMessage;
+ValidationTypes.getMessage = function (this: typeof ValidationTypes, type: string, isEach: boolean) {
+    var eachPrefix = isEach ? "里的每一项" : "";
+    switch (type) {
+        case this.CONTAINS:
+            return `$property ${eachPrefix}必须包含 $constraint1 字符串`;
+    }
+    return _getMessage.apply(ValidationTypes, arguments);
 }

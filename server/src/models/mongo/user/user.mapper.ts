@@ -3,7 +3,7 @@ import { Types } from 'mongoose';
 import { escapeRegExp } from '../../../_system/common';
 import { myEnum } from '../../../config/enum';
 import { dev } from '../../../config';
-import * as VaildSchema from '../../../vaild-schema/class-vaild';
+import * as VaildSchema from '../../../vaild-schema/class-valid';
 
 import { AuthorityModel } from '../authority';
 import { RoleModel } from '../role';

@@ -6,9 +6,9 @@ import { MongooseDocument, Error } from 'mongoose';
 import * as common from '../_system/common';
 import errorConfig from '../config/errorConfig';
 import { logger } from '../_main';
-import * as VaildSchema from '../vaild-schema/class-vaild';
+import * as VaildSchema from '../vaild-schema/class-valid';
 import { ajvInst, refType } from './ajv';
-import { vaild } from './class-vaild';
+import { valid } from './class-valid';
 
 type ResponseHandlerOptType = {
     json?: boolean;
@@ -106,7 +106,7 @@ export let paramsValid = function (schema, data, opt?: { list?: boolean }) {
 }
 
 export function paramsValidV2(data) {
-    let err = vaild(data);
+    let err = valid(data);
     if (err.length)
         throw common.error('', errorConfig.ARGS_ERROR, { remark: err.join(';') });
 
