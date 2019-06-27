@@ -1,7 +1,7 @@
 import { Types } from 'mongoose';
 import { myEnum, getEnumValueByStr } from '../../../config/enum';
 import { escapeRegExp } from '../../../_system/common';
-import * as VaildSchema from '../../../vaild-schema/class-vaild';
+import * as VaildSchema from '../../../vaild-schema/class-valid';
 
 import { AuthorityModel } from '../authority';
 import { UserMapper } from '../user';

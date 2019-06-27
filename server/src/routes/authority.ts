@@ -5,7 +5,7 @@ import { plainToClass } from 'class-transformer';
 import { responseHandler, paramsValidV2 } from '../helpers';
 import { error, escapeRegExp } from '../_system/common';
 import { AuthorityModel, AuthorityInstanceType, AuthorityMapper } from '../models/mongo/authority';
-import * as VaildSchema from '../vaild-schema/class-vaild';
+import * as VaildSchema from '../vaild-schema/class-valid';
 
 export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {
