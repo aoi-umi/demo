@@ -4,6 +4,10 @@ export class MyTableModel<T = any> {
         index: 1,
         size: 10
     };
+    sort = {
+        orderBy: '',
+        sortOrder: ''
+    };
     query: T = {} as any;
     setPage(p: { index?: any; size?: any }) {
         if (p) {
@@ -15,5 +19,13 @@ export class MyTableModel<T = any> {
             if (!isNaN(size) && size > 0)
                 this.page.size = size;
         }
+    }
+
+    setSort(sort: {
+        orderBy,
+        sortOrder
+    }) {
+        this.sort.orderBy = sort.orderBy;
+        this.sort.sortOrder = sort.sortOrder;
     }
 }

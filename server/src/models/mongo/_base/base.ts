@@ -13,26 +13,30 @@ export type BaseDocType = DocType<BaseInstanceType>;
 @setSchema()
 export class Base extends Model<Base> {
     @setStatic
-    static async findAndCountAll<T = BaseInstanceType>(options: {
+    static async findAndCountAll<T = BaseInstanceType>(opt: {
         conditions?: any,
         projection?: any,
         sort?: any,
+        orderBy?: string;
+        sortOrder?: any;
         page?: number,
         rows?: number,
         getAll?: boolean | string,
     }) {
         let self = this as BaseModelType;
-        let query = self.find(options.conditions, options.projection);
-        let getAll = parseBool(options.getAll);
+        let query = self.find(opt.conditions, opt.projection);
+        let getAll = parseBool(opt.getAll);
+
+        if (!opt.page || !opt.rows) {
+            getAll = true;
+        }
         if (!getAll)
-            query.skip((options.page - 1) * options.rows).limit(options.rows);
-        let sort = options.sort || {};
-        if (!sort._id)
-            sort._id = -1;
-        query.sort(sort);
+            query.skip((opt.page - 1) * opt.rows).limit(opt.rows);
+        let sortCondition = this.getSortCondition(opt);
+        query.sort(sortCondition);
         let rs = await Q.all([
             query.exec(),
-            getAll ? null : self.find(options.conditions).countDocuments().exec(),
+            getAll ? null : self.find(opt.conditions).countDocuments().exec(),
         ]);
         let rows = rs[0] as any as T[];
         let total = getAll ? rows.length : rs[1];
@@ -72,16 +76,7 @@ export class Base extends Model<Base> {
         let { noTotal } = opt;
         let extraPipeline = opt.extraPipeline || [];
         //排序
-        let sortCondition: any = {};
-        if (opt.sortCondition) {
-            for (let key in opt.sortCondition) {
-                sortCondition[key] = parseInt(opt.sortCondition[key] || -1);
-            }
-        } else if (opt.orderBy) {
-            sortCondition[opt.orderBy] = parseInt(opt.sortOrder || -1);
-        }
-        if (!sortCondition._id)
-            sortCondition._id = -1;
+        let sortCondition = this.getSortCondition(opt);
         extraPipeline = [
             ...extraPipeline,
             { $sort: sortCondition }
@@ -122,6 +117,25 @@ export class Base extends Model<Base> {
             total: getAll ? rows.length : (groupRs.total as number || 0),
             groupRs: groupRs as { [key in keyof U]: number } & { _id: any, total: number },
         }
+    }
+
+    @setStatic
+    static getSortCondition(options: {
+        sort?: any,
+        orderBy?: string;
+        sortOrder?: any;
+    }) {
+        let sortCondition: any = {};
+        if (options.sort) {
+            for (let key in options.sort) {
+                sortCondition[key] = parseInt(options.sort[key] || -1);
+            }
+        } else if (options.orderBy) {
+            sortCondition[options.orderBy] = parseInt(options.sortOrder || -1);
+        }
+        if (!sortCondition._id)
+            sortCondition._id = -1;
+        return sortCondition;
     }
 }
 

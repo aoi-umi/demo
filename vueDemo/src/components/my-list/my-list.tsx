@@ -18,7 +18,7 @@ type QueryArgsType = {
 const event = {
     addClick: 'add-click',
     resetClick: 'reset-click',
-    query: 'query'
+    query: 'query',
 };
 const clsPrefix = 'my-list-';
 
@@ -32,6 +32,9 @@ type ResultType = {
     msg: string,
     data: any[]
 }
+
+export type OnSortChangeOptions = { column: any, key: string, order: string };
+
 @Component
 class MyList<QueryArgs extends QueryArgsType> extends Vue {
     @Prop({
@@ -287,9 +290,32 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
                 <div style={{ position: 'relative', }}>
                     {this.$slots.default}
                     {this.type == 'table' ?
-                        <Table style={{ marginTop: '10px' }} columns={this.columns.filter(ele => !ele.hide)}
+                        <Table style={{ marginTop: '10px' }} columns={this.columns.filter(ele => {
+                            let sort = this.model.sort;
+                            ele.sortType = '' as any;
+                            if (sort.orderBy && sort.sortOrder) {
+                                if (ele.key == sort.orderBy) {
+                                    ele.sortType = sort.sortOrder as any;
+                                }
+                            }
+                            return !ele.hide;
+                        })}
                             data={this.result.data} no-data-text={this.result.msg}
-                            on-on-selection-change={this.setSelectedRows}>
+                            on-on-selection-change={this.setSelectedRows}
+                            on-on-sort-change={(opt: OnSortChangeOptions) => {
+                                let sortMap = {
+                                    asc: 1,
+                                    desc: -1
+                                };
+                                let orderBy, sortOrder = sortMap[opt.order];
+                                if (sortOrder)
+                                    orderBy = opt.key;
+                                this.model.setSort({
+                                    orderBy,
+                                    sortOrder,
+                                });
+                                this.handleQuery({ resetPage: true });
+                            }}>
                         </Table> :
                         this.customRenderFn(this.result)
                     }

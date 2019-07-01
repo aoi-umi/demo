@@ -34,6 +34,8 @@ export let query: RequestHandler = (req, res) => {
             page: data.page,
             rows: data.rows,
             getAll: data.getAll,
+            sortOrder: data.sortOrder,
+            orderBy: data.orderBy
         });
         return {
             rows,
