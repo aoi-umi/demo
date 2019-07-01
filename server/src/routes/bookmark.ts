@@ -29,9 +29,10 @@ export let query: RequestHandler = (req, res) => {
 
         let { rows, total } = await BookmarkModel.findAndCountAll({
             conditions: query,
-            sort: { _id: -1 },
             page: data.page,
-            rows: data.rows
+            rows: data.rows,
+            sortOrder: data.sortOrder,
+            orderBy: data.orderBy
         });
         return {
             rows,

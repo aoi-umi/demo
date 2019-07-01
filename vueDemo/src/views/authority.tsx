@@ -7,7 +7,7 @@ import { Modal, Input, Form, FormItem, Button, Checkbox, Switch, Transfer } from
 import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
 import { MyTransfer, IMyTransfer } from '@/components/my-transfer';
 import { MyConfirm } from '@/components/my-confirm';
-import { convClass } from '@/helpers';
+import { convClass, convert } from '@/helpers';
 import LoginUserStore from '@/store/loginUser';
 
 type DetailDataType = {
@@ -111,7 +111,7 @@ export default class Authority extends Vue {
     detailShow = false;
     delShow = false;
     detail: any;
-    $refs: { table: IMyList<any> };
+    $refs: { list: IMyList<any> };
     get storeUser() {
         return getModule(LoginUserStore, this.$store);
     }
@@ -136,19 +136,19 @@ export default class Authority extends Vue {
     }
 
     query() {
-        let table = this.$refs.table;
+        let list = this.$refs.list;
         let query = this.$route.query;
         ['name', 'code', 'anyKey'].forEach(key => {
             if (query[key])
-                this.$set(table.model.query, key, query[key]);
+                this.$set(list.model.query, key, query[key]);
         });
         let status = this.$route.query.status as string;
         let statusList = status ? status.split(',') : [];
         this.statusList.forEach(ele => {
             ele.checked = statusList.includes(ele.value.toString());
         });
-        table.model.setPage({ index: query.page, size: query.rows });
-        this.$refs.table.query(query);
+        convert.Test.queryToListModel(query, list.model);
+        this.$refs.list.query(query);
     }
 
     delIds = [];
@@ -159,7 +159,7 @@ export default class Authority extends Vue {
             this.$Message.info('删除成功');
             this.delIds = [];
             this.delShow = false;
-            this.$refs.table.query();
+            this.$refs.list.query();
         } catch (e) {
             this.$Message.error('删除失败:' + e.message);
         }
@@ -199,10 +199,12 @@ export default class Authority extends Vue {
         }, {
             title: '名字',
             key: 'name',
+            sortable: 'custom' as any,
             minWidth: 120,
         }, {
             title: '编码',
             key: 'code',
+            sortable: 'custom' as any,
             minWidth: 120,
         }, {
             title: '状态',
@@ -251,7 +253,7 @@ export default class Authority extends Vue {
                 <Modal v-model={this.detailShow} footer-hide mask-closable={false}>
                     <AuthorityDetailView detail={this.detail} on-save-success={() => {
                         this.detailShow = false;
-                        this.$refs.table.query();
+                        this.$refs.list.query();
                     }} />
                 </Modal>
                 <Modal v-model={this.delShow} footer-hide>
@@ -266,7 +268,7 @@ export default class Authority extends Vue {
                     </MyConfirm>
                 </Modal>
                 <MyList
-                    ref="table"
+                    ref="list"
                     current={this.page.index}
                     pageSize={this.page.size}
                     queryArgs={{
@@ -306,8 +308,7 @@ export default class Authority extends Vue {
                             query: {
                                 ...q,
                                 status: this.statusList.filter(ele => ele.checked).map(ele => ele.value).join(','),
-                                page: model.page.index,
-                                rows: model.page.size
+                                ...convert.Test.listModelToQuery(model),
                             }
                         });
                     }}

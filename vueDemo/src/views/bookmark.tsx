@@ -2,10 +2,10 @@ import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { Form as IForm } from 'iview';
 import { testApi } from '@/api';
 import { Tag, Modal, Input, Row, Col, Form, FormItem, Button } from '@/components/iview';
-import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
+import { MyList, IMyList, Const as MyTableConst, OnSortChangeOptions, MyTableModel } from '@/components/my-list';
 import { MyTagModel } from '@/components/my-tag';
 import { MyConfirm } from '@/components/my-confirm';
-import { convClass } from '@/helpers';
+import { convClass, convert } from '@/helpers';
 
 type DetailDataType = {
     _id?: string;
@@ -153,7 +153,7 @@ export default class Bookmark extends Vue {
             if (query[key])
                 this.$set(table.model.query, key, query[key]);
         });
-        table.model.setPage({ index: query.page, size: query.rows });
+        convert.Test.queryToListModel(query, table.model);
         this.$refs.list.query(query);
     }
 
@@ -168,6 +168,10 @@ export default class Bookmark extends Vue {
         } catch (e) {
             this.$Message.error('删除失败:' + e.message);
         }
+    }
+
+    queryHandler() {
+
     }
     protected render() {
         return (
@@ -186,7 +190,7 @@ export default class Bookmark extends Vue {
                         ok={async () => {
                             await this.delClick();
                         }}>
-                        {`将要删除${this.delIds.length}项`}
+                        将要删除{this.delIds.length}项
                     </MyConfirm>
                 </Modal>
                 <MyList
@@ -220,10 +224,12 @@ export default class Bookmark extends Vue {
                     }, {
                         title: '名字',
                         key: 'name',
+                        sortable: 'custom',
                         minWidth: 120,
                     }, {
                         title: 'url',
                         key: 'url',
+                        sortable: true,
                         minWidth: 200,
                         render: (h, params) => {
                             return (<a target="_blank" href={params.row.url}>{params.row.url}</a>);
@@ -261,14 +267,13 @@ export default class Bookmark extends Vue {
                         return rs;
                     }}
 
-                    on-query={(model) => {
+                    on-query={(model: MyTableModel) => {
                         let q = { ...model.query };
                         this.$router.push({
                             path: this.$route.path,
                             query: {
                                 ...q,
-                                page: model.page.index,
-                                rows: model.page.size
+                                ...convert.Test.listModelToQuery(model)
                             }
                         });
                     }}

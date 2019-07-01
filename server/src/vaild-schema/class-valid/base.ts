@@ -8,11 +8,12 @@ export class ListBase {
     @Type()
     rows?: number;
 
-    @IsIn([1, -1])
+    orderBy?: string;
+
+    @IsIn([1, -1, 0])
     @Type()
-    orderBy?: number;
-    sortOrder?: string;
-    
+    sortOrder?: number;
+
     @Type()
     getAll?: boolean;
 }

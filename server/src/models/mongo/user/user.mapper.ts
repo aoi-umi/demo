@@ -152,6 +152,8 @@ export class UserMapper {
             page: data.page,
             rows: data.rows,
             noTotal,
+            sortOrder: data.sortOrder,
+            orderBy: data.orderBy
         });
         rs.rows.forEach((ele) => {
             //可用权限

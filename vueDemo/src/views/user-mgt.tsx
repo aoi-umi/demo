@@ -1,13 +1,14 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { Form as IForm } from 'iview';
 import { getModule } from 'vuex-module-decorators';
+import moment from 'moment';
+
 import { testApi } from '@/api';
-import { myEnum, authority } from '@/config';
-import { convClass } from '@/helpers';
+import { myEnum, authority, dev } from '@/config';
+import { convClass, convert } from '@/helpers';
 import { Modal, Form, FormItem, Button } from '@/components/iview';
 import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
 import { MyTagModel } from '@/components/my-tag';
-import { MyInput } from '@/components/my-input';
 import LoginUserStore from '@/store/loginUser';
 import { AuthorityTransferView, IAuthorityTransfer } from './authority';
 import { IRoleTransfer } from './role';
@@ -102,7 +103,7 @@ export default class UserMgt extends Vue {
     detailShow = false;
     delShow = false;
     detail: any;
-    $refs: { table: IMyList<any> };
+    $refs: { list: IMyList<any> };
     get storeUser() {
         return getModule(LoginUserStore, this.$store);
     }
@@ -122,14 +123,14 @@ export default class UserMgt extends Vue {
     }
 
     query() {
-        let table = this.$refs.table;
+        let list = this.$refs.list;
         let query = this.$route.query;
         ['account', 'nickname', 'role', 'authority', 'anyKey'].forEach(key => {
             if (query[key])
-                this.$set(table.model.query, key, query[key]);
+                this.$set(list.model.query, key, query[key]);
         });
-        table.model.setPage({ index: query.page, size: query.rows });
-        this.$refs.table.query(query);
+        convert.Test.queryToListModel(query, list.model);
+        this.$refs.list.query(query);
     }
 
     private getColumns() {
@@ -145,10 +146,12 @@ export default class UserMgt extends Vue {
         }, {
             title: '账号',
             key: 'account',
+            sortable: 'custom' as any,
             minWidth: 120,
         }, {
             title: '昵称',
             key: 'nickname',
+            sortable: 'custom' as any,
             minWidth: 120,
         }, {
             title: '角色',
@@ -164,6 +167,14 @@ export default class UserMgt extends Vue {
             minWidth: 120,
             render: (h, params) => {
                 return MyTagModel.renderAuthorityTag(params.row.authorityList);
+            }
+        }, {
+            title: '创建时间',
+            key: 'createdAt',
+            sortable: 'custom' as any,
+            minWidth: 120,
+            render: (h, params) => {
+                return <label>{moment(params.row.createdAt).format(dev.dateFormat)}</label>;
             }
         }, {
             title: '操作',
@@ -194,11 +205,11 @@ export default class UserMgt extends Vue {
                 <Modal v-model={this.detailShow} footer-hide mask-closable={false}>
                     <RoleDetailView detail={this.detail} on-save-success={() => {
                         this.detailShow = false;
-                        this.$refs.table.query();
+                        this.$refs.list.query();
                     }} />
                 </Modal>
                 <MyList
-                    ref="table"
+                    ref="list"
                     current={this.page.index}
                     pageSize={this.page.size}
 
@@ -242,8 +253,7 @@ export default class UserMgt extends Vue {
                             path: this.$route.path,
                             query: {
                                 ...q,
-                                page: model.page.index,
-                                rows: model.page.size
+                                ...convert.Test.listModelToQuery(model)
                             }
                         });
                     }}

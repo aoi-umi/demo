@@ -98,6 +98,8 @@ export class RoleMapper {
             page: data.page,
             rows: data.rows,
             noTotal,
+            sortOrder: data.sortOrder,
+            orderBy: data.orderBy
         });
         rs.rows.forEach(ele => {
             let authorityList = ele.newAuthorityList;

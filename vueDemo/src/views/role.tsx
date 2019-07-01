@@ -3,7 +3,7 @@ import { Form as IForm } from 'iview';
 import { getModule } from 'vuex-module-decorators';
 import { testApi } from '@/api';
 import { myEnum, authority } from '@/config';
-import { convClass } from '@/helpers';
+import { convClass, convert } from '@/helpers';
 import { Modal, Input, Form, FormItem, Button, Checkbox, Switch } from '@/components/iview';
 import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
 import { MyConfirm } from '@/components/my-confirm';
@@ -123,7 +123,7 @@ export default class Role extends Vue {
     detailShow = false;
     delShow = false;
     detail: any;
-    $refs: { table: IMyList<any> };
+    $refs: { list: IMyList<any> };
     get storeUser() {
         return getModule(LoginUserStore, this.$store);
     }
@@ -148,19 +148,19 @@ export default class Role extends Vue {
     }
 
     query() {
-        let table = this.$refs.table;
+        let list = this.$refs.list;
         let query = this.$route.query;
         ['name', 'code', 'anyKey'].forEach(key => {
             if (query[key])
-                this.$set(table.model.query, key, query[key]);
+                this.$set(list.model.query, key, query[key]);
         });
         let status = query.status as string;
         let statusList = status ? status.split(',') : [];
         this.statusList.forEach(ele => {
             ele.checked = statusList.includes(ele.value.toString());
         });
-        table.model.setPage({ index: query.page, size: query.rows });
-        this.$refs.table.query(query);
+        convert.Test.queryToListModel(query, list.model);
+        this.$refs.list.query(query);
     }
 
     delIds = [];
@@ -171,7 +171,7 @@ export default class Role extends Vue {
             this.$Message.info('删除成功');
             this.delIds = [];
             this.delShow = false;
-            this.$refs.table.query();
+            this.$refs.list.query();
         } catch (e) {
             this.$Message.error('删除失败:' + e.message);
         }
@@ -186,7 +186,7 @@ export default class Role extends Vue {
             this.$Message.error('修改失败:' + e.message);
         }
     }
-    
+
     private get multiOperateBtnList() {
         let list = [];
         if (this.storeUser.user.hasAuth(authority.roleDel)) {
@@ -219,10 +219,12 @@ export default class Role extends Vue {
         }, {
             title: '名字',
             key: 'name',
+            sortable: 'custom' as any,
             minWidth: 120,
         }, {
             title: '编码',
             key: 'code',
+            sortable: 'custom' as any,
             minWidth: 120,
         }, {
             title: '状态',
@@ -270,7 +272,7 @@ export default class Role extends Vue {
                 <Modal v-model={this.detailShow} footer-hide mask-closable={false}>
                     <RoleDetailView detail={this.detail} on-save-success={() => {
                         this.detailShow = false;
-                        this.$refs.table.query();
+                        this.$refs.list.query();
                     }} />
                 </Modal>
                 <Modal v-model={this.delShow} footer-hide>
@@ -285,7 +287,7 @@ export default class Role extends Vue {
                     </MyConfirm>
                 </Modal>
                 <MyList
-                    ref="table"
+                    ref="list"
                     current={this.page.index}
                     pageSize={this.page.size}
                     queryArgs={{
@@ -336,8 +338,7 @@ export default class Role extends Vue {
                             query: {
                                 ...q,
                                 status: this.statusList.filter(ele => ele.checked).map(ele => ele.value).join(','),
-                                page: model.page.index,
-                                rows: model.page.size
+                                ...convert.Test.listModelToQuery(model)
                             }
                         });
                     }}
