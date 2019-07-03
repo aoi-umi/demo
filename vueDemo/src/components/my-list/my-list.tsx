@@ -241,7 +241,7 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
                         <div style={{ justifyContent: 'flex-end', display: 'flex' }}>
                             <div style={{ cursor: 'pointer' }} onClick={() => { this.showQuery = !this.showQuery; }}>
                                 {this.showQuery ? '隐藏' : '展开'}筛选
-                            <Icon type={this.showQuery ? 'ios-arrow-up' : 'ios-arrow-down'} />
+                                <Icon type={this.showQuery ? 'ios-arrow-up' : 'ios-arrow-down'} />
                             </div>
                         </div>
                         <div class={[clsPrefix + 'query-args-box'].concat(this.showQuery ? '' : 'collapsed')} on-keypress={this.handlePress}>
@@ -300,22 +300,22 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
                             }
                             return !ele.hide;
                         })}
-                            data={this.result.data} no-data-text={this.result.msg}
-                            on-on-selection-change={this.setSelectedRows}
-                            on-on-sort-change={(opt: OnSortChangeOptions) => {
-                                let sortMap = {
-                                    asc: 1,
-                                    desc: -1
-                                };
-                                let orderBy, sortOrder = sortMap[opt.order];
-                                if (sortOrder)
-                                    orderBy = opt.key;
-                                this.model.setSort({
-                                    orderBy,
-                                    sortOrder,
-                                });
-                                this.handleQuery({ resetPage: true });
-                            }}>
+                        data={this.result.data} no-data-text={this.result.msg}
+                        on-on-selection-change={this.setSelectedRows}
+                        on-on-sort-change={(opt: OnSortChangeOptions) => {
+                            let sortMap = {
+                                asc: 1,
+                                desc: -1
+                            };
+                            let orderBy, sortOrder = sortMap[opt.order];
+                            if (sortOrder)
+                                orderBy = opt.key;
+                            this.model.setSort({
+                                orderBy,
+                                sortOrder,
+                            });
+                            this.handleQuery({ resetPage: true });
+                        }}>
                         </Table> :
                         this.customRenderFn(this.result)
                     }

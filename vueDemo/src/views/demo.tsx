@@ -46,7 +46,7 @@ export default class App extends Vue {
         this.list = new Array(size).fill('').map((e, i) => {
             return {
                 test: i + start + 1 + '',
-            }
+            };
         });
     }
 
