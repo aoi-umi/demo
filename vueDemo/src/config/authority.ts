@@ -3,6 +3,7 @@ export default {
 
     userMgtQuery: 'userMgtQuery',
     userMgtEdit: 'userMgtEdit',
+    userMgtDisable: 'userMgtDisable',
 
     authorityQuery: 'authorityQuery',
     authorityDel: 'authorityDel',

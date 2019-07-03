@@ -1,6 +1,7 @@
 import { Types } from 'mongoose';
 
 import { escapeRegExp } from '../../../_system/common';
+import * as common from '../../../_system/common';
 import { myEnum } from '../../../config/enum';
 import { dev } from '../../../config';
 import * as VaildSchema from '../../../vaild-schema/class-valid';
@@ -156,6 +157,7 @@ export class UserMapper {
             orderBy: data.orderBy
         });
         rs.rows.forEach((ele) => {
+            let model = new UserModel(ele);
             //可用权限
             let auth = {};
             let authorityList = ele.newAuthorityList;
@@ -191,6 +193,11 @@ export class UserMapper {
             }
             ele.roleList = roleList;
             ele.auth = auth;
+
+            ele.canEdit = model.canEdit;
+            ele.statusText = model.statusText;
+            let disRs = model.checkDisabled();
+            ele.disabled = disRs.disabled;
         });
         return rs;
     }
@@ -216,5 +223,16 @@ export class UserMapper {
             });
         }
         return userDetail;
+    }
+
+    static async accountCheck(account: string) {
+        let user = await UserMapper.accountExists(account);
+        if (!user)
+            throw common.error('账号不存在');
+        let disRs = user.checkDisabled();
+        return {
+            user,
+            disableResult: disRs
+        };
     }
 }

@@ -267,6 +267,9 @@ export default class UserInfo extends Vue {
                         <FormItem label="创建时间">
                             {this.detail.createdAt && moment(this.detail.createdAt).format(dev.dateFormat)}
                         </FormItem>
+                        <FormItem label="状态">
+                            {this.detail.statusText}
+                        </FormItem>
                     </Form>
                 </Card>
                 {this.loading && <Spin size="large" fix></Spin>}

@@ -32,6 +32,9 @@ export const authConfig = {
     userMgtEdit: {
         code: 'userMgtEdit',
     },
+    userMgtDisable: {
+        code: 'userMgtDisable',
+    },
 
     roleQuery: {
         code: 'roleQuery',

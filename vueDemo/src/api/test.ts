@@ -14,6 +14,7 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
     userDetail,
     userMgtQuery,
     userMgtSave,
+    userMgtDisable,
 
     bookmarkQuery,
     bookmarkSave,
@@ -84,8 +85,11 @@ export class TestApi extends ApiModel<TestApiMethod> {
     async userMgtQuery(data?) {
         return this.requestByConfig(this.apiConfig.method.userMgtQuery, { data });
     }
-    async userMgtSave(data?) {
+    async userMgtSave(data) {
         return this.requestByConfig(this.apiConfig.method.userMgtSave, { data });
+    }
+    async userMgtDisable(data) {
+        return this.requestByConfig(this.apiConfig.method.userMgtDisable, { data });
     }
     //#endregion
 

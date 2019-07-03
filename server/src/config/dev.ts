@@ -6,6 +6,7 @@ import { authConfig as auth } from './authConfig';
 export let accessUrlConfig: AccessUrlConfigType[] = [
     { url: '/devMgt/user/mgt/query', auth: [auth.userMgtQuery] },
     { url: '/devMgt/user/mgt/save', auth: [auth.userMgtEdit] },
+    { url: '/devMgt/user/mgt/disable', auth: [auth.userMgtDisable] },
 
     { url: '/devMgt/role/query', auth: [auth.roleQuery] },
     { url: '/devMgt/role/save', auth: [auth.roleSave] },
@@ -31,3 +32,5 @@ export let cacheTime = {
 //#endregion
 
 export let rootRole = 'root';
+
+export const dateFormat = 'YYYY-MM-DD HH:mm:ss';

@@ -1,7 +1,8 @@
 import { RequestHandler } from "express";
 import * as cache from '../_system/cache';
-import * as auth from '../_system/auth';
+import { auth } from '../_main';
 import * as config from '../config';
+import { UserMapper } from "../models/mongo/user";
 
 export const normal: RequestHandler = async (req, res, next) => {
     try {
@@ -21,11 +22,21 @@ export const normal: RequestHandler = async (req, res, next) => {
         if (userKey) {
             userKey = config.dev.cacheKey.user + userKey;
             let user = await cache.get(userKey);
-            if (user)
+            if (user) {
+                let { disableResult } = await UserMapper.accountCheck(user.account);
+                if (disableResult.disabled) {
+                    user.authority = {};
+                }
                 req.myData.user = user;
+            }
         }
 
-        auth.check(req, res, next);
+        //url权限认证
+        var user = req.myData.user;
+        var pathname = req.baseUrl + req._parsedUrl.pathname;
+        let { accessableUrl } = auth.check(user, pathname);
+        req.myData.accessableUrl = accessableUrl;
+        next();
     } catch (e) {
         next(e);
     }

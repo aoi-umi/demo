@@ -59,14 +59,13 @@ export let save: RequestHandler = (req, res) => {
             });
 
             if (data.delAuthList && data.delAuthList.length) {
-                update.$pull = { authorityList: { $in: data.delAuthList } };
+                detail.authorityList = detail.authorityList.filter(ele => !data.delAuthList.includes(ele));
             }
-            await transaction(async (session) => {
-                await detail.update(update, { session });
-                if (data.addAuthList && data.addAuthList.length) {
-                    await detail.update({ $push: { authorityList: { $each: data.addAuthList } } }, { session });
-                }
-            });
+            if (data.addAuthList && data.addAuthList.length) {
+                detail.authorityList = [...detail.authorityList, ...data.addAuthList];
+            }
+            update.authorityList = detail.authorityList;
+            await detail.update(update);
         }
         return {
             _id: detail._id

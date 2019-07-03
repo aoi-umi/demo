@@ -52,6 +52,9 @@ const config = {
                 userMgtSave: {
                     url: '/user/mgt/save',
                 },
+                userMgtDisable: {
+                    url: '/user/mgt/disable',
+                },
 
                 bookmarkQuery: {
                     url: '/bookmark/query',

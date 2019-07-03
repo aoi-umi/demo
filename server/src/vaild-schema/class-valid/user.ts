@@ -54,3 +54,13 @@ export class UserMgtSave {
     @IsArray()
     addRoleList?: string[];
 }
+
+export class UserMgtDisable {
+    _id: string;
+
+    @Type()
+    disabled?: boolean;
+
+    //disabled为true, 不传时为永封
+    disabledTo?: string;
+}

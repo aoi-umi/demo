@@ -45,34 +45,32 @@ export let save: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let data = plainToClass(VaildSchema.BookmarkSave, req.body);
         paramsValidV2(data);
-        let model: BookmarkInstanceType;
+        let detail: BookmarkInstanceType;
         if (!data._id) {
             delete data._id;
-            model = await BookmarkModel.create({
+            detail = await BookmarkModel.create({
                 ...data,
                 tagList: data.addTagList
             });
         } else {
-            model = await BookmarkModel.findById(data._id);
-            if (!model)
+            detail = await BookmarkModel.findById(data._id);
+            if (!detail)
                 throw error('not exists');
             let update: any = {};
             ['name', 'url'].forEach(key => {
                 update[key] = data[key];
             });
             if (data.delTagList && data.delTagList.length) {
-                update.$pull = { tagList: { $in: data.delTagList } };
+                detail.tagList = detail.tagList.filter(ele => !data.delTagList.includes(ele));
             }
-            await transaction(async (session) => {
-                await model.update(update, { session });
-                if (data.addTagList && data.addTagList.length) {
-                    await model.update({ $push: { tagList: { $each: data.addTagList } } }, { session });
-                }
-            });
-
+            if (data.addTagList && data.addTagList.length) {
+                detail.tagList = [...detail.tagList, ...data.addTagList];
+            }
+            update.tagList = detail.tagList;
+            await detail.update(update);
         }
         return {
-            _id: model._id
+            _id: detail._id
         };
     }, req, res);
 }
