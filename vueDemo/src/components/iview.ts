@@ -10,6 +10,7 @@ export const Button = convClass<iviewTypes.Button>(iview.Button);
 export const Content = convClass<iviewTypes.Content>(iview.Content);
 export const Card = convClass<iviewTypes.Card>(iview.Card);
 export const Checkbox = convClass<iviewTypes.Checkbox>(iview.Checkbox);
+export const DatePicker = convClass<iviewTypes.DatePicker>(iview.DatePicker);
 export const Drawer = convClass<iviewTypes.Drawer>(iview.Drawer);
 export const Divider = convClass<iviewTypes.Divider>(iview.Divider);
 export const Form = convClass<iviewTypes.Form>(iview.Form);
@@ -27,6 +28,9 @@ export const Modal = convClass<iviewTypes.Modal>(iview.Modal);
 
 export const Page = convClass<iviewTypes.Page>(iview.Page);
 export const Poptip = convClass<iviewTypes.Poptip>(iview.Poptip);
+
+export const Radio = convClass<iviewTypes.Radio>(iview.Radio);
+export const RadioGroup = convClass<iviewTypes.RadioGroup>(iview.RadioGroup);
 
 export const Menu = convClass<iviewTypes.Menu>(iview.Menu);
 export const MenuGroup = convClass<iviewTypes.MenuGroup>(iview.MenuGroup);

@@ -13,6 +13,7 @@ router.get('/user/info', userAuth.normal, user.info);
 router.get('/user/detail', userAuth.normal, user.detail);
 router.get('/user/mgt/query', userAuth.normal, user.mgtQuery);
 router.post('/user/mgt/save', userAuth.normal, user.mgtSave);
+router.post('/user/mgt/disable', userAuth.normal, user.mgtDisable);
 //#endregion
 
 //#region bookmark 

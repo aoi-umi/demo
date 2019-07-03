@@ -5,7 +5,7 @@ import * as common from '../_system/common';
 import * as cache from '../_system/cache';
 import { transaction } from '../_system/dbMongo';
 import { responseHandler, paramsValidV2, } from '../helpers';
-import { dev, error, auth } from '../config';
+import { dev, error, auth, myEnum } from '../config';
 import { UserModel, UserMapper } from '../models/mongo/user';
 import * as VaildSchema from '../vaild-schema/class-valid';
 
@@ -40,9 +40,7 @@ export let signIn: RequestHandler = (req, res) => {
         let data = plainToClass(VaildSchema.UserSignIn, req.body);
         paramsValidV2(data);
         let token = req.header(dev.cacheKey.user);
-        let user = await UserMapper.accountExists(data.account);
-        if (!user)
-            throw common.error('账号不存在');
+        let { user, disableResult } = await UserMapper.accountCheck(data.account);
 
         let reqBody = JSON.stringify(data);
         let checkToken = common.createToken(data.account + user.password + reqBody);
@@ -52,9 +50,11 @@ export let signIn: RequestHandler = (req, res) => {
         let userAuth = {
             [auth.login.code]: 1
         };
-        let userDetail = await UserMapper.detail(user._id);
-        for (let key in userDetail.auth) {
-            userAuth[key] = 1;
+        if (!disableResult.disabled) {
+            let userDetail = await UserMapper.detail(user._id);
+            for (let key in userDetail.auth) {
+                userAuth[key] = 1;
+            }
         }
 
         let returnUser = { _id: user._id, account: user.account, nickname: user.nickname, key: token, authority: userAuth };
@@ -99,39 +99,63 @@ export let mgtQuery: RequestHandler = (req, res) => {
             total
         };
     }, req, res);
-}
+};
 
 export let mgtSave: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let data = plainToClass(VaildSchema.UserMgtSave, req.body);
         paramsValidV2(data);
         let detail = await UserModel.findById(data._id);
+        if (!detail.canEdit)
+            throw common.error('不可修改此账号');
         let update: any = {};
 
-        let pull: any = {};
         if (data.delAuthList && data.delAuthList.length) {
-            pull.authorityList = { $in: data.delAuthList };
+            detail.authorityList = detail.authorityList.filter(ele => !data.delAuthList.includes(ele));
         }
         if (data.delRoleList && data.delRoleList.length) {
-            pull.roleList = { $in: data.delRoleList };
+            detail.roleList = detail.roleList.filter(ele => !data.delRoleList.includes(ele));
         }
-        if (!common.isObjectEmpty(pull))
-            update.$pull = pull;
 
-        let push: any = {};
         if (data.addAuthList && data.addAuthList.length) {
-            push.authorityList = { $each: data.addAuthList };
+            detail.authorityList = [...detail.authorityList, ...data.addAuthList];
         }
         if (data.addRoleList && data.addRoleList.length) {
-            push.roleList = { $each: data.addRoleList };
+            detail.roleList = [...detail.roleList, ...data.addRoleList];
         }
-        await transaction(async (session) => {
-            await detail.update(update, { session });
-            if (!common.isObjectEmpty(push))
-                await detail.update({ $push: push }, { session });
-        });
+        update.authorityList = detail.authorityList;
+        update.roleList = detail.roleList;
+
+        await detail.update(update);
         return {
             _id: detail._id,
         };
     }, req, res);
-}
+};
+
+export let mgtDisable: RequestHandler = (req, res) => {
+    responseHandler(async () => {
+        let data = plainToClass(VaildSchema.UserMgtDisable, req.body);
+        paramsValidV2(data);
+        let detail = await UserModel.findById(data._id);
+        if (!detail.canEdit)
+            throw common.error('不可禁用此账号');
+        let update: any = {};
+        if (data.disabled) {
+            if (data.disabledTo) {
+                update.disabledTo = data.disabledTo;
+            } else {
+                update.status = myEnum.userStatus.禁用;
+            }
+        } else {
+            update.$unset = {
+                disabledTo: 1
+            };
+            update.status = myEnum.userStatus.正常;
+        }
+        await detail.update(update);
+        return {
+            _id: detail._id,
+        };
+    }, req, res);
+};

@@ -25,6 +25,9 @@ var authority = {
     userMgtEdit: {
         name: '用户管理修改'
     },
+    userMgtDisable: {
+        name: '用户管理封禁'
+    },
 };
 
 var authList = [];

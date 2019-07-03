@@ -2,7 +2,7 @@ import { Request, Response, Express } from 'express';
 import { configure, getLogger } from 'log4js';
 
 import * as mongo from './_system/dbMongo';
-import * as auth from './_system/auth';
+import { Auth } from './_system/auth';
 import * as config from './config';
 import * as helpers from './helpers';
 
@@ -21,7 +21,7 @@ configure({
     }
 });
 
-
+export const auth = new Auth();
 export async function init() {
     await mongo.connect();
     auth.init({

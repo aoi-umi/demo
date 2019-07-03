@@ -9,9 +9,6 @@ declare global {
             _parsedUrl: {
                 pathname: string;
             },
-            _parsedOriginalUrl: {
-                pathname: string;
-            }
         }
 
         interface MyData {

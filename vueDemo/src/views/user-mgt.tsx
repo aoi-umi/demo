@@ -6,12 +6,12 @@ import moment from 'moment';
 import { testApi } from '@/api';
 import { myEnum, authority, dev } from '@/config';
 import { convClass, convert } from '@/helpers';
-import { Modal, Form, FormItem, Button } from '@/components/iview';
+import { Modal, Form, FormItem, Button, RadioGroup, Radio, Input, DatePicker } from '@/components/iview';
 import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
 import { MyTagModel } from '@/components/my-tag';
 import LoginUserStore from '@/store/loginUser';
 import { AuthorityTransferView, IAuthorityTransfer } from './authority';
-import { IRoleTransfer } from './role';
+import { IRoleTransfer, RoleTransferView } from './role';
 
 export type DetailDataType = {
     _id?: string;
@@ -21,9 +21,17 @@ export type DetailDataType = {
     authorityList?: { code: string; name: string; isDel: boolean }[];
     auth?: { [code: string]: any };
     createdAt?: string;
-}
+    status?: number;
+    statusText?: string;
+    disabledTo?: Date;
+};
 @Component
-class RoleDetail extends Vue {
+class UserMgtDetail extends Vue {
+    @Prop({
+        default: myEnum.userEditType.修改
+    })
+    type: string;
+
     @Prop()
     detail: any;
 
@@ -36,26 +44,37 @@ class RoleDetail extends Vue {
 
     private initDetail(data) {
         this.innerDetail = data;
+        this.disableType = data.disabled ? myEnum.userDisableType.封禁至 : myEnum.userDisableType.解封;
     }
 
     private rules = {
     };
     $refs: { formVaild: IForm; roleTransfer: IRoleTransfer, authTransfer: IAuthorityTransfer };
+    private disableType;
 
     private saving = false;
     private async save() {
         this.saving = true;
         let detail = this.innerDetail;
         try {
-            let { addList: addAuthList, delList: delAuthList } = this.$refs.authTransfer.getChangeData('key');
-            let { addList: addRoleList, delList: delRoleList } = this.$refs.roleTransfer.getChangeData('key');
-            let rs = await testApi.userMgtSave({
-                _id: detail._id,
-                addAuthList,
-                delAuthList,
-                addRoleList,
-                delRoleList,
-            });
+            let rs;
+            if (this.type == myEnum.userEditType.修改) {
+                let { addList: addAuthList, delList: delAuthList } = this.$refs.authTransfer.getChangeData('key');
+                let { addList: addRoleList, delList: delRoleList } = this.$refs.roleTransfer.getChangeData('key');
+                rs = await testApi.userMgtSave({
+                    _id: detail._id,
+                    addAuthList,
+                    delAuthList,
+                    addRoleList,
+                    delRoleList,
+                });
+            } else {
+                rs = await testApi.userMgtDisable({
+                    _id: detail._id,
+                    disabled: this.disableType == myEnum.userDisableType.封禁至,
+                    disabledTo: detail.disabledTo,
+                });
+            }
             this.$emit('save-success', rs);
         } catch (e) {
             this.$Message.error('出错了:' + e.message);
@@ -68,16 +87,32 @@ class RoleDetail extends Vue {
         let detail = this.innerDetail;
         return (
             <div>
-                <h3>{'修改'}</h3>
+                <h3>{myEnum.userEditType.getKey(this.type)}</h3>
                 <br />
                 <Form label-width={50} ref="formVaild" props={{ model: detail }} rules={this.rules}>
                     <FormItem label="账号">{detail.account}({detail.nickname})</FormItem>
-                    <FormItem label="角色">
-                        <AuthorityTransferView ref="roleTransfer" selectedData={detail.roleList} />
-                    </FormItem>
-                    <FormItem label="权限">
-                        <AuthorityTransferView ref="authTransfer" selectedData={detail.authorityList} />
-                    </FormItem>
+                    {this.type == myEnum.userEditType.修改 ?
+                        <div>
+                            <FormItem label="角色">
+                                <RoleTransferView ref="roleTransfer" selectedData={detail.roleList} />
+                            </FormItem>
+                            <FormItem label="权限">
+                                <AuthorityTransferView ref="authTransfer" selectedData={detail.authorityList} />
+                            </FormItem>
+                        </div> :
+                        <div>
+                            <FormItem label="封禁">
+                                <RadioGroup v-model={this.disableType} vertical>
+                                    <Radio label={myEnum.userDisableType.解封}>解封</Radio>
+                                    <Radio label={myEnum.userDisableType.封禁至}>封禁至<DatePicker v-model={detail.disabledTo} options={{
+                                        disabledDate: (date?) => {
+                                            return date && date.valueOf() < Date.now();
+                                        }
+                                    }} /></Radio>
+                                </RadioGroup>
+                            </FormItem>
+                        </div>
+                    }
                     <FormItem>
                         <Button type="primary" on-click={() => {
                             // this.$refs.formVaild.validate((valid) => {
@@ -96,7 +131,7 @@ class RoleDetail extends Vue {
     }
 }
 
-const RoleDetailView = convClass<RoleDetail>(RoleDetail);
+const UserMgtDetailView = convClass<UserMgtDetail>(UserMgtDetail);
 
 @Component
 export default class UserMgt extends Vue {
@@ -109,6 +144,7 @@ export default class UserMgt extends Vue {
     }
 
     page: any;
+    editType;
     created() {
         let query = this.$route.query;
         this.page = { index: query.page, size: query.rows };
@@ -177,33 +213,47 @@ export default class UserMgt extends Vue {
                 return <label>{moment(params.row.createdAt).format(dev.dateFormat)}</label>;
             }
         }, {
+            title: '状态',
+            key: 'statusText',
+            minWidth: 120,
+        }, {
             title: '操作',
             key: 'action',
             fixed: 'right',
             width: 150,
-            hide: !this.storeUser.user.existsAuth([authority.userMgtEdit]),
+            hide: !this.storeUser.user.existsAuth([authority.userMgtEdit, authority.userMgtDisable]),
             render: (h, params) => {
                 let detail = params.row;
                 return (
                     <div class={MyTableConst.clsPrefix + "action-box"}>
-                        {this.storeUser.user.hasAuth(authority.userMgtEdit) &&
+                        {this.storeUser.user.hasAuth(authority.userMgtEdit) && detail.canEdit &&
                             <a on-click={() => {
-                                this.detail = detail;
-                                this.detailShow = true;
+                                this.showDetail(myEnum.userEditType.修改, detail);
                             }}>编辑</a>
                         }
-                    </div>
+                        {this.storeUser.user.hasAuth(authority.userMgtDisable) && detail.canEdit &&
+                            <a on-click={() => {
+                                this.showDetail(myEnum.userEditType.封禁, detail);
+                            }}>禁用</a>
+                        }
+                    </div >
                 );
             }
         }];
         return columns;
     }
 
+    private showDetail(type, detail) {
+        this.detail = detail;
+        this.editType = type;
+        this.detailShow = true;
+    }
+
     protected render() {
         return (
             <div>
                 <Modal v-model={this.detailShow} footer-hide mask-closable={false}>
-                    <RoleDetailView detail={this.detail} on-save-success={() => {
+                    <UserMgtDetailView type={this.editType} detail={this.detail} on-save-success={() => {
                         this.detailShow = false;
                         this.$refs.list.query();
                     }} />

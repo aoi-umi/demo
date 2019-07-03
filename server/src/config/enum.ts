@@ -8,6 +8,11 @@ export const enumDefine = {
         禁用: 0,
         启用: 1
     },
+    userStatus: {
+        禁用: 0,
+        待审核: 1,
+        正常: 2
+    },
 
     socket: {
         弹幕发送: 'danmakuSend',

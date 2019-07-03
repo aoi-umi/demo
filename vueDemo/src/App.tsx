@@ -41,16 +41,19 @@ export default class App extends Vue {
     async getUserInfo() {
         let token = localStorage.getItem(dev.cacheKey.testUser);
         if (token) {
-            let user = await testApi.userInfo();
-            this.storeUser.setUser(user);
-            if (user) {
-                if (location.pathname === routeConfig.userSignIn.path) {
-                    let { to, ...query } = this.$route.query;
-                    to = (to as string) || routeConfig.index.path;
-                    let toQuery = query;
-                    this.$router.push({ path: to, query: toQuery });
+            await testApi.userInfo().then(user => {
+                this.storeUser.setUser(user);
+                if (user) {
+                    if (location.pathname === routeConfig.userSignIn.path) {
+                        let { to, ...query } = this.$route.query;
+                        to = (to as string) || routeConfig.index.path;
+                        let toQuery = query;
+                        this.$router.push({ path: to, query: toQuery });
+                    }
                 }
-            }
+            }).catch(e => {
+                this.$Message.error(e.message);
+            });
         }
     }
 
