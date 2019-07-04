@@ -27,6 +27,7 @@ export default class App extends Vue {
         refName?: string;
     }[] = [];
     $refs: { board: HTMLElement; list: IMyList<any>; }
+    richText = '';
 
     public created() {
         this.setList();
@@ -140,7 +141,10 @@ export default class App extends Vue {
         let contents = this.contents;
         return (
             <div>
-                <div style={{ width: '500px' }}>
+                <div style={{
+                    width: '500px',
+                    display: 'inline-block',
+                }}>
                     <div ref='board' style={{
                         height: '400px', background: 'black', overflow: 'hidden', position: 'relative',
                         fontSize: '30px', color: 'white',
@@ -171,6 +175,22 @@ export default class App extends Vue {
                         </Row>
                         <Button on-click={() => { this.contents = []; }}>clear anime</Button>
                     </div>
+                </div>
+                <div style={{
+                    display: 'inline-block',
+                    width: '600px',
+                    verticalAlign: 'top',
+                }}>
+                    <quill-editor v-model={this.richText} options={{
+                        // theme: 'snow',
+                        // modules: {
+                        //     toolbar: ['bold', 'italic', 'underline', 'strike']
+                        // },
+                        placeholder: '输点啥。。。',
+                    }}></quill-editor>
+                    <Button on-click={() => {
+                        console.log(this.richText);
+                    }}>log</Button>
                 </div>
 
                 <MyList ref="list" type="custom" infiniteScroll
