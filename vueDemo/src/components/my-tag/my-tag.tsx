@@ -26,14 +26,14 @@ export class MyTag extends Vue {
         });
     }
 
-    renderAuthorityTag(list) {
+    renderAuthorityTag(list, hideCode?: boolean) {
         let newList = list ? list.map(ele => {
             let color = '';
             let tag = ele.code;
             if (ele.isDel || ele.status !== myEnum.authorityStatus.启用) {
                 color = 'default';
             } else {
-                tag = `${ele.name}(${ele.code})`;
+                tag = `${ele.name}` + (hideCode ? '' : `(${ele.code})`);
             }
             return {
                 tag,
@@ -44,7 +44,7 @@ export class MyTag extends Vue {
         return this.renderTag(newList);
     }
 
-    renderRoleTag(list) {
+    renderRoleTag(list, hideCode?: boolean) {
         if (!list)
             list = [];
         return list.map(ele => {
@@ -53,7 +53,7 @@ export class MyTag extends Vue {
             if (ele.isDel || ele.status !== myEnum.roleStatus.启用) {
                 color = 'default';
             } else {
-                tag = `${ele.name}(${ele.code})`;
+                tag = `${ele.name}` + (hideCode ? '' : `(${ele.code})`);
             }
             return (
                 <Tooltip theme="light" max-width="250" disabled={!ele.authorityList || !ele.authorityList.length}>

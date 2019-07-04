@@ -250,25 +250,22 @@ export default class UserInfo extends Vue {
                 <Card>
                     <Form label-width={60}>
                         <FormItem label="账号">
-                            {this.detail.account}
-                        </FormItem>
-                        <FormItem label="昵称">
-                            {this.detail.nickname}
-                        </FormItem>
-                        <FormItem label="角色">
-                            {MyTagModel.renderRoleTag(this.detail.roleList)}
-                        </FormItem>
-                        <FormItem label="权限">
-                            {MyTagModel.renderAuthorityTag(this.detail.authorityList)}
-                        </FormItem>
-                        <FormItem label="可用权限">
-                            {MyTagModel.renderAuthorityTag(Object.values(this.detail.auth))}
-                        </FormItem>
-                        <FormItem label="创建时间">
-                            {this.detail.createdAt && moment(this.detail.createdAt).format(dev.dateFormat)}
+                            {this.detail.account}({this.detail.nickname})
                         </FormItem>
                         <FormItem label="状态">
                             {this.detail.statusText}
+                        </FormItem>
+                        <FormItem label="角色">
+                            {MyTagModel.renderRoleTag(this.detail.roleList, true)}
+                        </FormItem>
+                        <FormItem label="权限">
+                            {MyTagModel.renderAuthorityTag(this.detail.authorityList, true)}
+                        </FormItem>
+                        <FormItem label="可用权限">
+                            {MyTagModel.renderAuthorityTag(Object.values(this.detail.auth), true)}
+                        </FormItem>
+                        <FormItem label="创建时间">
+                            {this.detail.createdAt && moment(this.detail.createdAt).format(dev.dateFormat)}
                         </FormItem>
                     </Form>
                 </Card>

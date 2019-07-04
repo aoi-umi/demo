@@ -64,6 +64,10 @@ class MyTransfer extends Vue {
                 data={this.allData}
                 targetKeys={this.targetKeys}
                 filterable={true as any}
+                filter-method={(d, query?) => {
+                    let data = d as any as { data: any; key: string; label: string };
+                    return data.label.toLocaleLowerCase().indexOf(query.toLocaleLowerCase()) > -1;
+                }}
                 titles={['未添加', '已添加']}
                 on-on-change={(targetKeys, direction, moveKeys) => {
                     this.targetKeys = targetKeys;
