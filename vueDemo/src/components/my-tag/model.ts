@@ -115,11 +115,11 @@ export class MyTagModel {
         return myTag.renderTag(tagList);
     }
 
-    static renderRoleTag(list) {
-        return myTag.renderRoleTag(list);
+    static renderRoleTag(list, hideCode?: boolean) {
+        return myTag.renderRoleTag(list, hideCode);
     }
 
-    static renderAuthorityTag(list) {
-        return myTag.renderAuthorityTag(list);
+    static renderAuthorityTag(list, hideCode?: boolean) {
+        return myTag.renderAuthorityTag(list, hideCode);
     }
 }
