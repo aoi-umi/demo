@@ -2,7 +2,7 @@ import { RequestHandler } from 'express';
 import { Types } from 'mongoose';
 import { plainToClass } from 'class-transformer';
 
-import { responseHandler, paramsValidV2 } from '../helpers';
+import { responseHandler, paramsValid } from '../helpers';
 import { error, escapeRegExp } from '../_system/common';
 import { AuthorityModel, AuthorityInstanceType, AuthorityMapper } from '../models/mongo/authority';
 import * as VaildSchema from '../vaild-schema/class-valid';
@@ -10,7 +10,7 @@ import * as VaildSchema from '../vaild-schema/class-valid';
 export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let data = plainToClass(VaildSchema.AuthorityQuery, req.query);
-        paramsValidV2(data);
+        paramsValid(data);
         let query: any = {};
         if (data.anyKey) {
             delete data.name;
@@ -47,7 +47,7 @@ export let query: RequestHandler = (req, res) => {
 export let codeExists: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let data = plainToClass(VaildSchema.AuthorityCodeExists, req.body);
-        paramsValidV2(data);
+        paramsValid(data);
         let rs = await AuthorityMapper.codeExists(data.code, data._id);
         return rs && { _id: rs._id };
     }, req, res);
@@ -111,7 +111,7 @@ export let update: RequestHandler = (req, res) => {
 export let del: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let data = plainToClass(VaildSchema.AuthorityDel, req.body);
-        paramsValidV2(data);
+        paramsValid(data);
         let rs = await AuthorityModel.deleteMany({ _id: { $in: data.idList.map(id => Types.ObjectId(id)) } });
         if (!rs.n)
             throw error('No Match Data');

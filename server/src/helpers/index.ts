@@ -7,7 +7,6 @@ import * as common from '../_system/common';
 import errorConfig from '../config/errorConfig';
 import { logger } from '../_main';
 import * as VaildSchema from '../vaild-schema/class-valid';
-import { ajvInst, refType } from './ajv';
 import { valid } from './class-valid';
 
 type ResponseHandlerOptType = {
@@ -62,50 +61,7 @@ export let responseHandler = function (fn: (opt?: ResponseHandlerOptType) => any
     });
 }
 
-export let paramsValid = function (schema, data, opt?: { list?: boolean }) {
-    opt = {
-        ...opt,
-    }
-    if (opt.list) {
-        schema.properties = {
-            pageIndex: { // 页码
-                $ref: refType.int
-            },
-            rows: { // 行数
-                $ref: refType.int
-            },
-            orderBy: { // 排序字段
-                type: 'string',
-            },
-            sortOrder: {
-                type: 'string',
-                enum: ['-1', '1', ''],
-            },
-            ...schema.properties,
-        }
-        if (!data.page)
-            data.page = '1';
-        if (!data.rows)
-            data.rows = '10';
-    }
-    let validator = ajvInst.compile(schema);
-    let isValid = validator(data);
-    if (!isValid) {
-        //console.log(validator.errors);
-        let list = validator.errors.map(error => {
-            return error.dataPath || error.message;
-        });
-        throw common.error({ remark: list.join(';') }, errorConfig.ARGS_ERROR);
-    }
-    if (opt.list) {
-        data.page = parseInt(data.page);
-        data.rows = parseInt(data.rows);
-        if (data.rows > 50)
-            data.rows = 50;
-    }
-}
-
-export function paramsValidV2(data) {
+export function paramsValid(data) {
     let err = valid(data);
     if (err.length)
         throw common.error('', errorConfig.ARGS_ERROR, { remark: err.join(';') });

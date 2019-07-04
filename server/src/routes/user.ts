@@ -4,7 +4,7 @@ import { plainToClass } from 'class-transformer';
 import * as common from '../_system/common';
 import * as cache from '../_system/cache';
 import { transaction } from '../_system/dbMongo';
-import { responseHandler, paramsValidV2, } from '../helpers';
+import { responseHandler, paramsValid, } from '../helpers';
 import { dev, error, auth, myEnum } from '../config';
 import { UserModel, UserMapper } from '../models/mongo/user';
 import * as VaildSchema from '../vaild-schema/class-valid';
@@ -12,7 +12,7 @@ import * as VaildSchema from '../vaild-schema/class-valid';
 export let accountExists: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let data = plainToClass(VaildSchema.UserAccountExists, req.body);
-        paramsValidV2(data);
+        paramsValid(data);
         let rs = await UserMapper.accountExists(data.account);
         return rs && { _id: rs._id };
     }, req, res);
@@ -21,7 +21,7 @@ export let accountExists: RequestHandler = (req, res) => {
 export let signUp: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let data = plainToClass(VaildSchema.UserSignUp, req.body);
-        paramsValidV2(data);
+        paramsValid(data);
         let rs = await UserMapper.accountExists(data.account);
         if (rs)
             throw common.error('账号已存在');
@@ -38,7 +38,7 @@ export let signUp: RequestHandler = (req, res) => {
 export let signIn: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let data = plainToClass(VaildSchema.UserSignIn, req.body);
-        paramsValidV2(data);
+        paramsValid(data);
         let token = req.header(dev.cacheKey.user);
         let { user, disableResult } = await UserMapper.accountCheck(data.account);
 
@@ -90,7 +90,7 @@ export let detail: RequestHandler = (req, res) => {
 export let mgtQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let data = plainToClass(VaildSchema.UserMgtQuery, req.query);
-        paramsValidV2(data);
+        paramsValid(data);
         let { rows, total } = await UserMapper.query({
             ...data, includeDelAuth: true
         });
@@ -104,7 +104,7 @@ export let mgtQuery: RequestHandler = (req, res) => {
 export let mgtSave: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let data = plainToClass(VaildSchema.UserMgtSave, req.body);
-        paramsValidV2(data);
+        paramsValid(data);
         let detail = await UserModel.findById(data._id);
         if (!detail.canEdit)
             throw common.error('不可修改此账号');
@@ -136,7 +136,7 @@ export let mgtSave: RequestHandler = (req, res) => {
 export let mgtDisable: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let data = plainToClass(VaildSchema.UserMgtDisable, req.body);
-        paramsValidV2(data);
+        paramsValid(data);
         let detail = await UserModel.findById(data._id);
         if (!detail.canEdit)
             throw common.error('不可禁用此账号');
