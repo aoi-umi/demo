@@ -12,6 +12,7 @@
     "animejs": "3.0.1",
     "axios": "0.18.0",
     "core-js": "2.6.5",
+    "echarts": "^4.2.1",
     "enum-ts": "1.1.1",
     "iview": "3.4.1",
     "moment": "^2.24.0",
@@ -27,6 +28,7 @@
   },
   "devDependencies": {
     "@types/animejs": "^2.0.2",
+    "@types/echarts": "^4.1.9",
     "@types/socket.io-client": "^1.4.32",
     "@vue/cli-plugin-babel": "^3.7.0",
     "@vue/cli-plugin-typescript": "^3.7.0",

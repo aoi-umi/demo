@@ -6,6 +6,9 @@ import 'quill/dist/quill.core.css';
 import 'quill/dist/quill.snow.css';
 import 'quill/dist/quill.bubble.css';
 
+//仅用于引入类型
+import { } from 'echarts';
+
 Vue.use(iView);
 Vue.use(VueQuillEditor);
 import App from './App';

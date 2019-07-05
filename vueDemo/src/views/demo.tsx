@@ -1,5 +1,7 @@
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import anime from 'animejs';
+import 'echarts/lib/chart/line';
+import * as echarts from 'echarts/lib/echarts';
 
 import { Input, Card, Button, ColorPicker, Row, Col, Checkbox } from '@/components/iview';
 import { MyList, IMyList } from '@/components/my-list';
@@ -26,8 +28,10 @@ export default class App extends Vue {
         dom?: HTMLElement,
         refName?: string;
     }[] = [];
-    $refs: { board: HTMLElement; list: IMyList<any>; }
+    $refs: { board: HTMLElement; list: IMyList<any>; echart: HTMLDivElement };
     richText = '';
+    chart: echarts.ECharts;
+    chartAddData = '';
 
     public created() {
         this.setList();
@@ -36,10 +40,30 @@ export default class App extends Vue {
 
     mounted() {
         this.$refs.list.query();
+        this.chart = echarts.init(this.$refs.echart);
+        this.setECharts();
+    }
+
+    setECharts() {
+        const optionData: any = {
+            xAxis: {
+                type: 'category',
+                data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [{
+                data: [820, 932, 901, 934, 1290, 1330, 1320],
+                type: 'line',
+                // smooth: true
+            }]
+        };
+
+        this.chart.setOption(optionData);
     }
 
     public handleClick() {
-        console.log('click');
         this.setList();
     }
 
@@ -191,6 +215,18 @@ export default class App extends Vue {
                     <Button on-click={() => {
                         console.log(this.richText);
                     }}>log</Button>
+                    <div ref="echart" style={{ height: '300px', width: '500px' }}></div>
+                    <Input v-model={this.chartAddData} search enter-button="添加" on-on-search={() => {
+                        let num = parseFloat(this.chartAddData);
+                        if (!isNaN(num)) {
+                            let opt = this.chart.getOption();
+                            let data: number[] = (opt.series[0] as any).data;
+                            data.shift();
+                            data.push(num);
+                            this.chart.setOption(opt);
+                            this.chartAddData = '';
+                        }
+                    }} />
                 </div>
 
                 <MyList ref="list" type="custom" infiniteScroll

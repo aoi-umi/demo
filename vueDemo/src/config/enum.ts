@@ -1,5 +1,5 @@
 import { Enum } from 'enum-ts';
-export const enumDefine = {
+const enumDefineBack = {
     authorityStatus: {
         禁用: 0,
         启用: 1
@@ -18,7 +18,9 @@ export const enumDefine = {
         弹幕发送: 'danmakuSend',
         弹幕接收: 'danmakuRecv'
     },
+};
 
+const enumDefineFront = {
     userEditType: {
         修改: 'edit',
         封禁: 'disable',
@@ -27,5 +29,9 @@ export const enumDefine = {
         解封: 0,
         封禁至: 1,
     },
+};
+export const enumDefine = {
+    ...enumDefineBack,
+    ...enumDefineFront
 };
 export const myEnum = Enum.createInstance(enumDefine);
