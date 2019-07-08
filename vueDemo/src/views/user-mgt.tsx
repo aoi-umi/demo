@@ -43,6 +43,8 @@ class UserMgtDetail extends Vue {
     private innerDetail: DetailDataType = {};
 
     private initDetail(data) {
+        if (data.disabledTo)
+            data.disabledTo = new Date(data.disabledTo);
         this.innerDetail = data;
         this.disableType = data.disabled ? myEnum.userDisableType.封禁至 : myEnum.userDisableType.解封;
     }
@@ -50,7 +52,7 @@ class UserMgtDetail extends Vue {
     private rules = {
     };
     $refs: { formVaild: IForm; roleTransfer: IRoleTransfer, authTransfer: IAuthorityTransfer };
-    private disableType;
+    private disableType = myEnum.userDisableType.解封;
 
     private saving = false;
     private async save() {
@@ -89,7 +91,9 @@ class UserMgtDetail extends Vue {
             <div>
                 <h3>{myEnum.userEditType.getKey(this.type)}</h3>
                 <br />
-                <Form label-width={50} ref="formVaild" props={{ model: detail }} rules={this.rules}>
+                <Form label-width={50} ref="formVaild" props={{ model: detail }} rules={this.rules} nativeOn-submit={(e) => {
+                    e.preventDefault();
+                }} >
                     <FormItem label="账号">{detail.account}({detail.nickname})</FormItem>
                     {this.type == myEnum.userEditType.修改 ?
                         <div>
@@ -102,14 +106,22 @@ class UserMgtDetail extends Vue {
                         </div> :
                         <div>
                             <FormItem label="封禁">
-                                <RadioGroup v-model={this.disableType} vertical>
+                                <RadioGroup v-model={this.disableType}>
                                     <Radio label={myEnum.userDisableType.解封}>解封</Radio>
-                                    <Radio label={myEnum.userDisableType.封禁至}>封禁至<DatePicker v-model={detail.disabledTo} options={{
+                                    <Radio label={myEnum.userDisableType.封禁至}>封禁至</Radio>
+                                </RadioGroup>
+                            </FormItem>
+                            <FormItem>
+                                {this.disableType === myEnum.userDisableType.封禁至 &&
+                                    <DatePicker v-model={detail.disabledTo} placeholder="永久" options={{
                                         disabledDate: (date?) => {
                                             return date && date.valueOf() < Date.now();
+                                        },
+                                    }} on-on-change={() => {
+                                        if (this.disableType !== myEnum.userDisableType.封禁至) {
+                                            this.disableType = myEnum.userDisableType.封禁至;
                                         }
-                                    }} /></Radio>
-                                </RadioGroup>
+                                    }} />}
                             </FormItem>
                         </div>
                     }
