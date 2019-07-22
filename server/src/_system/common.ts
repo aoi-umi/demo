@@ -23,14 +23,14 @@ import errorConfig from '../config/errorConfig';
  */
 export function promise<T>(fn: (...args) => Q.IWhenable<T>, caller?: any, nodeCallback?: boolean, args?: any[]): Q.Promise<T> {
     return Q.fcall((): any => {
-        var defer = Q.defer();
+        let defer = Q.defer();
         if (!fn) {
             throw error('fn can not be null');
         }
         if (!args)
             args = [];
         if (!nodeCallback) {
-            var def = Q.defer();
+            let def = Q.defer();
             args.push(def);
             defer.resolve(fn.apply(caller, args));
         } else {
@@ -96,7 +96,7 @@ export let promisify = function (fun, caller?) {
 };
 
 export let promisifyAll = function (obj) {
-    for (var key in obj) {
+    for (let key in obj) {
         if (typeof obj[key] == 'function')
             obj[key + 'Promise'] = promisify(obj[key], obj);
     }
@@ -106,7 +106,7 @@ export let s4 = function (count?: number) {
     if (count == undefined)
         count = 1;
     if (count > 0) {
-        for (var i = 0; i < count; i++) {
+        for (let i = 0; i < count; i++) {
             str += (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
         }
     }
@@ -116,7 +116,7 @@ export let guid = function () {
     return `${s4(2)}-${s4()}-${s4()}-${s4()}-${s4(3)}`;
 };
 export let createToken = function (str) {
-    var code = md5(str);
+    let code = md5(str);
     return code;
 };
 export let dateFormat = function (date, format = 'yyyy-MM-dd') {
@@ -126,7 +126,7 @@ export let dateFormat = function (date, format = 'yyyy-MM-dd') {
         else if (typeof date == 'number' || typeof date == 'string')
             date = new Date(date);
 
-        var o = {
+        let o = {
             y: date.getFullYear(),
             M: date.getMonth() + 1,
             d: date.getDate(),
@@ -137,7 +137,7 @@ export let dateFormat = function (date, format = 'yyyy-MM-dd') {
             S: date.getMilliseconds()
         };
 
-        var formatStr = format.replace(/(y+|M+|d+|h+|H+|m+|s+|S+)/g, function (e) {
+        let formatStr = format.replace(/(y+|M+|d+|h+|H+|m+|s+|S+)/g, function (e) {
             let key = e.slice(-1);
             if (key == 'S')
                 return ('' + o[key]).slice(0, e.length);
@@ -219,21 +219,21 @@ export function enumerable(value: boolean) {
 
 //#region 同名但实现不同
 export let md5 = function (data, option?) {
-    var opt = {
+    let opt = {
         encoding: 'hex',
     };
     opt = extend(opt, option);
-    var md5 = crypto.createHash('md5');
+    let md5 = crypto.createHash('md5');
     if (typeof (data) == 'string')
-        data = new Buffer(data, 'utf8');
+        data = Buffer.from(data, 'utf8');
 
-    var code = md5.update(data).digest(opt.encoding as any);
+    let code = md5.update(data).digest(opt.encoding as any);
     return code;
 };
 export let isInArray = function (obj, list) {
     if (list) {
-        for (var i = 0; i < list.length; i++) {
-            var t = list[i];
+        for (let i = 0; i < list.length; i++) {
+            let t = list[i];
             if (t === obj) {
                 return true;
             }
@@ -243,12 +243,12 @@ export let isInArray = function (obj, list) {
 };
 //code: string || errorConfig
 export let error = function (msg, code?, option?) {
-    var opt = {
+    let opt = {
         lang: 'zh',
         format: null,
         remark: null
     };
-    var status = null;
+    let status = null;
     if (option)
         opt = extend(opt, option);
     if (!code)
@@ -265,8 +265,8 @@ export let error = function (msg, code?, option?) {
         status = error.status;
         if (!msg) {
             let filepath = `../config/lang/${opt.lang}`;
-            var resolvePath = path.resolve(`${__dirname}/${filepath}.js`);
-            var isExist = fs.existsSync(resolvePath);
+            let resolvePath = path.resolve(`${__dirname}/${filepath}.js`);
+            let isExist = fs.existsSync(resolvePath);
             let lang = require(isExist ? filepath : '../config/lang/zh');
             msg = lang.errorConfig[code];
             if (typeof opt.format == 'function')
@@ -275,7 +275,7 @@ export let error = function (msg, code?, option?) {
     }
     if (!msg) msg = '';
     if (typeof msg == 'object') msg = JSON.stringify(msg);
-    var err: any = new Error(msg);
+    let err: any = new Error(msg);
     let remark = opt.remark;
     if (remark)
         err.remark = remark instanceof Array ? remark.join('#') : remark;
@@ -287,13 +287,13 @@ export let error = function (msg, code?, option?) {
 
 //#region only
 export let extend = function (...args) {
-    var res = args[0] || {};
+    let res = args[0] || {};
     for (let i = 1; i < args.length; i++) {
-        var arg = args[i];
+        let arg = args[i];
         if (typeof (arg) !== 'object') {
             continue;
         }
-        for (var key in arg) {
+        for (let key in arg) {
             if (arg[key] !== undefined)
                 res[key] = arg[key];
         }
@@ -309,16 +309,16 @@ export type RequestServiceByConfigOption = {
     outLog?: any;
 } & AxiosRequestConfig;
 export let requestServiceByConfig = function (option: RequestServiceByConfigOption) {
-    var method = '';
-    var url = '';
-    var log = logModle();
-    var startTime = new Date().getTime();
+    let method = '';
+    let url = '';
+    let log = logModle();
+    let startTime = new Date().getTime();
     return promise(async function () {
-        var errStr = `service "${option.serviceName}"`;
+        let errStr = `service "${option.serviceName}"`;
         type Args = {
             host: string;
         };
-        var service = config.api[option.serviceName] as {
+        let service = config.api[option.serviceName] as {
             defaultArgs: Args,
             method: {
                 [methodName: string]: {
@@ -330,27 +330,27 @@ export let requestServiceByConfig = function (option: RequestServiceByConfigOpti
             }
         };
         if (!service) throw error(`${errStr} is not exist!`);
-        var serviceArgs = clone(service.defaultArgs);
+        let serviceArgs = clone(service.defaultArgs);
 
-        var defaultMethodArgs = {
+        let defaultMethodArgs = {
             isUseDefault: true,
             method: 'POST',
         }
-        var methodConfig = service.method[option.methodName];
+        let methodConfig = service.method[option.methodName];
         methodConfig = extend(defaultMethodArgs, methodConfig);
 
         if (!methodConfig.isUseDefault) {
             serviceArgs = extend(serviceArgs, methodConfig.args);
         }
 
-        var host = serviceArgs.host;
+        let host = serviceArgs.host;
         if (!host) throw error(`${errStr} host is empty!`);
 
         method = methodConfig.method;
         url = methodConfig.url;
         if (!url) throw error(`${errStr} method "${option.methodName}" url is empty!`);
         url = host + url;
-        var opt: AxiosRequestConfig = {
+        let opt: AxiosRequestConfig = {
             url: url,
             data: option.data,
             method: method
@@ -384,7 +384,7 @@ export let requestServiceByConfig = function (option: RequestServiceByConfigOpti
 };
 
 export let requestService = function (option: AxiosRequestConfig) {
-    var opt: AxiosRequestConfig = {
+    let opt: AxiosRequestConfig = {
         method: 'POST',
     };
     opt = extend(opt, option);
@@ -394,7 +394,7 @@ export let requestService = function (option: AxiosRequestConfig) {
     return promise(async function () {
         let response = await axios.request(opt);
         let data = response.data;
-        var encoding = response.headers['content-encoding'];
+        let encoding = response.headers['content-encoding'];
         switch (encoding) {
             case 'gzip':
                 let buffer = await promisify(zlib.unzip)(data);
@@ -426,43 +426,43 @@ export let getErrorConfigByCode = function (code) {
 export let writeError = function (err, opt?) {
     promise(async () => {
         console.error(err);
-        var list = [];
-        var createDate = dateFormat(new Date(), 'yyyy-MM-dd');
-        var createDateTime = dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
+        let list = [];
+        let createDate = dateFormat(new Date(), 'yyyy-MM-dd');
+        let createDateTime = dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
         list.push(createDateTime);
         if (opt)
             list.push(JSON.stringify(opt));
         list.push(err);
         //用于查找上一级调用
-        var stack = new Error().stack;
-        var stackList = ['stack:']
+        let stack = new Error().stack;
+        let stackList = ['stack:']
             .concat(getStack(err.stack))
             .concat(['help stack:'])
             .concat(getStack(stack));
-        for (var i = 0; i < stackList.length; i++) {
+        for (let i = 0; i < stackList.length; i++) {
             console.error(stackList[i]);
             list.push(stackList[i]);
         }
 
         //write file
         mkdirsSync(config.errorDir);
-        var fileName = `${config.errorDir}/${createDate}.txt`;
+        let fileName = `${config.errorDir}/${createDate}.txt`;
         await promisify(fs.appendFile)(fileName, list.join('\r\n') + '\r\n\r\n');
     });
 };
 
 export let getStack = function (stack) {
-    var stackList = [];
-    var matchPath = [
+    let stackList = [];
+    let matchPath = [
         '../../',
     ];
-    for (var i = 0; i < matchPath.length; i++) {
+    for (let i = 0; i < matchPath.length; i++) {
         matchPath[i] = path.resolve(`${__dirname}/${matchPath[i]}`);
     }
-    var list = [];
+    let list = [];
     if (stack) stackList = stack.split('\n');
     stackList.forEach(t => {
-        for (var i = 0; i < matchPath.length; i++) {
+        for (let i = 0; i < matchPath.length; i++) {
             if (t.indexOf(matchPath[i]) >= 0) {
                 list.push(t);
                 break;
@@ -484,11 +484,11 @@ export let mkdirsSync = function (dirname, mode?) {
 }
 
 export let getClientIp = function (req: Request) {
-    // var ip = req.headers['x-forwarded-for']
+    // let ip = req.headers['x-forwarded-for']
     // || req.connection.remoteAddress
     // || req.socket.remoteAddress
     // || req.connection.socket.remoteAddress;
-    var ip = req.ip;
+    let ip = req.ip;
     return ip;
 };
 
@@ -500,10 +500,10 @@ export let IPv4ToIPv6 = function (ip, convert?: boolean) {
     } else {
         //转为2进制的数，每4位为一组，转换成16进制的
         //192.168.1.1  11000000 10101000 00000001 00000001  C0 A8 01 01 0:0:0:0:0:0:C0A8:0101  ::C0A8:0101
-        var ipv6 = [];
-        var list = ip.split('.');
-        for (var i = 0; i < list.length; i++) {
-            var t = parseInt(list[i]).toString(2);
+        let ipv6 = [];
+        let list = ip.split('.');
+        for (let i = 0; i < list.length; i++) {
+            let t = parseInt(list[i]).toString(2);
             let fixNum = 8 - t.length;
             if (fixNum != 0) {
                 t = '00000000'.slice(-fixNum) + t;
@@ -511,9 +511,9 @@ export let IPv4ToIPv6 = function (ip, convert?: boolean) {
             ipv6.push(parseInt(t.substr(0, 4), 2).toString(16));
             ipv6.push(parseInt(t.substr(4, 4), 2).toString(16));
         }
-        var ipv6List = [];
-        var ipv6Str = '';
-        for (var i = 0; i < ipv6.length; i++) {
+        let ipv6List = [];
+        let ipv6Str = '';
+        for (let i = 0; i < ipv6.length; i++) {
             ipv6Str += ipv6[i];
             if ((i + 1) % 4 == 0 && ipv6Str) {
                 ipv6List.push(ipv6Str);
@@ -545,8 +545,8 @@ export let logModle = function () {
 };
 
 // import * as soap from 'soap';
-// var url = 'http://www.webxml.com.cn/WebServices/WeatherWebService.asmx?wsdl';
-// var args = { byProvinceName: '浙江'};
+// let url = 'http://www.webxml.com.cn/WebServices/WeatherWebService.asmx?wsdl';
+// let args = { byProvinceName: '浙江'};
 // soap.createClient(url, function(err, client) {
 //     client.getSupportCity(args, function(err, result) {
 //         if (err) {
@@ -559,12 +559,12 @@ export let logModle = function () {
 
 export let streamToBuffer = function (stream: fs.ReadStream) {
     return promise(function (defer: Q.Deferred<Buffer>) {
-        var buffers = [];
+        let buffers = [];
         stream.on('data', function (buffer) {
             buffers.push(buffer);
         });
         stream.on('end', function () {
-            var buffer = Buffer.concat(buffers);
+            let buffer = Buffer.concat(buffers);
             defer.resolve(buffer);
         });
         stream.on('error', defer.reject);
@@ -579,7 +579,7 @@ export let getListDiff = function <T1, T2>(option: {
     delReturnValue?: (t: T1) => any,
     addReturnValue?: (t: T2) => any,
 }) {
-    var opt: any = {
+    let opt: any = {
         compare: function (item1, item2) {
             return item1 == item2;
         },
@@ -591,20 +591,20 @@ export let getListDiff = function <T1, T2>(option: {
         }
     };
     opt = extend(opt, option);
-    var list = opt.list, newList = opt.newList,
+    let list = opt.list, newList = opt.newList,
         compare = opt.compare, delReturnValue = opt.delReturnValue, addReturnValue = opt.addReturnValue;
-    var delList = [];
-    var addList = [];
+    let delList = [];
+    let addList = [];
     if (newList && newList.length) {
         list.forEach(function (item) {
-            var match = newList.find(function (item2) {
+            let match = newList.find(function (item2) {
                 return compare(item, item2);
             });
             if (!match)
                 delList.push(delReturnValue(item));
         });
         newList.forEach(function (item2) {
-            var match = list.find(function (item) {
+            let match = list.find(function (item) {
                 return compare(item, item2);
             });
             if (!match)

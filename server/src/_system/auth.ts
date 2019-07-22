@@ -37,22 +37,22 @@ export class Auth {
 
     //获取可访问的url，如传入pathname，该路径不可访问时抛出错误
     getAccessableUrl(user: UserType, pathname?: string) {
-        var url = {};
-        var accessable = false;
-        var isUrlExist = false;
+        let url = {};
+        let accessable = false;
+        let isUrlExist = false;
         this.accessUrlConfig.forEach(function (item) {
-            var opt = { notExistAuthority: null };
-            var result = !item.auth
+            let opt = { notExistAuthority: null };
+            let result = !item.auth
                 || (Array.isArray(item.auth) && !item.auth.length)
                 || Auth.hasAuthority(user, item.auth, opt);
-            var isExist = item.url == pathname;
+            let isExist = item.url == pathname;
             if (isExist) isUrlExist = true;
             if (result) {
                 url[item.url] = true;
                 if (isExist)
                     accessable = true;
             } else if (isExist) {
-                var errCode = Auth.getErrorCode(opt.notExistAuthority);
+                let errCode = Auth.getErrorCode(opt.notExistAuthority);
                 throw common.error('', errCode);
             }
         });
@@ -75,8 +75,8 @@ export class Auth {
     static hasAuthority(user: UserType, authData: AuthorityType | AuthorityType[] | AuthorityType[][], opt?: IsExistAuthorityOption) {
         if (!Array.isArray(authData))
             authData = [authData];
-        for (var i = 0; i < authData.length; i++) {
-            var item = authData[i];
+        for (let i = 0; i < authData.length; i++) {
+            let item = authData[i];
             if (!Auth.isExistAuthority(user, item, opt)) {
                 return false;
             }
@@ -89,8 +89,8 @@ export class Auth {
             authData = authData.code;
         if (typeof authData == 'string')
             authData = authData.split(',');
-        for (var i = 0; i < authData.length; i++) {
-            var item = authData[i];
+        for (let i = 0; i < authData.length; i++) {
+            let item = authData[i];
             if (typeof item != 'string')
                 item = item.code;
             if (user.authority[item]) {

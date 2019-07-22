@@ -40,3 +40,11 @@ router.post('/role/save', userAuth.normal, role.save);
 router.post('/role/update', userAuth.normal, role.update);
 router.post('/role/del', userAuth.normal, role.del);
 //#endregion
+
+//#region article 
+import * as article from './article';
+router.get('/article/query', userAuth.normal, article.query);
+router.post('/article/save', userAuth.normal, article.save);
+router.post('/article/del', userAuth.normal, article.del);
+router.post('/article/mgt/audit', userAuth.normal, article.mgtAudit);
+//#endregion

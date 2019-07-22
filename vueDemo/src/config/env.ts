@@ -100,6 +100,28 @@ const config = {
                 roleDel: {
                     url: '/role/del',
                 },
+
+
+                articleQuery: {
+                    url: '/article/query',
+                    method: 'GET',
+                },
+                articleDetailQuery: {
+                    url: '/article/detailQuery',
+                    method: 'GET',
+                },
+                articleSave: {
+                    url: '/article/save',
+                },
+                articleDel: {
+                    url: '/article/del',
+                },
+                articleMgtDel: {
+                    url: '/article/mgt/del',
+                },
+                articleMgtAudit: {
+                    url: '/article/mgt/audit',
+                },
             }
         } as TestApiConfigType
     }

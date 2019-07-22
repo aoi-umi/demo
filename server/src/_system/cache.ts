@@ -3,14 +3,14 @@ import config from '../config/config';
 import errorConfig from '../config/errorConfig';
 import * as common from './common';
 
-var client = new Redis(config.redis.uri);
-var cachePrefix = config.cachePrefix ? config.cachePrefix + ':' : '';
+let client = new Redis(config.redis.uri);
+let cachePrefix = config.cachePrefix ? config.cachePrefix + ':' : '';
 
 function writeCacheErr(err) {
     console.error(common.dateFormat(null, 'yyyy-MM-dd HH:mm:ss'), 'Cache Error [' + err + ']');
 }
 
-var connectErrorTimes = 0;
+let connectErrorTimes = 0;
 client.on('error', function (err) {
     if (err.code == 'ECONNREFUSED') {
         if (connectErrorTimes % 10 == 0) {

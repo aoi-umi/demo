@@ -13,6 +13,13 @@ export const enumDefine = {
         待审核: 1,
         正常: 2
     },
+    articleStatus: {
+        草稿: 0,
+        待审核: 1,
+        审核通过: 2,
+        审核不通过: 3,
+        已删除: -1,
+    },
 
     socket: {
         弹幕发送: 'danmakuSend',

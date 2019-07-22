@@ -28,6 +28,13 @@ var authority = {
     userMgtDisable: {
         name: '用户管理封禁'
     },
+
+    articleMgtDel: {
+        name: '文章管理删除'
+    },
+    articleMgtAudit: {
+        name: '文章管理审核'
+    },
 };
 
 var authList = [];
