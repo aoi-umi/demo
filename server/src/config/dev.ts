@@ -15,6 +15,9 @@ export let accessUrlConfig: AccessUrlConfigType[] = [
     { url: '/devMgt/authority/query', auth: [auth.authorityQuery] },
     { url: '/devMgt/authority/save', auth: [auth.authoritySave] },
     { url: '/devMgt/authority/del', auth: [auth.authorityDel] },
+
+    { url: '/devMgt/article/mgt/audit', auth: [auth.articleMgtAudit] },
+    { url: '/devMgt/article/mgt/del', auth: [auth.articleMgtDel] },
 ];
 //#endregion
 
@@ -26,8 +29,8 @@ export let cacheKey = {
 
 /**缓存时间 秒 */
 export let cacheTime = {
-    user: 7 * 24 * 3600,
-    captcha: 10 * 60
+    user: 3600 * 24 * 7,
+    captcha: 60 * 10
 };
 //#endregion
 

@@ -33,7 +33,7 @@ export function valid(data) {
 //本地化
 const _getMessage = ValidationTypes.getMessage;
 ValidationTypes.getMessage = function (this: typeof ValidationTypes, type: string, isEach: boolean) {
-    var eachPrefix = isEach ? "里的每一项" : "";
+    let eachPrefix = isEach ? "里的每一项" : "";
     switch (type) {
         case this.CONTAINS:
             return `$property ${eachPrefix}必须包含 $constraint1 字符串`;

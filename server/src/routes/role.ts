@@ -99,7 +99,7 @@ export let del: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let data = plainToClass(VaildSchema.RoleDel, req.body);
         paramsValid(data);
-        let rs = await RoleModel.deleteMany({ _id: { $in: data.idList.map(id => Types.ObjectId(id)) } });
+        let rs = await RoleModel.deleteMany({ _id: { $in: data.idList } });
         if (!rs.n)
             throw error('No Match Data');
     }, req, res);

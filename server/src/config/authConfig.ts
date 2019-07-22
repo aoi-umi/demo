@@ -55,44 +55,10 @@ export const authConfig = {
         code: 'authorityDel',
     },
 
-    mainContentQuery: {
-        code: 'mainContentQuery'
+    articleMgtDel: {
+        code: 'articleMgtDel'
     },
-    mainContentDetailQuery: {
-        code: 'mainContentDetailQuery'
+    articleMgtAudit: {
+        code: 'articleMgtAudit'
     },
-    mainContentSave: {
-        code: 'mainContentSave'
-    },
-    mainContentDel: {
-        code: 'mainContentDel'
-    },
-    mainContentAudit: {
-        code: 'mainContentAudit'
-    },
-    mainContentPass: {
-        code: 'mainContentPass'
-    },
-    mainContentNotPass: {
-        code: 'mainContentNotPass'
-    },
-    mainContentRecovery: {
-        code: 'mainContentRecovery'
-    },
-    mainContentUntread: {
-        code: 'mainContentUntread'
-    },
-
-    mainContentTypeQuery: {
-        code: 'mainContentTypeQuery'
-    },
-    mainContentTypeDetailQuery: {
-        code: 'mainContentTypeDetailQuery'
-    },
-    mainContentTypeSave: {
-        code: 'mainContentTypeSave'
-    },
-    mainContentTypeDel: {
-        code: 'mainContentTypeDel'
-    }
 };

@@ -18,7 +18,7 @@ export const normal: RequestHandler = async (req, res, next) => {
             accessableUrl: {},
             ip: req.ip,
         };
-        var userKey = req.header(config.dev.cacheKey.user);
+        let userKey = req.header(config.dev.cacheKey.user);
         if (userKey) {
             userKey = config.dev.cacheKey.user + userKey;
             let user = await cache.get(userKey);
@@ -32,8 +32,8 @@ export const normal: RequestHandler = async (req, res, next) => {
         }
 
         //url权限认证
-        var user = req.myData.user;
-        var pathname = req.baseUrl + req._parsedUrl.pathname;
+        let user = req.myData.user;
+        let pathname = req.baseUrl + req._parsedUrl.pathname;
         let { accessableUrl } = auth.check(user, pathname);
         req.myData.accessableUrl = accessableUrl;
         next();

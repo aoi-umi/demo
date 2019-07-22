@@ -148,6 +148,11 @@ export default class App extends Vue {
                                     icon: 'md-home',
                                     text: routeConfig.bookmark.text,
                                 }, {
+                                    name: routeConfig.article.path,
+                                    to: routeConfig.article.path,
+                                    icon: 'md-create',
+                                    text: routeConfig.article.text,
+                                }, {
                                     name: routeConfig.user.path,
                                     to: routeConfig.user.path,
                                     icon: 'md-people',

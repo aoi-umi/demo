@@ -31,6 +31,13 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
     roleSave,
     roleUpdate,
     roleDel,
+
+    articleQuery,
+    articleDetailQuery,
+    articleSave,
+    articleDel,
+    articleMgtDel,
+    articleMgtAudit,
 }>;
 export type TestApiConfigType = ApiConfigModel<TestApiMethod>;
 
@@ -138,6 +145,27 @@ export class TestApi extends ApiModel<TestApiMethod> {
     }
     async roleDel(idList: string[]) {
         return this.requestByConfig(this.apiConfig.method.roleDel, { data: { idList } });
+    }
+    //#endregion
+
+    //#region article 
+    async articleQuery(data?: { anyKey?} & ApiListQueryArgs) {
+        return this.requestByConfig<ListResult>(this.apiConfig.method.articleQuery, { data });
+    }
+    async articleDetailQuery(data) {
+        return this.requestByConfig(this.apiConfig.method.articleDetailQuery, { data });
+    }
+    async articleSave(data) {
+        return this.requestByConfig(this.apiConfig.method.articleSave, { data });
+    }
+    async articleDel(idList: string[]) {
+        return this.requestByConfig(this.apiConfig.method.articleDel, { data: { idList } });
+    }
+    async articleMgtDel(idList: string[]) {
+        return this.requestByConfig(this.apiConfig.method.articleMgtDel, { data: { idList } });
+    }
+    async articleMgtAudit(data: { idList: string[], status }) {
+        return this.requestByConfig(this.apiConfig.method.articleMgtAudit, { data });
     }
     //#endregion
 }

@@ -12,4 +12,7 @@ export default {
     roleQuery: 'roleQuery',
     roleDel: 'roleDel',
     roleSave: 'roleSave',
+
+    articleMgtDel: 'articleMgtDel',
+    articleMgtAudit: 'articleMgtAudit',
 };

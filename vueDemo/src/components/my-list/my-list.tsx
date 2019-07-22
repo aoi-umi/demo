@@ -158,7 +158,7 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
                     this.result.data = rs.rows;
                 this.result.total = rs.total;
             }
-            if (!this.result.data)
+            if (!this.result.data.length)
                 this.result.msg = '暂无数据';
             let lastPage = Math.ceil(this.result.total / this.model.page.size);
             this.loadedLastPage = this.model.page.index >= lastPage;
@@ -300,22 +300,22 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
                             }
                             return !ele.hide;
                         })}
-                        data={this.result.data} no-data-text={this.result.msg}
-                        on-on-selection-change={this.setSelectedRows}
-                        on-on-sort-change={(opt: OnSortChangeOptions) => {
-                            let sortMap = {
-                                asc: 1,
-                                desc: -1
-                            };
-                            let orderBy, sortOrder = sortMap[opt.order];
-                            if (sortOrder)
-                                orderBy = opt.key;
-                            this.model.setSort({
-                                orderBy,
-                                sortOrder,
-                            });
-                            this.handleQuery({ resetPage: true });
-                        }}>
+                            data={this.result.data} no-data-text={this.result.msg}
+                            on-on-selection-change={this.setSelectedRows}
+                            on-on-sort-change={(opt: OnSortChangeOptions) => {
+                                let sortMap = {
+                                    asc: 1,
+                                    desc: -1
+                                };
+                                let orderBy, sortOrder = sortMap[opt.order];
+                                if (sortOrder)
+                                    orderBy = opt.key;
+                                this.model.setSort({
+                                    orderBy,
+                                    sortOrder,
+                                });
+                                this.handleQuery({ resetPage: true });
+                            }}>
                         </Table> :
                         this.customRenderFn(this.result)
                     }

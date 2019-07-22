@@ -79,7 +79,7 @@ export let del: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let data = plainToClass(VaildSchema.BookmarkDel, req.body);
         paramsValid(data);
-        let rs = await BookmarkModel.deleteMany({ _id: { $in: data.idList.map(id => Types.ObjectId(id)) } });
+        let rs = await BookmarkModel.deleteMany({ _id: { $in: data.idList } });
         if (!rs.n)
             throw error('No Match Data');
     }, req, res);
