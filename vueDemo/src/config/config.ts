@@ -30,6 +30,7 @@ export const routeConfig = {
         authority: [authorityConfig.login],
     },
     article: { path: '/article' },
+    articleDetail: { path: '/article/detail' },
     test: { path: '/test' },
     error: { path: '/error' },
 };

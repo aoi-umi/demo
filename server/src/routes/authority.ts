@@ -6,6 +6,7 @@ import { responseHandler, paramsValid } from '../helpers';
 import { error, escapeRegExp } from '../_system/common';
 import { AuthorityModel, AuthorityInstanceType, AuthorityMapper } from '../models/mongo/authority';
 import * as VaildSchema from '../vaild-schema/class-valid';
+import { BaseMapper } from '../models/mongo/_base';
 
 export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {
@@ -31,11 +32,8 @@ export let query: RequestHandler = (req, res) => {
 
         let { rows, total } = await AuthorityModel.findAndCountAll({
             conditions: query,
-            page: data.page,
-            rows: data.rows,
             getAll: data.getAll,
-            sortOrder: data.sortOrder,
-            orderBy: data.orderBy
+            ...BaseMapper.getListOptions(data),
         });
         return {
             rows,

@@ -1,35 +1,19 @@
 import { RequestHandler } from 'express';
-import { Types } from 'mongoose';
 import { plainToClass } from 'class-transformer';
 
 import { responseHandler, paramsValid } from '../helpers';
+import { myEnum } from '../config';
 import { error, escapeRegExp } from '../_system/common';
 import * as VaildSchema from '../vaild-schema/class-valid';
 import { ArticleModel, ArticleInstanceType, ArticleMapper } from '../models/mongo/article';
-import { myEnum } from '../config';
+import { BaseMapper } from '../models/mongo/_base';
 
 export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let data = plainToClass(VaildSchema.AritcleQuery, req.query);
         paramsValid(data);
-        let query: any = {};
-        if (data.anyKey) {
-            let anykey = new RegExp(escapeRegExp(data.anyKey), 'i');
-            query.$or = [
-                { title: anykey },
-            ];
-        }
 
-        if (data.title)
-            query.title = new RegExp(escapeRegExp(data.title), 'i');
-
-        let { rows, total } = await ArticleModel.findAndCountAll({
-            conditions: query,
-            page: data.page,
-            rows: data.rows,
-            sortOrder: data.sortOrder,
-            orderBy: data.orderBy
-        });
+        let { rows, total } = await ArticleMapper.query(data);
         return {
             rows,
             total
@@ -37,7 +21,7 @@ export let query: RequestHandler = (req, res) => {
     }, req, res);
 };
 
-export let detail: RequestHandler = (req, res) => {
+export let detailQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
         let data = plainToClass(VaildSchema.AritcleSave, req.query);
@@ -62,6 +46,9 @@ export let save: RequestHandler = (req, res) => {
             });
         } else {
             detail = await ArticleMapper.findOne({ _id: data._id, userId: user._id });
+            if (!detail.canUpdate) {
+                throw error('当前状态无法修改');
+            }
             let update: any = {
                 status,
             };

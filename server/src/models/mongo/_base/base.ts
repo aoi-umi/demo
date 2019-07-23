@@ -138,7 +138,3 @@ export class Base extends Model<Base> {
         return sortCondition;
     }
 }
-
-export class Public {
-
-}

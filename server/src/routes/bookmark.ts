@@ -1,12 +1,11 @@
 import { RequestHandler } from 'express';
-import { Types } from 'mongoose';
 import { plainToClass } from 'class-transformer';
 
 import { responseHandler, paramsValid } from '../helpers';
 import { error, escapeRegExp } from '../_system/common';
-import { transaction } from '../_system/dbMongo';
 import { BookmarkModel, BookmarkInstanceType } from '../models/mongo/bookmark';
 import * as VaildSchema from '../vaild-schema/class-valid';
+import { BaseMapper } from '../models/mongo/_base';
 
 export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {
@@ -29,10 +28,7 @@ export let query: RequestHandler = (req, res) => {
 
         let { rows, total } = await BookmarkModel.findAndCountAll({
             conditions: query,
-            page: data.page,
-            rows: data.rows,
-            sortOrder: data.sortOrder,
-            orderBy: data.orderBy
+            ...BaseMapper.getListOptions(data),
         });
         return {
             rows,
