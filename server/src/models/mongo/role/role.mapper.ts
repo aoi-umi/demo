@@ -5,6 +5,7 @@ import * as VaildSchema from '../../../vaild-schema/class-valid';
 
 import { AuthorityModel } from '../authority';
 import { UserMapper } from '../user';
+import { BaseMapper } from '../_base';
 import { RoleModel } from ".";
 
 export class RoleMapper {
@@ -95,11 +96,8 @@ export class RoleMapper {
             },
         ];
         let rs = await RoleModel.aggregatePaginate(pipeline, {
-            page: data.page,
-            rows: data.rows,
             noTotal,
-            sortOrder: data.sortOrder,
-            orderBy: data.orderBy
+            ...BaseMapper.getListOptions(data),
         });
         rs.rows.forEach(ele => {
             let authorityList = ele.newAuthorityList;

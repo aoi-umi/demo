@@ -6,8 +6,11 @@ import { myEnum } from "../../config";
 import { ListBase, DelBase, DetailQueryBase } from "./base";
 
 export class AritcleQuery extends ListBase {
+    _id: string;
     title: string;
+    user: string;
     anyKey: string;
+    status: string;
 }
 
 export class AritcleDetailQuery extends DetailQueryBase {

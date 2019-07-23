@@ -66,6 +66,11 @@ export const routerConfig = {
         text: '文章',
         component: () => import('./views/article')
     },
+    articleDetail: {
+        path: dev.routeConfig.articleDetail.path,
+        text: '文章',
+        component: () => import('./views/article-detail')
+    },
 
     test: {
         path: '/test',

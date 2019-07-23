@@ -1,115 +1,18 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
-import { Form as IForm } from 'iview';
 import { getModule } from 'vuex-module-decorators';
+import moment from 'moment';
 import { testApi } from '@/api';
-import { myEnum, authority } from '@/config';
-import { Modal, Input, Form, FormItem, Button, Checkbox, Switch, Transfer } from '@/components/iview';
+import { myEnum, authority, dev } from '@/config';
+import { routeConfig } from '@/config/config';
+import { Modal, Input, Form, FormItem, Button, Checkbox, Switch, Row, Col } from '@/components/iview';
 import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
 import { MyConfirm } from '@/components/my-confirm';
 import { convClass, convert } from '@/helpers';
 import LoginUserStore from '@/store/loginUser';
 
-type DetailDataType = {
-    _id?: string;
-    cover?: string;
-    title?: string;
-    content?: string;
-    status?: number;
-    statusText?: string;
-}
-@Component
-class ArticleDetail extends Vue {
-    @Prop()
-    detail: any;
-
-    @Watch('detail')
-    updateDetail(newVal) {
-        let data = newVal || this.getDetailData();
-        this.initDetail(data);
-    }
-    private innerDetail: DetailDataType = {};
-    private getDetailData() {
-        return {
-            _id: '',
-            name: '',
-            code: '',
-            status: myEnum.articleStatus.草稿
-        };
-    }
-
-    private initDetail(data) {
-        this.innerDetail = data;
-    }
-
-    private rules = {
-        name: [
-            { required: true, trigger: 'blur' }
-        ],
-        code: [
-            { required: true, trigger: 'blur' }
-        ],
-    };
-    $refs: { formVaild: IForm };
-
-    saving = false;
-    async save() {
-        this.saving = true;
-        let detail = this.innerDetail;
-        try {
-            let rs = await testApi.articleSave({
-                _id: detail._id,
-                title: detail.title,
-                content: detail.content,
-            });
-            this.$emit('save-success', rs);
-            this.initDetail(this.getDetailData());
-        } catch (e) {
-            this.$Message.error('出错了:' + e.message);
-        } finally {
-            this.saving = false;
-        }
-    }
-
-    render() {
-        let detail = this.innerDetail;
-        return (
-            <div>
-                <h3>{detail._id ? '修改' : '新增'}</h3>
-                <br />
-                <Form label-width={50} ref="formVaild" props={{ model: detail }} rules={this.rules}>
-                    <FormItem label="状态" prop="status">
-                        {detail.statusText}
-                    </FormItem>
-                    <FormItem label="标题" prop="title">
-                        <Input v-model={detail.title} />
-                    </FormItem>
-                    <FormItem label="内容" prop="content">
-                        <Input v-model={detail.content} />
-                    </FormItem>
-                    <FormItem>
-                        <Button type="primary" on-click={() => {
-                            this.$refs.formVaild.validate((valid) => {
-                                if (!valid) {
-                                    this.$Message.error('参数有误');
-                                } else {
-                                    this.save();
-                                }
-                            });
-                        }} loading={this.saving}>保存</Button>
-                    </FormItem>
-                </Form>
-            </div >
-        );
-    }
-}
-
-const ArticleDetailView = convClass<ArticleDetail>(ArticleDetail);
-
 @Component
 export default class Article extends Vue {
-    detailShow = false;
     delShow = false;
-    detail: any;
     $refs: { list: IMyList<any> };
     get storeUser() {
         return getModule(LoginUserStore, this.$store);
@@ -137,7 +40,7 @@ export default class Article extends Vue {
     query() {
         let list = this.$refs.list;
         let query = this.$route.query;
-        ['name', 'code', 'anyKey'].forEach(key => {
+        ['user', 'title', 'anyKey'].forEach(key => {
             if (query[key])
                 this.$set(list.model.query, key, query[key]);
         });
@@ -163,11 +66,12 @@ export default class Article extends Vue {
             this.$Message.error('删除失败:' + e.message);
         }
     }
-    private async audit(detail: DetailDataType, pass: boolean) {
+    private async audit(detail: { _id: string, status, statusText }, pass: boolean) {
         try {
             let toStatus = pass ? myEnum.articleStatus.审核通过 : myEnum.articleStatus.审核不通过;
-            await testApi.articleMgtAudit({ idList: [detail._id], status: toStatus });
-            detail.status = toStatus;
+            let rs = await testApi.articleMgtAudit({ idList: [detail._id], status: toStatus });
+            detail.status = rs.status;
+            detail.statusText = rs.statusText;
             this.$Message.info('审核成功');
         } catch (e) {
             this.$Message.error('审核失败:' + e.message);
@@ -196,65 +100,94 @@ export default class Article extends Vue {
             align: 'center',
             hide: !this.multiOperateBtnList.length
         }, {
-            title: '名字',
-            key: 'name',
-            sortable: 'custom' as any,
+            title: '标题',
+            key: 'title',
             minWidth: 120,
         }, {
-            title: '编码',
-            key: 'code',
-            sortable: 'custom' as any,
+            title: '内容',
+            key: 'content',
             minWidth: 120,
+            ellipsis: true,
+            render: (h, params) => {
+                return <p>{params.row.content}</p>;
+            }
+        }, {
+            title: '用户',
+            key: 'user',
+            minWidth: 120,
+            render: (h, params) => {
+                return <p>{params.row.user.nickname}({params.row.user.account})</p>;
+            }
         }, {
             title: '状态',
             key: 'status',
             minWidth: 80,
             render: (h, params) => {
-                let text = myEnum.authorityStatus.getKey(params.row.status);
+                let text = myEnum.articleStatus.getKey(params.row.status);
                 return <span>{text}</span>;
+            }
+        }, {
+            title: '创建时间',
+            key: 'createdAt',
+            minWidth: 90,
+            render: (h, params) => {
+                return <span>{moment(params.row.createdAt).format(dev.dateFormat)}</span>;
             }
         }, {
             title: '操作',
             key: 'action',
             fixed: 'right',
-            width: 150,
-            hide: !this.storeUser.user.existsAuth([authority.authoritySave, authority.authorityDel]),
+            width: 180,
+            hide: !this.storeUser.user.existsAuth([authority.articleMgtAudit, authority.articleMgtDel]),
             render: (h, params) => {
                 let detail = params.row;
                 return (
-                    <div class={MyTableConst.clsPrefix + "action-box"}>
-                        {this.storeUser.user.hasAuth(authority.authoritySave) && [
-                            <a on-click={() => {
-                                this.audit(detail, true);
-                            }}>{detail.status == myEnum.authorityStatus.启用 ? '禁用' : '启用'}</a>,
-                            <a on-click={() => {
-                                this.detail = detail;
-                                this.detailShow = true;
-                            }}>编辑</a>
+                    <Row class={MyTableConst.clsPrefix + "action-box"}>
+                        {this.storeUser.user.hasAuth(authority.articleMgtAudit) && [
+                            <Col xs={10}>
+                                <a on-click={() => {
+                                    this.audit(detail, true);
+                                }}>审核通过</a>
+                            </Col>,
+                            <Col xs={10}>
+                                <a on-click={() => {
+                                    this.audit(detail, false);
+                                }}>审核不通过</a>
+                            </Col>,
                         ]}
-                        {this.storeUser.user.hasAuth(authority.authorityDel) &&
-                            <a on-click={() => {
-                                this.delIds = [detail._id];
-                                this.delShow = true;
-                            }}>删除</a>
-                        }
-                    </div>
+                        {this.storeUser.user._id === detail.userId && detail.canUpdate && [
+                            <Col xs={10}>
+                                <a on-click={() => {
+                                    this.toDetail(detail._id);
+                                }}>编辑</a>
+                            </Col>,
+                        ]}
+                        {(this.storeUser.user._id === detail.userId || this.storeUser.user.hasAuth(authority.articleMgtDel)) && [
+                            <Col xs={10}>
+                                <a on-click={() => {
+                                    this.delIds = [detail._id];
+                                    this.delShow = true;
+                                }}>删除</a>
+                            </Col>
+                        ]}
+                    </Row>
                 );
             }
         }];
         return columns;
     }
 
+    private toDetail(_id?) {
+        this.$router.push({
+            path: routeConfig.articleDetail.path,
+            query: { _id: _id || '' }
+        });
+    }
+
     protected render() {
 
         return (
             <div>
-                <Modal v-model={this.detailShow} footer-hide mask-closable={false}>
-                    <ArticleDetailView detail={this.detail} on-save-success={() => {
-                        this.detailShow = false;
-                        this.$refs.list.query();
-                    }} />
-                </Modal>
                 <Modal v-model={this.delShow} footer-hide>
                     <MyConfirm title='确认删除?' loading={true}
                         cancel={() => {
@@ -271,8 +204,11 @@ export default class Article extends Vue {
                     current={this.page.index}
                     pageSize={this.page.size}
                     queryArgs={{
-                        account: {
-                            label: '用户账号',
+                        user: {
+                            label: '用户',
+                        },
+                        title: {
+                            label: '标题',
                         },
                         anyKey: {
                             label: '任意字'
@@ -287,7 +223,7 @@ export default class Article extends Vue {
                     })}
 
                     hideQueryBtn={{
-                        add: true
+                        // add: true
                     }}
 
                     columns={this.getColumns()}
@@ -310,8 +246,7 @@ export default class Article extends Vue {
                     }}
 
                     on-add-click={() => {
-                        this.detail = null;
-                        this.detailShow = true;
+                        this.toDetail();
                     }}
 
                     on-reset-click={() => {

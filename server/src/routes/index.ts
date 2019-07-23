@@ -44,6 +44,7 @@ router.post('/role/del', userAuth.normal, role.del);
 //#region article 
 import * as article from './article';
 router.get('/article/query', userAuth.normal, article.query);
+router.get('/article/detailQuery', userAuth.normal, article.detailQuery);
 router.post('/article/save', userAuth.normal, article.save);
 router.post('/article/del', userAuth.normal, article.del);
 router.post('/article/mgt/audit', userAuth.normal, article.mgtAudit);
