@@ -9,8 +9,7 @@ import * as crypto from 'crypto';
 import * as Q from 'q';
 import * as zlib from 'zlib';
 import { Request } from 'express';
-import config from '../config/config';
-import errorConfig from '../config/errorConfig';
+import * as config from '../config';
 
 
 //#region 前后通用
@@ -318,7 +317,7 @@ export let requestServiceByConfig = function (option: RequestServiceByConfigOpti
         type Args = {
             host: string;
         };
-        let service = config.api[option.serviceName] as {
+        let service = config.env.api[option.serviceName] as {
             defaultArgs: Args,
             method: {
                 [methodName: string]: {
@@ -417,9 +416,9 @@ export let requestService = function (option: AxiosRequestConfig) {
 export let getErrorConfigByCode = function (code) {
     if (!code)
         return undefined;
-    for (let key in errorConfig) {
-        if (errorConfig[key].code == code)
-            return errorConfig[key];
+    for (let key in config.error) {
+        if (config.error[key].code == code)
+            return config.error[key];
     }
 };
 
@@ -445,8 +444,8 @@ export let writeError = function (err, opt?) {
         }
 
         //write file
-        mkdirsSync(config.errorDir);
-        let fileName = `${config.errorDir}/${createDate}.txt`;
+        mkdirsSync(config.env.errorDir);
+        let fileName = `${config.env.errorDir}/${createDate}.txt`;
         await promisify(fs.appendFile)(fileName, list.join('\r\n') + '\r\n\r\n');
     });
 };

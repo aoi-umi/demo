@@ -3,7 +3,7 @@ import { Types } from 'mongoose';
 import { escapeRegExp } from '../../../_system/common';
 import * as common from '../../../_system/common';
 import { myEnum } from '../../../config/enum';
-import { dev } from '../../../config';
+import * as config from '../../../config';
 import * as VaildSchema from '../../../vaild-schema/class-valid';
 
 import { AuthorityModel } from '../authority';
@@ -214,7 +214,7 @@ export class UserMapper {
     static async detail(_id) {
         let userRs = await UserMapper.query({ _id });
         let userDetail = userRs.rows[0];
-        if (userDetail && userDetail.roleList.find(r => r.code == dev.rootRole)) {
+        if (userDetail && userDetail.roleList.find(r => r.code == config.dev.rootRole)) {
             let authList = await AuthorityModel.find({ status: myEnum.authorityStatus.启用 });
             authList.forEach(ele => {
                 userDetail.auth[ele.code] = ele;

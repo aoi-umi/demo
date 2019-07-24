@@ -2,8 +2,8 @@
  * Created by umi on 2017-5-29.
  */
 import * as common from './common';
-import errorConfig from '../config/errorConfig';
-import { authConfig, AuthConfigType } from '../config/authConfig';
+import * as config from '../config';
+import { AuthConfigType } from '../config/authConfig';
 
 export type AccessUrlConfigType = {
     url: string;
@@ -44,7 +44,7 @@ export class Auth {
             let opt = { notExistAuthority: null };
             let result = !item.auth
                 || (Array.isArray(item.auth) && !item.auth.length)
-                || Auth.hasAuthority(user, item.auth, opt);
+                || Auth.includes(user, item.auth, opt);
             let isExist = item.url == pathname;
             if (isExist) isUrlExist = true;
             if (result) {
@@ -59,7 +59,7 @@ export class Auth {
         if (pathname) {
             if (!this.accessableIfNotExists) {
                 if (!isUrlExist)
-                    throw common.error('', errorConfig.NOT_FOUND, {
+                    throw common.error('', config.error.NOT_FOUND, {
                         format: function (msg) {
                             return msg + ':' + pathname;
                         }
@@ -67,24 +67,24 @@ export class Auth {
             } else
                 accessable = true;
             if (!accessable)
-                throw common.error('', authConfig.accessable.errCode);
+                throw common.error('', config.auth.accessable.errCode);
         }
         return url;
     }
 
-    static hasAuthority(user: UserType, authData: AuthorityType | AuthorityType[] | AuthorityType[][], opt?: IsExistAuthorityOption) {
+    static includes(user: UserType, authData: AuthorityType | AuthorityType[] | AuthorityType[][], opt?: IsExistAuthorityOption) {
         if (!Array.isArray(authData))
             authData = [authData];
         for (let i = 0; i < authData.length; i++) {
             let item = authData[i];
-            if (!Auth.isExistAuthority(user, item, opt)) {
+            if (!Auth.contains(user, item, opt)) {
                 return false;
             }
         }
         return true;
     }
 
-    static isExistAuthority(user: UserType, authData: AuthorityType | AuthorityType[], opt: IsExistAuthorityOption) {
+    static contains(user: UserType, authData: AuthorityType | AuthorityType[], opt?: IsExistAuthorityOption) {
         if (!Array.isArray(authData) && typeof authData != 'string')
             authData = authData.code;
         if (typeof authData == 'string')
@@ -108,9 +108,9 @@ export class Auth {
     }
 
     static getErrorCode(authData) {
-        if (authData && authConfig[authData] && authConfig[authData].errCode)
-            return authConfig[authData].errCode;
-        return errorConfig.NO_PERMISSIONS;
+        if (authData && config.auth[authData] && config.auth[authData].errCode)
+            return config.auth[authData].errCode;
+        return config.error.NO_PERMISSIONS;
     }
 }
 

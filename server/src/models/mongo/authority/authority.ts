@@ -2,8 +2,8 @@ import {
     getModelForClass, ModelType, DocType, InstanceType,
     setSchema, prop, arrayProp
 } from 'mongoose-ts-ua';
-import { Base } from '../_base';
 import { myEnum } from '../../../config/enum';
+import { Base } from '../_base';
 
 export type AuthorityInstanceType = InstanceType<Authority>;
 export type AuthorityModelType = ModelType<Authority, typeof Authority>;

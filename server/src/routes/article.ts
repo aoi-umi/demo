@@ -3,17 +3,21 @@ import { plainToClass } from 'class-transformer';
 
 import { responseHandler, paramsValid } from '../helpers';
 import { myEnum } from '../config';
+import * as config from '../config';
 import { error, escapeRegExp } from '../_system/common';
 import * as VaildSchema from '../vaild-schema/class-valid';
 import { ArticleModel, ArticleInstanceType, ArticleMapper } from '../models/mongo/article';
-import { BaseMapper } from '../models/mongo/_base';
 
 export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {
+        let user = req.myData.user;
         let data = plainToClass(VaildSchema.AritcleQuery, req.query);
         paramsValid(data);
 
         let { rows, total } = await ArticleMapper.query(data);
+        rows.forEach(detail => {
+            ArticleMapper.resetDetail(detail, user);
+        });
         return {
             rows,
             total
@@ -25,7 +29,8 @@ export let detailQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
         let data = plainToClass(VaildSchema.AritcleSave, req.query);
-        let detail = await ArticleMapper.findOne({ _id: data._id, userId: user._id });
+        let detail = await ArticleMapper.detailQuery({ _id: data._id, userId: user._id });
+        ArticleMapper.resetDetail(detail, user);
         return detail;
     }, req, res);
 };
@@ -45,7 +50,9 @@ export let save: RequestHandler = (req, res) => {
                 userId: user._id
             });
         } else {
-            detail = await ArticleMapper.findOne({ _id: data._id, userId: user._id });
+            detail = await ArticleMapper.findOne({ _id: data._id });
+            if (detail.userId.toString() !== user._id)
+                throw error('', config.error.NO_PERMISSIONS);
             if (!detail.canUpdate) {
                 throw error('当前状态无法修改');
             }
@@ -68,7 +75,7 @@ export let del: RequestHandler = (req, res) => {
         let user = req.myData.user;
         let data = plainToClass(VaildSchema.ArticleDel, req.body);
         paramsValid(data);
-        let rs = await ArticleModel.updateMany({ _id: data.idList, userId: user._id }, { status: myEnum.articleStatus.已删除 });
+        let rs = await ArticleModel.updateMany({ _id: data.idList, userId: user._id, status: { $ne: myEnum.articleStatus.已删除 } }, { status: myEnum.articleStatus.已删除 });
         if (!rs.n)
             throw error('No Match Data');
     }, req, res);
@@ -80,5 +87,9 @@ export let mgtAudit: RequestHandler = (req, res) => {
         let rs = await ArticleModel.updateMany({ _id: data.idList, status: myEnum.articleStatus.待审核 }, { status: data.status });
         if (!rs.n)
             throw error('No Match Data');
+        return {
+            status: data.status,
+            statusText: myEnum.articleStatus.getKey(data.status)
+        };
     }, req, res);
 };

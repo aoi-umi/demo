@@ -7,7 +7,7 @@ import * as bodyParser from 'body-parser';
 import * as cors from 'cors';
 
 import { AddressInfo } from 'net';
-import config from './config/config';
+import * as config from './config';
 import * as main from './_main';
 
 debug('my-application');
@@ -43,18 +43,18 @@ process.on('unhandledRejection', function (e) {
     main.logger.error(e);
 });
 
-app.set('port', process.env.PORT || config.port);
+app.set('port', process.env.PORT || config.env.port);
 
 const server = app.listen(app.get('port'), '0.0.0.0', function () {
     let address = server.address() as AddressInfo;
     console.log([
         '#################',
-        `# ${config.name} run at ${address.address}:${address.port},version:${config.version}`,
+        `# ${config.env.name} run at ${address.address}:${address.port},version:${config.env.version}`,
         '#################',
     ].join('\r\n'));
 });
 
 import * as SocketIO from 'socket.io';
 import * as socket from './_system/socket';
-const io = SocketIO(server, { path: config.urlPrefix + '/socket.io' });
+const io = SocketIO(server, { path: config.env.urlPrefix + '/socket.io' });
 socket.init(io, main.initSocket);
