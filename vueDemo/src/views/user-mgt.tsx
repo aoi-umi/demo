@@ -232,7 +232,7 @@ export default class UserMgt extends Vue {
             title: '操作',
             key: 'action',
             fixed: 'right',
-            width: 150,
+            width: 100,
             hide: !this.storeUser.user.existsAuth([authority.userMgtEdit, authority.userMgtDisable]),
             render: (h, params) => {
                 let detail = params.row;
