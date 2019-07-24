@@ -3,7 +3,6 @@ import { getModule } from 'vuex-module-decorators';
 import moment from 'moment';
 import { testApi } from '@/api';
 import { myEnum, authority, dev } from '@/config';
-import { routeConfig } from '@/config/config';
 import { Modal, Input, Form, FormItem, Button, Checkbox, Switch, Row, Col } from '@/components/iview';
 import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
 import { MyConfirm } from '@/components/my-confirm';
@@ -35,7 +34,7 @@ export class ArticleBase extends Vue {
 
     protected toDetail(_id?, preview?) {
         this.$router.push({
-            path: routeConfig.articleDetail.path,
+            path: dev.routeConfig.articleDetail.path,
             query: { _id: _id || '', preview: preview || '' }
         });
     }

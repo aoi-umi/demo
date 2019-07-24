@@ -5,7 +5,6 @@ import moment from 'moment';
 import { testApi } from '@/api';
 import { myEnum, dev } from '@/config';
 import { Modal, Input, Form, FormItem, Button, Checkbox, Switch, Transfer, Divider } from '@/components/iview';
-import { routeConfig } from '@/config/config';
 import { ArticleBase } from './article';
 
 type DetailDataType = {
@@ -86,7 +85,7 @@ export default class ArticleDetail extends ArticleBase {
             });
             this.$Message.info({
                 content: '提交成功', onClose: () => {
-                    this.$router.push(routeConfig.article);
+                    this.$router.push(dev.routeConfig.article);
                 }
             });
         } catch (e) {
