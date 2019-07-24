@@ -1,10 +1,9 @@
 import * as Redis from 'ioredis';
-import config from '../config/config';
-import errorConfig from '../config/errorConfig';
+import * as config from '../config';
 import * as common from './common';
 
-let client = new Redis(config.redis.uri);
-let cachePrefix = config.cachePrefix ? config.cachePrefix + ':' : '';
+let client = new Redis(config.env.redis.uri);
+let cachePrefix = config.env.cachePrefix ? config.env.cachePrefix + ':' : '';
 
 function writeCacheErr(err) {
     console.error(common.dateFormat(null, 'yyyy-MM-dd HH:mm:ss'), 'Cache Error [' + err + ']');
@@ -37,7 +36,7 @@ export let get = function (key) {
         }).catch(defer.reject);
         //超时
         setTimeout(function () {
-            defer.reject(common.error('Cache Get Timeout', errorConfig.CACHE_TIMEOUT));
+            defer.reject(common.error('Cache Get Timeout', config.error.CACHE_TIMEOUT));
         }, 10 * 1000);
         return defer.promise;
     });

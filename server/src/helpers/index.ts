@@ -4,7 +4,7 @@ import * as moment from 'moment';
 import { MongooseDocument, Error } from 'mongoose';
 
 import * as common from '../_system/common';
-import errorConfig from '../config/errorConfig';
+import * as config from '../config';
 import { logger } from '../_main';
 import * as VaildSchema from '../vaild-schema/class-valid';
 import { valid } from './class-valid';
@@ -64,7 +64,7 @@ export let responseHandler = function (fn: (opt?: ResponseHandlerOptType) => any
 export function paramsValid(data) {
     let err = valid(data);
     if (err.length)
-        throw common.error('', errorConfig.ARGS_ERROR, { remark: err.join(';') });
+        throw common.error('', config.error.ARGS_ERROR, { remark: err.join(';') });
 
     if (data instanceof VaildSchema.ListBase) {
         if (!data.page)
@@ -98,7 +98,7 @@ export let mongooseValid = function (dict: { [key: string]: MongooseDocument }) 
         }
     }
     if (invaild) {
-        throw common.error({ remark: list.join('#') }, errorConfig.ARGS_ERROR);
+        throw common.error({ remark: list.join('#') }, config.error.ARGS_ERROR);
     }
 }
 

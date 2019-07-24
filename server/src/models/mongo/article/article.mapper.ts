@@ -1,11 +1,14 @@
 import { Types } from 'mongoose';
 
-import { ListBase, AritcleQuery } from '../../../vaild-schema/class-valid';
 import { error, escapeRegExp } from '../../../_system/common';
+import { Auth } from '../../../_system/auth';
+import { ListBase, AritcleQuery } from '../../../vaild-schema/class-valid';
+import * as config from '../../../config';
 import { BaseMapper } from '../_base';
 import { UserModel } from '../user';
 
 import { ArticleModel } from "./article";
+import { myEnum } from '../../../config';
 
 export class ArticleMapper {
     static async query(data: AritcleQuery, opt?: { noTotal?: boolean }) {
@@ -64,6 +67,7 @@ export class ArticleMapper {
             { $unwind: '$user' },
             { $match: match },
         ];
+
         opt = { ...opt };
         let rs = await ArticleModel.aggregatePaginate(pipeline, {
             ...BaseMapper.getListOptions(data),
@@ -77,11 +81,28 @@ export class ArticleMapper {
         return rs;
     }
 
-    static async findOne(data) {
+    static async detailQuery(data) {
         let { rows } = await this.query(data, { noTotal: true });
         let detail = rows[0];
         if (!detail)
             throw error('not exists');
         return detail;
+    }
+
+    static async findOne(data) {
+        let detail = await ArticleModel.findOne(data);
+        if (!detail)
+            throw error('not exists');
+        return detail;
+    }
+
+    static resetDetail(detail, user: Express.MyDataUser) {
+        let rs = {
+            canDel: detail.status !== myEnum.articleStatus.已删除 && (detail.userId == user._id || Auth.contains(user, config.auth.articleMgtDel)),
+            canUpdate: detail.canUpdate && detail.userId == user._id,
+        };
+        detail.canDel = rs.canDel;
+        detail.canUpdate = rs.canUpdate;
+        return rs;
     }
 };

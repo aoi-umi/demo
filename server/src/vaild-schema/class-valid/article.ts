@@ -41,7 +41,7 @@ export class ArticleMgtAudit {
     idList: Types.ObjectId[];
 
     @IsDefined()
-    @IsIn(myEnum.articleStatus.getAllValue())
+    @IsIn([myEnum.articleStatus.审核通过, myEnum.articleStatus.审核不通过])
     @Type()
     status: number;
 }

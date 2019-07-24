@@ -6,7 +6,7 @@ import * as mongodb from 'mongodb';
 import { ClientSession, MongoClient, CommonOptions, GridFSBucket } from 'mongodb';
 import * as stream from 'stream';
 
-import config from '../config/config';
+import * as config from '../config';
 mongooseTsConfig.schemaOptions = { timestamps: true };
 require('mongoose').Promise = Q.Promise;
 declare module 'mongoose' {
@@ -42,7 +42,7 @@ declare module 'mongoose' {
     }
 }
 export async function connect() {
-    let conn = await mongoose.connect(config.mongoose.uri, config.mongoose.options);
+    let conn = await mongoose.connect(config.env.mongoose.uri, config.env.mongoose.options);
     gfs = new GridFS(conn.connection.db);
 }
 

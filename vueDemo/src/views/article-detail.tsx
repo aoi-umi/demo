@@ -3,35 +3,38 @@ import { Form as IForm } from 'iview';
 import { getModule } from 'vuex-module-decorators';
 import { testApi } from '@/api';
 import { myEnum, authority } from '@/config';
-import { Modal, Input, Form, FormItem, Button, Checkbox, Switch, Transfer } from '@/components/iview';
+import { Modal, Input, Form, FormItem, Button, Checkbox, Switch, Transfer, Divider } from '@/components/iview';
 import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
 import { MyConfirm } from '@/components/my-confirm';
 import { convClass, convert } from '@/helpers';
 import LoginUserStore from '@/store/loginUser';
 import { routeConfig } from '@/config/config';
+import { ArticleBase } from './article';
 
 type DetailDataType = {
-    _id?: string;
-    cover?: string;
-    title?: string;
-    content?: string;
-    status?: number;
-    statusText?: string;
-    canUpdate?: boolean;
+    _id: string;
+    cover: string;
+    title: string;
+    content: string;
+    status: number;
+    statusText: string;
+    canUpdate: boolean;
+    canDel: boolean;
 };
 @Component
-export default class ArticleDetail extends Vue {
+export default class ArticleDetail extends ArticleBase {
 
-    updateDetail(newVal) {
+    updateDetail(newVal?) {
         let data = newVal || this.getDetailData();
         this.initDetail(data);
     }
-    private innerDetail: DetailDataType = {};
+    private innerDetail: DetailDataType = {} as any;
+    private preview = false;
     private getDetailData() {
         return {
             _id: '',
-            name: '',
-            code: '',
+            title: '',
+            content: '',
             status: myEnum.articleStatus.草稿
         };
     }
@@ -41,28 +44,32 @@ export default class ArticleDetail extends Vue {
     }
 
     private rules = {
-        name: [
+        title: [
             { required: true, trigger: 'blur' }
         ],
-        code: [
+        content: [
             { required: true, trigger: 'blur' }
         ],
     };
     $refs: { formVaild: IForm };
 
-    mounted() {
+    created() {
         this.loadDetail();
     }
 
     async loadDetail() {
         let query = this.$route.query;
         if (query._id) {
+            if (query.preview)
+                this.preview = true;
             try {
                 let rs = await testApi.articleDetailQuery({ _id: query._id });
                 this.updateDetail(rs);
             } catch (e) {
                 this.$Message.error(e.message);
             }
+        } else {
+            this.updateDetail();
         }
     }
 
@@ -101,6 +108,12 @@ export default class ArticleDetail extends Vue {
     }
 
     render() {
+        if (!this.preview)
+            return this.renderEdit();
+        return this.renderPreview();
+    }
+
+    renderEdit() {
         let detail = this.innerDetail;
         return (
             <div>
@@ -124,8 +137,9 @@ export default class ArticleDetail extends Vue {
                             placeholder: '输点啥。。。',
                         }}></quill-editor>
                     </FormItem>
+                    <Divider size='small' />
                     <FormItem>
-                        <Button type="primary" on-click={() => {
+                        <Button on-click={() => {
                             this.saveClickHandler(false);
                         }} loading={this.saving}>保存草稿</Button>
                         <Button type="primary" on-click={() => {
@@ -134,6 +148,29 @@ export default class ArticleDetail extends Vue {
                     </FormItem>
                 </Form>
             </div >
+        );
+    }
+
+    renderPreview() {
+        let detail = this.innerDetail;
+        return (
+            <div>
+                <h2>{detail.title}</h2>
+                <div>
+                    {detail.content}
+                </div>
+                <Divider size='small' />
+                <div>
+                    {this.canAudit(detail) && [
+                        <Button type="primary" on-click={() => {
+                            this.audit(detail, true);
+                        }}>审核通过</Button>,
+                        <Button on-click={() => {
+                            this.audit(detail, false);
+                        }}>审核不通过</Button>
+                    ]}
+                </div>
+            </div>
         );
     }
 }

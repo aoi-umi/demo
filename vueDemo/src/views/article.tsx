@@ -10,13 +10,31 @@ import { MyConfirm } from '@/components/my-confirm';
 import { convClass, convert } from '@/helpers';
 import LoginUserStore from '@/store/loginUser';
 
-@Component
-export default class Article extends Vue {
-    delShow = false;
-    $refs: { list: IMyList<any> };
-    get storeUser() {
+export class ArticleBase extends Vue {
+    protected get storeUser() {
         return getModule(LoginUserStore, this.$store);
     }
+
+    protected async audit(detail: { _id: string, status, statusText }, pass: boolean) {
+        try {
+            let toStatus = pass ? myEnum.articleStatus.审核通过 : myEnum.articleStatus.审核不通过;
+            let rs = await testApi.articleMgtAudit({ idList: [detail._id], status: toStatus });
+            detail.status = rs.status;
+            detail.statusText = rs.statusText;
+            this.$Message.info('审核成功');
+        } catch (e) {
+            this.$Message.error('审核失败:' + e.message);
+        }
+    }
+
+    protected canAudit(detail: { status?: number }) {
+        return detail.status == myEnum.articleStatus.待审核 && this.storeUser.user.hasAuth(authority.articleMgtAudit)
+    }
+}
+@Component
+export default class Article extends ArticleBase {
+    delShow = false;
+    $refs: { list: IMyList<any> };
 
     page: any;
     protected created() {
@@ -66,17 +84,6 @@ export default class Article extends Vue {
             this.$Message.error('删除失败:' + e.message);
         }
     }
-    private async audit(detail: { _id: string, status, statusText }, pass: boolean) {
-        try {
-            let toStatus = pass ? myEnum.articleStatus.审核通过 : myEnum.articleStatus.审核不通过;
-            let rs = await testApi.articleMgtAudit({ idList: [detail._id], status: toStatus });
-            detail.status = rs.status;
-            detail.statusText = rs.statusText;
-            this.$Message.info('审核成功');
-        } catch (e) {
-            this.$Message.error('审核失败:' + e.message);
-        }
-    }
 
     private get multiOperateBtnList() {
         let list = [];
@@ -109,7 +116,9 @@ export default class Article extends Vue {
             minWidth: 120,
             ellipsis: true,
             render: (h, params) => {
-                return <p v-html={params.row.content}></p>;
+                return <p
+                // v-html={params.row.content}
+                >{params.row.content}</p>;
             }
         }, {
             title: '用户',
@@ -138,12 +147,11 @@ export default class Article extends Vue {
             key: 'action',
             fixed: 'right',
             width: 180,
-            hide: !this.storeUser.user.existsAuth([authority.articleMgtAudit, authority.articleMgtDel]),
             render: (h, params) => {
                 let detail = params.row;
                 return (
                     <Row class={MyTableConst.clsPrefix + "action-box"}>
-                        {this.storeUser.user.hasAuth(authority.articleMgtAudit) && [
+                        {this.canAudit(detail) && [
                             <Col xs={10}>
                                 <a on-click={() => {
                                     this.audit(detail, true);
@@ -155,14 +163,19 @@ export default class Article extends Vue {
                                 }}>审核不通过</a>
                             </Col>,
                         ]}
-                        {this.storeUser.user._id === detail.userId && detail.canUpdate && [
+                        <Col xs={10}>
+                            <a on-click={() => {
+                                this.toDetail(detail._id, true);
+                            }}>预览</a>
+                        </Col>
+                        {detail.canUpdate && [
                             <Col xs={10}>
                                 <a on-click={() => {
                                     this.toDetail(detail._id);
                                 }}>编辑</a>
                             </Col>,
                         ]}
-                        {(this.storeUser.user._id === detail.userId || this.storeUser.user.hasAuth(authority.articleMgtDel)) && [
+                        {detail.canDel && [
                             <Col xs={10}>
                                 <a on-click={() => {
                                     this.delIds = [detail._id];
@@ -177,10 +190,10 @@ export default class Article extends Vue {
         return columns;
     }
 
-    private toDetail(_id?) {
+    private toDetail(_id?, preview?) {
         this.$router.push({
             path: routeConfig.articleDetail.path,
-            query: { _id: _id || '' }
+            query: { _id: _id || '', preview: preview || '' }
         });
     }
 

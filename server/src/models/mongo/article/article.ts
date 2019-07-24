@@ -20,16 +20,21 @@ export type ArticleDocType = DocType<ArticleInstanceType>;
 export class Article extends Base {
     @prop({
         type: SchemaTypes.ObjectId,
+        required: true,
     })
     userId: Types.ObjectId;
 
     @prop()
     cover: string;
 
-    @prop()
+    @prop({
+        required: true,
+    })
     title: string;
 
-    @prop()
+    @prop({
+        required: true,
+    })
     content: string;
 
     @arrayProp({
@@ -61,6 +66,11 @@ export class Article extends Base {
         default: 0
     })
     commentCount: number;
+
+    @prop({
+        default: ''
+    })
+    notPassReason: string;
 }
 
 export const ArticleModel = getModelForClass<Article, typeof Article>(Article);
