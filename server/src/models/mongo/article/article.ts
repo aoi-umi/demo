@@ -43,14 +43,24 @@ export class Article extends Base {
     status: number;
 
     @prop()
+    get statusText() {
+        return myEnum.articleStatus.getKey(this.status);
+    }
+
+    @prop()
     get canUpdate() {
         return [myEnum.articleStatus.草稿, myEnum.articleStatus.审核不通过].includes(this.status);
     }
 
-    @prop()
-    get statusText() {
-        return myEnum.articleStatus.getKey(this.status);
-    }
+    @prop({
+        default: 0
+    })
+    readTimes: number;
+
+    @prop({
+        default: 0
+    })
+    commentCount: number;
 }
 
 export const ArticleModel = getModelForClass<Article, typeof Article>(Article);
