@@ -16,6 +16,7 @@ export let accessUrlConfig: AccessUrlConfigType[] = [
     { url: '/devMgt/authority/save', auth: [auth.authoritySave] },
     { url: '/devMgt/authority/del', auth: [auth.authorityDel] },
 
+    { url: '/devMgt/article/save', auth: [auth.login] },
     { url: '/devMgt/article/mgt/audit', auth: [auth.articleMgtAudit] },
     { url: '/devMgt/article/mgt/del', auth: [auth.articleMgtDel] },
 ];

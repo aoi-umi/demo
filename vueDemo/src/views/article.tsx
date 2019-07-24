@@ -11,6 +11,8 @@ import { convClass, convert } from '@/helpers';
 import LoginUserStore from '@/store/loginUser';
 
 export class ArticleBase extends Vue {
+    delShow = false;
+    delIds = [];
     protected get storeUser() {
         return getModule(LoginUserStore, this.$store);
     }
@@ -30,10 +32,53 @@ export class ArticleBase extends Vue {
     protected canAudit(detail: { status?: number }) {
         return detail.status == myEnum.articleStatus.待审核 && this.storeUser.user.hasAuth(authority.articleMgtAudit)
     }
+
+    protected toDetail(_id?, preview?) {
+        this.$router.push({
+            path: routeConfig.articleDetail.path,
+            query: { _id: _id || '', preview: preview || '' }
+        });
+    }
+
+    protected getOperate(detail, opt?: { noPreview?: boolean }) {
+        opt = { ...opt };
+        let operate: { text: string, type?: string, fn: () => any }[] = [];
+        if (this.canAudit(detail)) {
+            operate = [...operate, {
+                text: '审核通过',
+                type: 'primary',
+                fn: () => {
+                    this.audit(detail, true);
+                }
+            }, {
+                text: '审核不通过',
+                fn: () => {
+                    this.audit(detail, false);
+                }
+            },];
+        }
+        if (!opt.noPreview) {
+            operate = [...operate, {
+                text: '预览',
+                fn: () => {
+                    this.toDetail(detail._id, true);
+                }
+            },];
+        }
+        if (detail.canDel) {
+            operate = [...operate, {
+                text: '删除',
+                fn: () => {
+                    this.delIds = [detail._id];
+                    this.delShow = true;
+                }
+            }]
+        }
+        return operate;
+    }
 }
 @Component
 export default class Article extends ArticleBase {
-    delShow = false;
     $refs: { list: IMyList<any> };
 
     page: any;
@@ -71,7 +116,6 @@ export default class Article extends ArticleBase {
         this.$refs.list.query(query);
     }
 
-    delIds = [];
     statusList: { key: string; value: any, checked?: boolean }[] = [];
     async delClick() {
         try {
@@ -113,12 +157,10 @@ export default class Article extends ArticleBase {
         }, {
             title: '内容',
             key: 'content',
-            minWidth: 120,
+            minWidth: 150,
             ellipsis: true,
             render: (h, params) => {
-                return <p
-                // v-html={params.row.content}
-                >{params.row.content}</p>;
+                return <p domPropsInnerHTML={params.row.content}></p>;
             }
         }, {
             title: '用户',
@@ -146,55 +188,24 @@ export default class Article extends ArticleBase {
             title: '操作',
             key: 'action',
             fixed: 'right',
-            width: 180,
+            width: 110,
             render: (h, params) => {
                 let detail = params.row;
+                let operate = this.getOperate(detail);
                 return (
                     <Row class={MyTableConst.clsPrefix + "action-box"}>
-                        {this.canAudit(detail) && [
-                            <Col xs={10}>
-                                <a on-click={() => {
-                                    this.audit(detail, true);
-                                }}>审核通过</a>
-                            </Col>,
-                            <Col xs={10}>
-                                <a on-click={() => {
-                                    this.audit(detail, false);
-                                }}>审核不通过</a>
-                            </Col>,
-                        ]}
-                        <Col xs={10}>
-                            <a on-click={() => {
-                                this.toDetail(detail._id, true);
-                            }}>预览</a>
-                        </Col>
-                        {detail.canUpdate && [
-                            <Col xs={10}>
-                                <a on-click={() => {
-                                    this.toDetail(detail._id);
-                                }}>编辑</a>
-                            </Col>,
-                        ]}
-                        {detail.canDel && [
-                            <Col xs={10}>
-                                <a on-click={() => {
-                                    this.delIds = [detail._id];
-                                    this.delShow = true;
-                                }}>删除</a>
-                            </Col>
-                        ]}
+                        {operate.map(ele => {
+                            return (
+                                <div>
+                                    <a on-click={ele.fn}>{ele.text}</a>
+                                </div>
+                            );
+                        })}
                     </Row>
                 );
             }
         }];
         return columns;
-    }
-
-    private toDetail(_id?, preview?) {
-        this.$router.push({
-            path: routeConfig.articleDetail.path,
-            query: { _id: _id || '', preview: preview || '' }
-        });
     }
 
     protected render() {
@@ -236,7 +247,7 @@ export default class Article extends ArticleBase {
                     })}
 
                     hideQueryBtn={{
-                        // add: true
+                        add: !this.storeUser.user.isLogin
                     }}
 
                     columns={this.getColumns()}
