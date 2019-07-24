@@ -1,13 +1,10 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { Form as IForm } from 'iview';
-import { getModule } from 'vuex-module-decorators';
+import moment from 'moment';
+
 import { testApi } from '@/api';
-import { myEnum, authority } from '@/config';
+import { myEnum, dev } from '@/config';
 import { Modal, Input, Form, FormItem, Button, Checkbox, Switch, Transfer, Divider } from '@/components/iview';
-import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
-import { MyConfirm } from '@/components/my-confirm';
-import { convClass, convert } from '@/helpers';
-import LoginUserStore from '@/store/loginUser';
 import { routeConfig } from '@/config/config';
 import { ArticleBase } from './article';
 
@@ -18,8 +15,10 @@ type DetailDataType = {
     content: string;
     status: number;
     statusText: string;
+    createdAt: string;
     canUpdate: boolean;
     canDel: boolean;
+    user: any;
 };
 @Component
 export default class ArticleDetail extends ArticleBase {
@@ -113,16 +112,30 @@ export default class ArticleDetail extends ArticleBase {
         return this.renderPreview();
     }
 
+    renderHeader() {
+        let detail = this.innerDetail;
+        return (
+            <div>
+                {detail._id && [
+                    `状态: ${detail.statusText}`,
+                    `作者: ${detail.user.nickname}(${detail.user.account})`,
+                    `创建于: ${moment(detail.createdAt).format(dev.dateFormat)}`,
+                ].map(ele => {
+                    return (<span style={{ marginRight: '5px' }}>{ele}</span>);
+                })}
+            </div>
+        );
+    }
+
     renderEdit() {
         let detail = this.innerDetail;
         return (
             <div>
                 <h3>{detail._id ? '修改' : '新增'}</h3>
-                <br />
                 <Form label-width={50} ref="formVaild" props={{ model: detail }} rules={this.rules}>
                     {detail._id &&
-                        <FormItem label="状态" prop="status">
-                            {detail.statusText}
+                        <FormItem label="" prop="">
+                            {this.renderHeader()}
                         </FormItem>
                     }
                     <FormItem label="标题" prop="title">
@@ -138,14 +151,16 @@ export default class ArticleDetail extends ArticleBase {
                         }}></quill-editor>
                     </FormItem>
                     <Divider size='small' />
-                    <FormItem>
-                        <Button on-click={() => {
-                            this.saveClickHandler(false);
-                        }} loading={this.saving}>保存草稿</Button>
-                        <Button type="primary" on-click={() => {
-                            this.saveClickHandler(true);
-                        }} loading={this.saving}>发布</Button>
-                    </FormItem>
+                    {(!detail._id || detail.canUpdate) &&
+                        <FormItem>
+                            <Button on-click={() => {
+                                this.saveClickHandler(false);
+                            }} loading={this.saving}>保存草稿</Button>
+                            <Button type="primary" on-click={() => {
+                                this.saveClickHandler(true);
+                            }} loading={this.saving}>发布</Button>
+                        </FormItem>
+                    }
                 </Form>
             </div >
         );
@@ -153,22 +168,24 @@ export default class ArticleDetail extends ArticleBase {
 
     renderPreview() {
         let detail = this.innerDetail;
+        let operate = this.getOperate(detail, { noPreview: true });
         return (
             <div>
                 <h2>{detail.title}</h2>
-                <div>
-                    {detail.content}
+                <br />
+                {this.renderHeader()}
+                <br />
+                <div domPropsInnerHTML={detail.content}>
                 </div>
                 <Divider size='small' />
                 <div>
-                    {this.canAudit(detail) && [
-                        <Button type="primary" on-click={() => {
-                            this.audit(detail, true);
-                        }}>审核通过</Button>,
-                        <Button on-click={() => {
-                            this.audit(detail, false);
-                        }}>审核不通过</Button>
-                    ]}
+                    {operate.map(ele => {
+                        return (
+                            <Button type={ele.type as any} on-click={ele.fn}>
+                                {ele.text}
+                            </Button>
+                        );
+                    })}
                 </div>
             </div>
         );
