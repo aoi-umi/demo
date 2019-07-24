@@ -109,7 +109,7 @@ export default class Article extends Vue {
             minWidth: 120,
             ellipsis: true,
             render: (h, params) => {
-                return <p>{params.row.content}</p>;
+                return <p v-html={params.row.content}></p>;
             }
         }, {
             title: '用户',
