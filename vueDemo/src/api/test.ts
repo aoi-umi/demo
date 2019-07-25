@@ -59,11 +59,10 @@ export class TestApi extends ApiModel<TestApiMethod> {
     constructor(apiConfig: TestApiConfigType) {
         super(apiConfig, {
             beforeRequest: (req) => {
-                let token = localStorage.getItem(dev.cacheKey.testUser);
-                if (!req.headers)
-                    req.headers = {};
-                if (token)
-                    req.headers[dev.cacheKey.testUser] = token;
+                req.headers = {
+                    ...this.defaultHeaders(),
+                    ...req.headers,
+                }
                 return req;
             },
             afterResponse: (res: Result) => {
@@ -74,6 +73,14 @@ export class TestApi extends ApiModel<TestApiMethod> {
         });
         this.imgUploadUrl = this.getRequestConfig(this.apiConfig.method.imgUpload).url;
         this.imgUrl = this.getRequestConfig(this.apiConfig.method.imgGet).url;
+    }
+
+    defaultHeaders() {
+        let headers = {};
+        let token = localStorage.getItem(dev.cacheKey.testUser);
+        if (token)
+            headers[dev.cacheKey.testUser] = token;
+        return headers;
     }
     //#region file 
     imgUploadUrl = '';

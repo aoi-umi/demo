@@ -156,6 +156,7 @@ export default class ArticleDetail extends ArticleBase {
                             defaultFileList={detail.cover ? [{
                                 url: testApi.getImgUrl(detail.cover)
                             }] : []}
+                            headers={testApi.defaultHeaders()}
 
                         />
                     </FormItem>
