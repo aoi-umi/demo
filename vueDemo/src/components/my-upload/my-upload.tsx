@@ -42,6 +42,8 @@ class MyUpload extends Vue {
     })
     height?: number;
 
+    @Prop()
+    headers?: any;
 
     @Prop({
         default: () => []
@@ -160,6 +162,7 @@ class MyUpload extends Vue {
                         onError: this.handleError
                     }}
                     before-upload={this.handleBeforeUpload}
+                    headers={this.headers}
                     multiple
                     type="drag"
                     action={this.uploadUrl}
