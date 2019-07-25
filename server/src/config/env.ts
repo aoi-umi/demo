@@ -2,7 +2,7 @@
 import * as path from 'path';
 import { ConnectionOptions } from 'mongoose';
 
-let config = {
+let env = {
     name: 'devMgt',
     port: process.env.PORT || 8000,
     version: '0.0.1',
@@ -29,4 +29,4 @@ let config = {
     }
 };
 
-export default config;
+export default env;

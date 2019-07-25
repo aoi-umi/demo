@@ -38,6 +38,10 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
     articleDel,
     articleMgtDel,
     articleMgtAudit,
+
+    //file
+    imgUpload,
+    imgGet,
 }>;
 export type TestApiConfigType = ApiConfigModel<TestApiMethod>;
 
@@ -62,13 +66,26 @@ export class TestApi extends ApiModel<TestApiMethod> {
                     req.headers[dev.cacheKey.testUser] = token;
                 return req;
             },
-            afterResponse: async (res: Result) => {
+            afterResponse: (res: Result) => {
                 if (!res.result)
                     throw error(res.msg);
                 return res.data;
             }
         });
+        this.imgUploadUrl = this.getRequestConfig(this.apiConfig.method.imgUpload).url;
+        this.imgUrl = this.getRequestConfig(this.apiConfig.method.imgGet).url;
     }
+    //#region file 
+    imgUploadUrl = '';
+    imgUplodaHandler(res: Result) {
+        return this.afterResponse(res) as { fileId: string };
+    }
+    imgUrl = '';
+    getImgUrl(str) {
+        return this.imgUrl + '?_id=' + str;
+    }
+    //#endregion  
+
     //#region user 
     async userSignUp(data: { account: string, nickname: string, password: string }) {
         return this.requestByConfig(this.apiConfig.method.userSignUp, { data });
@@ -167,6 +184,6 @@ export class TestApi extends ApiModel<TestApiMethod> {
     async articleMgtAudit(data: { idList: string[], status }) {
         return this.requestByConfig(this.apiConfig.method.articleMgtAudit, { data });
     }
-    //#endregion
+    //#endregion  
 }
 

@@ -8,6 +8,7 @@ import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
 import { MyConfirm } from '@/components/my-confirm';
 import { convClass, convert } from '@/helpers';
 import LoginUserStore from '@/store/loginUser';
+import { DetailDataType } from './article-detail';
 
 export class ArticleBase extends Vue {
     delShow = false;
@@ -39,7 +40,7 @@ export class ArticleBase extends Vue {
         });
     }
 
-    protected getOperate(detail, opt?: { noPreview?: boolean }) {
+    protected getOperate(detail: DetailDataType, opt?: { noPreview?: boolean; noEdit?: boolean; }) {
         opt = { ...opt };
         let operate: { text: string, type?: string, fn: () => any }[] = [];
         if (this.canAudit(detail)) {
@@ -56,22 +57,30 @@ export class ArticleBase extends Vue {
                 }
             },];
         }
+        if (!opt.noEdit && detail.canUpdate) {
+            operate.push({
+                text: '修改',
+                fn: () => {
+                    this.toDetail(detail._id);
+                }
+            });
+        }
         if (!opt.noPreview) {
-            operate = [...operate, {
+            operate.push({
                 text: '预览',
                 fn: () => {
                     this.toDetail(detail._id, true);
                 }
-            },];
+            });
         }
         if (detail.canDel) {
-            operate = [...operate, {
+            operate.push({
                 text: '删除',
                 fn: () => {
                     this.delIds = [detail._id];
                     this.delShow = true;
                 }
-            }]
+            });
         }
         return operate;
     }

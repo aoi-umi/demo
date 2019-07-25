@@ -28,6 +28,7 @@ export const Modal = convClass<iviewTypes.Modal>(iview.Modal);
 
 export const Page = convClass<iviewTypes.Page>(iview.Page);
 export const Poptip = convClass<iviewTypes.Poptip>(iview.Poptip);
+export const Progress = convClass<iviewTypes.Progress>(iview.Progress);
 
 export const Radio = convClass<iviewTypes.Radio>(iview.Radio);
 export const RadioGroup = convClass<iviewTypes.RadioGroup>(iview.RadioGroup);
@@ -47,3 +48,5 @@ export const Table = convClass<iviewTypes.Table>(iview.Table);
 export const Transfer = convClass<iviewTypes.Transfer>(iview.Transfer);
 export const Tag = convClass<iviewTypes.Tag>(iview.Tag);
 export const Tooltip = convClass<iviewTypes.Tooltip>(iview.Tooltip);
+export const Upload = convClass<iviewTypes.Upload>(iview.Upload);
+

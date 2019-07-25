@@ -122,7 +122,16 @@ const config = {
                 articleMgtAudit: {
                     url: '/article/mgt/audit',
                 },
-            }
+
+                //file
+
+                imgUpload: {
+                    url: '/img/upload'
+                },
+                imgGet: {
+                    url: '/img'
+                }
+            },
         } as TestApiConfigType
     }
 };

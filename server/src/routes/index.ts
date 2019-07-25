@@ -1,51 +1,58 @@
 import * as express from 'express';
 let router = express.Router();
 export default router;
-import * as userAuth from '../middleware/userAuth';
+import { userAuthMid, fileMid } from '../middleware';
 
 //#region user 
 import * as user from './user';
-router.post('/user/accountExists', userAuth.normal, user.accountExists);
-router.post('/user/signUp', userAuth.normal, user.signUp);
-router.post('/user/signIn', userAuth.normal, user.signIn);
-router.post('/user/signOut', userAuth.normal, user.signOut);
-router.get('/user/info', userAuth.normal, user.info);
-router.get('/user/detail', userAuth.normal, user.detail);
-router.get('/user/mgt/query', userAuth.normal, user.mgtQuery);
-router.post('/user/mgt/save', userAuth.normal, user.mgtSave);
-router.post('/user/mgt/disable', userAuth.normal, user.mgtDisable);
+router.post('/user/accountExists', userAuthMid.normal, user.accountExists);
+router.post('/user/signUp', userAuthMid.normal, user.signUp);
+router.post('/user/signIn', userAuthMid.normal, user.signIn);
+router.post('/user/signOut', userAuthMid.normal, user.signOut);
+router.get('/user/info', userAuthMid.normal, user.info);
+router.get('/user/detail', userAuthMid.normal, user.detail);
+router.get('/user/mgt/query', userAuthMid.normal, user.mgtQuery);
+router.post('/user/mgt/save', userAuthMid.normal, user.mgtSave);
+router.post('/user/mgt/disable', userAuthMid.normal, user.mgtDisable);
 //#endregion
 
 //#region bookmark 
 import * as bookmark from './bookmark';
-router.get('/bookmark/query', userAuth.normal, bookmark.query);
-router.post('/bookmark/save', userAuth.normal, bookmark.save);
-router.post('/bookmark/del', userAuth.normal, bookmark.del);
+router.get('/bookmark/query', userAuthMid.normal, bookmark.query);
+router.post('/bookmark/save', userAuthMid.normal, bookmark.save);
+router.post('/bookmark/del', userAuthMid.normal, bookmark.del);
 //#endregion
 
 //#region authority 
 import * as authority from './authority';
-router.get('/authority/query', userAuth.normal, authority.query);
-router.post('/authority/codeExists', userAuth.normal, authority.codeExists);
-router.post('/authority/save', userAuth.normal, authority.save);
-router.post('/authority/update', userAuth.normal, authority.update);
-router.post('/authority/del', userAuth.normal, authority.del);
+router.get('/authority/query', userAuthMid.normal, authority.query);
+router.post('/authority/codeExists', userAuthMid.normal, authority.codeExists);
+router.post('/authority/save', userAuthMid.normal, authority.save);
+router.post('/authority/update', userAuthMid.normal, authority.update);
+router.post('/authority/del', userAuthMid.normal, authority.del);
 //#endregion
 
 //#region role 
 import * as role from './role';
-router.get('/role/query', userAuth.normal, role.query);
-router.post('/role/codeExists', userAuth.normal, role.codeExists);
-router.post('/role/save', userAuth.normal, role.save);
-router.post('/role/update', userAuth.normal, role.update);
-router.post('/role/del', userAuth.normal, role.del);
+router.get('/role/query', userAuthMid.normal, role.query);
+router.post('/role/codeExists', userAuthMid.normal, role.codeExists);
+router.post('/role/save', userAuthMid.normal, role.save);
+router.post('/role/update', userAuthMid.normal, role.update);
+router.post('/role/del', userAuthMid.normal, role.del);
 //#endregion
 
 //#region article 
 import * as article from './article';
-router.get('/article/query', userAuth.normal, article.query);
-router.get('/article/detailQuery', userAuth.normal, article.detailQuery);
-router.post('/article/save', userAuth.normal, article.save);
-router.post('/article/del', userAuth.normal, article.del);
-router.post('/article/mgt/audit', userAuth.normal, article.mgtAudit);
+router.get('/article/query', userAuthMid.normal, article.query);
+router.get('/article/detailQuery', userAuthMid.normal, article.detailQuery);
+router.post('/article/save', userAuthMid.normal, article.save);
+router.post('/article/del', userAuthMid.normal, article.del);
+router.post('/article/mgt/audit', userAuthMid.normal, article.mgtAudit);
+//#endregion
+
+//#region file 
+import * as file from './file';
+router.post('/img/upload', userAuthMid.normal, fileMid.single, file.imgUpload);
+router.get('/img', userAuthMid.normal, file.imgGet);
+
 //#endregion

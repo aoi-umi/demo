@@ -25,6 +25,9 @@ export const enumDefine = {
         弹幕发送: 'danmakuSend',
         弹幕接收: 'danmakuRecv'
     },
+    fileType: {
+        图片: 'image'
+    }
 };
 export const myEnum = Enum.createInstance(enumDefine);
 

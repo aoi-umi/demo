@@ -5,9 +5,10 @@ import moment from 'moment';
 import { testApi } from '@/api';
 import { myEnum, dev } from '@/config';
 import { Modal, Input, Form, FormItem, Button, Checkbox, Switch, Transfer, Divider } from '@/components/iview';
+import { MyUpload } from '@/components/my-upload';
 import { ArticleBase } from './article';
 
-type DetailDataType = {
+export type DetailDataType = {
     _id: string;
     cover: string;
     title: string;
@@ -31,6 +32,7 @@ export default class ArticleDetail extends ArticleBase {
     private getDetailData() {
         return {
             _id: '',
+            cover: '',
             title: '',
             content: '',
             status: myEnum.articleStatus.草稿
@@ -137,15 +139,31 @@ export default class ArticleDetail extends ArticleBase {
                             {this.renderHeader()}
                         </FormItem>
                     }
+                    <FormItem label="封面" prop="cover">
+                        <MyUpload
+                            uploadUrl={testApi.imgUploadUrl}
+                            successHandler={(res, file) => {
+                                try {
+                                    let rs = testApi.imgUplodaHandler(res);
+                                    file.url = testApi.getImgUrl(rs.fileId);
+                                } catch (e) {
+                                    this.$Notice.error(e.message);
+                                    return false;
+                                }
+                            }}
+                            format={['jpg']}
+                            width={160} height={90}
+                            defaultFileList={detail.cover ? [{
+                                url: testApi.getImgUrl(detail.cover)
+                            }] : []}
+
+                        />
+                    </FormItem>
                     <FormItem label="标题" prop="title">
                         <Input v-model={detail.title} />
                     </FormItem>
                     <FormItem label="内容" prop="content">
                         <quill-editor class="article-detail-content-editor" v-model={detail.content} options={{
-                            // theme: 'snow',
-                            // modules: {
-                            //     toolbar: ['bold', 'italic', 'underline', 'strike']
-                            // },
                             placeholder: '输点啥。。。',
                         }}></quill-editor>
                     </FormItem>
@@ -167,7 +185,7 @@ export default class ArticleDetail extends ArticleBase {
 
     renderPreview() {
         let detail = this.innerDetail;
-        let operate = this.getOperate(detail, { noPreview: true });
+        let operate = this.getOperate(detail, { noPreview: true, noEdit: true });
         return (
             <div>
                 <h2>{detail.title}</h2>
