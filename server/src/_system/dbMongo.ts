@@ -127,16 +127,27 @@ export class GridFS {
         return defer.promise;
     }
 
-    async upload(opt: { _id: Types.ObjectId; buffer: Buffer, filename?: string; metadata?: any; contentType?: string }) {
-        let defer = Q.defer<Boolean>();
+    async upload(opt: { _id?: Types.ObjectId; buffer: Buffer, filename?: string; metadata?: any; contentType?: string }) {
+        let defer = Q.defer<{ _id: Types.ObjectId }>();
         let readstream = new stream.PassThrough();
+        let _id = opt._id;
         readstream.end(opt.buffer);
-        let writeStream = this.gridFS.openUploadStreamWithId(opt._id, opt.filename, {
+
+        let writeStream: mongodb.GridFSBucketWriteStream;
+        let options = {
             metadata: opt.metadata,
             contentType: opt.contentType
-        });
+        };
+        if (_id) {
+            writeStream = this.gridFS.openUploadStreamWithId(_id, opt.filename, options);
+        } else {
+            writeStream = this.gridFS.openUploadStream(opt.filename, options);
+            _id = Types.ObjectId(writeStream.id as any);
+        }
         writeStream.on('finish', function () {
-            defer.resolve(true);
+            defer.resolve({
+                _id
+            });
         }).on('error', function (err) {
             defer.reject(err);
         });
@@ -145,11 +156,17 @@ export class GridFS {
     }
 }
 
-export type GridFSInstance<T = any> = InstanceType<{
+export class GridFSModel<T>{
     filename: string;
-    metadata: T;
     contentType: string;
+    length: number;
+    chunkSize: number;
     uploadDate: Date
-}>;
+    aliases: string;
+    md5: string;
+    metadata: T;
+}
+
+export type GridFSInstance<T = any> = InstanceType<GridFSModel<T>>;
 
 export let gfs: GridFS;

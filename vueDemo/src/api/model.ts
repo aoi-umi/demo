@@ -2,14 +2,14 @@ import { AxiosRequestConfig, AxiosResponse } from 'axios';
 
 import { request, extend, clone } from '../helpers/utils';
 type BeforeRequest = (request: AxiosRequestConfig) => any;
-type AfterResponse<T = any> = (data: T, response: AxiosResponse<T>) => any;
+type AfterResponse<T = any> = (data: T, response?: AxiosResponse<T>) => any;
 export type RequestByConfigOption<T> = {
     beforeRequest?: BeforeRequest;
     afterResponse?: AfterResponse<T>;
 } & AxiosRequestConfig;
 export class ApiModel<T = ApiMethodConfigType> {
-    private beforeRequest: BeforeRequest;
-    private afterResponse: AfterResponse;
+    protected beforeRequest: BeforeRequest;
+    protected afterResponse: AfterResponse;
     constructor(protected apiConfig: ApiConfigModel<T>, opt?: {
         beforeRequest?: BeforeRequest;
         afterResponse?: AfterResponse;
@@ -21,16 +21,26 @@ export class ApiModel<T = ApiMethodConfigType> {
             this.afterResponse = opt.afterResponse;
     }
 
-    protected async requestByConfig<U = any>(config: ApiMethodConfigType, options?: RequestByConfigOption<U>) {
+    getRequestConfig(config: ApiMethodConfigType) {
         let cfg = clone<ApiMethodConfigType>(config as any);
         let args = clone(this.apiConfig.defaultArgs);
         if (!cfg.isUseDefault && cfg.args) {
             args = extend(args, cfg.args);
         }
+        return {
+            args,
+            cfg,
+            method: cfg.method,
+            url: args.host + cfg.url,
+        };
+    }
+
+    protected async requestByConfig<U = any>(config: ApiMethodConfigType, options?: RequestByConfigOption<U>) {
+        let { url, method } = this.getRequestConfig(config);
 
         let req: RequestByConfigOption<U> = extend({
-            url: args.host + cfg.url,
-            method: cfg.method,
+            url,
+            method,
         }, options);
         let beforeRequest = req.beforeRequest || this.beforeRequest;
         let afterResponse = req.afterResponse || this.afterResponse;

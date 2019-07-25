@@ -19,6 +19,8 @@ export let accessUrlConfig: AccessUrlConfigType[] = [
     { url: '/devMgt/article/save', auth: [auth.login] },
     { url: '/devMgt/article/mgt/audit', auth: [auth.articleMgtAudit] },
     { url: '/devMgt/article/mgt/del', auth: [auth.articleMgtDel] },
+
+    { url: '/devMgt/img/upload', auth: [auth.login] },
 ];
 //#endregion
 
