@@ -140,7 +140,13 @@ class MyUpload extends Vue {
                     return (
                         <div class={clsPrefix + 'list'} style={{ width, height, lineHeight: height }}>
                             {item.status === 'finished' ? (
-                                <div>
+                                <div style={{
+                                    display: 'table-cell',
+                                    textAlign: 'center',
+                                    verticalAlign: 'middle',
+                                    width: 'inherit',
+                                    height: 'inherit',
+                                }}>
                                     <MyImg src={item.url} />
                                     <div class={clsPrefix + 'list-cover'}>
                                         <Icon type="ios-eye-outline" nativeOn-click={() => { this.handleView(item); }} />
