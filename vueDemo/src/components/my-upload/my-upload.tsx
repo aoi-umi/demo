@@ -2,6 +2,7 @@ import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import * as iview from 'iview';
 import { Upload, Modal, Icon, Progress } from '@/components/iview';
 import { convClass } from '@/helpers';
+import { MyImg } from '../my-img';
 import './my-upload.less';
 
 const clsPrefix = 'my-upload-';
@@ -43,7 +44,7 @@ class MyUpload extends Vue {
     height?: number;
 
     @Prop()
-    headers?: any;
+    headers?: () => any;
 
     @Prop({
         default: () => []
@@ -59,6 +60,7 @@ class MyUpload extends Vue {
     visible = false;
     uploadList: FileType[] = [];
     private showUrl = '';
+    private uploadHeaders = {};
     getFileCount() {
         let upload = this.$refs.upload;
         return upload ? upload.fileList.length : 0;
@@ -91,7 +93,14 @@ class MyUpload extends Vue {
     }
 
     handleSuccess(res, file: FileType) {
-        this.successHandler && this.successHandler(res, file);
+        if (this.successHandler) {
+            try {
+                this.successHandler(res, file);
+            } catch (e) {
+                this.handleRemove(file);
+                this.handleError(e);
+            }
+        }
     }
 
     handleError(error) {
@@ -132,7 +141,7 @@ class MyUpload extends Vue {
                         <div class={clsPrefix + 'list'} style={{ width, height, lineHeight: height }}>
                             {item.status === 'finished' ? (
                                 <div>
-                                    <img src={item.url} />
+                                    <MyImg src={item.url} />
                                     <div class={clsPrefix + 'list-cover'}>
                                         <Icon type="ios-eye-outline" nativeOn-click={() => { this.handleView(item); }} />
                                         <Icon type="ios-trash-outline" nativeOn-click={() => { this.handleRemove(item); }} />
@@ -162,12 +171,15 @@ class MyUpload extends Vue {
                         onError: this.handleError
                     }}
                     before-upload={this.handleBeforeUpload}
-                    headers={this.headers}
+                    headers={this.uploadHeaders}
                     multiple
                     type="drag"
                     action={this.uploadUrl}
                     style={{ width }}>
-                    <div style={{ width, height, lineHeight: height }}>
+                    <div style={{ width, height, lineHeight: height }} on-click={() => {
+                        if (this.headers)
+                            this.uploadHeaders = this.headers();
+                    }}>
                         <Icon type="ios-camera" size="20"></Icon>
                     </div>
                 </Upload>

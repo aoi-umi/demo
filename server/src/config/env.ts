@@ -2,6 +2,7 @@
 import * as path from 'path';
 import { ConnectionOptions } from 'mongoose';
 
+const urlPrefix = '/devMgt';
 let env = {
     name: 'devMgt',
     port: process.env.PORT || 8000,
@@ -22,11 +23,12 @@ let env = {
         } as ConnectionOptions
     },
     api: {},
-    urlPrefix: '/devMgt',
+    urlPrefix,
     logger: {
         name: 'devMgt',
         appenders: { type: 'stdout' }
-    }
+    },
+    imgPrefix: `${urlPrefix}/img`
 };
 
 export default env;

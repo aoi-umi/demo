@@ -11,6 +11,7 @@ import { ArticleBase } from './article';
 export type DetailDataType = {
     _id: string;
     cover: string;
+    coverUrl: string;
     title: string;
     content: string;
     status: number;
@@ -51,17 +52,17 @@ export default class ArticleDetail extends ArticleBase {
             { required: true, trigger: 'blur' }
         ],
     };
-    $refs: { formVaild: IForm };
+    $refs: { formVaild: IForm, quillEditor: any };
 
     created() {
         this.loadDetail();
     }
 
     async loadDetail() {
+        this.$refs
         let query = this.$route.query;
         if (query._id) {
-            if (query.preview)
-                this.preview = true;
+            this.preview = this.$route.path == dev.routeConfig.articleDetail.path;
             try {
                 let rs = await testApi.articleDetailQuery({ _id: query._id });
                 this.updateDetail(rs);
@@ -118,9 +119,9 @@ export default class ArticleDetail extends ArticleBase {
         return (
             <div>
                 {detail._id && [
-                    `状态: ${detail.statusText}`,
-                    `作者: ${detail.user.nickname}(${detail.user.account})`,
-                    `创建于: ${moment(detail.createdAt).format(dev.dateFormat)}`,
+                    '状态: ' + detail.statusText,
+                    '作者:' + detail.user.nickname + '(' + detail.user.account + ')',
+                    '创建于: ' + moment(detail.createdAt).format(dev.dateFormat),
                 ].map(ele => {
                     return (<span style={{ marginRight: '5px' }}>{ele}</span>);
                 })}
@@ -141,22 +142,18 @@ export default class ArticleDetail extends ArticleBase {
                     }
                     <FormItem label="封面" prop="cover">
                         <MyUpload
+                            headers={testApi.defaultHeaders}
                             uploadUrl={testApi.imgUploadUrl}
                             successHandler={(res, file) => {
-                                try {
-                                    let rs = testApi.imgUplodaHandler(res);
-                                    file.url = testApi.getImgUrl(rs.fileId);
-                                } catch (e) {
-                                    this.$Notice.error(e.message);
-                                    return false;
-                                }
+                                let rs = testApi.imgUplodaHandler(res);
+                                file.url = rs.url;
+                                detail.cover = rs.fileId;
                             }}
-                            format={['jpg']}
+                            // format={['jpg']}
                             width={160} height={90}
-                            defaultFileList={detail.cover ? [{
-                                url: testApi.getImgUrl(detail.cover)
+                            defaultFileList={detail.coverUrl ? [{
+                                url: detail.coverUrl
                             }] : []}
-                            headers={testApi.defaultHeaders()}
 
                         />
                     </FormItem>
@@ -164,9 +161,41 @@ export default class ArticleDetail extends ArticleBase {
                         <Input v-model={detail.title} />
                     </FormItem>
                     <FormItem label="内容" prop="content">
-                        <quill-editor class="article-detail-content-editor" v-model={detail.content} options={{
+                        <quill-editor ref="quillEditor" class="article-detail-content-editor" v-model={detail.content} options={{
                             placeholder: '输点啥。。。',
-                        }}></quill-editor>
+                            modules: {
+                                toolbar: {
+                                    container: [
+                                        ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+                                        ['blockquote', 'code-block'],
+
+                                        [{ 'header': 1 }, { 'header': 2 }],               // custom button values
+                                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                        [{ 'script': 'sub' }, { 'script': 'super' }],      // superscript/subscript
+                                        [{ 'indent': '-1' }, { 'indent': '+1' }],          // outdent/indent
+                                        [{ 'direction': 'rtl' }],                         // text direction
+
+                                        [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+                                        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+
+                                        [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+                                        [{ 'font': [] }],
+                                        [{ 'align': [] }],
+                                        ['link', 'image']//'formula','video'
+                                    ],
+                                    handlers: {
+                                        image: (value) => {
+                                            if (value) {
+                                                console.log(value);
+                                            } else {
+                                                this.$refs.quillEditor.quill.format('image', false);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        }></quill-editor>
                     </FormItem>
                     <Divider size='small' />
                     {(!detail._id || detail.canUpdate) &&
@@ -189,11 +218,11 @@ export default class ArticleDetail extends ArticleBase {
         let operate = this.getOperate(detail, { noPreview: true, noEdit: true });
         return (
             <div>
-                <h2>{detail.title}</h2>
+                <h1>{detail.title}</h1>
                 <br />
                 {this.renderHeader()}
                 <br />
-                <div domPropsInnerHTML={detail.content}>
+                <div class="ql-editor" domPropsInnerHTML={detail.content}>
                 </div>
                 <Divider size='small' />
                 <div>

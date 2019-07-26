@@ -6,6 +6,7 @@ import { myEnum, authority, dev } from '@/config';
 import { Modal, Input, Form, FormItem, Button, Checkbox, Switch, Row, Col } from '@/components/iview';
 import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
 import { MyConfirm } from '@/components/my-confirm';
+import { MyImg } from '@/components/my-img';
 import { convClass, convert } from '@/helpers';
 import LoginUserStore from '@/store/loginUser';
 import { DetailDataType } from './article-detail';
@@ -35,8 +36,8 @@ export class ArticleBase extends Vue {
 
     protected toDetail(_id?, preview?) {
         this.$router.push({
-            path: dev.routeConfig.articleDetail.path,
-            query: { _id: _id || '', preview: preview || '' }
+            path: preview ? dev.routeConfig.articleDetail.path : dev.routeConfig.articleEdit.path,
+            query: { _id: _id || '' }
         });
     }
 
@@ -158,6 +159,15 @@ export default class Article extends ArticleBase {
             width: 60,
             align: 'center',
             hide: !this.multiOperateBtnList.length
+        }, {
+            title: '封面',
+            key: 'cover',
+            minWidth: 120,
+            render: (h, params) => {
+                return <MyImg class="cover" src={params.row.coverUrl} alt="" on-error={() => {
+                    console.log('error')
+                }} />;
+            }
         }, {
             title: '标题',
             key: 'title',

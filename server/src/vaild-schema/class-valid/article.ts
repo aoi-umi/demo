@@ -1,6 +1,6 @@
 import { IsArray, IsDefined, ArrayMinSize, MinLength, IsIn } from "class-validator";
 import { Types } from 'mongoose';
-import { Type } from "class-transformer";
+import { Type, Transform } from "class-transformer";
 
 import { myEnum } from "../../config";
 import { ListBase, DelBase, DetailQueryBase } from "./base";
@@ -37,7 +37,7 @@ export class ArticleDel extends DelBase {
 
 export class ArticleMgtAudit {
     @IsDefined()
-    @Type(() => Types.ObjectId)
+    @Transform(value => Types.ObjectId(value))
     idList: Types.ObjectId[];
 
     @IsDefined()

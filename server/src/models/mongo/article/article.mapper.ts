@@ -9,6 +9,7 @@ import { UserModel } from '../user';
 
 import { ArticleModel } from "./article";
 import { myEnum } from '../../../config';
+import { FileMapper } from '../file';
 
 export class ArticleMapper {
     static async query(data: AritcleQuery, opt?: { noTotal?: boolean }) {
@@ -96,13 +97,19 @@ export class ArticleMapper {
         return detail;
     }
 
-    static resetDetail(detail, user: Express.MyDataUser) {
+    static resetDetail(detail, user: Express.MyDataUser, opt?: {
+        imgHost?: string;
+    }) {
         let rs = {
             canDel: detail.status !== myEnum.articleStatus.已删除 && (detail.userId == user._id || Auth.contains(user, config.auth.articleMgtDel)),
             canUpdate: detail.canUpdate && detail.userId == user._id,
         };
         detail.canDel = rs.canDel;
         detail.canUpdate = rs.canUpdate;
+        opt = {
+            ...opt,
+        };
+        detail.coverUrl = FileMapper.getImgUrl(detail.cover, opt.imgHost);
         return rs;
     }
 };

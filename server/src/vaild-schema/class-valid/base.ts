@@ -1,4 +1,4 @@
-import { Type } from 'class-transformer';
+import { Type, Transform } from 'class-transformer';
 import { IsIn, IsArray, IsDefined, ArrayMinSize } from "class-validator";
 import { Types } from 'mongoose';
 
@@ -21,7 +21,7 @@ export class ListBase {
 
 export class DetailQueryBase {
     @IsDefined()
-    @Type()
+    @Transform(value => Types.ObjectId(value))
     _id: Types.ObjectId;
 }
 
@@ -29,6 +29,6 @@ export class DelBase {
     @IsDefined()
     @IsArray()
     @ArrayMinSize(1)
-    @Type(() => Types.ObjectId)
+    @Transform(value => Types.ObjectId(value))
     idList: Types.ObjectId[];
 }

@@ -1,11 +1,9 @@
 import { RequestHandler, Request, Response } from "express";
 import { plainToClass } from "class-transformer";
 import { responseHandler, paramsValid } from "../helpers";
-import { FileMapper, File } from "../models/mongo/file";
 import { myEnum } from "../config";
-import * as config from "../config";
+import { FileMapper, File } from "../models/mongo/file";
 import * as VaildSchema from '../vaild-schema/class-valid';
-import { error } from "../_system/common";
 
 const uplaod = (option: { fileType: string }, req: Request, res: Response) => {
     responseHandler(async () => {
@@ -13,7 +11,7 @@ const uplaod = (option: { fileType: string }, req: Request, res: Response) => {
 
         let user = req.myData.user;
 
-        let imgFile = File.create({
+        let uFile = File.create({
             filename: file.originalname,
             metadata: {
                 userId: user._id,
@@ -25,9 +23,12 @@ const uplaod = (option: { fileType: string }, req: Request, res: Response) => {
             contentType: file.mimetype,
         });
 
-        await FileMapper.upload(imgFile);
-
-        return imgFile.toObject();
+        await FileMapper.upload(uFile);
+        let obj = uFile.toObject();
+        if (option.fileType == myEnum.fileType.图片) {
+            obj.url = FileMapper.getImgUrl(uFile.fileId, req.headers.host);
+        }
+        return obj;
     }, req, res);
 };
 
@@ -40,12 +41,12 @@ export const download = async (option: { fileType: string }, req: Request, res: 
         let data = plainToClass(VaildSchema.FileGet, req.query);
         paramsValid(data);
         let ifModifiedSince = req.headers['if-modified-since'] as string;
-        let myFile = await FileMapper.findById(data._id, ifModifiedSince);
-        if (!myFile) {
-            throw error('', config.error.NOT_FOUND);
-        }
+        let myFile = await FileMapper.findOne({ _id: data._id, 'metadata.fileType': option.fileType }, ifModifiedSince);
         opt.noSend = true;
-        if (myFile.noModified) {
+        if (!myFile) {
+            res.statusCode = 404;
+            res.end();
+        } else if (myFile.noModified) {
             res.statusCode = 304
             res.end();
         }
