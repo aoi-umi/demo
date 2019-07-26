@@ -66,9 +66,17 @@ export const routerConfig = {
         text: '文章',
         component: () => import('./views/article')
     },
+    articleEdit: {
+        path: dev.routeConfig.articleEdit.path,
+        text: '编辑文章',
+        meta: {
+            authority: dev.routeConfig.articleEdit.authority,
+        },
+        component: () => import('./views/article-detail')
+    },
     articleDetail: {
         path: dev.routeConfig.articleDetail.path,
-        text: '文章',
+        text: '查看文章',
         component: () => import('./views/article-detail')
     },
 

@@ -16,7 +16,9 @@ export let query: RequestHandler = (req, res) => {
 
         let { rows, total } = await ArticleMapper.query(data);
         rows.forEach(detail => {
-            ArticleMapper.resetDetail(detail, user);
+            ArticleMapper.resetDetail(detail, user, {
+                imgHost: req.headers.host
+            });
         });
         return {
             rows,
@@ -30,7 +32,9 @@ export let detailQuery: RequestHandler = (req, res) => {
         let user = req.myData.user;
         let data = plainToClass(VaildSchema.AritcleSave, req.query);
         let detail = await ArticleMapper.detailQuery({ _id: data._id, userId: user._id });
-        ArticleMapper.resetDetail(detail, user);
+        ArticleMapper.resetDetail(detail, user, {
+            imgHost: req.headers.host
+        });
         return detail;
     }, req, res);
 };
@@ -59,7 +63,7 @@ export let save: RequestHandler = (req, res) => {
             let update: any = {
                 status,
             };
-            ['title', 'content'].forEach(key => {
+            ['cover', 'title', 'content'].forEach(key => {
                 update[key] = data[key];
             });
             await detail.update(update);

@@ -1,5 +1,5 @@
 import { Types } from 'mongoose';
-import { plainToClass, Type } from 'class-transformer';
+import { plainToClass, Type, Transform } from 'class-transformer';
 import { GridFSModel } from '../../../_system/dbMongo';
 
 export class FileMetaType {
@@ -7,7 +7,7 @@ export class FileMetaType {
 
     account: string;
 
-    @Type(() => Types.ObjectId)
+    @Transform(value => Types.ObjectId(value))
     userId: Types.ObjectId | string;
 
     fileType: string;
@@ -32,7 +32,8 @@ export class File extends GridFSModel<FileMetaType> {
             filename: this.filename,
             fileId: this.fileId.toString(),
             md5: this.md5,
-        }
+            url: '',
+        };
     }
 }
 
