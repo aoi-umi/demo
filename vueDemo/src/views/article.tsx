@@ -164,9 +164,7 @@ export default class Article extends ArticleBase {
             key: 'cover',
             minWidth: 120,
             render: (h, params) => {
-                return <MyImg class="cover" src={params.row.coverUrl} alt="" on-error={() => {
-                    console.log('error')
-                }} />;
+                return <MyImg class="cover" src={params.row.coverUrl} style={{ marginTop: '5px' }} />;
             }
         }, {
             title: '标题',
