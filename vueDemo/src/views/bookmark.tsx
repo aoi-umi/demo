@@ -2,7 +2,7 @@ import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { Form as IForm } from 'iview';
 import { testApi } from '@/api';
 import { Tag, Modal, Input, Row, Col, Form, FormItem, Button } from '@/components/iview';
-import { MyList, IMyList, Const as MyTableConst, OnSortChangeOptions, MyTableModel } from '@/components/my-list';
+import { MyList, IMyList, Const as MyTableConst, OnSortChangeOptions, MyListModel } from '@/components/my-list';
 import { MyTagModel } from '@/components/my-tag';
 import { MyConfirm } from '@/components/my-confirm';
 import { convClass, convert } from '@/helpers';
@@ -267,7 +267,7 @@ export default class Bookmark extends Vue {
                         return rs;
                     }}
 
-                    on-query={(model: MyTableModel) => {
+                    on-query={(model: MyListModel) => {
                         let q = { ...model.query };
                         this.$router.push({
                             path: this.$route.path,

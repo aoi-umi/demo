@@ -10,7 +10,7 @@ export class MyInputBase extends Vue {
     @Prop()
     placeholder?: string;
 
-    protected currentValue = this.value;
+    protected currentValue = this.value || '';
     protected disableEmitChange = false;
 
     @Watch('value')

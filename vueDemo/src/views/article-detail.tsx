@@ -4,7 +4,7 @@ import moment from 'moment';
 
 import { testApi } from '@/api';
 import { myEnum, dev } from '@/config';
-import { Modal, Input, Form, FormItem, Button, Checkbox, Switch, Transfer, Divider } from '@/components/iview';
+import { Input, Form, FormItem, Button, Divider, Table } from '@/components/iview';
 import { MyUpload } from '@/components/my-upload';
 import { ArticleBase } from './article';
 import { MyEditor } from '@/components/my-editor';
@@ -22,6 +22,7 @@ export type DetailDataType = {
     canUpdate: boolean;
     canDel: boolean;
     user: any;
+    log: any[];
 };
 @Component
 export default class ArticleDetail extends ArticleBase {
@@ -131,6 +132,37 @@ export default class ArticleDetail extends ArticleBase {
         );
     }
 
+    renderLog() {
+        let detail = this.innerDetail;
+        return (
+            <div>
+                <Divider size='small' />
+                <Table
+                    columns={[{
+                        title: '源状态',
+                        key: 'srcStatusText',
+                    }, {
+                        title: '目状态',
+                        key: 'destStatusText',
+                    }, {
+                        title: '备注',
+                        key: 'remark',
+                    }, {
+                        title: '操作人',
+                        key: 'user',
+                    }, {
+                        title: '操作时间',
+                        key: 'createdAt',
+                        render: (h, params) => {
+                            return <span>{moment(params.row.createdAt).format(dev.dateFormat)}</span>
+                        }
+                    }]}
+                    data={detail.log}>
+                </Table>
+            </div>
+        );
+    }
+
     renderEdit() {
         let detail = this.innerDetail;
         let self = this;
@@ -138,11 +170,9 @@ export default class ArticleDetail extends ArticleBase {
             <div>
                 <h3>{detail._id ? '修改' : '新增'}</h3>
                 <Form label-width={50} ref="formVaild" props={{ model: detail }} rules={this.rules}>
-                    {detail._id &&
-                        <FormItem label="" prop="">
-                            {this.renderHeader()}
-                        </FormItem>
-                    }
+                    <FormItem class={detail._id ? 'hidden' : ''} label="" prop="header">
+                        {this.renderHeader()}
+                    </FormItem>
                     <FormItem label="封面" prop="cover">
                         <MyUpload
                             headers={testApi.defaultHeaders}
@@ -190,6 +220,7 @@ export default class ArticleDetail extends ArticleBase {
                         </FormItem>
                     }
                 </Form>
+                {this.renderLog()}
             </div >
         );
     }
@@ -215,6 +246,7 @@ export default class ArticleDetail extends ArticleBase {
                         );
                     })}
                 </div>
+                {this.renderLog()}
             </div>
         );
     }

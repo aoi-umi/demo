@@ -1,14 +1,14 @@
-import { MyTableModel } from '@/components/my-list';
+import { MyListModel } from '@/components/my-list';
 
 export class Test {
     //query参数与列表model之间的转换
-    static queryToListModel(query: any, model: MyTableModel) {
+    static queryToListModel(query: any, model: MyListModel) {
         model.setPage({ index: query.page, size: query.rows });
         let sort = { 1: 'asc', '-1': 'desc' };
         model.setSort({ orderBy: query.orderBy, sortOrder: sort[query.sortOrder as any] });
     }
 
-    static listModelToQuery(model: MyTableModel) {
+    static listModelToQuery(model: MyListModel) {
         return {
             page: model.page.index,
             rows: model.page.size,

@@ -5,7 +5,7 @@ import {
     Input, Button, Divider, Card, Icon, Spin
 } from '@/components/iview';
 import './my-list.less';
-import { MyTableModel } from './model';
+import { MyListModel } from './model';
 import { ListResult } from '@/api';
 
 type QueryArgsType = {
@@ -207,7 +207,7 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
 
     private showQuery = true;
     private loading = false;
-    model = new MyTableModel<{ [k in keyof QueryArgs]: any }>();
+    model = new MyListModel<{ [k in keyof QueryArgs]: any }>();
     private result: ResultType = {
         success: true,
         total: 0,

@@ -1,5 +1,5 @@
 
-export class MyTableModel<T = any> {
+export class MyListModel<T = any> {
     page = {
         index: 1,
         size: 10
