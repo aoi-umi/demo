@@ -39,7 +39,8 @@ export default class ArticleDetail extends ArticleBase {
             cover: '',
             title: '',
             content: '',
-            status: myEnum.articleStatus.草稿
+            status: myEnum.articleStatus.草稿,
+            log: [],
         };
     }
 
@@ -58,6 +59,7 @@ export default class ArticleDetail extends ArticleBase {
     $refs: { formVaild: IForm, editor: IMyEditor };
 
     created() {
+        this.updateDetail();
         this.loadDetail();
     }
 
@@ -136,29 +138,33 @@ export default class ArticleDetail extends ArticleBase {
         let detail = this.innerDetail;
         return (
             <div>
-                <Divider size='small' />
-                <Table
-                    columns={[{
-                        title: '源状态',
-                        key: 'srcStatusText',
-                    }, {
-                        title: '目状态',
-                        key: 'destStatusText',
-                    }, {
-                        title: '备注',
-                        key: 'remark',
-                    }, {
-                        title: '操作人',
-                        key: 'user',
-                    }, {
-                        title: '操作时间',
-                        key: 'createdAt',
-                        render: (h, params) => {
-                            return <span>{moment(params.row.createdAt).format(dev.dateFormat)}</span>
-                        }
-                    }]}
-                    data={detail.log}>
-                </Table>
+                {detail.log.length > 0 &&
+                    <div>
+                        <Divider size='small' />
+                        <Table
+                            columns={[{
+                                title: '源状态',
+                                key: 'srcStatusText',
+                            }, {
+                                title: '目状态',
+                                key: 'destStatusText',
+                            }, {
+                                title: '备注',
+                                key: 'remark',
+                            }, {
+                                title: '操作人',
+                                key: 'user',
+                            }, {
+                                title: '操作时间',
+                                key: 'createdAt',
+                                render: (h, params) => {
+                                    return <span>{moment(params.row.createdAt).format(dev.dateFormat)}</span>
+                                }
+                            }]}
+                            data={detail.log}>
+                        </Table>
+                    </div>
+                }
             </div>
         );
     }
@@ -208,21 +214,27 @@ export default class ArticleDetail extends ArticleBase {
                                 });
                             })} />
                     </FormItem>
-                    <Divider size='small' />
                     {(!detail._id || detail.canUpdate) &&
-                        <FormItem>
-                            <Button on-click={() => {
-                                this.saveClickHandler(false);
-                            }} loading={this.saving}>保存草稿</Button>
-                            <Button type="primary" on-click={() => {
-                                this.saveClickHandler(true);
-                            }} loading={this.saving}>发布</Button>
-                        </FormItem>
+                        <div>
+                            <Divider size='small' />
+                            <FormItem>
+                                <Button on-click={() => {
+                                    this.saveClickHandler(false);
+                                }} loading={this.saving}>保存草稿</Button>
+                                <Button type="primary" on-click={() => {
+                                    this.saveClickHandler(true);
+                                }} loading={this.saving}>发布</Button>
+                            </FormItem>
+                        </div>
                     }
                 </Form>
                 {this.renderLog()}
             </div >
         );
+    }
+
+    delSuccessHandler() {
+        this.loadDetail();
     }
 
     renderPreview() {
@@ -236,7 +248,7 @@ export default class ArticleDetail extends ArticleBase {
                 <br />
                 <div class="ql-editor" domPropsInnerHTML={detail.content}>
                 </div>
-                <Divider size='small' />
+                {operate.length > 0 && <Divider size='small' />}
                 <div>
                     {operate.map(ele => {
                         return (
@@ -247,6 +259,7 @@ export default class ArticleDetail extends ArticleBase {
                     })}
                 </div>
                 {this.renderLog()}
+                {this.renderDelConfirm()}
             </div>
         );
     }

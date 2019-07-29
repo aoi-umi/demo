@@ -5,9 +5,10 @@ import { responseHandler, paramsValid } from '../helpers';
 import { myEnum } from '../config';
 import * as config from '../config';
 import { error, escapeRegExp } from '../_system/common';
+import { transaction } from '../_system/dbMongo';
 import * as VaildSchema from '../vaild-schema/class-valid';
 import { ArticleModel, ArticleInstanceType, ArticleMapper, ArticleLogMapper } from '../models/mongo/article';
-import { transaction } from '../_system/dbMongo';
+import { Auth } from '../_system/auth';
 
 export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {
@@ -15,7 +16,7 @@ export let query: RequestHandler = (req, res) => {
         let data = plainToClass(VaildSchema.AritcleQuery, req.query);
         paramsValid(data);
 
-        let { rows, total } = await ArticleMapper.query(data);
+        let { rows, total } = await ArticleMapper.query(data, { userId: user._id, mgt: Auth.contains(user, config.auth.articleMgtAudit) });
         rows.forEach(detail => {
             ArticleMapper.resetDetail(detail, user, {
                 imgHost: req.headers.host
@@ -32,7 +33,7 @@ export let detailQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
         let data = plainToClass(VaildSchema.AritcleSave, req.query);
-        let detail = await ArticleMapper.detailQuery({ _id: data._id, userId: user._id });
+        let detail = await ArticleMapper.detailQuery({ _id: data._id }, { userId: user._id, mgt: Auth.contains(user, config.auth.articleMgtAudit) });
         ArticleMapper.resetDetail(detail, user, {
             imgHost: req.headers.host
         });

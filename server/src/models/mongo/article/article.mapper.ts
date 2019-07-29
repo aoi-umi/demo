@@ -14,7 +14,9 @@ import { ArticleInstanceType, ArticleModel } from "./article";
 import { ArticleLogModel } from './article-log';
 
 export class ArticleMapper {
-    static async query(data: AritcleQuery, opt?: { noTotal?: boolean }) {
+    static async query(data: AritcleQuery, opt: {
+        noTotal?: boolean,
+    } & ArticleQueryOption) {
         let match: any = {};
 
         if (data._id) {
@@ -48,6 +50,22 @@ export class ArticleMapper {
 
         if (data.status)
             match.status = { $in: data.status.split(',').map(ele => parseInt(ele)) };
+
+        let userId = Types.ObjectId(opt.userId);
+        if (opt.mgt) {
+            //排除非本人的草稿
+            match.$expr = {
+                $not: {
+                    $and: [
+                        { $ne: ['$userId', userId] },
+                        { $eq: ['$status', myEnum.articleStatus.草稿] }
+                    ]
+                }
+
+            };
+        } else {
+            match.userId = userId;
+        }
 
         let pipeline: any[] = [
             {
@@ -84,8 +102,8 @@ export class ArticleMapper {
         return rs;
     }
 
-    static async detailQuery(data) {
-        let { rows } = await this.query(data, { noTotal: true });
+    static async detailQuery(data, opt: ArticleQueryOption) {
+        let { rows } = await this.query(data, { ...opt, noTotal: true });
         let detail = rows[0];
         if (!detail)
             throw error('not exists');
@@ -148,6 +166,11 @@ export class ArticleMapper {
             statusText: myEnum.articleStatus.getKey(status)
         };
     }
+};
+
+type ArticleQueryOption = {
+    mgt?: boolean;
+    userId: string;
 };
 
 export class ArticleLogMapper {

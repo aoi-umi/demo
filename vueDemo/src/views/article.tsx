@@ -85,6 +85,35 @@ export class ArticleBase extends Vue {
         }
         return operate;
     }
+
+    protected renderDelConfirm() {
+        return (
+            <Modal v-model={this.delShow} footer-hide>
+                <MyConfirm title='确认删除?' loading={true}
+                    cancel={() => {
+                        this.delShow = false;
+                    }}
+                    ok={async () => {
+                        await this.delClick();
+                    }}>
+                    将要删除{this.delIds.length}项
+                    </MyConfirm>
+            </Modal>
+        );
+    }
+
+    protected delSuccessHandler() { }
+    async delClick() {
+        try {
+            await testApi.articleDel(this.delIds);
+            this.$Message.info('删除成功');
+            this.delIds = [];
+            this.delShow = false;
+            this.delSuccessHandler();
+        } catch (e) {
+            this.$Message.error('删除失败:' + e.message);
+        }
+    }
 }
 @Component
 export default class Article extends ArticleBase {
@@ -126,16 +155,9 @@ export default class Article extends ArticleBase {
     }
 
     statusList: { key: string; value: any, checked?: boolean }[] = [];
-    async delClick() {
-        try {
-            await testApi.articleDel(this.delIds);
-            this.$Message.info('删除成功');
-            this.delIds = [];
-            this.delShow = false;
-            this.$refs.list.query();
-        } catch (e) {
-            this.$Message.error('删除失败:' + e.message);
-        }
+
+    protected delSuccessHandler() {
+        this.$refs.list.query();
     }
 
     private get multiOperateBtnList() {
@@ -228,17 +250,7 @@ export default class Article extends ArticleBase {
 
         return (
             <div>
-                <Modal v-model={this.delShow} footer-hide>
-                    <MyConfirm title='确认删除?' loading={true}
-                        cancel={() => {
-                            this.delShow = false;
-                        }}
-                        ok={async () => {
-                            await this.delClick();
-                        }}>
-                        将要删除{this.delIds.length}项
-                    </MyConfirm>
-                </Modal>
+                {this.renderDelConfirm()}
                 <MyList
                     ref="list"
                     current={this.page.index}
