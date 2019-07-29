@@ -29,6 +29,8 @@ export class DelBase {
     @IsDefined()
     @IsArray()
     @ArrayMinSize(1)
-    @Transform(value => Types.ObjectId(value))
+    @Transform(value => {
+        return value.map(ele => Types.ObjectId(ele));
+    })
     idList: Types.ObjectId[];
 }

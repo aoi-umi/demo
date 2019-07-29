@@ -37,7 +37,10 @@ export class ArticleDel extends DelBase {
 
 export class ArticleMgtAudit {
     @IsDefined()
-    @Transform(value => Types.ObjectId(value))
+    @IsArray()
+    @Transform(value => {
+        return value.map(ele => Types.ObjectId(ele));
+    })
     idList: Types.ObjectId[];
 
     @IsDefined()

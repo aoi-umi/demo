@@ -6,7 +6,8 @@ import { myEnum } from '../config';
 import * as config from '../config';
 import { error, escapeRegExp } from '../_system/common';
 import * as VaildSchema from '../vaild-schema/class-valid';
-import { ArticleModel, ArticleInstanceType, ArticleMapper } from '../models/mongo/article';
+import { ArticleModel, ArticleInstanceType, ArticleMapper, ArticleLogMapper } from '../models/mongo/article';
+import { transaction } from '../_system/dbMongo';
 
 export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {
@@ -48,10 +49,15 @@ export let save: RequestHandler = (req, res) => {
         let status = data.submit ? myEnum.articleStatus.待审核 : myEnum.articleStatus.草稿;
         if (!data._id) {
             delete data._id;
-            detail = await ArticleModel.create({
+            detail = new ArticleModel({
                 ...data,
                 status,
                 userId: user._id
+            });
+            let log = ArticleLogMapper.create(detail, user, { srcStatus: myEnum.articleStatus.草稿, destStatus: status });
+            await transaction(async (session) => {
+                await detail.save({ session });
+                await log.save({ session });
             });
         } else {
             detail = await ArticleMapper.findOne({ _id: data._id });
@@ -66,7 +72,11 @@ export let save: RequestHandler = (req, res) => {
             ['cover', 'title', 'content'].forEach(key => {
                 update[key] = data[key];
             });
-            await detail.update(update);
+            let log = ArticleLogMapper.create(detail, user, { srcStatus: detail.status, destStatus: status });
+            await transaction(async (session) => {
+                await detail.update(update);
+                await log.save({ session });
+            });
         }
         return {
             _id: detail._id
@@ -79,21 +89,20 @@ export let del: RequestHandler = (req, res) => {
         let user = req.myData.user;
         let data = plainToClass(VaildSchema.ArticleDel, req.body);
         paramsValid(data);
-        let rs = await ArticleModel.updateMany({ _id: data.idList, userId: user._id, status: { $ne: myEnum.articleStatus.已删除 } }, { status: myEnum.articleStatus.已删除 });
-        if (!rs.n)
-            throw error('No Match Data');
+        await ArticleMapper.updateStatus(data.idList, myEnum.articleStatus.已删除, user, {
+            includeUserId: user._id,
+            status: { $ne: myEnum.articleStatus.已删除 },
+        });
     }, req, res);
 };
 
 export let mgtAudit: RequestHandler = (req, res) => {
     responseHandler(async () => {
+        let user = req.myData.user;
         let data = plainToClass(VaildSchema.ArticleMgtAudit, req.body);
-        let rs = await ArticleModel.updateMany({ _id: data.idList, status: myEnum.articleStatus.待审核 }, { status: data.status });
-        if (!rs.n)
-            throw error('No Match Data');
-        return {
-            status: data.status,
-            statusText: myEnum.articleStatus.getKey(data.status)
-        };
+        let rs = await ArticleMapper.updateStatus(data.idList, data.status, user, {
+            status: myEnum.articleStatus.待审核,
+        });
+        return rs;
     }, req, res);
 };
