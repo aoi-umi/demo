@@ -85,8 +85,17 @@ export class TestApi extends ApiModel<TestApiMethod> {
     //#region file 
     imgUploadUrl = '';
     imgUplodaHandler(res: Result) {
-        return this.afterResponse(res) as { fileId: string; url: string };
+        return this.afterResponse(res) as FileUploadRes;
     }
+
+    async imgUpload(file) {
+        let formData = new FormData();
+        formData.append('file', file);
+        return this.requestByConfig<FileUploadRes>(this.apiConfig.method.imgUpload, {
+            data: formData,
+        });
+    }
+
     imgUrl = '';
     getImgUrl(str) {
         return this.imgUrl + '?_id=' + str;
@@ -194,3 +203,4 @@ export class TestApi extends ApiModel<TestApiMethod> {
     //#endregion  
 }
 
+type FileUploadRes = { fileId: string; url: string };

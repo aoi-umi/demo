@@ -3,10 +3,40 @@ import { convClass } from '@/helpers';
 import { Option, Select, Input } from '../iview';
 
 @Component
-class MyInput extends Vue {
+export class MyInputBase extends Vue {
     @Prop()
     value?: string;
 
+    @Prop()
+    placeholder?: string;
+
+    protected currentValue = this.value;
+    protected disableEmitChange = false;
+
+    @Watch('value')
+    watchValue(val) {
+        if (this.currentValue !== val) {
+            this.disableEmitChange = true;
+        }
+        this.currentValue = val;
+    }
+
+    @Watch('currentValue')
+    watchCurrentValue(val) {
+        this.watchCurrentValueHandler && this.watchCurrentValueHandler(val);
+        this.$emit('input', val);
+        if (this.disableEmitChange) {
+            this.disableEmitChange = false;
+            return;
+        }
+        this.$emit('on-change', val);
+    }
+
+    protected watchCurrentValueHandler(val) { };
+}
+
+@Component
+class MyInput extends MyInputBase {
     @Prop()
     label?: string;
 
@@ -20,9 +50,6 @@ class MyInput extends Vue {
 
     @Prop()
     clearable?: boolean;
-
-    @Prop()
-    placeholder?: string;
 
     @Prop()
     size?: '' | 'small' | 'large' | 'default';
@@ -46,9 +73,6 @@ class MyInput extends Vue {
     loading?: boolean;
     $refs: { select: any, input: any };
 
-    private currentValue = this.value;
-    private disableEmitChange = false;
-
     get inputIcon() {
         let icon = '';
         if (this.clearable && this.currentValue) {
@@ -66,25 +90,10 @@ class MyInput extends Vue {
         // }
     }
 
-    @Watch('value')
-    watchValue(val) {
-        if (this.currentValue !== val) {
-            this.disableEmitChange = true;
-        }
-        this.currentValue = val;
+    watchCurrentValueHandler(val) {
+        this.$refs.select.setQuery(val);
     }
 
-    @Watch('currentValue')
-    watchCurrentValue(val) {
-        this.$refs.select.setQuery(val);
-        this.$emit('input', val);
-        if (this.disableEmitChange) {
-            this.disableEmitChange = false;
-            return;
-        }
-        this.$emit('on-change', val);
-        // this.dispatch('FormItem', 'on-form-change', val);
-    }
     private firstFocus = true;
     private handleInputChange(e) {
         let val = e.target.value && e.target.value.trim();
