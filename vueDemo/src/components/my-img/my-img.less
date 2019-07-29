@@ -1,18 +1,18 @@
 @clsPrefix: my-img-;
 
-.@{clsPrefix}root img {
-  height: 100%;
-  width: 100%;
+.@{clsPrefix}main {
+  display: table-cell;
+  text-align: center;
+  vertical-align: middle;
+  width: inherit;
+  height: inherit;
 }
 
 .@{clsPrefix}image {
+  height: 100%;
+  width: 100%;
   object-fit: cover;
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
-}
-
-.@{clsPrefix}load-fail {
-  width: 100px !important;
-  height: 100px !important;
 }

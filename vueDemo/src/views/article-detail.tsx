@@ -7,6 +7,8 @@ import { myEnum, dev } from '@/config';
 import { Modal, Input, Form, FormItem, Button, Checkbox, Switch, Transfer, Divider } from '@/components/iview';
 import { MyUpload } from '@/components/my-upload';
 import { ArticleBase } from './article';
+import { MyEditor } from '@/components/my-editor';
+import { IMyEditor } from '@/components/my-editor/my-editor';
 
 export type DetailDataType = {
     _id: string;
@@ -52,7 +54,7 @@ export default class ArticleDetail extends ArticleBase {
             { required: true, trigger: 'blur' }
         ],
     };
-    $refs: { formVaild: IForm, quillEditor: any };
+    $refs: { formVaild: IForm, editor: IMyEditor };
 
     created() {
         this.loadDetail();
@@ -131,6 +133,7 @@ export default class ArticleDetail extends ArticleBase {
 
     renderEdit() {
         let detail = this.innerDetail;
+        let self = this;
         return (
             <div>
                 <h3>{detail._id ? '修改' : '新增'}</h3>
@@ -161,41 +164,19 @@ export default class ArticleDetail extends ArticleBase {
                         <Input v-model={detail.title} />
                     </FormItem>
                     <FormItem label="内容" prop="content">
-                        <quill-editor ref="quillEditor" class="article-detail-content-editor" v-model={detail.content} options={{
-                            placeholder: '输点啥。。。',
-                            modules: {
-                                toolbar: {
-                                    container: [
-                                        ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
-                                        ['blockquote', 'code-block'],
-
-                                        [{ 'header': 1 }, { 'header': 2 }],               // custom button values
-                                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                                        [{ 'script': 'sub' }, { 'script': 'super' }],      // superscript/subscript
-                                        [{ 'indent': '-1' }, { 'indent': '+1' }],          // outdent/indent
-                                        [{ 'direction': 'rtl' }],                         // text direction
-
-                                        [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
-                                        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-
-                                        [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
-                                        [{ 'font': [] }],
-                                        [{ 'align': [] }],
-                                        ['link', 'image']//'formula','video'
-                                    ],
-                                    handlers: {
-                                        image: (value) => {
-                                            if (value) {
-                                                console.log(value);
-                                            } else {
-                                                this.$refs.quillEditor.quill.format('image', false);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        }></quill-editor>
+                        <MyEditor ref="editor" class="article-detail-content-editor"
+                            v-model={detail.content}
+                            placeholder='输点啥。。。'
+                            img-change={(file => {
+                                testApi.imgUpload(file).then(t => {
+                                    this.$refs.editor.insertEmbed('image', t.url);
+                                }).catch(e => {
+                                    self.$Notice.error({
+                                        title: '上传出错',
+                                        desc: e,
+                                    });
+                                });
+                            })} />
                     </FormItem>
                     <Divider size='small' />
                     {(!detail._id || detail.canUpdate) &&
