@@ -124,7 +124,7 @@ export default class Article extends Vue {
                                             <Col xs={4}><MyImg class="cover" src={ele.coverUrl} /></Col>
                                             <Col xs={20}>
                                                 <h3 class="article-list-title">{ele.title}</h3>
-                                                <label>作者:{ele.user.nickname}</label>
+                                                <label>作者: {ele.user.nickname}</label>
                                                 <p domPropsInnerHTML={ele.content}></p>
                                             </Col>
                                         </Row>

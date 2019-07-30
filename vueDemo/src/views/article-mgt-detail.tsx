@@ -130,7 +130,7 @@ export default class ArticleDetail extends ArticleMgtBase {
             <div>
                 {detail._id && [
                     '状态: ' + detail.statusText,
-                    '作者:' + detail.user.nickname + '(' + detail.user.account + ')',
+                    '作者: ' + detail.user.nickname + '(' + detail.user.account + ')',
                     '创建于: ' + moment(detail.createdAt).format(dev.dateFormat),
                 ].map(ele => {
                     return (<span style={{ marginRight: '5px' }}>{ele}</span>);
