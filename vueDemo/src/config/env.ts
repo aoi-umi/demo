@@ -110,11 +110,16 @@ const config = {
                     url: '/article/detailQuery',
                     method: 'GET',
                 },
-                articleSave: {
-                    url: '/article/save',
+                articleMgtQuery: {
+                    url: '/article/mgt/query',
+                    method: 'GET',
                 },
-                articleDel: {
-                    url: '/article/del',
+                articleMgtDetailQuery: {
+                    url: '/article/mgt/detailQuery',
+                    method: 'GET',
+                },
+                articleMgtSave: {
+                    url: '/article/mgt/save',
                 },
                 articleMgtDel: {
                     url: '/article/mgt/del',

@@ -175,7 +175,7 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
         }
     }
 
-    private handleQuery(opt?: {
+    handleQuery(opt?: {
         noClear?: boolean;
         resetPage?: boolean;
     }) {

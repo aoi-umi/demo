@@ -2,7 +2,7 @@ export let errorConfig = {
     DEV: 'dev',
     CODE_ERROR: '代码有误',
     BAD_REQUEST: '错误请求',
-    NOT_FOUND: '无法找到路径',
+    NOT_FOUND: '页面走丢了',
 
     TOKEN_WRONG: '密码错误或参数有误',
     NO_LOGIN: '未登录',

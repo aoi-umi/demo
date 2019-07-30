@@ -16,17 +16,23 @@ class MyImg extends Vue {
     @Prop()
     failImg?: string;
 
+    @Watch('src')
+    private watchSrc(newVal) {
+        if (!newVal)
+            this.isLoadSuccess = false;
+    }
+
     $refs: { img: HTMLElement }
-    private isLoadFail = false;
+    private isLoadSuccess = !!this.src;
     private get cls() {
         let cls = [clsPrefix + 'image'];
-        if (this.isLoadFail)
+        if (!this.isLoadSuccess)
             cls.push('hidden');
         return cls;
     }
 
     handleError(e) {
-        this.isLoadFail = true;
+        this.isLoadSuccess = false;
     }
 
     render() {
@@ -34,9 +40,9 @@ class MyImg extends Vue {
             <div class={clsPrefix + 'root'}>
                 <div class={clsPrefix + 'main'}>
                     {this.src && <img ref="img" class={this.cls} on-error={this.handleError} src={this.src} alt={this.alt} />}
-                    {!this.isLoadFail &&
-                        this.failImg ? <img src={this.failImg} alt={this.alt} /> :
-                        <Icon type="md-image" size={40} />
+                    {!this.isLoadSuccess &&
+                        (this.failImg ? <img src={this.failImg} alt={this.alt} /> :
+                            <Icon type="md-image" size={40} />)
                     }
                 </div>
             </div>

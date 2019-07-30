@@ -10,13 +10,13 @@ import * as VaildSchema from '../vaild-schema/class-valid';
 import { ArticleModel, ArticleInstanceType, ArticleMapper, ArticleLogMapper } from '../models/mongo/article';
 import { Auth } from '../_system/auth';
 
-export let query: RequestHandler = (req, res) => {
+export let mgtQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
         let data = plainToClass(VaildSchema.AritcleQuery, req.query);
         paramsValid(data);
 
-        let { rows, total } = await ArticleMapper.query(data, { userId: user._id, mgt: Auth.contains(user, config.auth.articleMgtAudit) });
+        let { rows, total } = await ArticleMapper.query(data, { userId: user._id, audit: Auth.contains(user, config.auth.articleMgtAudit) });
         rows.forEach(detail => {
             ArticleMapper.resetDetail(detail, user, {
                 imgHost: req.headers.host
@@ -29,19 +29,19 @@ export let query: RequestHandler = (req, res) => {
     }, req, res);
 };
 
-export let detailQuery: RequestHandler = (req, res) => {
+export let MgtDetailQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
         let data = plainToClass(VaildSchema.AritcleSave, req.query);
-        let detail = await ArticleMapper.detailQuery({ _id: data._id }, { userId: user._id, mgt: Auth.contains(user, config.auth.articleMgtAudit) });
-        ArticleMapper.resetDetail(detail, user, {
+        let rs = await ArticleMapper.detailQuery({ _id: data._id }, { userId: user._id, audit: Auth.contains(user, config.auth.articleMgtAudit) });
+        ArticleMapper.resetDetail(rs.detail, user, {
             imgHost: req.headers.host
         });
-        return detail;
+        return rs;
     }, req, res);
 };
 
-export let save: RequestHandler = (req, res) => {
+export let mgtSave: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
         let data = plainToClass(VaildSchema.AritcleSave, req.body);
@@ -85,7 +85,7 @@ export let save: RequestHandler = (req, res) => {
     }, req, res);
 };
 
-export let del: RequestHandler = (req, res) => {
+export let mgtDel: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
         let data = plainToClass(VaildSchema.ArticleDel, req.body);
@@ -103,6 +103,40 @@ export let mgtAudit: RequestHandler = (req, res) => {
         let data = plainToClass(VaildSchema.ArticleMgtAudit, req.body);
         let rs = await ArticleMapper.updateStatus(data.idList, data.status, user, {
             status: myEnum.articleStatus.待审核,
+        });
+        return rs;
+    }, req, res);
+};
+
+
+export let query: RequestHandler = (req, res) => {
+    responseHandler(async () => {
+        let user = req.myData.user;
+        let data = plainToClass(VaildSchema.AritcleQuery, req.query);
+        paramsValid(data);
+
+        let { rows, total } = await ArticleMapper.query(data, { normal: true });
+        rows.forEach(detail => {
+            ArticleMapper.resetDetail(detail, user, {
+                imgHost: req.headers.host
+            });
+        });
+        return {
+            rows,
+            total
+        };
+    }, req, res);
+};
+
+export let detailQuery: RequestHandler = (req, res) => {
+    responseHandler(async () => {
+        let user = req.myData.user;
+        let data = plainToClass(VaildSchema.AritcleSave, req.query);
+        let rs = await ArticleMapper.detailQuery({ _id: data._id }, { normal: true });
+        let detail = rs.detail;
+        ArticleModel.update({ _id: detail._id }, { readTimes: detail.readTimes + 1 }).exec();
+        ArticleMapper.resetDetail(detail, user, {
+            imgHost: req.headers.host
         });
         return rs;
     }, req, res);
