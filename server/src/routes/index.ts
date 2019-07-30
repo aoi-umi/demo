@@ -43,11 +43,14 @@ router.post('/role/del', userAuthMid.normal, role.del);
 
 //#region article 
 import * as article from './article';
+router.get('/article/mgt/query', userAuthMid.normal, article.mgtQuery);
+router.get('/article/mgt/detailQuery', userAuthMid.normal, article.MgtDetailQuery);
+router.post('/article/mgt/save', userAuthMid.normal, article.mgtSave);
+router.post('/article/mgt/del', userAuthMid.normal, article.mgtDel);
+router.post('/article/mgt/audit', userAuthMid.normal, article.mgtAudit);
+
 router.get('/article/query', userAuthMid.normal, article.query);
 router.get('/article/detailQuery', userAuthMid.normal, article.detailQuery);
-router.post('/article/save', userAuthMid.normal, article.save);
-router.post('/article/del', userAuthMid.normal, article.del);
-router.post('/article/mgt/audit', userAuthMid.normal, article.mgtAudit);
 //#endregion
 
 //#region file 

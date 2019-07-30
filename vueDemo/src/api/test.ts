@@ -34,8 +34,9 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
 
     articleQuery,
     articleDetailQuery,
-    articleSave,
-    articleDel,
+    articleMgtQuery,
+    articleMgtDetailQuery,
+    articleMgtSave,
     articleMgtDel,
     articleMgtAudit,
 
@@ -188,11 +189,14 @@ export class TestApi extends ApiModel<TestApiMethod> {
     async articleDetailQuery(data) {
         return this.requestByConfig(this.apiConfig.method.articleDetailQuery, { data });
     }
-    async articleSave(data) {
-        return this.requestByConfig(this.apiConfig.method.articleSave, { data });
+    async articleMgtQuery(data?: { anyKey?} & ApiListQueryArgs) {
+        return this.requestByConfig<ListResult>(this.apiConfig.method.articleMgtQuery, { data });
     }
-    async articleDel(idList: string[]) {
-        return this.requestByConfig(this.apiConfig.method.articleDel, { data: { idList } });
+    async articleMgtDetailQuery(data) {
+        return this.requestByConfig(this.apiConfig.method.articleMgtDetailQuery, { data });
+    }
+    async articleMgtSave(data) {
+        return this.requestByConfig(this.apiConfig.method.articleMgtSave, { data });
     }
     async articleMgtDel(idList: string[]) {
         return this.requestByConfig(this.apiConfig.method.articleMgtDel, { data: { idList } });

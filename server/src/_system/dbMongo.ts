@@ -8,6 +8,7 @@ import * as stream from 'stream';
 
 import * as config from '../config';
 mongooseTsConfig.schemaOptions = { timestamps: true };
+
 require('mongoose').Promise = Q.Promise;
 declare module 'mongoose' {
     type Promise<T> = Q.Promise<T>;

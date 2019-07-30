@@ -61,9 +61,9 @@ export default class App extends Vue {
         this.$refs.sider.toggleCollapse();
     }
 
-    renderMenu(data) {
+    renderMenu(data: MenuConfig) {
         return (
-            <MenuItem name={data.name} to={data.to}>
+            <MenuItem name={data.name || data.to} to={data.to}>
                 <Icon type={data.icon} />
                 <span>{data.text}</span>
             </MenuItem>
@@ -143,34 +143,34 @@ export default class App extends Vue {
                         >
                             {
                                 [{
-                                    name: routeConfig.bookmark.path,
                                     to: routeConfig.bookmark.path,
                                     icon: 'md-home',
                                     text: routeConfig.bookmark.text,
                                 }, {
-                                    name: routeConfig.article.path,
                                     to: routeConfig.article.path,
-                                    icon: 'md-create',
+                                    icon: 'md-paper',
                                     text: routeConfig.article.text,
                                 }, {
-                                    name: routeConfig.user.path,
+                                    to: routeConfig.articleMgt.path,
+                                    icon: 'md-create',
+                                    text: routeConfig.articleMgt.text,
+                                    show: this.storeUser.user.hasAuth(authority.login)
+                                }, {
                                     to: routeConfig.user.path,
                                     icon: 'md-people',
                                     text: routeConfig.user.text,
                                     show: this.storeUser.user.hasAuth(authority.userMgtQuery)
                                 }, {
-                                    name: routeConfig.role.path,
                                     to: routeConfig.role.path,
                                     icon: 'md-person',
                                     text: routeConfig.role.text,
                                     show: this.storeUser.user.hasAuth(authority.roleQuery)
                                 }, {
-                                    name: routeConfig.authority.path,
                                     to: routeConfig.authority.path,
                                     icon: 'md-lock',
                                     text: routeConfig.authority.text,
                                     show: this.storeUser.user.hasAuth(authority.authorityQuery)
-                                },].filter((ele: any) => {
+                                },].filter((ele: MenuConfig) => {
                                     let show = ele.show;
                                     if (!ele.hasOwnProperty('show')) {
                                         show = true;
@@ -190,3 +190,11 @@ export default class App extends Vue {
         );
     }
 }
+
+type MenuConfig = {
+    name?: string;
+    to: string;
+    text: string;
+    icon: string;
+    show?: boolean;
+};

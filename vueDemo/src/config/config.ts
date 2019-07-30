@@ -31,8 +31,16 @@ export const routeConfig = {
     },
     article: { path: '/article' },
     articleDetail: { path: '/article/detail' },
-    articleEdit: {
-        path: '/article/edit',
+    articleMgt: {
+        path: '/articleMgt',
+        authority: [authorityConfig.login],
+    },
+    articleMgtDetail: {
+        path: '/articleMgt/detail',
+        authority: [authorityConfig.login],
+    },
+    articleMgtEdit: {
+        path: '/articleMgt/edit',
         authority: [authorityConfig.login],
     },
     test: { path: '/test' },

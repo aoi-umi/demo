@@ -51,8 +51,10 @@ export class ArticleMapper {
         if (data.status)
             match.status = { $in: data.status.split(',').map(ele => parseInt(ele)) };
 
-        let userId = Types.ObjectId(opt.userId);
-        if (opt.mgt) {
+        let userId = opt.userId && Types.ObjectId(opt.userId);
+        if (opt.normal) {
+            match.status = myEnum.articleStatus.审核通过;
+        } else if (opt.audit) {
             //排除非本人的草稿
             match.$expr = {
                 $not: {
@@ -106,19 +108,24 @@ export class ArticleMapper {
         let { rows } = await this.query(data, { ...opt, noTotal: true });
         let detail = rows[0];
         if (!detail)
-            throw error('not exists');
-        let log = await ArticleLogModel.find({ articleId: detail._id }).sort({ _id: -1 });
-
-        detail.log = log.map(ele => {
-            return ArticleLogMapper.reset(ele.toJSON());
-        });
-        return detail;
+            throw error('', config.error.NOT_FOUND);
+        let rs = {
+            detail,
+            log: null as any[]
+        };
+        if (!opt.normal) {
+            let log = await ArticleLogModel.find({ articleId: detail._id }).sort({ _id: -1 });
+            rs.log = log.map(ele => {
+                return ArticleLogMapper.reset(ele.toJSON());
+            });
+        }
+        return rs;
     }
 
     static async findOne(data) {
         let detail = await ArticleModel.findOne(data);
         if (!detail)
-            throw error('not exists');
+            throw error('', config.error.NOT_FOUND);
         return detail;
     }
 
@@ -169,8 +176,9 @@ export class ArticleMapper {
 };
 
 type ArticleQueryOption = {
-    mgt?: boolean;
-    userId: string;
+    audit?: boolean;
+    normal?: boolean;
+    userId?: string;
 };
 
 export class ArticleLogMapper {
