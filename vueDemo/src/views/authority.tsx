@@ -138,10 +138,7 @@ export default class Authority extends Vue {
     query() {
         let list = this.$refs.list;
         let query = this.$route.query;
-        ['name', 'code', 'anyKey'].forEach(key => {
-            if (query[key])
-                this.$set(list.model.query, key, query[key]);
-        });
+        list.setQueryByKey(query, ['name', 'code', 'anyKey']);
         let status = this.$route.query.status as string;
         let statusList = status ? status.split(',') : [];
         this.statusList.forEach(ele => {

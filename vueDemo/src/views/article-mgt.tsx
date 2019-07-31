@@ -3,7 +3,7 @@ import { getModule } from 'vuex-module-decorators';
 import moment from 'moment';
 import { testApi } from '@/api';
 import { myEnum, authority, dev } from '@/config';
-import { Modal, Checkbox, Row } from '@/components/iview';
+import { Modal, Checkbox, Row, Input } from '@/components/iview';
 import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
 import { MyConfirm } from '@/components/my-confirm';
 import { MyImg } from '@/components/my-img';
@@ -14,16 +14,31 @@ import { DetailDataType } from './article-mgt-detail';
 export class ArticleMgtBase extends Vue {
     delShow = false;
     delIds = [];
+    notPassShow = false;
+    notPassRemark = '';
+    operateDetail: DetailDataType;
+    protected preview = false;
     protected get storeUser() {
         return getModule(LoginUserStore, this.$store);
+    }
+
+    protected togglePotPass(show: boolean) {
+        this.notPassShow = show;
+        this.notPassRemark = '';
+    }
+
+    protected auditSuccessHandler(detail) {
+
     }
 
     protected async audit(detail: { _id: string, status, statusText }, pass: boolean) {
         try {
             let toStatus = pass ? myEnum.articleStatus.审核通过 : myEnum.articleStatus.审核不通过;
-            let rs = await testApi.articleMgtAudit({ idList: [detail._id], status: toStatus });
+            let rs = await testApi.articleMgtAudit({ idList: [detail._id], status: toStatus, remark: this.notPassRemark });
             detail.status = rs.status;
             detail.statusText = rs.statusText;
+            this.auditSuccessHandler(detail);
+            this.togglePotPass(false);
             this.$Message.info('审核成功');
         } catch (e) {
             this.$Message.error('审核失败:' + e.message);
@@ -41,7 +56,7 @@ export class ArticleMgtBase extends Vue {
         });
     }
 
-    protected getOperate(detail: DetailDataType, opt?: { noPreview?: boolean; noEdit?: boolean; }) {
+    protected getOperate(detail: DetailDataType, opt?: { noPreview?: boolean; isDetail?: boolean; }) {
         opt = { ...opt };
         let operate: { text: string, type?: string, fn: () => any }[] = [];
         if (this.canAudit(detail)) {
@@ -54,15 +69,19 @@ export class ArticleMgtBase extends Vue {
             }, {
                 text: '审核不通过',
                 fn: () => {
-                    this.audit(detail, false);
+                    this.operateDetail = detail;
+                    this.togglePotPass(true);
                 }
             },];
         }
-        if (!opt.noEdit && detail.canUpdate) {
+        if (detail.canUpdate) {
             operate.push({
                 text: '修改',
                 fn: () => {
-                    this.toDetail(detail._id);
+                    if (opt.isDetail)
+                        this.preview = false;
+                    else
+                        this.toDetail(detail._id);
                 }
             });
         }
@@ -84,6 +103,22 @@ export class ArticleMgtBase extends Vue {
             });
         }
         return operate;
+    }
+
+    protected renderNotPassConfirm() {
+        return (
+            <Modal v-model={this.notPassShow} footer-hide>
+                <MyConfirm title='审核不通过' loading={true}
+                    cancel={() => {
+                        this.togglePotPass(false);
+                    }}
+                    ok={() => {
+                        this.audit(this.operateDetail, false);
+                    }}>
+                    备注: <Input v-model={this.notPassRemark} />
+                </MyConfirm>
+            </Modal>
+        );
     }
 
     protected renderDelConfirm() {
@@ -141,10 +176,7 @@ export default class Article extends ArticleMgtBase {
     query() {
         let list = this.$refs.list;
         let query = this.$route.query;
-        ['user', 'title', 'anyKey'].forEach(key => {
-            if (query[key])
-                this.$set(list.model.query, key, query[key]);
-        });
+        list.setQueryByKey(query, ['user', 'title', 'anyKey']);
         let status = this.$route.query.status as string;
         let statusList = status ? status.split(',') : [];
         this.statusList.forEach(ele => {
@@ -158,6 +190,10 @@ export default class Article extends ArticleMgtBase {
 
     protected delSuccessHandler() {
         this.$refs.list.query();
+    }
+
+    protected auditSuccessHandler(detail) {
+        this.$refs.list.result.data.splice(detail._index, 1, detail);
     }
 
     private get multiOperateBtnList() {
@@ -209,12 +245,8 @@ export default class Article extends ArticleMgtBase {
             }
         }, {
             title: '状态',
-            key: 'status',
+            key: 'statusText',
             minWidth: 80,
-            render: (h, params) => {
-                let text = myEnum.articleStatus.getKey(params.row.status);
-                return <span>{text}</span>;
-            }
         }, {
             title: '创建时间',
             key: 'createdAt',
@@ -251,6 +283,7 @@ export default class Article extends ArticleMgtBase {
         return (
             <div>
                 {this.renderDelConfirm()}
+                {this.renderNotPassConfirm()}
                 <MyList
                     ref="list"
                     current={this.page.index}

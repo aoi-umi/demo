@@ -32,10 +32,7 @@ export default class Article extends Vue {
     query() {
         let list = this.$refs.list;
         let query = this.$route.query;
-        ['user', 'title', 'anyKey'].forEach(key => {
-            if (query[key])
-                this.$set(list.model.query, key, query[key]);
-        });
+        list.setQueryByKey(query, ['user', 'title', 'anyKey']);
         convert.Test.queryToListModel(query, list.model);
         this.$refs.list.query(query);
     }

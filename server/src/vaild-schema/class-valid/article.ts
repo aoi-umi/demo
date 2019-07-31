@@ -33,6 +33,7 @@ export class AritcleSave {
 }
 
 export class ArticleDel extends DelBase {
+    remark: string;
 }
 
 export class ArticleMgtAudit {
@@ -47,4 +48,6 @@ export class ArticleMgtAudit {
     @IsIn([myEnum.articleStatus.审核通过, myEnum.articleStatus.审核不通过])
     @Type()
     status: number;
+
+    remark: string;
 }

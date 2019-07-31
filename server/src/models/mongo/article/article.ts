@@ -71,7 +71,7 @@ export class Article extends Base {
     @prop({
         default: ''
     })
-    notPassReason: string;
+    remark: string;
 }
 
 export const ArticleModel = getModelForClass<Article, typeof Article>(Article);

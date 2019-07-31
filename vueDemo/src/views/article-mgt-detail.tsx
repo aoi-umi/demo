@@ -23,6 +23,7 @@ export type DetailDataType = {
     status: number;
     statusText: string;
     createdAt: string;
+    remark: string;
     canUpdate: boolean;
     canDel: boolean;
     user: { nickname: string; account: string };
@@ -35,7 +36,6 @@ export default class ArticleDetail extends ArticleMgtBase {
         this.initDetail(data);
     }
     private innerDetail: DetailType = {} as any;
-    private preview = false;
     private getDetailData() {
         return {
             detail: {
@@ -44,6 +44,7 @@ export default class ArticleDetail extends ArticleMgtBase {
                 title: '',
                 content: '',
                 status: myEnum.articleStatus.草稿,
+                remark: ''
             },
             log: []
         };
@@ -89,11 +90,9 @@ export default class ArticleDetail extends ArticleMgtBase {
         this.saving = true;
         let { detail } = this.innerDetail;
         try {
+            let { user, ...restDetail } = detail;
             let rs = await testApi.articleMgtSave({
-                _id: detail._id,
-                cover: detail.cover,
-                title: detail.title,
-                content: detail.content,
+                ...restDetail,
                 submit
             });
             this.$Message.info({
@@ -219,6 +218,9 @@ export default class ArticleDetail extends ArticleMgtBase {
                                 });
                             })} />
                     </FormItem>
+                    <FormItem label="备注" prop="remark">
+                        <Input v-model={detail.remark} />
+                    </FormItem>
                     {(!detail._id || detail.canUpdate) &&
                         <div>
                             <Divider size='small' />
@@ -244,7 +246,7 @@ export default class ArticleDetail extends ArticleMgtBase {
 
     renderPreview() {
         let { detail } = this.innerDetail;
-        let operate = this.getOperate(detail, { noPreview: true, noEdit: true });
+        let operate = this.getOperate(detail, { noPreview: true, isDetail: true });
         return (
             <div>
                 <h1>{detail.title}</h1>
@@ -265,6 +267,7 @@ export default class ArticleDetail extends ArticleMgtBase {
                 </div>
                 {this.renderLog()}
                 {this.renderDelConfirm()}
+                {this.renderNotPassConfirm()}
             </div>
         );
     }

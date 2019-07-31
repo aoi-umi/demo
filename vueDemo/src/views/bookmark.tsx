@@ -147,13 +147,10 @@ export default class Bookmark extends Vue {
     }
 
     query() {
-        let table = this.$refs.list;
+        let list = this.$refs.list;
         let query = this.$route.query;
-        ['name', 'url', 'anyKey'].forEach(key => {
-            if (query[key])
-                this.$set(table.model.query, key, query[key]);
-        });
-        convert.Test.queryToListModel(query, table.model);
+        list.setQueryByKey(query, ['name', 'url', 'anyKey']);
+        convert.Test.queryToListModel(query, list.model);
         this.$refs.list.query(query);
     }
 

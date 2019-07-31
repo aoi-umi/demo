@@ -208,7 +208,13 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
     private showQuery = true;
     private loading = false;
     model = new MyListModel<{ [k in keyof QueryArgs]: any }>();
-    private result: ResultType = {
+    setQueryByKey(data, keyList: string[]) {
+        keyList.forEach(key => {
+            if (data[key])
+                this.$set(this.model.query, key, data[key]);
+        });
+    }
+    result: ResultType = {
         success: true,
         total: 0,
         msg: '',
