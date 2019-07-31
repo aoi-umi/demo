@@ -21,7 +21,7 @@ type DetailDataType = {
     isDel?: boolean;
 }
 @Component
-class RoleDetail extends Vue {
+class RoleDetail extends Base {
     @Prop()
     detail: any;
 
@@ -57,9 +57,9 @@ class RoleDetail extends Vue {
 
     private saving = false;
     private async save() {
-        this.saving = true;
-        let detail = this.innerDetail;
-        try {
+        await this.operateHandler('保存', async () => {
+            this.saving = true;
+            let detail = this.innerDetail;
             let { addList, delList } = this.$refs.authTransfer.getChangeData('key');
             let rs = await testApi.roleSave({
                 _id: detail._id,
@@ -71,11 +71,9 @@ class RoleDetail extends Vue {
             });
             this.$emit('save-success', rs);
             this.initDetail(this.getDetailData());
-        } catch (e) {
-            this.$Message.error('出错了:' + e.message);
-        } finally {
+        }).finally(() => {
             this.saving = false;
-        }
+        });
     }
 
     protected render() {
@@ -158,25 +156,19 @@ export default class Role extends Base {
     delIds = [];
     statusList: { key: string; value: any, checked?: boolean }[] = [];
     async delClick() {
-        try {
+        await this.operateHandler('删除', async () => {
             await testApi.roleDel(this.delIds);
-            this.$Message.info('删除成功');
             this.delIds = [];
             this.delShow = false;
             this.$refs.list.query();
-        } catch (e) {
-            this.$Message.error('删除失败:' + e.message);
-        }
+        });
     }
     private async updateStatus(detail: DetailDataType) {
-        try {
+        await this.operateHandler('修改', async () => {
             let toStatus = detail.status == myEnum.roleStatus.启用 ? myEnum.roleStatus.禁用 : myEnum.roleStatus.启用;
             await testApi.roleUpdate({ _id: detail._id, status: toStatus });
             detail.status = toStatus;
-            this.$Message.info('修改成功');
-        } catch (e) {
-            this.$Message.error('修改失败:' + e.message);
-        }
+        });
     }
 
     private get multiOperateBtnList() {

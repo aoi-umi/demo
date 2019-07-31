@@ -89,22 +89,15 @@ export default class ArticleDetail extends ArticleMgtBase {
     async save(submit: boolean) {
         this.saving = true;
         let { detail } = this.innerDetail;
-        try {
+        await this.operateHandler('保存', async () => {
             let { user, ...restDetail } = detail;
             let rs = await testApi.articleMgtSave({
                 ...restDetail,
                 submit
             });
-            this.$Message.info({
-                content: '提交成功', onClose: () => {
-                    this.$router.push(dev.routeConfig.articleMgt);
-                }
-            });
-        } catch (e) {
-            this.$Message.error('出错了:' + e.message);
-        } finally {
+        }).finally(() => {
             this.saving = false;
-        }
+        });
     }
 
     saveClickHandler(submit?: boolean) {

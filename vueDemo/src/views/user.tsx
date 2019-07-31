@@ -115,7 +115,7 @@ type SignUpDataType = {
 }
 
 @Component
-class SignUp extends Vue {
+class SignUp extends Base {
 
     private innerDetail: SignUpDataType = this.getDetailData();
     private getDetailData() {
@@ -156,15 +156,12 @@ class SignUp extends Vue {
     private loading = false;
 
     private async signUp() {
-        try {
+        await this.operateHandler('注册', async () => {
             let rs = await testApi.userSignUp(this.innerDetail);
             this.innerDetail = this.getDetailData();
             this.$emit('success');
-            this.$Message.success('注册成功');
             this.$router.push(dev.routeConfig.userSignIn.path);
-        } catch (e) {
-            this.$Message.error(e.message);
-        }
+        });
     }
 
     private handlePress(e) {
