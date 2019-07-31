@@ -55,7 +55,7 @@ export let mgtSave: RequestHandler = (req, res) => {
                 status,
                 userId: user._id
             });
-            let log = ArticleLogMapper.create(detail, user, { srcStatus: myEnum.articleStatus.草稿, destStatus: status });
+            let log = ArticleLogMapper.create(detail, user, { srcStatus: myEnum.articleStatus.草稿, destStatus: status, remark: detail.remark });
             await transaction(async (session) => {
                 await detail.save({ session });
                 await log.save({ session });
@@ -70,10 +70,11 @@ export let mgtSave: RequestHandler = (req, res) => {
             let update: any = {
                 status,
             };
-            ['cover', 'title', 'content'].forEach(key => {
+            ['cover', 'title', 'content', 'remark'].forEach(key => {
                 update[key] = data[key];
             });
-            let log = ArticleLogMapper.create(detail, user, { srcStatus: detail.status, destStatus: status });
+            let logRemark = update.remark == detail.remark ? null : update.remark;
+            let log = ArticleLogMapper.create(detail, user, { srcStatus: detail.status, destStatus: status, remark: logRemark });
             await transaction(async (session) => {
                 await detail.update(update);
                 await log.save({ session });
@@ -103,6 +104,7 @@ export let mgtAudit: RequestHandler = (req, res) => {
         let data = plainToClass(VaildSchema.ArticleMgtAudit, req.body);
         let rs = await ArticleMapper.updateStatus(data.idList, data.status, user, {
             status: myEnum.articleStatus.待审核,
+            logRemark: data.remark,
         });
         return rs;
     }, req, res);

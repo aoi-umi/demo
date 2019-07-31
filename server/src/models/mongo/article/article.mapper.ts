@@ -148,6 +148,7 @@ export class ArticleMapper {
     static async updateStatus(idList: Types.ObjectId[], status: number, user: Express.MyDataUser, opt?: {
         includeUserId?: Types.ObjectId | string;
         status?: any;
+        logRemark?: string;
     }) {
         opt = {
             ...opt,
@@ -161,7 +162,7 @@ export class ArticleMapper {
         if (!list.length)
             throw error('No Match Data');
         let log = list.map(ele => {
-            return ArticleLogMapper.create(ele, user, { srcStatus: ele.status, destStatus: status });
+            return ArticleLogMapper.create(ele, user, { srcStatus: ele.status, destStatus: status, remark: opt.logRemark });
         });
 
         await transaction(async (session) => {
@@ -185,7 +186,7 @@ export class ArticleLogMapper {
     static create(article: ArticleInstanceType, user: Express.MyDataUser, opt: {
         srcStatus: number,
         destStatus: number,
-        remark?: string
+        remark?: string;
     }) {
         let log = new ArticleLogModel({
             articleId: article._id,
