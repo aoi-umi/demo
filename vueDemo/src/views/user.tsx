@@ -1,6 +1,5 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { Form as IForm } from 'iview';
-import { getModule } from 'vuex-module-decorators';
 import moment from 'moment';
 
 import { convClass } from '@/helpers';
@@ -8,9 +7,9 @@ import * as helpers from '@/helpers';
 import { dev } from '@/config';
 import { testApi } from '@/api';
 import { Tag, Modal, Input, Row, Col, Form, FormItem, Button, Spin, Card } from '@/components/iview';
-import LoginUserStore from '@/store/loginUser';
 import { MyTagModel } from '@/components/my-tag';
 import { DetailDataType as UserDetailDataType } from './user-mgt';
+import { Base } from './base';
 
 
 type SignInDataType = {
@@ -19,7 +18,7 @@ type SignInDataType = {
 }
 
 @Component
-class SignIn extends Vue {
+class SignIn extends Base {
 
     private innerDetail: SignInDataType = this.getDetailData();
     private getDetailData() {
@@ -39,9 +38,6 @@ class SignIn extends Vue {
     };
 
     $refs: { formVaild: IForm };
-    get storeUser() {
-        return getModule(LoginUserStore, this.$store);
-    }
     private loading = false;
 
     private async signIn() {
@@ -217,10 +213,7 @@ class SignUp extends Vue {
 
 export const SignUpView = convClass<SignUp>(SignUp);
 @Component
-export default class UserInfo extends Vue {
-    get storeUser() {
-        return getModule(LoginUserStore, this.$store);
-    }
+export default class UserInfo extends Base {
     loading = false;
     detail: UserDetailDataType = {
         auth: {}

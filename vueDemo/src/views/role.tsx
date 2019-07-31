@@ -1,6 +1,5 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { Form as IForm } from 'iview';
-import { getModule } from 'vuex-module-decorators';
 import { testApi } from '@/api';
 import { myEnum, authority } from '@/config';
 import { convClass, convert } from '@/helpers';
@@ -10,9 +9,8 @@ import { MyConfirm } from '@/components/my-confirm';
 import { MyTagModel } from '@/components/my-tag';
 import { IMyTransfer, MyTransfer } from '@/components/my-transfer';
 
-import LoginUserStore from '@/store/loginUser';
-
 import { AuthorityTransferView, IAuthorityTransfer } from './authority';
+import { Base } from './base';
 
 type DetailDataType = {
     _id?: string;
@@ -119,14 +117,11 @@ class RoleDetail extends Vue {
 const RoleDetailView = convClass<RoleDetail>(RoleDetail);
 
 @Component
-export default class Role extends Vue {
+export default class Role extends Base {
     detailShow = false;
     delShow = false;
     detail: any;
     $refs: { list: IMyList<any> };
-    get storeUser() {
-        return getModule(LoginUserStore, this.$store);
-    }
 
     page: any;
     protected created() {
@@ -149,8 +144,8 @@ export default class Role extends Vue {
 
     query() {
         let list = this.$refs.list;
-        let query = this.$route.query;        
-        list.setQueryByKey(query, ['name', 'code', 'anyKey']);        
+        let query = this.$route.query;
+        list.setQueryByKey(query, ['name', 'code', 'anyKey']);
         let status = query.status as string;
         let statusList = status ? status.split(',') : [];
         this.statusList.forEach(ele => {

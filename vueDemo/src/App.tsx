@@ -1,5 +1,4 @@
 import { Component, Vue, Watch, Prop } from "vue-property-decorator";
-import { getModule } from 'vuex-module-decorators';
 
 import * as router from '@/router';
 import {
@@ -12,10 +11,10 @@ import { dev, authority } from './config';
 const routeConfig = router.routerConfig;
 import "./App.less";
 import { SignInView } from './views/user';
-import LoginUserStore from './store/loginUser';
+import { Base } from './views/base';
 
 @Component
-export default class App extends Vue {
+export default class App extends Base {
     drawerOpen = false;
     isCollapsed = true;
     theme = "light" as any;
@@ -29,10 +28,6 @@ export default class App extends Vue {
     }
     get menuitemClasses() {
         return ["menu-item", this.isCollapsed ? "collapsed-menu" : ""];
-    }
-
-    get storeUser() {
-        return getModule(LoginUserStore, this.$store);
     }
 
     setTitle() {

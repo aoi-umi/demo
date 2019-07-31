@@ -1,6 +1,5 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { Form as IForm } from 'iview';
-import { getModule } from 'vuex-module-decorators';
 import { testApi } from '@/api';
 import { myEnum, authority } from '@/config';
 import { Modal, Input, Form, FormItem, Button, Checkbox, Switch, Transfer } from '@/components/iview';
@@ -8,7 +7,7 @@ import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
 import { MyTransfer, IMyTransfer } from '@/components/my-transfer';
 import { MyConfirm } from '@/components/my-confirm';
 import { convClass, convert } from '@/helpers';
-import LoginUserStore from '@/store/loginUser';
+import { Base } from './base';
 
 type DetailDataType = {
     _id?: string;
@@ -107,14 +106,11 @@ class AuthorityDetail extends Vue {
 const AuthorityDetailView = convClass<AuthorityDetail>(AuthorityDetail);
 
 @Component
-export default class Authority extends Vue {
+export default class Authority extends Base {
     detailShow = false;
     delShow = false;
     detail: any;
     $refs: { list: IMyList<any> };
-    get storeUser() {
-        return getModule(LoginUserStore, this.$store);
-    }
 
     page: any;
     protected created() {

@@ -1,6 +1,5 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { Form as IForm } from 'iview';
-import { getModule } from 'vuex-module-decorators';
 import moment from 'moment';
 
 import { testApi } from '@/api';
@@ -9,9 +8,9 @@ import { convClass, convert } from '@/helpers';
 import { Modal, Form, FormItem, Button, RadioGroup, Radio, Input, DatePicker } from '@/components/iview';
 import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
 import { MyTagModel } from '@/components/my-tag';
-import LoginUserStore from '@/store/loginUser';
 import { AuthorityTransferView, IAuthorityTransfer } from './authority';
 import { IRoleTransfer, RoleTransferView } from './role';
+import { Base } from './base';
 
 export type DetailDataType = {
     _id?: string;
@@ -146,14 +145,11 @@ class UserMgtDetail extends Vue {
 const UserMgtDetailView = convClass<UserMgtDetail>(UserMgtDetail);
 
 @Component
-export default class UserMgt extends Vue {
+export default class UserMgt extends Base {
     detailShow = false;
     delShow = false;
     detail: any;
     $refs: { list: IMyList<any> };
-    get storeUser() {
-        return getModule(LoginUserStore, this.$store);
-    }
 
     page: any;
     editType;

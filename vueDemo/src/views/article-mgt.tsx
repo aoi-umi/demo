@@ -1,5 +1,4 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
-import { getModule } from 'vuex-module-decorators';
 import moment from 'moment';
 import { testApi } from '@/api';
 import { myEnum, authority, dev } from '@/config';
@@ -8,19 +7,16 @@ import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
 import { MyConfirm } from '@/components/my-confirm';
 import { MyImg } from '@/components/my-img';
 import { convert } from '@/helpers';
-import LoginUserStore from '@/store/loginUser';
 import { DetailDataType } from './article-mgt-detail';
+import { Base } from './base';
 
-export class ArticleMgtBase extends Vue {
+export class ArticleMgtBase extends Base {
     delShow = false;
     delIds = [];
     notPassShow = false;
     notPassRemark = '';
     operateDetail: DetailDataType;
     protected preview = false;
-    protected get storeUser() {
-        return getModule(LoginUserStore, this.$store);
-    }
 
     protected togglePotPass(show: boolean) {
         this.notPassShow = show;
@@ -113,7 +109,7 @@ export class ArticleMgtBase extends Vue {
                         this.togglePotPass(false);
                     }}
                     ok={() => {
-                        this.audit(this.operateDetail, false);
+                        return this.audit(this.operateDetail, false);
                     }}>
                     备注: <Input v-model={this.notPassRemark} />
                 </MyConfirm>
