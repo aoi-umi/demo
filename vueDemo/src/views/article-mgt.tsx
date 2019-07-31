@@ -28,17 +28,14 @@ export class ArticleMgtBase extends Base {
     }
 
     protected async audit(detail: { _id: string, status, statusText }, pass: boolean) {
-        try {
+        await this.operateHandler('审核', async () => {
             let toStatus = pass ? myEnum.articleStatus.审核通过 : myEnum.articleStatus.审核不通过;
             let rs = await testApi.articleMgtAudit({ idList: [detail._id], status: toStatus, remark: this.notPassRemark });
             detail.status = rs.status;
             detail.statusText = rs.statusText;
             this.auditSuccessHandler(detail);
             this.togglePotPass(false);
-            this.$Message.info('审核成功');
-        } catch (e) {
-            this.$Message.error('审核失败:' + e.message);
-        }
+        });
     }
 
     protected canAudit(detail: { status?: number }) {
@@ -135,15 +132,12 @@ export class ArticleMgtBase extends Base {
 
     protected delSuccessHandler() { }
     async delClick() {
-        try {
+        await this.operateHandler('删除', async () => {
             await testApi.articleMgtDel(this.delIds);
-            this.$Message.info('删除成功');
             this.delIds = [];
             this.delShow = false;
             this.delSuccessHandler();
-        } catch (e) {
-            this.$Message.error('删除失败:' + e.message);
-        }
+        });
     }
 }
 @Component

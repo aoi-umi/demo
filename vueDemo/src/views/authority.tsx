@@ -15,9 +15,9 @@ type DetailDataType = {
     code?: string;
     status?: number;
     isDel?: boolean;
-}
+};
 @Component
-class AuthorityDetail extends Vue {
+class AuthorityDetail extends Base {
     @Prop()
     detail: any;
 
@@ -52,9 +52,9 @@ class AuthorityDetail extends Vue {
 
     saving = false;
     async save() {
-        this.saving = true;
-        let detail = this.innerDetail;
-        try {
+        await this.operateHandler('保存', async () => {
+            this.saving = true;
+            let detail = this.innerDetail;
             let rs = await testApi.authoritySave({
                 _id: detail._id,
                 name: detail.name,
@@ -63,11 +63,9 @@ class AuthorityDetail extends Vue {
             });
             this.$emit('save-success', rs);
             this.initDetail(this.getDetailData());
-        } catch (e) {
-            this.$Message.error('出错了:' + e.message);
-        } finally {
+        }).finally(() => {
             this.saving = false;
-        }
+        });
     }
 
     render() {
@@ -147,25 +145,19 @@ export default class Authority extends Base {
     delIds = [];
     statusList: { key: string; value: any, checked?: boolean }[] = [];
     async delClick() {
-        try {
+        await this.operateHandler('删除', async () => {
             await testApi.authorityDel(this.delIds);
-            this.$Message.info('删除成功');
             this.delIds = [];
             this.delShow = false;
             this.$refs.list.query();
-        } catch (e) {
-            this.$Message.error('删除失败:' + e.message);
-        }
+        });
     }
     private async updateStatus(detail: DetailDataType) {
-        try {
+        await this.operateHandler('修改', async () => {
             let toStatus = detail.status == myEnum.authorityStatus.启用 ? myEnum.authorityStatus.禁用 : myEnum.authorityStatus.启用;
             await testApi.authorityUpdate({ _id: detail._id, status: toStatus });
             detail.status = toStatus;
-            this.$Message.info('修改成功');
-        } catch (e) {
-            this.$Message.error('修改失败:' + e.message);
-        }
+        });
     }
 
     private get multiOperateBtnList() {

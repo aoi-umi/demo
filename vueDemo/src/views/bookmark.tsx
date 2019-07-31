@@ -6,15 +6,16 @@ import { MyList, IMyList, Const as MyTableConst, OnSortChangeOptions, MyListMode
 import { MyTagModel } from '@/components/my-tag';
 import { MyConfirm } from '@/components/my-confirm';
 import { convClass, convert } from '@/helpers';
+import { Base } from './base';
 
 type DetailDataType = {
     _id?: string;
     name?: string;
     url?: string;
     tagList?: string[];
-}
+};
 @Component
-class BookmarkDetail extends Vue {
+class BookmarkDetail extends Base {
     @Prop()
     detail: any;
 
@@ -62,9 +63,9 @@ class BookmarkDetail extends Vue {
 
     saving = false;
     async save() {
-        this.saving = true;
-        let detail = this.innerDetail;
-        try {
+        await this.operateHandler('保存', async () => {
+            this.saving = true;
+            let detail = this.innerDetail;
             let { addTagList, delTagList } = this.tagModel.getChangeTag('key');
             let rs = await testApi.bookmarkSave({
                 _id: detail._id,
@@ -75,11 +76,9 @@ class BookmarkDetail extends Vue {
             });
             this.$emit('save-success', rs);
             this.initDetail(this.getDetailData());
-        } catch (e) {
-            this.$Message.error('出错了:' + e.message);
-        } finally {
+        }).finally(() => {
             this.saving = false;
-        }
+        });
     }
 
     render() {
@@ -126,7 +125,7 @@ const BookmarkDetailView = convClass<BookmarkDetail>(BookmarkDetail);
 
 
 @Component
-export default class Bookmark extends Vue {
+export default class Bookmark extends Base {
     detailShow = false;
     delShow = false;
     detail: any;
@@ -156,15 +155,12 @@ export default class Bookmark extends Vue {
 
     delIds = [];
     async delClick() {
-        try {
+        await this.operateHandler('删除', async () => {
             await testApi.bookmarkDel(this.delIds);
-            this.$Message.info('删除成功');
             this.delIds = [];
             this.delShow = false;
             this.$refs.list.query();
-        } catch (e) {
-            this.$Message.error('删除失败:' + e.message);
-        }
+        });
     }
 
     queryHandler() {

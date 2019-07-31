@@ -25,7 +25,7 @@ export type DetailDataType = {
     disabledTo?: Date;
 };
 @Component
-class UserMgtDetail extends Vue {
+class UserMgtDetail extends Base {
     @Prop({
         default: myEnum.userEditType.修改
     })
@@ -55,9 +55,9 @@ class UserMgtDetail extends Vue {
 
     private saving = false;
     private async save() {
-        this.saving = true;
-        let detail = this.innerDetail;
-        try {
+        await this.operateHandler('保存', async () => {
+            this.saving = true;
+            let detail = this.innerDetail;
             let rs;
             if (this.type == myEnum.userEditType.修改) {
                 let { addList: addAuthList, delList: delAuthList } = this.$refs.authTransfer.getChangeData('key');
@@ -77,11 +77,9 @@ class UserMgtDetail extends Vue {
                 });
             }
             this.$emit('save-success', rs);
-        } catch (e) {
-            this.$Message.error('出错了:' + e.message);
-        } finally {
+        }).finally(() => {
             this.saving = false;
-        }
+        });
     }
 
     protected render() {
