@@ -2,6 +2,7 @@ import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import * as iview from 'iview';
 import { Upload, Modal, Icon, Progress } from '@/components/iview';
 import { convClass } from '@/helpers';
+import { VueCropper } from 'vue-cropper';
 import { MyImg } from '../my-img';
 import './my-upload.less';
 
@@ -15,7 +16,9 @@ type FileType = {
     showProgress?: boolean;
 };
 
-@Component
+@Component({
+    VueCropper
+})
 class MyUpload extends Vue {
     @Prop()
     uploadUrl: string;
@@ -54,13 +57,20 @@ class MyUpload extends Vue {
     @Prop()
     successHandler: (res: any, file: FileType) => any;
 
-    $refs: { upload: iview.Upload & { fileList: FileType[] } };
+    $refs: { upload: iview.Upload & { fileList: FileType[] }, cropper: any };
 
     defaultList = [];
     visible = false;
     uploadList: FileType[] = [];
+    private file;
     private showUrl = '';
     private uploadHeaders = {};
+    private cropper = {
+        show: false,
+        img: '',
+        autoCropWidth: 240,
+        autoCropHeight: 160
+    };
     getFileCount() {
         let upload = this.$refs.upload;
         return upload ? upload.fileList.length : 0;
@@ -124,7 +134,15 @@ class MyUpload extends Vue {
         });
     }
 
-    handleBeforeUpload() {
+    handleBeforeUpload(file) {
+        let reader = new FileReader()
+        reader.readAsDataURL(file)
+        reader.onload = e => {
+            this.cropper.img = (e.target as any).result;
+            this.cropper.show = true;
+        }
+        this.file = file;
+        return false
         return true;
     }
 
@@ -189,7 +207,19 @@ class MyUpload extends Vue {
                         <Icon type="ios-camera" size="20"></Icon>
                     </div>
                 </Upload>
-
+                <Modal title="裁剪" v-model={this.cropper.show} >
+                    <div style={{ textAlign: 'center', width: '100%' }}>
+                        <div style={{ width: '480px', height: '300px', display: 'inline-block' }}>
+                            <VueCropper
+                                ref="cropper"
+                                img={this.cropper.img}
+                                autoCrop={true}
+                                autoCropWidth={this.cropper.autoCropWidth}
+                                autoCropHeight={this.cropper.autoCropHeight}
+                            ></VueCropper>
+                        </div>
+                    </div>
+                </Modal>
                 <Modal title="查看图片" v-model={this.visible}>
                     <img src={this.showUrl} style={{ width: '100%' }} />
                 </Modal>
