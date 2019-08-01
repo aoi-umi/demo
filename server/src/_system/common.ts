@@ -214,6 +214,16 @@ export function enumerable(value: boolean) {
         }
     };
 }
+
+export function getDataInKey(data, keyList: string[]) {
+    let newData = {};
+    for (let key in data) {
+        if (keyList.includes[key]) {
+            newData[key] = data[key];
+        }
+    }
+    return newData;
+}
 //#endregion
 
 //#region 同名但实现不同

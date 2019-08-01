@@ -19,6 +19,8 @@ export type UserDocType = DocType<UserInstanceType>;
 export class User extends Base {
     @prop({
         required: true,
+        trim: true,
+        minlength: 1,
         index: {
             unique: true
         }
@@ -26,7 +28,9 @@ export class User extends Base {
     account: string;
 
     @prop({
-        required: true
+        required: true,
+        trim: true,
+        minlength: 1,
     })
     nickname: string;
 

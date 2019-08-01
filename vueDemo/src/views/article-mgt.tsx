@@ -42,6 +42,12 @@ export class ArticleMgtBase extends Base {
         return detail.status == myEnum.articleStatus.待审核 && this.storeUser.user.hasAuth(authority.articleMgtAudit)
     }
 
+    protected toList() {
+        this.$router.push({
+            path: dev.routeConfig.articleMgt.path,
+        });
+    }
+
     protected toDetail(_id?, preview?) {
         this.$router.push({
             path: preview ? dev.routeConfig.articleMgtDetail.path : dev.routeConfig.articleMgtEdit.path,

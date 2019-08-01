@@ -41,6 +41,9 @@ const config = {
                     url: '/user/detail',
                     method: 'get',
                 },
+                userUpdate: {
+                    url: '/user/update',
+                },
                 userAccountExists: {
                     url: '/user/accountExists',
                 },

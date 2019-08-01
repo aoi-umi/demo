@@ -56,7 +56,7 @@ class RoleDetail extends Base {
     $refs: { formVaild: IForm, authTransfer: IAuthorityTransfer };
 
     private saving = false;
-    private async save() {
+    private async handleSave() {
         await this.operateHandler('保存', async () => {
             this.saving = true;
             let detail = this.innerDetail;
@@ -71,7 +71,10 @@ class RoleDetail extends Base {
             });
             this.$emit('save-success', rs);
             this.initDetail(this.getDetailData());
-        }).finally(() => {
+        }, {
+                validate: this.$refs.formVaild.validate
+            }
+        ).finally(() => {
             this.saving = false;
         });
     }
@@ -97,13 +100,7 @@ class RoleDetail extends Base {
                     </FormItem>
                     <FormItem>
                         <Button type="primary" on-click={() => {
-                            this.$refs.formVaild.validate((valid) => {
-                                if (!valid) {
-                                    this.$Message.error('参数有误');
-                                } else {
-                                    this.save();
-                                }
-                            });
+                            this.handleSave();
                         }} loading={this.saving}>保存</Button>
                     </FormItem>
                 </Form>

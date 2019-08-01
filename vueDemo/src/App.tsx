@@ -78,7 +78,6 @@ export default class App extends Base {
             testApi.userSignOut();
         }
         this.storeUser.setUser(null);
-        localStorage.removeItem(dev.cacheKey.testUser);
     }
 
     render() {

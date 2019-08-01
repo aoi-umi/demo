@@ -1,3 +1,5 @@
+import * as helpers from '@/helpers';
+
 export type LoginUserType = UserInfo & LoginUser;
 export class LoginUser {
     isLogin = false;
@@ -32,5 +34,11 @@ export class LoginUser {
                 return true;
         }
         return false;
+    }
+
+    static createToken(account, pwd, data) {
+        let token = account + helpers.md5(pwd) + JSON.stringify(data);
+        token = helpers.md5(token);
+        return token;
     }
 }

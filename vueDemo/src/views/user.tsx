@@ -10,12 +10,13 @@ import { Tag, Modal, Input, Row, Col, Form, FormItem, Button, Spin, Card } from 
 import { MyTagModel } from '@/components/my-tag';
 import { DetailDataType as UserDetailDataType } from './user-mgt';
 import { Base } from './base';
+import { LoginUser } from '@/model/user';
 
 
 type SignInDataType = {
     account?: string;
     password?: string;
-}
+};
 
 @Component
 class SignIn extends Base {
@@ -40,12 +41,11 @@ class SignIn extends Base {
     $refs: { formVaild: IForm };
     private loading = false;
 
-    private async signIn() {
-        try {
+    private async handleSignIn() {
+        await this.operateHandler('登录', async () => {
             let { account, password } = this.innerDetail;
             let req = { account, rand: helpers.randStr() };
-            let token = req.account + helpers.md5(password) + JSON.stringify(req);
-            token = helpers.md5(token);
+            let token = LoginUser.createToken(account, password, req);
             localStorage.setItem(dev.cacheKey.testUser, token);
             let rs = await testApi.userSignIn(req);
             this.storeUser.setUser(rs);
@@ -53,25 +53,16 @@ class SignIn extends Base {
             this.$emit('success');
             if (this.to)
                 this.$router.push({ path: this.to, query: this.toQuery });
-        } catch (e) {
-            this.$Message.error(e.message);
-        }
+        }, {
+                validate: this.$refs.formVaild.validate
+            }
+        );
     }
 
     private handlePress(e) {
-        if (e.charCode == 13) {
+        if (this.isPressEnter(e)) {
             this.handleSignIn();
         }
-    }
-
-    private handleSignIn() {
-        this.$refs.formVaild.validate((valid) => {
-            if (!valid) {
-                this.$Message.error('参数有误');
-            } else {
-                this.signIn();
-            }
-        });
     }
 
     to = '';
@@ -155,29 +146,22 @@ class SignUp extends Base {
 
     private loading = false;
 
-    private async signUp() {
+    private async handleSignUp() {
         await this.operateHandler('注册', async () => {
             let rs = await testApi.userSignUp(this.innerDetail);
             this.innerDetail = this.getDetailData();
             this.$emit('success');
             this.$router.push(dev.routeConfig.userSignIn.path);
-        });
+        }, {
+                validate: this.$refs.formVaild.validate
+            }
+        );
     }
 
     private handlePress(e) {
-        if (e.charCode == 13) {
+        if (this.isPressEnter(e)) {
             this.handleSignUp();
         }
-    }
-
-    private handleSignUp() {
-        this.$refs.formVaild.validate((valid) => {
-            if (!valid) {
-                this.$Message.error('参数有误');
-            } else {
-                this.signUp();
-            }
-        });
     }
 
     render() {
@@ -234,13 +218,85 @@ export default class UserInfo extends Base {
         }
     }
 
+    $refs: { formVaild: IForm };
+    pwdLoading = false;
+    changePwdDetail = {
+        pwd: '',
+        newPwd: '',
+        newPwdRepeat: '',
+    };
+    changePwdShow = false;
+    async toggleChangePwd(show: boolean) {
+        this.changePwdShow = show;
+        this.changePwdDetail.pwd = '';
+        this.changePwdDetail.newPwd = '';
+        this.changePwdDetail.newPwdRepeat = '';
+    }
+    private rules = {
+        pwd: [
+            { required: true, trigger: 'blur' }
+        ],
+        newPwd: [{
+            required: true, trigger: 'blur'
+        }, {
+            validator: (rule, value, callback) => {
+                if (value === this.changePwdDetail.pwd) {
+                    callback(new Error('新旧密码相同'));
+                } else {
+                    callback();
+                }
+            },
+            trigger: 'blur'
+        }],
+        newPwdRepeat: [{
+            required: true, trigger: 'blur'
+        }, {
+            validator: (rule, value, callback) => {
+                if (value !== this.changePwdDetail.newPwd) {
+                    callback(new Error('两次输入密码不一致'));
+                } else {
+                    callback();
+                }
+            },
+            trigger: 'blur'
+        }],
+    };
+
+    handleChangePwd() {
+        this.operateHandler('修改密码', async () => {
+            let user = this.storeUser.user;
+            let req = {
+                newPassword: this.changePwdDetail.newPwd,
+                round: helpers.randStr(),
+            };
+            let token = LoginUser.createToken(user.account, this.changePwdDetail.pwd, req);
+            await testApi.userUpdate({
+                ...req,
+                token
+            });
+            this.storeUser.setUser(null);
+            this.toggleChangePwd(false);
+        }, {
+                validate: this.$refs.formVaild.validate
+            }
+        );
+    }
+
+    private handlePress(e) {
+        if (this.isPressEnter(e)) {
+            this.handleChangePwd();
+        }
+    }
+
     render() {
         return (
             <div style={{ position: 'relative', }}>
                 <Card>
                     <Form label-width={60}>
                         <FormItem label="账号">
-                            {this.detail.account}({this.detail.nickname})
+                            {this.detail.account}({this.detail.nickname}) <a on-click={() => {
+                                this.toggleChangePwd(true);
+                            }}>修改密码</a>
                         </FormItem>
                         <FormItem label="状态">
                             {this.detail.statusText}
@@ -260,7 +316,27 @@ export default class UserInfo extends Base {
                     </Form>
                 </Card>
                 {this.loading && <Spin size="large" fix></Spin>}
-            </div>
+                <Modal v-model={this.changePwdShow} footer-hide>
+                    <div class="dialog-view" on-keypress={this.handlePress}>
+                        <h3>修改密码</h3>
+                        <br />
+                        <Form label-width={100} ref="formVaild" props={{ model: this.changePwdDetail }} rules={this.rules}>
+                            <FormItem label="密码" prop="pwd">
+                                <Input v-model={this.changePwdDetail.pwd} type="password" />
+                            </FormItem>
+                            <FormItem label="新密码" prop="newPwd">
+                                <Input v-model={this.changePwdDetail.newPwd} type="password" />
+                            </FormItem>
+                            <FormItem label="确认密码" prop="newPwdRepeat">
+                                <Input v-model={this.changePwdDetail.newPwdRepeat} type="password" />
+                            </FormItem>
+                            <FormItem>
+                                <Button type="primary" long on-click={this.handleChangePwd} loading={this.pwdLoading}>修改</Button>
+                            </FormItem>
+                        </Form>
+                    </div>
+                </Modal>
+            </div >
         );
     }
 }

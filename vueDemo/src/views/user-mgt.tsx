@@ -124,13 +124,6 @@ class UserMgtDetail extends Base {
                     }
                     <FormItem>
                         <Button type="primary" on-click={() => {
-                            // this.$refs.formVaild.validate((valid) => {
-                            //     if (!valid) {
-                            //         this.$Message.error('参数有误');
-                            //     } else {
-                            //         this.save();
-                            //     }
-                            // })
                             this.save();
                         }} loading={this.saving}>保存</Button>
                     </FormItem>
