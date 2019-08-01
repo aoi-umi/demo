@@ -9,6 +9,7 @@ declare global {
             _parsedUrl: {
                 pathname: string;
             },
+            realIp: string;
         }
 
         interface MyData {
@@ -34,8 +35,8 @@ declare global {
             authority: { [key: string]: boolean };
             key?: string;
             cacheDatetime?: string;
-            token?: string;
-            reqBody?: any;
+            // token?: string;
+            loginData?: any;
         }
 
         interface Response {

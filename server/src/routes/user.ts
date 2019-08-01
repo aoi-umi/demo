@@ -3,7 +3,6 @@ import { plainToClass } from 'class-transformer';
 
 import * as common from '../_system/common';
 import * as cache from '../_system/cache';
-import { transaction } from '../_system/dbMongo';
 import { responseHandler, paramsValid, } from '../helpers';
 import { dev, error, auth, myEnum } from '../config';
 import { UserModel, UserMapper } from '../models/mongo/user';
@@ -39,11 +38,10 @@ export let signIn: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let data = plainToClass(VaildSchema.UserSignIn, req.body);
         paramsValid(data);
-        let token = req.header(dev.cacheKey.user);
+        let token = req.myData.user.key;
         let { user, disableResult } = await UserMapper.accountCheck(data.account);
 
-        let reqBody = JSON.stringify(data);
-        let checkToken = common.createToken(data.account + user.password + reqBody);
+        let { checkToken } = UserMapper.createToken(data, user);
         if (token !== checkToken)
             throw common.error('', error.TOKEN_WRONG);
         let userInfoKey = dev.cacheKey.user + token;
@@ -57,7 +55,7 @@ export let signIn: RequestHandler = (req, res) => {
             }
         }
 
-        let returnUser = { _id: user._id, account: user.account, nickname: user.nickname, key: token, authority: userAuth };
+        let returnUser = { _id: user._id, account: user.account, nickname: user.nickname, key: token, authority: userAuth, loginData: data };
         await cache.set(userInfoKey, returnUser, dev.cacheTime.user);
         return returnUser;
     }, req, res);
@@ -75,6 +73,7 @@ export let signOut: RequestHandler = (req, res) => {
 export let info: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
+        delete user.loginData;
         return user.key ? user : null;
     }, req, res);
 };
@@ -84,6 +83,24 @@ export let detail: RequestHandler = (req, res) => {
         let user = req.myData.user;
         let userDetail = await UserMapper.detail(user._id);
         return userDetail;
+    }, req, res);
+};
+
+export let update: RequestHandler = (req, res) => {
+    responseHandler(async () => {
+        let data = plainToClass(VaildSchema.UserUpdate, req.body);
+        paramsValid(data);
+        let user = req.myData.user;
+        let { token, ...restData } = data;
+        let update: any = common.getDataInKey(restData, ['nickname']);
+        let dbUser = await UserModel.findById(user._id);
+        if (restData.newPassword) {
+            let { checkToken } = UserMapper.createToken(restData, dbUser);
+            if (token !== checkToken)
+                throw common.error('', error.TOKEN_WRONG);
+            update.password = common.md5(restData.newPassword);
+        }
+        await dbUser.update(update);
     }, req, res);
 };
 

@@ -11,6 +11,7 @@ router.post('/user/signIn', userAuthMid.normal, user.signIn);
 router.post('/user/signOut', userAuthMid.normal, user.signOut);
 router.get('/user/info', userAuthMid.normal, user.info);
 router.get('/user/detail', userAuthMid.normal, user.detail);
+router.post('/user/update', userAuthMid.normal, user.update);
 router.get('/user/mgt/query', userAuthMid.normal, user.mgtQuery);
 router.post('/user/mgt/save', userAuthMid.normal, user.mgtSave);
 router.post('/user/mgt/disable', userAuthMid.normal, user.mgtDisable);

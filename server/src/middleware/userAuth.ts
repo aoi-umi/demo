@@ -20,14 +20,16 @@ export const normal: RequestHandler = async (req, res, next) => {
         };
         let userKey = req.header(config.dev.cacheKey.user);
         if (userKey) {
-            userKey = config.dev.cacheKey.user + userKey;
-            let user = await cache.get(userKey);
+            let userKey2 = config.dev.cacheKey.user + userKey;
+            let user: Express.MyDataUser = await cache.get(userKey2);
             if (user) {
-                let { disableResult } = await UserMapper.accountCheck(user.account);
+                let { disableResult } = await UserMapper.accountCheck(user.account, user);
                 if (disableResult.disabled) {
                     user.authority = {};
                 }
                 req.myData.user = user;
+            } else {
+                req.myData.user.key = userKey;
             }
         }
 

@@ -10,8 +10,15 @@ import { AuthorityModel } from '../authority';
 import { RoleModel } from '../role';
 import { UserModel } from ".";
 import { BaseMapper } from '../_base';
+import { UserInstanceType } from './user';
 
 export class UserMapper {
+    static createToken(data, user: UserInstanceType) {
+        let dataStr = JSON.stringify(data);
+        let checkToken = common.createToken(user.account + user.password + dataStr);
+        return { dataStr, checkToken };
+    }
+
     static async accountExists(account: string) {
         let rs = await UserModel.findOne({ account });
         return rs;
@@ -223,11 +230,17 @@ export class UserMapper {
         return userDetail;
     }
 
-    static async accountCheck(account: string) {
+    static async accountCheck(account: string, sessionUser?: Express.MyDataUser) {
         let user = await UserMapper.accountExists(account);
         if (!user)
             throw common.error('账号不存在');
         let disRs = user.checkDisabled();
+        if (sessionUser && sessionUser.loginData) {
+            let { checkToken } = UserMapper.createToken(sessionUser.loginData, user);
+            if (checkToken !== sessionUser.key) {
+                throw common.error('账号的密码已变更, 请重新登录');
+            }
+        }
         return {
             user,
             disableResult: disRs

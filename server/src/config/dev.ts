@@ -4,6 +4,9 @@ import { authConfig as auth } from './authConfig';
 
 //#region 访问权限配置
 export let accessUrlConfig: AccessUrlConfigType[] = [
+    { url: '/devMgt/user/info', auth: [auth.login] },
+    { url: '/devMgt/user/update', auth: [auth.login] },
+    { url: '/devMgt/user/detail', auth: [auth.login] },
     { url: '/devMgt/user/mgt/query', auth: [auth.userMgtQuery] },
     { url: '/devMgt/user/mgt/save', auth: [auth.userMgtEdit] },
     { url: '/devMgt/user/mgt/disable', auth: [auth.userMgtDisable] },

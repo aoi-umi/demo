@@ -23,7 +23,16 @@ export class UserSignIn {
     @IsDefined()
     account: string;
 
+    @IsDefined()
     rand: string;
+}
+
+export class UserUpdate {
+    newPassword: string;
+
+    rand: string;
+
+    token: string;
 }
 
 export class UserMgtQuery extends ListBase {

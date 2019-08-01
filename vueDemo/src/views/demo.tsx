@@ -6,9 +6,10 @@ import * as echarts from 'echarts/lib/echarts';
 import { Input, Card, Button, ColorPicker, Row, Col, Checkbox } from '@/components/iview';
 import { MyList, IMyList } from '@/components/my-list';
 import { testSocket } from '@/api';
+import { Base } from './base';
 
 @Component
-export default class App extends Vue {
+export default class App extends Base {
     public value = '';
     public msg = '';
     public list: { test: string }[] = [];
@@ -188,7 +189,7 @@ export default class App extends Vue {
                         <Row >
                             <Col span={21}>
                                 <Input v-model={this.danmaku} on-on-keypress={(e) => {
-                                    if (e.charCode == 13) {
+                                    if (this.isPressEnter(e)) {
                                         this.sendDanmaku();
                                     }
                                 }} search enter-button="danmaku" on-on-search={this.sendDanmaku} />

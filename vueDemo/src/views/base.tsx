@@ -8,10 +8,27 @@ export class Base extends Vue {
     }
 
     protected async operateHandler(operate: string, fn: () => any, opt?: {
-        onSuccessClose: () => any;
+        onSuccessClose?: () => any;
+        validate?: (callback?: (valid?: boolean) => void) => void
     }) {
         try {
             opt = { ...opt };
+            let valid = await new Promise((reso, rej) => {
+                if (opt.validate) {
+                    opt.validate((valid) => {
+                        if (!valid) {
+                            this.$Message.error('参数有误');
+                            reso(false);
+                        } else {
+                            reso(true);
+                        }
+                    })
+                } else {
+                    reso(true);
+                }
+            });
+            if (!valid)
+                return false;
             await fn();
             this.$Message.success({
                 content: operate + '成功',
@@ -22,5 +39,9 @@ export class Base extends Vue {
             this.$Message.error(operate + '出错:' + e.message);
             return false;
         }
+    }
+
+    protected isPressEnter(e: { charCode: number }) {
+        return e && e.charCode === 13;
     }
 }

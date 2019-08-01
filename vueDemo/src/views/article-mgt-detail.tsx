@@ -86,7 +86,7 @@ export default class ArticleDetail extends ArticleMgtBase {
     }
 
     saving = false;
-    async save(submit: boolean) {
+    async handleSave(submit?: boolean) {
         this.saving = true;
         let { detail } = this.innerDetail;
         await this.operateHandler('保存', async () => {
@@ -95,18 +95,14 @@ export default class ArticleDetail extends ArticleMgtBase {
                 ...restDetail,
                 submit
             });
-        }).finally(() => {
-            this.saving = false;
-        });
-    }
-
-    saveClickHandler(submit?: boolean) {
-        this.$refs.formVaild.validate((valid) => {
-            if (!valid) {
-                this.$Message.error('参数有误');
-            } else {
-                this.save(submit);
+        }, {
+                validate: this.$refs.formVaild.validate,
+                onSuccessClose: () => {
+                    this.toList();
+                }
             }
+        ).finally(() => {
+            this.saving = false;
         });
     }
 
@@ -219,10 +215,10 @@ export default class ArticleDetail extends ArticleMgtBase {
                             <Divider size='small' />
                             <FormItem>
                                 <Button on-click={() => {
-                                    this.saveClickHandler(false);
+                                    this.handleSave(false);
                                 }} loading={this.saving}>保存草稿</Button>
                                 <Button type="primary" on-click={() => {
-                                    this.saveClickHandler(true);
+                                    this.handleSave(true);
                                 }} loading={this.saving}>发布</Button>
                             </FormItem>
                         </div>
@@ -233,8 +229,12 @@ export default class ArticleDetail extends ArticleMgtBase {
         );
     }
 
+    auditSuccessHandler() {
+        this.toList();
+    }
+
     delSuccessHandler() {
-        this.loadDetail();
+        this.toList();
     }
 
     renderPreview() {

@@ -51,7 +51,7 @@ class AuthorityDetail extends Base {
     $refs: { formVaild: IForm };
 
     saving = false;
-    async save() {
+    async handleSave() {
         await this.operateHandler('保存', async () => {
             this.saving = true;
             let detail = this.innerDetail;
@@ -63,7 +63,10 @@ class AuthorityDetail extends Base {
             });
             this.$emit('save-success', rs);
             this.initDetail(this.getDetailData());
-        }).finally(() => {
+        }, {
+                validate: this.$refs.formVaild.validate
+            }
+        ).finally(() => {
             this.saving = false;
         });
     }
@@ -86,13 +89,7 @@ class AuthorityDetail extends Base {
                     </FormItem>
                     <FormItem>
                         <Button type="primary" on-click={() => {
-                            this.$refs.formVaild.validate((valid) => {
-                                if (!valid) {
-                                    this.$Message.error('参数有误');
-                                } else {
-                                    this.save();
-                                }
-                            });
+                            this.handleSave();
                         }} loading={this.saving}>保存</Button>
                     </FormItem>
                 </Form>
