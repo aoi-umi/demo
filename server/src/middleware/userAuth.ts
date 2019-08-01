@@ -7,7 +7,6 @@ import { UserMapper } from "../models/mongo/user";
 export const normal: RequestHandler = async (req, res, next) => {
     try {
         req.myData = {
-            method: {},
             user: {
                 _id: '',
                 nickname: '',
@@ -16,7 +15,7 @@ export const normal: RequestHandler = async (req, res, next) => {
             },
             startTime: new Date().getTime(),
             accessableUrl: {},
-            ip: req.ip,
+            ip: req.realIp,
         };
         let userKey = req.header(config.dev.cacheKey.user);
         if (userKey) {

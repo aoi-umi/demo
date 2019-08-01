@@ -13,9 +13,6 @@ declare global {
         }
 
         interface MyData {
-            method: {
-                methodName?: string
-            };
             user: MyDataUser;
             viewPath?: string;
             noNav?: boolean;
