@@ -53,6 +53,7 @@ export default class ArticleDetail extends ArticleMgtBase {
 
     private initDetail(data) {
         this.innerDetail = data;
+        this.coverList = this.innerDetail.detail.coverUrl ? [{ url: this.innerDetail.detail.coverUrl }] : [];
     }
 
     private rules = {
@@ -86,15 +87,23 @@ export default class ArticleDetail extends ArticleMgtBase {
         }
     }
 
+    coverList = [];
+
     saving = false;
     async handleSave(submit?: boolean) {
         this.saving = true;
         let { detail } = this.innerDetail;
         await this.operateHandler('保存', async () => {
-            let err = await this.$refs.upload.upload();
+            let upload = this.$refs.upload;
+            let err = await upload.upload();
             if (err.length) {
                 throw new Error(err.join(','));
             }
+            let file = upload.fileList[0];
+            if (!file)
+                detail.cover = '';
+            else if (file.uploadRes)
+                detail.cover = file.uploadRes;
             let { user, ...restDetail } = detail;
             let rs = await testApi.articleMgtSave({
                 ...restDetail,
@@ -185,13 +194,11 @@ export default class ArticleDetail extends ArticleMgtBase {
                             successHandler={(res, file) => {
                                 let rs = testApi.imgUplodaHandler(res);
                                 file.url = rs.url;
-                                detail.cover = rs.fileId;
+                                return rs.fileId;
                             }}
                             // format={['jpg']}
                             width={160} height={90}
-                            defaultFileList={detail.coverUrl ? [{
-                                url: detail.coverUrl
-                            }] : []}
+                            v-model={this.coverList}
 
                         />
                     </FormItem>
