@@ -21,6 +21,7 @@ type FileType = {
     data?: string;
     originData?: string;
     willUpload?: boolean;
+    uploadRes?: any;
 };
 
 type CropperOption = {
@@ -68,17 +69,17 @@ class MyUpload extends Vue {
     @Prop({
         default: () => []
     })
-    defaultFileList: { name?: string; url?: string }[];
+    value: FileType[];
+    fileList: FileType[] = [];
 
-    @Watch('defaultFileList')
-    private watchDefaultFileList(newVal: any[]) {
-        let defaultFileList = newVal;
+    @Watch('value')
+    private watchValue(newVal: any[]) {
         if (newVal) {
-            this.defaultList = this.maxCount > 0 && defaultFileList.length > this.maxCount ?
-                defaultFileList.slice(0, this.maxCount) :
-                defaultFileList;
+            this.fileList = this.maxCount > 0 && newVal.length > this.maxCount ?
+                newVal.slice(0, this.maxCount) :
+                newVal;
         } else {
-            this.defaultList = [];
+            this.fileList = [];
         }
     }
 
@@ -92,13 +93,6 @@ class MyUpload extends Vue {
 
     defaultList = [];
     visible = false;
-    get fileList(): FileType[] {
-        return this.$refs.upload && this.$refs.upload.fileList;
-    }
-
-    private getFileList(): FileType[] {
-        return this.$refs.upload ? this.$refs.upload.fileList : [];
-    }
 
     private showUrl = '';
     private uploadHeaders = {};
@@ -115,7 +109,7 @@ class MyUpload extends Vue {
         outputType: 'png',
     };
     private getFileCount() {
-        return this.getFileList().length;
+        return this.fileList.length;
     }
 
     private getHideUpload() {
@@ -123,7 +117,7 @@ class MyUpload extends Vue {
     }
 
     protected created() {
-        this.watchDefaultFileList(this.defaultFileList);
+        // this.watchValue(this.defaultFileList);
         if (this.cropperOptions) {
             this.cropper = {
                 ...this.cropper,
@@ -167,7 +161,7 @@ class MyUpload extends Vue {
                         data: formData,
                         headers
                     });
-                    this.successHandler && this.successHandler(rs.data, file);
+                    file.uploadRes = this.successHandler && this.successHandler(rs.data, file);
                     file.willUpload = false;
                 } catch (e) {
                     errorList.push(`[图${idx + 1}]:${e.message}`);
@@ -212,11 +206,11 @@ class MyUpload extends Vue {
     private handleBeforeUpload(file) {
         this.file = file;
         let reader = new FileReader()
-        reader.readAsDataURL(file)
+        reader.readAsDataURL(file);
         reader.onload = e => {
             this.cropper.img = (e.target as any).result;
             this.cropperShow = true;
-        }
+        };
         return false;
     }
 
@@ -242,30 +236,23 @@ class MyUpload extends Vue {
             uploadCls.push('hidden');
         return (
             <div>
-                {this.getFileList().map(item => {
+                {this.fileList.map(item => {
                     return (
                         <div class={clsPrefix + 'list'} style={{ width, height, lineHeight: height }}>
-                            {item.status === 'finished' ? (
-                                <div style={{
+                            <div style={{
+                                width: 'inherit',
+                                height: 'inherit',
+                            }}>
+                                <MyImg style={{
                                     width: 'inherit',
                                     height: 'inherit',
-                                }}>
-                                    <MyImg style={{
-                                        width: 'inherit',
-                                        height: 'inherit',
-                                    }} src={item.url || item.data} />
-                                    <div class={clsPrefix + 'list-cover'}>
-                                        <Icon type="md-create" nativeOn-click={() => { this.handleEdit(item); }} />
-                                        <Icon type="md-eye" nativeOn-click={() => { this.handleView(item); }} />
-                                        <Icon type="md-trash" nativeOn-click={() => { this.handleRemove(item); }} />
-                                    </div>
+                                }} src={item.url || item.data} />
+                                <div class={clsPrefix + 'list-cover'}>
+                                    {item.originData && <Icon type="md-create" nativeOn-click={() => { this.handleEdit(item); }} />}
+                                    <Icon type="md-eye" nativeOn-click={() => { this.handleView(item); }} />
+                                    <Icon type="md-trash" nativeOn-click={() => { this.handleRemove(item); }} />
                                 </div>
-                            ) : (
-                                    <div>
-                                        {item.showProgress && <Progress percent={item.percentage} hide-info />}
-                                    </div>
-                                )
-                            }
+                            </div>
                         </div>
                     )
                 })}
@@ -274,7 +261,7 @@ class MyUpload extends Vue {
                     class={uploadCls}
                     ref="upload"
                     show-upload-list={false}
-                    default-file-list={this.defaultList as any}
+                    // default-file-list={this.defaultList as any}
                     format={this.format}
                     max-size={this.maxSize}
                     props={{
