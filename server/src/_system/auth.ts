@@ -5,9 +5,10 @@ import * as common from './common';
 import * as config from '../config';
 import { AuthConfigType } from '../config/authConfig';
 
+export type AuthType = AuthorityType | AuthorityType[] | AuthorityType[][];
 export type AccessUrlConfigType = {
     url: string;
-    auth?: AuthorityType | AuthorityType[] | AuthorityType[][];
+    auth?: AuthType;
 }
 
 type AuthorityType = string | AuthConfigType;
@@ -40,11 +41,9 @@ export class Auth {
         let url = {};
         let accessable = false;
         let isUrlExist = false;
-        this.accessUrlConfig.forEach(function (item) {
+        this.accessUrlConfig.forEach((item) => {
             let opt = { notExistAuthority: null };
-            let result = !item.auth
-                || (Array.isArray(item.auth) && !item.auth.length)
-                || Auth.includes(user, item.auth, opt);
+            let result = this.isAccessable(user, item.auth, opt);
             let isExist = item.url == pathname;
             if (isExist) isUrlExist = true;
             if (result) {
@@ -72,7 +71,23 @@ export class Auth {
         return url;
     }
 
-    static includes(user: UserType, authData: AuthorityType | AuthorityType[] | AuthorityType[][], opt?: IsExistAuthorityOption) {
+    isAccessable(user: UserType, auth: AuthType, opt?: IsExistAuthorityOption) {
+        let result = !auth
+            || (Array.isArray(auth) && !auth.length)
+            || Auth.includes(user, auth, opt);
+        return result;
+    }
+
+    checkAccessable(user: UserType, auth: AuthType) {
+        let opt = { notExistAuthority: null };
+        let result = this.isAccessable(user, auth, opt);
+        if (!result) {
+            let errCode = Auth.getErrorCode(opt.notExistAuthority);
+            throw common.error('', errCode);
+        }
+    }
+
+    static includes(user: UserType, authData: AuthType, opt?: IsExistAuthorityOption) {
         if (!Array.isArray(authData))
             authData = [authData];
         for (let i = 0; i < authData.length; i++) {
