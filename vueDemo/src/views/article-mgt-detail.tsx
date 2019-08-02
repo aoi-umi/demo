@@ -41,6 +41,7 @@ export default class ArticleDetail extends ArticleMgtBase {
             detail: {
                 _id: '',
                 cover: '',
+                coverUrl: '',
                 title: '',
                 content: '',
                 status: myEnum.articleStatus.草稿,
