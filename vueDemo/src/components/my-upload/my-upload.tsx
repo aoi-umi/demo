@@ -70,6 +70,18 @@ class MyUpload extends Vue {
     })
     defaultFileList: { name?: string; url?: string }[];
 
+    @Watch('defaultFileList')
+    private watchDefaultFileList(newVal: any[]) {
+        let defaultFileList = newVal;
+        if (newVal) {
+            this.defaultList = this.maxCount > 0 && defaultFileList.length > this.maxCount ?
+                defaultFileList.slice(0, this.maxCount) :
+                defaultFileList;
+        } else {
+            this.defaultList = [];
+        }
+    }
+
     @Prop()
     successHandler: (res: any, file: FileType) => any;
 
@@ -80,7 +92,14 @@ class MyUpload extends Vue {
 
     defaultList = [];
     visible = false;
-    fileList: FileType[] = [];
+    get fileList(): FileType[] {
+        return this.$refs.upload && this.$refs.upload.fileList;
+    }
+
+    private getFileList(): FileType[] {
+        return this.$refs.upload ? this.$refs.upload.fileList : [];
+    }
+
     private showUrl = '';
     private uploadHeaders = {};
     private cropperShow = false;
@@ -96,8 +115,7 @@ class MyUpload extends Vue {
         outputType: 'png',
     };
     private getFileCount() {
-        let upload = this.$refs.upload;
-        return upload ? upload.fileList.length : 0;
+        return this.getFileList().length;
     }
 
     private getHideUpload() {
@@ -105,21 +123,16 @@ class MyUpload extends Vue {
     }
 
     protected created() {
-        if (this.defaultFileList) {
-            this.defaultList = this.maxCount > 0 && this.defaultFileList.length > this.maxCount ?
-                this.defaultFileList.slice(0, this.maxCount) :
-                this.defaultFileList;
-        }
+        this.watchDefaultFileList(this.defaultFileList);
         if (this.cropperOptions) {
             this.cropper = {
                 ...this.cropper,
                 ...this.cropperOptions,
-            }
+            };
         }
     }
 
     protected mounted() {
-        this.fileList = this.$refs.upload.fileList;
     }
 
     private handleEdit(file: FileType) {
@@ -229,7 +242,7 @@ class MyUpload extends Vue {
             uploadCls.push('hidden');
         return (
             <div>
-                {this.fileList.map(item => {
+                {this.getFileList().map(item => {
                     return (
                         <div class={clsPrefix + 'list'} style={{ width, height, lineHeight: height }}>
                             {item.status === 'finished' ? (
