@@ -1,10 +1,12 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import * as iview from 'iview';
-import { Upload, Modal, Icon, Progress } from '@/components/iview';
+import { Upload, Modal, Icon, Progress, Button } from '@/components/iview';
 import { convClass } from '@/helpers';
+import axios, { AxiosRequestConfig } from 'axios';
 import { VueCropper } from 'vue-cropper';
 import { MyImg } from '../my-img';
 import './my-upload.less';
+import { Utils } from '../utils';
 
 const clsPrefix = 'my-upload-';
 
@@ -14,8 +16,22 @@ type FileType = {
     percentage?: number;
     status?: string;
     showProgress?: boolean;
+
+    file?: File;
+    data?: string;
+    originData?: string;
+    willUpload?: boolean;
 };
 
+type CropperOption = {
+    img?: any;
+    autoCrop?: boolean;
+    autoCropWidth?: number;
+    autoCropHeight?: number;
+    fixed?: boolean;
+    fixedNumber?: [number, number]
+    outputType?: 'jpeg' | 'png' | 'webp'
+};
 @Component({
     VueCropper
 })
@@ -57,52 +73,98 @@ class MyUpload extends Vue {
     @Prop()
     successHandler: (res: any, file: FileType) => any;
 
+    @Prop()
+    cropperOptions?: CropperOption;
+
     $refs: { upload: iview.Upload & { fileList: FileType[] }, cropper: any };
 
     defaultList = [];
     visible = false;
-    uploadList: FileType[] = [];
-    private file;
+    fileList: FileType[] = [];
     private showUrl = '';
     private uploadHeaders = {};
-    private cropper = {
-        show: false,
+    private cropperShow = false;
+    private editIndex = -1;
+    private file: File;
+    private cropper: CropperOption = {
         img: '',
-        autoCropWidth: 240,
-        autoCropHeight: 160
+        autoCrop: true,
+        autoCropWidth: 512,
+        autoCropHeight: 288,
+        fixed: true,
+        fixedNumber: [16, 9],
+        outputType: 'png',
     };
-    getFileCount() {
+    private getFileCount() {
         let upload = this.$refs.upload;
         return upload ? upload.fileList.length : 0;
     }
 
-    getHideUpload() {
+    private getHideUpload() {
         return this.maxCount > 0 && this.getFileCount() >= this.maxCount;
     }
 
-    created() {
+    protected created() {
         if (this.defaultFileList) {
             this.defaultList = this.maxCount > 0 && this.defaultFileList.length > this.maxCount ?
                 this.defaultFileList.slice(0, this.maxCount) :
                 this.defaultFileList;
         }
+        if (this.cropperOptions) {
+            this.cropper = {
+                ...this.cropper,
+                ...this.cropperOptions,
+            }
+        }
     }
 
-    mounted() {
-        this.uploadList = this.$refs.upload.fileList;
+    protected mounted() {
+        this.fileList = this.$refs.upload.fileList;
     }
 
-    handleView(file: FileType) {
-        this.showUrl = file.url;
+    private handleEdit(file: FileType) {
+        this.editIndex = this.fileList.indexOf(file);
+        this.file = file.file;
+        this.cropperShow = true;
+        this.cropper.img = file.originData;
+    }
+
+    private handleView(file: FileType) {
+        this.showUrl = file.url || file.data;
         this.visible = true;
     }
 
-    handleRemove(file: FileType) {
-        const fileList = this.$refs.upload.fileList;
-        this.$refs.upload.fileList.splice(fileList.indexOf(file), 1);
+    private handleRemove(file: FileType) {
+        this.fileList.splice(this.fileList.indexOf(file), 1);
     }
 
-    handleSuccess(res, file: FileType) {
+    async upload() {
+        let errorList = [];
+        let headers = this.headers && this.headers();
+        for (let idx = 0; idx < this.fileList.length; idx++) {
+            let file = this.fileList[idx];
+            if (file.willUpload) {
+                try {
+                    let formData = new FormData();
+                    let uploadFile = Utils.base64ToFile(file.data, file.file.name);
+                    formData.append('file', uploadFile);
+                    let rs = await axios.request({
+                        method: 'post',
+                        url: this.uploadUrl,
+                        data: formData,
+                        headers
+                    });
+                    this.successHandler && this.successHandler(rs.data, file);
+                    file.willUpload = false;
+                } catch (e) {
+                    errorList.push(`[图${idx + 1}]:${e.message}`);
+                }
+            }
+        }
+        return errorList;
+    }
+
+    private handleSuccess(res, file: FileType) {
         if (this.successHandler) {
             try {
                 this.successHandler(res, file);
@@ -113,40 +175,53 @@ class MyUpload extends Vue {
         }
     }
 
-    handleError(error) {
+    private handleError(error) {
         this.$Notice.error({
             title: '上传出错了',
             desc: error
         });
     }
 
-    handleFormatError(file: FileType) {
+    private handleFormatError(file: FileType) {
         this.$Notice.warning({
             title: '文件格式不正确',
             desc: `文件 "${file.name}" 的格式不正确, 只能上传${this.format.join(',')}格式的文件`
         });
     }
 
-    handleMaxSize(file: FileType) {
+    private handleMaxSize(file: FileType) {
         this.$Notice.warning({
             title: '文件大小超出限制',
             desc: `文件 "${file.name}" 大小超出限制`
         });
     }
 
-    handleBeforeUpload(file) {
+    private handleBeforeUpload(file) {
+        this.file = file;
         let reader = new FileReader()
         reader.readAsDataURL(file)
         reader.onload = e => {
             this.cropper.img = (e.target as any).result;
-            this.cropper.show = true;
+            this.cropperShow = true;
         }
-        this.file = file;
-        return false
-        return true;
+        return false;
     }
 
-    render() {
+    private pushImg(data, originData?) {
+        let file = {
+            data: data,
+            originData: originData || data,
+            status: 'finished',
+            file: this.file,
+            willUpload: true,
+        };
+        if (this.editIndex >= 0) {
+            this.fileList.splice(this.editIndex, 1, file);
+        } else
+            this.fileList.push(file);
+    }
+
+    protected render() {
         let width = this.width + 'px',
             height = this.height + 'px';
         let uploadCls = [clsPrefix + 'upload'];
@@ -154,7 +229,7 @@ class MyUpload extends Vue {
             uploadCls.push('hidden');
         return (
             <div>
-                {this.uploadList.map(item => {
+                {this.fileList.map(item => {
                     return (
                         <div class={clsPrefix + 'list'} style={{ width, height, lineHeight: height }}>
                             {item.status === 'finished' ? (
@@ -165,10 +240,11 @@ class MyUpload extends Vue {
                                     <MyImg style={{
                                         width: 'inherit',
                                         height: 'inherit',
-                                    }} src={item.url} />
+                                    }} src={item.url || item.data} />
                                     <div class={clsPrefix + 'list-cover'}>
-                                        <Icon type="ios-eye-outline" nativeOn-click={() => { this.handleView(item); }} />
-                                        <Icon type="ios-trash-outline" nativeOn-click={() => { this.handleRemove(item); }} />
+                                        <Icon type="md-create" nativeOn-click={() => { this.handleEdit(item); }} />
+                                        <Icon type="md-eye" nativeOn-click={() => { this.handleView(item); }} />
+                                        <Icon type="md-trash" nativeOn-click={() => { this.handleRemove(item); }} />
                                     </div>
                                 </div>
                             ) : (
@@ -196,7 +272,7 @@ class MyUpload extends Vue {
                     }}
                     before-upload={this.handleBeforeUpload}
                     headers={this.uploadHeaders}
-                    multiple
+                    multiple={false}
                     type="drag"
                     action={this.uploadUrl}
                     style={{ width }}>
@@ -207,19 +283,31 @@ class MyUpload extends Vue {
                         <Icon type="ios-camera" size="20"></Icon>
                     </div>
                 </Upload>
-                <Modal title="裁剪" v-model={this.cropper.show} >
+                <div class={[clsPrefix + 'cropper-bg', this.cropperShow ? '' : 'hidden']}>
                     <div style={{ textAlign: 'center', width: '100%' }}>
-                        <div style={{ width: '480px', height: '300px', display: 'inline-block' }}>
+                        <div style={{ width: '1024px', height: '576px', display: 'inline-block' }}>
                             <VueCropper
                                 ref="cropper"
-                                img={this.cropper.img}
-                                autoCrop={true}
-                                autoCropWidth={this.cropper.autoCropWidth}
-                                autoCropHeight={this.cropper.autoCropHeight}
-                            ></VueCropper>
+                                props={this.cropper}
+                            />
+                        </div>
+                        <div>
+                            <Button on-click={() => {
+                                this.cropperShow = false;
+                            }}>取消</Button>
+                            <Button type="primary" on-click={() => {
+                                this.$refs.cropper.getCropData((data) => {
+                                    this.pushImg(data, this.cropper.img);
+                                });
+                                this.cropperShow = false;
+                            }}>截取</Button>
+                            <Button on-click={() => {
+                                this.pushImg(this.cropper.img);
+                                this.cropperShow = false;
+                            }}>原图</Button>
                         </div>
                     </div>
-                </Modal>
+                </div>
                 <Modal title="查看图片" v-model={this.visible}>
                     <img src={this.showUrl} style={{ width: '100%' }} />
                 </Modal>
@@ -230,3 +318,4 @@ class MyUpload extends Vue {
 
 const MyUploadView = convClass<MyUpload>(MyUpload);
 export default MyUploadView;
+export interface IMyUpload extends MyUpload { }

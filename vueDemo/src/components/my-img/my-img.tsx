@@ -18,8 +18,7 @@ class MyImg extends Vue {
 
     @Watch('src')
     private watchSrc(newVal) {
-        if (!newVal)
-            this.isLoadSuccess = false;
+        this.isLoadSuccess = !!newVal;
     }
 
     $refs: { img: HTMLElement }

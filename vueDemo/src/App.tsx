@@ -86,7 +86,7 @@ export default class App extends Base {
                 <Modal v-model={this.signInShow} footer-hide>
                     <SignInView on-success={() => {
                         this.signInShow = false;
-                    }}></SignInView>
+                    }}/>
                 </Modal>
                 <Header class="layout-header-bar">
                     <Icon
