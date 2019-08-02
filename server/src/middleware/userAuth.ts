@@ -46,7 +46,7 @@ export class UserAuthMid {
         }
     }
 
-    static normalV2(authData: AuthType) {
+    static normalV2(authData?: AuthType) {
         let fn: RequestHandler = async function (req, res, next) {
             try {
                 req.myData = {
@@ -77,7 +77,8 @@ export class UserAuthMid {
 
                 //url权限认证
                 let user = req.myData.user;
-                auth.checkAccessable(user, authData);
+                if (authData)
+                    auth.checkAccessable(user, authData);
                 next();
             } catch (e) {
                 next(e);
