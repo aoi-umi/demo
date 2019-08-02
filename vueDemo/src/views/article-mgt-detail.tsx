@@ -5,7 +5,7 @@ import moment from 'moment';
 import { testApi } from '@/api';
 import { myEnum, dev } from '@/config';
 import { Input, Form, FormItem, Button, Divider, Table } from '@/components/iview';
-import { MyUpload } from '@/components/my-upload';
+import { MyUpload, IMyUpload } from '@/components/my-upload';
 import { ArticleMgtBase } from './article-mgt';
 import { MyEditor } from '@/components/my-editor';
 import { IMyEditor } from '@/components/my-editor/my-editor';
@@ -62,7 +62,7 @@ export default class ArticleDetail extends ArticleMgtBase {
             { required: true, trigger: 'blur' }
         ],
     };
-    $refs: { formVaild: IForm, editor: IMyEditor };
+    $refs: { formVaild: IForm, editor: IMyEditor, upload: IMyUpload };
 
     created() {
         this.updateDetail();
@@ -90,6 +90,10 @@ export default class ArticleDetail extends ArticleMgtBase {
         this.saving = true;
         let { detail } = this.innerDetail;
         await this.operateHandler('保存', async () => {
+            let err = await this.$refs.upload.upload();
+            if (err.length) {
+                throw new Error(err.join(','));
+            }
             let { user, ...restDetail } = detail;
             let rs = await testApi.articleMgtSave({
                 ...restDetail,
@@ -174,6 +178,7 @@ export default class ArticleDetail extends ArticleMgtBase {
                     </FormItem>
                     <FormItem label="封面" prop="cover">
                         <MyUpload
+                            ref='upload'
                             headers={testApi.defaultHeaders}
                             uploadUrl={testApi.imgUploadUrl}
                             successHandler={(res, file) => {
