@@ -1,34 +1,4 @@
 
-import { AccessUrlConfigType } from '../_system/auth';
-import { authConfig as auth } from './authConfig';
-
-//#region 访问权限配置
-export let accessUrlConfig: AccessUrlConfigType[] = [
-    { url: '/devMgt/user/info', auth: [auth.login] },
-    { url: '/devMgt/user/update', auth: [auth.login] },
-    { url: '/devMgt/user/detail', auth: [auth.login] },
-    { url: '/devMgt/user/mgt/query', auth: [auth.userMgtQuery] },
-    { url: '/devMgt/user/mgt/save', auth: [auth.userMgtEdit] },
-    { url: '/devMgt/user/mgt/disable', auth: [auth.userMgtDisable] },
-
-    { url: '/devMgt/role/query', auth: [auth.roleQuery] },
-    { url: '/devMgt/role/save', auth: [auth.roleSave] },
-    { url: '/devMgt/role/del', auth: [auth.roleDel] },
-
-    { url: '/devMgt/authority/query', auth: [auth.authorityQuery] },
-    { url: '/devMgt/authority/save', auth: [auth.authoritySave] },
-    { url: '/devMgt/authority/del', auth: [auth.authorityDel] },
-
-    { url: '/devMgt/article/mgt/query', auth: [auth.login] },
-    { url: '/devMgt/article/mgt/detailQuery', auth: [auth.login] },
-    { url: '/devMgt/article/mgt/save', auth: [auth.login] },
-    { url: '/devMgt/article/mgt/audit', auth: [auth.articleMgtAudit] },
-    { url: '/devMgt/article/mgt/del', auth: [auth.articleMgtDel] },
-
-    { url: '/devMgt/img/upload', auth: [auth.login] },
-];
-//#endregion
-
 //#region 缓存 
 export let cacheKey = {
     user: 'userCacheKey',

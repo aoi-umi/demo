@@ -25,7 +25,6 @@ export const auth = new Auth();
 export async function init() {
     await mongo.connect();
     auth.init({
-        accessUrlConfig: config.dev.accessUrlConfig,
         accessableIfNotExists: true
     });
 }
