@@ -221,26 +221,33 @@ export default class UserInfo extends Base {
     $refs: { formVaild: IForm };
     pwdLoading = false;
     changePwdDetail = {
+        nickname: '',
         pwd: '',
         newPwd: '',
         newPwdRepeat: '',
     };
     changePwdShow = false;
-    async toggleChangePwd(show: boolean) {
+    async toggleUpdate(show: boolean) {
         this.changePwdShow = show;
+        this.changePwdDetail.nickname = this.detail.nickname;
         this.changePwdDetail.pwd = '';
         this.changePwdDetail.newPwd = '';
         this.changePwdDetail.newPwdRepeat = '';
     }
     private rules = {
-        pwd: [
-            { required: true, trigger: 'blur' }
-        ],
-        newPwd: [{
-            required: true, trigger: 'blur'
-        }, {
+        pwd: [{
             validator: (rule, value, callback) => {
-                if (value === this.changePwdDetail.pwd) {
+                if (this.changePwdDetail.newPwd && !value) {
+                    callback(new Error('请输入密码'));
+                } else {
+                    callback();
+                }
+            },
+            trigger: 'blur'
+        }],
+        newPwd: [{
+            validator: (rule, value, callback) => {
+                if (value && value === this.changePwdDetail.pwd) {
                     callback(new Error('新旧密码相同'));
                 } else {
                     callback();
@@ -249,10 +256,8 @@ export default class UserInfo extends Base {
             trigger: 'blur'
         }],
         newPwdRepeat: [{
-            required: true, trigger: 'blur'
-        }, {
             validator: (rule, value, callback) => {
-                if (value !== this.changePwdDetail.newPwd) {
+                if (this.changePwdDetail.newPwd && value !== this.changePwdDetail.newPwd) {
                     callback(new Error('两次输入密码不一致'));
                 } else {
                     callback();
@@ -262,20 +267,35 @@ export default class UserInfo extends Base {
         }],
     };
 
-    handleChangePwd() {
-        this.operateHandler('修改密码', async () => {
+    handleUpdate() {
+        this.operateHandler('修改', async () => {
             let user = this.storeUser.user;
-            let req = {
-                newPassword: this.changePwdDetail.newPwd,
-                round: helpers.randStr(),
-            };
-            let token = LoginUser.createToken(user.account, this.changePwdDetail.pwd, req);
-            await testApi.userUpdate({
-                ...req,
-                token
-            });
-            this.storeUser.setUser(null);
-            this.toggleChangePwd(false);
+            let req: any = {};
+            let logOut = false;
+            if (this.changePwdDetail.nickname && this.changePwdDetail.nickname != this.detail.nickname)
+                req.nickname = this.changePwdDetail.nickname;
+            if (this.changePwdDetail.newPwd) {
+                logOut = true;
+                req = {
+                    ...req,
+                    newPassword: this.changePwdDetail.newPwd,
+                    round: helpers.randStr(),
+                };
+                let token = LoginUser.createToken(user.account, this.changePwdDetail.pwd, req);
+                req = {
+                    ...req,
+                    token
+                };
+            }
+            if (Object.keys(req).length)
+                await testApi.userUpdate(req);
+            if (logOut)
+                this.storeUser.setUser(null);
+            else {
+                if (req.nickname)
+                    this.detail.nickname = req.nickname;
+            }
+            this.toggleUpdate(false);
         }, {
                 validate: this.$refs.formVaild.validate
             }
@@ -284,7 +304,7 @@ export default class UserInfo extends Base {
 
     private handlePress(e) {
         if (this.isPressEnter(e)) {
-            this.handleChangePwd();
+            this.handleUpdate();
         }
     }
 
@@ -294,9 +314,10 @@ export default class UserInfo extends Base {
                 <Card>
                     <Form label-width={60}>
                         <FormItem label="账号">
-                            {this.detail.account}({this.detail.nickname}) <a on-click={() => {
-                                this.toggleChangePwd(true);
-                            }}>修改密码</a>
+                            {this.detail.nickname}({this.detail.account})
+                            <a on-click={() => {
+                                this.toggleUpdate(true);
+                            }} style={{ marginLeft: '5px' }}>修改</a>
                         </FormItem>
                         <FormItem label="状态">
                             {this.detail.statusText}
@@ -318,11 +339,14 @@ export default class UserInfo extends Base {
                 {this.loading && <Spin size="large" fix></Spin>}
                 <Modal v-model={this.changePwdShow} footer-hide>
                     <div class="dialog-view" on-keypress={this.handlePress}>
-                        <h3>修改密码</h3>
+                        <h3>修改</h3>
                         <br />
                         <Form label-width={100} ref="formVaild" props={{ model: this.changePwdDetail }} rules={this.rules}>
+                            <FormItem label="昵称" prop="nickname">
+                                <Input v-model={this.changePwdDetail.nickname} />
+                            </FormItem>
                             <FormItem label="密码" prop="pwd">
-                                <Input v-model={this.changePwdDetail.pwd} type="password" />
+                                <Input v-model={this.changePwdDetail.pwd} type="password" placeholder="不修改密码时不用填" />
                             </FormItem>
                             <FormItem label="新密码" prop="newPwd">
                                 <Input v-model={this.changePwdDetail.newPwd} type="password" />
@@ -331,7 +355,7 @@ export default class UserInfo extends Base {
                                 <Input v-model={this.changePwdDetail.newPwdRepeat} type="password" />
                             </FormItem>
                             <FormItem>
-                                <Button type="primary" long on-click={this.handleChangePwd} loading={this.pwdLoading}>修改</Button>
+                                <Button type="primary" long on-click={this.handleUpdate} loading={this.pwdLoading}>修改</Button>
                             </FormItem>
                         </Form>
                     </div>

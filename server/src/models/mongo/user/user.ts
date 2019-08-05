@@ -2,7 +2,7 @@ import {
     getModelForClass, ModelType, DocType, InstanceType,
     setSchema, prop, arrayProp, setMethod
 } from 'mongoose-ts-ua';
-import moment = require('moment');
+import * as moment from 'moment';
 import { myEnum, dev } from '../../../config';
 import { Base } from '../_base';
 

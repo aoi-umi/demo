@@ -24,18 +24,15 @@ configure({
 export const auth = new Auth();
 export async function init() {
     await mongo.connect();
-    auth.init({
-        accessableIfNotExists: true
-    });
 }
 
-import routes from './routes';
 import { SocketOnConnect } from './typings/libs';
 export let register = function (app: Express) {
     app.use((req, res, next) => {
         req.realIp = req.header('X-Real-IP') || req.ip;
         next();
     });
+    const routes = require('./routes').default;
     app.use(config.env.urlPrefix, routes);
 }
 

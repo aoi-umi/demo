@@ -5,8 +5,9 @@ import * as common from '../_system/common';
 import * as cache from '../_system/cache';
 import { responseHandler, paramsValid, } from '../helpers';
 import { dev, error, auth, myEnum } from '../config';
-import { UserModel, UserMapper } from '../models/mongo/user';
+import { UserModel, UserMapper, UserLogMapper } from '../models/mongo/user';
 import * as VaildSchema from '../vaild-schema/class-valid';
+import { transaction } from '../_system/dbMongo';
 
 export let accountExists: RequestHandler = (req, res) => {
     responseHandler(async () => {
@@ -100,7 +101,11 @@ export let update: RequestHandler = (req, res) => {
                 throw common.error('', error.TOKEN_WRONG);
             update.password = common.md5(restData.newPassword);
         }
-        await dbUser.update(update);
+        let log = UserLogMapper.create(dbUser, user, { update });
+        await transaction(async (session) => {
+            await dbUser.update(update, { session });
+            await log.save({ session });
+        });
     }, req, res);
 };
 
@@ -120,6 +125,7 @@ export let mgtQuery: RequestHandler = (req, res) => {
 
 export let mgtSave: RequestHandler = (req, res) => {
     responseHandler(async () => {
+        let user = req.myData.user;
         let data = plainToClass(VaildSchema.UserMgtSave, req.body);
         paramsValid(data);
         let detail = await UserModel.findById(data._id);
@@ -127,23 +133,32 @@ export let mgtSave: RequestHandler = (req, res) => {
             throw common.error('不可修改此账号');
         let update: any = {};
 
+        let remark = '';
         if (data.delAuthList && data.delAuthList.length) {
             detail.authorityList = detail.authorityList.filter(ele => !data.delAuthList.includes(ele));
+            remark += `[删除了权限:${data.delAuthList.join(',')}]`;
         }
         if (data.delRoleList && data.delRoleList.length) {
             detail.roleList = detail.roleList.filter(ele => !data.delRoleList.includes(ele));
+            remark += `[删除了角色:${data.delRoleList.join(',')}]`;
         }
 
         if (data.addAuthList && data.addAuthList.length) {
             detail.authorityList = [...detail.authorityList, ...data.addAuthList];
+            remark += `[增加了权限:${data.addAuthList.join(',')}]`;
         }
         if (data.addRoleList && data.addRoleList.length) {
             detail.roleList = [...detail.roleList, ...data.addRoleList];
+            remark += `[增加了角色:${data.addRoleList.join(',')}]`;
         }
         update.authorityList = detail.authorityList;
         update.roleList = detail.roleList;
 
-        await detail.update(update);
+        let log = UserLogMapper.create(detail, user, { remark });
+        await transaction(async (session) => {
+            await detail.update(update, { session });
+            await log.save({ session });
+        });
         return {
             _id: detail._id,
         };
@@ -152,25 +167,35 @@ export let mgtSave: RequestHandler = (req, res) => {
 
 export let mgtDisable: RequestHandler = (req, res) => {
     responseHandler(async () => {
+        let user = req.myData.user;
         let data = plainToClass(VaildSchema.UserMgtDisable, req.body);
         paramsValid(data);
         let detail = await UserModel.findById(data._id);
         if (!detail.canEdit)
             throw common.error('不可禁用此账号');
         let update: any = {};
+        let remark = '封禁';
         if (data.disabled) {
             if (data.disabledTo) {
                 update.disabledTo = data.disabledTo;
+                remark += '至' + data.disabledTo;
             } else {
                 update.status = myEnum.userStatus.禁用;
+                remark += '永久';
             }
         } else {
+            remark = '解封';
             update.$unset = {
                 disabledTo: 1
             };
             update.status = myEnum.userStatus.正常;
         }
-        await detail.update(update);
+
+        let log = UserLogMapper.create(detail, user, { remark });
+        await transaction(async (session) => {
+            await detail.update(update, { session });
+            await log.save({ session });
+        });
         return {
             _id: detail._id,
         };

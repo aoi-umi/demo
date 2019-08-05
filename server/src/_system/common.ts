@@ -217,11 +217,10 @@ export function enumerable(value: boolean) {
 
 export function getDataInKey(data, keyList: string[]) {
     let newData = {};
-    for (let key in data) {
-        if (keyList.includes[key]) {
+    keyList.forEach(key => {
+        if (![undefined, null].includes(data[key]))
             newData[key] = data[key];
-        }
-    }
+    });
     return newData;
 }
 //#endregion

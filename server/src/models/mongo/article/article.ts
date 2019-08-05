@@ -6,7 +6,6 @@ import { Types, SchemaTypes } from 'mongoose';
 
 import { Base } from '../_base';
 import { myEnum } from '../../../config';
-import { FileMapper } from '../file';
 
 export type ArticleInstanceType = InstanceType<Article>;
 export type ArticleModelType = ModelType<Article, typeof Article>;
