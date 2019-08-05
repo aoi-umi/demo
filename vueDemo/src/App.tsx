@@ -19,8 +19,12 @@ export default class App extends Base {
     isCollapsed = true;
     theme = "light" as any;
     title = '';
-    activeName = location.pathname;
+    activeName = this.getActiveNameByPath(location.pathname);
     $refs: { sider: any };
+
+    getActiveNameByPath(path: string) {
+        return path.split('/')[1];
+    }
 
     protected created() {
         this.setTitle();
@@ -57,8 +61,11 @@ export default class App extends Base {
     }
 
     renderMenu(data: MenuConfig) {
+        let name = data.name;
+        if (!name)
+            name = this.getActiveNameByPath(data.to);
         return (
-            <MenuItem name={data.name || data.to} to={data.to}>
+            <MenuItem name={name} to={data.to}>
                 <Icon type={data.icon} />
                 <span>{data.text}</span>
             </MenuItem>
@@ -68,7 +75,7 @@ export default class App extends Base {
     @Watch('$route')
     route(to, from) {
         this.setTitle();
-        this.activeName = location.pathname;
+        this.activeName = this.getActiveNameByPath(location.pathname);
     }
 
     signInShow = false;
@@ -86,7 +93,7 @@ export default class App extends Base {
                 <Modal v-model={this.signInShow} footer-hide>
                     <SignInView on-success={() => {
                         this.signInShow = false;
-                    }}/>
+                    }} />
                 </Modal>
                 <Header class="layout-header-bar">
                     <Icon
@@ -174,7 +181,6 @@ export default class App extends Base {
                             }
                         </Menu>
                     </Sider>
-                    {/* 占位 */}
                     <Content class={["side-menu-blank", this.isCollapsed ? '' : 'side-open']}></Content>
                     <Content class="main-content">
                         <router-view></router-view>
