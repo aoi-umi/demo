@@ -12,6 +12,7 @@ import { FileMapper } from '../file';
 
 import { ArticleInstanceType, ArticleModel } from "./article";
 import { ArticleLogModel } from './article-log';
+import { LoginUser } from '../../login-user';
 
 export class ArticleMapper {
     static async query(data: AritcleQuery, opt: {
@@ -129,7 +130,7 @@ export class ArticleMapper {
         return detail;
     }
 
-    static resetDetail(detail, user: Express.MyDataUser, opt?: {
+    static resetDetail(detail, user: LoginUser, opt?: {
         imgHost?: string;
     }) {
         let rs = {
@@ -145,7 +146,7 @@ export class ArticleMapper {
         return rs;
     }
 
-    static async updateStatus(idList: Types.ObjectId[], status: number, user: Express.MyDataUser, opt?: {
+    static async updateStatus(idList: Types.ObjectId[], status: number, user: LoginUser, opt?: {
         includeUserId?: Types.ObjectId | string;
         status?: any;
         logRemark?: string;
@@ -183,7 +184,7 @@ type ArticleQueryOption = {
 };
 
 export class ArticleLogMapper {
-    static create(article: ArticleInstanceType, user: Express.MyDataUser, opt: {
+    static create(article: ArticleInstanceType, user: LoginUser, opt: {
         srcStatus: number,
         destStatus: number,
         remark?: string;
@@ -193,7 +194,7 @@ export class ArticleLogMapper {
             userId: user._id,
             srcStatus: opt.srcStatus,
             destStatus: opt.destStatus,
-            user: user.nickname + '(' + user.account + ')',
+            user: user.nameToString(),
         });
         log.remark = opt.remark || (myEnum.articleStatus.getKey(log.srcStatus) + '=>' + myEnum.articleStatus.getKey(log.destStatus));
         return log;

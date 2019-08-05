@@ -5,12 +5,13 @@ import * as common from '../../../_system/common';
 import { myEnum } from '../../../config/enum';
 import * as config from '../../../config';
 import * as VaildSchema from '../../../vaild-schema/class-valid';
+import { LoginUser } from '../../login-user';
 
 import { AuthorityModel } from '../authority';
 import { RoleModel } from '../role';
-import { UserModel } from ".";
 import { BaseMapper } from '../_base';
-import { UserInstanceType } from './user';
+import { UserModel, UserInstanceType } from ".";
+import { UserLogModel } from './user-log';
 
 export class UserMapper {
     static createToken(data, user: UserInstanceType) {
@@ -230,14 +231,14 @@ export class UserMapper {
         return userDetail;
     }
 
-    static async accountCheck(account: string, sessionUser?: Express.MyDataUser) {
+    static async accountCheck(account: string, loginUser?: LoginUser) {
         let user = await UserMapper.accountExists(account);
         if (!user)
             throw common.error('账号不存在');
         let disRs = user.checkDisabled();
-        if (sessionUser && sessionUser.loginData) {
-            let { checkToken } = UserMapper.createToken(sessionUser.loginData, user);
-            if (checkToken !== sessionUser.key) {
+        if (loginUser && loginUser.loginData) {
+            let { checkToken } = UserMapper.createToken(loginUser.loginData, user);
+            if (checkToken !== loginUser.key) {
                 throw common.error('账号的密码已变更, 请重新登录');
             }
         }
@@ -245,5 +246,25 @@ export class UserMapper {
             user,
             disableResult: disRs
         };
+    }
+}
+
+export class UserLogMapper {
+    static create(user: UserInstanceType, operator: LoginUser, opt: {
+        remark?: string;
+        update?: object;
+    }) {
+        let log = new UserLogModel({
+            userId: user._id,
+            operatorId: operator._id,
+            operator: operator.nameToString()
+        });
+        let remark = opt.remark || '';
+        if (!remark) {
+            if (opt.update)
+                remark += `[修改了:${Object.keys(opt.update)}]`;
+        }
+        log.remark = remark;
+        return log;
     }
 }

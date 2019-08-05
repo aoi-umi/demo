@@ -12,16 +12,7 @@ type UserType = {
     authority: { [key: string]: boolean }
 };
 export class Auth {
-    accessableIfNotExists = false;
-    init(opt: {
-        //accessUrlConfig中不存在时能否访问
-        accessableIfNotExists?: boolean,
-    }) {
-        opt = common.extend({ accessableIfNoExists: false }, opt);
-        this.accessableIfNotExists = opt.accessableIfNotExists;
-    };
-
-    isAccessable(user: UserType, auth: AuthType, opt?: IsExistAuthorityOption) {
+    isAccessable(user: UserType, auth: AuthType, opt?: IsExistsAuthorityOption) {
         let result = !auth
             || (Array.isArray(auth) && !auth.length)
             || Auth.includes(user, auth, opt);
@@ -29,15 +20,15 @@ export class Auth {
     }
 
     checkAccessable(user: UserType, auth: AuthType) {
-        let opt = { notExistAuthority: null };
+        let opt: IsExistsAuthorityOption = {};
         let result = this.isAccessable(user, auth, opt);
         if (!result) {
-            let errCode = Auth.getErrorCode(opt.notExistAuthority);
+            let errCode = Auth.getErrorCode(opt.notExistsAuthority);
             throw common.error('', errCode);
         }
     }
 
-    static includes(user: UserType, authData: AuthType, opt?: IsExistAuthorityOption) {
+    static includes(user: UserType, authData: AuthType, opt?: IsExistsAuthorityOption) {
         if (!Array.isArray(authData))
             authData = [authData];
         for (let i = 0; i < authData.length; i++) {
@@ -49,7 +40,7 @@ export class Auth {
         return true;
     }
 
-    static contains(user: UserType, authData: AuthorityType | AuthorityType[], opt?: IsExistAuthorityOption) {
+    static contains(user: UserType, authData: AuthorityType | AuthorityType[], opt?: IsExistsAuthorityOption) {
         if (!Array.isArray(authData) && typeof authData != 'string')
             authData = authData.code;
         if (typeof authData == 'string')
@@ -59,15 +50,15 @@ export class Auth {
             if (typeof item != 'string')
                 item = item.code;
             if (user.authority[item]) {
-                if (opt) opt.notExistAuthority = null;
+                if (opt) opt.notExistsAuthority = null;
                 return true;
             }
             if (opt) {
-                opt.notExistAuthority = item;
+                opt.notExistsAuthority = item;
             }
         }
         if (opt && opt.throwError) {
-            throw common.error('', Auth.getErrorCode(opt.notExistAuthority));
+            throw common.error('', Auth.getErrorCode(opt.notExistsAuthority));
         }
         return false;
     }
@@ -79,8 +70,8 @@ export class Auth {
     }
 }
 
-type IsExistAuthorityOption = {
+type IsExistsAuthorityOption = {
     //output
-    notExistAuthority?: string;
+    notExistsAuthority?: string;
     throwError?: boolean;
 }
