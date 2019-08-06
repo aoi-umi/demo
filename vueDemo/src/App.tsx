@@ -12,6 +12,7 @@ const routeConfig = router.routerConfig;
 import "./App.less";
 import { SignInView } from './views/user';
 import { Base } from './views/base';
+import { UserAvatarView } from './views/user-avatar';
 
 @Component
 export default class App extends Base {
@@ -79,13 +80,6 @@ export default class App extends Base {
     }
 
     signInShow = false;
-    signOut() {
-        let token = localStorage.getItem(dev.cacheKey.testUser);
-        if (token) {
-            testApi.userSignOut();
-        }
-        this.storeUser.setUser(null);
-    }
 
     render() {
         return (
@@ -106,16 +100,7 @@ export default class App extends Base {
                     <span>{this.title}</span>
                     <div class="layout-header-right">
                         {this.storeUser.user.isLogin ?
-                            <Poptip trigger="hover" style={{ cursor: 'pointer' }}>
-                                <Avatar icon="md-person" style={{ marginRight: '10px' }} />
-                                <span>{this.storeUser.user.nickname}</span>
-                                <div slot="content">
-                                    <p class="ivu-select-item" on-click={() => {
-                                        this.$router.push(routeConfig.userInfo.path);
-                                    }}>主页</p>
-                                    <p class="ivu-select-item" on-click={this.signOut}>退出</p>
-                                </div>
-                            </Poptip> :
+                            <UserAvatarView user={this.storeUser.user} self /> :
                             [
                                 <Button type="primary" on-click={() => {
                                     this.signInShow = true;

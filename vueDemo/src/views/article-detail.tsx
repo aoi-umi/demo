@@ -6,6 +6,7 @@ import { myEnum, dev } from '@/config';
 import { DetailType } from './article-mgt-detail';
 import { CommentView } from './comment';
 import { Divider } from '@/components/iview';
+import { UserAvatarView } from './user-avatar';
 
 @Component
 export default class ArticleDetail extends Vue {
@@ -54,14 +55,20 @@ export default class ArticleDetail extends Vue {
 
     renderHeader() {
         let { detail } = this.innerDetail;
-        return (
-            <div>
-                {detail._id && [
-                    '作者: ' + detail.user.nickname + '(' + detail.user.account + ')',
+        let list = [];
+        if (detail._id) {
+            list = [
+                <UserAvatarView user={detail.user} placement="top-start" />,
+                ...[
                     '创建于: ' + moment(detail.createdAt).format(dev.dateFormat),
                 ].map(ele => {
-                    return (<span style={{ marginRight: '5px' }}>{ele}</span>);
-                })}
+                    return (<span style={{ marginLeft: '5px' }}>{ele}</span>);
+                })
+            ]
+        }
+        return (
+            <div>
+                {list}
             </div>
         );
     }

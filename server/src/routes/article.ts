@@ -32,7 +32,7 @@ export let mgtQuery: RequestHandler = (req, res) => {
 export let MgtDetailQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = plainToClass(VaildSchema.AritcleSave, req.query);
+        let data = plainToClass(VaildSchema.AritcleDetailQuery, req.query);
         paramsValid(data);
         let rs = await ArticleMapper.detailQuery({ _id: data._id }, { userId: user._id, audit: Auth.contains(user, config.auth.articleMgtAudit) });
         ArticleMapper.resetDetail(rs.detail, user, {
