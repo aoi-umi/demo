@@ -11,8 +11,14 @@ export class Base extends Vue {
 
     protected async operateHandler(operate: string, fn: () => any, opt?: {
         onSuccessClose?: () => any;
-        validate?: (callback?: (valid?: boolean) => void) => void
+        validate?: (callback?: (valid?: boolean) => void) => void,
+        noDefaultHandler?: boolean;
     }) {
+        let result = {
+            success: true,
+            msg: '',
+            err: null
+        };
         try {
             opt = { ...opt };
             let valid = await new Promise((reso, rej) => {
@@ -29,24 +35,31 @@ export class Base extends Vue {
                     reso(true);
                 }
             });
-            if (!valid)
-                return false;
-            let rs = await fn();
-            if (rs !== false) {
+            if (!valid) {
+                result.success = false;
+                result.msg = '参数有误';
+                return result;
+            }
+            await fn();
+            if (!opt.noDefaultHandler) {
                 this.$Message.success({
                     content: operate + '成功',
                     onClose: opt.onSuccessClose
                 });
             }
-            return true;
+            return result;
         } catch (e) {
-            console.log(e.code, error.NotFound.code)
-            if (e.code == error.NotFound.code) {
-                this.toError(error.NotFound);
-            } else {
-                this.$Message.error(operate + '出错:' + e.message);
+            result.success = false;
+            result.msg = e.message;
+            result.err = e;
+            if (!opt.noDefaultHandler) {
+                if (e.code == error.NotFound.code) {
+                    this.toError(error.NotFound);
+                } else {
+                    this.$Message.error(operate + '出错:' + e.message);
+                }
             }
-            return false;
+            return result;
         }
     }
 

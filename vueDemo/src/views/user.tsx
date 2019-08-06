@@ -206,15 +206,16 @@ export default class UserInfo extends Base {
     async getUserDetail() {
         if (!this.detail._id) {
             this.loading = true;
-            try {
+            this.operateHandler('', async () => {
                 this.detail = await testApi.userDetail();
                 if (!this.detail)
                     throw new Error('用户不存在');
-            } catch (e) {
-                this.$router.push({ path: dev.routeConfig.error.path, query: { msg: '获取用户出错:' + e.message } });
-            } finally {
+            }, { noDefaultHandler: true }).then(rs => {
+                if (!rs.success)
+                    this.toError({ msg: '获取用户出错:' + rs.msg });
+            }).finally(() => {
                 this.loading = false;
-            }
+            });
         }
     }
 
