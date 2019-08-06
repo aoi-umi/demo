@@ -4,6 +4,8 @@ import moment from 'moment';
 import { testApi } from '@/api';
 import { myEnum, dev } from '@/config';
 import { DetailType } from './article-mgt-detail';
+import { CommentView } from './comment';
+import { Divider } from '@/components/iview';
 
 @Component
 export default class ArticleDetail extends Vue {
@@ -24,7 +26,6 @@ export default class ArticleDetail extends Vue {
     }
 
     async loadDetail() {
-        this.$refs
         let query = this.$route.query;
         try {
             let rs = await testApi.articleDetailQuery({ _id: query._id });
@@ -36,7 +37,19 @@ export default class ArticleDetail extends Vue {
     }
 
     render() {
-        return this.renderContent();
+        let { detail } = this.innerDetail;
+        return (
+            <div>
+                <h1>{detail.title}</h1>
+                <br />
+                {this.renderHeader()}
+                <br />
+                <div class="ql-editor" domPropsInnerHTML={detail.content}>
+                </div>
+                <Divider size='small' />
+                {detail._id && <CommentView ownerId={detail._id} type={myEnum.commentType.文章} />}
+            </div>
+        );
     }
 
     renderHeader() {
@@ -49,20 +62,6 @@ export default class ArticleDetail extends Vue {
                 ].map(ele => {
                     return (<span style={{ marginRight: '5px' }}>{ele}</span>);
                 })}
-            </div>
-        );
-    }
-
-    renderContent() {
-        let { detail } = this.innerDetail;
-        return (
-            <div>
-                <h1>{detail.title}</h1>
-                <br />
-                {this.renderHeader()}
-                <br />
-                <div class="ql-editor" domPropsInnerHTML={detail.content}>
-                </div>
             </div>
         );
     }

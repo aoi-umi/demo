@@ -36,6 +36,8 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
 
     articleQuery,
     articleDetailQuery,
+    commentSubmit,
+    commentQuery,
     articleMgtQuery,
     articleMgtDetailQuery,
     articleMgtSave,
@@ -210,6 +212,16 @@ export class TestApi extends ApiModel<TestApiMethod> {
         return this.requestByConfig(this.apiConfig.method.articleMgtAudit, { data });
     }
     //#endregion  
+
+    //#region comment 
+
+    async commentSubmit(data) {
+        return this.requestByConfig(this.apiConfig.method.commentSubmit, { data });
+    }
+    async commentQuery(data) {
+        return this.requestByConfig(this.apiConfig.method.commentQuery, { data });
+    }
+    //#endregion
 }
 
 type FileUploadRes = { fileId: string; url: string };

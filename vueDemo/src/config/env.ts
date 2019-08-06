@@ -113,6 +113,13 @@ const config = {
                     url: '/article/detailQuery',
                     method: 'GET',
                 },
+                commentQuery: {
+                    url: '/comment/query',
+                    method: 'GET',
+                },
+                commentSubmit: {
+                    url: '/comment/submit',
+                },
                 articleMgtQuery: {
                     url: '/article/mgt/query',
                     method: 'GET',
