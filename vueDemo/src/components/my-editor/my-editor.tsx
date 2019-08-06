@@ -28,7 +28,7 @@ class MyEditor extends MyInputBase {
             ];
         }
     })
-    toolbar?: string[][];
+    toolbar?: any[][];
 
     $refs: { quillEditor: any };
 

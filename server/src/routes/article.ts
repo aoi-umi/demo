@@ -4,7 +4,7 @@ import { plainToClass } from 'class-transformer';
 import { responseHandler, paramsValid } from '../helpers';
 import { myEnum } from '../config';
 import * as config from '../config';
-import { error, escapeRegExp } from '../_system/common';
+import { error } from '../_system/common';
 import { transaction } from '../_system/dbMongo';
 import * as VaildSchema from '../vaild-schema/class-valid';
 import { ArticleModel, ArticleInstanceType, ArticleMapper, ArticleLogMapper } from '../models/mongo/article';
@@ -33,6 +33,7 @@ export let MgtDetailQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
         let data = plainToClass(VaildSchema.AritcleSave, req.query);
+        paramsValid(data);
         let rs = await ArticleMapper.detailQuery({ _id: data._id }, { userId: user._id, audit: Auth.contains(user, config.auth.articleMgtAudit) });
         ArticleMapper.resetDetail(rs.detail, user, {
             imgHost: req.headers.host
@@ -53,7 +54,7 @@ export let mgtSave: RequestHandler = (req, res) => {
             detail = new ArticleModel({
                 ...data,
                 status,
-                userId: user._id
+                userId: user._id,
             });
             let log = ArticleLogMapper.create(detail, user, { srcStatus: myEnum.articleStatus.草稿, destStatus: status, remark: detail.remark });
             await transaction(async (session) => {
@@ -102,6 +103,7 @@ export let mgtAudit: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
         let data = plainToClass(VaildSchema.ArticleMgtAudit, req.body);
+        paramsValid(data);
         let rs = await ArticleMapper.updateStatus(data.idList, data.status, user, {
             status: myEnum.articleStatus.待审核,
             logRemark: data.remark,
@@ -133,7 +135,8 @@ export let query: RequestHandler = (req, res) => {
 export let detailQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = plainToClass(VaildSchema.AritcleSave, req.query);
+        let data = plainToClass(VaildSchema.AritcleDetailQuery, req.query);
+        paramsValid(data);
         let rs = await ArticleMapper.detailQuery({ _id: data._id }, { normal: true });
         let detail = rs.detail;
         ArticleModel.update({ _id: detail._id }, { readTimes: detail.readTimes + 1 }).exec();

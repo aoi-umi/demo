@@ -41,53 +41,6 @@ export default class Article extends Vue {
         this.$refs.list.query();
     }
 
-
-    private getColumns() {
-        let columns = [{
-            title: '封面',
-            key: 'cover',
-            minWidth: 120,
-            render: (h, params) => {
-                return <MyImg class="cover" src={params.row.coverUrl} style={{ marginTop: '5px' }} />;
-            }
-        }, {
-            title: '标题',
-            key: 'title',
-            minWidth: 120,
-        }, {
-            title: '内容',
-            key: 'content',
-            minWidth: 150,
-            ellipsis: true,
-            render: (h, params) => {
-                return <p domPropsInnerHTML={params.row.content}></p>;
-            }
-        }, {
-            title: '用户',
-            key: 'user',
-            minWidth: 120,
-            render: (h, params) => {
-                return <p>{params.row.user.nickname}({params.row.user.account})</p>;
-            }
-        }, {
-            title: '状态',
-            key: 'status',
-            minWidth: 80,
-            render: (h, params) => {
-                let text = myEnum.articleStatus.getKey(params.row.status);
-                return <span>{text}</span>;
-            }
-        }, {
-            title: '创建时间',
-            key: 'createdAt',
-            minWidth: 90,
-            render: (h, params) => {
-                return <span>{moment(params.row.createdAt).format(dev.dateFormat)}</span>;
-            }
-        }];
-        return columns;
-    }
-
     protected render() {
         return (
             <div>

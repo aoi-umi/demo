@@ -55,6 +55,12 @@ router.get('/article/query', UserAuthMid.normal(), article.query);
 router.get('/article/detailQuery', UserAuthMid.normal(), article.detailQuery);
 //#endregion
 
+//#region comment 
+import * as comment from './comment';
+router.post('/comment/submit', UserAuthMid.normal([auth.login]), comment.submit);
+router.get('/comment/query', UserAuthMid.normal(), comment.query);
+//#endregion
+
 //#region file 
 import * as file from './file';
 router.post('/img/upload', UserAuthMid.normal([auth.login]), FileMid.single, file.imgUpload);

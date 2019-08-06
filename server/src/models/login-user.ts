@@ -1,3 +1,5 @@
+import { Type } from "class-transformer";
+
 export class LoginUser {
     _id: string;
     nickname: string;
@@ -7,6 +9,9 @@ export class LoginUser {
     cacheDatetime?: string;
     // token?: string;
     loginData?: any;
+    
+    @Type()
+    lastLoginAt?: Date;
 
     nameToString() {
         return this.nickname + '(' + this.account + ')';

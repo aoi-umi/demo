@@ -42,21 +42,8 @@ export let signIn: RequestHandler = (req, res) => {
         let token = req.myData.user.key;
         let { user, disableResult } = await UserMapper.accountCheck(data.account);
 
-        let { checkToken } = UserMapper.createToken(data, user);
-        if (token !== checkToken)
-            throw common.error('', error.TOKEN_WRONG);
+        let returnUser = await UserMapper.login(token, user, data, disableResult.disabled);
         let userInfoKey = dev.cacheKey.user + token;
-        let userAuth = {
-            [auth.login.code]: 1
-        };
-        if (!disableResult.disabled) {
-            let userDetail = await UserMapper.detail(user._id);
-            for (let key in userDetail.auth) {
-                userAuth[key] = 1;
-            }
-        }
-
-        let returnUser = { _id: user._id, account: user.account, nickname: user.nickname, key: token, authority: userAuth, loginData: data };
         await cache.set(userInfoKey, returnUser, dev.cacheTime.user);
         return returnUser;
     }, req, res);
@@ -93,19 +80,27 @@ export let update: RequestHandler = (req, res) => {
         paramsValid(data);
         let user = req.myData.user;
         let { token, ...restData } = data;
-        let update: any = common.getDataInKey(restData, ['nickname']);
+        let updateCache: any = common.getDataInKey(restData, ['nickname']);
+        let update = { ...updateCache };
         let dbUser = await UserModel.findById(user._id);
         if (restData.newPassword) {
             let { checkToken } = UserMapper.createToken(restData, dbUser);
             if (token !== checkToken)
                 throw common.error('', error.TOKEN_WRONG);
-            update.password = common.md5(restData.newPassword);
+            updateCache.password = common.md5(restData.newPassword);
         }
         let log = UserLogMapper.create(dbUser, user, { update });
         await transaction(async (session) => {
             await dbUser.update(update, { session });
             await log.save({ session });
         });
+        if (!common.isObjectEmpty(updateCache)) {
+            for (let key in updateCache) {
+                user[key] = updateCache[key];
+            }
+            let userInfoKey = dev.cacheKey.user + user.key;
+            await cache.set(userInfoKey, user, dev.cacheTime.user);
+        }
     }, req, res);
 };
 

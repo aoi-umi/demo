@@ -10,8 +10,8 @@ import { LoginUser } from '../../login-user';
 import { AuthorityModel } from '../authority';
 import { RoleModel } from '../role';
 import { BaseMapper } from '../_base';
-import { UserModel, UserInstanceType } from ".";
 import { UserLogModel } from './user-log';
+import { UserModel, UserInstanceType } from ".";
 
 export class UserMapper {
     static createToken(data, user: UserInstanceType) {
@@ -245,6 +245,27 @@ export class UserMapper {
         return {
             user,
             disableResult: disRs
+        };
+    }
+
+    static async login(token, user: UserInstanceType, data: VaildSchema.UserSignIn, disabled: boolean) {
+        let { checkToken } = UserMapper.createToken(data, user);
+        if (token !== checkToken)
+            throw common.error('', config.error.TOKEN_WRONG);
+        let userAuth = {
+            [config.auth.login.code]: 1
+        };
+        if (!disabled) {
+            let userDetail = await UserMapper.detail(user._id);
+            for (let key in userDetail.auth) {
+                userAuth[key] = 1;
+            }
+        }
+
+        return {
+            _id: user._id, account: user.account, nickname: user.nickname, key: token, authority: userAuth,
+            loginData: data,
+            lastLoginAt: new Date()
         };
     }
 }
