@@ -77,12 +77,10 @@ export default class ArticleDetail extends ArticleMgtBase {
         let query = this.$route.query;
         if (query._id) {
             this.preview = this.$route.path == dev.routeConfig.articleMgtDetail.path;
-            try {
+            this.operateHandler('', async () => {
                 let rs = await testApi.articleMgtDetailQuery({ _id: query._id });
                 this.updateDetail(rs);
-            } catch (e) {
-                this.$Message.error(e.message);
-            }
+            });
         } else {
             this.updateDetail();
         }

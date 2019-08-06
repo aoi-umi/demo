@@ -1,6 +1,8 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { getModule } from 'vuex-module-decorators';
 import LoginUserStore from '@/store/loginUser';
+import { dev, error } from '@/config';
+import { getErrorCfgByCode } from '@/config/error';
 
 export class Base extends Vue {
     protected get storeUser() {
@@ -29,19 +31,33 @@ export class Base extends Vue {
             });
             if (!valid)
                 return false;
-            await fn();
-            this.$Message.success({
-                content: operate + '成功',
-                onClose: opt.onSuccessClose
-            });
+            let rs = await fn();
+            if (rs !== false) {
+                this.$Message.success({
+                    content: operate + '成功',
+                    onClose: opt.onSuccessClose
+                });
+            }
             return true;
         } catch (e) {
-            this.$Message.error(operate + '出错:' + e.message);
+            console.log(e.code, error.NotFound.code)
+            if (e.code == error.NotFound.code) {
+                this.toError(error.NotFound);
+            } else {
+                this.$Message.error(operate + '出错:' + e.message);
+            }
             return false;
         }
     }
 
     protected isPressEnter(e: { charCode: number }) {
         return e && e.charCode === 13;
+    }
+
+    protected toError(query: { code?: string; msg?: string }) {
+        this.$router.push({
+            path: dev.routeConfig.error.path,
+            query,
+        });
     }
 }

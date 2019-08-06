@@ -4,7 +4,7 @@ type ErrConfigType = {
 };
 export const errConfig = {
     NotFound: {
-        code: '404',
+        code: 'NOT_FOUND',
         msg: '页面走丢了'
     }
 };

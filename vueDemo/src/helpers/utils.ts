@@ -60,6 +60,8 @@ function getDeco(fn: (constructor) => any) {
 export function error(e, code?) {
     if (!(e instanceof Error))
         e = new Error(e);
+    if (code)
+        e.code = code;
     return e;
 }
 

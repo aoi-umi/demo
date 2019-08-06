@@ -53,6 +53,7 @@ export type TestApiConfigType = ApiConfigModel<TestApiMethod>;
 export type Result<T = any> = {
     result: boolean;
     msg?: string;
+    code?: string;
     data: T;
 };
 
@@ -72,7 +73,7 @@ export class TestApi extends ApiModel<TestApiMethod> {
             },
             afterResponse: (res: Result) => {
                 if (!res.result)
-                    throw error(res.msg);
+                    throw error(res.msg, res.code);
                 return res.data;
             }
         });
