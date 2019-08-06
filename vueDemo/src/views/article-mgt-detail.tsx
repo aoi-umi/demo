@@ -9,6 +9,7 @@ import { MyUpload, IMyUpload } from '@/components/my-upload';
 import { ArticleMgtBase } from './article-mgt';
 import { MyEditor } from '@/components/my-editor';
 import { IMyEditor } from '@/components/my-editor/my-editor';
+import { UserAvatarView } from './user-avatar';
 
 export type DetailType = {
     detail: DetailDataType;
@@ -128,15 +129,21 @@ export default class ArticleDetail extends ArticleMgtBase {
 
     renderHeader() {
         let { detail } = this.innerDetail;
-        return (
-            <div>
-                {detail._id && [
+        let list = [];
+        if (detail._id) {
+            list = [
+                <UserAvatarView user={detail.user} placement="top-start" />,
+                ...[
                     '状态: ' + detail.statusText,
-                    '作者: ' + detail.user.nickname + '(' + detail.user.account + ')',
                     '创建于: ' + moment(detail.createdAt).format(dev.dateFormat),
                 ].map(ele => {
-                    return (<span style={{ marginRight: '5px' }}>{ele}</span>);
-                })}
+                    return (<span style={{ marginLeft: '5px' }}>{ele}</span>);
+                })
+            ]
+        }
+        return (
+            <div>
+                {list}
             </div>
         );
     }

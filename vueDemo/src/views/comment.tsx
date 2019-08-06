@@ -5,9 +5,10 @@ import { testApi } from '@/api';
 import { convClass, convert } from '@/helpers';
 import { MyList, IMyList } from '@/components/my-list';
 import { MyEditor } from '@/components/my-editor';
-import { Divider, Button } from '@/components/iview';
-import { myEnum, dev } from '@/config';
+import { Divider, Button, Avatar } from '@/components/iview';
+import { dev } from '@/config';
 import { Base } from './base';
+import { UserAvatarView } from './user-avatar';
 
 @Component
 class Comment extends Base {
@@ -85,9 +86,11 @@ class Comment extends Base {
                         return rs.data.map((ele) => {
                             return (
                                 <div>
-                                    <p>{ele.user.nickname}</p>
-                                    <p domPropsInnerHTML={ele.comment} />
-                                    {moment(ele.createdAt).format(dev.dateFormat)}
+                                    <UserAvatarView user={ele.user} placement="top-start" />
+                                    <div style={{ marginLeft: '42px' }}>
+                                        <p domPropsInnerHTML={ele.comment} />
+                                        {moment(ele.createdAt).format(dev.dateFormat)}
+                                    </div>
                                     <Divider size='small' />
                                 </div>
                             );
