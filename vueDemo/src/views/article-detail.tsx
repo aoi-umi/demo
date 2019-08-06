@@ -7,9 +7,10 @@ import { DetailType } from './article-mgt-detail';
 import { CommentView } from './comment';
 import { Divider } from '@/components/iview';
 import { UserAvatarView } from './user-avatar';
+import { Base } from './base';
 
 @Component
-export default class ArticleDetail extends Vue {
+export default class ArticleDetail extends Base {
 
     updateDetail(newVal?) {
         let data = newVal || { detail: {} };
@@ -28,13 +29,10 @@ export default class ArticleDetail extends Vue {
 
     async loadDetail() {
         let query = this.$route.query;
-        try {
+        this.operateHandler('', async () => {
             let rs = await testApi.articleDetailQuery({ _id: query._id });
             this.updateDetail(rs);
-        } catch (e) {
-            this.$Message.error(e.message);
-        }
-
+        });
     }
 
     render() {
