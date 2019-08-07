@@ -50,3 +50,5 @@ export const routeConfig = {
 export const cacheKey = {
     testUser: 'userCacheKey',
 };
+
+export const defaultProfile = '这个人很懒,什么都没写';

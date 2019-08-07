@@ -12,6 +12,7 @@ import { RoleModel } from '../role';
 import { BaseMapper } from '../_base';
 import { UserLogModel } from './user-log';
 import { UserModel, UserInstanceType } from ".";
+import { FileMapper } from '../file';
 
 export class UserMapper {
     static createToken(data, user: UserInstanceType) {
@@ -267,6 +268,15 @@ export class UserMapper {
             loginData: data,
             lastLoginAt: new Date()
         };
+    }
+
+    static resetDetail(detail, opt?: {
+        imgHost?: string;
+    }) {
+        opt = {
+            ...opt,
+        };
+        detail.avatarUrl = FileMapper.getImgUrl(detail.avatar, opt.imgHost);
     }
 }
 

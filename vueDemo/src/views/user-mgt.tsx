@@ -22,6 +22,7 @@ export type DetailDataType = {
     createdAt?: string;
     status?: number;
     statusText?: string;
+    profile?: string;
     disabledTo?: Date;
     self?: boolean;
 };

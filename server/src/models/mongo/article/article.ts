@@ -24,6 +24,11 @@ export class Article extends Base {
     })
     userId: Types.ObjectId;
 
+    @prop({
+        default: ''
+    })
+    profile: string;
+
     @prop()
     cover: string;
 

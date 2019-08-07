@@ -71,7 +71,7 @@ export let mgtSave: RequestHandler = (req, res) => {
             let update: any = {
                 status,
             };
-            ['cover', 'title', 'content', 'remark'].forEach(key => {
+            ['cover', 'title', 'profile', 'content', 'remark'].forEach(key => {
                 update[key] = data[key];
             });
             let logRemark = update.remark == detail.remark ? null : update.remark;

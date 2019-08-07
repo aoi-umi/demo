@@ -86,7 +86,7 @@ class Comment extends Base {
                         return rs.data.map((ele) => {
                             return (
                                 <div>
-                                    <UserAvatarView user={ele.user} placement="top-start" />
+                                    <UserAvatarView user={ele.user} tipsPlacement="top-start" />
                                     <div style={{ marginLeft: '42px' }}>
                                         <p domPropsInnerHTML={ele.comment} />
                                         {moment(ele.createdAt).format(dev.dateFormat)}
