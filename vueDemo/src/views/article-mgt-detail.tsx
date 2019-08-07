@@ -21,6 +21,7 @@ export type DetailDataType = {
     cover: string;
     coverUrl: string;
     title: string;
+    profile: string;
     content: string;
     status: number;
     statusText: string;
@@ -39,6 +40,7 @@ export default class ArticleDetail extends ArticleMgtBase {
                 cover: '',
                 coverUrl: '',
                 title: '',
+                profile: '',
                 content: '',
                 status: myEnum.articleStatus.草稿,
                 remark: ''
@@ -136,7 +138,7 @@ export default class ArticleDetail extends ArticleMgtBase {
     renderHeader(detail: DetailDataType) {
         return (
             <div>
-                <UserAvatarView user={detail.user} placement="top-start" />
+                <UserAvatarView user={detail.user} tipsPlacement="top-start" />
                 {[
                     '状态: ' + detail.statusText,
                     '创建于: ' + moment(detail.createdAt).format(dev.dateFormat),
@@ -208,6 +210,9 @@ export default class ArticleDetail extends ArticleMgtBase {
                     </FormItem>
                     <FormItem label="标题" prop="title">
                         <Input v-model={detail.title} />
+                    </FormItem>
+                    <FormItem label="简介" prop="profile">
+                        <Input v-model={detail.profile} type="textarea" />
                     </FormItem>
                     <FormItem label="内容" prop="content">
                         <MyEditor ref="editor" class="article-mgt-detail-content"

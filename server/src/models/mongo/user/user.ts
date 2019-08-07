@@ -34,6 +34,14 @@ export class User extends Base {
     })
     nickname: string;
 
+    @prop()
+    avatar: string;
+
+    @prop({
+        default: ''
+    })
+    profile: string;
+
     @prop({
         required: true
     })

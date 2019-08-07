@@ -206,6 +206,15 @@ export default class UserInfo extends Base {
     loading = false;
     detail: UserDetailDataType = {};
     mounted() {
+        this.load();
+    }
+
+    @Watch('$route')
+    route(to, from) {
+        this.load();
+    }
+
+    load() {
         this.$refs.loadView.loadData();
     }
 
@@ -224,24 +233,26 @@ export default class UserInfo extends Base {
 
     $refs: { formVaild: IForm, loadView: ILoadView };
     pwdLoading = false;
-    changePwdDetail = {
+    updateDetail = {
         nickname: '',
         pwd: '',
         newPwd: '',
         newPwdRepeat: '',
+        profile: ''
     };
-    changePwdShow = false;
+    updateShow = false;
     async toggleUpdate(show: boolean) {
-        this.changePwdShow = show;
-        this.changePwdDetail.nickname = this.detail.nickname;
-        this.changePwdDetail.pwd = '';
-        this.changePwdDetail.newPwd = '';
-        this.changePwdDetail.newPwdRepeat = '';
+        this.updateShow = show;
+        this.updateDetail.nickname = this.detail.nickname;
+        this.updateDetail.pwd = '';
+        this.updateDetail.newPwd = '';
+        this.updateDetail.newPwdRepeat = '';
+        this.updateDetail.profile = this.detail.profile;
     }
     private rules = {
         pwd: [{
             validator: (rule, value, callback) => {
-                if (this.changePwdDetail.newPwd && !value) {
+                if (this.updateDetail.newPwd && !value) {
                     callback(new Error('请输入密码'));
                 } else {
                     callback();
@@ -251,7 +262,7 @@ export default class UserInfo extends Base {
         }],
         newPwd: [{
             validator: (rule, value, callback) => {
-                if (value && value === this.changePwdDetail.pwd) {
+                if (value && value === this.updateDetail.pwd) {
                     callback(new Error('新旧密码相同'));
                 } else {
                     callback();
@@ -261,7 +272,7 @@ export default class UserInfo extends Base {
         }],
         newPwdRepeat: [{
             validator: (rule, value, callback) => {
-                if (this.changePwdDetail.newPwd && value !== this.changePwdDetail.newPwd) {
+                if (this.updateDetail.newPwd && value !== this.updateDetail.newPwd) {
                     callback(new Error('两次输入密码不一致'));
                 } else {
                     callback();
@@ -276,16 +287,21 @@ export default class UserInfo extends Base {
             let user = this.storeUser.user;
             let req: any = {};
             let logOut = false;
-            if (this.changePwdDetail.nickname && this.changePwdDetail.nickname != this.detail.nickname)
-                req.nickname = this.changePwdDetail.nickname;
-            if (this.changePwdDetail.newPwd) {
+            function isUpdate(newVal, oldVal) {
+                return newVal && newVal != oldVal
+            }
+            if (isUpdate(this.updateDetail.nickname, this.detail.nickname))
+                req.nickname = this.updateDetail.nickname;
+            if (isUpdate(this.updateDetail.profile, this.detail.profile))
+                req.profile = this.updateDetail.profile;
+            if (this.updateDetail.newPwd) {
                 logOut = true;
                 req = {
                     ...req,
-                    newPassword: this.changePwdDetail.newPwd,
+                    newPassword: this.updateDetail.newPwd,
                     round: helpers.randStr(),
                 };
-                let token = LoginUser.createToken(user.account, this.changePwdDetail.pwd, req);
+                let token = LoginUser.createToken(user.account, this.updateDetail.pwd, req);
                 req = {
                     ...req,
                     token
@@ -298,6 +314,8 @@ export default class UserInfo extends Base {
             else {
                 if (req.nickname)
                     this.detail.nickname = req.nickname;
+                if (req.profile)
+                    this.detail.profile = req.profile;
             }
             this.toggleUpdate(false);
         }, {
@@ -320,9 +338,12 @@ export default class UserInfo extends Base {
                     this.toggleUpdate(true);
                 }} style={{ marginLeft: '5px' }}>修改</a>}
                 {detail.self ?
-                    <Form label-width={60}>
+                    <Form class="form-no-error" label-width={60}>
                         <FormItem label="状态">
                             {detail.statusText}
+                        </FormItem>
+                        <FormItem label="简介">
+                            {detail.profile || dev.defaultProfile}
                         </FormItem>
                         <FormItem label="角色">
                             {MyTagModel.renderRoleTag(detail.roleList, true)}
@@ -337,7 +358,10 @@ export default class UserInfo extends Base {
                             {detail.createdAt && moment(detail.createdAt).format(dev.dateFormat)}
                         </FormItem>
                     </Form> :
-                    <Form label-width={60}>
+                    <Form class="form-no-error" label-width={60}>
+                        <FormItem label="简介">
+                            {detail.profile || dev.defaultProfile}
+                        </FormItem>
                         <FormItem label="注册时间">
                             {detail.createdAt && moment(detail.createdAt).format(dev.dateFormat)}
                         </FormItem>
@@ -357,22 +381,25 @@ export default class UserInfo extends Base {
                         return this.renderInfo(detail);
                     }} />
 
-                <Modal v-model={this.changePwdShow} footer-hide>
+                <Modal v-model={this.updateShow} footer-hide>
                     <div class="dialog-view" on-keypress={this.handlePress}>
                         <h3>修改</h3>
                         <br />
-                        <Form label-width={100} ref="formVaild" props={{ model: this.changePwdDetail }} rules={this.rules}>
+                        <Form label-width={100} ref="formVaild" props={{ model: this.updateDetail }} rules={this.rules}>
                             <FormItem label="昵称" prop="nickname">
-                                <Input v-model={this.changePwdDetail.nickname} />
+                                <Input v-model={this.updateDetail.nickname} />
                             </FormItem>
                             <FormItem label="密码" prop="pwd">
-                                <Input v-model={this.changePwdDetail.pwd} type="password" placeholder="不修改密码时不用填" />
+                                <Input v-model={this.updateDetail.pwd} type="password" placeholder="不修改密码时不用填" />
                             </FormItem>
                             <FormItem label="新密码" prop="newPwd">
-                                <Input v-model={this.changePwdDetail.newPwd} type="password" />
+                                <Input v-model={this.updateDetail.newPwd} type="password" />
                             </FormItem>
                             <FormItem label="确认密码" prop="newPwdRepeat">
-                                <Input v-model={this.changePwdDetail.newPwdRepeat} type="password" />
+                                <Input v-model={this.updateDetail.newPwdRepeat} type="password" />
+                            </FormItem>
+                            <FormItem label="简介" prop="profile">
+                                <Input v-model={this.updateDetail.profile} type="textarea" />
                             </FormItem>
                             <FormItem>
                                 <Button type="primary" long on-click={this.handleUpdate} loading={this.pwdLoading}>修改</Button>

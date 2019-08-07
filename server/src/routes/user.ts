@@ -70,8 +70,9 @@ export let info: RequestHandler = (req, res) => {
 export let detail: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let userDetail = await UserMapper.detail(user._id);
-        return userDetail;
+        let detail = await UserMapper.detail(user._id);
+        UserMapper.resetDetail(detail, { imgHost: req.headers.host });
+        return detail;
     }, req, res);
 };
 
@@ -79,10 +80,12 @@ export let detailQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let data = plainToClass(VaildSchema.UserMgtQuery, req.query);
         paramsValid(data);
-        let detail = await UserModel.findById(data._id);
+        let detail = await UserModel.findById(data._id, { password: 0, roleList: 0, authorityList: 0 });
         if (!detail)
-            throw common.error('', config.error.USER_NOT_FOUND)
-        return detail;
+            throw common.error('', config.error.USER_NOT_FOUND);
+        let obj = detail.toJSON({ virtuals: false });
+        UserMapper.resetDetail(obj, { imgHost: req.headers.host });
+        return obj;
     }, req, res);
 };
 
@@ -92,7 +95,7 @@ export let update: RequestHandler = (req, res) => {
         paramsValid(data);
         let user = req.myData.user;
         let { token, ...restData } = data;
-        let updateCache: any = common.getDataInKey(restData, ['nickname']);
+        let updateCache: any = common.getDataInKey(restData, ['nickname', 'profile']);
         let update = { ...updateCache };
         let dbUser = await UserModel.findById(user._id);
         if (restData.newPassword) {
@@ -123,6 +126,9 @@ export let mgtQuery: RequestHandler = (req, res) => {
         let { rows, total } = await UserMapper.query({
             ...data, includeDelAuth: true
         });
+        rows.forEach(detail => {
+            UserMapper.resetDetail(detail, { imgHost: req.headers.host });
+        })
         return {
             rows,
             total

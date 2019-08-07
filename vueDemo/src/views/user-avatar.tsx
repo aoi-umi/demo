@@ -23,7 +23,7 @@ class UserAvatar extends Base {
     showAccount?: boolean;
 
     @Prop()
-    placement: iviewTypes.Poptip['placement'];
+    tipsPlacement: iviewTypes.Poptip['placement'];
 
     signOut() {
         let token = localStorage.getItem(dev.cacheKey.testUser);
@@ -33,10 +33,19 @@ class UserAvatar extends Base {
         this.storeUser.setUser(null);
     }
 
+    avatarUrl = (this.user && this.user.avatarUrl) || '';
+
+    @Watch('user')
+    watchUser(newVal, oldVal) {
+        this.avatarUrl = (newVal && newVal.avatarUrl) || '';
+    }
+
     render() {
         return (
-            <Poptip disabled={this.noTips} trigger="hover" style={{ cursor: 'pointer' }} placement={this.placement}>
-                <Avatar icon="md-person" style={{ marginRight: '10px' }} />
+            <Poptip disabled={this.noTips} trigger="hover" style={{ cursor: 'pointer' }} placement={this.tipsPlacement}>
+                <Avatar icon="md-person" src={this.avatarUrl} style={{ marginRight: '10px' }} on-error={() => {
+                    this.avatarUrl = '';
+                }} />
                 <b>{this.user.nickname}{this.showAccount && `(${this.user.account})`}</b>
                 {this.self ?
                     <div slot="content">
@@ -50,7 +59,7 @@ class UserAvatar extends Base {
                             <Avatar icon="md-person" size="large" />
                         </div>
                         <br />
-                        {this.user.desc || '这个人很懒,什么都没写'}
+                        {this.user.profile || dev.defaultProfile}
                         <br />
                         <br />
                         <div style={{ textAlign: 'center' }}>
