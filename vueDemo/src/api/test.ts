@@ -12,6 +12,7 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
     userInfo,
     userAccountExists,
     userDetail,
+    userDetailQuery,
     userUpdate,
 
     userMgtQuery,
@@ -123,6 +124,9 @@ export class TestApi extends ApiModel<TestApiMethod> {
     }
     async userDetail() {
         return this.requestByConfig(this.apiConfig.method.userDetail);
+    }
+    async userDetailQuery(_id) {
+        return this.requestByConfig(this.apiConfig.method.userDetailQuery, { data: { _id } });
     }
     async userUpdate(data) {
         return this.requestByConfig(this.apiConfig.method.userUpdate, { data });

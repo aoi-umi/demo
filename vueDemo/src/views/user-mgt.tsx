@@ -23,6 +23,7 @@ export type DetailDataType = {
     status?: number;
     statusText?: string;
     disabledTo?: Date;
+    self?: boolean;
 };
 @Component
 class UserMgtDetail extends Base {

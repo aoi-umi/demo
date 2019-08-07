@@ -41,6 +41,10 @@ const config = {
                     url: '/user/detail',
                     method: 'get',
                 },
+                userDetailQuery: {
+                    url: '/user/detailQuery',
+                    method: 'get',
+                },
                 userUpdate: {
                     url: '/user/update',
                 },

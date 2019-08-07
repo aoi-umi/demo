@@ -8,9 +8,11 @@ import { dev } from '@/config';
 import { testApi } from '@/api';
 import { Tag, Modal, Input, Row, Col, Form, FormItem, Button, Spin, Card } from '@/components/iview';
 import { MyTagModel } from '@/components/my-tag';
+import { LoginUser } from '@/model/user';
 import { DetailDataType as UserDetailDataType } from './user-mgt';
 import { Base } from './base';
-import { LoginUser } from '@/model/user';
+import { LoadView, ILoadView } from './load-view';
+import { UserAvatarView } from './user-avatar';
 
 
 type SignInDataType = {
@@ -43,6 +45,7 @@ class SignIn extends Base {
 
     private async handleSignIn() {
         await this.operateHandler('登录', async () => {
+            this.loading = true;
             let { account, password } = this.innerDetail;
             let req = { account, rand: helpers.randStr() };
             let token = LoginUser.createToken(account, password, req);
@@ -56,7 +59,9 @@ class SignIn extends Base {
         }, {
                 validate: this.$refs.formVaild.validate
             }
-        );
+        ).finally(() => {
+            this.loading = false;
+        });
     }
 
     private handlePress(e) {
@@ -148,6 +153,7 @@ class SignUp extends Base {
 
     private async handleSignUp() {
         await this.operateHandler('注册', async () => {
+            this.loading = true;
             let rs = await testApi.userSignUp(this.innerDetail);
             this.innerDetail = this.getDetailData();
             this.$emit('success');
@@ -155,7 +161,9 @@ class SignUp extends Base {
         }, {
                 validate: this.$refs.formVaild.validate
             }
-        );
+        ).finally(() => {
+            this.loading = false;
+        });
     }
 
     private handlePress(e) {
@@ -196,30 +204,25 @@ export const SignUpView = convClass<SignUp>(SignUp);
 @Component
 export default class UserInfo extends Base {
     loading = false;
-    detail: UserDetailDataType = {
-        auth: {}
-    };
+    detail: UserDetailDataType = {};
     mounted() {
-        this.getUserDetail();
+        this.$refs.loadView.loadData();
     }
 
     async getUserDetail() {
-        if (!this.detail._id) {
-            this.loading = true;
-            this.operateHandler('', async () => {
-                this.detail = await testApi.userDetail();
-                if (!this.detail)
-                    throw new Error('用户不存在');
-            }, { noDefaultHandler: true }).then(rs => {
-                if (!rs.success)
-                    this.toError({ msg: '获取用户出错:' + rs.msg });
-            }).finally(() => {
-                this.loading = false;
-            });
+        let query = this.$route.query;
+        let detail: UserDetailDataType;
+        if (!query._id) {
+            detail = await testApi.userDetail();
+            detail.self = true;
+        } else {
+            detail = await testApi.userDetailQuery(query._id);
         }
+        this.detail = detail;
+        return detail;
     }
 
-    $refs: { formVaild: IForm };
+    $refs: { formVaild: IForm, loadView: ILoadView };
     pwdLoading = false;
     changePwdDetail = {
         nickname: '',
@@ -309,35 +312,51 @@ export default class UserInfo extends Base {
         }
     }
 
-    render() {
+    renderInfo(detail: UserDetailDataType) {
         return (
-            <div style={{ position: 'relative', }}>
-                <Card>
+            <Card>
+                <UserAvatarView user={detail} noTips showAccount style={{ marginLeft: '18px' }} />
+                {detail.self && <a on-click={() => {
+                    this.toggleUpdate(true);
+                }} style={{ marginLeft: '5px' }}>修改</a>}
+                {detail.self ?
                     <Form label-width={60}>
-                        <FormItem label="账号">
-                            {this.detail.nickname}({this.detail.account})
-                            <a on-click={() => {
-                                this.toggleUpdate(true);
-                            }} style={{ marginLeft: '5px' }}>修改</a>
-                        </FormItem>
                         <FormItem label="状态">
-                            {this.detail.statusText}
+                            {detail.statusText}
                         </FormItem>
                         <FormItem label="角色">
-                            {MyTagModel.renderRoleTag(this.detail.roleList, true)}
+                            {MyTagModel.renderRoleTag(detail.roleList, true)}
                         </FormItem>
                         <FormItem label="权限">
-                            {MyTagModel.renderAuthorityTag(this.detail.authorityList, true)}
+                            {MyTagModel.renderAuthorityTag(detail.authorityList, true)}
                         </FormItem>
                         <FormItem label="可用权限">
-                            {MyTagModel.renderAuthorityTag(Object.values(this.detail.auth), true)}
+                            {MyTagModel.renderAuthorityTag(Object.values(detail.auth), true)}
                         </FormItem>
-                        <FormItem label="创建时间">
-                            {this.detail.createdAt && moment(this.detail.createdAt).format(dev.dateFormat)}
+                        <FormItem label="注册时间">
+                            {detail.createdAt && moment(detail.createdAt).format(dev.dateFormat)}
+                        </FormItem>
+                    </Form> :
+                    <Form label-width={60}>
+                        <FormItem label="注册时间">
+                            {detail.createdAt && moment(detail.createdAt).format(dev.dateFormat)}
                         </FormItem>
                     </Form>
-                </Card>
-                {this.loading && <Spin size="large" fix></Spin>}
+                }
+            </Card>
+        );
+    }
+
+    render() {
+        return (
+            <div>
+                <LoadView
+                    ref="loadView"
+                    loadFn={this.getUserDetail}
+                    renderFn={(detail: UserDetailDataType) => {
+                        return this.renderInfo(detail);
+                    }} />
+
                 <Modal v-model={this.changePwdShow} footer-hide>
                     <div class="dialog-view" on-keypress={this.handlePress}>
                         <h3>修改</h3>

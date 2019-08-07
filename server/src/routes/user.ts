@@ -4,7 +4,8 @@ import { plainToClass } from 'class-transformer';
 import * as common from '../_system/common';
 import * as cache from '../_system/cache';
 import { responseHandler, paramsValid, } from '../helpers';
-import { dev, error, auth, myEnum } from '../config';
+import { myEnum } from '../config';
+import * as config from '../config';
 import { UserModel, UserMapper, UserLogMapper } from '../models/mongo/user';
 import * as VaildSchema from '../vaild-schema/class-valid';
 import { transaction } from '../_system/dbMongo';
@@ -43,8 +44,8 @@ export let signIn: RequestHandler = (req, res) => {
         let { user, disableResult } = await UserMapper.accountCheck(data.account);
 
         let returnUser = await UserMapper.login(token, user, data, disableResult.disabled);
-        let userInfoKey = dev.cacheKey.user + token;
-        await cache.set(userInfoKey, returnUser, dev.cacheTime.user);
+        let userInfoKey = config.dev.cacheKey.user + token;
+        await cache.set(userInfoKey, returnUser, config.dev.cacheTime.user);
         return returnUser;
     }, req, res);
 };
@@ -74,6 +75,17 @@ export let detail: RequestHandler = (req, res) => {
     }, req, res);
 };
 
+export let detailQuery: RequestHandler = (req, res) => {
+    responseHandler(async () => {
+        let data = plainToClass(VaildSchema.UserMgtQuery, req.query);
+        paramsValid(data);
+        let detail = await UserModel.findById(data._id);
+        if (!detail)
+            throw common.error('', config.error.USER_NOT_FOUND)
+        return detail;
+    }, req, res);
+};
+
 export let update: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let data = plainToClass(VaildSchema.UserUpdate, req.body);
@@ -86,7 +98,7 @@ export let update: RequestHandler = (req, res) => {
         if (restData.newPassword) {
             let { checkToken } = UserMapper.createToken(restData, dbUser);
             if (token !== checkToken)
-                throw common.error('', error.TOKEN_WRONG);
+                throw common.error('', config.error.TOKEN_WRONG);
             updateCache.password = common.md5(restData.newPassword);
         }
         let log = UserLogMapper.create(dbUser, user, { update });
@@ -98,8 +110,8 @@ export let update: RequestHandler = (req, res) => {
             for (let key in updateCache) {
                 user[key] = updateCache[key];
             }
-            let userInfoKey = dev.cacheKey.user + user.key;
-            await cache.set(userInfoKey, user, dev.cacheTime.user);
+            let userInfoKey = config.dev.cacheKey.user + user.key;
+            await cache.set(userInfoKey, user, config.dev.cacheTime.user);
         }
     }, req, res);
 };

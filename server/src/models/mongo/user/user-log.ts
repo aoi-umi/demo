@@ -34,6 +34,11 @@ export class UserLog extends Base {
 
     @prop()
     remark: string;
+
+    @prop({
+        type: Object
+    })
+    oldData: any;
 }
 
 export const UserLogModel = getModelForClass<UserLog, typeof UserLog>(UserLog);

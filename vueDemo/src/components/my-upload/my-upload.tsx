@@ -117,7 +117,7 @@ class MyUpload extends Vue {
     }
 
     protected created() {
-        // this.watchValue(this.defaultFileList);
+        this.watchValue(this.value);
         if (this.cropperOptions) {
             this.cropper = {
                 ...this.cropper,
