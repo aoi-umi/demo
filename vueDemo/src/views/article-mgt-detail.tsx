@@ -10,6 +10,7 @@ import { ArticleMgtBase } from './article-mgt';
 import { MyEditor } from '@/components/my-editor';
 import { IMyEditor } from '@/components/my-editor/my-editor';
 import { UserAvatarView } from './user-avatar';
+import { LoadView, ILoadView } from './load-view';
 
 export type DetailType = {
     detail: DetailDataType;
@@ -31,12 +32,6 @@ export type DetailDataType = {
 };
 @Component
 export default class ArticleDetail extends ArticleMgtBase {
-
-    updateDetail(newVal?) {
-        let data = newVal || this.getDetailData();
-        this.initDetail(data);
-    }
-    private innerDetail: DetailType = {} as any;
     private getDetailData() {
         return {
             detail: {
@@ -52,10 +47,7 @@ export default class ArticleDetail extends ArticleMgtBase {
         };
     }
 
-    private initDetail(data) {
-        this.innerDetail = data;
-        this.coverList = this.innerDetail.detail.coverUrl ? [{ url: this.innerDetail.detail.coverUrl }] : [];
-    }
+    private innerDetail: DetailType = {} as any;
 
     private rules = {
         title: [
@@ -65,28 +57,27 @@ export default class ArticleDetail extends ArticleMgtBase {
             { required: true, trigger: 'blur' }
         ],
     };
-    $refs: { formVaild: IForm, editor: IMyEditor, upload: IMyUpload };
+    $refs: { formVaild: IForm, editor: IMyEditor, upload: IMyUpload, loadView: ILoadView };
 
-    created() {
-        this.updateDetail();
-        this.loadDetail();
-    }
-
-    async loadDetail() {
-        this.$refs
-        let query = this.$route.query;
-        if (query._id) {
-            this.preview = this.$route.path == dev.routeConfig.articleMgtDetail.path;
-            this.operateHandler('', async () => {
-                let rs = await testApi.articleMgtDetailQuery({ _id: query._id });
-                this.updateDetail(rs);
-            });
-        } else {
-            this.updateDetail();
-        }
+    mounted() {
+        this.$refs.loadView.loadData();
     }
 
     coverList = [];
+    async loadDetail() {
+        let query = this.$route.query;
+        let detail: DetailType;
+        if (query._id) {
+            this.preview = this.$route.path == dev.routeConfig.articleMgtDetail.path;
+            detail = await testApi.articleMgtDetailQuery({ _id: query._id });
+        } else {
+            detail = this.getDetailData() as any;
+        }
+        this.coverList = detail.detail.coverUrl ? [{ url: detail.detail.coverUrl }] : [];
+        this.innerDetail = detail;
+        return detail;
+    }
+
 
     saving = false;
     async handleSave(submit?: boolean) {
@@ -119,29 +110,39 @@ export default class ArticleDetail extends ArticleMgtBase {
         });
     }
 
-    render() {
-        if (!this.preview)
-            return this.renderEdit();
-        return this.renderPreview();
+    auditSuccessHandler() {
+        this.toList();
     }
 
-    renderHeader() {
-        let { detail } = this.innerDetail;
-        let list = [];
-        if (detail._id) {
-            list = [
-                <UserAvatarView user={detail.user} placement="top-start" />,
-                ...[
+    delSuccessHandler() {
+        this.toList();
+    }
+
+    render() {
+        return (
+            <LoadView
+                ref="loadView"
+                loadFn={this.loadDetail}
+                renderFn={(t: DetailType) => {
+                    let { detail } = t;
+                    if (!this.preview)
+                        return this.renderEdit(detail);
+                    return this.renderPreview(detail);
+                }}
+            />
+        );
+    }
+
+    renderHeader(detail: DetailDataType) {
+        return (
+            <div>
+                <UserAvatarView user={detail.user} placement="top-start" />
+                {[
                     '状态: ' + detail.statusText,
                     '创建于: ' + moment(detail.createdAt).format(dev.dateFormat),
                 ].map(ele => {
                     return (<span style={{ marginLeft: '5px' }}>{ele}</span>);
-                })
-            ]
-        }
-        return (
-            <div>
-                {list}
+                })}
             </div>
         );
     }
@@ -181,15 +182,14 @@ export default class ArticleDetail extends ArticleMgtBase {
         );
     }
 
-    renderEdit() {
-        let { detail } = this.innerDetail;
+    renderEdit(detail: DetailDataType) {
         let self = this;
         return (
             <div>
                 <h3>{detail._id ? '修改' : '新增'}</h3>
                 <Form label-width={50} ref="formVaild" props={{ model: detail }} rules={this.rules}>
                     <FormItem class={detail._id ? 'hidden' : ''} label="" prop="header">
-                        {this.renderHeader()}
+                        {this.renderHeader(detail)}
                     </FormItem>
                     <FormItem label="封面" prop="cover">
                         <MyUpload
@@ -204,7 +204,6 @@ export default class ArticleDetail extends ArticleMgtBase {
                             // format={['jpg']}
                             width={160} height={90}
                             v-model={this.coverList}
-
                         />
                     </FormItem>
                     <FormItem label="标题" prop="title">
@@ -247,22 +246,13 @@ export default class ArticleDetail extends ArticleMgtBase {
         );
     }
 
-    auditSuccessHandler() {
-        this.toList();
-    }
-
-    delSuccessHandler() {
-        this.toList();
-    }
-
-    renderPreview() {
-        let { detail } = this.innerDetail;
+    renderPreview(detail: DetailDataType) {
         let operate = this.getOperate(detail, { noPreview: true, isDetail: true });
         return (
             <div>
                 <h1>{detail.title}</h1>
                 <br />
-                {this.renderHeader()}
+                {this.renderHeader(detail)}
                 <br />
                 <div class="ql-editor" domPropsInnerHTML={detail.content}>
                 </div>

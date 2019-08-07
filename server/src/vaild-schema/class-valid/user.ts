@@ -35,6 +35,11 @@ export class UserUpdate {
     token: string;
 }
 
+export class UserDetailQuery {
+    @IsDefined()
+    _id: string;
+}
+
 export class UserMgtQuery extends ListBase {
     _id?: string;
     account?: string;

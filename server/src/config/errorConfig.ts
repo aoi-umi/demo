@@ -53,6 +53,10 @@ let errorConfig = {
     },
     CAPTCHA_EXPIRE: {
         code: 'CACHE_EXPIRE',
-    }
+    },
+
+    USER_NOT_FOUND: {
+        code: 'USER_NOT_FOUND',
+    },
 };
 export default errorConfig;

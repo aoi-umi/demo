@@ -14,7 +14,13 @@ class UserAvatar extends Base {
     user: any;
 
     @Prop()
+    noTips?: boolean;
+
+    @Prop()
     self?: boolean;
+
+    @Prop()
+    showAccount?: boolean;
 
     @Prop()
     placement: iviewTypes.Poptip['placement'];
@@ -29,9 +35,9 @@ class UserAvatar extends Base {
 
     render() {
         return (
-            <Poptip trigger="hover" style={{ cursor: 'pointer' }} placement={this.placement}>
+            <Poptip disabled={this.noTips} trigger="hover" style={{ cursor: 'pointer' }} placement={this.placement}>
                 <Avatar icon="md-person" style={{ marginRight: '10px' }} />
-                <b>{this.user.nickname}</b>
+                <b>{this.user.nickname}{this.showAccount && `(${this.user.account})`}</b>
                 {this.self ?
                     <div slot="content">
                         <p class="ivu-select-item" on-click={() => {
@@ -40,7 +46,21 @@ class UserAvatar extends Base {
                         <p class="ivu-select-item" on-click={this.signOut}>退出</p>
                     </div> :
                     <div slot="content">
-                        这里写简介
+                        <div style={{ textAlign: 'center' }}>
+                            <Avatar icon="md-person" size="large" />
+                        </div>
+                        <br />
+                        {this.user.desc || '这个人很懒,什么都没写'}
+                        <br />
+                        <br />
+                        <div style={{ textAlign: 'center' }}>
+                            <Button on-click={() => {
+                                this.$router.push({
+                                    path: dev.routeConfig.userInfo.path,
+                                    query: { _id: this.user._id }
+                                })
+                            }}>主页</Button>
+                        </div>
                     </div>
                 }
             </Poptip>

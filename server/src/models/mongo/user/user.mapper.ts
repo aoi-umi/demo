@@ -282,8 +282,14 @@ export class UserLogMapper {
         });
         let remark = opt.remark || '';
         if (!remark) {
-            if (opt.update)
-                remark += `[修改了:${Object.keys(opt.update)}]`;
+            if (opt.update) {
+                let updateKey = Object.keys(opt.update);
+                remark += `[修改了:${updateKey}]`;
+                log.oldData = {};
+                updateKey.forEach(key => {
+                    log.oldData[key] = user[key];
+                });
+            }
         }
         log.remark = remark;
         return log;
