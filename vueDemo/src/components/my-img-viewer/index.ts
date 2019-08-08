@@ -1,0 +1,1 @@
+export { default as MyImgViewer } from './my-img-viewer';

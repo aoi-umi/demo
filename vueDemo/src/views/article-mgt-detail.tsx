@@ -29,12 +29,12 @@ export type DetailDataType = {
     remark: string;
     canUpdate: boolean;
     canDel: boolean;
-    user: { nickname: string; account: string };
+    user: { _id: string; nickname: string; account: string };
 };
 @Component
 export default class ArticleDetail extends ArticleMgtBase {
     private getDetailData() {
-        return {
+        let data = {
             detail: {
                 _id: '',
                 cover: '',
@@ -43,10 +43,13 @@ export default class ArticleDetail extends ArticleMgtBase {
                 profile: '',
                 content: '',
                 status: myEnum.articleStatus.草稿,
-                remark: ''
+                statusText: '',
+                remark: '',
             },
             log: []
         };
+        data.detail.statusText = myEnum.articleStatus.getKey(data.detail.status);
+        return data;
     }
 
     private innerDetail: DetailType = {} as any;
@@ -190,8 +193,8 @@ export default class ArticleDetail extends ArticleMgtBase {
             <div>
                 <h3>{detail._id ? '修改' : '新增'}</h3>
                 <Form label-width={50} ref="formVaild" props={{ model: detail }} rules={this.rules}>
-                    <FormItem class={detail._id ? 'hidden' : ''} label="" prop="header">
-                        {this.renderHeader(detail)}
+                    <FormItem class={!detail._id ? 'hidden' : ''} label="" prop="header">
+                        {!!detail._id && this.renderHeader(detail)}
                     </FormItem>
                     <FormItem label="封面" prop="cover">
                         <MyUpload

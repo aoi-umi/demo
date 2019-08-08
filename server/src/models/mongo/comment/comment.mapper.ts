@@ -6,7 +6,11 @@ import { ArticleMapper } from '../article';
 import { myEnum } from '../../../config';
 import { InstanceType } from 'mongoose-ts-ua';
 import { UserModel } from '../user';
+import { FileMapper } from '../file';
 
+type CommentResetOption = {
+    imgHost?: string;
+};
 export class CommentMapper {
     static async create(data: VaildSchema.CommentSubmit, type, user: LoginUser) {
         let lastComment = await CommentModel.findOne({ ownerId: data.ownerId }).sort({ floor: -1 });
@@ -21,13 +25,15 @@ export class CommentMapper {
         return comment;
     }
 
-    static async query(data: VaildSchema.CommentQuery) {
+    static async query(data: VaildSchema.CommentQuery, opt: {
+        resetOpt?: CommentResetOption
+    }) {
         let match: any = {
             ownerId: data.ownerId,
             type: data.type
         };
 
-        return CommentModel.aggregatePaginate([
+        let rs = await CommentModel.aggregatePaginate([
             {
                 $match: match
             },
@@ -42,7 +48,8 @@ export class CommentMapper {
                     }, {
                         $project: {
                             account: 1,
-                            nickname: 1
+                            nickname: 1,
+                            avatar: 1,
                         }
                     }],
                     as: 'user'
@@ -52,6 +59,13 @@ export class CommentMapper {
         ], {
                 ...BaseMapper.getListOptions(data),
             });
+
+        if (opt.resetOpt) {
+            rs.rows.forEach(detail => {
+                this.resetDetail(detail, opt.resetOpt);
+            });
+        }
+        return rs;
     }
 
     static async findOwner(ownerId, type) {
@@ -60,5 +74,11 @@ export class CommentMapper {
             owner = await ArticleMapper.findOne({ _id: ownerId, status: myEnum.articleStatus.审核通过 });
         }
         return owner;
+    }
+
+    static resetDetail(detail, opt: CommentResetOption) {
+        if (detail.user) {
+            detail.user.avatarUrl = FileMapper.getImgUrl(detail.user.avatar, opt.imgHost);
+        }
     }
 }

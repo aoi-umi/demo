@@ -14,6 +14,18 @@ import { ArticleInstanceType, ArticleModel } from "./article";
 import { ArticleLogModel } from './article-log';
 import { LoginUser } from '../../login-user';
 
+type ArticleResetOption = {
+    user?: LoginUser,
+    imgHost?: string;
+};
+
+type ArticleQueryOption = {
+    audit?: boolean;
+    normal?: boolean;
+    userId?: string;
+    resetOpt?: ArticleResetOption;
+};
+
 export class ArticleMapper {
     static async query(data: AritcleQuery, opt: {
         noTotal?: boolean,
@@ -82,7 +94,8 @@ export class ArticleMapper {
                     }, {
                         $project: {
                             account: 1,
-                            nickname: 1
+                            nickname: 1,
+                            avatar: 1,
                         }
                     }],
                     as: 'user'
@@ -100,6 +113,8 @@ export class ArticleMapper {
         rs.rows = rs.rows.map(ele => {
             let e = new ArticleModel(ele).toJSON();
             e.user = ele.user;
+            if (opt.resetOpt)
+                this.resetDetail(e, opt.resetOpt);
             return e;
         });
         return rs;
@@ -130,20 +145,21 @@ export class ArticleMapper {
         return detail;
     }
 
-    static resetDetail(detail, user: LoginUser, opt?: {
-        imgHost?: string;
-    }) {
-        let rs = {
-            canDel: detail.status !== myEnum.articleStatus.已删除 && (detail.userId == user._id || Auth.contains(user, config.auth.articleMgtDel)),
-            canUpdate: detail.canUpdate && detail.userId == user._id,
-        };
-        detail.canDel = rs.canDel;
-        detail.canUpdate = rs.canUpdate;
-        opt = {
-            ...opt,
-        };
+    static resetDetail(detail, opt: ArticleResetOption) {
+        let { user } = opt;
+        if (user) {
+            let rs = {
+                canDel: detail.status !== myEnum.articleStatus.已删除 && (detail.userId == user._id || Auth.contains(user, config.auth.articleMgtDel)),
+                canUpdate: detail.canUpdate && detail.userId == user._id,
+            };
+            detail.canDel = rs.canDel;
+            detail.canUpdate = rs.canUpdate;
+        }
+
         detail.coverUrl = FileMapper.getImgUrl(detail.cover, opt.imgHost);
-        return rs;
+        if (detail.user) {
+            detail.user.avatarUrl = FileMapper.getImgUrl(detail.user.avatar, opt.imgHost);
+        }
     }
 
     static async updateStatus(idList: Types.ObjectId[], status: number, user: LoginUser, opt?: {
@@ -175,12 +191,6 @@ export class ArticleMapper {
             statusText: myEnum.articleStatus.getKey(status)
         };
     }
-};
-
-type ArticleQueryOption = {
-    audit?: boolean;
-    normal?: boolean;
-    userId?: string;
 };
 
 export class ArticleLogMapper {
