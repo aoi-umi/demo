@@ -5,8 +5,10 @@ import { convClass } from '@/helpers';
 import axios, { AxiosRequestConfig } from 'axios';
 import { VueCropper } from 'vue-cropper';
 import { MyImg } from '../my-img';
-import './my-upload.less';
 import { Utils } from '../utils';
+import * as style from '../style';
+import './my-upload.less';
+import { MyImgViewer } from '../my-img-viewer';
 
 const clsPrefix = 'my-upload-';
 
@@ -283,7 +285,7 @@ class MyUpload extends Vue {
                         <Icon type="ios-camera" size="20"></Icon>
                     </div>
                 </Upload>
-                <div class={[clsPrefix + 'cropper-bg', this.cropperShow ? '' : 'hidden']}>
+                <div class={[style.cls.mask, this.cropperShow ? '' : 'hidden']}>
                     <div style={{ textAlign: 'center', width: '100%' }}>
                         <div style={{ width: '1024px', height: '576px', display: 'inline-block' }}>
                             <VueCropper
@@ -308,9 +310,7 @@ class MyUpload extends Vue {
                         </div>
                     </div>
                 </div>
-                <Modal title="查看图片" v-model={this.visible}>
-                    <img src={this.showUrl} style={{ width: '100%' }} />
-                </Modal>
+                {this.visible && <MyImgViewer src={this.showUrl} />}
             </div>
         );
     }

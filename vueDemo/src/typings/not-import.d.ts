@@ -12,5 +12,6 @@ interface UserInfo {
     account: string;
     nickname: string;
     key: string;
+    avatarUrl: string;
     authority: { [key: string]: boolean };
 }

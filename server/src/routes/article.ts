@@ -16,11 +16,13 @@ export let mgtQuery: RequestHandler = (req, res) => {
         let data = plainToClass(VaildSchema.AritcleQuery, req.query);
         paramsValid(data);
 
-        let { rows, total } = await ArticleMapper.query(data, { userId: user._id, audit: Auth.contains(user, config.auth.articleMgtAudit) });
-        rows.forEach(detail => {
-            ArticleMapper.resetDetail(detail, user, {
-                imgHost: req.headers.host
-            });
+        let { rows, total } = await ArticleMapper.query(data, {
+            userId: user._id,
+            audit: Auth.contains(user, config.auth.articleMgtAudit),
+            resetOpt: {
+                imgHost: req.headers.host,
+                user,
+            }
         });
         return {
             rows,
@@ -34,9 +36,13 @@ export let MgtDetailQuery: RequestHandler = (req, res) => {
         let user = req.myData.user;
         let data = plainToClass(VaildSchema.AritcleDetailQuery, req.query);
         paramsValid(data);
-        let rs = await ArticleMapper.detailQuery({ _id: data._id }, { userId: user._id, audit: Auth.contains(user, config.auth.articleMgtAudit) });
-        ArticleMapper.resetDetail(rs.detail, user, {
-            imgHost: req.headers.host
+        let rs = await ArticleMapper.detailQuery({ _id: data._id }, {
+            userId: user._id,
+            audit: Auth.contains(user, config.auth.articleMgtAudit),
+            resetOpt: {
+                imgHost: req.headers.host,
+                user,
+            }
         });
         return rs;
     }, req, res);
@@ -119,11 +125,12 @@ export let query: RequestHandler = (req, res) => {
         let data = plainToClass(VaildSchema.AritcleQuery, req.query);
         paramsValid(data);
 
-        let { rows, total } = await ArticleMapper.query(data, { normal: true });
-        rows.forEach(detail => {
-            ArticleMapper.resetDetail(detail, user, {
-                imgHost: req.headers.host
-            });
+        let { rows, total } = await ArticleMapper.query(data, {
+            normal: true,
+            resetOpt: {
+                imgHost: req.headers.host,
+                user,
+            }
         });
         return {
             rows,
@@ -137,12 +144,15 @@ export let detailQuery: RequestHandler = (req, res) => {
         let user = req.myData.user;
         let data = plainToClass(VaildSchema.AritcleDetailQuery, req.query);
         paramsValid(data);
-        let rs = await ArticleMapper.detailQuery({ _id: data._id }, { normal: true });
+        let rs = await ArticleMapper.detailQuery({ _id: data._id }, {
+            normal: true,
+            resetOpt: {
+                imgHost: req.headers.host,
+                user
+            }
+        });
         let detail = rs.detail;
         ArticleModel.update({ _id: detail._id }, { readTimes: detail.readTimes + 1 }).exec();
-        ArticleMapper.resetDetail(detail, user, {
-            imgHost: req.headers.host
-        });
         return rs;
     }, req, res);
 };

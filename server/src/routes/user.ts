@@ -44,6 +44,7 @@ export let signIn: RequestHandler = (req, res) => {
         let { user, disableResult } = await UserMapper.accountCheck(data.account);
 
         let returnUser = await UserMapper.login(token, user, data, disableResult.disabled);
+        UserMapper.resetDetail(returnUser, { imgHost: req.headers.host });
         let userInfoKey = config.dev.cacheKey.user + token;
         await cache.set(userInfoKey, returnUser, config.dev.cacheTime.user);
         return returnUser;
@@ -102,7 +103,7 @@ export let update: RequestHandler = (req, res) => {
             let { checkToken } = UserMapper.createToken(restData, dbUser);
             if (token !== checkToken)
                 throw common.error('', config.error.TOKEN_WRONG);
-            updateCache.password = common.md5(restData.newPassword);
+            update.password = common.md5(restData.newPassword);
         }
         let log = UserLogMapper.create(dbUser, user, { update });
         await transaction(async (session) => {

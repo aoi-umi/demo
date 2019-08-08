@@ -39,6 +39,7 @@ export class UserAuthMid {
                         if (user.lastLoginAt && user.lastLoginAt.getTime() < new Date().getTime() - 1000 * 3600 * 2) {
                             try {
                                 let returnUser = await UserMapper.login(token, dbUser, user.loginData, disableResult.disabled);
+                                UserMapper.resetDetail(returnUser, { imgHost: req.headers.host });
                                 await cache.set(userCacheKey, returnUser, config.dev.cacheTime.user);
                                 user = plainToClass(LoginUser, returnUser);
                                 req.myData.user = user;

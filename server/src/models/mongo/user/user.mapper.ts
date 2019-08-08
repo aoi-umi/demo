@@ -264,18 +264,16 @@ export class UserMapper {
         }
 
         return {
-            _id: user._id, account: user.account, nickname: user.nickname, key: token, authority: userAuth,
+            _id: user._id, account: user.account, nickname: user.nickname, avatar: user.avatar,
+            key: token, authority: userAuth,
             loginData: data,
             lastLoginAt: new Date()
         };
     }
 
-    static resetDetail(detail, opt?: {
+    static resetDetail(detail, opt: {
         imgHost?: string;
     }) {
-        opt = {
-            ...opt,
-        };
         detail.avatarUrl = FileMapper.getImgUrl(detail.avatar, opt.imgHost);
     }
 }

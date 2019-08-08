@@ -6,10 +6,9 @@ export class LoginUser {
     static create(data: UserInfo) {
         let user = new LoginUser();
         if (data) {
-            let setKey: (keyof UserInfo)[] = ['_id', 'account', 'key', 'nickname', 'authority'];
-            setKey.forEach(key => {
+            for (let key in data) {
                 user[key] = data[key];
-            });
+            }
             user.isLogin = true;
         } else {
 

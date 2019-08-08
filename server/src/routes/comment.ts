@@ -34,7 +34,11 @@ export let query: RequestHandler = (req, res) => {
         paramsValid(data);
         let { total, rows } = await CommentMapper.query({
             ...data,
-        });
+        }, {
+                resetOpt: {
+                    imgHost: req.headers.host
+                }
+            });
         return {
             rows,
             total,
