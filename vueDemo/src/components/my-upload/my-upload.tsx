@@ -69,6 +69,11 @@ class MyUpload extends Vue {
     headers?: () => any;
 
     @Prop({
+        default: 'square'
+    })
+    shape?: 'circle' | 'square';
+
+    @Prop({
         default: () => []
     })
     value: FileType[];
@@ -236,7 +241,7 @@ class MyUpload extends Vue {
             <div>
                 {this.fileList.map(item => {
                     return (
-                        <div class={clsPrefix + 'list'} style={{ width, height, lineHeight: height }}>
+                        <div class={[clsPrefix + 'item', this.shape == 'circle' ? style.cls.circle : '']} style={{ width, height }}>
                             <div style={{
                                 width: 'inherit',
                                 height: 'inherit',
@@ -245,7 +250,7 @@ class MyUpload extends Vue {
                                     width: 'inherit',
                                     height: 'inherit',
                                 }} src={item.url || item.data} />
-                                <div class={clsPrefix + 'list-cover'}>
+                                <div class={clsPrefix + 'item-cover'} style={{ lineHeight: height }}>
                                     {item.originData && <Icon type="md-create" nativeOn-click={() => { this.handleEdit(item); }} />}
                                     <Icon type="md-eye" nativeOn-click={() => { this.handleView(item); }} />
                                     <Icon type="md-trash" nativeOn-click={() => { this.handleRemove(item); }} />
@@ -289,6 +294,7 @@ class MyUpload extends Vue {
                                 <VueCropper
                                     ref="cropper"
                                     props={this.cropper}
+                                    class={this.shape == 'circle' ? clsPrefix + 'cropper-circle' : ''}
                                 />
                             </div>
                             <div>

@@ -9,6 +9,7 @@ import { testApi } from '@/api';
 import { Tag, Modal, Input, Row, Col, Form, FormItem, Button, Spin, Card } from '@/components/iview';
 import { MyTagModel } from '@/components/my-tag';
 import { LoginUser } from '@/model/user';
+import { MyUpload, IMyUpload } from '@/components/my-upload';
 import { DetailDataType as UserDetailDataType } from './user-mgt';
 import { Base } from './base';
 import { LoadView, ILoadView } from './load-view';
@@ -231,23 +232,32 @@ export default class UserInfo extends Base {
         return detail;
     }
 
-    $refs: { formVaild: IForm, loadView: ILoadView };
+    $refs: { formVaild: IForm, loadView: ILoadView, upload: IMyUpload };
     pwdLoading = false;
-    updateDetail = {
-        nickname: '',
-        pwd: '',
-        newPwd: '',
-        newPwdRepeat: '',
-        profile: ''
-    };
+    private getUpdateUser() {
+        return {
+            avatar: '',
+            avatarUrl: '',
+            nickname: '',
+            pwd: '',
+            newPwd: '',
+            newPwdRepeat: '',
+            profile: ''
+        };
+    }
+    updateDetail = this.getUpdateUser();
     updateShow = false;
+    avatarList = [];
     async toggleUpdate(show: boolean) {
         this.updateShow = show;
-        this.updateDetail.nickname = this.detail.nickname;
-        this.updateDetail.pwd = '';
-        this.updateDetail.newPwd = '';
-        this.updateDetail.newPwdRepeat = '';
-        this.updateDetail.profile = this.detail.profile;
+        this.updateDetail = {
+            ...this.getUpdateUser(),
+            avatar: this.detail.avatar,
+            avatarUrl: this.detail.avatarUrl,
+            nickname: this.detail.nickname,
+            profile: this.detail.profile,
+        };
+        this.avatarList = this.updateDetail.avatarUrl ? [{ url: this.updateDetail.avatarUrl }] : [];
     }
     private rules = {
         pwd: [{
@@ -333,7 +343,7 @@ export default class UserInfo extends Base {
     renderInfo(detail: UserDetailDataType) {
         return (
             <Card>
-                <UserAvatarView user={detail} noTips showAccount style={{ marginLeft: '18px' }} />
+                <UserAvatarView user={detail} size="large" noTips showAccount style={{ marginLeft: '10px' }} />
                 {detail.self && <a on-click={() => {
                     this.toggleUpdate(true);
                 }} style={{ marginLeft: '5px' }}>修改</a>}
@@ -386,6 +396,28 @@ export default class UserInfo extends Base {
                         <h3>修改</h3>
                         <br />
                         <Form label-width={100} ref="formVaild" props={{ model: this.updateDetail }} rules={this.rules}>
+                            <FormItem prop="avatar">
+                                <div style={{ textAlign: 'center' }}>
+                                    <MyUpload
+                                        headers={testApi.defaultHeaders}
+                                        uploadUrl={testApi.imgUploadUrl}
+                                        successHandler={(res, file) => {
+                                            let rs = testApi.imgUplodaHandler(res);
+                                            file.url = rs.url;
+                                            return rs.fileId;
+                                        }}
+                                        // format={['jpg']}
+                                        width={90} height={90}
+                                        cropperOptions={{
+                                            autoCropWidth: 288,
+                                            autoCropHeight: 288,
+                                            fixedNumber: [1, 1],
+                                        }}
+                                        v-model={this.avatarList}
+                                        shape="circle"
+                                    />
+                                </div>
+                            </FormItem>
                             <FormItem label="昵称" prop="nickname">
                                 <Input v-model={this.updateDetail.nickname} />
                             </FormItem>
