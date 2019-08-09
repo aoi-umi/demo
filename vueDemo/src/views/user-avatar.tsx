@@ -3,8 +3,9 @@ import * as iviewTypes from 'iview';
 
 import { testApi } from '@/api';
 import { convClass } from '@/helpers';
-import { Button, Avatar, Poptip, Spin } from '@/components/iview';
 import { dev } from '@/config';
+import { Button, Avatar, Poptip, Spin } from '@/components/iview';
+import { MyImgViewer, IMyImgViewer } from '@/components/my-img-viewer';
 import { Base } from './base';
 import { DetailDataType } from './user-mgt';
 
@@ -29,8 +30,13 @@ class UserAvatar extends Base {
     @Prop()
     tipsPlacement: iviewTypes.Poptip['placement'];
 
+    @Prop()
+    size: iviewTypes.Avatar['size'];
+
     private innerUser: DetailDataType = {};
     avatarUrl = '';
+
+    $refs: { imgViewer: IMyImgViewer };
 
     created() {
         this.init(this.user);
@@ -74,7 +80,19 @@ class UserAvatar extends Base {
             <Poptip disabled={this.noTips} trigger="hover" style={{ cursor: 'pointer' }} placement={this.tipsPlacement} on-on-popper-show={() => {
                 this.getUserDetail();
             }}>
-                <Avatar class="shadow" icon="md-person" src={this.avatarUrl} style={{ marginRight: '10px' }} />
+                <Avatar
+                    class="shadow"
+                    icon="md-person"
+                    size={this.size}
+                    src={this.avatarUrl}
+                    style={{ marginRight: '10px' }}
+                    nativeOn-click={() => {
+                        if (this.avatarUrl) {
+                            this.$refs.imgViewer.show();
+                        }
+                    }}
+                />
+                {this.avatarUrl && <MyImgViewer src={this.avatarUrl} ref='imgViewer' />}
                 <b>{this.user.nickname}{this.showAccount && `(${this.user.account})`}</b>
                 {this.self ?
                     <div slot="content">
