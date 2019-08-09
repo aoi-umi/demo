@@ -193,7 +193,7 @@ export default class ArticleDetail extends ArticleMgtBase {
             <div>
                 <h3>{detail._id ? '修改' : '新增'}</h3>
                 <Form label-width={50} ref="formVaild" props={{ model: detail }} rules={this.rules}>
-                    <FormItem class={!detail._id ? 'hidden' : ''} label="" prop="header">
+                    <FormItem label="" prop="header" v-show={!detail._id}>
                         {!!detail._id && this.renderHeader(detail)}
                     </FormItem>
                     <FormItem label="封面" prop="cover">
