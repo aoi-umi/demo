@@ -23,12 +23,6 @@ class MyImg extends Vue {
 
     $refs: { img: HTMLElement }
     private isLoadSuccess = !!this.src;
-    private get cls() {
-        let cls = [clsPrefix + 'image'];
-        if (!this.isLoadSuccess)
-            cls.push('hidden');
-        return cls;
-    }
 
     handleError(e) {
         this.isLoadSuccess = false;
@@ -38,9 +32,9 @@ class MyImg extends Vue {
         return (
             <div class={clsPrefix + 'root'}>
                 <div class={clsPrefix + 'main'}>
-                    {this.src && <img ref="img" class={this.cls} on-error={this.handleError} src={this.src} alt={this.alt} />}
+                    {this.src && <img ref="img" class={clsPrefix + 'image'} v-show={this.isLoadSuccess} on-error={this.handleError} src={this.src} alt={this.alt} />}
                     {!this.isLoadSuccess &&
-                        (this.failImg ? <img src={this.failImg} alt={this.alt} /> :
+                        (this.failImg ? <img class={clsPrefix + 'image'} src={this.failImg} alt={this.alt} /> :
                             <Icon type="md-image" size={40} />)
                     }
                 </div>

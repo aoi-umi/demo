@@ -13,7 +13,7 @@ let env = {
         uri: process.env.RedisUri || 'redis://localhost',
     },
     mongoose: {
-        uri: process.env.MongoUri || "mongodb://dev:123456@127.0.0.1:27017/admin",
+        uri: process.env.MongoUri || "mongodb://localhost",
         options: {
             useNewUrlParser: true,
             autoReconnect: true,

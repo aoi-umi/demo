@@ -1,1 +1,32 @@
 @prefix: my-img-viewer-;
+
+.@{prefix}box {
+  display: inline-block;
+  width: 800px;
+  position: relative;
+  border-radius: 3px;
+}
+
+.@{prefix}item {
+  background: rgba(0, 0, 0, 0.3);
+  text-align: center;
+  height: 460px;
+  line-height: 460px;
+}
+
+.@{prefix}close-btn {
+  position: absolute;
+  right: 20px;
+  top: 10px;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.1s linear;
+  &:hover {
+    color: rgba(255, 255, 255, 0.8);
+  }
+  i {
+    font-size: 20px;
+    color: inherit !important;
+    line-height: inherit !important;
+  }
+}

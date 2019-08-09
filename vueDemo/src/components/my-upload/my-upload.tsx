@@ -8,7 +8,7 @@ import { MyImg } from '../my-img';
 import { Utils } from '../utils';
 import * as style from '../style';
 import './my-upload.less';
-import { MyImgViewer } from '../my-img-viewer';
+import { MyImgViewer, IMyImgViewer } from '../my-img-viewer';
 
 const clsPrefix = 'my-upload-';
 
@@ -91,10 +91,9 @@ class MyUpload extends Vue {
     @Prop()
     cropperOptions?: CropperOption;
 
-    $refs: { upload: iview.Upload & { fileList: FileType[] }, cropper: any };
+    $refs: { upload: iview.Upload & { fileList: FileType[] }, cropper: any, imgViewer: IMyImgViewer };
 
     defaultList = [];
-    visible = false;
 
     private showUrl = '';
     private uploadHeaders = {};
@@ -140,7 +139,7 @@ class MyUpload extends Vue {
 
     private handleView(file: FileType) {
         this.showUrl = file.url || file.data;
-        this.visible = true;
+        this.$refs.imgViewer.show();
     }
 
     private handleRemove(file: FileType) {
@@ -233,9 +232,6 @@ class MyUpload extends Vue {
     protected render() {
         let width = this.width + 'px',
             height = this.height + 'px';
-        let uploadCls = [clsPrefix + 'upload'];
-        if (this.getHideUpload())
-            uploadCls.push('hidden');
         return (
             <div>
                 {this.fileList.map(item => {
@@ -260,7 +256,8 @@ class MyUpload extends Vue {
                 })}
 
                 <Upload
-                    class={uploadCls}
+                    class={clsPrefix + 'upload'}
+                    v-show={!this.getHideUpload()}
                     ref="upload"
                     show-upload-list={false}
                     // default-file-list={this.defaultList as any}
@@ -285,32 +282,34 @@ class MyUpload extends Vue {
                         <Icon type="ios-camera" size="20"></Icon>
                     </div>
                 </Upload>
-                <div class={[style.cls.mask, this.cropperShow ? '' : 'hidden']}>
-                    <div style={{ textAlign: 'center', width: '100%' }}>
-                        <div style={{ width: '1024px', height: '576px', display: 'inline-block' }}>
-                            <VueCropper
-                                ref="cropper"
-                                props={this.cropper}
-                            />
-                        </div>
-                        <div>
-                            <Button on-click={() => {
-                                this.cropperShow = false;
-                            }}>取消</Button>
-                            <Button type="primary" on-click={() => {
-                                this.$refs.cropper.getCropData((data) => {
-                                    this.pushImg(data, this.cropper.img);
-                                });
-                                this.cropperShow = false;
-                            }}>截取</Button>
-                            <Button on-click={() => {
-                                this.pushImg(this.cropper.img);
-                                this.cropperShow = false;
-                            }}>原图</Button>
+                <transition name="fade">
+                    <div class={[style.cls.mask]} v-show={this.cropperShow}>
+                        <div style={{ textAlign: 'center', width: '100%' }}>
+                            <div style={{ width: '1024px', height: '576px', display: 'inline-block' }}>
+                                <VueCropper
+                                    ref="cropper"
+                                    props={this.cropper}
+                                />
+                            </div>
+                            <div>
+                                <Button on-click={() => {
+                                    this.cropperShow = false;
+                                }}>取消</Button>
+                                <Button type="primary" on-click={() => {
+                                    this.$refs.cropper.getCropData((data) => {
+                                        this.pushImg(data, this.cropper.img);
+                                    });
+                                    this.cropperShow = false;
+                                }}>截取</Button>
+                                <Button on-click={() => {
+                                    this.pushImg(this.cropper.img);
+                                    this.cropperShow = false;
+                                }}>原图</Button>
+                            </div>
                         </div>
                     </div>
-                </div>
-                {this.visible && <MyImgViewer src={this.showUrl} />}
+                </transition>
+                <MyImgViewer ref="imgViewer" src={this.showUrl} />
             </div>
         );
     }
