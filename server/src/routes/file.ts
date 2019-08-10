@@ -54,7 +54,7 @@ export const download = async (option: { fileType: string }, req: Request, res: 
             res.set('Content-Type', myFile.contentType);
             res.set('Content-Length', myFile.buffer.length.toString());
             res.set('Content-Disposition', 'inline');
-            res.set('Last-Modified', myFile.uploadDate ? myFile.uploadDate.toString() : new Date().toString());
+            res.set('Last-Modified', (myFile.uploadDate || new Date()).toUTCString());
             res.end(myFile.buffer);
         }
     }, req, res);

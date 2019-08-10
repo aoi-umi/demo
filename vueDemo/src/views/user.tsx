@@ -233,7 +233,7 @@ export default class UserInfo extends Base {
     }
 
     $refs: { formVaild: IForm, loadView: ILoadView, upload: IMyUpload };
-    pwdLoading = false;
+    updateLoading = false;
     private getUpdateUser() {
         return {
             avatar: '',
@@ -294,16 +294,28 @@ export default class UserInfo extends Base {
 
     handleUpdate() {
         this.operateHandler('修改', async () => {
+            this.updateLoading = true;
+            let upload = this.$refs.upload;
+            let err = await upload.upload();
+            if (err.length) {
+                throw new Error(`上传头像失败:${err[0]}`);
+            }
+            let file = upload.fileList[0];
+            if (file && file.uploadRes)
+                this.updateDetail.avatar = file.uploadRes;
+
             let user = this.storeUser.user;
             let req: any = {};
             let logOut = false;
             function isUpdate(newVal, oldVal) {
                 return newVal && newVal != oldVal
             }
-            if (isUpdate(this.updateDetail.nickname, this.detail.nickname))
-                req.nickname = this.updateDetail.nickname;
-            if (isUpdate(this.updateDetail.profile, this.detail.profile))
-                req.profile = this.updateDetail.profile;
+            let detail = this.detail;
+            let updateKey = ['nickname', 'profile', 'avatar'];
+            updateKey.forEach(key => {
+                if (isUpdate(this.updateDetail[key], detail[key]))
+                    req[key] = this.updateDetail[key];
+            });
             if (this.updateDetail.newPwd) {
                 logOut = true;
                 req = {
@@ -317,21 +329,28 @@ export default class UserInfo extends Base {
                     token
                 };
             }
-            if (Object.keys(req).length)
-                await testApi.userUpdate(req);
-            if (logOut)
-                this.storeUser.setUser(null);
-            else {
-                if (req.nickname)
-                    this.detail.nickname = req.nickname;
-                if (req.profile)
-                    this.detail.profile = req.profile;
+            if (Object.keys(req).length) {
+                let rs = await testApi.userUpdate(req);
+                if (logOut)
+                    this.storeUser.setUser(null);
+                else {
+                    this.storeUser.setUser({
+                        ...this.storeUser.user,
+                        ...rs,
+                    });
+                    this.detail = {
+                        ...this.detail,
+                        ...rs,
+                    };
+                }
             }
             this.toggleUpdate(false);
         }, {
                 validate: this.$refs.formVaild.validate
             }
-        );
+        ).finally(() => {
+            this.updateLoading = false;
+        });
     }
 
     private handlePress(e) {
@@ -340,7 +359,8 @@ export default class UserInfo extends Base {
         }
     }
 
-    renderInfo(detail: UserDetailDataType) {
+    renderInfo() {
+        let detail = this.detail;
         return (
             <Card>
                 <UserAvatarView user={detail} size="large" noTips showAccount style={{ marginLeft: '10px' }} />
@@ -387,8 +407,8 @@ export default class UserInfo extends Base {
                 <LoadView
                     ref="loadView"
                     loadFn={this.getUserDetail}
-                    renderFn={(detail: UserDetailDataType) => {
-                        return this.renderInfo(detail);
+                    renderFn={() => {
+                        return this.renderInfo();
                     }} />
 
                 <Modal v-model={this.updateShow} footer-hide>
@@ -399,6 +419,7 @@ export default class UserInfo extends Base {
                             <FormItem prop="avatar">
                                 <div style={{ textAlign: 'center' }}>
                                     <MyUpload
+                                        ref='upload'
                                         headers={testApi.defaultHeaders}
                                         uploadUrl={testApi.imgUploadUrl}
                                         successHandler={(res, file) => {
@@ -407,7 +428,7 @@ export default class UserInfo extends Base {
                                             return rs.fileId;
                                         }}
                                         // format={['jpg']}
-                                        width={90} height={90}
+                                        width={120} height={120}
                                         cropperOptions={{
                                             autoCropWidth: 288,
                                             autoCropHeight: 288,
@@ -434,7 +455,7 @@ export default class UserInfo extends Base {
                                 <Input v-model={this.updateDetail.profile} type="textarea" />
                             </FormItem>
                             <FormItem>
-                                <Button type="primary" long on-click={this.handleUpdate} loading={this.pwdLoading}>修改</Button>
+                                <Button type="primary" long on-click={this.handleUpdate} loading={this.updateLoading}>修改</Button>
                             </FormItem>
                         </Form>
                     </div>

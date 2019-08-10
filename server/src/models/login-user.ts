@@ -4,14 +4,15 @@ export class LoginUser {
     _id: string;
     nickname: string;
     account: string;
+    avatar?: string;
+    avatarUrl?: string;
+
     authority: { [key: string]: boolean };
     key?: string;
-    cacheDatetime?: string;
-    // token?: string;
     loginData?: any;
-    
+
     @Type()
-    lastLoginAt?: Date;
+    cacheAt?: Date;
 
     nameToString() {
         return this.nickname + '(' + this.account + ')';
