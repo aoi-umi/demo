@@ -128,11 +128,10 @@ export default class ArticleDetail extends ArticleMgtBase {
             <LoadView
                 ref="loadView"
                 loadFn={this.loadDetail}
-                renderFn={(t: DetailType) => {
-                    let { detail } = t;
+                renderFn={() => {
                     if (!this.preview)
-                        return this.renderEdit(detail);
-                    return this.renderPreview(detail);
+                        return this.renderEdit();
+                    return this.renderPreview();
                 }}
             />
         );
@@ -187,8 +186,9 @@ export default class ArticleDetail extends ArticleMgtBase {
         );
     }
 
-    renderEdit(detail: DetailDataType) {
+    renderEdit() {
         let self = this;
+        let { detail } = this.innerDetail;
         return (
             <div>
                 <h3>{detail._id ? '修改' : '新增'}</h3>
@@ -254,7 +254,8 @@ export default class ArticleDetail extends ArticleMgtBase {
         );
     }
 
-    renderPreview(detail: DetailDataType) {
+    renderPreview() {
+        let { detail } = this.innerDetail;
         let operate = this.getOperate(detail, { noPreview: true, isDetail: true });
         return (
             <div>

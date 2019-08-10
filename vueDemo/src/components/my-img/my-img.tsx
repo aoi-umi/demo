@@ -34,8 +34,8 @@ class MyImg extends Vue {
                 <div class={clsPrefix + 'main'}>
                     {this.src && <img ref="img" class={clsPrefix + 'image'} v-show={this.isLoadSuccess} on-error={this.handleError} src={this.src} alt={this.alt} />}
                     {!this.isLoadSuccess &&
-                        (this.failImg ? <img class={clsPrefix + 'image'} src={this.failImg} alt={this.alt} /> :
-                            <Icon type="md-image" size={40} />)
+                        (this.failImg ? <img src={this.failImg} alt={this.alt} /> :
+                            <Icon type="md-image" size={40} style={{ lineHeight: '90px' }} />)
                     }
                 </div>
             </div>

@@ -36,7 +36,7 @@ export class UserAuthMid {
                             user.authority = {};
                         }
                         //自动重新登录
-                        if (user.lastLoginAt && user.lastLoginAt.getTime() < new Date().getTime() - 1000 * 3600 * 2) {
+                        if (user.cacheAt && user.cacheAt.getTime() < new Date().getTime() - 1000 * 3600 * 2) {
                             try {
                                 let returnUser = await UserMapper.login(token, dbUser, user.loginData, disableResult.disabled);
                                 UserMapper.resetDetail(returnUser, { imgHost: req.headers.host });

@@ -142,6 +142,11 @@ class MyUpload extends Vue {
         this.cropper.img = file.originData;
     }
 
+    private handleSelectFile(file: FileType) {
+        this.$refs.upload['handleClick']();
+        this.handleRemove(file);
+    }
+
     private handleView(file: FileType) {
         this.showUrl = file.url || file.data;
         this.$refs.imgViewer.show();
@@ -252,6 +257,9 @@ class MyUpload extends Vue {
                                 }} src={item.url || item.data} />
                                 <div class={clsPrefix + 'item-cover'} style={{ lineHeight: height }}>
                                     {item.originData && <Icon type="md-create" nativeOn-click={() => { this.handleEdit(item); }} />}
+                                    <Icon type="md-camera" nativeOn-click={() => {
+                                        this.handleSelectFile(item);
+                                    }} />
                                     <Icon type="md-eye" nativeOn-click={() => { this.handleView(item); }} />
                                     <Icon type="md-trash" nativeOn-click={() => { this.handleRemove(item); }} />
                                 </div>
@@ -284,7 +292,7 @@ class MyUpload extends Vue {
                         if (this.headers)
                             this.uploadHeaders = this.headers();
                     }}>
-                        <Icon type="ios-camera" size="20"></Icon>
+                        <Icon type="md-camera" size="20"></Icon>
                     </div>
                 </Upload>
                 <transition name="fade">

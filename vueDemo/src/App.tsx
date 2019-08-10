@@ -52,7 +52,7 @@ export default class App extends Base {
                     }
                 }
             }).catch(e => {
-                this.$Message.error(e.message);
+                console.error(e);
             });
         }
     }

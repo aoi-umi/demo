@@ -47,8 +47,8 @@ export async function connect() {
     gfs = new GridFS(conn.connection.db);
 }
 
-export async function transaction(fn: (session: ClientSession) => any) {
-    const session = await mongoose.connection.startSession();
+export async function transaction(fn: (session: ClientSession) => any, conn?: mongoose.Connection) {
+    const session = await (conn || mongoose.connection).startSession();
     session.startTransaction({
         readConcern: {
             level: 'snapshot'
