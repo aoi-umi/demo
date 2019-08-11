@@ -104,6 +104,7 @@ class MyUpload extends Vue {
     private uploadHeaders = {};
     private cropperShow = false;
     private editIndex = -1;
+    private selectedIndex = -1;
     private file: File;
     private cropper: CropperOption = {
         img: '',
@@ -144,7 +145,7 @@ class MyUpload extends Vue {
 
     private handleSelectFile(file: FileType) {
         this.$refs.upload['handleClick']();
-        this.handleRemove(file);
+        this.selectedIndex = this.fileList.indexOf(file);
     }
 
     private handleView(file: FileType) {
@@ -235,6 +236,9 @@ class MyUpload extends Vue {
         };
         if (this.editIndex >= 0) {
             this.fileList.splice(this.editIndex, 1, file);
+        } else if (this.selectedIndex >= 0) {
+            this.fileList.splice(this.selectedIndex, 1, file);
+            this.selectedIndex = -1;
         } else
             this.fileList.push(file);
     }
@@ -308,6 +312,7 @@ class MyUpload extends Vue {
                             <div>
                                 <Button on-click={() => {
                                     this.cropperShow = false;
+                                    this.selectedIndex = -1;
                                 }}>取消</Button>
                                 <Button type="primary" on-click={() => {
                                     this.$refs.cropper.getCropData((data) => {
