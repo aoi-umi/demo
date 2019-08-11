@@ -238,7 +238,6 @@ class MyUpload extends Vue {
             this.fileList.splice(this.editIndex, 1, file);
         } else if (this.selectedIndex >= 0) {
             this.fileList.splice(this.selectedIndex, 1, file);
-            this.selectedIndex = -1;
         } else
             this.fileList.push(file);
     }
@@ -291,7 +290,10 @@ class MyUpload extends Vue {
                     multiple={false}
                     type="drag"
                     action={this.uploadUrl}
-                    style={{ width }}>
+                    style={{ width }}
+                    nativeOn-click={() => {
+                        this.selectedIndex = -1;
+                    }}>
                     <div style={{ width, height, lineHeight: height }} on-click={() => {
                         if (this.headers)
                             this.uploadHeaders = this.headers();
@@ -312,7 +314,6 @@ class MyUpload extends Vue {
                             <div>
                                 <Button on-click={() => {
                                     this.cropperShow = false;
-                                    this.selectedIndex = -1;
                                 }}>取消</Button>
                                 <Button type="primary" on-click={() => {
                                     this.$refs.cropper.getCropData((data) => {
