@@ -6,7 +6,7 @@ import { convClass } from '@/helpers';
 import * as helpers from '@/helpers';
 import { dev } from '@/config';
 import { testApi } from '@/api';
-import { Tag, Modal, Input, Row, Col, Form, FormItem, Button, Spin, Card } from '@/components/iview';
+import { Modal, Input, Form, FormItem, Button, Card } from '@/components/iview';
 import { MyTagModel } from '@/components/my-tag';
 import { LoginUser } from '@/model/user';
 import { MyUpload, IMyUpload } from '@/components/my-upload';

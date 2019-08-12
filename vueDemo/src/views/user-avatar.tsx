@@ -77,7 +77,7 @@ class UserAvatar extends Base {
 
     render() {
         return (
-            <Poptip disabled={this.noTips} trigger="hover" style={{ cursor: 'pointer' }} placement={this.tipsPlacement} on-on-popper-show={() => {
+            <Poptip disabled={this.noTips} trigger="hover" style={{ cursor: 'pointer', zIndex: 10 }} placement={this.tipsPlacement} on-on-popper-show={() => {
                 this.getUserDetail();
             }}>
                 <Avatar
