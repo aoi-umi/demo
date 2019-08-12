@@ -32,6 +32,19 @@ export default class App extends Base {
         this.setTitle();
         this.getUserInfo();
     }
+
+    private isSmall = false;
+    protected mounted() {
+        window.addEventListener('resize', this.handleResize);
+    }
+
+    protected beforeDestroy() {
+        window.removeEventListener('scroll', this.handleResize);
+    }
+
+    private handleResize() {
+        this.isSmall = document.body.clientWidth < 576;
+    }
     get menuitemClasses() {
         return ["menu", this.isCollapsed ? "collapsed-menu" : ""];
     }
@@ -81,14 +94,9 @@ export default class App extends Base {
     }
 
     signInShow = false;
-    private isSmall() {
-        return document.body.clientWidth < 480;
-    }
-
     private siderWidth = 160;
     render() {
-        let isSmall = this.isSmall();
-        let collapsedWidth = isSmall ? 0 : 56;
+        let collapsedWidth = this.isSmall ? 0 : 56;
         return (
             <Layout class="layout">
                 <Modal v-model={this.signInShow} footer-hide>
@@ -135,7 +143,7 @@ export default class App extends Base {
                             width="auto"
                             class={this.menuitemClasses}
                             on-on-select={() => {
-                                if (this.isSmall())
+                                if (this.isSmall)
                                     this.isCollapsed = true;
                             }}
                         >
@@ -178,7 +186,7 @@ export default class App extends Base {
                             }
                         </Menu>
                     </Sider>
-                    {!isSmall ? <Content class={["side-menu-blank"]} style={{
+                    {!this.isSmall ? <Content class={["side-menu-blank"]} style={{
                         flex: `0 0 ${this.isCollapsed ? collapsedWidth : this.siderWidth}px`
                     }}></Content> :
                         <transition name="fade">

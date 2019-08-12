@@ -101,7 +101,7 @@ class BookmarkDetail extends Base {
                         {this.tagModel && this.tagModel.renderTag()}
                         <br />
                         <Row gutter={10}>
-                            <Col span={20}>
+                            <Col span={12}>
                                 <Input placeholder="回车或点击按钮添加" v-model={this.tag} on-on-enter={this.addTag} />
                             </Col>
                             <Col span={4}><Button on-click={this.addTag}>添加</Button></Col>
