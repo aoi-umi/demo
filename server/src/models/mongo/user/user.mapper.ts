@@ -17,7 +17,7 @@ import { FileMapper } from '../file';
 export class UserMapper {
     static createToken(data, user: UserInstanceType) {
         let dataStr = JSON.stringify(data);
-        let checkToken = common.createToken(user.account + user.password + dataStr);
+        let checkToken = common.md5(user.account + user.password + dataStr);
         return { dataStr, checkToken };
     }
 

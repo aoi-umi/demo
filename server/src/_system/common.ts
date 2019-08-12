@@ -114,40 +114,7 @@ export let s4 = function (count?: number) {
 export let guid = function () {
     return `${s4(2)}-${s4()}-${s4()}-${s4()}-${s4(3)}`;
 };
-export let createToken = function (str) {
-    let code = md5(str);
-    return code;
-};
-export let dateFormat = function (date, format = 'yyyy-MM-dd') {
-    try {
-        if (!date)
-            date = new Date();
-        else if (typeof date == 'number' || typeof date == 'string')
-            date = new Date(date);
 
-        let o = {
-            y: date.getFullYear(),
-            M: date.getMonth() + 1,
-            d: date.getDate(),
-            h: date.getHours() % 12,
-            H: date.getHours(),
-            m: date.getMinutes(),
-            s: date.getSeconds(),
-            S: date.getMilliseconds()
-        };
-
-        let formatStr = format.replace(/(y+|M+|d+|h+|H+|m+|s+|S+)/g, function (e) {
-            let key = e.slice(-1);
-            if (key == 'S')
-                return ('' + o[key]).slice(0, e.length);
-            else
-                return ((e.length > 1 ? '0' : '') + o[key]).slice(-(e.length > 2 ? e.length : 2));
-        });
-        return formatStr;
-    } catch (e) {
-        return e.message;
-    }
-};
 //字符串
 export let stringFormat = function (formatString: string, ...args) {
     if (!formatString)
@@ -238,17 +205,7 @@ export let md5 = function (data, option?) {
     let code = md5.update(data).digest(opt.encoding as any);
     return code;
 };
-export let isInArray = function (obj, list) {
-    if (list) {
-        for (let i = 0; i < list.length; i++) {
-            let t = list[i];
-            if (t === obj) {
-                return true;
-            }
-        }
-    }
-    return false;
-};
+
 //code: string || errorConfig
 export let error = function (msg, code?, option?) {
     let opt = {
@@ -431,66 +388,6 @@ export let getErrorConfigByCode = function (code) {
     }
 };
 
-export let writeError = function (err, opt?) {
-    promise(async () => {
-        console.error(err);
-        let list = [];
-        let createDate = dateFormat(new Date(), 'yyyy-MM-dd');
-        let createDateTime = dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss');
-        list.push(createDateTime);
-        if (opt)
-            list.push(JSON.stringify(opt));
-        list.push(err);
-        //用于查找上一级调用
-        let stack = new Error().stack;
-        let stackList = ['stack:']
-            .concat(getStack(err.stack))
-            .concat(['help stack:'])
-            .concat(getStack(stack));
-        for (let i = 0; i < stackList.length; i++) {
-            console.error(stackList[i]);
-            list.push(stackList[i]);
-        }
-
-        //write file
-        mkdirsSync(config.env.errorDir);
-        let fileName = `${config.env.errorDir}/${createDate}.txt`;
-        await promisify(fs.appendFile)(fileName, list.join('\r\n') + '\r\n\r\n');
-    });
-};
-
-export let getStack = function (stack) {
-    let stackList = [];
-    let matchPath = [
-        '../../',
-    ];
-    for (let i = 0; i < matchPath.length; i++) {
-        matchPath[i] = path.resolve(`${__dirname}/${matchPath[i]}`);
-    }
-    let list = [];
-    if (stack) stackList = stack.split('\n');
-    stackList.forEach(t => {
-        for (let i = 0; i < matchPath.length; i++) {
-            if (t.indexOf(matchPath[i]) >= 0) {
-                list.push(t);
-                break;
-            }
-        }
-    });
-    return list;
-};
-
-export let mkdirsSync = function (dirname, mode?) {
-    if (fs.existsSync(dirname)) {
-        return true;
-    }
-    if (mkdirsSync(path.dirname(dirname), mode)) {
-        fs.mkdirSync(dirname, mode);
-        return true;
-    }
-    return false;
-}
-
 export let getClientIp = function (req: Request) {
     // let ip = req.headers['x-forwarded-for']
     // || req.connection.remoteAddress
@@ -543,7 +440,7 @@ export let logModle = function () {
         code: null,
         req: null,
         res: null,
-        createDate: dateFormat(new Date(), 'yyyy-MM-dd HH:mm:ss'),
+        createDate: new Date(),
         remark: null,
         guid: null,
         ip: null,

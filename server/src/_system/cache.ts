@@ -1,12 +1,13 @@
 import * as Redis from 'ioredis';
 import * as config from '../config';
 import * as common from './common';
+import * as moment from 'moment';
 
 let client = new Redis(config.env.redis.uri);
 let cachePrefix = config.env.cachePrefix ? config.env.cachePrefix + ':' : '';
 
 function writeCacheErr(err) {
-    console.error(common.dateFormat(null, 'yyyy-MM-dd HH:mm:ss'), 'Cache Error [' + err + ']');
+    console.error(moment().format('yyyy-MM-dd HH:mm:ss'), 'Cache Error [' + err + ']');
 }
 
 let connectErrorTimes = 0;
