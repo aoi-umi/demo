@@ -427,7 +427,7 @@ export default class UserInfo extends Base {
                                             file.url = rs.url;
                                             return rs.fileId;
                                         }}
-                                        // format={['jpg']}
+                                        format={['jpg', 'png', 'bmp', 'gif']}
                                         width={120} height={120}
                                         cropperOptions={{
                                             autoCropWidth: 288,

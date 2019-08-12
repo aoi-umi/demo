@@ -183,40 +183,57 @@ class MyUpload extends Vue {
         return errorList;
     }
 
-    private handleSuccess(res, file: FileType) {
-        if (this.successHandler) {
-            try {
-                this.successHandler(res, file);
-            } catch (e) {
-                this.handleRemove(file);
-                this.handleError(e);
+    private checkFormat(file: File) {
+        // check format
+        if (this.format.length) {
+            const _file_format = file.name.split('.').pop().toLocaleLowerCase();
+            const checked = this.format.some(item => item.toLocaleLowerCase() === _file_format);
+            if (!checked) {
+                this.handleFormatError(file, this.fileList);
+                return false;
             }
         }
+        return true;
     }
 
-    private handleError(error) {
-        this.$Notice.error({
-            title: '上传出错了',
-            desc: error
-        });
-    }
-
-    private handleFormatError(file: FileType) {
+    private handleFormatError(file: File, fileList: FileType[]) {
         this.$Notice.warning({
             title: '文件格式不正确',
             desc: `文件 "${file.name}" 的格式不正确, 只能上传${this.format.join(',')}格式的文件`
         });
     }
 
-    private handleMaxSize(file: FileType) {
+    private checkSize(file: File, checkData?: string) {
+        let size = file.size;
+        if (checkData) {
+            checkData = checkData.split(',')[1];
+            checkData = checkData.split('=')[0];
+            let strLength = checkData.length;
+            size = parseInt((strLength - (strLength / 8) * 2) as any);
+        }
+        // check maxSize
+        if (this.maxSize) {
+            if (size > this.maxSize * 1024) {
+                this.handleMaxSize(file, this.fileList);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private handleMaxSize(file: File, fileList: FileType[]) {
         this.$Notice.warning({
             title: '文件大小超出限制',
-            desc: `文件 "${file.name}" 大小超出限制`
+            desc: `文件 "${file.name}" 大小超出限制(${(this.maxSize / 1024).toFixed(2)}M)`
         });
     }
 
-    private handleBeforeUpload(file) {
+    private handleBeforeUpload(file: File) {
         this.file = file;
+        let rs = this.checkFormat(file);
+        if (!rs)
+            return false;
+
         let reader = new FileReader()
         reader.readAsDataURL(file);
         reader.onload = e => {
@@ -234,12 +251,17 @@ class MyUpload extends Vue {
             file: this.file,
             willUpload: true,
         };
+        let rs = this.checkSize(this.file, data);
+        if (!rs)
+            return false;
         if (this.editIndex >= 0) {
             this.fileList.splice(this.editIndex, 1, file);
         } else if (this.selectedIndex >= 0) {
             this.fileList.splice(this.selectedIndex, 1, file);
         } else
             this.fileList.push(file);
+
+        this.cropperShow = false;
     }
 
     protected render() {
@@ -276,15 +298,14 @@ class MyUpload extends Vue {
                     v-show={!this.getHideUpload()}
                     ref="upload"
                     show-upload-list={false}
-                    // default-file-list={this.defaultList as any}
                     format={this.format}
                     max-size={this.maxSize}
-                    props={{
-                        onSuccess: this.handleSuccess,
-                        onFormatError: this.handleFormatError,
-                        onExceededSize: this.handleMaxSize,
-                        onError: this.handleError
-                    }}
+                    // props={{
+                    //     onSuccess: this.handleSuccess,
+                    //     onFormatError: this.handleFormatError,
+                    //     onExceededSize: this.handleMaxSize,
+                    //     onError: this.handleError
+                    // }}
                     before-upload={this.handleBeforeUpload}
                     headers={this.uploadHeaders}
                     multiple={false}
@@ -319,11 +340,9 @@ class MyUpload extends Vue {
                                     this.$refs.cropper.getCropData((data) => {
                                         this.pushImg(data, this.cropper.img);
                                     });
-                                    this.cropperShow = false;
                                 }}>截取</Button>
                                 <Button on-click={() => {
                                     this.pushImg(this.cropper.img);
-                                    this.cropperShow = false;
                                 }}>原图</Button>
                             </div>
                         </div>
