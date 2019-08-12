@@ -5,6 +5,7 @@ import {
     Menu, MenuItem, Option,
     Icon, Content, Sider, Layout, Header, Button, Row, Col, Poptip, Avatar, Modal,
 } from "@/components/iview";
+import * as style from '@/components/style';
 
 import { testApi } from './api';
 import { dev, authority } from './config';
@@ -32,7 +33,7 @@ export default class App extends Base {
         this.getUserInfo();
     }
     get menuitemClasses() {
-        return ["menu-item", this.isCollapsed ? "collapsed-menu" : ""];
+        return ["menu", this.isCollapsed ? "collapsed-menu" : ""];
     }
 
     setTitle() {
@@ -66,7 +67,7 @@ export default class App extends Base {
         if (!name)
             name = this.getActiveNameByPath(data.to);
         return (
-            <MenuItem name={name} to={data.to}>
+            <MenuItem class="menu-item" name={name} to={data.to}>
                 <Icon type={data.icon} />
                 <span>{data.text}</span>
             </MenuItem>
@@ -80,8 +81,14 @@ export default class App extends Base {
     }
 
     signInShow = false;
+    private isSmall() {
+        return document.body.clientWidth < 480;
+    }
 
+    private siderWidth = 160;
     render() {
+        let isSmall = this.isSmall();
+        let collapsedWidth = isSmall ? 0 : 56;
         return (
             <Layout class="layout">
                 <Modal v-model={this.signInShow} footer-hide>
@@ -118,7 +125,8 @@ export default class App extends Base {
                         ref="sider"
                         hide-trigger
                         collapsible
-                        collapsed-width="78"
+                        collapsed-width={collapsedWidth}
+                        width={this.siderWidth}
                         v-model={this.isCollapsed}
                     >
                         <Menu
@@ -126,6 +134,10 @@ export default class App extends Base {
                             theme={"dark"}
                             width="auto"
                             class={this.menuitemClasses}
+                            on-on-select={() => {
+                                if (this.isSmall())
+                                    this.isCollapsed = true;
+                            }}
                         >
                             {
                                 [{
@@ -166,7 +178,15 @@ export default class App extends Base {
                             }
                         </Menu>
                     </Sider>
-                    <Content class={["side-menu-blank", this.isCollapsed ? '' : 'side-open']}></Content>
+                    {!isSmall ? <Content class={["side-menu-blank"]} style={{
+                        flex: `0 0 ${this.isCollapsed ? collapsedWidth : this.siderWidth}px`
+                    }}></Content> :
+                        <transition name="fade">
+                            <div class={style.cls.mask} v-show={!this.isCollapsed} style={{ zIndex: 10 }} on-click={() => {
+                                this.isCollapsed = true;
+                            }}></div>
+                        </transition>
+                    }
                     <Content class="main-content">
                         <router-view></router-view>
                     </Content>

@@ -43,7 +43,16 @@ export const Option = convClass<iviewTypes.Option>(iview.Option);
 export const Submenu = convClass<any>(iview.Submenu);
 
 export const Select = convClass<iviewTypes.Select>(iview.Select);
-export const Sider = convClass<any>(iview.Sider);
+export const Sider = convClass<{
+    breakpoint?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
+    value?: boolean;
+    width?: number;
+    collapsible?: boolean;
+    'collapsed-width'?: number;
+    'hide-trigger'?: boolean;
+    'default-collapsed'?: boolean;
+    'reverse-arrow'?: boolean;
+}>(iview.Sider);
 export const Spin = convClass<iviewTypes.Spin>(iview.Spin);
 export const Switch = convClass<iviewTypes.Switch>(iview.Switch);
 export const Table = convClass<iviewTypes.Table>(iview.Table);

@@ -2,7 +2,6 @@ import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { getModule } from 'vuex-module-decorators';
 import LoginUserStore from '@/store/loginUser';
 import { dev, error } from '@/config';
-import { getErrorCfgByCode } from '@/config/error';
 
 export class Base extends Vue {
     protected get storeUser() {
