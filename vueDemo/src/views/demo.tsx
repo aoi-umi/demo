@@ -3,12 +3,20 @@ import anime from 'animejs';
 import 'echarts/lib/chart/line';
 import * as echarts from 'echarts/lib/echarts';
 
+import 'video.js/dist/video-js.css';
+import 'vue-video-player/src/custom-theme.css';
+import { videoPlayer } from 'vue-video-player';
+
 import { Input, Card, Button, ColorPicker, Row, Col, Checkbox } from '@/components/iview';
 import { MyList, IMyList } from '@/components/my-list';
-import { testSocket } from '@/api';
+import { testSocket, testApi } from '@/api';
 import { Base } from './base';
 
-@Component
+@Component({
+    components: {
+        videoPlayer
+    }
+})
 export default class App extends Base {
     public value = '';
     public msg = '';
@@ -170,20 +178,53 @@ export default class App extends Base {
                     width: '500px',
                     display: 'inline-block',
                 }}>
-                    <div ref='board' style={{
-                        height: '400px', background: 'black', overflow: 'hidden', position: 'relative',
-                        fontSize: '30px', color: 'white',
-                        textStroke: '0.5px #000',
+                    <div style={{
+                        position: 'relative',
+                        height: '400px',
+                        width: '100%',
+                        background: '#000',
+                        display: 'flex',
+                        alignItems: 'center'
                     }}>
-                        {
-                            contents.map(ele => {
-                                let idx = ele.idx;
-                                return (
-                                    <div key={idx} ref={ele.refName} style={{ display: 'inline-block', position: 'absolute', left: '100%', whiteSpace: 'nowrap', color: ele.color }}>
-                                        {ele.msg}
-                                    </div>);
-                            })
-                        }
+                        <video-player
+                            class="video-player vjs-custom-skin"
+                            options={
+                                {
+                                    // videojs options
+                                    muted: true,
+                                    language: 'en',
+                                    playbackRates: [0.7, 1.0, 1.5, 2.0],
+                                    sources: [{
+                                        type: "video/mp4",
+                                        src: "http://localhost:8000/devMgt/video/detail?_id=test"
+                                    }],
+                                    // poster: "/static/images/author.jpg",
+                                    aspectRatio: '16:9',
+                                }
+                            }
+                            style={{
+                                width: '100%'
+                            }}
+                        />
+                        {/* <video style={{ width: '100%' }} src="http://localhost:8000/devMgt/video/detail?_id=test" controls="conrtols"/> */}
+                        <div ref='board' style={{
+                            overflow: 'hidden', position: 'absolute',
+                            fontSize: '30px', color: 'white',
+                            textStroke: '0.5px #000',
+                            left: 0, right: 0,
+                            top: 0, bottom: 0,
+                            pointerEvents: 'none'
+                        }}>
+                            {
+                                contents.map(ele => {
+                                    let idx = ele.idx;
+                                    return (
+                                        <div key={idx} ref={ele.refName} style={{ display: 'inline-block', position: 'absolute', left: '100%', whiteSpace: 'nowrap', color: ele.color }}>
+                                            {ele.msg}
+                                        </div>);
+                                })
+                            }
+                        </div>
                     </div>
                     <div>
                         <Row >
@@ -266,7 +307,7 @@ export default class App extends Base {
                         });
                         return list;
                     }}></MyList>
-            </div>
+            </div >
         );
     }
 }

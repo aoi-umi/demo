@@ -31,13 +31,12 @@ export let responseHandler = function (fn: (opt?: ResponseHandlerOptType) => any
             let filename = result.filename || '未命名';
             let userAgent = (req.headers['user-agent'] || '').toLowerCase();
             res.setHeader('Content-Type', "application/octet-stream");
-            if (userAgent.indexOf('msie') >= 0 || userAgent.indexOf('chrome') >= 0) {
-                res.setHeader('Content-Disposition', 'attachment; filename=' + encodeURIComponent(filename));
-            } else if (userAgent.indexOf('firefox') >= 0) {
-                res.setHeader('Content-Disposition', 'attachment; filename*="utf8\'\'' + encodeURIComponent(filename) + '"');
-            } else {
-                res.setHeader('Content-Disposition', 'attachment; filename=' + encodeURIComponent(filename));
+            let encodeName = encodeURIComponent(filename);
+            let disposition = 'attachment; filename=' + encodeName;
+            if (userAgent.indexOf('firefox') >= 0) {
+                disposition = `attachment; filename*="utf8''${encodeName}"`;
             }
+            res.setHeader('Content-Disposition', disposition);
             res.end(result.fileBuff);
         }
         else {
