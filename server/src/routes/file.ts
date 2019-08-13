@@ -1,9 +1,12 @@
 import { RequestHandler, Request, Response } from "express";
 import { plainToClass } from "class-transformer";
+import { Types } from 'mongoose';
+
 import { responseHandler, paramsValid } from "../helpers";
 import { myEnum } from "../config";
 import { FileMapper, File } from "../models/mongo/file";
 import * as VaildSchema from '../vaild-schema/class-valid';
+import { gfs } from "../_system/dbMongo";
 
 const uplaod = (option: { fileType: string }, req: Request, res: Response) => {
     responseHandler(async () => {
@@ -62,4 +65,34 @@ export const download = async (option: { fileType: string }, req: Request, res: 
 
 export const imgGet: RequestHandler = (req, res) => {
     download({ fileType: myEnum.fileType.图片 }, req, res);
+};
+
+export const vedioGet: RequestHandler = (req, res) => {
+    responseHandler(async (opt) => {
+        let data = req.query;
+
+        let range = req.headers.range as string;
+        let pos = range.replace(/bytes=/, "").split("-");
+        data._id = '5d521fca691ea819d8db4ea7';
+        opt.noSend = true;
+        let file = await gfs.findOne({ _id: Types.ObjectId(data._id) });
+
+        let total = file.length;
+        let start = parseInt(pos[0], 10);
+        let end = pos[1] ? parseInt(pos[1], 10) : total - 1;
+        let chunksize = (end - start) + 1;
+
+        res.writeHead(206, {
+            'Content-Range': `bytes ${start}-${end}/${total}`,
+            'Accept-Ranges': 'bytes',
+            'Content-Length': chunksize,
+            'Content-Type': 'video/mp4'
+        });
+
+        let stream = gfs.gridFS.openDownloadStream(file._id, { start, end })
+            .on('error', function (err) {
+                res.end(err);
+            });
+        stream.pipe(res);
+    }, req, res);
 };
