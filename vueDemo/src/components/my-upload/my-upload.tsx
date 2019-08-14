@@ -42,11 +42,13 @@ class MyUpload extends Vue {
     @Prop()
     uploadUrl: string;
 
-    @Prop()
+    @Prop({
+        default: () => []
+    })
     format?: string[];
 
     @Prop({
-        default: 2048
+        default: 1024 * 5
     })
     maxSize?: number;
 

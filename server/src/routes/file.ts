@@ -4,32 +4,28 @@ import { Types } from 'mongoose';
 
 import { responseHandler, paramsValid } from "../helpers";
 import { myEnum } from "../config";
-import { FileMapper, File } from "../models/mongo/file";
+import { FileMapper, FileModel } from "../models/mongo/file";
 import * as VaildSchema from '../vaild-schema/class-valid';
-import { gfs } from "../_system/dbMongo";
 
 const uplaod = (option: { fileType: string }, req: Request, res: Response) => {
     responseHandler(async () => {
         let file = req.file;
-
         let user = req.myData.user;
 
-        let uFile = File.create({
+        let fs = new FileModel({
             filename: file.originalname,
-            metadata: {
-                userId: user._id,
-                nickname: user.nickname,
-                account: user.nickname,
-                fileType: option.fileType
-            },
+            userId: user._id,
+            nickname: user.nickname,
+            account: user.nickname,
+            fileType: option.fileType
+        });
+        await fs.upload({
             buffer: file.buffer,
             contentType: file.mimetype,
         });
-
-        await FileMapper.upload(uFile);
-        let obj = uFile.toObject();
+        let obj = fs.toOutObject();
         if (option.fileType == myEnum.fileType.图片) {
-            obj.url = FileMapper.getImgUrl(uFile.fileId, req.headers.host);
+            obj.url = FileMapper.getImgUrl(fs.fileId, req.headers.host);
         }
         return obj;
     }, req, res);
@@ -44,21 +40,26 @@ export const download = async (option: { fileType: string }, req: Request, res: 
         let data = plainToClass(VaildSchema.FileGet, req.query);
         paramsValid(data);
         let ifModifiedSince = req.headers['if-modified-since'] as string;
-        let myFile = await FileMapper.findOne({ _id: data._id, 'metadata.fileType': option.fileType }, ifModifiedSince);
+        let detail = await FileModel.findOne({ _id: data._id, fileType: option.fileType });
         opt.noSend = true;
-        if (!myFile) {
-            res.statusCode = 404;
+        if (!detail) {
+            res.status(404);
             res.end();
-        } else if (myFile.noModified) {
-            res.statusCode = 304
-            res.end();
+            return;
         }
-        else {
-            res.set('Content-Type', myFile.contentType);
-            res.set('Content-Length', myFile.buffer.length.toString());
+        let rs = await detail.download({
+            ifModifiedSince,
+            returnStream: true,
+        });
+        if (rs.noModified) {
+            res.status(304)
+            res.end();
+        } else {
+            res.set('Content-Type', rs.raw.contentType);
+            res.set('Content-Length', rs.raw.length.toString());
             res.set('Content-Disposition', 'inline');
-            res.set('Last-Modified', (myFile.uploadDate || new Date()).toUTCString());
-            res.end(myFile.buffer);
+            res.set('Last-Modified', (rs.raw.uploadDate || new Date()).toUTCString());
+            rs.stream.pipe(res);
         }
     }, req, res);
 };
@@ -75,7 +76,7 @@ export const vedioGet: RequestHandler = (req, res) => {
         let pos = range.replace(/bytes=/, "").split("-");
         data._id = '5d521fca691ea819d8db4ea7';
         opt.noSend = true;
-        let file = await gfs.findOne({ _id: Types.ObjectId(data._id) });
+        let file = await FileModel.rawFindOne({ _id: Types.ObjectId(data._id) });
 
         let total = file.length;
         let start = parseInt(pos[0], 10);
@@ -89,10 +90,10 @@ export const vedioGet: RequestHandler = (req, res) => {
             'Content-Type': 'video/mp4'
         });
 
-        let stream = gfs.gridFS.openDownloadStream(file._id, { start, end })
-            .on('error', function (err) {
-                res.end(err);
-            });
+        let { stream } = await new FileModel({ fileId: file._id }).download({ returnStream: true, streamOpt: { start, end } });
+        stream.on('error', function (err) {
+            res.end(err);
+        });
         stream.pipe(res);
     }, req, res);
 };

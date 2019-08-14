@@ -193,7 +193,7 @@ export function getDataInKey(data, keyList: string[]) {
 //#endregion
 
 //#region 同名但实现不同
-export let md5 = function (data, option?) {
+export let md5 = function (data: string | Buffer, option?: { encoding: string }) {
     let opt = {
         encoding: 'hex',
     };

@@ -1,39 +1,34 @@
-import { Types } from 'mongoose';
+import { Types, SchemaTypes } from 'mongoose';
 import { plainToClass, Type, Transform } from 'class-transformer';
-import { GridFSModel } from '../../../_system/dbMongo';
+import { GridFSFile, GridFSModel, setSchema, prop, setMethod, getGridFSModel } from 'mongoose-ts-ua';
 
-export class FileMetaType {
+
+@setSchema()
+class File extends GridFSFile {
+    @prop()
     nickname: string;
 
+    @prop()
     account: string;
 
-    @Transform(value => Types.ObjectId(value))
-    userId: Types.ObjectId | string;
+    @prop({
+        type: SchemaTypes.ObjectId
+    })
+    userId: Types.ObjectId;
 
+    @prop()
     fileType: string;
-}
 
-export class File extends GridFSModel<FileMetaType> {
-    fileId: Types.ObjectId;
-    buffer: Buffer;
-    noModified: boolean;
-    @Type()
-    metadata: FileMetaType;
-
-    static create(data: Partial<File>) {
-        return plainToClass(File, {
-            ...data,
-            fileId: data.fileId || new Types.ObjectId()
-        });
-    }
-
-    toObject() {
+    @setMethod
+    toOutObject() {
         return {
             filename: this.filename,
-            fileId: this.fileId.toString(),
-            md5: this.md5,
+            fileId: this._id.toString(),
             url: '',
         };
     }
 }
 
+export const FileModel = getGridFSModel<File, typeof File>({
+    schema: File,
+});
