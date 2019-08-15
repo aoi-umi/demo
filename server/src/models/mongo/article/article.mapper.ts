@@ -177,7 +177,7 @@ export class ArticleMapper {
             cond.userId = Types.ObjectId(opt.includeUserId as any);
         let list = await ArticleModel.find(cond);
         if (!list.length)
-            throw error('No Match Data');
+            throw error('', config.error.NO_MATCH_DATA);
         let log = list.map(ele => {
             return ArticleLogMapper.create(ele, user, { srcStatus: ele.status, destStatus: status, remark: opt.logRemark });
         });

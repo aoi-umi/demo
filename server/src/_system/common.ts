@@ -236,6 +236,8 @@ export let error = function (msg, code?, option?) {
             msg = lang.errorConfig[code];
             if (typeof opt.format == 'function')
                 msg = opt.format(msg);
+            if (!msg)
+                msg = code;
         }
     }
     if (!msg) msg = '';

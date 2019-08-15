@@ -111,7 +111,7 @@ export const routerConfig = {
         path: "*",
         redirect: {
             path: dev.routeConfig.error.path,
-            query: { code: error.NotFound.code }
+            query: { code: error.NOT_FOUND.code }
         }
     },
 };

@@ -6,6 +6,7 @@ import { Types, SchemaTypes } from 'mongoose';
 
 import { Base } from '../_base';
 import { myEnum } from '../../../config';
+import { ContentBase } from '../_base/contentBase';
 
 export type ArticleInstanceType = InstanceType<Article>;
 export type ArticleModelType = ModelType<Article, typeof Article>;
@@ -17,35 +18,11 @@ export type ArticleDocType = DocType<ArticleInstanceType>;
         }
     }
 })
-export class Article extends Base {
-    @prop({
-        type: SchemaTypes.ObjectId,
-        required: true,
-    })
-    userId: Types.ObjectId;
-
-    @prop({
-        default: ''
-    })
-    profile: string;
-
-    @prop()
-    cover: string;
-
-    @prop({
-        required: true,
-    })
-    title: string;
-
+export class Article extends ContentBase {
     @prop({
         required: true,
     })
     content: string;
-
-    @arrayProp({
-        type: String
-    })
-    cate: string[];
 
     @prop({
         enum: myEnum.articleStatus
@@ -61,31 +38,6 @@ export class Article extends Base {
     get canUpdate() {
         return [myEnum.articleStatus.草稿, myEnum.articleStatus.审核不通过].includes(this.status);
     }
-
-    @prop({
-        default: 0
-    })
-    readTimes: number;
-
-    @prop({
-        default: 0
-    })
-    commentCount: number;
-
-    @prop({
-        default: 0
-    })
-    like: number;
-
-    @prop({
-        default: 0
-    })
-    dislike: number;
-
-    @prop({
-        default: ''
-    })
-    remark: string;
 }
 
 export const ArticleModel = getModelForClass<Article, typeof Article>(Article);

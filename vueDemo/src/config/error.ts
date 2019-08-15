@@ -3,7 +3,11 @@ type ErrConfigType = {
     msg: string;
 };
 export const errConfig = {
-    NotFound: {
+    NO_LOGIN: {
+        code: 'NO_LOGIN',
+        status: 401,
+    },
+    NOT_FOUND: {
         code: 'NOT_FOUND',
         msg: '页面走丢了'
     }

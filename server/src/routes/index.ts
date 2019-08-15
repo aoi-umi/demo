@@ -60,6 +60,7 @@ router.get('/article/detailQuery', UserAuthMid.normal(), article.detailQuery);
 import * as comment from './comment';
 router.post('/comment/submit', UserAuthMid.normal([auth.login]), comment.submit);
 router.get('/comment/query', UserAuthMid.normal(), comment.query);
+router.post('/comment/del', UserAuthMid.normal(), comment.del);
 //#endregion
 
 //#region file 

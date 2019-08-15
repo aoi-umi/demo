@@ -1,12 +1,11 @@
 import { RequestHandler } from 'express';
-import { Types } from 'mongoose';
 import { plainToClass } from 'class-transformer';
 
 import { responseHandler, paramsValid } from '../helpers';
 import { error } from '../_system/common';
-import { transaction } from '../_system/dbMongo';
-import { RoleModel, RoleInstanceType, RoleMapper } from '../models/mongo/role';
+import * as config from '../config';
 import * as VaildSchema from '../vaild-schema/class-valid';
+import { RoleModel, RoleInstanceType, RoleMapper } from '../models/mongo/role';
 
 export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {
@@ -101,6 +100,6 @@ export let del: RequestHandler = (req, res) => {
         paramsValid(data);
         let rs = await RoleModel.deleteMany({ _id: { $in: data.idList } });
         if (!rs.n)
-            throw error('No Match Data');
+            throw error('', config.error.NO_MATCH_DATA);
     }, req, res);
 }
