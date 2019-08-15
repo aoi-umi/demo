@@ -2,8 +2,8 @@ import { Component, Vue, Watch, Prop } from "vue-property-decorator";
 
 import * as router from '@/router';
 import {
-    Menu, MenuItem, Option,
-    Icon, Content, Sider, Layout, Header, Button, Row, Col, Poptip, Avatar, Modal,
+    Menu, MenuItem,
+    Icon, Content, Sider, Layout, Header, Button, Modal,
 } from "@/components/iview";
 import * as style from '@/components/style';
 
@@ -93,15 +93,16 @@ export default class App extends Base {
         this.activeName = this.getActiveNameByPath(location.pathname);
     }
 
-    signInShow = false;
     private siderWidth = 160;
     render() {
         let collapsedWidth = this.isSmall ? 0 : 56;
         return (
             <Layout class="layout">
-                <Modal v-model={this.signInShow} footer-hide>
+                <Modal v-model={this.storeSetting.setting.signInShow} footer-hide>
                     <SignInView on-success={() => {
-                        this.signInShow = false;
+                        this.storeSetting.setSetting({
+                            signInShow: false
+                        });
                     }} />
                 </Modal>
                 <Header class="layout-header-bar">
@@ -118,7 +119,9 @@ export default class App extends Base {
                             <UserAvatarView user={this.storeUser.user} self /> :
                             [
                                 <Button type="primary" on-click={() => {
-                                    this.signInShow = true;
+                                    this.storeSetting.setSetting({
+                                        signInShow: true
+                                    });
                                 }}>登录</Button>,
                                 <Button on-click={() => {
                                     this.$router.push(routeConfig.userSignUp.path);

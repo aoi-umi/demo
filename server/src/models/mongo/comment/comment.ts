@@ -34,6 +34,13 @@ export class Comment extends Base {
     type: number;
 
     @prop({
+        required: true,
+        enum: myEnum.commentStatus.getAllValue(),
+        default: myEnum.commentStatus.正常
+    })
+    status: number;
+
+    @prop({
         type: SchemaTypes.ObjectId
     })
     quotId: Types.ObjectId;

@@ -69,7 +69,7 @@ export let mgtSave: RequestHandler = (req, res) => {
             });
         } else {
             detail = await ArticleMapper.findOne({ _id: data._id });
-            if (detail.userId.toString() !== user._id)
+            if (!detail.userId.equals(user._id))
                 throw error('', config.error.NO_PERMISSIONS);
             if (!detail.canUpdate) {
                 throw error('当前状态无法修改');

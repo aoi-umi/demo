@@ -39,6 +39,7 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
     articleDetailQuery,
     commentSubmit,
     commentQuery,
+    commentDel,
     articleMgtQuery,
     articleMgtDetailQuery,
     articleMgtSave,
@@ -225,6 +226,9 @@ export class TestApi extends ApiModel<TestApiMethod> {
     }
     async commentQuery(data) {
         return this.requestByConfig(this.apiConfig.method.commentQuery, { data });
+    }
+    async commentDel(data) {
+        return this.requestByConfig(this.apiConfig.method.commentDel, { data });
     }
     //#endregion
 }

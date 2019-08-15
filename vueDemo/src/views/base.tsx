@@ -2,10 +2,14 @@ import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { getModule } from 'vuex-module-decorators';
 import LoginUserStore from '@/store/loginUser';
 import { dev, error } from '@/config';
+import SettingStore from '@/store/setting';
 
 export class Base extends Vue {
     protected get storeUser() {
         return getModule(LoginUserStore, this.$store);
+    }
+    protected get storeSetting() {
+        return getModule(SettingStore, this.$store);
     }
 
     protected async operateHandler(operate: string, fn: () => any, opt?: {
@@ -52,8 +56,12 @@ export class Base extends Vue {
             result.msg = e.message;
             result.err = e;
             if (!opt.noDefaultHandler) {
-                if (e.code == error.NotFound.code) {
-                    this.toError(error.NotFound);
+                if (e.code == error.NO_LOGIN.code) {
+                    this.storeSetting.setSetting({
+                        signInShow: true
+                    });
+                } else if (e.code == error.NOT_FOUND.code) {
+                    this.toError(error.NOT_FOUND);
                 } else {
                     this.$Message.error(operate + '出错:' + e.message);
                 }

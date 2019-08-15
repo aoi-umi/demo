@@ -1,7 +1,7 @@
 import { Transform, Type } from "class-transformer";
 import { IsDefined, MinLength, MaxLength, IsIn } from "class-validator";
 import { Types } from 'mongoose';
-import { ListBase } from "./base";
+import { ListBase, DelBase } from "./base";
 import { myEnum } from "../../config";
 
 export class CommentSubmit {
@@ -30,4 +30,7 @@ export class CommentQuery extends ListBase {
 
     @Type()
     type: number;
+}
+
+export class CommentDel extends DelBase {
 }

@@ -23,6 +23,10 @@ export const enumDefine = {
     commentType: {
         文章: 0,
     },
+    commentStatus: {
+        正常: 0,
+        已删除: -1
+    },
 
     socket: {
         弹幕发送: 'danmakuSend',

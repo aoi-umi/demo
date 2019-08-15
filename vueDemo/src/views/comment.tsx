@@ -5,7 +5,8 @@ import { testApi } from '@/api';
 import { convClass, convert } from '@/helpers';
 import { MyList, IMyList } from '@/components/my-list';
 import { MyEditor } from '@/components/my-editor';
-import { Divider, Button, Avatar } from '@/components/iview';
+import { Divider, Button, Avatar, Modal } from '@/components/iview';
+import { MyConfirm } from '@/components/my-confirm';
 import { dev } from '@/config';
 import { Base } from './base';
 import { UserAvatarView } from './user-avatar';
@@ -40,6 +41,21 @@ class Comment extends Base {
             this.comment = '';
         }).finally(() => {
             this.submitLoading = false;
+        });
+    }
+
+    delShow = false;
+    delIds = [];
+    handleDel(id) {
+        this.delIds = [id];
+        this.delShow = true;
+    }
+
+    delClick() {
+        return this.operateHandler('删除', async () => {
+            await testApi.commentDel({ idList: this.delIds });
+            this.$refs.list.result.data = this.$refs.list.result.data.filter(ele => !this.delIds.includes(ele._id));
+            this.delShow = false;
         });
     }
 
@@ -86,11 +102,21 @@ class Comment extends Base {
                         return rs.data.map((ele) => {
                             return (
                                 <div>
-                                    <UserAvatarView user={ele.user} tipsPlacement="top-start" />
-                                    <div style={{ marginLeft: '42px' }}>
-                                        <p domPropsInnerHTML={ele.comment} />
-                                        {moment(ele.createdAt).format(dev.dateFormat)}
-                                    </div>
+                                    {ele.isDel ?
+                                        <p style={{ marginLeft: '42px' }} domPropsInnerHTML={ele.comment} /> :
+                                        <div>
+                                            <UserAvatarView user={ele.user} tipsPlacement="top-start" />
+                                            <div style={{ marginLeft: '42px' }}>
+                                                <p domPropsInnerHTML={ele.comment} />
+                                                {moment(ele.createdAt).format(dev.dateFormat)}
+                                                <div style={{ position: 'absolute', right: '5px' }}>
+                                                    {ele.canDel && <a on-click={() => {
+                                                        this.handleDel(ele._id);
+                                                    }}>删除</a>}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
                                     <Divider size='small' />
                                 </div>
                             );
@@ -110,6 +136,17 @@ class Comment extends Base {
                         return rs;
                     }}
                 ></MyList>
+                <Modal v-model={this.delShow} footer-hide>
+                    <MyConfirm title='确认删除?' loading={true}
+                        cancel={() => {
+                            this.delShow = false;
+                        }}
+                        ok={async () => {
+                            await this.delClick();
+                        }}>
+                        确认删除?
+                    </MyConfirm>
+                </Modal>
             </div>
         );
     }

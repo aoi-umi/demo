@@ -124,6 +124,9 @@ const config = {
                 commentSubmit: {
                     url: '/comment/submit',
                 },
+                commentDel: {
+                    url: '/comment/del',
+                },
                 articleMgtQuery: {
                     url: '/article/mgt/query',
                     method: 'GET',

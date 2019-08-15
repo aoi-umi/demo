@@ -1,15 +1,19 @@
+import { Types } from 'mongoose';
 import * as VaildSchema from '../../../vaild-schema/class-valid';
-import { LoginUser } from '../../login-user';
-import { CommentModel } from './comment';
-import { BaseMapper } from '../_base';
-import { ArticleMapper } from '../article';
+import { Auth } from '../../../_system/auth';
+import * as config from '../../../config';
 import { myEnum } from '../../../config';
-import { InstanceType } from 'mongoose-ts-ua';
+import { LoginUser } from '../../login-user';
+import { BaseMapper, ContentBaseInstanceType } from '../_base';
+import { ArticleMapper } from '../article';
 import { UserModel } from '../user';
 import { FileMapper } from '../file';
+import { CommentModel } from './comment';
 
 type CommentResetOption = {
     imgHost?: string;
+    user?: LoginUser
+    authorId?: Types.ObjectId;
 };
 export class CommentMapper {
     static async create(data: VaildSchema.CommentSubmit, type, user: LoginUser) {
@@ -30,9 +34,14 @@ export class CommentMapper {
     }) {
         let match: any = {
             ownerId: data.ownerId,
-            type: data.type
+            type: data.type,
         };
 
+        let owner = await CommentMapper.findOwner({
+            ownerId: data.ownerId,
+            type: data.type,
+            mgt: true,
+        });
         let rs = await CommentModel.aggregatePaginate([
             {
                 $match: match
@@ -61,17 +70,24 @@ export class CommentMapper {
             });
 
         if (opt.resetOpt) {
-            rs.rows.forEach(detail => {
-                this.resetDetail(detail, opt.resetOpt);
+            rs.rows = rs.rows.map(detail => {
+                return this.resetDetail(detail, { ...opt.resetOpt, authorId: owner && owner.userId });
             });
         }
         return rs;
     }
 
-    static async findOwner(ownerId, type) {
-        let owner: InstanceType<{ commentCount: number }>;
-        if (type == myEnum.commentType.文章) {
-            owner = await ArticleMapper.findOne({ _id: ownerId, status: myEnum.articleStatus.审核通过 });
+    static async findOwner(opt: {
+        ownerId,
+        type,
+        mgt?: boolean
+    }) {
+        let owner: ContentBaseInstanceType;
+        let match: any = { _id: opt.ownerId };
+        if (opt.type == myEnum.commentType.文章) {
+            if (!opt.mgt)
+                match.status = myEnum.articleStatus.审核通过
+            owner = await ArticleMapper.findOne(match);
         }
         return owner;
     }
@@ -80,5 +96,21 @@ export class CommentMapper {
         if (detail.user) {
             detail.user.avatarUrl = FileMapper.getImgUrl(detail.user.avatar, opt.imgHost);
         }
+        let { user } = opt;
+        if (detail.status !== myEnum.commentStatus.正常) {
+            return {
+                _id: detail._id,
+                isDel: true,
+                comment: '评论已删除'
+            };
+        }
+        if (user) {
+            let rs = {
+                canDel: detail.status !== myEnum.commentStatus.已删除
+                    && (detail.userId == user._id || Auth.contains(user, config.auth.commentMgtDel) || (opt.authorId && opt.authorId.equals(user._id))),
+            };
+            detail.canDel = rs.canDel;
+        }
+        return detail;
     }
 }

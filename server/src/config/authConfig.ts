@@ -61,4 +61,8 @@ export const authConfig = {
     articleMgtAudit: {
         code: 'articleMgtAudit'
     },
+
+    commentMgtDel: {
+        code: 'commentMgtDel'
+    }
 };

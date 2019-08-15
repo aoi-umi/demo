@@ -58,5 +58,8 @@ let errorConfig = {
     USER_NOT_FOUND: {
         code: 'USER_NOT_FOUND',
     },
+    NO_MATCH_DATA: {
+        code: 'NO_MATCH_DATA',
+    }
 };
 export default errorConfig;
