@@ -27,6 +27,11 @@ export type DetailDataType = {
     statusText: string;
     createdAt: string;
     remark: string;
+    readTimes: number;
+    commentCount: number;
+    like: number;
+    dislike: number;
+
     canUpdate: boolean;
     canDel: boolean;
     user: { _id: string; nickname: string; account: string };
@@ -206,7 +211,7 @@ export default class ArticleDetail extends ArticleMgtBase {
                                 file.url = rs.url;
                                 return rs.fileId;
                             }}
-                            // format={['jpg']}
+                            format={['jpg', 'png', 'bmp', 'gif']}
                             width={160} height={90}
                             v-model={this.coverList}
                         />

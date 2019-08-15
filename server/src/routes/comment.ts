@@ -13,6 +13,7 @@ export let submit: RequestHandler = (req, res) => {
         paramsValid(data);
         let owner = await CommentMapper.findOwner(data.ownerId, data.type);
         let comment = await CommentMapper.create(data, data.type, user);
+        comment.ip = req.realIp;
         await transaction(async (session) => {
             await comment.save({ session });
             await owner.update({ commentCount: owner.commentCount + 1 });
@@ -22,6 +23,8 @@ export let submit: RequestHandler = (req, res) => {
             user: {
                 account: user.account,
                 nickname: user.nickname,
+                avatar: user.avatar,
+                avatarUrl: user.avatarUrl,
             }
         };
     }, req, res);
