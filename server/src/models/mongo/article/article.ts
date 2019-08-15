@@ -73,6 +73,16 @@ export class Article extends Base {
     commentCount: number;
 
     @prop({
+        default: 0
+    })
+    like: number;
+
+    @prop({
+        default: 0
+    })
+    dislike: number;
+
+    @prop({
         default: ''
     })
     remark: string;

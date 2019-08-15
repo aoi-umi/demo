@@ -44,12 +44,20 @@ export class Comment extends Base {
     floor: number;
 
     @prop()
+    ip: string;
+
+    @prop()
     comment: string;
 
     @prop({
         default: 0
     })
-    vote: number;
+    like: number;
+
+    @prop({
+        default: 0
+    })
+    dislike: number;
 }
 
 export const CommentModel = getModelForClass<Comment, typeof Comment>(Comment);
