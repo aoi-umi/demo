@@ -31,6 +31,7 @@ export default class App extends Base {
     protected created() {
         this.setTitle();
         this.getUserInfo();
+        this.handleResize();
     }
 
     private isSmall = false;
@@ -39,7 +40,7 @@ export default class App extends Base {
     }
 
     protected beforeDestroy() {
-        window.removeEventListener('scroll', this.handleResize);
+        window.removeEventListener('resize', this.handleResize);
     }
 
     private handleResize() {
