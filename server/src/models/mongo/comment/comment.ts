@@ -6,12 +6,13 @@ import { Types, SchemaTypes } from 'mongoose';
 
 import { myEnum } from '../../../config';
 import { Base } from '../_base';
+import { IVoteOwner } from '../vote';
 
 export type CommentInstanceType = InstanceType<Comment>;
 export type CommentModelType = ModelType<Comment, typeof Comment>;
 export type CommentDocType = DocType<CommentInstanceType>;
 @setSchema()
-export class Comment extends Base {
+export class Comment extends Base implements IVoteOwner {
     /**
      * 所属文章等id
      */

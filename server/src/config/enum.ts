@@ -22,10 +22,20 @@ export const enumDefine = {
     },
     commentType: {
         文章: 0,
+        // 视频: 1,
     },
     commentStatus: {
         正常: 0,
         已删除: -1
+    },
+    voteType: {
+        文章: 0,
+        评论: 10
+    },
+    voteValue: {
+        无: 0,
+        喜欢: 1,
+        不喜欢: 2
     },
 
     socket: {

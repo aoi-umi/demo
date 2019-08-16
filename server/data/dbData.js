@@ -35,6 +35,10 @@ var authority = {
     articleMgtAudit: {
         name: '文章管理审核'
     },
+
+    commentMgtDel: {
+        name: '评论管理删除'
+    },
 };
 
 var authList = [];

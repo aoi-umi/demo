@@ -4,12 +4,13 @@ import {
 } from 'mongoose-ts-ua';
 import { Base } from './base';
 import { Types, SchemaTypes } from 'mongoose';
+import { IVoteOwner } from '../vote';
 
 export type ContentBaseInstanceType = InstanceType<ContentBase>;
 export type ContentBaseDocType = DocType<ContentBaseInstanceType>;
 
 @setSchema()
-export class ContentBase extends Base {
+export class ContentBase extends Base implements IVoteOwner {
     @prop({
         type: SchemaTypes.ObjectId,
         required: true,

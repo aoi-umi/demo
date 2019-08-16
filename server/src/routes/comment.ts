@@ -43,7 +43,7 @@ export let query: RequestHandler = (req, res) => {
         }, {
                 resetOpt: {
                     imgHost: req.headers.host,
-                    user
+                    user: user._id ? user : null
                 }
             });
         return {
@@ -60,26 +60,25 @@ export let del: RequestHandler = (req, res) => {
         paramsValid(data);
         /**
          * 可删除
-         * 1.作者
+         * 1.本人
          * 2.有评论管理-删除权限的
-         * 3.本人
          *  */
         let match = { _id: { $in: data.idList } };
         let delIdList = [];
         if (Auth.contains(user, config.auth.commentMgtDel)) {
             delIdList = data.idList;
         } else {
-            //作者和本人只能单条删除
+            //本人只能单条删除
             let id = data.idList[0];
             let detail = await CommentModel.findById(id);
             if (detail) {
-                if (detail.userId.equals(user._id)) {
+                if (detail.userId.equals(user._id))
                     delIdList = [id];
-                } else {
-                    let owner = await CommentMapper.findOwner({ ownerId: detail.ownerId, type: detail.type, mgt: true });
-                    if (owner && owner.userId.equals(user._id))
-                        delIdList = [id];
-                }
+                // else {
+                //     let owner = await CommentMapper.findOwner({ ownerId: detail.ownerId, type: detail.type, mgt: true });
+                //     if (owner && owner.userId.equals(user._id))
+                //         delIdList = [id];
+                // }
             }
         }
         if (!delIdList.length)

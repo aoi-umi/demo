@@ -16,6 +16,8 @@ export class Base extends Vue {
         onSuccessClose?: () => any;
         validate?: (callback?: (valid?: boolean) => void) => void,
         noDefaultHandler?: boolean;
+        noSuccessHandler?: boolean;
+        noErrorHandler?: boolean;
     }) {
         let result = {
             success: true,
@@ -44,7 +46,7 @@ export class Base extends Vue {
                 return result;
             }
             await fn();
-            if (!opt.noDefaultHandler) {
+            if (!opt.noDefaultHandler && !opt.noSuccessHandler) {
                 this.$Message.success({
                     content: operate + '成功',
                     onClose: opt.onSuccessClose
@@ -55,7 +57,7 @@ export class Base extends Vue {
             result.success = false;
             result.msg = e.message;
             result.err = e;
-            if (!opt.noDefaultHandler) {
+            if (!opt.noDefaultHandler && !opt.noErrorHandler) {
                 if (e.code == error.NO_LOGIN.code) {
                     this.storeSetting.setSetting({
                         signInShow: true

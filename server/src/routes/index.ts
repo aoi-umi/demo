@@ -63,6 +63,11 @@ router.get('/comment/query', UserAuthMid.normal(), comment.query);
 router.post('/comment/del', UserAuthMid.normal(), comment.del);
 //#endregion
 
+//#region vote 
+import * as vote from './vote';
+router.post('/vote/submit', UserAuthMid.normal([auth.login]), vote.submit);
+//#endregion
+
 //#region file 
 import * as file from './file';
 router.post('/img/upload', UserAuthMid.normal([auth.login]), FileMid.single, file.imgUpload);

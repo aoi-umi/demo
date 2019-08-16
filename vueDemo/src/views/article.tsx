@@ -1,5 +1,4 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
-import { getModule } from 'vuex-module-decorators';
 import moment from 'moment';
 import { testApi } from '@/api';
 import { myEnum, authority, dev } from '@/config';
@@ -9,9 +8,10 @@ import { MyImg } from '@/components/my-img';
 import { convert } from '@/helpers';
 import { DetailDataType } from './article-mgt-detail';
 import { UserAvatarView } from './user-avatar';
+import { Base } from './base';
 
 @Component
-export default class Article extends Vue {
+export default class Article extends Base {
     $refs: { list: IMyList<any> };
 
     page: any;
@@ -49,6 +49,18 @@ export default class Article extends Vue {
         });
     }
 
+    private handleVote(detail, value) {
+        this.operateHandler('', async () => {
+            let rs = await testApi.voteSubmit({ ownerId: detail._id, value, type: myEnum.voteType.文章 });
+            for (let key in rs) {
+                detail[key] = rs[key];
+            }
+            detail.voteValue = value;
+        }, {
+                noSuccessHandler: true
+            });
+    }
+
     protected render() {
         return (
             <div>
@@ -72,19 +84,25 @@ export default class Article extends Vue {
                         return rs.data.map((ele: DetailDataType) => {
                             let iconList = [{
                                 icon: 'md-eye',
-                                text: ele.readTimes
+                                text: ele.readTimes,
                             }, {
                                 icon: 'md-text',
                                 text: ele.commentCount
-                            },
-                                // {
-                                //     icon: 'md-thumbs-up',
-                                //     text: ele.like
-                                // }, {
-                                //     icon: 'md-thumbs-down',
-                                //     text: ele.dislike
-                                // }
-                            ];
+                            }, {
+                                icon: 'md-thumbs-up',
+                                text: ele.like,
+                                color: ele.voteValue == myEnum.voteValue.喜欢 ? 'red' : '',
+                                onClick: () => {
+                                    this.handleVote(ele, ele.voteValue == myEnum.voteValue.喜欢 ? myEnum.voteValue.无 : myEnum.voteValue.喜欢);
+                                }
+                            }, {
+                                icon: 'md-thumbs-down',
+                                text: ele.dislike,
+                                color: ele.voteValue == myEnum.voteValue.不喜欢 ? 'red' : '',
+                                onClick: () => {
+                                    this.handleVote(ele, ele.voteValue == myEnum.voteValue.不喜欢 ? myEnum.voteValue.无 : myEnum.voteValue.不喜欢);
+                                }
+                            }];
                             return (
                                 <Card style={{ marginTop: '5px', cursor: 'pointer' }}>
                                     <Row>
@@ -114,8 +132,14 @@ export default class Article extends Vue {
                                                     display: 'flex',
                                                     justifyContent: 'center',
                                                     alignItems: 'center'
-                                                }}>
-                                                    <Icon type={iconEle.icon} size={24} />
+                                                }}
+                                                    nativeOn-click={iconEle.onClick || (() => {
+                                                        this.toDetail(ele);
+                                                    })} >
+                                                    <Icon
+                                                        type={iconEle.icon}
+                                                        size={24}
+                                                        color={iconEle.color} />
                                                     <b style={{ marginLeft: '4px' }}>{iconEle.text}</b>
                                                 </Col>
                                             );
