@@ -21,7 +21,7 @@ export let submit: RequestHandler = (req, res) => {
             await comment.save({ session });
             await owner.update({ commentCount: owner.commentCount + 1 });
         });
-        return {
+        let ret = {
             ...comment.toJSON(),
             user: {
                 account: user.account,
@@ -30,6 +30,10 @@ export let submit: RequestHandler = (req, res) => {
                 avatarUrl: user.avatarUrl,
             }
         };
+        return CommentMapper.resetDetail(ret, {
+            user,
+            imgHost: req.headers.host,
+        });
     }, req, res);
 };
 

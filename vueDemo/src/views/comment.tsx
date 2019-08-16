@@ -24,10 +24,13 @@ class Comment extends Base {
         this.query();
     }
 
-    query(opt?) {
-        this.$refs.list.query(opt);
+    async query(opt?) {
+        this.refreshLoading = true;
+        await this.$refs.list.query(opt);
+        this.refreshLoading = false;
     }
 
+    refreshLoading = false;
     submitLoading = false;
     comment = '';
     submit() {
@@ -93,10 +96,10 @@ class Comment extends Base {
                 <div style={{ textAlign: 'right', marginTop: '5px' }}>
                     <Button on-click={() => {
                         this.query();
-                    }} loading={this.submitLoading}>刷新评论</Button>
+                    }} loading={this.refreshLoading}>刷新评论</Button>
                     <Button type="primary" on-click={() => {
                         this.submit();
-                    }}>发送评论</Button>
+                    }} loading={this.submitLoading}>发送评论</Button>
                 </div>
                 <Divider size='small' />
                 <MyList
