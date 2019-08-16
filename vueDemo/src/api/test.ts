@@ -46,6 +46,8 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
     articleMgtDel,
     articleMgtAudit,
 
+    voteSubmit,
+
     //file
     imgUpload,
     imgGet,
@@ -229,6 +231,12 @@ export class TestApi extends ApiModel<TestApiMethod> {
     }
     async commentDel(data) {
         return this.requestByConfig(this.apiConfig.method.commentDel, { data });
+    }
+    //#endregion
+
+    //#region vote 
+    async voteSubmit(data) {
+        return this.requestByConfig(this.apiConfig.method.voteSubmit, { data });
     }
     //#endregion
 }

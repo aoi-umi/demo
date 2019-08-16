@@ -8,7 +8,8 @@ import { BaseMapper, ContentBaseInstanceType } from '../_base';
 import { ArticleMapper } from '../article';
 import { UserModel } from '../user';
 import { FileMapper } from '../file';
-import { CommentModel } from './comment';
+import { CommentModel, CommentDocType } from './comment';
+import { VoteModel } from '../vote';
 
 type CommentResetOption = {
     imgHost?: string;
@@ -37,12 +38,12 @@ export class CommentMapper {
             type: data.type,
         };
 
-        let owner = await CommentMapper.findOwner({
-            ownerId: data.ownerId,
-            type: data.type,
-            mgt: true,
-        });
-        let rs = await CommentModel.aggregatePaginate([
+        // let owner = await CommentMapper.findOwner({
+        //     ownerId: data.ownerId,
+        //     type: data.type,
+        //     mgt: true,
+        // });
+        let pipeline: any[] = [
             {
                 $match: match
             },
@@ -65,15 +66,37 @@ export class CommentMapper {
                 }
             },
             { $unwind: '$user' },
-        ], {
-                ...BaseMapper.getListOptions(data),
-            });
-
-        if (opt.resetOpt) {
-            rs.rows = rs.rows.map(detail => {
-                return this.resetDetail(detail, { ...opt.resetOpt, authorId: owner && owner.userId });
-            });
+        ];
+        let resetOpt = { ...opt.resetOpt };
+        if (resetOpt.user) {
+            pipeline = [
+                ...pipeline,
+                {
+                    $lookup: {
+                        from: VoteModel.collection.collectionName,
+                        let: { commentId: '$_id' },
+                        pipeline: [{
+                            $match: {
+                                userId: Types.ObjectId(resetOpt.user._id),
+                                $expr: { $eq: ['$$commentId', '$ownerId'] }
+                            }
+                        }],
+                        as: 'vote'
+                    }
+                },
+                { $unwind: { path: '$vote', preserveNullAndEmptyArrays: true } },
+            ];
         }
+        let rs = await CommentModel.aggregatePaginate(pipeline, {
+            ...BaseMapper.getListOptions(data),
+        });
+
+        rs.rows = rs.rows.map(detail => {
+            return this.resetDetail(detail, {
+                ...resetOpt,
+                // authorId: owner && owner.userId
+            });
+        });
         return rs;
     }
 
@@ -100,14 +123,19 @@ export class CommentMapper {
         if (detail.status !== myEnum.commentStatus.正常) {
             return {
                 _id: detail._id,
+                floor: detail.floor,
                 isDel: true,
                 comment: '评论已删除'
             };
         }
+        detail.voteValue = detail.vote ? detail.vote.value : myEnum.voteValue.无;
         if (user) {
             let rs = {
                 canDel: detail.status !== myEnum.commentStatus.已删除
-                    && (detail.userId == user._id || Auth.contains(user, config.auth.commentMgtDel) || (opt.authorId && opt.authorId.equals(user._id))),
+                    && (detail.userId == user._id
+                        || Auth.contains(user, config.auth.commentMgtDel)
+                        // || (opt.authorId && opt.authorId.equals(user._id))
+                    ),
             };
             detail.canDel = rs.canDel;
         }

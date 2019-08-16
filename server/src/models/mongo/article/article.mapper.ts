@@ -6,13 +6,13 @@ import { ListBase, AritcleQuery } from '../../../vaild-schema/class-valid';
 import { error, escapeRegExp } from '../../../_system/common';
 import { Auth } from '../../../_system/auth';
 import { transaction } from '../../../_system/dbMongo';
+import { LoginUser } from '../../login-user';
 import { BaseMapper } from '../_base';
 import { UserModel } from '../user';
 import { FileMapper } from '../file';
 
 import { ArticleInstanceType, ArticleModel } from "./article";
 import { ArticleLogModel } from './article-log';
-import { LoginUser } from '../../login-user';
 
 type ArticleResetOption = {
     user?: LoginUser,
@@ -104,6 +104,26 @@ export class ArticleMapper {
             { $unwind: '$user' },
             { $match: match },
         ];
+        let resetOpt = { ...opt.resetOpt };
+        if (opt.normal && resetOpt.user) {
+            pipeline = [
+                ...pipeline,
+                {
+                    $lookup: {
+                        from: ArticleModel.collection.collectionName,
+                        let: { articleId: '$_id' },
+                        pipeline: [{
+                            $match: {
+                                userId: Types.ObjectId(resetOpt.user._id),
+                                $expr: { $eq: ['$$articleId', '$ownerId'] }
+                            }
+                        }],
+                        as: 'vote'
+                    }
+                },
+                { $unwind: { path: '$vote', preserveNullAndEmptyArrays: true } },
+            ];
+        }
 
         opt = { ...opt };
         let rs = await ArticleModel.aggregatePaginate(pipeline, {
@@ -160,6 +180,7 @@ export class ArticleMapper {
         if (detail.user) {
             detail.user.avatarUrl = FileMapper.getImgUrl(detail.user.avatar, opt.imgHost);
         }
+        detail.voteValue = detail.vote ? detail.vote.value : myEnum.voteValue.无;
     }
 
     static async updateStatus(idList: Types.ObjectId[], status: number, user: LoginUser, opt?: {

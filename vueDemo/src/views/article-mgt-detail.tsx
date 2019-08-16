@@ -31,7 +31,8 @@ export type DetailDataType = {
     commentCount: number;
     like: number;
     dislike: number;
-
+    
+    voteValue: number;
     canUpdate: boolean;
     canDel: boolean;
     user: { _id: string; nickname: string; account: string };

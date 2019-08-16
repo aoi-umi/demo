@@ -5,9 +5,9 @@ import { testApi } from '@/api';
 import { convClass, convert } from '@/helpers';
 import { MyList, IMyList } from '@/components/my-list';
 import { MyEditor } from '@/components/my-editor';
-import { Divider, Button, Avatar, Modal } from '@/components/iview';
+import { Divider, Button, Avatar, Modal, Icon } from '@/components/iview';
 import { MyConfirm } from '@/components/my-confirm';
-import { dev } from '@/config';
+import { dev, myEnum } from '@/config';
 import { Base } from './base';
 import { UserAvatarView } from './user-avatar';
 
@@ -59,6 +59,18 @@ class Comment extends Base {
         });
     }
 
+    handleVote(detail, value) {
+        this.operateHandler('', async () => {
+            let rs = await testApi.voteSubmit({ ownerId: detail._id, value, type: myEnum.voteType.评论 });
+            for (let key in rs) {
+                detail[key] = rs[key];
+            }
+            detail.voteValue = value;
+        }, {
+                noSuccessHandler: true
+            });
+    }
+
     render() {
         return (
             <div>
@@ -103,16 +115,27 @@ class Comment extends Base {
                             return (
                                 <div>
                                     {ele.isDel ?
-                                        <p style={{ marginLeft: '42px' }} domPropsInnerHTML={ele.comment} /> :
                                         <div>
+                                            <p style={{ marginLeft: '42px' }} domPropsInnerHTML={ele.comment} />
+                                            <span style={{ position: 'absolute', right: '5px' }}>
+                                                #{ele.floor}
+                                            </span>
+                                        </div> :
+                                        <div style={{ position: 'relative' }}>
                                             <UserAvatarView user={ele.user} tipsPlacement="top-start" />
+                                            <span style={{ position: 'absolute', right: '5px' }}>
+                                                #{ele.floor}
+                                            </span>
                                             <div style={{ marginLeft: '42px' }}>
                                                 <p domPropsInnerHTML={ele.comment} />
                                                 {moment(ele.createdAt).format(dev.dateFormat)}
-                                                <div style={{ position: 'absolute', right: '5px' }}>
-                                                    {ele.canDel && <a on-click={() => {
+                                                <div style={{ position: 'absolute', right: '5px', cursor: 'pointer' }}>
+                                                    {ele.canDel && <Icon type="md-trash" size={24} on-click={() => {
                                                         this.handleDel(ele._id);
-                                                    }}>删除</a>}
+                                                    }} />}
+                                                    <Icon type="md-thumbs-up" size={24} color={ele.voteValue == myEnum.voteValue.喜欢 ? "red" : ''} on-click={() => {
+                                                        this.handleVote(ele, ele.voteValue == myEnum.voteValue.喜欢 ? myEnum.voteValue.无 : myEnum.voteValue.喜欢);
+                                                    }} />{ele.like}
                                                 </div>
                                             </div>
                                         </div>
