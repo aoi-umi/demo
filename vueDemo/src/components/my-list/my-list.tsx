@@ -139,7 +139,7 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
         }
     }
     public query(data?: any, noClear?: boolean) {
-        this._handleQuery(data, noClear);
+        return this._handleQuery(data, noClear);
     }
     private async _handleQuery(data?: any, noClear?: boolean) {
         this.loading = true;
