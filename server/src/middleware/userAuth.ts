@@ -18,7 +18,8 @@ export class UserAuthMid {
                         _id: '',
                         nickname: '',
                         account: '',
-                        authority: {}
+                        authority: {},
+                        isLogin: false
                     }),
                     startTime: new Date().getTime(),
                     accessableUrl: {},
@@ -30,6 +31,7 @@ export class UserAuthMid {
                     let userData = await cache.get(userCacheKey);
                     if (userData) {
                         let user = plainToClass(LoginUser, userData);
+                        user.isLogin = true;
 
                         let { disableResult, user: dbUser } = await UserMapper.accountCheck(user.account, user);
                         if (disableResult.disabled) {

@@ -47,7 +47,7 @@ export let query: RequestHandler = (req, res) => {
         }, {
                 resetOpt: {
                     imgHost: req.headers.host,
-                    user: user._id ? user : null
+                    user: user.isLogin ? user : null
                 }
             });
         return {

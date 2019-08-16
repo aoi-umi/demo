@@ -1,6 +1,7 @@
 import { Type } from "class-transformer";
 
 export class LoginUser {
+    isLogin: boolean;
     _id: string;
     nickname: string;
     account: string;
