@@ -119,10 +119,10 @@ class Comment extends Base {
                                 <div>
                                     {ele.isDel ?
                                         <div>
-                                            <p style={{ marginLeft: '42px' }} domPropsInnerHTML={ele.comment} />
                                             <span style={{ position: 'absolute', right: '5px' }}>
                                                 #{ele.floor}
                                             </span>
+                                            <p style={{ marginLeft: '42px' }} domPropsInnerHTML={ele.comment} />
                                         </div> :
                                         <div style={{ position: 'relative' }}>
                                             <UserAvatarView user={ele.user} tipsPlacement="top-start" />
@@ -130,8 +130,7 @@ class Comment extends Base {
                                                 #{ele.floor}
                                             </span>
                                             <div style={{ marginLeft: '42px' }}>
-                                                <p domPropsInnerHTML={ele.comment} />
-                                                {moment(ele.createdAt).format(dev.dateFormat)}
+                                                <p domPropsInnerHTML={ele.comment} style={{ overflowWrap: 'break-word', marginBottom: '10px' }} />
                                                 <div style={{ position: 'absolute', right: '5px', cursor: 'pointer' }}>
                                                     {ele.canDel && <Icon type="md-trash" size={24} on-click={() => {
                                                         this.handleDel(ele._id);
@@ -140,6 +139,7 @@ class Comment extends Base {
                                                         this.handleVote(ele, ele.voteValue == myEnum.voteValue.喜欢 ? myEnum.voteValue.无 : myEnum.voteValue.喜欢);
                                                     }} />{ele.like}
                                                 </div>
+                                                <span style={{ color: '#798692' }}>{moment(ele.createdAt).format(dev.dateFormat)}</span>
                                             </div>
                                         </div>
                                     }
