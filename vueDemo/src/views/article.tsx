@@ -128,11 +128,7 @@ export default class Article extends Base {
                                     <Row>
                                         {iconList.map(iconEle => {
                                             return (
-                                                <Col xs={24 / iconList.length} style={{
-                                                    display: 'flex',
-                                                    justifyContent: 'center',
-                                                    alignItems: 'center'
-                                                }}
+                                                <Col class="center" xs={24 / iconList.length}
                                                     nativeOn-click={iconEle.onClick || (() => {
                                                         this.toDetail(ele);
                                                     })} >

@@ -129,7 +129,7 @@ export let query: RequestHandler = (req, res) => {
             normal: true,
             resetOpt: {
                 imgHost: req.headers.host,
-                user,
+                user: user.isLogin ? user : null,
             }
         });
         return {
@@ -148,7 +148,7 @@ export let detailQuery: RequestHandler = (req, res) => {
             normal: true,
             resetOpt: {
                 imgHost: req.headers.host,
-                user
+                user: user.isLogin ? user : null,
             }
         });
         let detail = rs.detail;

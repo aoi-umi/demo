@@ -36,11 +36,11 @@ class Load extends Base {
         if (!this.result.success) {
             return (
                 <div style={{ position: 'relative', }}>
-                    <Card style={{ height: '200px' }}>
+                    <Card class="center" style={{ height: '200px', }}>
                         {this.loading ? <Spin size="large" fix /> :
-                            <div class="center">
+                            <div class="center" style={{ flexFlow: 'column' }}>
                                 {this.result.msg}
-                                <Button style={{ marginLeft: '5px' }} on-click={this.loadData}>重试</Button>
+                                <Button style={{ margin: '5px' }} on-click={this.loadData}>重试</Button>
                             </div>
                         }
                     </Card>
