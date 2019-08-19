@@ -47,6 +47,7 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
     articleMgtAudit,
 
     voteSubmit,
+    followSave,
 
     //file
     imgUpload,
@@ -237,6 +238,12 @@ export class TestApi extends ApiModel<TestApiMethod> {
     //#region vote 
     async voteSubmit(data) {
         return this.requestByConfig(this.apiConfig.method.voteSubmit, { data });
+    }
+    //#endregion
+
+    //#region follow 
+    async followSave(data) {
+        return this.requestByConfig(this.apiConfig.method.followSave, { data });
     }
     //#endregion
 }

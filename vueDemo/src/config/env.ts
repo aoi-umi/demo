@@ -149,7 +149,9 @@ const config = {
                 voteSubmit: {
                     url: '/vote/submit',
                 },
-
+                followSave: {
+                    url: '/follow/save',
+                },
                 //file
 
                 imgUpload: {
