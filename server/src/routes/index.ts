@@ -68,6 +68,11 @@ import * as vote from './vote';
 router.post('/vote/submit', UserAuthMid.normal([auth.login]), vote.submit);
 //#endregion
 
+//#region follow 
+import * as follow from './follow';
+router.post('/follow/save', UserAuthMid.normal([auth.login]), follow.save);
+//#endregion
+
 //#region file 
 import * as file from './file';
 router.post('/img/upload', UserAuthMid.normal([auth.login]), FileMid.single, file.imgUpload);

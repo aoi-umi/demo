@@ -3,20 +3,23 @@ import * as iviewTypes from 'iview';
 
 import { testApi } from '@/api';
 import { convClass } from '@/helpers';
-import { dev } from '@/config';
+import { dev, myEnum } from '@/config';
 import { Button, Avatar, Poptip, Spin } from '@/components/iview';
 import { MyImgViewer, IMyImgViewer } from '@/components/my-img-viewer';
 import { Base } from './base';
 import { DetailDataType } from './user-mgt';
 
+type User = {
+    _id?: string;
+    nickname?: string;
+    account?: string;
+    avatarUrl?: string;
+    followStatus?: number;
+};
 @Component
 class UserAvatar extends Base {
     @Prop()
-    user: {
-        _id?: string;
-        nickname?: string;
-        account?: string;
-    };
+    user: User;
 
     @Prop()
     noTips?: boolean;
@@ -35,6 +38,7 @@ class UserAvatar extends Base {
 
     private innerUser: DetailDataType = {};
     avatarUrl = '';
+    isFollow = false;
 
     $refs: { imgViewer: IMyImgViewer };
 
@@ -42,8 +46,9 @@ class UserAvatar extends Base {
         this.init(this.user);
     }
 
-    private init(user) {
+    private init(user: User) {
         this.avatarUrl = (user && user.avatarUrl) || '';
+        this.isFollow = user ? user.followStatus === myEnum.followStatus.已关注 : false;
     }
 
     @Watch('user')
@@ -73,6 +78,17 @@ class UserAvatar extends Base {
                 this.loading = false;
             });
         }
+    }
+
+    private async handleFollow() {
+        let status = this.isFollow ? myEnum.followStatus.已取消 : myEnum.followStatus.已关注;
+        this.operateHandler(this.isFollow ? '取消关注' : '关注', async () => {
+            let rs = await testApi.followSave({ userId: this.user._id, status });
+            this.init({
+                ...this.user,
+                followStatus: rs.status,
+            });
+        });
     }
 
     render() {
@@ -127,6 +143,9 @@ class UserAvatar extends Base {
                                     query: { _id: this.user._id }
                                 });
                             }}>主页</Button>
+                            {this.user._id !== this.storeUser.user._id && <Button on-click={() => {
+                                this.handleFollow();
+                            }}>{this.isFollow ? '取消关注' : '关注'}</Button>}
                         </div>
                     </div>
                 }

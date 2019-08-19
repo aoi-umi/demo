@@ -63,6 +63,12 @@ export class User extends Base {
     })
     status: number;
 
+    @prop()
+    get statusText() {
+        let rs = this.checkDisabled();
+        return rs.disabled ? rs.text : myEnum.userStatus.getKey(this.status);
+    }
+
     //禁用时间
     @prop()
     disabledTo: Date;
@@ -86,11 +92,15 @@ export class User extends Base {
         return !this.roleList.includes(dev.rootRole);
     }
 
-    @prop()
-    get statusText() {
-        let rs = this.checkDisabled();
-        return rs.disabled ? rs.text : myEnum.userStatus.getKey(this.status);
-    }
+    @prop({
+        default: 0
+    })
+    follower: number;
+
+    @prop({
+        default: 0
+    })
+    following: number;
 }
 
 export const UserModel = getModelForClass<User, typeof User>(User);

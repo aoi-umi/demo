@@ -36,6 +36,11 @@ const enumDefineBack = {
         喜欢: 1,
         不喜欢: 2
     },
+    followStatus: {
+        未关注: 0,
+        已关注: 1,
+        已取消: -1,
+    },
 
     socket: {
         弹幕发送: 'danmakuSend',
