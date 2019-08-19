@@ -251,6 +251,13 @@ export default class Article extends ArticleMgtBase {
                 return <span>{moment(params.row.createdAt).format(dev.dateFormat)}</span>;
             }
         }, {
+            title: '发布时间',
+            key: 'publishAt',
+            minWidth: 90,
+            render: (h, params) => {
+                return <span>{moment(params.row.publishAt).format(dev.dateFormat)}</span>;
+            }
+        }, {
             title: '操作',
             key: 'action',
             fixed: 'right',

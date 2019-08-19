@@ -51,7 +51,7 @@ export default class ArticleDetail extends Base {
             <div>
                 <UserAvatarView user={detail.user} tipsPlacement="top-start" />
                 {[
-                    '创建于: ' + moment(detail.createdAt).format(dev.dateFormat),
+                    '发布于: ' + moment(detail.publishAt).format(dev.dateFormat),
                 ].map(ele => {
                     return (<span style={{ marginLeft: '5px' }}>{ele}</span>);
                 })}

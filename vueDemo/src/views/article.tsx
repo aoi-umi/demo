@@ -113,7 +113,7 @@ export default class Article extends Base {
                                             this.toDetail(ele);
                                         }}>
                                             <h3 class="article-list-title" title={ele.title}>{ele.title}</h3>
-                                            创建于 {moment(ele.createdAt).format(dev.dateFormat)}
+                                            发布于 {moment(ele.publishAt).format(dev.dateFormat)}
                                         </Col>
                                     </Row>
                                     <Row nativeOn-click={() => {

@@ -7,7 +7,7 @@ import * as config from '../config';
 import { error } from '../_system/common';
 import { transaction } from '../_system/dbMongo';
 import * as VaildSchema from '../vaild-schema/class-valid';
-import { ArticleModel, ArticleInstanceType, ArticleMapper, ArticleLogMapper } from '../models/mongo/article';
+import { ArticleModel, ArticleInstanceType, ArticleMapper, ArticleLogMapper, ArticleDocType } from '../models/mongo/article';
 import { Auth } from '../_system/auth';
 
 export let mgtQuery: RequestHandler = (req, res) => {
@@ -77,7 +77,11 @@ export let mgtSave: RequestHandler = (req, res) => {
             let update: any = {
                 status,
             };
-            ['cover', 'title', 'profile', 'content', 'remark'].forEach(key => {
+            let updateKey: (keyof ArticleDocType)[] = [
+                'cover', 'title', 'profile', 'content', 'remark',
+                'setPublish', 'setPublishAt'
+            ];
+            updateKey.forEach(key => {
                 update[key] = data[key];
             });
             let logRemark = update.remark == detail.remark ? null : update.remark;
@@ -125,6 +129,7 @@ export let query: RequestHandler = (req, res) => {
         let data = plainToClass(VaildSchema.AritcleQuery, req.query);
         paramsValid(data);
 
+        data.orderBy = 'publishAt';
         let { rows, total } = await ArticleMapper.query(data, {
             normal: true,
             resetOpt: {

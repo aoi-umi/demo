@@ -4,7 +4,7 @@ import moment from 'moment';
 
 import { testApi } from '@/api';
 import { myEnum, dev } from '@/config';
-import { Input, Form, FormItem, Button, Divider, Table } from '@/components/iview';
+import { Input, Form, FormItem, Button, Divider, Table, Checkbox, DatePicker } from '@/components/iview';
 import { MyUpload, IMyUpload } from '@/components/my-upload';
 import { ArticleMgtBase } from './article-mgt';
 import { MyEditor } from '@/components/my-editor';
@@ -31,7 +31,11 @@ export type DetailDataType = {
     commentCount: number;
     like: number;
     dislike: number;
-    
+
+    setPublish: boolean;
+    setPublishAt: string;
+    publishAt: string;
+
     voteValue: number;
     canUpdate: boolean;
     canDel: boolean;
@@ -58,16 +62,32 @@ export default class ArticleDetail extends ArticleMgtBase {
         return data;
     }
 
-    private innerDetail: DetailType = {} as any;
+    private innerDetail: DetailType = null;
 
-    private rules = {
-        title: [
-            { required: true, trigger: 'blur' }
-        ],
-        content: [
-            { required: true, trigger: 'blur' }
-        ],
-    };
+    private rules = {};
+
+    private setRules() {
+        this.rules = {
+            title: [
+                { required: true, trigger: 'blur' }
+            ],
+            content: [
+                { required: true, trigger: 'blur' }
+            ],
+            setPublishAt: [{
+                validator: (rule, value, callback) => {
+                    let { detail } = this.innerDetail;
+                    if (detail.setPublish && !detail.setPublishAt) {
+                        callback(new Error('请填写发布时间'));
+                    } else {
+                        callback();
+                    }
+                },
+                trigger: 'blur'
+            }],
+        }
+    }
+
     $refs: { formVaild: IForm, editor: IMyEditor, upload: IMyUpload, loadView: ILoadView };
 
     mounted() {
@@ -86,6 +106,7 @@ export default class ArticleDetail extends ArticleMgtBase {
         }
         this.coverList = detail.detail.coverUrl ? [{ url: detail.detail.coverUrl }] : [];
         this.innerDetail = detail;
+        this.setRules();
         return detail;
     }
 
@@ -150,6 +171,7 @@ export default class ArticleDetail extends ArticleMgtBase {
                 {[
                     '状态: ' + detail.statusText,
                     '创建于: ' + moment(detail.createdAt).format(dev.dateFormat),
+                    detail.publishAt && ('发布于:' + moment(detail.publishAt).format(dev.dateFormat)),
                 ].map(ele => {
                     return (<span style={{ marginLeft: '5px' }}>{ele}</span>);
                 })}
@@ -198,7 +220,7 @@ export default class ArticleDetail extends ArticleMgtBase {
         return (
             <div>
                 <h3>{detail._id ? '修改' : '新增'}</h3>
-                <Form label-width={50} ref="formVaild" props={{ model: detail }} rules={this.rules}>
+                <Form label-width={90} ref="formVaild" props={{ model: detail }} rules={this.rules}>
                     <FormItem label="" prop="header" v-show={!detail._id}>
                         {!!detail._id && this.renderHeader(detail)}
                     </FormItem>
@@ -237,6 +259,10 @@ export default class ArticleDetail extends ArticleMgtBase {
                                     });
                                 });
                             })} />
+                    </FormItem>
+                    <FormItem label="指定时间发布" prop="setPublishAt">
+                        <Checkbox v-model={detail.setPublish} />
+                        <DatePicker v-model={detail.setPublishAt} type="datetime" />
                     </FormItem>
                     <FormItem label="备注" prop="remark">
                         <Input v-model={detail.remark} />
