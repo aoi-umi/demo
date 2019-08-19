@@ -71,6 +71,7 @@ export class ArticleMapper {
         let userId = opt.userId && Types.ObjectId(opt.userId);
         if (opt.normal) {
             match.status = myEnum.articleStatus.审核通过;
+            match.publishAt = { $lte: new Date() };
         } else if (opt.audit) {
             //排除非本人的草稿
             match.$expr = {
@@ -195,7 +196,7 @@ export class ArticleMapper {
         opt = {
             ...opt,
         };
-        let cond: any = { _id: idList };
+        let cond: any = { _id: { $in: idList } };
         if (opt.status !== undefined)
             cond.status = opt.status;
         if (opt.includeUserId)
@@ -203,12 +204,40 @@ export class ArticleMapper {
         let list = await ArticleModel.find(cond);
         if (!list.length)
             throw error('', config.error.NO_MATCH_DATA);
+        let bulk = [];
+        //指定时间发布
+        if (status === myEnum.articleStatus.审核通过) {
+            let now = new Date();
+            bulk = list.map(ele => {
+                let update = { status, publishAt: now };
+                if (ele.setPublish && ele.setPublishAt && ele.setPublishAt.getTime() > now.getTime()) {
+                    update.publishAt = ele.setPublishAt;
+                }
+                return {
+                    updateOne: {
+                        filter: { ...cond, _id: ele._id },
+                        update: {
+                            $set: update
+                        }
+                    }
+                }
+            });
+        } else {
+            bulk = [{
+                updateMany: {
+                    filter: cond,
+                    update: {
+                        $set: { status }
+                    }
+                }
+            }]
+        }
         let log = list.map(ele => {
             return ArticleLogMapper.create(ele, user, { srcStatus: ele.status, destStatus: status, remark: opt.logRemark });
         });
 
         await transaction(async (session) => {
-            let rs = await ArticleModel.updateMany(cond, { status }, { session });
+            await ArticleModel.bulkWrite(bulk, { session });
             await ArticleLogModel.insertMany(log, { session });
         });
         return {

@@ -59,4 +59,14 @@ export class ContentBase extends Base implements IVoteOwner {
         default: ''
     })
     remark: string;
+
+    @prop()
+    setPublish: boolean;
+
+    @prop()
+    setPublishAt: Date;
+
+    //发布时间
+    @prop()
+    publishAt: Date;
 }

@@ -250,47 +250,53 @@ export default class UserInfo extends Base {
     avatarList = [];
     async toggleUpdate(show: boolean) {
         this.updateShow = show;
-        this.updateDetail = {
-            ...this.getUpdateUser(),
-            avatar: this.detail.avatar,
-            avatarUrl: this.detail.avatarUrl,
-            nickname: this.detail.nickname,
-            profile: this.detail.profile,
-        };
-        this.avatarList = this.updateDetail.avatarUrl ? [{ url: this.updateDetail.avatarUrl }] : [];
+        if (show) {
+            this.updateDetail = {
+                ...this.getUpdateUser(),
+                avatar: this.detail.avatar,
+                avatarUrl: this.detail.avatarUrl,
+                nickname: this.detail.nickname,
+                profile: this.detail.profile,
+            };
+            this.avatarList = this.updateDetail.avatarUrl ? [{ url: this.updateDetail.avatarUrl }] : [];
+            this.setRules();
+        }
     }
-    private rules = {
-        pwd: [{
-            validator: (rule, value, callback) => {
-                if (this.updateDetail.newPwd && !value) {
-                    callback(new Error('请输入密码'));
-                } else {
-                    callback();
-                }
-            },
-            trigger: 'blur'
-        }],
-        newPwd: [{
-            validator: (rule, value, callback) => {
-                if (value && value === this.updateDetail.pwd) {
-                    callback(new Error('新旧密码相同'));
-                } else {
-                    callback();
-                }
-            },
-            trigger: 'blur'
-        }],
-        newPwdRepeat: [{
-            validator: (rule, value, callback) => {
-                if (this.updateDetail.newPwd && value !== this.updateDetail.newPwd) {
-                    callback(new Error('两次输入密码不一致'));
-                } else {
-                    callback();
-                }
-            },
-            trigger: 'blur'
-        }],
-    };
+    private rules = {};
+    private setRules() {
+        this.rules = {
+            pwd: [{
+                validator: (rule, value, callback) => {
+                    if (this.updateDetail.newPwd && !value) {
+                        callback(new Error('请输入密码'));
+                    } else {
+                        callback();
+                    }
+                },
+                trigger: 'blur'
+            }],
+            newPwd: [{
+                validator: (rule, value, callback) => {
+                    if (value && value === this.updateDetail.pwd) {
+                        callback(new Error('新旧密码相同'));
+                    } else {
+                        callback();
+                    }
+                },
+                trigger: 'blur'
+            }],
+            newPwdRepeat: [{
+                validator: (rule, value, callback) => {
+                    if (this.updateDetail.newPwd && value !== this.updateDetail.newPwd) {
+                        callback(new Error('两次输入密码不一致'));
+                    } else {
+                        callback();
+                    }
+                },
+                trigger: 'blur'
+            }],
+        };
+    }
 
     handleUpdate() {
         this.operateHandler('修改', async () => {
