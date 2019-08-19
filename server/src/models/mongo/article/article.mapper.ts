@@ -11,6 +11,7 @@ import { BaseMapper } from '../_base';
 import { UserModel } from '../user';
 import { FileMapper } from '../file';
 
+import { VoteModel } from '../vote';
 import { ArticleInstanceType, ArticleModel } from "./article";
 import { ArticleLogModel } from './article-log';
 
@@ -30,6 +31,7 @@ export class ArticleMapper {
     static async query(data: AritcleQuery, opt: {
         noTotal?: boolean,
     } & ArticleQueryOption) {
+        opt = { ...opt };
         let match: any = {};
 
         if (data._id) {
@@ -50,6 +52,8 @@ export class ArticleMapper {
             and.push({
                 $or: [
                     { title: anykey },
+                    { content: anykey },
+                    { profile: anykey },
                     { 'user.nickname': anykey },
                     { 'user.account': anykey },
                 ]
@@ -110,7 +114,7 @@ export class ArticleMapper {
                 ...pipeline,
                 {
                     $lookup: {
-                        from: ArticleModel.collection.collectionName,
+                        from: VoteModel.collection.collectionName,
                         let: { articleId: '$_id' },
                         pipeline: [{
                             $match: {
@@ -125,7 +129,6 @@ export class ArticleMapper {
             ];
         }
 
-        opt = { ...opt };
         let rs = await ArticleModel.aggregatePaginate(pipeline, {
             ...BaseMapper.getListOptions(data),
             ...opt,
@@ -133,9 +136,8 @@ export class ArticleMapper {
         rs.rows = rs.rows.map(ele => {
             let e = new ArticleModel(ele).toJSON();
             e.user = ele.user;
-            if (opt.resetOpt)
-                this.resetDetail(e, opt.resetOpt);
-            return e;
+            e.vote = ele.vote;
+            return this.resetDetail(e, resetOpt);
         });
         return rs;
     }
@@ -181,6 +183,8 @@ export class ArticleMapper {
             detail.user.avatarUrl = FileMapper.getImgUrl(detail.user.avatar, opt.imgHost);
         }
         detail.voteValue = detail.vote ? detail.vote.value : myEnum.voteValue.无;
+        delete detail.vote;
+        return detail;
     }
 
     static async updateStatus(idList: Types.ObjectId[], status: number, user: LoginUser, opt?: {

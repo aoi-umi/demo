@@ -129,6 +129,7 @@ export class CommentMapper {
             };
         }
         detail.voteValue = detail.vote ? detail.vote.value : myEnum.voteValue.无;
+        delete detail.vote;
         if (user) {
             let rs = {
                 canDel: detail.status !== myEnum.commentStatus.已删除
