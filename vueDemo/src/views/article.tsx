@@ -119,19 +119,21 @@ export default class Article extends Base {
                                     <Row style={{ marginLeft: '40px' }} nativeOn-click={() => {
                                         this.toDetail(ele);
                                     }}>
-                                        {ele.coverUrl ?
-                                            [
-                                                <Col xs={10} md={4}><MyImg class=" my-upload-item cover" style={{
-                                                    border: '1px solid #e2e4e6',
-                                                    borderRadius: '5px'
-                                                }} src={ele.coverUrl} /></Col>,
-                                                <Col xs={14} md={20} style={{ paddingLeft: '5px', overflowY: 'hidden', maxHeight: '150px' }}>
-                                                    <p domPropsInnerHTML={ele.content}></p>
-                                                </Col>] :
-                                            <Col style={{ overflowY: 'hidden', maxHeight: '150px' }}>
-                                                <p domPropsInnerHTML={ele.content}></p>
-                                            </Col>
-                                        }
+                                        <Col style={{
+                                            display: 'flex',
+                                            alignItems: 'flex-start',
+                                            flexWrap: 'wrap',
+                                        }}>
+                                            {ele.coverUrl && <MyImg class=" my-upload-item cover" style={{
+                                                border: '1px solid #e2e4e6',
+                                                borderRadius: '5px',
+                                                marginRight: '5px',
+                                                marginBottom: '5px',
+                                            }} src={ele.coverUrl} />}
+                                            <p style={{
+                                                overflowY: 'hidden', maxHeight: '150px', minWidth: '200px', whiteSpace: 'pre-wrap'
+                                            }}>{ele.profile || dev.defaultArticleProfile}</p>
+                                        </Col>
                                     </Row>
                                     <Divider size="small" />
                                     <Row>
@@ -172,7 +174,7 @@ export default class Article extends Base {
                     }}
                 >
                 </MyList>
-            </div>
+            </div >
         );
     }
 }
