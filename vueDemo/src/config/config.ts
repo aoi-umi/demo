@@ -52,3 +52,4 @@ export const cacheKey = {
 };
 
 export const defaultProfile = '这个人很懒,什么都没写';
+export const defaultArticleProfile = defaultProfile;

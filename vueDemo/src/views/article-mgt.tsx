@@ -225,12 +225,12 @@ export default class Article extends ArticleMgtBase {
             key: 'title',
             minWidth: 120,
         }, {
-            title: '内容',
-            key: 'content',
-            minWidth: 150,
+            title: '简介',
+            key: 'profile',
+            minWidth: 120,
             ellipsis: true,
             render: (h, params) => {
-                return <p domPropsInnerHTML={params.row.content}></p>;
+                return <p style={{ whiteSpace: 'pre-wrap' }}>{params.row.profile}</p>;
             }
         }, {
             title: '用户',
