@@ -1,4 +1,5 @@
 import { Model, InstanceType } from "mongoose-ts-ua";
+import { Types } from "mongoose";
 import { myEnum } from "../../../config";
 import { ArticleMapper, ArticleModel } from "../article";
 import { CommentModel } from "../comment";
@@ -39,5 +40,27 @@ export class VoteMapper {
             });
         }
         return owner;
+    }
+
+    static lookupPipeline(opt: {
+        userId: any;
+        ownerIdKey?: string;
+    }) {
+        return [
+            {
+                $lookup: {
+                    from: VoteModel.collection.collectionName,
+                    let: { ownerId: '$' + (opt.ownerIdKey || '_id') },
+                    pipeline: [{
+                        $match: {
+                            userId: Types.ObjectId(opt.userId),
+                            $expr: { $eq: ['$$ownerId', '$ownerId'] }
+                        }
+                    }],
+                    as: 'vote'
+                }
+            },
+            { $unwind: { path: '$vote', preserveNullAndEmptyArrays: true } },
+        ];
     }
 }

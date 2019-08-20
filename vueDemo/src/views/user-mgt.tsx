@@ -26,6 +26,9 @@ export type DetailDataType = {
     statusText?: string;
     profile?: string;
     disabledTo?: Date;
+    follower?: number;
+    following?: number;
+
     self?: boolean;
 };
 @Component

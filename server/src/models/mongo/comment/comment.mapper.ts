@@ -9,7 +9,8 @@ import { ArticleMapper } from '../article';
 import { UserModel } from '../user';
 import { FileMapper } from '../file';
 import { CommentModel, CommentDocType } from './comment';
-import { VoteModel } from '../vote';
+import { VoteModel, VoteMapper } from '../vote';
+import { FollowMapper } from '../follow';
 
 type CommentResetOption = {
     imgHost?: string;
@@ -68,27 +69,20 @@ export class CommentMapper {
             { $unwind: '$user' },
         ];
         let resetOpt = { ...opt.resetOpt };
+        let extraPipeline = [];
         if (resetOpt.user) {
-            pipeline = [
-                ...pipeline,
-                {
-                    $lookup: {
-                        from: VoteModel.collection.collectionName,
-                        let: { commentId: '$_id' },
-                        pipeline: [{
-                            $match: {
-                                userId: Types.ObjectId(resetOpt.user._id),
-                                $expr: { $eq: ['$$commentId', '$ownerId'] }
-                            }
-                        }],
-                        as: 'vote'
-                    }
-                },
-                { $unwind: { path: '$vote', preserveNullAndEmptyArrays: true } },
+            extraPipeline = [
+                ...VoteMapper.lookupPipeline({
+                    userId: resetOpt.user._id
+                }),
+                ...FollowMapper.lookupPipeline({
+                    userId: resetOpt.user._id,
+                })
             ];
         }
         let rs = await CommentModel.aggregatePaginate(pipeline, {
             ...BaseMapper.getListOptions(data),
+            extraPipeline,
         });
 
         rs.rows = rs.rows.map(detail => {
@@ -116,10 +110,6 @@ export class CommentMapper {
     }
 
     static resetDetail(detail, opt: CommentResetOption) {
-        if (detail.user) {
-            detail.user.avatarUrl = FileMapper.getImgUrl(detail.user.avatar, opt.imgHost);
-        }
-        let { user } = opt;
         if (detail.status !== myEnum.commentStatus.正常) {
             return {
                 _id: detail._id,
@@ -127,8 +117,7 @@ export class CommentMapper {
                 isDel: true,
             };
         }
-        detail.voteValue = detail.vote ? detail.vote.value : myEnum.voteValue.无;
-        delete detail.vote;
+        let { user } = opt;
         if (user) {
             let rs = {
                 canDel: detail.status !== myEnum.commentStatus.已删除
@@ -139,6 +128,13 @@ export class CommentMapper {
             };
             detail.canDel = rs.canDel;
         }
+        if (detail.user) {
+            detail.user.avatarUrl = FileMapper.getImgUrl(detail.user.avatar, opt.imgHost);
+            detail.user.followStatus = detail.follow ? detail.follow.status : myEnum.followStatus.未关注;
+        }
+        delete detail.follow;
+        detail.voteValue = detail.vote ? detail.vote.value : myEnum.voteValue.无;
+        delete detail.vote;
         return detail;
     }
 }
