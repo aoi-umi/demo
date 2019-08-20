@@ -86,7 +86,7 @@ class SignIn extends Base {
             <div class="dialog-view" on-keypress={this.handlePress}>
                 <h3>登录</h3>
                 <br />
-                <Form label-width={50} ref="formVaild" props={{ model: detail }} rules={this.rules}>
+                <Form class="dialog-content" label-width={50} ref="formVaild" props={{ model: detail }} rules={this.rules}>
                     <FormItem label="账号" prop="account">
                         <Input v-model={detail.account} />
                     </FormItem>
@@ -179,7 +179,7 @@ class SignUp extends Base {
             <div class="dialog-view" on-keypress={this.handlePress}>
                 <h3>注册</h3>
                 <br />
-                <Form label-width={100} ref="formVaild" props={{ model: detail }} rules={this.rules}>
+                <Form class="dialog-content" label-width={100} ref="formVaild" props={{ model: detail }} rules={this.rules}>
                     <FormItem label="账号" prop="account">
                         <Input v-model={detail.account} />
                     </FormItem>
@@ -421,43 +421,47 @@ export default class UserInfo extends Base {
                     <div class="dialog-view" on-keypress={this.handlePress}>
                         <h3>修改</h3>
                         <br />
-                        <Form label-width={100} ref="formVaild" props={{ model: this.updateDetail }} rules={this.rules}>
+                        <Form class="dialog-content" ref="formVaild" props={{ model: this.updateDetail }} rules={this.rules}>
                             <FormItem prop="avatar">
-                                <div style={{ textAlign: 'center' }}>
-                                    <MyUpload
-                                        ref='upload'
-                                        headers={testApi.defaultHeaders}
-                                        uploadUrl={testApi.imgUploadUrl}
-                                        successHandler={(res, file) => {
-                                            let rs = testApi.imgUplodaHandler(res);
-                                            file.url = rs.url;
-                                            return rs.fileId;
-                                        }}
-                                        format={['jpg', 'png', 'bmp', 'gif']}
-                                        width={120} height={120}
-                                        cropperOptions={{
-                                            autoCropWidth: 288,
-                                            autoCropHeight: 288,
-                                            fixedNumber: [1, 1],
-                                        }}
-                                        v-model={this.avatarList}
-                                        shape="circle"
-                                    />
-                                </div>
+                                <MyUpload
+                                    class="center"
+                                    ref='upload'
+                                    headers={testApi.defaultHeaders}
+                                    uploadUrl={testApi.imgUploadUrl}
+                                    successHandler={(res, file) => {
+                                        let rs = testApi.imgUplodaHandler(res);
+                                        file.url = rs.url;
+                                        return rs.fileId;
+                                    }}
+                                    format={['jpg', 'png', 'bmp', 'gif']}
+                                    width={120} height={120}
+                                    cropperOptions={{
+                                        autoCropWidth: 288,
+                                        autoCropHeight: 288,
+                                        fixedNumber: [1, 1],
+                                    }}
+                                    v-model={this.avatarList}
+                                    shape="circle"
+                                />
                             </FormItem>
-                            <FormItem label="昵称" prop="nickname">
+                            <FormItem prop="nickname">
+                                <span>昵称</span>
                                 <Input v-model={this.updateDetail.nickname} />
                             </FormItem>
-                            <FormItem label="密码" prop="pwd">
+                            <FormItem prop="pwd">
+                                <span>密码</span>
                                 <Input v-model={this.updateDetail.pwd} type="password" placeholder="不修改密码时不用填" />
                             </FormItem>
-                            <FormItem label="新密码" prop="newPwd">
+                            <FormItem prop="newPwd">
+                                <span>新密码</span>
                                 <Input v-model={this.updateDetail.newPwd} type="password" />
                             </FormItem>
-                            <FormItem label="确认密码" prop="newPwdRepeat">
+                            <FormItem prop="newPwdRepeat">
+                                <span>确认密码</span>
                                 <Input v-model={this.updateDetail.newPwdRepeat} type="password" />
                             </FormItem>
-                            <FormItem label="简介" prop="profile">
+                            <FormItem prop="profile">
+                                <span>简介</span>
                                 <Input v-model={this.updateDetail.profile} type="textarea" />
                             </FormItem>
                             <FormItem>

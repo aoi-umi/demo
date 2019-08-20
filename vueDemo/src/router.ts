@@ -132,16 +132,6 @@ routes.forEach(ele => {
     if (!ele.meta.title) {
         ele.meta.title = ele.text;
     }
-    // if (ele.component) {
-    //   let component: any = ele.component;
-    //   ele.component = () => {
-    //     let auth = ele.meta && ele.meta.authority;
-    //     if (auth && auth.includes(authority.Login) && !store.state.user) {
-    //       return import('./views/user').then(t => t.SignInView);
-    //     }
-    //     return typeof component === 'function' ? component() : component;
-    //   }
-    // }
 });
 
 const router = new Router({
@@ -151,7 +141,7 @@ const router = new Router({
 });
 router.beforeEach((to, from, next) => {
     if (to.path == routerConfig.index.path) {
-        return next(routerConfig.bookmark.path);
+        return next(routerConfig.article.path);
     }
     let auth = to.meta && to.meta.authority;
     let mod = getModule(LoginUserStore, store);

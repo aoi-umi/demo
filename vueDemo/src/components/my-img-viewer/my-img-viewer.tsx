@@ -46,7 +46,7 @@ class MyImgViewer extends Vue {
                                 return (
                                     <CarouselItem>
                                         <div class={clsPrefix + 'item'}>
-                                            <MyImg src={src} style={{ maxHeight: '460px', maxWidth: '800px' }} />
+                                            <MyImg class={clsPrefix + 'img'} src={src} />
                                         </div>
                                     </CarouselItem>
                                 );
