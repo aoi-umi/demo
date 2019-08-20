@@ -71,7 +71,7 @@ export function randStr() {
 
 export function md5(str: string) {
     let md5 = md.md5.create();
-    md5.update(str);
+    md5.update(str, 'utf8');
     return md5.digest().toHex();
 }
 

@@ -122,7 +122,9 @@ class Comment extends Base {
                                             <span style={{ position: 'absolute', right: '5px' }}>
                                                 #{ele.floor}
                                             </span>
-                                            <p style={{ marginLeft: '42px' }} domPropsInnerHTML={ele.comment} />
+                                            <p style={{ marginLeft: '42px' }}>
+                                                评论已删除
+                                            </p>
                                         </div> :
                                         <div style={{ position: 'relative' }}>
                                             <UserAvatarView user={ele.user} tipsPlacement="top-start" />
@@ -139,7 +141,7 @@ class Comment extends Base {
                                                         this.handleVote(ele, ele.voteValue == myEnum.voteValue.喜欢 ? myEnum.voteValue.无 : myEnum.voteValue.喜欢);
                                                     }} />{ele.like}
                                                 </div>
-                                                <span style={{ color: '#798692' }}>{moment(ele.createdAt).format(dev.dateFormat)}</span>
+                                                <span class="not-important">{moment(ele.createdAt).format(dev.dateFormat)}</span>
                                             </div>
                                         </div>
                                     }

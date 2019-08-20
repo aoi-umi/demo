@@ -53,7 +53,7 @@ export default class ArticleDetail extends Base {
                 {[
                     '发布于: ' + moment(detail.publishAt).format(dev.dateFormat),
                 ].map(ele => {
-                    return (<span style={{ marginLeft: '5px' }}>{ele}</span>);
+                    return (<span class="not-important" style={{ marginLeft: '5px' }}>{ele}</span>);
                 })}
             </div>
         );

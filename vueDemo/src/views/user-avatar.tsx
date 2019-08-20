@@ -109,7 +109,7 @@ class UserAvatar extends Base {
                     }}
                 />
                 {this.avatarUrl && <MyImgViewer src={this.avatarUrl} ref='imgViewer' />}
-                <b>{this.user.nickname}{this.showAccount && `(${this.user.account})`}</b>
+                <span class="not-important">{this.user.nickname}{this.showAccount && `(${this.user.account})`}</span>
                 {this.self ?
                     <div slot="content">
                         <p class="ivu-select-item" on-click={() => {

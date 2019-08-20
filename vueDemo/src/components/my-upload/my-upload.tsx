@@ -269,6 +269,13 @@ class MyUpload extends Vue {
     protected render() {
         let width = this.width + 'px',
             height = this.height + 'px';
+        let cropperSize = { width: '1024px', height: '576px' };
+        if (document.body.clientWidth < 1024) {
+            cropperSize = {
+                width: document.body.clientWidth + 'px',
+                height: (document.body.clientHeight - 50) + 'px'
+            }
+        }
         return (
             <div>
                 {this.fileList.map(item => {
@@ -327,7 +334,7 @@ class MyUpload extends Vue {
                 <transition name="fade">
                     <div class={[style.cls.mask]} v-show={this.cropperShow}>
                         <div style={{ textAlign: 'center', width: '100%' }}>
-                            <div style={{ width: '1024px', height: '576px', display: 'inline-block' }}>
+                            <div style={{ ...cropperSize, display: 'inline-block' }}>
                                 <VueCropper
                                     ref="cropper"
                                     props={this.cropper}

@@ -111,7 +111,10 @@ body {
 }
 
 .dialog-view {
-  max-width: 400px;
+  .dialog-content {
+    max-width: 400px;
+    margin: 0 auto;
+  }
 }
 
 button {
@@ -119,8 +122,15 @@ button {
 }
 
 .cover {
-  width: 160px;
-  height: 90px;
+  width: 160px !important;
+  height: 90px !important;
+}
+
+@media (max-width: 800px) {
+  .cover {
+    width: 144px !important;
+    height: 81px !important;
+  }
 }
 
 .article-mgt-detail-content .ql-editor {
@@ -146,4 +156,8 @@ button {
 }
 .shadow {
   box-shadow: 1px 1px 5px #888888;
+}
+
+.not-important {
+  color: #798692;
 }

@@ -173,7 +173,7 @@ export default class ArticleDetail extends ArticleMgtBase {
                     '创建于: ' + moment(detail.createdAt).format(dev.dateFormat),
                     detail.publishAt && ('发布于:' + moment(detail.publishAt).format(dev.dateFormat)),
                 ].map(ele => {
-                    return (<span style={{ marginLeft: '5px' }}>{ele}</span>);
+                    return (<span class="not-important" style={{ marginLeft: '5px' }}>{ele}</span>);
                 })}
             </div>
         );

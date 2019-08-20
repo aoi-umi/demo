@@ -156,6 +156,7 @@ export default class App extends Base {
                                     to: routeConfig.bookmark.path,
                                     icon: 'md-home',
                                     text: routeConfig.bookmark.text,
+                                    show: false,
                                 }, {
                                     to: routeConfig.article.path,
                                     icon: 'md-paper',

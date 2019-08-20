@@ -125,7 +125,6 @@ export class CommentMapper {
                 _id: detail._id,
                 floor: detail.floor,
                 isDel: true,
-                comment: '评论已删除'
             };
         }
         detail.voteValue = detail.vote ? detail.vote.value : myEnum.voteValue.无;

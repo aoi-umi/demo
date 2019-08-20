@@ -106,23 +106,32 @@ export default class Article extends Base {
                             return (
                                 <Card style={{ marginTop: '5px', cursor: 'pointer' }}>
                                     <Row>
-                                        <Col xs={4}>
-                                            <UserAvatarView user={ele.user} tipsPlacement="top-start" />
-                                        </Col>
-                                        <Col xs={20} nativeOn-click={() => {
+                                        <Col style={{ marginLeft: '40px' }} nativeOn-click={() => {
                                             this.toDetail(ele);
                                         }}>
                                             <h3 class="article-list-title" title={ele.title}>{ele.title}</h3>
-                                            发布于 {moment(ele.publishAt).format(dev.dateFormat)}
+                                        </Col>
+                                        <Col style={{ marginTop: '2px', marginBottom: '2px' }}>
+                                            <UserAvatarView user={ele.user} tipsPlacement="top-start" />
+                                            <span class="not-important" style={{ marginLeft: '5px' }}>发布于 {moment(ele.publishAt).format(dev.dateFormat)}</span>
                                         </Col>
                                     </Row>
-                                    <Row nativeOn-click={() => {
+                                    <Row style={{ marginLeft: '40px' }} nativeOn-click={() => {
                                         this.toDetail(ele);
                                     }}>
-                                        <Col xs={4}><MyImg class="cover" src={ele.coverUrl} /></Col>
-                                        <Col xs={20} style={{ overflowY: 'hidden', maxHeight: '150px' }}>
-                                            <p domPropsInnerHTML={ele.content}></p>
-                                        </Col>
+                                        {ele.coverUrl ?
+                                            [
+                                                <Col xs={10} md={4}><MyImg class=" my-upload-item cover" style={{
+                                                    border: '1px solid #e2e4e6',
+                                                    borderRadius: '5px'
+                                                }} src={ele.coverUrl} /></Col>,
+                                                <Col xs={14} md={20} style={{ overflowY: 'hidden', maxHeight: '150px' }}>
+                                                    <p domPropsInnerHTML={ele.content}></p>
+                                                </Col>] :
+                                            <Col style={{ overflowY: 'hidden', maxHeight: '150px' }}>
+                                                <p domPropsInnerHTML={ele.content}></p>
+                                            </Col>
+                                        }
                                     </Row>
                                     <Divider size="small" />
                                     <Row>
