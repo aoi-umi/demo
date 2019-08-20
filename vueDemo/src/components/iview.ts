@@ -6,6 +6,7 @@ import { convClass } from "../helpers";
 export const AutoComplete = convClass<iviewTypes.AutoComplete>(iview.AutoComplete);
 export const Avatar = convClass<iviewTypes.Avatar>(iview.Avatar);
 export const BackTop = convClass<iviewTypes.BackTop>(iview.BackTop);
+export const Badge = convClass<iviewTypes.Badge>(iview.Badge);
 export const Button = convClass<iviewTypes.Button>(iview.Button);
 export const Card = convClass<iviewTypes.Card>(iview.Card);
 export const Carousel = convClass<iviewTypes.Carousel>(iview.Carousel);
@@ -56,8 +57,10 @@ export const Sider = convClass<{
 export const Spin = convClass<iviewTypes.Spin>(iview.Spin);
 export const Switch = convClass<iviewTypes.Switch>(iview.Switch);
 export const Table = convClass<iviewTypes.Table>(iview.Table);
-export const Transfer = convClass<iviewTypes.Transfer>(iview.Transfer);
+export const Tabs = convClass<iviewTypes.Tabs>(iview.Tabs);
+export const TabPane = convClass<iviewTypes.TabPane>(iview.TabPane);
 export const Tag = convClass<iviewTypes.Tag>(iview.Tag);
 export const Tooltip = convClass<iviewTypes.Tooltip>(iview.Tooltip);
+export const Transfer = convClass<iviewTypes.Transfer>(iview.Transfer);
 export const Upload = convClass<iviewTypes.Upload>(iview.Upload);
 

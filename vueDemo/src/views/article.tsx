@@ -112,7 +112,7 @@ export default class Article extends Base {
                                             <h3 class="article-list-title" title={ele.title}>{ele.title}</h3>
                                         </Col>
                                         <Col style={{ marginTop: '2px', marginBottom: '2px' }}>
-                                            <UserAvatarView user={ele.user} tipsPlacement="top-start" />
+                                            <UserAvatarView user={ele.user} tipsPlacement="bottom-start" />
                                             <span class="not-important" style={{ marginLeft: '5px' }}>发布于 {moment(ele.publishAt).format(dev.dateFormat)}</span>
                                         </Col>
                                     </Row>
@@ -125,7 +125,7 @@ export default class Article extends Base {
                                                     border: '1px solid #e2e4e6',
                                                     borderRadius: '5px'
                                                 }} src={ele.coverUrl} /></Col>,
-                                                <Col xs={14} md={20} style={{ overflowY: 'hidden', maxHeight: '150px' }}>
+                                                <Col xs={14} md={20} style={{ paddingLeft: '5px', overflowY: 'hidden', maxHeight: '150px' }}>
                                                     <p domPropsInnerHTML={ele.content}></p>
                                                 </Col>] :
                                             <Col style={{ overflowY: 'hidden', maxHeight: '150px' }}>

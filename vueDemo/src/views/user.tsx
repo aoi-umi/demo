@@ -6,7 +6,7 @@ import { convClass } from '@/helpers';
 import * as helpers from '@/helpers';
 import { dev } from '@/config';
 import { testApi } from '@/api';
-import { Modal, Input, Form, FormItem, Button, Card } from '@/components/iview';
+import { Modal, Input, Form, FormItem, Button, Card, TabPane, Tabs } from '@/components/iview';
 import { MyTagModel } from '@/components/my-tag';
 import { LoginUser } from '@/model/user';
 import { MyUpload, IMyUpload } from '@/components/my-upload';
@@ -373,36 +373,50 @@ export default class UserInfo extends Base {
                 {detail.self && <a on-click={() => {
                     this.toggleUpdate(true);
                 }} style={{ marginLeft: '5px' }}>修改</a>}
-                {detail.self ?
-                    <Form class="form-no-error" label-width={60}>
-                        <FormItem label="状态">
-                            {detail.statusText}
-                        </FormItem>
-                        <FormItem label="简介">
-                            {detail.profile || dev.defaultProfile}
-                        </FormItem>
-                        <FormItem label="角色">
-                            {MyTagModel.renderRoleTag(detail.roleList, true)}
-                        </FormItem>
-                        <FormItem label="权限">
-                            {MyTagModel.renderAuthorityTag(detail.authorityList, true)}
-                        </FormItem>
-                        <FormItem label="可用权限">
-                            {MyTagModel.renderAuthorityTag(Object.values(detail.auth), true)}
-                        </FormItem>
-                        <FormItem label="注册时间">
-                            {detail.createdAt && moment(detail.createdAt).format(dev.dateFormat)}
-                        </FormItem>
-                    </Form> :
-                    <Form class="form-no-error" label-width={60}>
-                        <FormItem label="简介">
-                            {detail.profile || dev.defaultProfile}
-                        </FormItem>
-                        <FormItem label="注册时间">
-                            {detail.createdAt && moment(detail.createdAt).format(dev.dateFormat)}
-                        </FormItem>
-                    </Form>
-                }
+                <Tabs>
+                    <TabPane label="概览">
+                        {detail.self ?
+                            <Form class="form-no-error" label-width={60}>
+                                <FormItem label="状态">
+                                    {detail.statusText}
+                                </FormItem>
+                                <FormItem label="简介">
+                                    {detail.profile || dev.defaultProfile}
+                                </FormItem>
+                                <FormItem label="角色">
+                                    {MyTagModel.renderRoleTag(detail.roleList, true)}
+                                </FormItem>
+                                <FormItem label="权限">
+                                    {MyTagModel.renderAuthorityTag(detail.authorityList, true)}
+                                </FormItem>
+                                <FormItem label="可用权限">
+                                    {MyTagModel.renderAuthorityTag(Object.values(detail.auth), true)}
+                                </FormItem>
+                                <FormItem label="注册时间">
+                                    {detail.createdAt && moment(detail.createdAt).format(dev.dateFormat)}
+                                </FormItem>
+                            </Form> :
+                            <Form class="form-no-error" label-width={60}>
+                                <FormItem label="简介">
+                                    {detail.profile || dev.defaultProfile}
+                                </FormItem>
+                                <FormItem label="注册时间">
+                                    {detail.createdAt && moment(detail.createdAt).format(dev.dateFormat)}
+                                </FormItem>
+                            </Form>
+                        }
+                    </TabPane>
+                    <TabPane label={() => {
+                        return <div>粉丝: {detail.follower}</div>
+                    }}>
+                        还没写
+                    </TabPane>
+                    <TabPane label={() => {
+                        return <div>关注: {detail.following}</div>
+                    }}>
+                        还没写
+                    </TabPane>
+                </Tabs>
             </Card>
         );
     }

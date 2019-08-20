@@ -11,9 +11,10 @@ import { BaseMapper } from '../_base';
 import { UserModel } from '../user';
 import { FileMapper } from '../file';
 
-import { VoteModel } from '../vote';
+import { VoteModel, VoteMapper } from '../vote';
 import { ArticleInstanceType, ArticleModel } from "./article";
 import { ArticleLogModel } from './article-log';
+import { FollowMapper } from '../follow';
 
 type ArticleResetOption = {
     user?: LoginUser,
@@ -110,34 +111,28 @@ export class ArticleMapper {
             { $match: match },
         ];
         let resetOpt = { ...opt.resetOpt };
+        let extraPipeline = [];
         if (opt.normal && resetOpt.user) {
-            pipeline = [
-                ...pipeline,
-                {
-                    $lookup: {
-                        from: VoteModel.collection.collectionName,
-                        let: { articleId: '$_id' },
-                        pipeline: [{
-                            $match: {
-                                userId: Types.ObjectId(resetOpt.user._id),
-                                $expr: { $eq: ['$$articleId', '$ownerId'] }
-                            }
-                        }],
-                        as: 'vote'
-                    }
-                },
-                { $unwind: { path: '$vote', preserveNullAndEmptyArrays: true } },
+            extraPipeline = [
+                ...VoteMapper.lookupPipeline({
+                    userId: resetOpt.user._id
+                }),
+                ...FollowMapper.lookupPipeline({
+                    userId: resetOpt.user._id,
+                })
             ];
         }
 
         let rs = await ArticleModel.aggregatePaginate(pipeline, {
             ...BaseMapper.getListOptions(data),
             ...opt,
+            extraPipeline,
         });
         rs.rows = rs.rows.map(ele => {
-            let e = new ArticleModel(ele).toJSON();
-            e.user = ele.user;
-            e.vote = ele.vote;
+            let e = {
+                ...ele,
+                ...new ArticleModel(ele).toJSON()
+            };
             return this.resetDetail(e, resetOpt);
         });
         return rs;
@@ -182,7 +177,9 @@ export class ArticleMapper {
         detail.coverUrl = FileMapper.getImgUrl(detail.cover, opt.imgHost);
         if (detail.user) {
             detail.user.avatarUrl = FileMapper.getImgUrl(detail.user.avatar, opt.imgHost);
+            detail.user.followStatus = detail.follow ? detail.follow.status : myEnum.followStatus.未关注;
         }
+        delete detail.follow;
         detail.voteValue = detail.vote ? detail.vote.value : myEnum.voteValue.无;
         delete detail.vote;
         return detail;

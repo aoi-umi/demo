@@ -49,7 +49,7 @@ export default class ArticleDetail extends Base {
     renderHeader(detail: DetailDataType) {
         return (
             <div>
-                <UserAvatarView user={detail.user} tipsPlacement="top-start" />
+                <UserAvatarView user={detail.user} tipsPlacement="bottom-start" />
                 {[
                     '发布于: ' + moment(detail.publishAt).format(dev.dateFormat),
                 ].map(ele => {
