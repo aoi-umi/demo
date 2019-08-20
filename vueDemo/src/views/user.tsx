@@ -2,9 +2,9 @@ import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { Form as IForm } from 'iview';
 import moment from 'moment';
 
-import { convClass } from '@/helpers';
+import { convClass, convert } from '@/helpers';
 import * as helpers from '@/helpers';
-import { dev } from '@/config';
+import { dev, myEnum } from '@/config';
 import { testApi } from '@/api';
 import { Modal, Input, Form, FormItem, Button, Card, TabPane, Tabs } from '@/components/iview';
 import { MyTagModel } from '@/components/my-tag';
@@ -14,6 +14,7 @@ import { DetailDataType as UserDetailDataType } from './user-mgt';
 import { Base } from './base';
 import { LoadView, ILoadView } from './load-view';
 import { UserAvatarView } from './user-avatar';
+import { MyList, IMyList, ResultType } from '@/components/my-list';
 
 
 type SignInDataType = {
@@ -232,7 +233,10 @@ export default class UserInfo extends Base {
         return detail;
     }
 
-    $refs: { formVaild: IForm, loadView: ILoadView, upload: IMyUpload };
+    $refs: {
+        formVaild: IForm, loadView: ILoadView, upload: IMyUpload,
+        followerList: IMyList<any>, followingList: IMyList<any>,
+    };
     updateLoading = false;
     private getUpdateUser() {
         return {
@@ -365,6 +369,40 @@ export default class UserInfo extends Base {
         }
     }
 
+    private async followQuery(type, opt?) {
+        opt = {
+            ...opt,
+            type,
+        };
+        if (type == myEnum.followQueryType.粉丝)
+            await this.$refs.followerList.query(opt);
+        else
+            await this.$refs.followingList.query(opt);
+    }
+
+    private async followQueryFn(data) {
+        let rs = await testApi.followQuery(data);
+        return rs;
+    }
+
+    private renderFollow(type: number, rs: ResultType) {
+        if (!rs.success || !rs.data.length) {
+            let msg = !rs.success ? rs.msg : '空空的';
+            return (
+                <Card class="center" style={{ marginTop: '5px' }}>{msg}</Card>
+            );
+        }
+        return rs.data.map(ele => {
+            let user = type == myEnum.followQueryType.粉丝 ? ele.followerUser : ele.followingUser;
+            return (
+                <Card>
+                    <UserAvatarView user={user} />
+                    <span style={{ marginLeft: '5px' }}>{user.profile || dev.defaultProfile}</span>
+                </Card>
+            )
+        });
+    }
+
     renderInfo() {
         let detail = this.detail;
         return (
@@ -409,12 +447,36 @@ export default class UserInfo extends Base {
                     <TabPane label={() => {
                         return <div>粉丝: {detail.follower}</div>
                     }}>
-                        还没写
+                        <MyList
+                            ref="followerList"
+                            type="custom"
+                            on-query={(t) => {
+                                this.followQuery(myEnum.followQueryType.粉丝);
+                            }}
+
+                            queryFn={this.followQueryFn}
+
+                            customRenderFn={(rs) => {
+                                return this.renderFollow(myEnum.followQueryType.粉丝, rs);
+                            }}
+                        />
                     </TabPane>
                     <TabPane label={() => {
                         return <div>关注: {detail.following}</div>
                     }}>
-                        还没写
+                        <MyList
+                            ref="followingList"
+                            type="custom"
+                            on-query={(t) => {
+                                this.followQuery(myEnum.followQueryType.关注);
+                            }}
+
+                            queryFn={this.followQueryFn}
+
+                            customRenderFn={(rs) => {
+                                return this.renderFollow(myEnum.followQueryType.关注, rs);
+                            }}
+                        />
                     </TabPane>
                 </Tabs>
             </Card>
@@ -476,7 +538,7 @@ export default class UserInfo extends Base {
                             </FormItem>
                             <FormItem prop="profile">
                                 <span>简介</span>
-                                <Input v-model={this.updateDetail.profile} type="textarea" />
+                                <Input v-model={this.updateDetail.profile} placeholder={dev.defaultProfile} type="textarea" />
                             </FormItem>
                             <FormItem>
                                 <Button type="primary" long on-click={this.handleUpdate} loading={this.updateLoading}>修改</Button>

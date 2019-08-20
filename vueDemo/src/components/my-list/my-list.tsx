@@ -26,7 +26,7 @@ export const Const = {
     clsPrefix
 };
 
-type ResultType = {
+export type ResultType = {
     success: boolean,
     total: number,
     msg: string,

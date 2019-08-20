@@ -8,7 +8,7 @@ import { Auth } from '../../../_system/auth';
 import { transaction } from '../../../_system/dbMongo';
 import { LoginUser } from '../../login-user';
 import { BaseMapper } from '../_base';
-import { UserModel } from '../user';
+import { UserModel, UserMapper } from '../user';
 import { FileMapper } from '../file';
 
 import { VoteModel, VoteMapper } from '../vote';
@@ -89,25 +89,7 @@ export class ArticleMapper {
         }
 
         let pipeline: any[] = [
-            {
-                $lookup: {
-                    from: UserModel.collection.collectionName,
-                    let: { userId: '$userId' },
-                    pipeline: [{
-                        $match: {
-                            $expr: { $eq: ['$$userId', '$_id'] }
-                        }
-                    }, {
-                        $project: {
-                            account: 1,
-                            nickname: 1,
-                            avatar: 1,
-                        }
-                    }],
-                    as: 'user'
-                }
-            },
-            { $unwind: '$user' },
+            ...UserMapper.lookupPipeline(),
             { $match: match },
         ];
         let resetOpt = { ...opt.resetOpt };

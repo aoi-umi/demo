@@ -276,6 +276,39 @@ export class UserMapper {
     }) {
         detail.avatarUrl = FileMapper.getImgUrl(detail.avatar, opt.imgHost);
     }
+
+    static lookupPipeline(opt?: {
+        userIdKey?: string;
+        asName?: string;
+        project?: object;
+    }) {
+        opt = {
+            ...opt
+        };
+        let asName = opt.asName || 'user';
+        return [
+            {
+                $lookup: {
+                    from: UserModel.collection.collectionName,
+                    let: { userId: '$' + (opt.userIdKey || 'userId') },
+                    pipeline: [{
+                        $match: {
+                            $expr: { $eq: ['$$userId', '$_id'] }
+                        }
+                    }, {
+                        $project: {
+                            account: 1,
+                            nickname: 1,
+                            avatar: 1,
+                            ...opt.project,
+                        }
+                    }],
+                    as: asName
+                }
+            },
+            { $unwind: '$' + asName },
+        ];
+    }
 }
 
 export class UserLogMapper {

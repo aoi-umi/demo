@@ -6,7 +6,7 @@ import { myEnum } from '../../../config';
 import { LoginUser } from '../../login-user';
 import { BaseMapper, ContentBaseInstanceType } from '../_base';
 import { ArticleMapper } from '../article';
-import { UserModel } from '../user';
+import { UserModel, UserMapper } from '../user';
 import { FileMapper } from '../file';
 import { CommentModel, CommentDocType } from './comment';
 import { VoteModel, VoteMapper } from '../vote';
@@ -48,25 +48,7 @@ export class CommentMapper {
             {
                 $match: match
             },
-            {
-                $lookup: {
-                    from: UserModel.collection.collectionName,
-                    let: { userId: '$userId' },
-                    pipeline: [{
-                        $match: {
-                            $expr: { $eq: ['$$userId', '$_id'] }
-                        }
-                    }, {
-                        $project: {
-                            account: 1,
-                            nickname: 1,
-                            avatar: 1,
-                        }
-                    }],
-                    as: 'user'
-                }
-            },
-            { $unwind: '$user' },
+            ...UserMapper.lookupPipeline(),
         ];
         let resetOpt = { ...opt.resetOpt };
         let extraPipeline = [];

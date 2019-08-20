@@ -48,6 +48,7 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
 
     voteSubmit,
     followSave,
+    followQuery,
 
     //file
     imgUpload,
@@ -244,6 +245,9 @@ export class TestApi extends ApiModel<TestApiMethod> {
     //#region follow 
     async followSave(data) {
         return this.requestByConfig(this.apiConfig.method.followSave, { data });
+    }
+    async followQuery(data) {
+        return this.requestByConfig(this.apiConfig.method.followQuery, { data });
     }
     //#endregion
 }

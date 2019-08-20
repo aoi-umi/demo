@@ -71,6 +71,7 @@ router.post('/vote/submit', UserAuthMid.normal([auth.login]), vote.submit);
 //#region follow 
 import * as follow from './follow';
 router.post('/follow/save', UserAuthMid.normal([auth.login]), follow.save);
+router.get('/follow/query', UserAuthMid.normal([auth.login]), follow.query);
 //#endregion
 
 //#region file 
