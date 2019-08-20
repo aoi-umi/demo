@@ -42,6 +42,10 @@ export const enumDefine = {
         已关注: 1,
         已取消: -1,
     },
+    followQueryType: {
+        关注: 1,
+        粉丝: 2
+    },
 
     socket: {
         弹幕发送: 'danmakuSend',

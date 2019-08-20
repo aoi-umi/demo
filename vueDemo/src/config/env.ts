@@ -152,6 +152,10 @@ const config = {
                 followSave: {
                     url: '/follow/save',
                 },
+                followQuery: {
+                    url: '/follow/query',
+                    method: 'get',
+                },
                 //file
 
                 imgUpload: {
