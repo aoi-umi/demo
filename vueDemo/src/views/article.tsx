@@ -2,7 +2,7 @@ import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import moment from 'moment';
 import { testApi } from '@/api';
 import { myEnum, authority, dev } from '@/config';
-import { Card, Input, Row, Col, Icon, Divider } from '@/components/iview';
+import { Card, Input, Row, Col, Icon, Divider, Time } from '@/components/iview';
 import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
 import { MyImg } from '@/components/my-img';
 import { convert } from '@/helpers';
@@ -105,15 +105,27 @@ export default class Article extends Base {
                             }];
                             return (
                                 <Card style={{ marginTop: '5px', cursor: 'pointer' }}>
-                                    <Row>
+                                    <Row >
                                         <Col style={{ marginLeft: '40px' }} nativeOn-click={() => {
                                             this.toDetail(ele);
                                         }}>
                                             <h3 class="article-list-title" title={ele.title}>{ele.title}</h3>
                                         </Col>
-                                        <Col style={{ marginTop: '2px', marginBottom: '2px' }}>
+                                        <Col style={{
+                                            marginTop: '2px', marginBottom: '2px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                        }}>
                                             <UserAvatarView user={ele.user} tipsPlacement="bottom-start" />
-                                            <span class="not-important" style={{ marginLeft: '5px' }}>发布于 {moment(ele.publishAt).format(dev.dateFormat)}</span>
+                                            <span class="not-important" style={{ marginLeft: '5px' }} on-click={() => {
+                                                this.toDetail(ele);
+                                            }}>发布于 <Time time={new Date(ele.publishAt)} /></span>
+                                            <div style={{
+                                                flex: '1 1 auto',
+                                                alignSelf: 'stretch',
+                                            }} on-click={() => {
+                                                this.toDetail(ele);
+                                            }}></div>
                                         </Col>
                                     </Row>
                                     <Row style={{ marginLeft: '40px' }} nativeOn-click={() => {

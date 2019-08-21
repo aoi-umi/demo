@@ -280,6 +280,7 @@ export class UserMapper {
     static lookupPipeline(opt?: {
         userIdKey?: string;
         asName?: string;
+        match?: object;
         project?: object;
     }) {
         opt = {
@@ -293,6 +294,7 @@ export class UserMapper {
                     let: { userId: '$' + (opt.userIdKey || 'userId') },
                     pipeline: [{
                         $match: {
+                            ...opt.match,
                             $expr: { $eq: ['$$userId', '$_id'] }
                         }
                     }, {

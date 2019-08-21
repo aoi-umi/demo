@@ -20,4 +20,6 @@ export class FollowQuery extends ListBase {
     @IsIn(myEnum.followQueryType.getAllValue())
     @Type()
     type: number;
+
+    anyKey: string;
 }

@@ -220,11 +220,12 @@ export default class ArticleDetail extends ArticleMgtBase {
         return (
             <div>
                 <h3>{detail._id ? '修改' : '新增'}</h3>
-                <Form label-width={90} ref="formVaild" props={{ model: detail }} rules={this.rules}>
+                <Form ref="formVaild" props={{ model: detail }} rules={this.rules}>
                     <FormItem label="" prop="header" v-show={!detail._id}>
                         {!!detail._id && this.renderHeader(detail)}
                     </FormItem>
-                    <FormItem label="封面" prop="cover">
+                    <FormItem prop="cover">
+                        <span>封面</span>
                         <MyUpload
                             ref='upload'
                             headers={testApi.defaultHeaders}
@@ -239,13 +240,16 @@ export default class ArticleDetail extends ArticleMgtBase {
                             v-model={this.coverList}
                         />
                     </FormItem>
-                    <FormItem label="标题" prop="title">
+                    <FormItem prop="title">
+                        <span>标题</span>
                         <Input v-model={detail.title} />
                     </FormItem>
-                    <FormItem label="简介" prop="profile">
+                    <FormItem prop="profile">
+                        <span>简介</span>
                         <Input v-model={detail.profile} type="textarea" />
                     </FormItem>
-                    <FormItem label="内容" prop="content">
+                    <FormItem prop="content">
+                        <span>内容</span>
                         <MyEditor ref="editor" class="article-mgt-detail-content"
                             v-model={detail.content}
                             placeholder='输点啥。。。'
@@ -260,11 +264,21 @@ export default class ArticleDetail extends ArticleMgtBase {
                                 });
                             })} />
                     </FormItem>
-                    <FormItem label="指定时间发布" prop="setPublishAt">
-                        <Checkbox v-model={detail.setPublish} />
-                        <DatePicker v-model={detail.setPublishAt} type="datetime" />
+                    <FormItem prop="setPublishAt">
+                        <label style={{ marginRight: '5px' }}>
+                            <Checkbox v-model={detail.setPublish} />
+                            指定时间发布
+                        </label>
+                        <DatePicker v-model={detail.setPublishAt} type="datetime" options={{
+                            disabledDate: (date?: Date) => {
+                                let start = moment().startOf('day');
+                                let end = moment(start).add({ d: 3 });
+                                return date && (date.valueOf() < start.valueOf() || date.valueOf() >= end.valueOf());
+                            }
+                        }} />
                     </FormItem>
-                    <FormItem label="备注" prop="remark">
+                    <FormItem prop="remark">
+                        <span>备注</span>
                         <Input v-model={detail.remark} />
                     </FormItem>
                     {(!detail._id || detail.canUpdate) &&

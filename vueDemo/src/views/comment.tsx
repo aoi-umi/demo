@@ -5,7 +5,7 @@ import { testApi } from '@/api';
 import { convClass, convert } from '@/helpers';
 import { MyList, IMyList } from '@/components/my-list';
 import { MyEditor } from '@/components/my-editor';
-import { Divider, Button, Avatar, Modal, Icon } from '@/components/iview';
+import { Divider, Button, Avatar, Modal, Icon, Time } from '@/components/iview';
 import { MyConfirm } from '@/components/my-confirm';
 import { dev, myEnum } from '@/config';
 import { Base } from './base';
@@ -141,7 +141,7 @@ class Comment extends Base {
                                                         this.handleVote(ele, ele.voteValue == myEnum.voteValue.喜欢 ? myEnum.voteValue.无 : myEnum.voteValue.喜欢);
                                                     }} />{ele.like}
                                                 </div>
-                                                <span class="not-important">{moment(ele.createdAt).format(dev.dateFormat)}</span>
+                                                <span class="not-important"><Time time={new Date(ele.createdAt)} /></span>
                                             </div>
                                         </div>
                                     }
