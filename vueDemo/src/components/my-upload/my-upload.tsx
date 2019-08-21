@@ -270,10 +270,10 @@ class MyUpload extends Vue {
         let width = this.width + 'px',
             height = this.height + 'px';
         let cropperSize = { width: '1024px', height: '576px' };
-        if (document.body.clientWidth < 1024) {
+        if (window.innerWidth < 1024) {
             cropperSize = {
-                width: document.body.clientWidth + 'px',
-                height: (document.body.clientHeight - 50) + 'px'
+                width: window.innerWidth + 'px',
+                height: (window.innerHeight - 200) + 'px'
             }
         }
         return (

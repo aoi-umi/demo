@@ -15,6 +15,7 @@ import { Base } from './base';
 import { LoadView, ILoadView } from './load-view';
 import { UserAvatarView } from './user-avatar';
 import { MyList, IMyList, ResultType } from '@/components/my-list';
+import { FollowBottonView } from './follow-button';
 
 
 type SignInDataType = {
@@ -369,6 +370,12 @@ export default class UserInfo extends Base {
         }
     }
 
+    private followerAnyKey = '';
+    private followingAnyKey = '';
+    private followLoaded = {
+        following: false,
+        follower: false
+    };
     private async followQuery(type, opt?) {
         opt = {
             ...opt,
@@ -378,6 +385,14 @@ export default class UserInfo extends Base {
             await this.$refs.followerList.query(opt);
         else
             await this.$refs.followingList.query(opt);
+    }
+
+    private handleFollowerSearch() {
+        this.$refs.followerList.handleQuery({ resetPage: true });
+    }
+
+    private handleFollowingSearch() {
+        this.$refs.followingList.handleQuery({ resetPage: true });
     }
 
     private async followQueryFn(data) {
@@ -395,9 +410,16 @@ export default class UserInfo extends Base {
         return rs.data.map(ele => {
             let user = type == myEnum.followQueryType.粉丝 ? ele.followerUser : ele.followingUser;
             return (
-                <Card>
-                    <UserAvatarView user={user} />
-                    <span style={{ marginLeft: '5px' }}>{user.profile || dev.defaultProfile}</span>
+                <Card style={{ marginTop: '5px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline' }}>
+                        <UserAvatarView tipsPlacement="right-start" user={user} />
+                        <span style={{ marginLeft: '5px' }}>{user.profile || dev.defaultProfile}</span>
+                        <div style={{
+                            flexGrow: 1
+                        }} >
+                        </div>
+                        <FollowBottonView user={user} />
+                    </div>
                 </Card>
             )
         });
@@ -411,7 +433,15 @@ export default class UserInfo extends Base {
                 {detail.self && <a on-click={() => {
                     this.toggleUpdate(true);
                 }} style={{ marginLeft: '5px' }}>修改</a>}
-                <Tabs>
+                <Tabs style={{ minHeight: '300px' }} on-on-click={(name: string) => {
+                    if (name === 'follower' && !this.followLoaded.follower) {
+                        this.handleFollowerSearch();
+                        this.followLoaded.follower = true;
+                    } else if (name === 'following' && !this.followLoaded.following) {
+                        this.handleFollowingSearch();
+                        this.followLoaded.following = true;
+                    }
+                }}>
                     <TabPane label="概览">
                         {detail.self ?
                             <Form class="form-no-error" label-width={60}>
@@ -444,14 +474,16 @@ export default class UserInfo extends Base {
                             </Form>
                         }
                     </TabPane>
-                    <TabPane label={() => {
+                    <TabPane name="follower" label={() => {
                         return <div>粉丝: {detail.follower}</div>
                     }}>
+                        <Input v-model={this.followerAnyKey} search on-on-search={this.handleFollowerSearch} />
                         <MyList
                             ref="followerList"
                             type="custom"
+                            hideSearchBox
                             on-query={(t) => {
-                                this.followQuery(myEnum.followQueryType.粉丝);
+                                this.followQuery(myEnum.followQueryType.粉丝, { anyKey: this.followerAnyKey });
                             }}
 
                             queryFn={this.followQueryFn}
@@ -461,14 +493,16 @@ export default class UserInfo extends Base {
                             }}
                         />
                     </TabPane>
-                    <TabPane label={() => {
+                    <TabPane name="following" label={() => {
                         return <div>关注: {detail.following}</div>
                     }}>
+                        <Input v-model={this.followingAnyKey} search on-on-search={this.handleFollowingSearch} />
                         <MyList
                             ref="followingList"
                             type="custom"
+                            hideSearchBox
                             on-query={(t) => {
-                                this.followQuery(myEnum.followQueryType.关注);
+                                this.followQuery(myEnum.followQueryType.关注, { anyKey: this.followingAnyKey });
                             }}
 
                             queryFn={this.followQueryFn}

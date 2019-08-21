@@ -60,6 +60,7 @@ export const Table = convClass<iviewTypes.Table>(iview.Table);
 export const Tabs = convClass<iviewTypes.Tabs>(iview.Tabs);
 export const TabPane = convClass<iviewTypes.TabPane>(iview.TabPane);
 export const Tag = convClass<iviewTypes.Tag>(iview.Tag);
+export const Time = convClass<iviewTypes.Time>(iview.Time);
 export const Tooltip = convClass<iviewTypes.Tooltip>(iview.Tooltip);
 export const Transfer = convClass<iviewTypes.Transfer>(iview.Transfer);
 export const Upload = convClass<iviewTypes.Upload>(iview.Upload);
