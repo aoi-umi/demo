@@ -121,6 +121,9 @@ export let query: RequestHandler = (req, res) => {
             } else {
                 detail.user.followStatus = eachFollowStatus;
             }
+            UserMapper.resetDetail(detail.user, {
+                imgHost: opt.imgHost
+            });
             delete detail.user;
             delete detail.follow;
             return detail;
