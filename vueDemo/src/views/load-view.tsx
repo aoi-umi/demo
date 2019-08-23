@@ -22,7 +22,7 @@ class Load extends Base {
 
     loadData() {
         this.loading = true;
-        this.operateHandler('', async () => {
+        return this.operateHandler('', async () => {
             this.result.data = await this.loadFn();
         }, { noDefaultHandler: true }).then(rs => {
             this.result.success = rs.success;

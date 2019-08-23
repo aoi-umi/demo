@@ -208,6 +208,7 @@ export const SignUpView = convClass<SignUp>(SignUp);
 export default class UserInfo extends Base {
     loading = false;
     detail: UserDetailDataType = {};
+    tab = '';
     mounted() {
         this.load();
     }
@@ -218,7 +219,15 @@ export default class UserInfo extends Base {
     }
 
     load() {
-        this.$refs.loadView.loadData();
+        let query = this.$route.query as { [key: string]: string };
+        this.$refs.loadView.loadData().then(() => {
+            if (this.$refs.loadView.result.success) {
+                if (['follower', 'following'].includes(query.tab)) {
+                    this.tab = query.tab;
+                    this.handleFollowSearch(this.tab === 'follower' ? myEnum.followQueryType.粉丝 : myEnum.followQueryType.关注);
+                }
+            }
+        });
     }
 
     async getUserDetail() {
@@ -381,18 +390,29 @@ export default class UserInfo extends Base {
             ...opt,
             type,
         };
+
+        // this.$router.push({
+        //     path: this.$route.path,
+        //     query: {
+        //         ...this.$route.query,
+        //         tab: name
+        //     }
+        // });
+
         if (type == myEnum.followQueryType.粉丝)
             await this.$refs.followerList.query(opt);
         else
             await this.$refs.followingList.query(opt);
     }
 
-    private handleFollowerSearch() {
-        this.$refs.followerList.handleQuery({ resetPage: true });
-    }
-
-    private handleFollowingSearch() {
-        this.$refs.followingList.handleQuery({ resetPage: true });
+    private handleFollowSearch(type) {
+        if (type == myEnum.followQueryType.粉丝) {
+            this.$refs.followerList.handleQuery({ resetPage: true });
+            this.followLoaded.follower = true;
+        } else {
+            this.$refs.followingList.handleQuery({ resetPage: true });
+            this.followLoaded.following = true;
+        }
     }
 
     private async followQueryFn(data) {
@@ -433,13 +453,11 @@ export default class UserInfo extends Base {
                 {detail.self && <a on-click={() => {
                     this.toggleUpdate(true);
                 }} style={{ marginLeft: '5px' }}>修改</a>}
-                <Tabs style={{ minHeight: '300px' }} on-on-click={(name: string) => {
+                <Tabs v-model={this.tab} style={{ minHeight: '300px' }} on-on-click={(name: string) => {
                     if (name === 'follower' && !this.followLoaded.follower) {
-                        this.handleFollowerSearch();
-                        this.followLoaded.follower = true;
+                        this.handleFollowSearch(myEnum.followQueryType.粉丝);
                     } else if (name === 'following' && !this.followLoaded.following) {
-                        this.handleFollowingSearch();
-                        this.followLoaded.following = true;
+                        this.handleFollowSearch(myEnum.followQueryType.关注);
                     }
                 }}>
                     <TabPane label="概览">
@@ -477,7 +495,9 @@ export default class UserInfo extends Base {
                     <TabPane name="follower" label={() => {
                         return <div>粉丝: {detail.follower}</div>
                     }}>
-                        <Input v-model={this.followerAnyKey} search on-on-search={this.handleFollowerSearch} />
+                        <Input v-model={this.followerAnyKey} search on-on-search={() => {
+                            this.handleFollowSearch(myEnum.followQueryType.粉丝);
+                        }} />
                         <MyList
                             ref="followerList"
                             type="custom"
@@ -496,7 +516,9 @@ export default class UserInfo extends Base {
                     <TabPane name="following" label={() => {
                         return <div>关注: {detail.following}</div>
                     }}>
-                        <Input v-model={this.followingAnyKey} search on-on-search={this.handleFollowingSearch} />
+                        <Input v-model={this.followingAnyKey} search on-on-search={() => {
+                            this.handleFollowSearch(myEnum.followQueryType.关注);
+                        }} />
                         <MyList
                             ref="followingList"
                             type="custom"
