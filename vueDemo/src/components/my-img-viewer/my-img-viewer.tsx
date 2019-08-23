@@ -30,13 +30,17 @@ class MyImgViewer extends Vue {
     }
 
     render() {
-        let list = this.src instanceof Array ? this.src : [this.src];
+        let list = this.src instanceof Array ? this.src : [this.src, this.src];
         let mutli = list.length > 1;
         return (
             <transition name="fade">
                 {this.visible && <div class={style.cls.mask} on-click={() => {
                     if (this.maskClosable)
                         this.hide();
+                }} on-touchmove={(event) => {
+                    event.preventDefault();
+                }} on-mousewheel={(event) => {
+                    event.preventDefault();
                 }}>
                     <div class={clsPrefix + 'box'} on-click={(event) => {
                         event.stopPropagation();
