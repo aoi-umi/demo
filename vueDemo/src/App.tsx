@@ -3,7 +3,7 @@ import { Component, Vue, Watch, Prop } from "vue-property-decorator";
 import * as router from '@/router';
 import {
     Menu, MenuItem,
-    Icon, Content, Sider, Layout, Header, Button, Modal,
+    Icon, Content, Sider, Layout, Header, Button, Modal, BackTop,
 } from "@/components/iview";
 import * as style from '@/components/style';
 
@@ -203,6 +203,7 @@ export default class App extends Base {
                     <Content class="main-content">
                         <router-view></router-view>
                     </Content>
+                    <BackTop />
                 </Layout>
             </Layout>
         );
