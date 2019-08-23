@@ -30,7 +30,7 @@ class MyImgViewer extends Vue {
     }
 
     render() {
-        let list = this.src instanceof Array ? this.src : [this.src, this.src];
+        let list = this.src instanceof Array ? this.src : [this.src];
         let mutli = list.length > 1;
         return (
             <transition name="fade">
