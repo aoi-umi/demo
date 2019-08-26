@@ -6,11 +6,12 @@ import * as cache from '../_system/cache';
 import { responseHandler, paramsValid, } from '../helpers';
 import { myEnum } from '../config';
 import * as config from '../config';
-import { UserModel, UserMapper, UserLogMapper } from '../models/mongo/user';
 import * as VaildSchema from '../vaild-schema/class-valid';
 import { transaction } from '../_system/dbMongo';
+import { UserModel, UserMapper, UserLogMapper } from '../models/mongo/user';
 import { FileMapper } from '../models/mongo/file';
 import { LoginUser } from '../models/login-user';
+import { FollowModel, FollowInstanceType, FollowMapper } from '../models/mongo/follow';
 
 export let accountExists: RequestHandler = (req, res) => {
     responseHandler(async () => {
@@ -77,13 +78,16 @@ export let detail: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
         let detail = await UserMapper.detail(user._id);
+        let dbUser = await UserModel.findById(user._id);
         UserMapper.resetDetail(detail, { imgHost: req.headers.host });
+        await UserMapper.resetStat(dbUser, detail);
         return detail;
     }, req, res);
 };
 
 export let detailQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
+        let user = req.myData.user;
         let data = plainToClass(VaildSchema.UserMgtQuery, req.query);
         paramsValid(data);
         let detail = await UserModel.findById(data._id, { password: 0, roleList: 0, authorityList: 0 });
@@ -91,6 +95,22 @@ export let detailQuery: RequestHandler = (req, res) => {
             throw common.error('', config.error.USER_NOT_FOUND);
         let obj = detail.toJSON({ virtuals: false });
         UserMapper.resetDetail(obj, { imgHost: req.headers.host });
+        await UserMapper.resetStat(detail, obj);
+        let follow: FollowInstanceType;
+        obj.followEachOther = false;
+        obj.followStatus = myEnum.followStatus.未关注;
+        if (user.isLogin) {
+            follow = await FollowModel.findOne({ userId: user._id, followUserId: detail._id });
+            if (follow) {
+                let { followEachOther } = await FollowMapper.isFollowEach({
+                    srcStatus: follow.status,
+                    srcUserId: user._id,
+                    destUserId: follow.followUserId
+                });
+                obj.followEachOther = followEachOther;
+                obj.followStatus = follow.status;
+            }
+        }
         return obj;
     }, req, res);
 };
@@ -138,7 +158,7 @@ export let mgtQuery: RequestHandler = (req, res) => {
         });
         rows.forEach(detail => {
             UserMapper.resetDetail(detail, { imgHost: req.headers.host });
-        })
+        });
         return {
             rows,
             total

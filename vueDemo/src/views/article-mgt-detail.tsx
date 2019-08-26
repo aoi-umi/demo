@@ -215,7 +215,6 @@ export default class ArticleDetail extends ArticleMgtBase {
     }
 
     renderEdit() {
-        let self = this;
         let { detail } = this.innerDetail;
         return (
             <div>
@@ -253,16 +252,16 @@ export default class ArticleDetail extends ArticleMgtBase {
                         <MyEditor ref="editor" class="article-mgt-detail-content"
                             v-model={detail.content}
                             placeholder='输点啥。。。'
-                            img-change={(file => {
+                            img-change={(file) => {
                                 testApi.imgUpload(file).then(t => {
                                     this.$refs.editor.insertEmbed('image', t.url);
                                 }).catch(e => {
-                                    self.$Notice.error({
+                                    this.$Notice.error({
                                         title: '上传出错',
                                         desc: e,
                                     });
                                 });
-                            })} />
+                            }} />
                     </FormItem>
                     <FormItem prop="setPublishAt">
                         <label style={{ marginRight: '5px' }}>

@@ -6,9 +6,12 @@ import { myEnum } from "../../config";
 import { ListBase, DelBase, DetailQueryBase } from "./base";
 
 export class AritcleQuery extends ListBase {
+    @Transform(value => Types.ObjectId(value))
     _id: string;
     title: string;
     user: string;
+    @Transform(value => Types.ObjectId(value))
+    userId: string;
     anyKey: string;
     status: string;
 }

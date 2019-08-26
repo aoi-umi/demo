@@ -8,14 +8,15 @@ import { dev, myEnum } from '@/config';
 import { testApi } from '@/api';
 import { Modal, Input, Form, FormItem, Button, Card, TabPane, Tabs } from '@/components/iview';
 import { MyTagModel } from '@/components/my-tag';
-import { LoginUser } from '@/model/user';
 import { MyUpload, IMyUpload } from '@/components/my-upload';
+import { MyList, IMyList, ResultType } from '@/components/my-list';
+import { LoginUser } from '@/model/user';
 import { DetailDataType as UserDetailDataType } from './user-mgt';
 import { Base } from './base';
 import { LoadView, ILoadView } from './load-view';
 import { UserAvatarView } from './user-avatar';
-import { MyList, IMyList, ResultType } from '@/components/my-list';
 import { FollowBottonView } from './follow-button';
+import { ArticleListItemView } from './article';
 
 
 type SignInDataType = {
@@ -246,6 +247,7 @@ export default class UserInfo extends Base {
     $refs: {
         formVaild: IForm, loadView: ILoadView, upload: IMyUpload,
         followerList: IMyList<any>, followingList: IMyList<any>,
+        articleList: IMyList<any>,
     };
     updateLoading = false;
     private getUpdateUser() {
@@ -381,9 +383,11 @@ export default class UserInfo extends Base {
 
     private followerAnyKey = '';
     private followingAnyKey = '';
-    private followLoaded = {
+    private articleAnyKey = '';
+    private tabLoaded = {
         following: false,
-        follower: false
+        follower: false,
+        article: false,
     };
     private async followQuery(type, opt?) {
         opt = {
@@ -408,11 +412,16 @@ export default class UserInfo extends Base {
     private handleFollowSearch(type) {
         if (type == myEnum.followQueryType.粉丝) {
             this.$refs.followerList.handleQuery({ resetPage: true });
-            this.followLoaded.follower = true;
+            this.tabLoaded.follower = true;
         } else {
             this.$refs.followingList.handleQuery({ resetPage: true });
-            this.followLoaded.following = true;
+            this.tabLoaded.following = true;
         }
+    }
+
+    private handleArticleSearch() {
+        this.$refs.articleList.handleQuery({ resetPage: true });
+        this.tabLoaded.article = true;
     }
 
     private async followQueryFn(data) {
@@ -448,16 +457,24 @@ export default class UserInfo extends Base {
     renderInfo() {
         let detail = this.detail;
         return (
-            <Card>
-                <UserAvatarView user={detail} size="large" noTips showAccount style={{ marginLeft: '10px' }} />
-                {detail.self && <a on-click={() => {
-                    this.toggleUpdate(true);
-                }} style={{ marginLeft: '5px' }}>修改</a>}
+            <Card style={{
+                // background: 'rgba(255,255,255,0.6)'
+            }}>
+                <div style={{ display: 'flex', alignItems: 'baseline' }}>
+                    <UserAvatarView user={detail} size="large" noTips showAccount style={{ marginLeft: '10px' }} />
+                    {detail.self && <a on-click={() => {
+                        this.toggleUpdate(true);
+                    }} style={{ marginLeft: '5px' }}>修改</a>}
+                    <div style="flex-grow: 1;"></div>
+                    {!detail.self && <FollowBottonView style={{ alignItems: 'flex-end' }} user={detail} />}
+                </div>
                 <Tabs v-model={this.tab} style={{ minHeight: '300px' }} on-on-click={(name: string) => {
-                    if (name === 'follower' && !this.followLoaded.follower) {
+                    if (name === 'follower' && !this.tabLoaded.follower) {
                         this.handleFollowSearch(myEnum.followQueryType.粉丝);
-                    } else if (name === 'following' && !this.followLoaded.following) {
+                    } else if (name === 'following' && !this.tabLoaded.following) {
                         this.handleFollowSearch(myEnum.followQueryType.关注);
+                    } else if (name === 'article') {
+                        this.handleArticleSearch();
                     }
                 }}>
                     <TabPane label="概览">
@@ -492,7 +509,27 @@ export default class UserInfo extends Base {
                             </Form>
                         }
                     </TabPane>
-                    <TabPane name="follower" label={() => {
+                    <TabPane name="article" label={() => {
+                        return <div>文章: {detail.article}</div>
+                    }}>
+                        <Input v-model={this.articleAnyKey} search on-on-search={this.handleArticleSearch} />
+                        <MyList
+                            ref="articleList"
+                            type="custom"
+                            hideSearchBox
+                            on-query={(t) => {
+                                this.$refs.articleList.query({ userId: detail._id, anyKey: this.articleAnyKey });
+                            }}
+
+                            queryFn={(data) => {
+                                return testApi.articleQuery(data);
+                            }}
+
+                            customRenderFn={(rs) => {
+                                return <ArticleListItemView rs={rs} />;
+                            }}
+                        />
+                    </TabPane><TabPane name="follower" label={() => {
                         return <div>粉丝: {detail.follower}</div>
                     }}>
                         <Input v-model={this.followerAnyKey} search on-on-search={() => {

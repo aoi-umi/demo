@@ -22,8 +22,11 @@ export let save: RequestHandler = (req, res) => {
             throw error('不能关注自己');
         }
         let detail = await FollowMapper.create({ userId: user._id, followUserId: data.userId });
-        let other = await FollowModel.findOne({ userId: data.userId, followUserId: user._id });
-        let followEachOther = other && other.status === myEnum.followStatus.已关注 && data.status === myEnum.followStatus.已关注;
+        let { followEachOther } = await FollowMapper.isFollowEach({
+            srcStatus: data.status,
+            srcUserId: user._id,
+            destUserId: data.userId
+        });
         if (detail.status !== data.status) {
             let self = await UserModel.findById(user._id);
             let follow = await UserModel.findById(data.userId);
