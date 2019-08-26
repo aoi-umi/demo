@@ -22,4 +22,8 @@ export class FollowQuery extends ListBase {
     type: number;
 
     anyKey: string;
+
+    @IsDefined()
+    @Transform(value => Types.ObjectId(value))
+    userId: Types.ObjectId;
 }
