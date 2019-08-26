@@ -55,7 +55,7 @@ export let query: RequestHandler = (req, res) => {
         let cond: any = {
             status: myEnum.followStatus.已关注
         };
-        let userId = Types.ObjectId(user._id);
+        let userId = data.userId;
         let userIdKey = '';
         let asName = '';
         if (data.type == myEnum.followQueryType.关注) {
@@ -79,7 +79,7 @@ export let query: RequestHandler = (req, res) => {
             };
         }
 
-        let rs = await FollowModel.aggregatePaginate([
+        let pipeline: any[] = [
             { $match: cond },
             ...UserMapper.lookupPipeline({
                 userIdKey,
@@ -88,29 +88,35 @@ export let query: RequestHandler = (req, res) => {
                     profile: 1
                 }
             }),
-            //获取相互关注状态
-            {
-                $lookup: {
-                    from: FollowModel.collection.collectionName,
-                    let: { followUserId: '$followUserId', userId: '$userId' },
-                    pipeline: [{
-                        $match: {
-                            $expr: {
-                                $and: [
-                                    { $eq: ['$$followUserId', '$userId'] },
-                                    { $eq: ['$$userId', '$followUserId'] }
-                                ]
+        ];
+        if (data.userId.equals(user._id)) {
+            pipeline = [
+                ...pipeline,
+                //获取相互关注状态
+                {
+                    $lookup: {
+                        from: FollowModel.collection.collectionName,
+                        let: { followUserId: '$followUserId', userId: '$userId' },
+                        pipeline: [{
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ['$$followUserId', '$userId'] },
+                                        { $eq: ['$$userId', '$followUserId'] }
+                                    ]
 
+                                }
                             }
-                        }
-                    }],
-                    as: 'follow'
-                }
-            },
-            { $unwind: { path: '$follow', preserveNullAndEmptyArrays: true } },
-        ], {
-                ...BaseMapper.getListOptions(data),
-            });
+                        }],
+                        as: 'follow'
+                    }
+                },
+                { $unwind: { path: '$follow', preserveNullAndEmptyArrays: true } },
+            ];
+        }
+        let rs = await FollowModel.aggregatePaginate(pipeline, {
+            ...BaseMapper.getListOptions(data),
+        });
         let opt = {
             imgHost: req.headers.host
         };

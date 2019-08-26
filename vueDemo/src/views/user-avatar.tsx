@@ -8,7 +8,7 @@ import { Button, Avatar, Poptip, Spin } from '@/components/iview';
 import { MyImgViewer, IMyImgViewer } from '@/components/my-img-viewer';
 import { Base } from './base';
 import { DetailDataType } from './user-mgt';
-import { FollowBottonView } from './follow-button';
+import { FollowButtonView } from './follow-button';
 
 export type User = {
     _id?: string;
@@ -134,7 +134,7 @@ class UserAvatar extends Base {
                                     query: { _id: this.user._id }
                                 });
                             }}>主页</Button>
-                            {this.user._id !== this.storeUser.user._id && <FollowBottonView user={this.user} />}
+                            {this.user._id !== this.storeUser.user._id && <FollowButtonView user={this.user} />}
                         </div>
                     </div>
                 }

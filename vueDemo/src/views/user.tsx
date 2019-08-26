@@ -15,7 +15,7 @@ import { DetailDataType as UserDetailDataType } from './user-mgt';
 import { Base } from './base';
 import { LoadView, ILoadView } from './load-view';
 import { UserAvatarView } from './user-avatar';
-import { FollowBottonView } from './follow-button';
+import { FollowButtonView } from './follow-button';
 import { ArticleListItemView } from './article';
 
 
@@ -220,13 +220,19 @@ export default class UserInfo extends Base {
     }
 
     load() {
+        for (let key in this.tabLoaded) {
+            this.tabLoaded[key] = false;
+        }
         let query = this.$route.query as { [key: string]: string };
         this.$refs.loadView.loadData().then(() => {
             if (this.$refs.loadView.result.success) {
-                if (['follower', 'following'].includes(query.tab)) {
+                if (['follower', 'following', 'article'].includes(query.tab)) {
                     this.tab = query.tab;
-                    this.handleFollowSearch(this.tab === 'follower' ? myEnum.followQueryType.粉丝 : myEnum.followQueryType.关注);
                 }
+                if (['follower', 'following'].includes(this.tab))
+                    this.handleFollowSearch(this.tab === 'follower' ? myEnum.followQueryType.粉丝 : myEnum.followQueryType.关注);
+                else if (this.tab == 'article')
+                    this.handleArticleSearch();
             }
         });
     }
@@ -234,12 +240,13 @@ export default class UserInfo extends Base {
     async getUserDetail() {
         let query = this.$route.query;
         let detail: UserDetailDataType;
-        if (!query._id) {
+        let self = !query._id || query._id == this.storeUser.user._id;
+        if (self) {
             detail = await testApi.userDetail();
-            detail.self = true;
         } else {
             detail = await testApi.userDetailQuery(query._id);
         }
+        detail.self = self;
         this.detail = detail;
         return detail;
     }
@@ -392,6 +399,7 @@ export default class UserInfo extends Base {
     private async followQuery(type, opt?) {
         opt = {
             ...opt,
+            userId: this.detail._id,
             type,
         };
 
@@ -447,7 +455,7 @@ export default class UserInfo extends Base {
                             flexGrow: 1
                         }} >
                         </div>
-                        <FollowBottonView user={user} />
+                        <FollowButtonView user={user} />
                     </div>
                 </Card>
             )
@@ -466,7 +474,7 @@ export default class UserInfo extends Base {
                         this.toggleUpdate(true);
                     }} style={{ marginLeft: '5px' }}>修改</a>}
                     <div style="flex-grow: 1;"></div>
-                    {!detail.self && <FollowBottonView style={{ alignItems: 'flex-end' }} user={detail} />}
+                    {!detail.self && <FollowButtonView style={{ alignItems: 'flex-end' }} user={detail} />}
                 </div>
                 <Tabs v-model={this.tab} style={{ minHeight: '300px' }} on-on-click={(name: string) => {
                     if (name === 'follower' && !this.tabLoaded.follower) {

@@ -56,8 +56,7 @@ class UserMgtDetail extends Base {
         this.disableType = data.disabled ? myEnum.userDisableType.封禁至 : myEnum.userDisableType.解封;
     }
 
-    private rules = {
-    };
+    private rules = {};
     $refs: { formVaild: IForm; roleTransfer: IRoleTransfer, authTransfer: IAuthorityTransfer };
     private disableType = myEnum.userDisableType.解封;
 

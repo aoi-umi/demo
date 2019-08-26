@@ -51,5 +51,5 @@ class FollowBotton extends Base {
 }
 
 
-export const FollowBottonView = convClass<FollowBotton>(FollowBotton);
+export const FollowButtonView = convClass<FollowBotton>(FollowBotton);
 export interface IFollowBottonView extends FollowBotton { };
