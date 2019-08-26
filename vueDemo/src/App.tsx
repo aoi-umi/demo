@@ -98,7 +98,7 @@ export default class App extends Base {
     render() {
         let collapsedWidth = this.isSmall ? 0 : 56;
         return (
-            <Layout class="layout">
+            <Layout class="layout no-bg">
                 <Modal v-model={this.storeSetting.setting.signInShow} footer-hide>
                     <SignInView on-success={() => {
                         this.storeSetting.setSetting({
@@ -131,7 +131,7 @@ export default class App extends Base {
                         }
                     </div>
                 </Header>
-                <Layout>
+                <Layout class="no-bg">
                     <Sider
                         class="side-menu"
                         ref="sider"

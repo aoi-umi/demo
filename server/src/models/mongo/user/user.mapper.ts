@@ -13,6 +13,8 @@ import { BaseMapper } from '../_base';
 import { UserLogModel } from './user-log';
 import { UserModel, UserInstanceType } from ".";
 import { FileMapper } from '../file';
+import { FollowModel } from '../follow';
+import { ArticleModel } from '../article';
 
 export class UserMapper {
     static createToken(data, user: UserInstanceType) {
@@ -275,6 +277,35 @@ export class UserMapper {
         imgHost?: string;
     }) {
         detail.avatarUrl = FileMapper.getImgUrl(detail.avatar, opt.imgHost);
+    }
+
+    static async resetStat(detail: UserInstanceType, obj: any) {
+        //实时查数据
+        let [
+            following,
+            follower,
+            article,
+        ] = await Promise.all([
+            FollowModel.countDocuments({ userId: detail._id, status: myEnum.followStatus.已关注 }),
+            FollowModel.countDocuments({ followUserId: detail._id, status: myEnum.followStatus.已关注 }),
+            ArticleModel.countDocuments({
+                userId: detail._id,
+                status: myEnum.articleStatus.审核通过,
+                publishAt: { $lte: new Date() }
+            })
+        ]);
+        obj.following = following;
+        obj.follower = follower;
+        obj.article = article;
+        let update = {};
+        ['following', 'follower', 'article'].forEach(key => {
+            if (obj[key] != detail[key]) {
+                update[key] = obj[key];
+            }
+        });
+        if (!common.isObjectEmpty(update)) {
+            await detail.update(update);
+        }
     }
 
     static lookupPipeline(opt?: {

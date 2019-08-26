@@ -12,7 +12,7 @@ router.post('/user/signIn', UserAuthMid.normal(), user.signIn);
 router.post('/user/signOut', UserAuthMid.normal(), user.signOut);
 router.get('/user/info', UserAuthMid.normal([auth.login]), user.info);
 router.get('/user/detail', UserAuthMid.normal([auth.login]), user.detail);
-router.get('/user/detailQuery', user.detailQuery);
+router.get('/user/detailQuery', UserAuthMid.normal(), user.detailQuery);
 router.post('/user/update', UserAuthMid.normal([auth.login]), user.update);
 router.get('/user/mgt/query', UserAuthMid.normal([auth.userMgtQuery]), user.mgtQuery);
 router.post('/user/mgt/save', UserAuthMid.normal([auth.userMgtEdit]), user.mgtSave);

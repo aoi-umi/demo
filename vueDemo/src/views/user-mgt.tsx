@@ -28,6 +28,7 @@ export type DetailDataType = {
     disabledTo?: Date;
     follower?: number;
     following?: number;
+    article?: number;
 
     self?: boolean;
 };

@@ -36,7 +36,11 @@ export class ArticleMapper {
         let match: any = {};
 
         if (data._id) {
-            match._id = Types.ObjectId(data._id);
+            match._id = data._id;
+        }
+
+        if (data.userId) {
+            match.userId = data.userId;
         }
         let and = [];
         if (data.user) {
@@ -184,11 +188,14 @@ export class ArticleMapper {
         if (!list.length)
             throw error('', config.error.NO_MATCH_DATA);
         let bulk = [];
-        //指定时间发布
+        let dbUser = await UserModel.findById(user._id);
+        let articleChange = 0;
         if (status === myEnum.articleStatus.审核通过) {
+            articleChange = 1;
             let now = new Date();
             bulk = list.map(ele => {
                 let update = { status, publishAt: now };
+                //指定时间发布
                 if (ele.setPublish && ele.setPublishAt && ele.setPublishAt.getTime() > now.getTime()) {
                     update.publishAt = ele.setPublishAt;
                 }
@@ -202,6 +209,8 @@ export class ArticleMapper {
                 }
             });
         } else {
+            if (status === myEnum.articleStatus.已删除)
+                articleChange = 1;
             bulk = [{
                 updateMany: {
                     filter: cond,
@@ -216,6 +225,8 @@ export class ArticleMapper {
         });
 
         await transaction(async (session) => {
+            if (articleChange)
+                await dbUser.update({ article: dbUser.article + articleChange }, { session });
             await ArticleModel.bulkWrite(bulk, { session });
             await ArticleLogModel.insertMany(log, { session });
         });

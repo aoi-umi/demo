@@ -118,6 +118,8 @@ class UserAvatar extends Base {
                                 </div>
                                 <br />
                                 {this.innerUser.profile || dev.defaultProfile}
+                                <br />
+                                关注: {this.innerUser.following}  粉丝: {this.innerUser.follower}
                             </div>
                         }
                         <br />

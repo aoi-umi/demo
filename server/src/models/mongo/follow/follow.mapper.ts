@@ -40,4 +40,17 @@ export class FollowMapper {
             { $unwind: { path: '$follow', preserveNullAndEmptyArrays: true } },
         ];
     }
+
+    static async isFollowEach(data: {
+        srcStatus: number,
+        srcUserId: any,
+        destUserId: any
+    }) {
+        let destFollow = await FollowModel.findOne({ userId: data.destUserId, followUserId: data.srcUserId });
+        let followEachOther = destFollow && destFollow.status === myEnum.followStatus.已关注 && data.srcStatus === myEnum.followStatus.已关注;
+        return {
+            destFollow,
+            followEachOther
+        };
+    }
 }
