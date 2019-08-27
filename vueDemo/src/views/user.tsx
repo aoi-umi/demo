@@ -12,11 +12,15 @@ import { MyUpload, IMyUpload } from '@/components/my-upload';
 import { MyList, IMyList, ResultType } from '@/components/my-list';
 import { MyLoad, IMyLoad } from '@/components/my-load';
 import { LoginUser } from '@/model/user';
-import { DetailDataType as UserDetailDataType } from './user-mgt';
-import { Base } from './base';
+
 import { UserAvatarView } from './comps/user-avatar';
 import { FollowButtonView } from './comps/follow-button';
+import { AuthorityTagView } from './comps/authority-tag';
+
+import { Base } from './base';
+import { DetailDataType as UserDetailDataType } from './user-mgt';
 import { ArticleListItemView } from './article';
+import { RoleTagView } from './comps/role-tag';
 
 
 type SignInDataType = {
@@ -495,13 +499,13 @@ export default class UserInfo extends Base {
                                     {detail.profile || dev.defaultProfile}
                                 </FormItem>
                                 <FormItem label="角色">
-                                    {MyTagModel.renderRoleTag(detail.roleList, true)}
+                                    <RoleTagView value={detail.roleList} hideCode />
                                 </FormItem>
                                 <FormItem label="权限">
-                                    {MyTagModel.renderAuthorityTag(detail.authorityList, true)}
+                                    <AuthorityTagView value={detail.authorityList} hideCode />
                                 </FormItem>
                                 <FormItem label="可用权限">
-                                    {MyTagModel.renderAuthorityTag(Object.values(detail.auth), true)}
+                                    <AuthorityTagView value={Object.values(detail.auth)} hideCode />
                                 </FormItem>
                                 <FormItem label="注册时间">
                                     {detail.createdAt && moment(detail.createdAt).format(dev.dateFormat)}

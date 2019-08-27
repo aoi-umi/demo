@@ -1,9 +1,4 @@
-import { Vue } from 'vue-property-decorator';
-import { myEnum } from '@/config';
 
-import { MyTag, RenderTagType } from './my-tag';
-
-const myTag = new MyTag();
 export type TagType = {
     add?: boolean;
     key?: string;
@@ -25,7 +20,11 @@ type OutTagType = TagObjType | string;
 export class MyTagModel {
     tagList: TagType[] = [];
 
-    constructor(tagList: OutTagType[]) {
+    constructor(tagList?: OutTagType[]) {
+        this.initTag(tagList);
+    }
+
+    initTag(tagList: OutTagType[]) {
         if (tagList && tagList.length) {
             this.tagList = tagList.map(ele => {
                 let newTag = this.getTag(ele);
@@ -91,10 +90,6 @@ export class MyTagModel {
         }
     }
 
-    renderTag() {
-        return myTag.renderTag(this.tagList);
-    }
-
     getChangeTag(key?: string) {
         type returnType = TagType | any;
         let addTagList: returnType[] = [], delTagList: returnType[] = [];
@@ -109,17 +104,5 @@ export class MyTagModel {
             addTagList,
             delTagList,
         };
-    }
-
-    static renderTag(tagList: RenderTagType | (RenderTagType[])) {
-        return myTag.renderTag(tagList);
-    }
-
-    static renderRoleTag(list, hideCode?: boolean) {
-        return myTag.renderRoleTag(list, hideCode);
-    }
-
-    static renderAuthorityTag(list, hideCode?: boolean) {
-        return myTag.renderAuthorityTag(list, hideCode);
     }
 }
