@@ -196,7 +196,7 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
     }
 
 
-    private selectedRows = [];
+    selectedRows = [];
     private setSelectedRows(selection) {
         this.selectedRows = selection;
     }
