@@ -11,6 +11,8 @@ import { MyTagModel } from '@/components/my-tag';
 import { AuthorityTransferView, IAuthorityTransfer } from './authority';
 import { IRoleTransfer, RoleTransferView } from './role';
 import { Base } from './base';
+import { AuthorityTagView } from './comps/authority-tag';
+import { RoleTagView } from './comps/role-tag';
 
 export type DetailDataType = {
     _id?: string;
@@ -180,7 +182,7 @@ export default class UserMgt extends Base {
             render: (h, params) => {
                 let auth = params.row.auth;
                 let enableAuthList: any[] = Object.values(auth);
-                return MyTagModel.renderAuthorityTag(enableAuthList);
+                return <AuthorityTagView value={enableAuthList} />;
             }
         }, {
             title: '账号',
@@ -198,14 +200,14 @@ export default class UserMgt extends Base {
             minWidth: 120,
             render: (h, params) => {
                 let roleList = params.row.roleList;
-                return MyTagModel.renderRoleTag(roleList);
+                return <RoleTagView value={roleList} />;
             }
         }, {
             title: '权限',
             key: 'authorityList',
             minWidth: 120,
             render: (h, params) => {
-                return MyTagModel.renderAuthorityTag(params.row.authorityList);
+                return <AuthorityTagView value={params.row.authorityList} />;
             }
         }, {
             title: '创建时间',

@@ -3,7 +3,7 @@ import { Form as IForm } from 'iview';
 import { testApi } from '@/api';
 import { Tag, Modal, Input, Row, Col, Form, FormItem, Button } from '@/components/iview';
 import { MyList, IMyList, Const as MyTableConst, OnSortChangeOptions, MyListModel } from '@/components/my-list';
-import { MyTagModel } from '@/components/my-tag';
+import { MyTagModel, MyTag } from '@/components/my-tag';
 import { MyConfirm } from '@/components/my-confirm';
 import { convClass, convert } from '@/helpers';
 import { Base } from './base';
@@ -20,7 +20,7 @@ class BookmarkDetail extends Base {
     detail: any;
 
     tag = '';
-    tagModel: MyTagModel;
+    tagModel = new MyTagModel();
 
     @Watch('detail')
     updateDetail(newVal) {
@@ -39,7 +39,7 @@ class BookmarkDetail extends Base {
 
     private initDetail(data) {
         this.innerDetail = data;
-        this.tagModel = new MyTagModel(this.innerDetail.tagList);
+        this.tagModel.initTag(this.innerDetail.tagList);
     }
 
     private rules = {
@@ -98,7 +98,7 @@ class BookmarkDetail extends Base {
                         <Input v-model={detail.url} />
                     </FormItem>
                     <FormItem label="标签" >
-                        {this.tagModel && this.tagModel.renderTag()}
+                        <MyTag value={this.tagModel.tagList} />
                         <br />
                         <Row gutter={10}>
                             <Col span={12}>
@@ -160,9 +160,6 @@ export default class Bookmark extends Base {
         });
     }
 
-    queryHandler() {
-
-    }
     protected render() {
         return (
             <div>
@@ -207,9 +204,7 @@ export default class Bookmark extends Base {
                         width: 30,
                         render: (h, params) => {
                             let tagList = params.row.tagList;
-                            if (tagList && tagList.length) {
-                                return MyTagModel.renderTag(tagList);
-                            }
+                            return <MyTag value={tagList} />;
                         }
                     }, {
                         title: '名字',

@@ -6,13 +6,13 @@ import { convClass, convert } from '@/helpers';
 import { Modal, Input, Form, FormItem, Button, Checkbox, Switch } from '@/components/iview';
 import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
 import { MyConfirm } from '@/components/my-confirm';
-import { MyTagModel } from '@/components/my-tag';
 import { IMyTransfer, MyTransfer } from '@/components/my-transfer';
 
+import { AuthorityTagView } from './comps/authority-tag';
 import { AuthorityTransferView, IAuthorityTransfer } from './authority';
 import { Base } from './base';
 
-type DetailDataType = {
+export type DetailDataType = {
     _id?: string;
     name?: string;
     code?: string;
@@ -195,7 +195,7 @@ export default class Role extends Base {
             width: 30,
             render: (h, params) => {
                 let authorityList = params.row.authorityList;
-                return MyTagModel.renderAuthorityTag(authorityList);
+                return <AuthorityTagView value={authorityList} />;
             }
         }, {
             title: '名字',
