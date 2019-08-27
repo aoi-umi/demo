@@ -2,13 +2,14 @@ import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import moment from 'moment';
 import { testApi } from '@/api';
 import { myEnum, authority, dev } from '@/config';
-import { Card, Input, Row, Col, Icon, Divider, Time } from '@/components/iview';
+import { Card, Input, Row, Col, Icon, Divider, Time, Checkbox } from '@/components/iview';
 import { MyList, IMyList, Const as MyTableConst, ResultType } from '@/components/my-list';
 import { MyImg } from '@/components/my-img';
 import { convert, convClass } from '@/helpers';
 import { DetailDataType } from './article-mgt-detail';
 import { UserAvatarView } from './comps/user-avatar';
 import { Base } from './base';
+import { MyTag } from '@/components/my-tag';
 
 @Component
 export default class Article extends Base {
@@ -42,25 +43,6 @@ export default class Article extends Base {
         this.$refs.list.query();
     }
 
-    private toDetail(ele: DetailDataType) {
-        this.$router.push({
-            path: dev.routeConfig.articleDetail.path,
-            query: { _id: ele._id }
-        });
-    }
-
-    private handleVote(detail, value) {
-        this.operateHandler('', async () => {
-            let rs = await testApi.voteSubmit({ ownerId: detail._id, value, type: myEnum.voteType.文章 });
-            for (let key in rs) {
-                detail[key] = rs[key];
-            }
-            detail.voteValue = value;
-        }, {
-                noSuccessHandler: true
-            });
-    }
-
     protected render() {
         return (
             <div>
@@ -75,7 +57,17 @@ export default class Article extends Base {
 
                     type="custom"
                     customRenderFn={(rs) => {
-                        return <ArticleListItemView rs={rs} />
+                        if (!rs.success || !rs.data.length) {
+                            let msg = !rs.success ? rs.msg : '暂无数据';
+                            return (
+                                <Card style={{ marginTop: '5px', textAlign: 'center' }}>{msg}</Card>
+                            );
+                        }
+                        return rs.data.map(ele => {
+                            return (
+                                <ArticleListItemView value={ele} />
+                            );
+                        });
                     }}
 
                     queryFn={async (data) => {
@@ -106,9 +98,31 @@ class ArticleListItem extends Base {
     @Prop({
         required: true
     })
-    rs: ResultType;
+    value: DetailDataType;
+
+    @Prop({
+        default: false
+    })
+    selectable?: boolean;
+
+    @Prop({
+        default: false
+    })
+    selected?: boolean;
+
+    private innerSelected = this.selected;
+    @Watch('selected')
+    private watchSelected(newVal) {
+        this.innerSelected = newVal;
+    }
+
+    @Prop()
+    mgt?: boolean;
 
     private toDetail(ele: DetailDataType) {
+        if (this.mgt) {
+            return;
+        }
         this.$router.push({
             path: dev.routeConfig.articleDetail.path,
             query: { _id: ele._id }
@@ -128,100 +142,107 @@ class ArticleListItem extends Base {
     }
 
     render() {
-        let rs = this.rs;
-        if (!rs.success || !rs.data.length) {
-            let msg = !rs.success ? rs.msg : '暂无数据';
-            return (
-                <Card style={{ marginTop: '5px', textAlign: 'center' }}>{msg}</Card>
-            );
-        }
+        let ele = this.value;
         return (
             <div>
-                {rs.data.map((ele: DetailDataType) => {
-                    return (
-                        <Card style={{ marginTop: '5px', cursor: 'pointer' }}>
-                            <Row >
-                                <Col style={{ marginLeft: '40px' }} nativeOn-click={() => {
-                                    this.toDetail(ele);
-                                }}>
-                                    <h3 class="article-list-title" title={ele.title}>{ele.title}</h3>
-                                </Col>
-                                <Col style={{
-                                    marginTop: '2px', marginBottom: '2px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                }}>
-                                    <UserAvatarView user={ele.user} tipsPlacement="bottom-start" />
-                                    <span class="not-important" style={{ marginLeft: '5px' }} on-click={() => {
-                                        this.toDetail(ele);
-                                    }}>发布于 <Time time={new Date(ele.publishAt)} /></span>
-                                    <div style={{
-                                        flex: '1 1 auto',
-                                        alignSelf: 'stretch',
-                                    }} on-click={() => {
-                                        this.toDetail(ele);
-                                    }}></div>
-                                </Col>
-                            </Row>
-                            <Row style={{ marginLeft: '40px' }} nativeOn-click={() => {
+                <Card style={{ marginTop: '5px', cursor: this.mgt ? '' : 'pointer' }}>
+                    <Row>
+                        <Col style={{ marginLeft: '40px', display: 'flex', }} nativeOn-click={() => {
+                            this.toDetail(ele);
+                        }}>
+                            <h3 class="article-list-title" style={{ display: 'inline' }} title={ele.title}>{ele.title}</h3>
+                            <div style={{
+                                flex: '1 1 auto',
+                                alignSelf: 'stretch',
+                            }} on-click={() => {
                                 this.toDetail(ele);
                             }}>
-                                <Col style={{
-                                    display: 'flex',
-                                    alignItems: 'flex-start',
-                                    flexWrap: 'wrap',
-                                }}>
-                                    {ele.coverUrl && <MyImg class=" my-upload-item cover" style={{
-                                        border: '1px solid #e2e4e6',
-                                        borderRadius: '5px',
-                                        marginRight: '5px',
-                                        marginBottom: '5px',
-                                    }} src={ele.coverUrl} />}
-                                    <p style={{
-                                        overflowY: 'hidden', maxHeight: '150px', minWidth: '200px', whiteSpace: 'pre-wrap'
-                                    }}>{ele.profile || dev.defaultArticleProfile}</p>
-                                </Col>
-                            </Row>
-                            <Divider size="small" />
-                            <div style={{ display: 'flex' }}>
-                                {[{
-                                    icon: 'md-eye',
-                                    text: ele.readTimes,
-                                }, {
-                                    icon: 'md-text',
-                                    text: ele.commentCount
-                                }, {
-                                    icon: 'md-thumbs-up',
-                                    text: ele.like,
-                                    color: ele.voteValue == myEnum.voteValue.喜欢 ? 'red' : '',
-                                    onClick: () => {
-                                        this.handleVote(ele, ele.voteValue == myEnum.voteValue.喜欢 ? myEnum.voteValue.无 : myEnum.voteValue.喜欢);
-                                    }
-                                }, {
-                                    icon: 'md-thumbs-down',
-                                    text: ele.dislike,
-                                    color: ele.voteValue == myEnum.voteValue.不喜欢 ? 'red' : '',
-                                    onClick: () => {
-                                        this.handleVote(ele, ele.voteValue == myEnum.voteValue.不喜欢 ? myEnum.voteValue.无 : myEnum.voteValue.不喜欢);
-                                    }
-                                }].map(iconEle => {
-                                    return (
-                                        <div class="center" style={{ flex: 1 }}
-                                            nativeOn-click={iconEle.onClick || (() => {
-                                                this.toDetail(ele);
-                                            })} >
-                                            <Icon
-                                                type={iconEle.icon}
-                                                size={24}
-                                                color={iconEle.color} />
-                                            <b style={{ marginLeft: '4px' }}>{iconEle.text}</b>
-                                        </div>
-                                    );
-                                })}
                             </div>
-                        </Card>
-                    );
-                })}
+                            {this.selectable && <Checkbox v-model={this.innerSelected} on-on-change={(checked) => {
+                                this.$emit('selected-change', checked);
+                            }} />}
+                        </Col>
+                        <Col style={{
+                            marginTop: '2px', marginBottom: '2px',
+                            display: 'flex',
+                            alignItems: 'center',
+                        }}>
+                            <UserAvatarView user={ele.user} tipsPlacement="bottom-start" />
+                            {this.mgt && <span class="not-important" style={{ marginLeft: '5px' }} on-click={() => {
+                                this.toDetail(ele);
+                            }}>创建于 <Time time={new Date(ele.createdAt)} /></span>}
+                            {ele.publishAt && <span class="not-important" style={{ marginLeft: '5px' }} on-click={() => {
+                                this.toDetail(ele);
+                            }}>发布于 <Time time={new Date(ele.publishAt)} /></span>}
+                            <div style={{
+                                flex: '1 1 auto',
+                                alignSelf: 'stretch',
+                            }} on-click={() => {
+                                this.toDetail(ele);
+                            }}>
+                            </div>
+                            {this.mgt && <MyTag value={ele.statusText} />}
+                        </Col>
+                    </Row>
+                    <Row style={{ marginLeft: '40px' }} nativeOn-click={() => {
+                        this.toDetail(ele);
+                    }}>
+                        <Col style={{
+                            display: 'flex',
+                            alignItems: 'flex-start',
+                            flexWrap: 'wrap',
+                        }}>
+                            {ele.coverUrl && <MyImg class=" my-upload-item cover" style={{
+                                border: '1px solid #e2e4e6',
+                                borderRadius: '5px',
+                                marginRight: '5px',
+                                marginBottom: '5px',
+                            }} src={ele.coverUrl} />}
+                            <p style={{
+                                overflowY: 'hidden', maxHeight: '150px', minWidth: '200px', whiteSpace: 'pre-wrap'
+                            }}>{ele.profile || dev.defaultArticleProfile}</p>
+                        </Col>
+                    </Row>
+                    <Divider size="small" />
+                    {this.$slots.default || (!this.mgt ?
+                        <div style={{ display: 'flex' }}>
+                            {[{
+                                icon: 'md-eye',
+                                text: ele.readTimes,
+                            }, {
+                                icon: 'md-text',
+                                text: ele.commentCount
+                            }, {
+                                icon: 'md-thumbs-up',
+                                text: ele.like,
+                                color: ele.voteValue == myEnum.voteValue.喜欢 ? 'red' : '',
+                                onClick: () => {
+                                    this.handleVote(ele, ele.voteValue == myEnum.voteValue.喜欢 ? myEnum.voteValue.无 : myEnum.voteValue.喜欢);
+                                }
+                            }, {
+                                icon: 'md-thumbs-down',
+                                text: ele.dislike,
+                                color: ele.voteValue == myEnum.voteValue.不喜欢 ? 'red' : '',
+                                onClick: () => {
+                                    this.handleVote(ele, ele.voteValue == myEnum.voteValue.不喜欢 ? myEnum.voteValue.无 : myEnum.voteValue.不喜欢);
+                                }
+                            }].map(iconEle => {
+                                return (
+                                    <div class="center" style={{ flex: 1 }}
+                                        on-click={iconEle.onClick || (() => {
+                                            this.toDetail(ele);
+                                        })} >
+                                        <Icon
+                                            type={iconEle.icon}
+                                            size={24}
+                                            color={iconEle.color} />
+                                        <b style={{ marginLeft: '4px' }}>{iconEle.text}</b>
+                                    </div>
+                                );
+                            })}
+                        </div> :
+                        <div />)}
+                </Card>
             </div>
         )
     }

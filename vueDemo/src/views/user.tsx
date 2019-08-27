@@ -538,7 +538,17 @@ export default class UserInfo extends Base {
                             }}
 
                             customRenderFn={(rs) => {
-                                return <ArticleListItemView rs={rs} />;
+                                if (!rs.success || !rs.data.length) {
+                                    let msg = !rs.success ? rs.msg : '暂无数据';
+                                    return (
+                                        <Card style={{ marginTop: '5px', textAlign: 'center' }}>{msg}</Card>
+                                    );
+                                }
+                                return rs.data.map(ele => {
+                                    return (
+                                        <ArticleListItemView value={ele} />
+                                    );
+                                });
                             }}
                         />
                     </TabPane><TabPane name="follower" label={() => {

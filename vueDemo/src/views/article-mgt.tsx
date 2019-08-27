@@ -2,13 +2,14 @@ import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import moment from 'moment';
 import { testApi } from '@/api';
 import { myEnum, authority, dev } from '@/config';
-import { Modal, Checkbox, Row, Input } from '@/components/iview';
+import { Modal, Checkbox, Row, Input, Card, Button } from '@/components/iview';
 import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
 import { MyConfirm } from '@/components/my-confirm';
 import { MyImg } from '@/components/my-img';
 import { convert } from '@/helpers';
 import { DetailDataType } from './article-mgt-detail';
 import { Base } from './base';
+import { ArticleListItemView } from './article';
 
 export class ArticleMgtBase extends Base {
     delShow = false;
@@ -18,7 +19,7 @@ export class ArticleMgtBase extends Base {
     operateDetail: DetailDataType;
     protected preview = false;
 
-    protected togglePotPass(show: boolean) {
+    protected toggleNotPass(show: boolean) {
         this.notPassShow = show;
         this.notPassRemark = '';
     }
@@ -34,7 +35,7 @@ export class ArticleMgtBase extends Base {
             detail.status = rs.status;
             detail.statusText = rs.statusText;
             this.auditSuccessHandler(detail);
-            this.togglePotPass(false);
+            this.toggleNotPass(false);
         });
     }
 
@@ -69,7 +70,7 @@ export class ArticleMgtBase extends Base {
                 text: '审核不通过',
                 fn: () => {
                     this.operateDetail = detail;
-                    this.togglePotPass(true);
+                    this.toggleNotPass(true);
                 }
             },];
         }
@@ -109,7 +110,7 @@ export class ArticleMgtBase extends Base {
             <Modal v-model={this.notPassShow} footer-hide>
                 <MyConfirm title='审核不通过' loading={true}
                     cancel={() => {
-                        this.togglePotPass(false);
+                        this.toggleNotPass(false);
                     }}
                     ok={() => {
                         return this.audit(this.operateDetail, false);
@@ -206,81 +207,6 @@ export default class Article extends ArticleMgtBase {
         return list;
     }
 
-    private getColumns() {
-        let columns = [{
-            key: '_selection',
-            type: 'selection',
-            width: 60,
-            align: 'center',
-            hide: !this.multiOperateBtnList.length
-        }, {
-            title: '封面',
-            key: 'cover',
-            minWidth: 120,
-            render: (h, params) => {
-                return <MyImg class="cover" src={params.row.coverUrl} />;
-            }
-        }, {
-            title: '标题',
-            key: 'title',
-            minWidth: 120,
-        }, {
-            title: '简介',
-            key: 'profile',
-            minWidth: 120,
-            ellipsis: true,
-            render: (h, params) => {
-                return <p style={{ whiteSpace: 'pre-wrap' }}>{params.row.profile}</p>;
-            }
-        }, {
-            title: '用户',
-            key: 'user',
-            minWidth: 120,
-            render: (h, params) => {
-                return <p>{params.row.user.nickname}({params.row.user.account})</p>;
-            }
-        }, {
-            title: '状态',
-            key: 'statusText',
-            minWidth: 80,
-        }, {
-            title: '创建时间',
-            key: 'createdAt',
-            minWidth: 90,
-            render: (h, params) => {
-                return <span>{moment(params.row.createdAt).format(dev.dateFormat)}</span>;
-            }
-        }, {
-            title: '发布时间',
-            key: 'publishAt',
-            minWidth: 90,
-            render: (h, params) => {
-                return <span>{moment(params.row.publishAt).format(dev.dateFormat)}</span>;
-            }
-        }, {
-            title: '操作',
-            key: 'action',
-            fixed: 'right',
-            width: 110,
-            render: (h, params) => {
-                let detail = params.row;
-                let operate = this.getOperate(detail);
-                return (
-                    <Row class={MyTableConst.clsPrefix + "action-box"}>
-                        {operate.map(ele => {
-                            return (
-                                <div>
-                                    <a on-click={ele.fn}>{ele.text}</a>
-                                </div>
-                            );
-                        })}
-                    </Row>
-                );
-            }
-        }];
-        return columns;
-    }
-
     protected render() {
 
         return (
@@ -314,7 +240,37 @@ export default class Article extends ArticleMgtBase {
                         add: !this.storeUser.user.isLogin
                     }}
 
-                    columns={this.getColumns()}
+                    type="custom"
+                    customRenderFn={(rs) => {
+                        if (!rs.success || !rs.data.length) {
+                            let msg = !rs.success ? rs.msg : '暂无数据';
+                            return (
+                                <Card style={{ marginTop: '5px', textAlign: 'center' }}>{msg}</Card>
+                            );
+                        }
+                        return rs.data.map(ele => {
+                            return (
+                                <ArticleListItemView value={ele} mgt
+                                    // selectable={!!this.multiOperateBtnList.length}
+                                    on-selected-change={(val) => {
+                                        ele._selected = val;
+                                        this.$refs.list.selectedRows = rs.data.filter(ele => ele._selected);
+                                    }}>
+                                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                        {
+                                            this.getOperate(ele).map(ele => {
+                                                return (
+                                                    <Button type={ele.type as any} on-click={ele.fn}>
+                                                        {ele.text}
+                                                    </Button>
+                                                );
+                                            })
+                                        }
+                                    </div>
+                                </ArticleListItemView>
+                            );
+                        });
+                    }}
 
                     queryFn={async (data) => {
                         let rs = await testApi.articleMgtQuery(data);
