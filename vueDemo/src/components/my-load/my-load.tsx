@@ -1,12 +1,11 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 
 import { convClass } from '@/helpers';
-import { Base } from "./base";
 import { Spin, Button, Card } from '@/components/iview';
 
 
 @Component
-class Load extends Base {
+class MyLoad extends Vue {
     @Prop()
     loadFn: () => Promise<any>;
 
@@ -20,16 +19,17 @@ class Load extends Base {
         data: null,
     };
 
-    loadData() {
+    async loadData() {
         this.loading = true;
-        return this.operateHandler('', async () => {
+        try {
             this.result.data = await this.loadFn();
-        }, { noDefaultHandler: true }).then(rs => {
-            this.result.success = rs.success;
-            this.result.msg = rs.msg;
-        }).finally(() => {
+            this.result.success = true;
+        } catch (e) {
+            this.result.success = false;
+            this.result.msg = e.message;
+        } finally {
             this.loading = false;
-        });
+        }
     }
 
     render() {
@@ -53,5 +53,6 @@ class Load extends Base {
 }
 
 
-export const LoadView = convClass<Load>(Load);
-export interface ILoadView extends Load { };
+const MyLoadView = convClass<MyLoad>(MyLoad);
+export default MyLoadView;
+export interface IMyLoad extends MyLoad { };

@@ -10,12 +10,12 @@ import { Modal, Input, Form, FormItem, Button, Card, TabPane, Tabs } from '@/com
 import { MyTagModel } from '@/components/my-tag';
 import { MyUpload, IMyUpload } from '@/components/my-upload';
 import { MyList, IMyList, ResultType } from '@/components/my-list';
+import { MyLoad, IMyLoad } from '@/components/my-load';
 import { LoginUser } from '@/model/user';
 import { DetailDataType as UserDetailDataType } from './user-mgt';
 import { Base } from './base';
-import { LoadView, ILoadView } from './load-view';
-import { UserAvatarView } from './user-avatar';
-import { FollowButtonView } from './follow-button';
+import { UserAvatarView } from './comps/user-avatar';
+import { FollowButtonView } from './comps/follow-button';
 import { ArticleListItemView } from './article';
 
 
@@ -252,7 +252,7 @@ export default class UserInfo extends Base {
     }
 
     $refs: {
-        formVaild: IForm, loadView: ILoadView, upload: IMyUpload,
+        formVaild: IForm, loadView: IMyLoad, upload: IMyUpload,
         followerList: IMyList<any>, followingList: IMyList<any>,
         articleList: IMyList<any>,
     };
@@ -587,7 +587,7 @@ export default class UserInfo extends Base {
     render() {
         return (
             <div>
-                <LoadView
+                <MyLoad
                     ref="loadView"
                     loadFn={this.getUserDetail}
                     renderFn={() => {

@@ -7,7 +7,7 @@ import { MyList, IMyList, Const as MyTableConst, ResultType } from '@/components
 import { MyImg } from '@/components/my-img';
 import { convert, convClass } from '@/helpers';
 import { DetailDataType } from './article-mgt-detail';
-import { UserAvatarView } from './user-avatar';
+import { UserAvatarView } from './comps/user-avatar';
 import { Base } from './base';
 
 @Component
@@ -138,27 +138,6 @@ class ArticleListItem extends Base {
         return (
             <div>
                 {rs.data.map((ele: DetailDataType) => {
-                    let iconList = [{
-                        icon: 'md-eye',
-                        text: ele.readTimes,
-                    }, {
-                        icon: 'md-text',
-                        text: ele.commentCount
-                    }, {
-                        icon: 'md-thumbs-up',
-                        text: ele.like,
-                        color: ele.voteValue == myEnum.voteValue.喜欢 ? 'red' : '',
-                        onClick: () => {
-                            this.handleVote(ele, ele.voteValue == myEnum.voteValue.喜欢 ? myEnum.voteValue.无 : myEnum.voteValue.喜欢);
-                        }
-                    }, {
-                        icon: 'md-thumbs-down',
-                        text: ele.dislike,
-                        color: ele.voteValue == myEnum.voteValue.不喜欢 ? 'red' : '',
-                        onClick: () => {
-                            this.handleVote(ele, ele.voteValue == myEnum.voteValue.不喜欢 ? myEnum.voteValue.无 : myEnum.voteValue.不喜欢);
-                        }
-                    }];
                     return (
                         <Card style={{ marginTop: '5px', cursor: 'pointer' }}>
                             <Row >
@@ -204,10 +183,30 @@ class ArticleListItem extends Base {
                                 </Col>
                             </Row>
                             <Divider size="small" />
-                            <Row>
-                                {iconList.map(iconEle => {
+                            <div style={{ display: 'flex' }}>
+                                {[{
+                                    icon: 'md-eye',
+                                    text: ele.readTimes,
+                                }, {
+                                    icon: 'md-text',
+                                    text: ele.commentCount
+                                }, {
+                                    icon: 'md-thumbs-up',
+                                    text: ele.like,
+                                    color: ele.voteValue == myEnum.voteValue.喜欢 ? 'red' : '',
+                                    onClick: () => {
+                                        this.handleVote(ele, ele.voteValue == myEnum.voteValue.喜欢 ? myEnum.voteValue.无 : myEnum.voteValue.喜欢);
+                                    }
+                                }, {
+                                    icon: 'md-thumbs-down',
+                                    text: ele.dislike,
+                                    color: ele.voteValue == myEnum.voteValue.不喜欢 ? 'red' : '',
+                                    onClick: () => {
+                                        this.handleVote(ele, ele.voteValue == myEnum.voteValue.不喜欢 ? myEnum.voteValue.无 : myEnum.voteValue.不喜欢);
+                                    }
+                                }].map(iconEle => {
                                     return (
-                                        <Col class="center" xs={24 / iconList.length}
+                                        <div class="center" style={{ flex: 1 }}
                                             nativeOn-click={iconEle.onClick || (() => {
                                                 this.toDetail(ele);
                                             })} >
@@ -216,10 +215,10 @@ class ArticleListItem extends Base {
                                                 size={24}
                                                 color={iconEle.color} />
                                             <b style={{ marginLeft: '4px' }}>{iconEle.text}</b>
-                                        </Col>
+                                        </div>
                                     );
                                 })}
-                            </Row>
+                            </div>
                         </Card>
                     );
                 })}

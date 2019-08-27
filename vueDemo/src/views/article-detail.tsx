@@ -3,17 +3,17 @@ import moment from 'moment';
 
 import { testApi } from '@/api';
 import { myEnum, dev } from '@/config';
+import { Divider, Spin } from '@/components/iview';
+import { MyLoad, IMyLoad } from '@/components/my-load';
 import { DetailType, DetailDataType } from './article-mgt-detail';
 import { CommentView } from './comment';
-import { Divider, Spin } from '@/components/iview';
-import { UserAvatarView } from './user-avatar';
+import { UserAvatarView } from './comps/user-avatar';
 import { Base } from './base';
-import { LoadView, ILoadView } from './load-view';
 
 @Component
 export default class ArticleDetail extends Base {
 
-    $refs: { loadView: ILoadView };
+    $refs: { loadView: IMyLoad };
 
     mounted() {
         this.$refs.loadView.loadData();
@@ -21,7 +21,7 @@ export default class ArticleDetail extends Base {
 
     render() {
         return (
-            <LoadView
+            <MyLoad
                 ref="loadView"
                 loadFn={async () => {
                     let query = this.$route.query;
