@@ -90,7 +90,7 @@ class BookmarkDetail extends Base {
             <div>
                 <h3>{detail._id ? '修改' : '新增'}</h3>
                 <br />
-                <Form label-width={50} ref="formVaild" props={{ model: detail }} rules={this.rules}>
+                <Form ref="formVaild" label-position="top" props={{ model: detail }} rules={this.rules}>
                     <FormItem label="名字" prop="name">
                         <Input v-model={detail.name} />
                     </FormItem>

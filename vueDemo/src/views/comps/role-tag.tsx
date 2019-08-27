@@ -19,21 +19,6 @@ class RoleTag extends MyTagBase {
     @Prop()
     hideCode?: boolean;
 
-    protected convertValue(ele) {
-        let color = '';
-        let tag = ele.code;
-        if (ele.isDel || ele.status !== myEnum.authorityStatus.启用) {
-            color = 'default';
-        } else {
-            tag = `${ele.name}` + (this.hideCode ? '' : `(${ele.code})`);
-        }
-        return {
-            tag,
-            color,
-            isDel: ele.isDel,
-        };
-    }
-
     render() {
         return (
             <div>
@@ -48,7 +33,7 @@ class RoleTag extends MyTagBase {
                     return (
                         <Tooltip theme="light" max-width="250" disabled={!ele.authorityList || !ele.authorityList.length}>
                             <div slot="content" >
-                                {<AuthorityTagView value={ele.authorityList} />}
+                                <AuthorityTagView value={ele.authorityList} />
                             </div>
                             {
                                 this.renderTag({

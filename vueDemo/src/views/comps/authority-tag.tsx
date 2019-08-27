@@ -8,11 +8,7 @@ import { MyTagBase } from '@/components/my-tag/my-tag';
 @Component
 class AuthorityTag extends MyTagBase {
     @Prop()
-    hideCode?: boolean;
-
-    created() {
-        super.created();
-    }
+    hideCode?: boolean
 
     protected convertValue(ele) {
         let color = '';
@@ -27,10 +23,6 @@ class AuthorityTag extends MyTagBase {
             color,
             isDel: ele.isDel,
         };
-    }
-
-    render() {
-        return super.render();
     }
 }
 

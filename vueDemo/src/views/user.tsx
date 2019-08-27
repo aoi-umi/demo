@@ -93,7 +93,7 @@ class SignIn extends Base {
             <div class="dialog-view" on-keypress={this.handlePress}>
                 <h3>登录</h3>
                 <br />
-                <Form class="dialog-content" label-width={50} ref="formVaild" props={{ model: detail }} rules={this.rules}>
+                <Form class="dialog-content" label-position="top" ref="formVaild" props={{ model: detail }} rules={this.rules}>
                     <FormItem label="账号" prop="account">
                         <Input v-model={detail.account} />
                     </FormItem>
@@ -186,7 +186,7 @@ class SignUp extends Base {
             <div class="dialog-view" on-keypress={this.handlePress}>
                 <h3>注册</h3>
                 <br />
-                <Form class="dialog-content" label-width={100} ref="formVaild" props={{ model: detail }} rules={this.rules}>
+                <Form class="dialog-content" label-position="top" ref="formVaild" props={{ model: detail }} rules={this.rules}>
                     <FormItem label="账号" prop="account">
                         <Input v-model={detail.account} />
                     </FormItem>
