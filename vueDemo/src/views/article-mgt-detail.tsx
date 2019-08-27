@@ -219,12 +219,11 @@ export default class ArticleDetail extends ArticleMgtBase {
         return (
             <div>
                 <h3>{detail._id ? '修改' : '新增'}</h3>
-                <Form ref="formVaild" props={{ model: detail }} rules={this.rules}>
+                <Form ref="formVaild" label-position="top" props={{ model: detail }} rules={this.rules}>
                     <FormItem label="" prop="header" v-show={!detail._id}>
                         {!!detail._id && this.renderHeader(detail)}
                     </FormItem>
-                    <FormItem prop="cover">
-                        <span>封面</span>
+                    <FormItem label="封面" prop="cover">
                         <MyUpload
                             ref='upload'
                             headers={testApi.defaultHeaders}
@@ -239,16 +238,13 @@ export default class ArticleDetail extends ArticleMgtBase {
                             v-model={this.coverList}
                         />
                     </FormItem>
-                    <FormItem prop="title">
-                        <span>标题</span>
+                    <FormItem label="标题" prop="title">
                         <Input v-model={detail.title} />
                     </FormItem>
-                    <FormItem prop="profile">
-                        <span>简介</span>
+                    <FormItem label="简介" prop="profile">
                         <Input v-model={detail.profile} type="textarea" />
                     </FormItem>
-                    <FormItem prop="content">
-                        <span>内容</span>
+                    <FormItem label="内容" prop="content">
                         <MyEditor ref="editor" class="article-mgt-detail-content"
                             v-model={detail.content}
                             placeholder='输点啥。。。'
@@ -276,8 +272,7 @@ export default class ArticleDetail extends ArticleMgtBase {
                             }
                         }} />
                     </FormItem>
-                    <FormItem prop="remark">
-                        <span>备注</span>
+                    <FormItem label="备注" prop="remark">
                         <Input v-model={detail.remark} />
                     </FormItem>
                     {(!detail._id || detail.canUpdate) &&
