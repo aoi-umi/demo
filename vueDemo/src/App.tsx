@@ -13,7 +13,7 @@ const routeConfig = router.routerConfig;
 import "./App.less";
 import { SignInView } from './views/user';
 import { Base } from './views/base';
-import { UserAvatarView } from './views/user-avatar';
+import { UserAvatarView } from './views/comps/user-avatar';
 
 @Component
 export default class App extends Base {

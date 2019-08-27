@@ -9,7 +9,7 @@ import { Divider, Button, Avatar, Modal, Icon, Time } from '@/components/iview';
 import { MyConfirm } from '@/components/my-confirm';
 import { dev, myEnum } from '@/config';
 import { Base } from './base';
-import { UserAvatarView } from './user-avatar';
+import { UserAvatarView } from './comps/user-avatar';
 
 @Component
 class Comment extends Base {

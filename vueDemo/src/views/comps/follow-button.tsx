@@ -4,7 +4,7 @@ import { convClass } from '@/helpers';
 import { Spin, Button, Card } from '@/components/iview';
 import { myEnum } from '@/config';
 import { testApi } from '@/api';
-import { Base } from "./base";
+import { Base } from "../base";
 import { User } from './user-avatar';
 
 

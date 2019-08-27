@@ -6,11 +6,11 @@ import { testApi } from '@/api';
 import { myEnum, dev } from '@/config';
 import { Input, Form, FormItem, Button, Divider, Table, Checkbox, DatePicker } from '@/components/iview';
 import { MyUpload, IMyUpload } from '@/components/my-upload';
-import { ArticleMgtBase } from './article-mgt';
 import { MyEditor } from '@/components/my-editor';
 import { IMyEditor } from '@/components/my-editor/my-editor';
-import { UserAvatarView } from './user-avatar';
-import { LoadView, ILoadView } from './load-view';
+import { MyLoad, IMyLoad } from '@/components/my-load';
+import { ArticleMgtBase } from './article-mgt';
+import { UserAvatarView } from './comps/user-avatar';
 
 export type DetailType = {
     detail: DetailDataType;
@@ -88,7 +88,7 @@ export default class ArticleDetail extends ArticleMgtBase {
         }
     }
 
-    $refs: { formVaild: IForm, editor: IMyEditor, upload: IMyUpload, loadView: ILoadView };
+    $refs: { formVaild: IForm, editor: IMyEditor, upload: IMyUpload, loadView: IMyLoad };
 
     mounted() {
         this.$refs.loadView.loadData();
@@ -152,7 +152,7 @@ export default class ArticleDetail extends ArticleMgtBase {
 
     render() {
         return (
-            <LoadView
+            <MyLoad
                 ref="loadView"
                 loadFn={this.loadDetail}
                 renderFn={() => {

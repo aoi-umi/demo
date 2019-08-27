@@ -6,8 +6,8 @@ import { convClass } from '@/helpers';
 import { dev, myEnum } from '@/config';
 import { Button, Avatar, Poptip, Spin } from '@/components/iview';
 import { MyImgViewer, IMyImgViewer } from '@/components/my-img-viewer';
-import { Base } from './base';
-import { DetailDataType } from './user-mgt';
+import { Base } from '../base';
+import { DetailDataType } from '../user-mgt';
 import { FollowButtonView } from './follow-button';
 
 export type User = {
