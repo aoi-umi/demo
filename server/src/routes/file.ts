@@ -1,5 +1,4 @@
 import { RequestHandler, Request, Response } from "express";
-import { plainToClass } from "class-transformer";
 import { Types } from 'mongoose';
 
 import { responseHandler, paramsValid } from "../helpers";
@@ -37,8 +36,7 @@ export const imgUpload: RequestHandler = (req, res) => {
 
 export const download = async (option: { fileType: string }, req: Request, res: Response) => {
     responseHandler(async (opt) => {
-        let data = plainToClass(VaildSchema.FileGet, req.query);
-        paramsValid(data);
+        let data = paramsValid(req.query, VaildSchema.FileGet);
         let ifModifiedSince = req.headers['if-modified-since'] as string;
         let detail = await FileModel.findOne({ _id: data._id, fileType: option.fileType });
         opt.noSend = true;

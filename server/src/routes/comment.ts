@@ -1,5 +1,4 @@
 import { RequestHandler } from 'express';
-import { plainToClass } from 'class-transformer';
 
 import { transaction } from '../_system/dbMongo';
 import { error } from '../_system/common';
@@ -12,8 +11,7 @@ import { CommentMapper, CommentModel } from '../models/mongo/comment';
 export let submit: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = plainToClass(VaildSchema.CommentSubmit, req.body);
-        paramsValid(data);
+        let data = paramsValid(req.body, VaildSchema.CommentSubmit);
         let owner = await CommentMapper.findOwner({ ownerId: data.ownerId, type: data.type });
         let comment = await CommentMapper.create(data, data.type, user);
         comment.ip = req.realIp;
@@ -40,8 +38,7 @@ export let submit: RequestHandler = (req, res) => {
 export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = plainToClass(VaildSchema.CommentQuery, req.query);
-        paramsValid(data);
+        let data = paramsValid(req.query, VaildSchema.CommentQuery);
         let { total, rows } = await CommentMapper.query({
             ...data,
         }, {
@@ -60,8 +57,7 @@ export let query: RequestHandler = (req, res) => {
 export let del: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = plainToClass(VaildSchema.CommentDel, req.body);
-        paramsValid(data);
+        let data = paramsValid(req.body, VaildSchema.CommentDel);
         /**
          * 可删除
          * 1.本人

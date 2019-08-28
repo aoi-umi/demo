@@ -1,5 +1,4 @@
 import { RequestHandler } from 'express';
-import { plainToClass } from 'class-transformer';
 
 import { transaction } from '../_system/dbMongo';
 import { error } from '../_system/common';
@@ -12,8 +11,7 @@ import { VoteModel, VoteMapper } from '../models/mongo/vote';
 export let submit: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = plainToClass(VaildSchema.VoteSubmit, req.body);
-        paramsValid(data);
+        let data = paramsValid(req.body, VaildSchema.VoteSubmit);
         let owner = await VoteMapper.findOwner({ ownerId: data.ownerId, type: data.type });
         if (!owner)
             throw error('', config.error.NO_MATCH_DATA);

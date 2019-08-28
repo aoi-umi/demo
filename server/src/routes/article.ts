@@ -1,5 +1,4 @@
 import { RequestHandler } from 'express';
-import { plainToClass } from 'class-transformer';
 
 import { responseHandler, paramsValid } from '../helpers';
 import { myEnum } from '../config';
@@ -13,8 +12,7 @@ import { Auth } from '../_system/auth';
 export let mgtQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = plainToClass(VaildSchema.AritcleQuery, req.query);
-        paramsValid(data);
+        let data = paramsValid(req.query, VaildSchema.AritcleQuery);
 
         let { rows, total } = await ArticleMapper.query(data, {
             userId: user._id,
@@ -31,11 +29,10 @@ export let mgtQuery: RequestHandler = (req, res) => {
     }, req, res);
 };
 
-export let MgtDetailQuery: RequestHandler = (req, res) => {
+export let mgtDetailQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = plainToClass(VaildSchema.AritcleDetailQuery, req.query);
-        paramsValid(data);
+        let data = paramsValid(req.query, VaildSchema.AritcleDetailQuery);;
         let rs = await ArticleMapper.detailQuery({ _id: data._id }, {
             userId: user._id,
             audit: Auth.contains(user, config.auth.articleMgtAudit),
@@ -51,8 +48,7 @@ export let MgtDetailQuery: RequestHandler = (req, res) => {
 export let mgtSave: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = plainToClass(VaildSchema.AritcleSave, req.body);
-        paramsValid(data);
+        let data = paramsValid(req.body, VaildSchema.AritcleSave);
         let detail: ArticleInstanceType;
         let status = data.submit ? myEnum.articleStatus.待审核 : myEnum.articleStatus.草稿;
         if (!data._id) {
@@ -100,10 +96,9 @@ export let mgtSave: RequestHandler = (req, res) => {
 export let mgtDel: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = plainToClass(VaildSchema.ArticleDel, req.body);
-        paramsValid(data);
+        let data = paramsValid(req.body, VaildSchema.ArticleDel);
         await ArticleMapper.updateStatus(data.idList, myEnum.articleStatus.已删除, user, {
-            includeUserId: user._id,
+            includeUserId: Auth.contains(user, config.auth.articleMgtDel) ? null : user._id,
             status: { $ne: myEnum.articleStatus.已删除 },
         });
     }, req, res);
@@ -112,8 +107,7 @@ export let mgtDel: RequestHandler = (req, res) => {
 export let mgtAudit: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = plainToClass(VaildSchema.ArticleMgtAudit, req.body);
-        paramsValid(data);
+        let data = paramsValid(req.body, VaildSchema.ArticleMgtAudit);
         let rs = await ArticleMapper.updateStatus(data.idList, data.status, user, {
             status: myEnum.articleStatus.待审核,
             logRemark: data.remark,
@@ -126,8 +120,7 @@ export let mgtAudit: RequestHandler = (req, res) => {
 export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = plainToClass(VaildSchema.AritcleQuery, req.query);
-        paramsValid(data);
+        let data = paramsValid(req.query, VaildSchema.AritcleQuery);
 
         data.orderBy = 'publishAt';
         let { rows, total } = await ArticleMapper.query(data, {
@@ -147,8 +140,7 @@ export let query: RequestHandler = (req, res) => {
 export let detailQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = plainToClass(VaildSchema.AritcleDetailQuery, req.query);
-        paramsValid(data);
+        let data = paramsValid(req.query, VaildSchema.AritcleDetailQuery);
         let rs = await ArticleMapper.detailQuery({ _id: data._id }, {
             normal: true,
             resetOpt: {

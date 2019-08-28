@@ -15,12 +15,7 @@ import { MyTag } from '@/components/my-tag';
 export default class Article extends Base {
     $refs: { list: IMyList<any> };
 
-    page: any;
     anyKey = '';
-    protected created() {
-        let query = this.$route.query;
-        this.page = { index: query.page, size: query.rows };
-    }
 
     mounted() {
         this.query();
@@ -51,8 +46,6 @@ export default class Article extends Base {
                 }} />
                 <MyList
                     ref="list"
-                    current={this.page.index}
-                    pageSize={this.page.size}
                     hideSearchBox
 
                     type="custom"
@@ -105,17 +98,6 @@ class ArticleListItem extends Base {
     })
     selectable?: boolean;
 
-    @Prop({
-        default: false
-    })
-    selected?: boolean;
-
-    private innerSelected = this.selected;
-    @Watch('selected')
-    private watchSelected(newVal) {
-        this.innerSelected = newVal;
-    }
-
     @Prop()
     mgt?: boolean;
 
@@ -158,7 +140,7 @@ class ArticleListItem extends Base {
                                 this.toDetail(ele);
                             }}>
                             </div>
-                            {this.selectable && <Checkbox v-model={this.innerSelected} on-on-change={(checked) => {
+                            {this.selectable && <Checkbox value={ele._checked} disabled={ele._disabled} on-on-change={(checked) => {
                                 this.$emit('selected-change', checked);
                             }} />}
                         </Col>

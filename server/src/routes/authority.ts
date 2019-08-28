@@ -1,6 +1,4 @@
 import { RequestHandler } from 'express';
-import { Types } from 'mongoose';
-import { plainToClass } from 'class-transformer';
 
 import { responseHandler, paramsValid } from '../helpers';
 import * as config from '../config';
@@ -11,8 +9,7 @@ import { BaseMapper } from '../models/mongo/_base';
 
 export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let data = plainToClass(VaildSchema.AuthorityQuery, req.query);
-        paramsValid(data);
+        let data = paramsValid(req.query, VaildSchema.AuthorityQuery);
         let query: any = {};
         if (data.anyKey) {
             delete data.name;
@@ -45,8 +42,7 @@ export let query: RequestHandler = (req, res) => {
 
 export let codeExists: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let data = plainToClass(VaildSchema.AuthorityCodeExists, req.body);
-        paramsValid(data);
+        let data = paramsValid(req.body, VaildSchema.AuthorityCodeExists);
         let rs = await AuthorityMapper.codeExists(data.code, data._id);
         return rs && { _id: rs._id };
     }, req, res);
@@ -109,8 +105,7 @@ export let update: RequestHandler = (req, res) => {
 
 export let del: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let data = plainToClass(VaildSchema.AuthorityDel, req.body);
-        paramsValid(data);
+        let data = paramsValid(req.body, VaildSchema.AuthorityDel);
         let rs = await AuthorityModel.deleteMany({ _id: { $in: data.idList } });
         if (!rs.n)
             throw error('', config.error.NO_MATCH_DATA);

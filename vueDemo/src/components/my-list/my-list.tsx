@@ -1,4 +1,4 @@
-import { Component, Vue, Prop } from 'vue-property-decorator';
+import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
 
 import {
     Table, Page, Row, Col,
@@ -70,12 +70,6 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
     customRenderFn?: (result: ResultType) => any;
 
     @Prop()
-    pageSize: number | string;
-
-    @Prop()
-    current?: number | string;
-
-    @Prop()
     data?: any[];
 
     @Prop()
@@ -117,7 +111,6 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
         } else {
             this.result.msg = '暂无数据';
         }
-        this.model.setPage({ index: this.current, size: this.pageSize });
 
         window.addEventListener('scroll', () => {
             if (this.infiniteScroll && this.isScrollEnd()) {
@@ -207,7 +200,17 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
 
     private showQuery = true;
     private loading = false;
-    model = new MyListModel<{ [k in keyof QueryArgs]: any }>();
+    @Prop({
+        default: () => new MyListModel<{ [k in keyof QueryArgs]: any }>()
+    })
+    value: MyListModel<{ [k in keyof QueryArgs]: any }>;
+    model = this.value;
+
+    @Watch('value')
+    private watchValue(newVal) {
+        this.model = newVal;
+    }
+
     setQueryByKey(data, keyList: string[]) {
         keyList.forEach(key => {
             if (data[key])
@@ -238,8 +241,13 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
         }
     }
 
+    $refs: { page: iView.Page & { currentPage: number } };
+
     protected render() {
         let hideQueryBtn = this.hideQueryBtn || {};
+        if (this.$refs.page && this.$refs.page.currentPage !== this.model.page.index) {
+            this.$refs.page.currentPage = this.model.page.index;
+        }
         return (
             <div>
                 {!this.hideSearchBox &&
@@ -326,7 +334,10 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
                         this.customRenderFn(this.result)
                     }
                     {!this.infiniteScroll &&
-                        <Page class={clsPrefix + "page"} total={this.result.total}
+                        <Page
+                            ref="page"
+                            class={clsPrefix + "page"} total={this.result.total}
+                            placement="top"
                             current={this.model.page.index}
                             page-size={this.model.page.size}
                             show-total show-elevator show-sizer
