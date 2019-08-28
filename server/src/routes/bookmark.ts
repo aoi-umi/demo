@@ -1,5 +1,4 @@
 import { RequestHandler } from 'express';
-import { plainToClass } from 'class-transformer';
 
 import { responseHandler, paramsValid } from '../helpers';
 import { error, escapeRegExp } from '../_system/common';
@@ -10,8 +9,7 @@ import { BaseMapper } from '../models/mongo/_base';
 
 export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let data = plainToClass(VaildSchema.BookmarkQuery, req.query);
-        paramsValid(data);
+        let data = paramsValid(req.query, VaildSchema.BookmarkQuery);
         let query: any = {};
         if (data.anyKey) {
             let anykey = new RegExp(escapeRegExp(data.anyKey), 'i');
@@ -40,8 +38,7 @@ export let query: RequestHandler = (req, res) => {
 
 export let save: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let data = plainToClass(VaildSchema.BookmarkSave, req.body);
-        paramsValid(data);
+        let data = paramsValid(req.body, VaildSchema.BookmarkSave);
         let detail: BookmarkInstanceType;
         if (!data._id) {
             delete data._id;
@@ -74,8 +71,7 @@ export let save: RequestHandler = (req, res) => {
 
 export let del: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let data = plainToClass(VaildSchema.BookmarkDel, req.body);
-        paramsValid(data);
+        let data = paramsValid(req.body, VaildSchema.BookmarkDel);
         let rs = await BookmarkModel.deleteMany({ _id: { $in: data.idList } });
         if (!rs.n)
             throw error('', config.error.NO_MATCH_DATA);

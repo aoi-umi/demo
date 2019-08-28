@@ -1,6 +1,4 @@
 import { RequestHandler } from 'express';
-import { plainToClass } from 'class-transformer';
-import { Types } from 'mongoose';
 
 import { transaction } from '../_system/dbMongo';
 import { error, escapeRegExp } from '../_system/common';
@@ -16,8 +14,7 @@ import { FileMapper } from '../models/mongo/file';
 export let save: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = plainToClass(VaildSchema.FollowSave, req.body);
-        paramsValid(data);
+        let data = paramsValid(req.body, VaildSchema.FollowSave);
         if (data.userId.equals(user._id)) {
             throw error('不能关注自己');
         }
@@ -50,8 +47,7 @@ export let save: RequestHandler = (req, res) => {
 export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = plainToClass(VaildSchema.FollowQuery, req.query);
-        paramsValid(data);
+        let data = paramsValid(req.query, VaildSchema.FollowQuery);
         let cond: any = {
             status: myEnum.followStatus.已关注
         };

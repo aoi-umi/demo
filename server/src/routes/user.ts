@@ -1,5 +1,4 @@
 import { RequestHandler } from 'express';
-import { plainToClass } from 'class-transformer';
 
 import * as common from '../_system/common';
 import * as cache from '../_system/cache';
@@ -15,8 +14,7 @@ import { FollowModel, FollowInstanceType, FollowMapper } from '../models/mongo/f
 
 export let accountExists: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let data = plainToClass(VaildSchema.UserAccountExists, req.body);
-        paramsValid(data);
+        let data = paramsValid(req.body, VaildSchema.UserAccountExists);
         let rs = await UserMapper.accountExists(data.account);
         return rs && { _id: rs._id };
     }, req, res);
@@ -24,8 +22,7 @@ export let accountExists: RequestHandler = (req, res) => {
 
 export let signUp: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let data = plainToClass(VaildSchema.UserSignUp, req.body);
-        paramsValid(data);
+        let data = paramsValid(req.body, VaildSchema.UserSignUp);
         let rs = await UserMapper.accountExists(data.account);
         if (rs)
             throw common.error('账号已存在');
@@ -41,13 +38,11 @@ export let signUp: RequestHandler = (req, res) => {
 
 export let signIn: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let data = plainToClass(VaildSchema.UserSignIn, req.body);
-        paramsValid(data);
+        let data = paramsValid(req.body, VaildSchema.UserSignIn);
         let token = req.myData.user.key;
         let { user, disableResult } = await UserMapper.accountCheck(data.account);
 
-        let returnUser = await UserMapper.login(token, user, data, disableResult.disabled);
-        UserMapper.resetDetail(returnUser, { imgHost: req.headers.host });
+        let returnUser = await UserMapper.login(token, user, data, disableResult.disabled, { imgHost: req.headers.host });
         let userInfoKey = config.dev.cacheKey.user + token;
         await cache.set(userInfoKey, returnUser, config.dev.cacheTime.user);
         return returnUser;
@@ -88,7 +83,7 @@ export let detail: RequestHandler = (req, res) => {
 export let detailQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = plainToClass(VaildSchema.UserMgtQuery, req.query);
+        let data = paramsValid(req.query, VaildSchema.UserMgtQuery);
         paramsValid(data);
         let detail = await UserModel.findById(data._id, { password: 0, roleList: 0, authorityList: 0 });
         if (!detail)
@@ -117,8 +112,7 @@ export let detailQuery: RequestHandler = (req, res) => {
 
 export let update: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let data = plainToClass(VaildSchema.UserUpdate, req.body);
-        paramsValid(data);
+        let data = paramsValid(req.body, VaildSchema.UserUpdate);
         let user = req.myData.user;
         let { token, ...restData } = data;
         let updateCache: any = common.getDataInKey(restData, ['avatar', 'nickname', 'profile']);
@@ -151,8 +145,7 @@ export let update: RequestHandler = (req, res) => {
 
 export let mgtQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let data = plainToClass(VaildSchema.UserMgtQuery, req.query);
-        paramsValid(data);
+        let data = paramsValid(req.query, VaildSchema.UserMgtQuery);
         let { rows, total } = await UserMapper.query({
             ...data, includeDelAuth: true
         });
@@ -169,8 +162,7 @@ export let mgtQuery: RequestHandler = (req, res) => {
 export let mgtSave: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = plainToClass(VaildSchema.UserMgtSave, req.body);
-        paramsValid(data);
+        let data = paramsValid(req.body, VaildSchema.UserMgtSave);
         let detail = await UserModel.findById(data._id);
         if (!detail.canEdit)
             throw common.error('不可修改此账号');
@@ -211,8 +203,7 @@ export let mgtSave: RequestHandler = (req, res) => {
 export let mgtDisable: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = plainToClass(VaildSchema.UserMgtDisable, req.body);
-        paramsValid(data);
+        let data = paramsValid(req.body, VaildSchema.UserMgtDisable);
         let detail = await UserModel.findById(data._id);
         if (!detail.canEdit)
             throw common.error('不可禁用此账号');

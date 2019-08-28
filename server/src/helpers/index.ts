@@ -8,6 +8,7 @@ import * as config from '../config';
 import { logger } from '../_main';
 import * as VaildSchema from '../vaild-schema/class-valid';
 import { valid } from './class-valid';
+import { plainToClass } from 'class-transformer';
 
 type ResponseHandlerOptType = {
     json?: boolean;
@@ -60,21 +61,28 @@ export let responseHandler = function (fn: (opt?: ResponseHandlerOptType) => any
     });
 }
 
-export function paramsValid(data) {
-    let err = valid(data);
+/**
+ * 数据校验
+ * @param data 已经转换了的数据，如果未转换，传入schema
+ * @param schema 
+ */
+export function paramsValid(data, schema?) {
+    let rtnData = schema ? plainToClass(schema, data) : data;
+    let err = valid(rtnData);
     if (err.length)
         throw common.error('', config.error.ARGS_ERROR, { remark: err.join(';') });
 
-    if (data instanceof VaildSchema.ListBase) {
-        if (!data.page)
-            data.page = 1;
-        if (!data.rows)
-            data.rows = 10;
+    if (rtnData instanceof VaildSchema.ListBase) {
+        if (!rtnData.page)
+            rtnData.page = 1;
+        if (!rtnData.rows)
+            rtnData.rows = 10;
 
         let maxRows = 100;
-        if (data.rows > maxRows)
-            data.rows = maxRows;
+        if (rtnData.rows > maxRows)
+            rtnData.rows = maxRows;
     }
+    return rtnData;
 };
 
 /**

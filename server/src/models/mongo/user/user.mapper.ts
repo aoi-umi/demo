@@ -15,7 +15,11 @@ import { UserModel, UserInstanceType } from ".";
 import { FileMapper } from '../file';
 import { FollowModel } from '../follow';
 import { ArticleModel } from '../article';
+import { plainToClass } from 'class-transformer';
 
+type UserResetOption = {
+    imgHost?: string;
+};
 export class UserMapper {
     static createToken(data, user: UserInstanceType) {
         let dataStr = JSON.stringify(data);
@@ -251,7 +255,7 @@ export class UserMapper {
         };
     }
 
-    static async login(token, user: UserInstanceType, data: VaildSchema.UserSignIn, disabled: boolean) {
+    static async login(token, user: UserInstanceType, data: VaildSchema.UserSignIn, disabled: boolean, opt?: UserResetOption) {
         let { checkToken } = UserMapper.createToken(data, user);
         if (token !== checkToken)
             throw common.error('', config.error.TOKEN_WRONG);
@@ -265,17 +269,20 @@ export class UserMapper {
             }
         }
 
-        return {
+        let rtn = {
             _id: user._id, account: user.account, nickname: user.nickname, avatar: user.avatar,
             key: token, authority: userAuth,
             loginData: data,
             lastLoginAt: new Date()
         };
+        UserMapper.resetDetail(rtn, opt);
+        return plainToClass(LoginUser, rtn);
     }
 
-    static resetDetail(detail, opt: {
-        imgHost?: string;
-    }) {
+    static resetDetail(detail, opt: UserResetOption) {
+        opt = {
+            ...opt
+        };
         detail.avatarUrl = FileMapper.getImgUrl(detail.avatar, opt.imgHost);
     }
 

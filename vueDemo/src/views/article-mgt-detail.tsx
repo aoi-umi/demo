@@ -31,7 +31,6 @@ export type DetailDataType = {
     commentCount: number;
     like: number;
     dislike: number;
-
     setPublish: boolean;
     setPublishAt: string;
     publishAt: string;
@@ -40,6 +39,9 @@ export type DetailDataType = {
     canUpdate: boolean;
     canDel: boolean;
     user: { _id: string; nickname: string; account: string };
+
+    _disabled?: boolean;
+    _checked?: boolean;
 };
 @Component
 export default class ArticleDetail extends ArticleMgtBase {
@@ -91,6 +93,15 @@ export default class ArticleDetail extends ArticleMgtBase {
     $refs: { formVaild: IForm, editor: IMyEditor, upload: IMyUpload, loadView: IMyLoad };
 
     mounted() {
+        this.init();
+    }
+
+    @Watch('$route')
+    route(to, from) {
+        this.init();
+    }
+
+    private init() {
         this.$refs.loadView.loadData();
     }
 
@@ -101,6 +112,9 @@ export default class ArticleDetail extends ArticleMgtBase {
         if (query._id) {
             this.preview = this.$route.path == dev.routeConfig.articleMgtDetail.path;
             detail = await testApi.articleMgtDetailQuery({ _id: query._id });
+            if (query.repost) {
+                detail.detail._id = '';
+            }
         } else {
             detail = this.getDetailData() as any;
         }

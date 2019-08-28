@@ -1,5 +1,4 @@
 import { Types, SchemaTypes } from 'mongoose';
-import { plainToClass, Type, Transform } from 'class-transformer';
 import { GridFSFile, GridFSModel, setSchema, prop, setMethod, getGridFSModel } from 'mongoose-ts-ua';
 
 

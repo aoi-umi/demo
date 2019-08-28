@@ -30,13 +30,15 @@ export function valid(data) {
     return msg;
 }
 
-//本地化
+//校验本地化
 const _getMessage = ValidationTypes.getMessage;
 ValidationTypes.getMessage = function (this: typeof ValidationTypes, type: string, isEach: boolean) {
     let eachPrefix = isEach ? "里的每一项" : "";
     switch (type) {
         case this.CONTAINS:
             return `$property ${eachPrefix}必须包含 $constraint1 字符串`;
+        case this.IS_INT:
+            return `$property ${eachPrefix}必须是整数`;
     }
     return _getMessage.apply(ValidationTypes, arguments);
 }

@@ -40,10 +40,8 @@ export class UserAuthMid {
                         //自动重新登录
                         if (user.cacheAt && user.cacheAt.getTime() < new Date().getTime() - 1000 * 3600 * 2) {
                             try {
-                                let returnUser = await UserMapper.login(token, dbUser, user.loginData, disableResult.disabled);
-                                UserMapper.resetDetail(returnUser, { imgHost: req.headers.host });
+                                let returnUser = user = await UserMapper.login(token, dbUser, user.loginData, disableResult.disabled, { imgHost: req.headers.host });
                                 await cache.set(userCacheKey, returnUser, config.dev.cacheTime.user);
-                                user = plainToClass(LoginUser, returnUser);
                                 req.myData.user = user;
                             } catch (e) {
                                 logger.error(e);

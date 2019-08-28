@@ -49,10 +49,16 @@ export class ArticleMgtBase extends Base {
         });
     }
 
-    protected toDetail(_id?, preview?) {
+    protected toDetail(_id?, opt?: {
+        preview?: boolean,
+        repost?: boolean,
+    }) {
+        opt = {
+            ...opt
+        };
         this.$router.push({
-            path: preview ? dev.routeConfig.articleMgtDetail.path : dev.routeConfig.articleMgtEdit.path,
-            query: { _id: _id || '' }
+            path: opt.preview ? dev.routeConfig.articleMgtDetail.path : dev.routeConfig.articleMgtEdit.path,
+            query: { _id: _id || '', repost: opt.repost ? 'true' : '' }
         });
     }
 
@@ -89,7 +95,7 @@ export class ArticleMgtBase extends Base {
             operate.push({
                 text: '预览',
                 fn: () => {
-                    this.toDetail(detail._id, true);
+                    this.toDetail(detail._id, { preview: true });
                 }
             });
         }
@@ -99,6 +105,14 @@ export class ArticleMgtBase extends Base {
                 fn: () => {
                     this.delIds = [detail._id];
                     this.delShow = true;
+                }
+            });
+        }
+        if (detail.user._id === this.storeUser.user._id && detail.status === myEnum.articleStatus.已删除) {
+            operate.push({
+                text: '重投',
+                fn: () => {
+                    this.toDetail(detail._id, { repost: true });
                 }
             });
         }
@@ -151,14 +165,12 @@ export class ArticleMgtBase extends Base {
 export default class Article extends ArticleMgtBase {
     $refs: { list: IMyList<any> };
 
-    page: any;
     protected created() {
         this.statusList = myEnum.articleStatus.toArray().map(ele => {
             ele['checked'] = false;
             return ele;
         });
         let query = this.$route.query;
-        this.page = { index: query.page, size: query.rows };
     }
 
     mounted() {
@@ -186,7 +198,7 @@ export default class Article extends ArticleMgtBase {
     statusList: { key: string; value: any, checked?: boolean }[] = [];
 
     protected delSuccessHandler() {
-        this.$refs.list.query();
+        this.query();
     }
 
     protected auditSuccessHandler(detail) {
@@ -215,8 +227,6 @@ export default class Article extends ArticleMgtBase {
                 {this.renderNotPassConfirm()}
                 <MyList
                     ref="list"
-                    current={this.page.index}
-                    pageSize={this.page.size}
                     queryArgs={{
                         user: {
                             label: '用户',
@@ -248,13 +258,14 @@ export default class Article extends ArticleMgtBase {
                                 <Card style={{ marginTop: '5px', textAlign: 'center' }}>{msg}</Card>
                             );
                         }
-                        return rs.data.map(ele => {
+                        return rs.data.map((ele: DetailDataType) => {
+                            ele._disabled = !ele.canDel;
                             return (
                                 <ArticleListItemView value={ele} mgt
-                                    // selectable={!!this.multiOperateBtnList.length}
+                                    selectable={!!this.multiOperateBtnList.length}
                                     on-selected-change={(val) => {
-                                        ele._selected = val;
-                                        this.$refs.list.selectedRows = rs.data.filter(ele => ele._selected);
+                                        ele._checked = val;
+                                        this.$refs.list.selectedRows = rs.data.filter(ele => ele._checked);
                                     }}>
                                     <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                                         {

@@ -128,11 +128,6 @@ export default class Bookmark extends Base {
     detail: any;
     $refs: { list: IMyList<any> };
 
-    page: any;
-    created() {
-        let query = this.$route.query;
-        this.page = { index: query.page, size: query.rows };
-    }
     mounted() {
         this.query();
     }
@@ -156,7 +151,7 @@ export default class Bookmark extends Base {
             await testApi.bookmarkDel(this.delIds);
             this.delIds = [];
             this.delShow = false;
-            this.$refs.list.query();
+            this.query();
         });
     }
 
@@ -182,8 +177,6 @@ export default class Bookmark extends Base {
                 </Modal>
                 <MyList
                     ref="list"
-                    current={this.page.index}
-                    pageSize={this.page.size}
                     queryArgs={{
                         name: {
                             label: '名字',

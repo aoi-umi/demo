@@ -1,5 +1,4 @@
 import { RequestHandler } from 'express';
-import { plainToClass } from 'class-transformer';
 
 import { responseHandler, paramsValid } from '../helpers';
 import { error } from '../_system/common';
@@ -9,8 +8,7 @@ import { RoleModel, RoleInstanceType, RoleMapper } from '../models/mongo/role';
 
 export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let data = plainToClass(VaildSchema.RoleQuery, req.query);
-        paramsValid(data);
+        let data = paramsValid(req.query, VaildSchema.RoleQuery);
         let { rows, total } = await RoleMapper.query({ ...data, includeDelAuth: true });
         return {
             rows,
@@ -21,8 +19,7 @@ export let query: RequestHandler = (req, res) => {
 
 export let codeExists: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let data = plainToClass(VaildSchema.RoleCodeExists, req.body);
-        paramsValid(data);
+        let data = paramsValid(req.body, VaildSchema.RoleCodeExists);
         let rs = await RoleMapper.codeExists(data.code, data._id);
         return rs && { _id: rs._id };
     }, req, res);
@@ -96,8 +93,7 @@ export let update: RequestHandler = (req, res) => {
 
 export let del: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let data = plainToClass(VaildSchema.RoleDel, req.body);
-        paramsValid(data);
+        let data = paramsValid(req.body, VaildSchema.RoleDel);
         let rs = await RoleModel.deleteMany({ _id: { $in: data.idList } });
         if (!rs.n)
             throw error('', config.error.NO_MATCH_DATA);
