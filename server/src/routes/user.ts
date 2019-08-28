@@ -84,7 +84,7 @@ export let detailQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
         let data = paramsValid(req.query, VaildSchema.UserMgtQuery);
-        paramsValid(data);
+
         let detail = await UserModel.findById(data._id, { password: 0, roleList: 0, authorityList: 0 });
         if (!detail)
             throw common.error('', config.error.USER_NOT_FOUND);

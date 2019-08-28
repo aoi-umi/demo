@@ -7,7 +7,6 @@ import { myEnum, authority, dev } from '@/config';
 import { convClass, convert } from '@/helpers';
 import { Modal, Form, FormItem, Button, RadioGroup, Radio, Input, DatePicker } from '@/components/iview';
 import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
-import { MyTagModel } from '@/components/my-tag';
 import { AuthorityTransferView, IAuthorityTransfer } from './authority';
 import { IRoleTransfer, RoleTransferView } from './role';
 import { Base } from './base';
@@ -151,12 +150,7 @@ export default class UserMgt extends Base {
     detail: any;
     $refs: { list: IMyList<any> };
 
-    page: any;
     editType;
-    created() {
-        let query = this.$route.query;
-        this.page = { index: query.page, size: query.rows };
-    }
     mounted() {
         this.query();
     }
@@ -265,8 +259,6 @@ export default class UserMgt extends Base {
                 </Modal>
                 <MyList
                     ref="list"
-                    current={this.page.index}
-                    pageSize={this.page.size}
 
                     queryArgs={{
                         account: {

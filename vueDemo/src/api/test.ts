@@ -215,8 +215,8 @@ export class TestApi extends ApiModel<TestApiMethod> {
     async articleMgtSave(data) {
         return this.requestByConfig(this.apiConfig.method.articleMgtSave, { data });
     }
-    async articleMgtDel(idList: string[]) {
-        return this.requestByConfig(this.apiConfig.method.articleMgtDel, { data: { idList } });
+    async articleMgtDel(data: { idList: string[], remark?: string }) {
+        return this.requestByConfig(this.apiConfig.method.articleMgtDel, { data });
     }
     async articleMgtAudit(data: { idList: string[], status, remark?}) {
         return this.requestByConfig(this.apiConfig.method.articleMgtAudit, { data });

@@ -2,6 +2,7 @@ import { Request, Response, Express } from 'express';
 import * as Q from 'q';
 import * as moment from 'moment';
 import { MongooseDocument, Error } from 'mongoose';
+import { ClassType } from 'class-transformer/ClassTransformer';
 
 import * as common from '../_system/common';
 import * as config from '../config';
@@ -66,6 +67,8 @@ export let responseHandler = function (fn: (opt?: ResponseHandlerOptType) => any
  * @param data 已经转换了的数据，如果未转换，传入schema
  * @param schema 
  */
+export function paramsValid<T>(data: T): T;
+export function paramsValid<T>(data, schema: ClassType<T>): T;
 export function paramsValid(data, schema?) {
     let rtnData = schema ? plainToClass(schema, data) : data;
     let err = valid(rtnData);
@@ -83,7 +86,7 @@ export function paramsValid(data, schema?) {
             rtnData.rows = maxRows;
     }
     return rtnData;
-};
+}
 
 /**
  * mongoose数据模型验证
