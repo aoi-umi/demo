@@ -49,8 +49,8 @@ import * as article from './article';
 router.get('/article/mgt/query', UserAuthMid.normal([auth.login]), article.mgtQuery);
 router.get('/article/mgt/detailQuery', UserAuthMid.normal([auth.login]), article.mgtDetailQuery);
 router.post('/article/mgt/save', UserAuthMid.normal([auth.login]), article.mgtSave);
-router.post('/article/mgt/del', UserAuthMid.normal([auth.articleMgtAudit]), article.mgtDel);
-router.post('/article/mgt/audit', UserAuthMid.normal([auth.articleMgtDel]), article.mgtAudit);
+router.post('/article/mgt/del', UserAuthMid.normal(), article.mgtDel);
+router.post('/article/mgt/audit', UserAuthMid.normal([auth.articleMgtAudit]), article.mgtAudit);
 
 router.get('/article/query', UserAuthMid.normal(), article.query);
 router.get('/article/detailQuery', UserAuthMid.normal(), article.detailQuery);

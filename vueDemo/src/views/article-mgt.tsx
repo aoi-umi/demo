@@ -1,11 +1,9 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
-import moment from 'moment';
 import { testApi } from '@/api';
 import { myEnum, authority, dev } from '@/config';
 import { Modal, Checkbox, Row, Input, Card, Button } from '@/components/iview';
 import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
 import { MyConfirm } from '@/components/my-confirm';
-import { MyImg } from '@/components/my-img';
 import { convert } from '@/helpers';
 import { DetailDataType } from './article-mgt-detail';
 import { Base } from './base';
@@ -14,6 +12,7 @@ import { ArticleListItemView } from './article';
 export class ArticleMgtBase extends Base {
     delShow = false;
     delIds = [];
+    delRemark = '';
     notPassShow = false;
     notPassRemark = '';
     operateDetail: DetailDataType;
@@ -145,8 +144,9 @@ export class ArticleMgtBase extends Base {
                     ok={async () => {
                         await this.delClick();
                     }}>
-                    将要删除{this.delIds.length}项
-                    </MyConfirm>
+                    <p>将要删除{this.delIds.length}项</p>
+                    <p>备注: <Input v-model={this.delRemark} /></p>
+                </MyConfirm>
             </Modal>
         );
     }
@@ -154,9 +154,10 @@ export class ArticleMgtBase extends Base {
     protected delSuccessHandler() { }
     async delClick() {
         await this.operateHandler('删除', async () => {
-            await testApi.articleMgtDel(this.delIds);
+            await testApi.articleMgtDel({ idList: this.delIds, remark: this.delRemark });
             this.delIds = [];
             this.delShow = false;
+            this.delRemark = '';
             this.delSuccessHandler();
         });
     }
@@ -170,7 +171,6 @@ export default class Article extends ArticleMgtBase {
             ele['checked'] = false;
             return ele;
         });
-        let query = this.$route.query;
     }
 
     mounted() {
@@ -213,6 +213,7 @@ export default class Article extends ArticleMgtBase {
                 onClick: (selection) => {
                     this.delIds = selection.map(ele => ele._id);
                     this.delShow = true;
+                    this.delRemark = '';
                 }
             });
         }

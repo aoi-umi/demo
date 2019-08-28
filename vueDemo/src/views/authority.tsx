@@ -107,14 +107,11 @@ export default class Authority extends Base {
     detail: any;
     $refs: { list: IMyList<any> };
 
-    page: any;
     protected created() {
         this.statusList = myEnum.authorityStatus.toArray().map(ele => {
             ele['checked'] = false;
             return ele;
         });
-        let query = this.$route.query;
-        this.page = { index: query.page, size: query.rows };
     }
 
     mounted() {
@@ -251,8 +248,6 @@ export default class Authority extends Base {
                 </Modal>
                 <MyList
                     ref="list"
-                    current={this.page.index}
-                    pageSize={this.page.size}
                     queryArgs={{
                         name: {
                             label: '名字',

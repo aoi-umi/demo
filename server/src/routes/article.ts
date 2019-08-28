@@ -100,6 +100,7 @@ export let mgtDel: RequestHandler = (req, res) => {
         await ArticleMapper.updateStatus(data.idList, myEnum.articleStatus.已删除, user, {
             includeUserId: Auth.contains(user, config.auth.articleMgtDel) ? null : user._id,
             status: { $ne: myEnum.articleStatus.已删除 },
+            logRemark: data.remark,
         });
     }, req, res);
 };
