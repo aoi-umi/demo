@@ -26,7 +26,7 @@ export class ArticleLog extends Base {
     userId: Types.ObjectId;
 
     @prop()
-    user: string;
+    logUser: string;
 
     @prop({
         type: SchemaTypes.ObjectId,
@@ -40,11 +40,21 @@ export class ArticleLog extends Base {
     })
     srcStatus: number;
 
+    @prop()
+    get srcStatusText() {
+        return myEnum.articleStatus.getKey(this.srcStatus);
+    }
+
     @prop({
         enum: myEnum.articleStatus.getAllValue(),
         required: true,
     })
     destStatus: number;
+
+    @prop()
+    get destStatusText() {
+        return myEnum.articleStatus.getKey(this.destStatus);
+    }
 
     @prop()
     remark: string;

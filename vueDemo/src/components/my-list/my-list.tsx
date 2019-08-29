@@ -89,6 +89,9 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
     @Prop()
     hideSearchBox?: boolean;
 
+    @Prop()
+    hidePage?: boolean;
+
     //下拉刷新
     @Prop()
     infiniteScroll?: boolean;
@@ -304,7 +307,7 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
                 <div style={{ position: 'relative', }}>
                     {this.$slots.default}
                     {this.type == 'table' ?
-                        <Table style={{ marginTop: '10px' }} columns={this.columns.filter(ele => {
+                        <Table style={{ marginTop: '10px', overflow: 'visible' }} columns={this.columns.filter(ele => {
                             let sort = this.model.sort;
                             ele.sortType = '' as any;
                             if (sort.orderBy && sort.sortOrder) {
@@ -333,7 +336,7 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
                         </Table> :
                         this.customRenderFn(this.result)
                     }
-                    {!this.infiniteScroll &&
+                    {!this.infiniteScroll && !this.hidePage &&
                         <Page
                             ref="page"
                             class={clsPrefix + "page"} total={this.result.total}
