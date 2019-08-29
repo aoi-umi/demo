@@ -16,6 +16,9 @@ class MyImg extends Vue {
     @Prop()
     failImg?: string;
 
+    @Prop()
+    vLazy?: string;
+
     @Watch('src')
     private watchSrc(newVal) {
         this.isLoadSuccess = !!newVal;
