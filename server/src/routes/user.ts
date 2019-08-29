@@ -72,7 +72,7 @@ export let info: RequestHandler = (req, res) => {
 export let detail: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let detail = await UserMapper.detail(user._id);
+        let detail = await UserMapper.detail(user._id, { imgHost: req.headers.host });
         let dbUser = await UserModel.findById(user._id);
         UserMapper.resetDetail(detail, { imgHost: req.headers.host });
         await UserMapper.resetStat(dbUser, detail);
@@ -148,7 +148,7 @@ export let mgtQuery: RequestHandler = (req, res) => {
         let data = paramsValid(req.query, VaildSchema.UserMgtQuery);
         let { rows, total } = await UserMapper.query({
             ...data, includeDelAuth: true
-        });
+        }, { imgHost: req.headers.host });
         rows.forEach(detail => {
             UserMapper.resetDetail(detail, { imgHost: req.headers.host });
         });

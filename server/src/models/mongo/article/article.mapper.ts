@@ -25,7 +25,7 @@ type ArticleQueryOption = {
     audit?: boolean;
     normal?: boolean;
     userId?: string;
-    resetOpt?: ArticleResetOption;
+    resetOpt: ArticleResetOption;
 };
 
 export class ArticleMapper {
@@ -134,9 +134,16 @@ export class ArticleMapper {
             log: null as any[]
         };
         if (!opt.normal) {
-            let log = await ArticleLogModel.find({ articleId: detail._id }).sort({ _id: -1 });
-            rs.log = log.map(ele => {
-                return ArticleLogMapper.reset(ele.toJSON());
+            let logRs = await ArticleLogModel.aggregatePaginate([
+                { $match: { articleId: detail._id } },
+                ...UserMapper.lookupPipeline(),
+                { $sort: { _id: -1 } }
+            ]);
+            rs.log = logRs.rows.map(ele => {
+                let obj = new ArticleLogModel(ele).toJSON();
+                UserMapper.resetDetail(ele.user, { imgHost: opt.resetOpt.imgHost });
+                obj.user = ele.user;
+                return obj;
             });
         }
         return rs;
@@ -248,15 +255,13 @@ export class ArticleLogMapper {
             userId: user._id,
             srcStatus: opt.srcStatus,
             destStatus: opt.destStatus,
-            user: user.nameToString(),
+            logUser: user.nameToString(),
         });
         log.remark = opt.remark || (myEnum.articleStatus.getKey(log.srcStatus) + '=>' + myEnum.articleStatus.getKey(log.destStatus));
         return log;
     }
 
-    static reset(log: any) {
-        log.srcStatusText = myEnum.articleStatus.getKey(log.srcStatus);
-        log.destStatusText = myEnum.articleStatus.getKey(log.destStatus);
+    static resetDetail(log: any) {
         return log;
     }
 }

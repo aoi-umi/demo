@@ -32,7 +32,7 @@ export class UserMapper {
         return rs;
     }
 
-    static async query(data: VaildSchema.UserMgtQuery) {
+    static async query(data: VaildSchema.UserMgtQuery, opt: UserResetOption) {
         let query: any = {};
         let noTotal = false;
         if (data._id) {
@@ -169,12 +169,12 @@ export class UserMapper {
             noTotal,
             ...BaseMapper.getListOptions(data),
         });
-        rs.rows.forEach((ele) => {
+        rs.rows = rs.rows.map((ele) => {
             let model = new UserModel(ele);
+            let obj = model.toJSON();
             //可用权限
             let auth = {};
             let authorityList = ele.newAuthorityList;
-            delete ele.newAuthorityList;
             authorityList.forEach(authority => {
                 if (authority.status == myEnum.authorityStatus.启用)
                     auth[authority.code] = authority;
@@ -182,10 +182,9 @@ export class UserMapper {
             if (data.includeDelAuth) {
                 UserMapper.setDelAuthOrRole(authorityList, ele.authorityList);
             }
-            ele.authorityList = authorityList;
+            obj.authorityList = authorityList;
 
             let roleList = ele.newRoleList;
-            delete ele.newRoleList;
             roleList.forEach(role => {
                 if (role.status == myEnum.roleStatus.启用) {
                     let roleAuthorityList = role.newAuthorityList;
@@ -204,13 +203,13 @@ export class UserMapper {
             if (data.includeDelAuth) {
                 UserMapper.setDelAuthOrRole(roleList, ele.roleList);
             }
-            ele.roleList = roleList;
-            ele.auth = auth;
+            obj.roleList = roleList;
+            obj.auth = auth;
 
-            ele.canEdit = model.canEdit;
-            ele.statusText = model.statusText;
             let disRs = model.checkDisabled();
-            ele.disabled = disRs.disabled;
+            obj.disabled = disRs.disabled;
+            UserMapper.resetDetail(obj, opt);
+            return obj;
         });
         return rs;
     }
@@ -226,8 +225,8 @@ export class UserMapper {
         });
     }
 
-    static async detail(_id) {
-        let userRs = await UserMapper.query({ _id });
+    static async detail(_id, opt: UserResetOption) {
+        let userRs = await UserMapper.query({ _id }, opt);
         let userDetail = userRs.rows[0];
         if (userDetail && userDetail.roleList.find(r => r.code == config.dev.rootRole)) {
             let authList = await AuthorityModel.find({ status: myEnum.authorityStatus.启用 });
@@ -255,7 +254,7 @@ export class UserMapper {
         };
     }
 
-    static async login(token, user: UserInstanceType, data: VaildSchema.UserSignIn, disabled: boolean, opt?: UserResetOption) {
+    static async login(token, user: UserInstanceType, data: VaildSchema.UserSignIn, disabled: boolean, opt: UserResetOption) {
         let { checkToken } = UserMapper.createToken(data, user);
         if (token !== checkToken)
             throw common.error('', config.error.TOKEN_WRONG);
@@ -263,7 +262,7 @@ export class UserMapper {
             [config.auth.login.code]: 1
         };
         if (!disabled) {
-            let userDetail = await UserMapper.detail(user._id);
+            let userDetail = await UserMapper.detail(user._id, opt);
             for (let key in userDetail.auth) {
                 userAuth[key] = 1;
             }

@@ -12,6 +12,7 @@ import { IRoleTransfer, RoleTransferView } from './role';
 import { Base } from './base';
 import { AuthorityTagView } from './comps/authority-tag';
 import { RoleTagView } from './comps/role-tag';
+import { UserAvatarView } from './comps/user-avatar';
 
 export type DetailDataType = {
     _id?: string;
@@ -181,13 +182,10 @@ export default class UserMgt extends Base {
         }, {
             title: '账号',
             key: 'account',
-            sortable: 'custom' as any,
             minWidth: 120,
-        }, {
-            title: '昵称',
-            key: 'nickname',
-            sortable: 'custom' as any,
-            minWidth: 120,
+            render: (h, params) => {
+                return <UserAvatarView style={{ margin: '5px' }} user={params.row} />;
+            }
         }, {
             title: '角色',
             key: 'roleList',

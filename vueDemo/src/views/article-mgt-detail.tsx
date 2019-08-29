@@ -11,6 +11,7 @@ import { IMyEditor } from '@/components/my-editor/my-editor';
 import { MyLoad, IMyLoad } from '@/components/my-load';
 import { ArticleMgtBase } from './article-mgt';
 import { UserAvatarView } from './comps/user-avatar';
+import { MyList } from '@/components/my-list';
 
 export type DetailType = {
     detail: DetailDataType;
@@ -200,8 +201,16 @@ export default class ArticleDetail extends ArticleMgtBase {
                 {log.length > 0 &&
                     <div>
                         <Divider size='small' />
-                        <Table
+                        <MyList
+                            hideSearchBox
+                            hidePage
                             columns={[{
+                                title: '操作人',
+                                key: 'user',
+                                render: (h, params) => {
+                                    return <UserAvatarView style={{ margin: '5px' }} user={params.row.user} />;
+                                }
+                            }, {
                                 title: '源状态',
                                 key: 'srcStatusText',
                             }, {
@@ -211,9 +220,6 @@ export default class ArticleDetail extends ArticleMgtBase {
                                 title: '备注',
                                 key: 'remark',
                             }, {
-                                title: '操作人',
-                                key: 'user',
-                            }, {
                                 title: '操作时间',
                                 key: 'createdAt',
                                 render: (h, params) => {
@@ -221,7 +227,7 @@ export default class ArticleDetail extends ArticleMgtBase {
                                 }
                             }]}
                             data={log}>
-                        </Table>
+                        </MyList>
                     </div>
                 }
             </div>
