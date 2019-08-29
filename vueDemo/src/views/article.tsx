@@ -174,12 +174,12 @@ class ArticleListItem extends Base {
                             alignItems: 'flex-start',
                             flexWrap: 'wrap',
                         }}>
-                            {ele.coverUrl && <MyImg class=" my-upload-item cover" style={{
+                            {ele.coverUrl && <img class="my-upload-item cover" style={{
                                 border: '1px solid #e2e4e6',
                                 borderRadius: '5px',
                                 marginRight: '5px',
                                 marginBottom: '5px',
-                            }} src={ele.coverUrl} />}
+                            }} v-lazy={ele.coverUrl} />}
                             <p style={{
                                 overflowY: 'hidden', maxHeight: '150px', minWidth: '200px', whiteSpace: 'pre-wrap'
                             }}>{ele.profile || dev.defaultArticleProfile}</p>
