@@ -3,7 +3,7 @@ export type TagType = {
     add?: boolean;
     key?: string;
     tag?: string;
-    selected?: boolean;
+    checked?: boolean;
     color?: string;
     checkable?: boolean;
     data?: any;
@@ -73,12 +73,12 @@ export class MyTagModel {
                 add: true,
                 tag,
                 key,
-                selected: true,
+                checked: true,
                 checkable: true,
                 data,
             });
         } else {
-            match.selected = true;
+            match.checked = true;
         }
     }
 
@@ -86,7 +86,7 @@ export class MyTagModel {
         let { key, tag } = this.getTag(oTag);
         let match = this.findTag(key);
         if (match) {
-            match.selected = false;
+            match.checked = false;
         }
     }
 
@@ -94,9 +94,9 @@ export class MyTagModel {
         type returnType = TagType | any;
         let addTagList: returnType[] = [], delTagList: returnType[] = [];
         this.tagList.map(ele => {
-            if (ele.add && ele.selected) {
+            if (ele.add && ele.checked) {
                 addTagList.push(key ? ele[key] : ele);
-            } else if (!ele.add && !ele.selected) {
+            } else if (!ele.add && !ele.checked) {
                 delTagList.push(key ? ele[key] : ele);
             }
         });

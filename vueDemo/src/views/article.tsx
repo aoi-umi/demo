@@ -1,10 +1,8 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
-import moment from 'moment';
 import { testApi } from '@/api';
 import { myEnum, authority, dev } from '@/config';
 import { Card, Input, Row, Col, Icon, Divider, Time, Checkbox } from '@/components/iview';
-import { MyList, IMyList, Const as MyTableConst, ResultType } from '@/components/my-list';
-import { MyImg } from '@/components/my-img';
+import { MyList, IMyList } from '@/components/my-list';
 import { convert, convClass } from '@/helpers';
 import { DetailDataType } from './article-mgt-detail';
 import { UserAvatarView } from './comps/user-avatar';
@@ -129,7 +127,7 @@ class ArticleListItem extends Base {
             <div>
                 <Card style={{ marginTop: '5px', cursor: this.mgt ? '' : 'pointer' }}>
                     <Row>
-                        <Col style={{ marginLeft: '40px', display: 'flex', }} nativeOn-click={() => {
+                        <Col style={{ marginLeft: '40px', display: 'flex', alignItems: 'baseline' }} nativeOn-click={() => {
                             this.toDetail(ele);
                         }}>
                             <h3 class="article-list-title" style={{ display: 'inline' }} title={ele.title}>{ele.title}</h3>
@@ -140,6 +138,7 @@ class ArticleListItem extends Base {
                                 this.toDetail(ele);
                             }}>
                             </div>
+                            {this.mgt && <MyTag value={ele.statusText} />}
                             {this.selectable && <Checkbox value={ele._checked} disabled={ele._disabled} on-on-change={(checked) => {
                                 this.$emit('selected-change', checked);
                             }} />}
@@ -150,9 +149,6 @@ class ArticleListItem extends Base {
                             alignItems: 'center',
                         }}>
                             <UserAvatarView user={ele.user} tipsPlacement="bottom-start" />
-                            {this.mgt && <span class="not-important" style={{ marginLeft: '5px' }} on-click={() => {
-                                this.toDetail(ele);
-                            }}>创建于 <Time time={new Date(ele.createdAt)} /></span>}
                             {ele.publishAt && <span class="not-important" style={{ marginLeft: '5px' }} on-click={() => {
                                 this.toDetail(ele);
                             }}>发布于 <Time time={new Date(ele.publishAt)} /></span>}
@@ -163,7 +159,6 @@ class ArticleListItem extends Base {
                                 this.toDetail(ele);
                             }}>
                             </div>
-                            {this.mgt && <MyTag value={ele.statusText} />}
                         </Col>
                     </Row>
                     <Row style={{ marginLeft: '40px' }} nativeOn-click={() => {
@@ -184,6 +179,9 @@ class ArticleListItem extends Base {
                                 overflowY: 'hidden', maxHeight: '150px', minWidth: '200px', whiteSpace: 'pre-wrap'
                             }}>{ele.profile || dev.defaultArticleProfile}</p>
                         </Col>
+                        {this.mgt && <p class="not-important" on-click={() => {
+                            this.toDetail(ele);
+                        }}>创建于 <Time time={new Date(ele.createdAt)} /></p>}
                     </Row>
                     <Divider size="small" />
                     {this.$slots.default || (!this.mgt ?

@@ -2,8 +2,9 @@ import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { testApi } from '@/api';
 import { myEnum, authority, dev } from '@/config';
 import { Modal, Checkbox, Row, Input, Card, Button } from '@/components/iview';
-import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
+import { MyList, IMyList } from '@/components/my-list';
 import { MyConfirm } from '@/components/my-confirm';
+import { MyTag, TagType } from '@/components/my-tag';
 import { convert } from '@/helpers';
 import { DetailDataType } from './article-mgt-detail';
 import { Base } from './base';
@@ -168,8 +169,11 @@ export default class Article extends ArticleMgtBase {
 
     protected created() {
         this.statusList = myEnum.articleStatus.toArray().map(ele => {
-            ele['checked'] = false;
-            return ele;
+            return {
+                tag: ele.key,
+                key: ele.value,
+                checkable: true
+            }
         });
     }
 
@@ -189,13 +193,13 @@ export default class Article extends ArticleMgtBase {
         let status = this.$route.query.status as string;
         let statusList = status ? status.split(',') : [];
         this.statusList.forEach(ele => {
-            ele.checked = statusList.includes(ele.value.toString());
+            ele.checked = statusList.includes(ele.key.toString());
         });
         convert.Test.queryToListModel(query, list.model);
         this.$refs.list.query(query);
     }
 
-    statusList: { key: string; value: any, checked?: boolean }[] = [];
+    statusList: TagType[] = [];
 
     protected delSuccessHandler() {
         this.query();
@@ -239,13 +243,7 @@ export default class Article extends ArticleMgtBase {
                             label: '任意字'
                         }
                     }}
-                    customQueryNode={this.statusList.map(ele => {
-                        return (
-                            <label style={{ marginRight: '5px' }}>
-                                <Checkbox v-model={ele.checked} />{ele.key}
-                            </label>
-                        );
-                    })}
+                    customQueryNode={<MyTag v-model={this.statusList} />}
 
                     hideQueryBtn={{
                         add: !this.storeUser.user.isLogin
@@ -295,7 +293,7 @@ export default class Article extends ArticleMgtBase {
                             path: this.$route.path,
                             query: {
                                 ...q,
-                                status: this.statusList.filter(ele => ele.checked).map(ele => ele.value).join(','),
+                                status: this.statusList.filter(ele => ele.checked).map(ele => ele.key).join(','),
                                 ...convert.Test.listModelToQuery(model),
                             }
                         });
