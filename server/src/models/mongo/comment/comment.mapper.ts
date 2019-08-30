@@ -24,20 +24,31 @@ export class CommentMapper {
             userId: user._id,
             ownerId: data.ownerId,
             comment: data.comment,
-            quotId: data.quotId,
+            quoteId: data.quoteId,
+            topId: data.topId,
             type: type,
             floor: lastComment ? lastComment.floor + 1 : 1
         });
         return comment;
     }
 
-    static async query(data: VaildSchema.CommentQuery, opt: {
-        resetOpt?: CommentResetOption
+    static async query(data: Partial<VaildSchema.CommentQuery>, opt: {
+        resetOpt?: CommentResetOption,
+        replyTopId?: any
     }) {
-        let match: any = {
-            ownerId: data.ownerId,
-            type: data.type,
-        };
+        let match: any;
+        if (opt.replyTopId) {
+            let topId = opt.replyTopId instanceof Array ? { $in: opt.replyTopId.map(ele => Types.ObjectId(ele)) } : Types.ObjectId(opt.replyTopId);
+            match = { topId: topId };
+            data.orderBy = '_id';
+            data.sortOrder = 1;
+        } else {
+            match = {
+                ownerId: data.ownerId,
+                type: data.type,
+                topId: data.topId || { $exists: 0 }
+            }
+        }
 
         // let owner = await CommentMapper.findOwner({
         //     ownerId: data.ownerId,
@@ -62,8 +73,11 @@ export class CommentMapper {
                 })
             ];
         }
+
         let rs = await CommentModel.aggregatePaginate(pipeline, {
-            ...BaseMapper.getListOptions(data),
+            ...BaseMapper.getListOptions({
+                ...data,
+            }),
             extraPipeline,
         });
 
@@ -92,10 +106,18 @@ export class CommentMapper {
     }
 
     static resetDetail(detail, opt: CommentResetOption) {
+        detail.voteValue = detail.vote ? detail.vote.value : myEnum.voteValue.无;
+        delete detail.vote;
         if (detail.status !== myEnum.commentStatus.正常) {
             return {
                 _id: detail._id,
                 floor: detail.floor,
+                topId: detail.topId,
+                quoteId: detail.quoteId,
+                createdAt: detail.createdAt,
+                voteValue: detail.voteValue,
+                like: detail.like,
+                dislike: detail.dislike,
                 isDel: true,
             };
         }
@@ -115,8 +137,6 @@ export class CommentMapper {
             detail.user.followStatus = detail.follow ? detail.follow.status : myEnum.followStatus.未关注;
         }
         delete detail.follow;
-        detail.voteValue = detail.vote ? detail.vote.value : myEnum.voteValue.无;
-        delete detail.vote;
         return detail;
     }
 }

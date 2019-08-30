@@ -32,32 +32,47 @@ class Comment extends Base {
 
     refreshLoading = false;
     submitLoading = false;
-    comment = '';
     submit() {
-        let comment = this.comment.trim();
-        if (!comment)
+        let reply = this.reply.content.trim();
+        if (!reply)
             return this.$Message.warning('请输入评论');
         this.operateHandler('发送评论', async () => {
             this.submitLoading = true;
-            let rs = await testApi.commentSubmit({ ownerId: this.ownerId, comment: this.comment, type: this.type });
-            this.$refs.list.result.data.unshift(rs);
-            this.comment = '';
+            let quote = this.reply.quote || {};
+            let topId = quote.topId || quote._id || '';
+            let rs = await testApi.commentSubmit({
+                ownerId: this.ownerId, comment: reply, type: this.type,
+                quoteId: quote._id || '',
+                topId,
+            });
+            let data = this.$refs.list.result.data;
+            if (!topId)
+                data.unshift(rs);
+            else {
+                let top = data.find(ele => ele._id === topId);
+                if (top)
+                    top.replyList.push(rs);
+            }
+            this.resetReply();
         }).finally(() => {
             this.submitLoading = false;
         });
     }
 
     delShow = false;
-    delIds = [];
-    handleDel(id) {
-        this.delIds = [id];
+    delList = [];
+    handleDel(ele) {
+        this.delList = [ele];
         this.delShow = true;
     }
 
     delClick() {
         return this.operateHandler('删除', async () => {
-            await testApi.commentDel({ idList: this.delIds });
-            this.$refs.list.result.data = this.$refs.list.result.data.filter(ele => !this.delIds.includes(ele._id));
+            await testApi.commentDel({ idList: this.delList.map(ele => ele._id) });
+            this.delList.forEach(ele => {
+                ele.isDel = true;
+            });
+            this.delList = [];
             this.delShow = false;
         });
     }
@@ -74,9 +89,20 @@ class Comment extends Base {
             });
     }
 
-    render() {
+    private reply = {
+        floor: -1,
+        quote: null,
+        content: ''
+    };
+
+    private resetReply(comment?) {
+        this.reply.content = '';
+        this.reply.floor = comment ? comment.floor : -1;
+        this.reply.quote = comment || null;
+    }
+    renderSubmitBox() {
         return (
-            <div>
+            <div style={{ marginTop: '10px' }}>
                 <MyEditor
                     class="comment-send"
                     toolbar={
@@ -91,17 +117,85 @@ class Comment extends Base {
                         ]
                     }
                     placeholder='请输入评论'
-                    v-model={this.comment}
+                    v-model={this.reply.content}
                 />
                 <div style={{ textAlign: 'right', marginTop: '5px' }}>
                     <Button on-click={() => {
-                        this.query();
-                    }} loading={this.refreshLoading}>刷新评论</Button>
+                        this.resetReply();
+                    }} >取消</Button>
                     <Button type="primary" on-click={() => {
                         this.submit();
                     }} loading={this.submitLoading}>发送评论</Button>
                 </div>
-                <Divider size='small' />
+            </div>
+        );
+    }
+
+    renderComment(ele, reply?: boolean) {
+        let tab = '42px';
+        let rootStyle: any = {
+            marginTop: '5px',
+        };
+        let contentStyle: any = {
+            marginLeft: tab,
+        };
+        if (ele.replyList && ele.replyList.length)
+            contentStyle.marginBottom = '10px';
+        let dividerStyle: any = {};
+        if (reply) {
+            rootStyle = {
+                marginLeft: tab,
+                background: '#eef1f3',
+                padding: '24px 0 0 5px',
+            };
+            dividerStyle = {
+                marginBottom: 0,
+            };
+        }
+        return (
+            <div style={rootStyle}>
+                <div style={{ position: 'relative' }}>
+                    {ele.user && <UserAvatarView user={ele.user} tipsPlacement="bottom-start" />}
+                    <span style={{ position: 'absolute', right: '5px' }}>
+                        #{ele.floor}
+                    </span>
+                    <div style={contentStyle}>
+                        {ele.isDel ?
+                            <p>评论已删除</p> : <p domPropsInnerHTML={ele.comment} style={{ overflowWrap: 'break-word', marginBottom: '10px' }} />
+                        }
+                        <div style={{ position: 'absolute', right: '5px', cursor: 'pointer' }}>
+                            {ele.canDel && <Icon type="md-trash" size={20} on-click={() => {
+                                this.handleDel(ele);
+                            }} />}
+                            <span style={{ marginRight: '5px' }}><Icon type="md-thumbs-up" size={20} color={ele.voteValue == myEnum.voteValue.喜欢 ? "red" : ''} on-click={() => {
+                                this.handleVote(ele, ele.voteValue == myEnum.voteValue.喜欢 ? myEnum.voteValue.无 : myEnum.voteValue.喜欢);
+                            }} />{ele.like}</span>
+                            <Icon type="md-quote" size={20} on-click={() => {
+                                this.resetReply(ele);
+                            }} />
+                        </div>
+                        <span class="not-important"><Time time={new Date(ele.createdAt)} /></span>
+                    </div>
+                    {this.reply.floor === ele.floor && this.renderSubmitBox()}
+                </div>
+                {!!ele.replyList && ele.replyList.map(reply => this.renderComment(reply, true))}
+                <Divider style={dividerStyle} size='small' />
+            </div>
+        );
+    }
+
+    render() {
+        return (
+            <div>
+                <div style={{ textAlign: 'right', marginTop: '5px', marginBottom: '10px' }}>
+                    <Button on-click={() => {
+                        this.query();
+                    }} loading={this.refreshLoading}>刷新评论</Button>
+                    <Button type="primary" on-click={() => {
+                        this.resetReply({ floor: 0 });
+                    }}>发送评论</Button>
+                    {this.reply.floor === 0 && this.renderSubmitBox()}
+                </div>
                 <MyList
                     ref="list"
                     hideSearchBox
@@ -115,39 +209,7 @@ class Comment extends Base {
                             );
                         }
                         return rs.data.map((ele) => {
-                            return (
-                                <div>
-                                    {ele.isDel ?
-                                        <div>
-                                            <span style={{ position: 'absolute', right: '5px' }}>
-                                                #{ele.floor}
-                                            </span>
-                                            <p style={{ marginLeft: '42px' }}>
-                                                评论已删除
-                                            </p>
-                                        </div> :
-                                        <div style={{ position: 'relative' }}>
-                                            <UserAvatarView user={ele.user} tipsPlacement="bottom-start" />
-                                            <span style={{ position: 'absolute', right: '5px' }}>
-                                                #{ele.floor}
-                                            </span>
-                                            <div style={{ marginLeft: '42px' }}>
-                                                <p domPropsInnerHTML={ele.comment} style={{ overflowWrap: 'break-word', marginBottom: '10px' }} />
-                                                <div style={{ position: 'absolute', right: '5px', cursor: 'pointer' }}>
-                                                    {ele.canDel && <Icon type="md-trash" size={24} on-click={() => {
-                                                        this.handleDel(ele._id);
-                                                    }} />}
-                                                    <Icon type="md-thumbs-up" size={24} color={ele.voteValue == myEnum.voteValue.喜欢 ? "red" : ''} on-click={() => {
-                                                        this.handleVote(ele, ele.voteValue == myEnum.voteValue.喜欢 ? myEnum.voteValue.无 : myEnum.voteValue.喜欢);
-                                                    }} />{ele.like}
-                                                </div>
-                                                <span class="not-important"><Time time={new Date(ele.createdAt)} /></span>
-                                            </div>
-                                        </div>
-                                    }
-                                    <Divider size='small' />
-                                </div>
-                            );
+                            return this.renderComment(ele);
                         });
                     }}
 

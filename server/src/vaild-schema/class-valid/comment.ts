@@ -15,7 +15,10 @@ export class CommentSubmit {
     comment: string;
 
     @Transform(value => Types.ObjectId(value))
-    quotId: Types.ObjectId;
+    quoteId: Types.ObjectId;
+
+    @Transform(value => Types.ObjectId(value))
+    topId: Types.ObjectId;
 
     @IsDefined()
     @IsIn(myEnum.commentType.getAllValue())
@@ -30,6 +33,9 @@ export class CommentQuery extends ListBase {
 
     @Type()
     type: number;
+
+    @Transform(value => Types.ObjectId(value))
+    topId?: Types.ObjectId
 }
 
 export class CommentDel extends DelBase {

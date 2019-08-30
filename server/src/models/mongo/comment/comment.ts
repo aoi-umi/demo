@@ -44,7 +44,12 @@ export class Comment extends Base implements IVoteOwner {
     @prop({
         type: SchemaTypes.ObjectId
     })
-    quotId: Types.ObjectId;
+    topId: Types.ObjectId;
+
+    @prop({
+        type: SchemaTypes.ObjectId
+    })
+    quoteId: Types.ObjectId;
 
     @prop({
         required: true
