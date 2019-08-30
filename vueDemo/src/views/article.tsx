@@ -131,10 +131,7 @@ class ArticleListItem extends Base {
                             this.toDetail(ele);
                         }}>
                             <h3 class="article-list-title" style={{ display: 'inline' }} title={ele.title}>{ele.title}</h3>
-                            <div style={{
-                                flex: '1 1 auto',
-                                alignSelf: 'stretch',
-                            }} on-click={() => {
+                            <div class="flex-stretch" on-click={() => {
                                 this.toDetail(ele);
                             }}>
                             </div>
@@ -152,10 +149,7 @@ class ArticleListItem extends Base {
                             {ele.publishAt && <span class="not-important" style={{ marginLeft: '5px' }} on-click={() => {
                                 this.toDetail(ele);
                             }}>发布于 <Time time={new Date(ele.publishAt)} /></span>}
-                            <div style={{
-                                flex: '1 1 auto',
-                                alignSelf: 'stretch',
-                            }} on-click={() => {
+                            <div class="flex-stretch" on-click={() => {
                                 this.toDetail(ele);
                             }}>
                             </div>
