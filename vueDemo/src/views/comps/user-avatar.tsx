@@ -94,11 +94,6 @@ class UserAvatar extends Base {
                     size={this.size}
                     src={this.avatarUrl}
                     style={{ marginRight: '10px' }}
-                    nativeOn-click={() => {
-                        if (this.avatarUrl) {
-                            this.$refs.imgViewer.show();
-                        }
-                    }}
                 />
                 {this.avatarUrl && <MyImgViewer src={this.avatarUrl} ref='imgViewer' />}
                 <span class="not-important">{this.user.nickname}{this.showAccount && `(${this.user.account})`}</span>
@@ -117,7 +112,12 @@ class UserAvatar extends Base {
                             <div>
                                 {this.loading && <Spin fix />}
                                 <div style={{ textAlign: 'center' }}>
-                                    <Avatar class="shadow" icon="md-person" src={this.innerUser.avatarUrl} size="large" />
+                                    <Avatar class="shadow" icon="md-person" src={this.innerUser.avatarUrl} size="large"
+                                        nativeOn-click={() => {
+                                            if (this.avatarUrl) {
+                                                this.$refs.imgViewer.show();
+                                            }
+                                        }} />
                                 </div>
                                 <br />
                                 {this.innerUser.profile || dev.defaultProfile}

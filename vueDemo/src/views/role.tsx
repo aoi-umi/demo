@@ -8,7 +8,7 @@ import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
 import { MyConfirm } from '@/components/my-confirm';
 import { IMyTransfer, MyTransfer } from '@/components/my-transfer';
 
-import { AuthorityTagView } from './comps/authority-tag';
+import { AuthorityTagView, AuthorityDetail } from './comps/authority-tag';
 import { AuthorityTransferView, IAuthorityTransfer } from './authority';
 import { Base } from './base';
 
@@ -17,7 +17,7 @@ export type DetailDataType = {
     name?: string;
     code?: string;
     status?: number;
-    authorityList?: { code: string; name: string, isDel: boolean; }[];
+    authorityList?: AuthorityDetail[];
     isDel?: boolean;
 }
 @Component

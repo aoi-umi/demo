@@ -5,25 +5,27 @@ import { TagType } from './model';
 export type RenderTagType = string | TagType;
 
 @Component
-export class MyTagBase extends Vue {
+export class MyTagBase<T = RenderTagType> extends Vue {
     @Prop()
-    value: RenderTagType | (RenderTagType[]);
-
-    protected convertValue(ele: any): RenderTagType {
-        return ele;
-    }
+    value: T | (T[]);
 
     @Watch('value')
     protected watchValue(newValue) {
         let newList = [];
         if (newValue)
             newList = newValue instanceof Array ? newValue : [newValue];
-        if (this.convertValue)
-            newList = newList.map(ele => this.convertValue(ele));
+        newList.map(ele => {
+            if (typeof ele !== 'string') {
+                if (!('checked' in ele))
+                    this.$set(ele, 'checked', false);
+                if (!('checkable' in ele))
+                    this.$set(ele, 'checkable', false);
+            }
+        });
         this.tagList = newList;
     }
 
-    tagList: RenderTagType[] = [];
+    tagList: T[] = [];
 
     created() {
         this.watchValue(this.value);
@@ -41,10 +43,9 @@ export class MyTagBase extends Vue {
                     if (typeof ele === 'string') {
                         return <Tag color="blue">{ele}</Tag>;
                     }
-                    let checkable = (ele as Object).hasOwnProperty('checkable') ? ele.checkable : false;
                     return (
-                        <Tag color={ele.color as any || "blue"} checkable={checkable} checked={ele.selected} on-on-change={(checked) => {
-                            ele.selected = checked;
+                        <Tag color={ele.color as any || "blue"} checkable={ele.checkable} checked={ele.checked} on-on-change={(checked) => {
+                            ele.checked = checked;
                         }}>
                             {ele.isDel ?
                                 <del>

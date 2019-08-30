@@ -21,7 +21,7 @@ export type DetailDataType = {
     avatar?: string;
     avatarUrl?: string;
     roleList?: { code: string; name: string; isDel: boolean; }[];
-    authorityList?: { code: string; name: string; isDel: boolean }[];
+    authorityList?: { code: string; name: string; isDel: boolean, status: number }[];
     auth?: { [code: string]: any };
     createdAt?: string;
     status?: number;
