@@ -136,6 +136,9 @@ class Comment extends Base {
         let rootStyle: any = {
             marginTop: '5px',
         };
+        let textStyle = {
+            marginBottom: '10px',
+        };
         let contentStyle: any = {
             marginLeft: tab,
         };
@@ -161,20 +164,21 @@ class Comment extends Base {
                     </span>
                     <div style={contentStyle}>
                         {ele.isDel ?
-                            <p>评论已删除</p> : <p domPropsInnerHTML={ele.comment} style={{ overflowWrap: 'break-word', marginBottom: '10px' }} />
+                            <p style={textStyle}>评论已删除</p> : <p domPropsInnerHTML={ele.comment} style={{ ...textStyle, overflowWrap: 'break-word' }} />
                         }
-                        <div style={{ position: 'absolute', right: '5px', cursor: 'pointer' }}>
-                            {ele.canDel && <Icon type="md-trash" size={20} on-click={() => {
+                        <div style={{ display: 'flex', justifyContent: 'flex-start', cursor: 'pointer', marginRight: '5px' }}>
+                            <span class="not-important" ><Time time={new Date(ele.createdAt)} /></span>
+                            <div class='flex-stretch'></div>
+                            {ele.canDel && <Icon style={{ marginRight: '20px' }} type="md-trash" size={20} on-click={() => {
                                 this.handleDel(ele);
                             }} />}
-                            <span style={{ marginRight: '5px' }}><Icon type="md-thumbs-up" size={20} color={ele.voteValue == myEnum.voteValue.喜欢 ? "red" : ''} on-click={() => {
+                            <span style={{ marginRight: '20px' }}><Icon type="md-thumbs-up" size={20} color={ele.voteValue == myEnum.voteValue.喜欢 ? "red" : ''} on-click={() => {
                                 this.handleVote(ele, ele.voteValue == myEnum.voteValue.喜欢 ? myEnum.voteValue.无 : myEnum.voteValue.喜欢);
                             }} />{ele.like}</span>
                             <Icon type="md-quote" size={20} on-click={() => {
                                 this.resetReply(ele);
                             }} />
                         </div>
-                        <span class="not-important"><Time time={new Date(ele.createdAt)} /></span>
                     </div>
                     {this.reply.floor === ele.floor && this.renderSubmitBox()}
                 </div>
