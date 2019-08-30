@@ -39,10 +39,10 @@ class Comment extends Base {
         this.operateHandler('发送评论', async () => {
             this.submitLoading = true;
             let quote = this.reply.quote || {};
-            let topId = quote.topId || quote._id || '';
+            let topId = quote.topId || quote._id || null;
             let rs = await testApi.commentSubmit({
                 ownerId: this.ownerId, comment: reply, type: this.type,
-                quoteId: quote._id || '',
+                quoteId: quote._id || null,
                 topId,
             });
             let data = this.$refs.list.result.data;
