@@ -39,17 +39,22 @@ export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
         let data = paramsValid(req.query, VaildSchema.CommentQuery);
+        let queryOpt = {
+            resetOpt: {
+                imgHost: req.headers.host,
+                user: user.isLogin ? user : null
+            }
+        };
         let { total, rows } = await CommentMapper.query({
             ...data,
-        }, {
-                resetOpt: {
-                    imgHost: req.headers.host,
-                    user: user.isLogin ? user : null
-                }
-            });
+        }, queryOpt);
+
+        //获取二级回复
+        let { rows: replyList } = await CommentMapper.query({}, { ...queryOpt, replyTopId: rows.map(ele => ele._id) });
         return {
             rows,
             total,
+            replyList
         };
     }, req, res);
 };

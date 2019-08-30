@@ -229,7 +229,11 @@ export class TestApi extends ApiModel<TestApiMethod> {
         return this.requestByConfig(this.apiConfig.method.commentSubmit, { data });
     }
     async commentQuery(data) {
-        return this.requestByConfig(this.apiConfig.method.commentQuery, { data });
+        let rs = await this.requestByConfig<ListResult & { replyList: any[] }>(this.apiConfig.method.commentQuery, { data });
+        rs.rows.forEach(ele => {
+            ele.replyList = rs.replyList.filter(reply => reply.topId === ele._id);
+        });
+        return rs;
     }
     async commentDel(data) {
         return this.requestByConfig(this.apiConfig.method.commentDel, { data });

@@ -59,7 +59,7 @@ class MyEditor extends MyInputBase {
     render() {
         let self = this;
         return (
-            <quill-editor ref="quillEditor" v-model={this.currentValue} options={{
+            <quill-editor style={{ background: '#fff' }} ref="quillEditor" v-model={this.currentValue} options={{
                 placeholder: this.placeholder,
                 modules: {
                     toolbar: {
