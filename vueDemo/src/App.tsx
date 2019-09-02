@@ -117,7 +117,7 @@ export default class App extends Base {
                     <span>{this.title}</span>
                     <div class="layout-header-right">
                         {this.storeUser.user.isLogin ?
-                            <UserAvatarView user={this.storeUser.user} self /> :
+                            <UserAvatarView user={this.storeUser.user} self tipsPlacement="bottom" /> :
                             [
                                 <Button type="primary" on-click={() => {
                                     this.storeSetting.setSetting({

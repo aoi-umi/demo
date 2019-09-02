@@ -452,7 +452,7 @@ export default class UserInfo extends Base {
             return (
                 <Card style={{ marginTop: '5px' }}>
                     <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline' }}>
-                        <UserAvatarView tipsPlacement="right-start" user={user} />
+                        <UserAvatarView user={user} />
                         <span style={{ marginLeft: '5px' }}>{user.profile || dev.defaultProfile}</span>
                         <div style={{
                             flexGrow: 1

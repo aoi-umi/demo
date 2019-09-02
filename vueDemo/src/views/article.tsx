@@ -145,7 +145,7 @@ class ArticleListItem extends Base {
                             display: 'flex',
                             alignItems: 'center',
                         }}>
-                            <UserAvatarView user={ele.user} tipsPlacement="bottom-start" />
+                            <UserAvatarView user={ele.user} />
                             {ele.publishAt && <span class="not-important" style={{ marginLeft: '5px' }} on-click={() => {
                                 this.toDetail(ele);
                             }}>发布于 <Time time={new Date(ele.publishAt)} /></span>}

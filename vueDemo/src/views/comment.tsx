@@ -158,7 +158,7 @@ class Comment extends Base {
         return (
             <div style={rootStyle}>
                 <div style={{ position: 'relative' }}>
-                    {ele.user && <UserAvatarView user={ele.user} tipsPlacement="bottom-start" />}
+                    {ele.user && <UserAvatarView user={ele.user} />}
                     <span style={{ position: 'absolute', right: '5px' }}>
                         #{ele.floor}
                     </span>
