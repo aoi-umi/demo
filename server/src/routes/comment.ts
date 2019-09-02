@@ -77,7 +77,7 @@ export let del: RequestHandler = (req, res) => {
             let id = data.idList[0];
             let detail = await CommentModel.findById(id);
             if (detail) {
-                if (detail.userId.equals(user._id))
+                if (user.equalsId(detail.userId))
                     delIdList = [id];
                 // else {
                 //     let owner = await CommentMapper.findOwner({ ownerId: detail.ownerId, type: detail.type, mgt: true });

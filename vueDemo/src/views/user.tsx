@@ -211,7 +211,6 @@ class SignUp extends Base {
 export const SignUpView = convClass<SignUp>(SignUp);
 @Component
 export default class UserInfo extends Base {
-    loading = false;
     detail: UserDetailDataType = {};
     tab = '';
     mounted() {

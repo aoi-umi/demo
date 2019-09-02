@@ -15,7 +15,7 @@ export let save: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
         let data = paramsValid(req.body, VaildSchema.FollowSave);
-        if (data.userId.equals(user._id)) {
+        if (user.equalsId(data.userId)) {
             throw error('不能关注自己');
         }
         let detail = await FollowMapper.create({ userId: user._id, followUserId: data.userId });
@@ -85,7 +85,7 @@ export let query: RequestHandler = (req, res) => {
                 }
             }),
         ];
-        if (data.userId.equals(user._id)) {
+        if (user.equalsId(data.userId)) {
             pipeline = [
                 ...pipeline,
                 //获取相互关注状态

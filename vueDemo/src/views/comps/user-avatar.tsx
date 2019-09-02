@@ -3,7 +3,7 @@ import * as iviewTypes from 'iview';
 
 import { testApi } from '@/api';
 import { convClass } from '@/helpers';
-import { dev, myEnum } from '@/config';
+import { dev, myEnum, authority } from '@/config';
 import { Button, Avatar, Poptip, Spin } from '@/components/iview';
 import { MyImgViewer, IMyImgViewer } from '@/components/my-img-viewer';
 import { Base } from '../base';
@@ -60,6 +60,14 @@ class UserAvatar extends Base {
         let token = localStorage.getItem(dev.cacheKey.testUser);
         if (token) {
             testApi.userSignOut();
+        }
+        for (let key in dev.routeConfig) {
+            let rtCfg = dev.routeConfig[key];
+            if (rtCfg.path === this.$route.path) {
+                if (rtCfg.authority && rtCfg.authority.includes(authority.login))
+                    this.$router.go(0);
+                break;
+            }
         }
         this.storeUser.setUser(null);
     }
@@ -137,7 +145,14 @@ class UserAvatar extends Base {
                                     query: { _id: this.user._id }
                                 });
                             }}>主页</Button>
-                            {this.user._id !== this.storeUser.user._id && <FollowButtonView user={this.user} />}
+                            {this.user._id !== this.storeUser.user._id && [
+                                <FollowButtonView user={this.user} />,
+                                <Button on-click={() => {
+                                    this.$router.push({
+                                        path: dev.routeConfig.userChat.path,
+                                        query: { _id: this.user._id }
+                                    });
+                                }}>私信</Button>]}
                         </div>
                     </div>
                 }

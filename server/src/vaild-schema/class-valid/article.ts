@@ -4,6 +4,7 @@ import { Type, Transform } from "class-transformer";
 
 import { myEnum } from "../../config";
 import { ListBase, DelBase, DetailQueryBase } from "./base";
+import { arrayTransform } from "./util";
 
 export class AritcleQuery extends ListBase {
     @Transform(value => Types.ObjectId(value))
@@ -43,7 +44,7 @@ export class ArticleMgtAudit {
     @IsDefined()
     @IsArray()
     @Transform(value => {
-        return value.map(ele => Types.ObjectId(ele));
+        return arrayTransform(value, Types.ObjectId);
     })
     idList: Types.ObjectId[];
 

@@ -74,6 +74,12 @@ router.post('/follow/save', UserAuthMid.normal([auth.login]), follow.save);
 router.get('/follow/query', UserAuthMid.normal(), follow.query);
 //#endregion
 
+//#region chat 
+import * as chat from './chat';
+router.post('/chat/submit', UserAuthMid.normal([auth.login]), chat.submit);
+router.get('/chat/query', UserAuthMid.normal([auth.login]), chat.query);
+//#endregion
+
 //#region file 
 import * as file from './file';
 router.post('/img/upload', UserAuthMid.normal([auth.login]), FileMid.single, file.imgUpload);

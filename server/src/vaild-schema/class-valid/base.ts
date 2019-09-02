@@ -1,6 +1,7 @@
 import { Type, Transform } from 'class-transformer';
 import { IsIn, IsArray, IsDefined, ArrayMinSize, IsInt } from "class-validator";
 import { Types } from 'mongoose';
+import { arrayTransform } from './util';
 
 export class ListBase {
     @IsInt()
@@ -32,7 +33,7 @@ export class DelBase {
     @IsArray()
     @ArrayMinSize(1)
     @Transform(value => {
-        return value.map(ele => Types.ObjectId(ele));
+        return arrayTransform(value, Types.ObjectId);
     })
     idList: Types.ObjectId[];
 }

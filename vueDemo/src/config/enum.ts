@@ -61,6 +61,11 @@ const enumDefineFront = {
         解封: 0,
         封禁至: 1,
     },
+    chatSendStatus: {
+        发送中: 0,
+        发送成功: 1,
+        发送失败: -1
+    }
 };
 export const enumDefine = {
     ...enumDefineBack,
