@@ -24,7 +24,7 @@ type ArticleResetOption = {
 type ArticleQueryOption = {
     audit?: boolean;
     normal?: boolean;
-    userId?: string;
+    userId?: Types.ObjectId;
     resetOpt: ArticleResetOption;
 };
 
@@ -73,7 +73,7 @@ export class ArticleMapper {
         if (data.status)
             match.status = { $in: data.status.split(',').map(ele => parseInt(ele)) };
 
-        let userId = opt.userId && Types.ObjectId(opt.userId);
+        let userId = opt.userId;
         if (opt.normal) {
             match.status = myEnum.articleStatus.审核通过;
             match.publishAt = { $lte: new Date() };
@@ -160,8 +160,8 @@ export class ArticleMapper {
         let { user } = opt;
         if (user) {
             let rs = {
-                canDel: detail.status !== myEnum.articleStatus.已删除 && (detail.userId == user._id || Auth.contains(user, config.auth.articleMgtDel)),
-                canUpdate: detail.canUpdate && detail.userId == user._id,
+                canDel: detail.status !== myEnum.articleStatus.已删除 && (user.equalsId(detail.userId) || Auth.contains(user, config.auth.articleMgtDel)),
+                canUpdate: detail.canUpdate && user.equalsId(detail.userId),
             };
             detail.canDel = rs.canDel;
             detail.canUpdate = rs.canUpdate;

@@ -55,6 +55,7 @@ export const Sider = convClass<{
     'reverse-arrow'?: boolean;
 }>(iview.Sider);
 export const Spin = convClass<iviewTypes.Spin>(iview.Spin);
+export const Split = convClass<iviewTypes.Split>(iview.Split);
 export const Switch = convClass<iviewTypes.Switch>(iview.Switch);
 export const Table = convClass<iviewTypes.Table>(iview.Table);
 export const Tabs = convClass<iviewTypes.Tabs>(iview.Tabs);

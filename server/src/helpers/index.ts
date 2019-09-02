@@ -71,6 +71,7 @@ export function paramsValid<T>(data: T): T;
 export function paramsValid<T>(data, schema: ClassType<T>): T;
 export function paramsValid(data, schema?) {
     let rtnData = schema ? plainToClass(schema, data) : data;
+    // console.log(rtnData);
     let err = valid(rtnData);
     if (err.length)
         throw common.error('', config.error.ARGS_ERROR, { remark: err.join(';') });

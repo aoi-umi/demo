@@ -35,6 +35,14 @@ export const routerConfig = {
         },
         component: () => import('./views/user')
     },
+    userChat: {
+        path: dev.routeConfig.userChat.path,
+        text: '私信',
+        meta: {
+            authority: dev.routeConfig.userChat.authority,
+        },
+        component: () => import('./views/user-chat')
+    },
     userSignIn: {
         path: dev.routeConfig.userSignIn.path,
         text: '登录',

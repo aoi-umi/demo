@@ -1,8 +1,11 @@
-import { Type } from "class-transformer";
+import { Type, Transform } from "class-transformer";
+import { Types } from 'mongoose';
 
 export class LoginUser {
     isLogin: boolean;
-    _id: string;
+
+    @Transform(value => Types.ObjectId(value))
+    _id: Types.ObjectId;
     nickname: string;
     account: string;
     avatar?: string;
@@ -17,5 +20,9 @@ export class LoginUser {
 
     nameToString() {
         return this.nickname + '(' + this.account + ')';
+    }
+
+    equalsId(id) {
+        return this._id && this._id.equals(id);
     }
 }

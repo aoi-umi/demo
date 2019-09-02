@@ -125,7 +125,7 @@ export class CommentMapper {
         if (user) {
             let rs = {
                 canDel: detail.status !== myEnum.commentStatus.已删除
-                    && (detail.userId == user._id
+                    && (user.equalsId(detail.userId)
                         || Auth.contains(user, config.auth.commentMgtDel)
                         // || (opt.authorId && opt.authorId.equals(user._id))
                     ),

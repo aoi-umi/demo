@@ -156,6 +156,13 @@ const config = {
                     url: '/follow/query',
                     method: 'get',
                 },
+                chatSubmit: {
+                    url: '/chat/submit',
+                },
+                chatQuery: {
+                    url: '/chat/query',
+                    method: 'get',
+                },
                 //file
 
                 imgUpload: {

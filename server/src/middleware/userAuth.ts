@@ -15,7 +15,7 @@ export class UserAuthMid {
 
                 req.myData = {
                     user: plainToClass(LoginUser, {
-                        _id: '',
+                        _id: undefined,
                         nickname: '',
                         account: '',
                         authority: {},

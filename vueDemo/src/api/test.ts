@@ -49,6 +49,8 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
     voteSubmit,
     followSave,
     followQuery,
+    chatSubmit,
+    chatQuery,
 
     //file
     imgUpload,
@@ -124,9 +126,11 @@ export class TestApi extends ApiModel<TestApiMethod> {
     async userSignOut() {
         return this.requestByConfig(this.apiConfig.method.userSignOut);
     }
+    //登录信息
     async userInfo() {
         return this.requestByConfig(this.apiConfig.method.userInfo);
     }
+    //用户详细（自己）
     async userDetail() {
         return this.requestByConfig(this.apiConfig.method.userDetail);
     }
@@ -252,6 +256,15 @@ export class TestApi extends ApiModel<TestApiMethod> {
     }
     async followQuery(data) {
         return this.requestByConfig(this.apiConfig.method.followQuery, { data });
+    }
+    //#endregion
+
+    //#region chat 
+    async chatSubmit(data) {
+        return this.requestByConfig(this.apiConfig.method.chatSubmit, { data });
+    }
+    async chatQuery(data) {
+        return this.requestByConfig<ListResult>(this.apiConfig.method.chatQuery, { data });
     }
     //#endregion
 }

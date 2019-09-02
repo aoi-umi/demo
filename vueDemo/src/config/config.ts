@@ -15,6 +15,10 @@ export const routeConfig = {
     },
     userSignIn: { path: '/user/signIn' },
     userSignUp: { path: '/user/signUp' },
+    userChat: {
+        path: '/user/chat',
+        authority: [authorityConfig.login],
+    },
     //管理
     userMgt: {
         path: '/userMgt',

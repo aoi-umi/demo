@@ -336,7 +336,7 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
                         </Table> :
                         this.customRenderFn(this.result)
                     }
-                    {!this.infiniteScroll && !this.hidePage &&
+                    {!this.infiniteScroll && !this.hidePage && (this.result.total / this.model.page.size > 1) &&
                         <Page
                             ref="page"
                             class={clsPrefix + "page"} total={this.result.total}

@@ -27,11 +27,15 @@ export class Base extends Model<Base> {
         let query = self.find(opt.conditions, opt.projection);
         let getAll = parseBool(opt.getAll);
 
-        if (!opt.page || !opt.rows) {
+        if (!opt.page && !opt.rows) {
             getAll = true;
         }
-        if (!getAll)
-            query.skip((opt.page - 1) * opt.rows).limit(opt.rows);
+        if (!getAll) {
+            if (opt.rows && opt.page)
+                query.skip((opt.page - 1) * opt.rows);
+            if (opt.rows)
+                query.limit(opt.rows);
+        }
         let sortCondition = this.getSortCondition(opt);
         query.sort(sortCondition);
         let rs = await Q.all([
@@ -84,17 +88,18 @@ export class Base extends Model<Base> {
         let { getAll } = opt;
         getAll = parseBool(getAll);
         //分页
-        if (!opt.page || !opt.rows) {
+        if (!opt.page && !opt.rows) {
             getAll = true;
         }
         if (!getAll) {
-            opt.page = parseInt(opt.page as any);
-            opt.rows = parseInt(opt.rows as any);
-            extraPipeline = [
-                ...extraPipeline,
-                { $skip: (opt.page - 1) * opt.rows },
-                { $limit: opt.rows }
-            ];
+            if (opt.page)
+                opt.page = parseInt(opt.page as any);
+            if (opt.rows)
+                opt.rows = parseInt(opt.rows as any);
+            if (opt.page && opt.rows)
+                extraPipeline.push({ $skip: (opt.page - 1) * opt.rows });
+            if (opt.rows)
+                extraPipeline.push({ $limit: opt.rows });
         }
         let group = {
             _id: null,

@@ -17,7 +17,7 @@ import { FollowModel } from '../follow';
 import { ArticleModel } from '../article';
 import { plainToClass } from 'class-transformer';
 
-type UserResetOption = {
+export type UserResetOption = {
     imgHost?: string;
 };
 export class UserMapper {
