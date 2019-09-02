@@ -32,7 +32,9 @@ class UserAvatar extends Base {
     @Prop()
     showAccount?: boolean;
 
-    @Prop()
+    @Prop({
+        default: 'right-start'
+    })
     tipsPlacement: iviewTypes.Poptip['placement'];
 
     @Prop()

@@ -182,7 +182,7 @@ export default class ArticleDetail extends ArticleMgtBase {
     renderHeader(detail: DetailDataType) {
         return (
             <div>
-                <UserAvatarView user={detail.user} tipsPlacement="bottom-start" />
+                <UserAvatarView user={detail.user} />
                 {[
                     '状态: ' + detail.statusText,
                     '创建于: ' + moment(detail.createdAt).format(dev.dateFormat),
