@@ -35,6 +35,7 @@ export type DetailDataType = {
     setPublish: boolean;
     setPublishAt: string;
     publishAt: string;
+    userId: string;
 
     voteValue: number;
     canUpdate: boolean;

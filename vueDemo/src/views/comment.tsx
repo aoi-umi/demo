@@ -10,11 +10,15 @@ import { MyConfirm } from '@/components/my-confirm';
 import { dev, myEnum } from '@/config';
 import { Base } from './base';
 import { UserAvatarView } from './comps/user-avatar';
+import { UserPoptipView } from './comps/user-poptip';
 
 @Component
 class Comment extends Base {
     @Prop()
     ownerId: string;
+
+    @Prop()
+    ownUserId: string;
 
     @Prop()
     type: number;
@@ -158,11 +162,19 @@ class Comment extends Base {
         return (
             <div style={rootStyle}>
                 <div style={{ position: 'relative' }}>
-                    {ele.user && <UserAvatarView user={ele.user} />}
+                    {ele.user && <UserAvatarView user={ele.user} isAuthor={ele.user._id === this.ownUserId} />}
                     <span style={{ position: 'absolute', right: '5px' }}>
                         #{ele.floor}
                     </span>
                     <div style={contentStyle}>
+                        {ele.quoteUser &&
+                            <div><span>回复</span>
+                                <UserPoptipView user={ele.quoteUser}>
+                                    <b><a>{ele.quoteUser.nickname}</a></b>
+                                </UserPoptipView>
+                                <b>{ele.quoteUser._id === this.ownUserId && '(作者)'}:</b>
+                            </div>
+                        }
                         {ele.isDel ?
                             <p style={textStyle}>评论已删除</p> : <p domPropsInnerHTML={ele.comment} style={{ ...textStyle, overflowWrap: 'break-word' }} />
                         }
