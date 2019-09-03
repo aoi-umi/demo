@@ -221,7 +221,7 @@ class Comment extends Base {
                         if (!rs.success || !rs.data.length) {
                             let msg = !rs.success ? rs.msg : '暂无评论';
                             return (
-                                <div style={{ marginTop: '5px', textAlign: 'center' }}>{msg}</div>
+                                <div class="center" style={{ marginTop: '5px', minHeight: '50px' }}>{msg}</div>
                             );
                         }
                         return rs.data.map((ele) => {

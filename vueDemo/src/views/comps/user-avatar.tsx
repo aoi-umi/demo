@@ -62,7 +62,7 @@ class UserAvatar extends Base {
 
     render() {
         return (
-            <div>
+            <div style={{ display: 'inline-block' }}>
                 <UserPoptipView
                     user={this.user}
                     tipsPlacement={this.tipsPlacement}
