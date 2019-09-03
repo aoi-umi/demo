@@ -6,7 +6,7 @@ import { myEnum } from '../../../config';
 import { LoginUser } from '../../login-user';
 import { BaseMapper, ContentBaseInstanceType } from '../_base';
 import { ArticleMapper } from '../article';
-import { UserModel, UserMapper, UserDocType } from '../user';
+import { UserModel, UserMapper, UserDocType, UserResetOption } from '../user';
 import { FileMapper } from '../file';
 import { CommentModel, CommentDocType, CommentInstanceType } from './comment';
 import { VoteModel, VoteMapper } from '../vote';
@@ -93,14 +93,7 @@ export class CommentMapper {
         let quoteList = rs.rows.filter(ele => ele.quoteUserId);
         let quoteUserList: UserDocType[];
         if (quoteList.length) {
-            quoteUserList = await UserModel.find({ _id: quoteList.map(ele => ele.quoteUserId) }, {
-                account: 1,
-                nickname: 1,
-                avatar: 1,
-            }).lean();
-            quoteUserList.forEach(ele => {
-                UserMapper.resetDetail(ele, { imgHost: resetOpt.imgHost });
-            });
+            quoteUserList = await CommentMapper.quoteUserQuery(quoteList.map(ele => ele.quoteUserId), { imgHost: resetOpt.imgHost });
         }
 
         rs.rows = rs.rows.map(detail => {
@@ -157,5 +150,17 @@ export class CommentMapper {
             delete detail.user;
         }
         return detail;
+    }
+
+    static async quoteUserQuery(userId, opt?: UserResetOption) {
+        let quoteUserList = await UserModel.find({ _id: userId }, {
+            account: 1,
+            nickname: 1,
+            avatar: 1,
+        }).lean();
+        quoteUserList.forEach(ele => {
+            UserMapper.resetDetail(ele, opt);
+        });
+        return quoteUserList;
     }
 }
