@@ -1,7 +1,7 @@
 import { Type, Transform } from 'class-transformer';
 import { IsIn, IsArray, IsDefined, ArrayMinSize, IsInt } from "class-validator";
 import { Types } from 'mongoose';
-import { arrayTransform } from './util';
+import { arrayTransform, objectIdTransform } from './util';
 
 export class ListBase {
     @IsInt()
@@ -24,7 +24,7 @@ export class ListBase {
 
 export class DetailQueryBase {
     @IsDefined()
-    @Transform(value => Types.ObjectId(value))
+    @Transform(objectIdTransform)
     _id: Types.ObjectId;
 }
 

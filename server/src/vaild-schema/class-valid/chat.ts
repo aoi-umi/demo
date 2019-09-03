@@ -2,10 +2,11 @@ import { Transform, Type } from "class-transformer";
 import { IsDefined, MinLength, MaxLength, } from "class-validator";
 import { Types } from 'mongoose';
 import { ListBase } from "./base";
+import { objectIdTransform } from "./util";
 
 export class ChatSubmit {
     @IsDefined()
-    @Transform(value => Types.ObjectId(value))
+    @Transform(objectIdTransform)
     destUserId: Types.ObjectId;
 
     @IsDefined()
@@ -14,10 +15,10 @@ export class ChatSubmit {
 }
 
 export class ChatQuery extends ListBase {
-    @Transform(value => Types.ObjectId(value))
+    @Transform(objectIdTransform)
     lastId: Types.ObjectId;
 
     @IsDefined()
-    @Transform(value => Types.ObjectId(value))
+    @Transform(objectIdTransform)
     destUserId: Types.ObjectId;
 }
