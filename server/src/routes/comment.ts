@@ -22,6 +22,7 @@ export let submit: RequestHandler = (req, res) => {
         let ret = {
             ...comment.toJSON(),
             user: {
+                _id: user._id,
                 account: user.account,
                 nickname: user.nickname,
                 avatar: user.avatar,
