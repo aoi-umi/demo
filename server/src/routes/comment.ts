@@ -28,10 +28,15 @@ export let submit: RequestHandler = (req, res) => {
                 avatarUrl: user.avatarUrl,
             }
         };
-        return CommentMapper.resetDetail(ret, {
+        let obj = CommentMapper.resetDetail(ret, {
             user,
             imgHost: req.headers.host,
         });
+        if (comment.quoteUserId) {
+            let list = await CommentMapper.quoteUserQuery(comment.quoteUserId, { imgHost: req.headers.host });
+            obj.quoteUser = list[0];
+        }
+        return obj;
     }, req, res);
 };
 

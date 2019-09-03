@@ -49,13 +49,16 @@ class Comment extends Base {
                 quoteId: quote._id || null,
                 topId,
             });
+            rs.replyList = [];
             let data = this.$refs.list.result.data;
             if (!topId)
                 data.unshift(rs);
             else {
                 let top = data.find(ele => ele._id === topId);
-                if (top)
+                if (top) {
+                    rs.quoteUser = top.user;
                     top.replyList.push(rs);
+                }
             }
             this.resetReply();
         }).finally(() => {
