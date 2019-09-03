@@ -135,20 +135,6 @@ export class CommentMapper {
         }
         detail.voteValue = detail.vote ? detail.vote.value : myEnum.voteValue.无;
         delete detail.vote;
-        if (detail.status !== myEnum.commentStatus.正常) {
-            return {
-                _id: detail._id,
-                floor: detail.floor,
-                topId: detail.topId,
-                quoteId: detail.quoteId,
-                quoteUser: detail.quoteUser,
-                createdAt: detail.createdAt,
-                voteValue: detail.voteValue,
-                like: detail.like,
-                dislike: detail.dislike,
-                isDel: true,
-            };
-        }
         let { user } = opt;
         if (user) {
             let rs = {
@@ -165,6 +151,11 @@ export class CommentMapper {
             detail.user.followStatus = detail.follow ? detail.follow.status : myEnum.followStatus.未关注;
         }
         delete detail.follow;
+        if (detail.status !== myEnum.commentStatus.正常) {
+            detail.isDel = true;
+            delete detail.comment;
+            delete detail.user;
+        }
         return detail;
     }
 }
