@@ -9,54 +9,54 @@ import { UserMapper } from "../models/mongo/user";
 import { LoginUser } from "../models/login-user";
 
 export class UserAuthMid {
-    static normal(authData?: AuthType) {
-        let fn: RequestHandler = async function (req, res, next) {
-            try {
+    static async  getUser(token, resetOpt?) {
+        let user = plainToClass(LoginUser, {
+            _id: undefined,
+            nickname: '',
+            account: '',
+            authority: {},
+            isLogin: false,
+            key: token || ''
+        });
+        if (token) {
+            let userCacheKey = config.dev.cacheKey.user + token;
+            let userData = await cache.get(userCacheKey);
+            if (userData) {
+                user = plainToClass(LoginUser, userData);
+                user.isLogin = true;
 
+                let { disableResult, user: dbUser } = await UserMapper.accountCheck(user.account, user);
+                if (disableResult.disabled) {
+                    user.authority = {};
+                }
+                //自动重新登录
+                if (user.cacheAt && user.cacheAt.getTime() < new Date().getTime() - 1000 * 3600 * 2) {
+                    try {
+                        let cacheUser = user = await UserMapper.login(token, dbUser, user.loginData, disableResult.disabled, resetOpt);
+                        await cache.set(userCacheKey, cacheUser, config.dev.cacheTime.user);
+                    } catch (e) {
+                        logger.error(e);
+                        cache.del(userCacheKey);
+                    }
+                }
+            }
+        }
+        return user;
+    }
+
+    static normal(authData?: AuthType) {
+        let fn: RequestHandler = async (req, res, next) => {
+            try {
+                let token = req.header(config.dev.cacheKey.user);
+                let user = await UserAuthMid.getUser(token, { imgHost: req.headers.host });
                 req.myData = {
-                    user: plainToClass(LoginUser, {
-                        _id: undefined,
-                        nickname: '',
-                        account: '',
-                        authority: {},
-                        isLogin: false
-                    }),
+                    user,
                     startTime: new Date().getTime(),
                     accessableUrl: {},
                     ip: req.realIp,
                 };
-                let token = req.header(config.dev.cacheKey.user);
-                if (token) {
-                    let userCacheKey = config.dev.cacheKey.user + token;
-                    let userData = await cache.get(userCacheKey);
-                    if (userData) {
-                        let user = plainToClass(LoginUser, userData);
-                        user.isLogin = true;
-
-                        let { disableResult, user: dbUser } = await UserMapper.accountCheck(user.account, user);
-                        if (disableResult.disabled) {
-                            user.authority = {};
-                        }
-                        //自动重新登录
-                        if (user.cacheAt && user.cacheAt.getTime() < new Date().getTime() - 1000 * 3600 * 2) {
-                            try {
-                                let returnUser = user = await UserMapper.login(token, dbUser, user.loginData, disableResult.disabled, { imgHost: req.headers.host });
-                                await cache.set(userCacheKey, returnUser, config.dev.cacheTime.user);
-                                req.myData.user = user;
-                            } catch (e) {
-                                logger.error(e);
-                                cache.del(userCacheKey);
-                            }
-                        } else {
-                            req.myData.user = user;
-                        }
-                    } else {
-                        req.myData.user.key = token;
-                    }
-                }
 
                 //url权限认证
-                let user = req.myData.user;
                 if (authData)
                     auth.checkAccessable(user, authData);
                 next();

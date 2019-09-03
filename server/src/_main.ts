@@ -5,6 +5,8 @@ import * as mongo from './_system/dbMongo';
 import { Auth } from './_system/auth';
 import * as config from './config';
 import * as helpers from './helpers';
+import { SocketOnConnect } from './typings/libs';
+import { MySocket } from './_system/socket';
 
 export const logger = getLogger();
 
@@ -26,7 +28,6 @@ export async function init() {
     await mongo.connect();
 }
 
-import { SocketOnConnect } from './typings/libs';
 export let register = function (app: Express) {
     app.use((req, res, next) => {
         req.realIp = req.header('X-Real-IP') || req.ip;
@@ -42,9 +43,25 @@ export let errorHandler = function (err, req: Request, res: Response, next) {
     }, req, res);
 };
 
-export let initSocket: SocketOnConnect = function (socket) {
-    socket.on(config.myEnum.socket.弹幕发送, (msg) => {
-        socket.broadcast.emit(config.myEnum.socket.弹幕接收, msg);
+export var mySocket: MySocket = null;
+export let initSocket = function (io: SocketIO.Server) {
+    const { MySocket } = require('./_system/socket');
+    mySocket = new MySocket(io, (socket, mySocket) => {
+        let { socketUser } = mySocket;
+        socket.myData = {};
+        socket.on(config.myEnum.socket.弹幕发送, (msg) => {
+            socket.broadcast.emit(config.myEnum.socket.弹幕接收, msg);
+        });
+        socket.on(config.myEnum.socket.登录, (msg) => {
+            socketUser.addUser(msg, socket);
+        });
+        socket.on(config.myEnum.socket.登出, (msg) => {
+            socketUser.delUserBySocket(socket);
+        });
+
+        socket.on('disconnect', function () {
+            socketUser.delUserBySocket(socket);
+        });
     });
 };
 

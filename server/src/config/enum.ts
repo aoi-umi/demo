@@ -49,7 +49,10 @@ export const enumDefine = {
 
     socket: {
         弹幕发送: 'danmakuSend',
-        弹幕接收: 'danmakuRecv'
+        弹幕接收: 'danmakuRecv',
+        登录: 'login',
+        登出: 'logout',
+        私信接收: 'chatRecv',
     },
     fileType: {
         图片: 'image'

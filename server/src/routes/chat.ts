@@ -3,6 +3,7 @@ import { responseHandler, paramsValid } from "../helpers";
 import * as VaildSchema from '../vaild-schema/class-valid';
 import { ChatModel, ChatMapper } from "../models/mongo/chat";
 import { error } from "../_system/common";
+import { mySocket } from "../_main";
 
 export let submit: RequestHandler = (req, res) => {
     responseHandler(async () => {
@@ -15,6 +16,7 @@ export let submit: RequestHandler = (req, res) => {
             userId: user._id,
         });
         await chat.save();
+        mySocket.socketUser.sendChat(chat.toObject())
     }, req, res);
 };
 

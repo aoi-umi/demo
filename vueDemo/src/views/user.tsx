@@ -5,7 +5,7 @@ import moment from 'moment';
 import { convClass, convert } from '@/helpers';
 import * as helpers from '@/helpers';
 import { dev, myEnum } from '@/config';
-import { testApi } from '@/api';
+import { testApi, testSocket } from '@/api';
 import { Modal, Input, Form, FormItem, Button, Card, TabPane, Tabs } from '@/components/iview';
 import { MyTagModel } from '@/components/my-tag';
 import { MyUpload, IMyUpload } from '@/components/my-upload';
@@ -59,6 +59,7 @@ class SignIn extends Base {
             let token = LoginUser.createToken(account, password, req);
             localStorage.setItem(dev.cacheKey.testUser, token);
             let rs = await testApi.userSignIn(req);
+            testSocket.login({ [dev.cacheKey.testUser]: token });
             this.storeUser.setUser(rs);
             this.innerDetail = this.getDetailData();
             this.$emit('success');

@@ -11,4 +11,5 @@ type ApiListQueryArgs = {
 }
 
 interface Socket extends SocketIO.Socket {
+    myData?: { userId?: string };
 }

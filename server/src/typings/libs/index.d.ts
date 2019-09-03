@@ -1,6 +1,7 @@
 
 //后端
 import 'express';
+import { LoginUser } from '../../models/login-user';
 
 declare global {
     namespace Express {
@@ -23,7 +24,7 @@ declare global {
             accessableUrl: { [url: string]: boolean };
             ip: string;
             lang?: string;
-        }        
+        }
 
         interface Response {
         }
@@ -32,5 +33,5 @@ declare global {
 
 
 import { Server } from 'http';
-import { LoginUser } from '../../models/login-user';
-type SocketOnConnect = (socket: Socket, io: SocketIO.Server) => void;
+import { MySocket } from '../../_system/socket';
+type SocketOnConnect = (socket: Socket, mySocket: MySocket) => void;

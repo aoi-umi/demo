@@ -1,7 +1,7 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import * as iviewTypes from 'iview';
 
-import { testApi } from '@/api';
+import { testApi, testSocket } from '@/api';
 import { convClass } from '@/helpers';
 import { dev, myEnum, authority } from '@/config';
 import { Button, Avatar, Poptip, Spin } from '@/components/iview';
@@ -62,6 +62,7 @@ class UserAvatar extends Base {
         let token = localStorage.getItem(dev.cacheKey.testUser);
         if (token) {
             testApi.userSignOut();
+            testSocket.logout({ [dev.cacheKey.testUser]: token });
         }
         for (let key in dev.routeConfig) {
             let rtCfg = dev.routeConfig[key];
@@ -92,73 +93,77 @@ class UserAvatar extends Base {
 
     render() {
         return (
-            <Poptip disabled={this.noTips} trigger="hover" style={{
-                cursor: 'pointer',
-                // zIndex: 10
-            }} placement={this.tipsPlacement} on-on-popper-show={() => {
-                this.getUserDetail();
-            }}>
-                <Avatar
-                    class="shadow"
-                    icon="md-person"
-                    size={this.size}
-                    src={this.avatarUrl}
-                    style={{ marginRight: '10px' }}
-                />
-                {this.avatarUrl && <MyImgViewer src={this.avatarUrl} ref='imgViewer' />}
-                <span class="not-important">{this.user.nickname}{this.showAccount && `(${this.user.account})`}</span>
-                {this.self ?
-                    <div slot="content">
-                        <p class="ivu-select-item" on-click={() => {
-                            this.$router.push(dev.routeConfig.userInfo.path);
-                        }}>主页</p>
-                        <p class="ivu-select-item" on-click={this.signOut}>退出</p>
-                    </div> :
-                    <div slot="content" style={{ position: 'relative', margin: '2px' }}>
-                        {!!this.loadFailMsg ?
-                            <div style={{ textAlign: 'center' }}>
-                                {this.loadFailMsg}
-                            </div> :
-                            <div>
-                                {this.loading && <Spin fix />}
+            <div>
+                <Poptip disabled={this.noTips} trigger="hover" style={{
+                    cursor: 'pointer',
+                    // zIndex: 10
+                }} placement={this.tipsPlacement} on-on-popper-show={() => {
+                    this.getUserDetail();
+                }}>
+                    <Avatar
+                        class="shadow"
+                        icon="md-person"
+                        size={this.size}
+                        src={this.avatarUrl}
+                        style={{ marginRight: '10px' }}
+                    />
+                    {this.self ?
+                        <div slot="content">
+                            <p class="ivu-select-item" on-click={() => {
+                                this.$router.push(dev.routeConfig.userInfo.path);
+                            }}>主页</p>
+                            <p class="ivu-select-item" on-click={this.signOut}>退出</p>
+                        </div> :
+                        <div slot="content" style={{ position: 'relative', margin: '2px' }}>
+                            {!!this.loadFailMsg ?
                                 <div style={{ textAlign: 'center' }}>
-                                    <Avatar class="shadow" icon="md-person" src={this.innerUser.avatarUrl} size="large"
-                                        nativeOn-click={() => {
-                                            if (this.avatarUrl) {
-                                                this.$refs.imgViewer.show();
-                                            }
-                                        }} />
+                                    {this.loadFailMsg}
+                                </div> :
+                                <div>
+                                    {this.loading && <Spin fix />}
+                                    <div style={{ textAlign: 'center' }}>
+                                        <Avatar class="shadow" icon="md-person" src={this.innerUser.avatarUrl} size="large"
+                                            nativeOn-click={() => {
+                                                if (this.avatarUrl) {
+                                                    this.$refs.imgViewer.show();
+                                                }
+                                            }} />
+
+                                        <div class="not-important">{this.user.nickname}({this.user.account})</div>
+                                    </div>
+                                    <br />
+                                    {this.innerUser.profile || dev.defaultProfile}
+                                    <br />
+                                    关注: {this.innerUser.following}  粉丝: {this.innerUser.follower}
                                 </div>
-                                <br />
-                                {this.innerUser.profile || dev.defaultProfile}
-                                <br />
-                                关注: {this.innerUser.following}  粉丝: {this.innerUser.follower}
-                            </div>
-                        }
-                        <br />
-                        <div style={{ textAlign: 'center' }}>
-                            {!!this.loadFailMsg &&
-                                <Button on-click={() => {
-                                    this.getUserDetail();
-                                }}>重试</Button>}
-                            <Button on-click={() => {
-                                this.$router.push({
-                                    path: dev.routeConfig.userInfo.path,
-                                    query: { _id: this.user._id }
-                                });
-                            }}>主页</Button>
-                            {this.user._id !== this.storeUser.user._id && [
-                                <FollowButtonView user={this.user} />,
+                            }
+                            <br />
+                            <div style={{ textAlign: 'center' }}>
+                                {!!this.loadFailMsg &&
+                                    <Button on-click={() => {
+                                        this.getUserDetail();
+                                    }}>重试</Button>}
                                 <Button on-click={() => {
                                     this.$router.push({
-                                        path: dev.routeConfig.userChat.path,
+                                        path: dev.routeConfig.userInfo.path,
                                         query: { _id: this.user._id }
                                     });
-                                }}>私信</Button>]}
+                                }}>主页</Button>
+                                {this.user._id !== this.storeUser.user._id && [
+                                    <FollowButtonView user={this.user} />,
+                                    <Button on-click={() => {
+                                        this.$router.push({
+                                            path: dev.routeConfig.userChat.path,
+                                            query: { _id: this.user._id }
+                                        });
+                                    }}>私信</Button>]}
+                            </div>
                         </div>
-                    </div>
-                }
-            </Poptip>
+                    }
+                </Poptip>
+                {this.avatarUrl && <MyImgViewer src={this.avatarUrl} ref='imgViewer' />}
+                <span class="not-important">{this.user.nickname}{this.showAccount && `(${this.user.account})`}</span>
+            </div>
         );
     }
 }
