@@ -7,7 +7,7 @@ import {
 } from "@/components/iview";
 import * as style from '@/components/style';
 
-import { testApi } from './api';
+import { testApi, testSocket } from './api';
 import { dev, authority } from './config';
 const routeConfig = router.routerConfig;
 import "./App.less";
@@ -57,6 +57,7 @@ export default class App extends Base {
         let token = localStorage.getItem(dev.cacheKey.testUser);
         if (token) {
             await testApi.userInfo().then(user => {
+                testSocket.login({ [dev.cacheKey.testUser]: token });
                 this.storeUser.setUser(user);
                 if (user) {
                     if (location.pathname === routeConfig.userSignIn.path) {

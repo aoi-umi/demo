@@ -72,8 +72,8 @@ export class Base extends Vue {
         }
     }
 
-    protected isPressEnter(e: { charCode: number }) {
-        return e && e.charCode === 13;
+    protected isPressEnter(e: KeyboardEvent) {
+        return e && (e.charCode || e.keyCode) === 13;
     }
 
     protected toError(query: { code?: string; msg?: string }) {

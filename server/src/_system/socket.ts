@@ -1,14 +1,5 @@
-import { Server } from 'http';
 import { SocketOnConnect } from '../typings/libs';
-
-export let io: SocketIO.Server = null;
-export let init = function (optIO: SocketIO.Server, onConnect?: SocketOnConnect) {
-    io = optIO;
-    io.on('connection', function (socket: Socket) {
-        onConnect && onConnect(socket, io);
-    });
-    return io;
-};
+import { SocketUser } from '../models/socket-user';
 
 export function tryFn(socket: Socket, fn: () => void) {
     try {
@@ -16,5 +7,17 @@ export function tryFn(socket: Socket, fn: () => void) {
     } catch (e) {
         console.error(e.message);
         socket.emit('err', e.message);
+    }
+}
+
+export class MySocket {
+    io: SocketIO.Server;
+    socketUser: SocketUser;
+    constructor(optIO: SocketIO.Server, onConnect?: SocketOnConnect) {
+        this.io = optIO;
+        this.socketUser = new SocketUser();
+        this.io.on('connection', (socket: Socket) => {
+            onConnect && onConnect(socket, this);
+        });
     }
 }

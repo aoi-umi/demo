@@ -11,7 +11,6 @@ import * as config from './config';
 import * as main from './_main';
 
 import * as SocketIO from 'socket.io';
-import * as socket from './_system/socket';
 
 debug('my-application');
 
@@ -57,5 +56,5 @@ main.init().then(() => {
         ].join('\r\n'));
     });
     const io = SocketIO(server, { path: config.env.urlPrefix + '/socket.io' });
-    socket.init(io, main.initSocket);
+    main.initSocket(io);
 });
