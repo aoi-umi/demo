@@ -64,6 +64,11 @@ const enumDefineFront = {
         解封: 0,
         封禁至: 1,
     },
+    userTab: {
+        粉丝: 'follower',
+        关注: 'following',
+        文章: 'article'
+    },
     chatSendStatus: {
         发送中: 0,
         发送成功: 1,

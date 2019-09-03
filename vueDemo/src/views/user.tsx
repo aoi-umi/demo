@@ -230,15 +230,22 @@ export default class UserInfo extends Base {
         let query = this.$route.query as { [key: string]: string };
         this.$refs.loadView.loadData().then(() => {
             if (this.$refs.loadView.result.success) {
-                if (['follower', 'following', 'article'].includes(query.tab)) {
+                if (myEnum.userTab.getAllValue().includes(query.tab)) {
                     this.tab = query.tab;
                 }
-                if (['follower', 'following'].includes(this.tab))
-                    this.handleFollowSearch(this.tab === 'follower' ? myEnum.followQueryType.粉丝 : myEnum.followQueryType.关注);
-                else if (this.tab == 'article')
-                    this.handleArticleSearch();
+                this.changeTab();
             }
         });
+    }
+
+    private changeTab() {
+        if (this.tab === myEnum.userTab.粉丝 && !this.tabLoaded.follower) {
+            this.handleFollowSearch(myEnum.followQueryType.粉丝);
+        } else if (this.tab === myEnum.userTab.关注 && !this.tabLoaded.following) {
+            this.handleFollowSearch(myEnum.followQueryType.关注);
+        } else if (this.tab === myEnum.userTab.文章 && !this.tabLoaded.article) {
+            this.handleArticleSearch();
+        }
     }
 
     async getUserDetail() {
@@ -481,13 +488,7 @@ export default class UserInfo extends Base {
                     {!detail.self && <FollowButtonView style={{ alignItems: 'flex-end' }} user={detail} />}
                 </div>
                 <Tabs v-model={this.tab} style={{ minHeight: '300px' }} on-on-click={(name: string) => {
-                    if (name === 'follower' && !this.tabLoaded.follower) {
-                        this.handleFollowSearch(myEnum.followQueryType.粉丝);
-                    } else if (name === 'following' && !this.tabLoaded.following) {
-                        this.handleFollowSearch(myEnum.followQueryType.关注);
-                    } else if (name === 'article') {
-                        this.handleArticleSearch();
-                    }
+                    this.changeTab();
                 }}>
                     <TabPane label="概览">
                         {detail.self ?
@@ -521,7 +522,7 @@ export default class UserInfo extends Base {
                             </Form>
                         }
                     </TabPane>
-                    <TabPane name="article" label={() => {
+                    <TabPane name={myEnum.userTab.文章} label={() => {
                         return <div>文章: {detail.article}</div>
                     }}>
                         <Input v-model={this.articleAnyKey} search on-on-search={this.handleArticleSearch} />
@@ -551,7 +552,7 @@ export default class UserInfo extends Base {
                                 });
                             }}
                         />
-                    </TabPane><TabPane name="follower" label={() => {
+                    </TabPane><TabPane name={myEnum.userTab.粉丝} label={() => {
                         return <div>粉丝: {detail.follower}</div>
                     }}>
                         <Input v-model={this.followerAnyKey} search on-on-search={() => {
@@ -572,7 +573,7 @@ export default class UserInfo extends Base {
                             }}
                         />
                     </TabPane>
-                    <TabPane name="following" label={() => {
+                    <TabPane name={myEnum.userTab.关注} label={() => {
                         return <div>关注: {detail.following}</div>
                     }}>
                         <Input v-model={this.followingAnyKey} search on-on-search={() => {

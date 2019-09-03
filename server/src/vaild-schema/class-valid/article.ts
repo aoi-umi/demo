@@ -4,14 +4,14 @@ import { Type, Transform } from "class-transformer";
 
 import { myEnum } from "../../config";
 import { ListBase, DelBase, DetailQueryBase } from "./base";
-import { arrayTransform } from "./util";
+import { arrayTransform, objectIdTransform } from "./util";
 
 export class AritcleQuery extends ListBase {
-    @Transform(value => Types.ObjectId(value))
+    @Transform(objectIdTransform)
     _id: string;
     title: string;
     user: string;
-    @Transform(value => Types.ObjectId(value))
+    @Transform(objectIdTransform)
     userId: string;
     anyKey: string;
     status: string;

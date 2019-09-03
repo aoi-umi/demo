@@ -6,9 +6,9 @@ import { myEnum } from '../../../config';
 import { LoginUser } from '../../login-user';
 import { BaseMapper, ContentBaseInstanceType } from '../_base';
 import { ArticleMapper } from '../article';
-import { UserModel, UserMapper } from '../user';
+import { UserModel, UserMapper, UserDocType } from '../user';
 import { FileMapper } from '../file';
-import { CommentModel, CommentDocType } from './comment';
+import { CommentModel, CommentDocType, CommentInstanceType } from './comment';
 import { VoteModel, VoteMapper } from '../vote';
 import { FollowMapper } from '../follow';
 
@@ -16,19 +16,28 @@ type CommentResetOption = {
     imgHost?: string;
     user?: LoginUser
     authorId?: Types.ObjectId;
+    quoteUserList?: UserDocType[];
 };
 export class CommentMapper {
     static async create(data: VaildSchema.CommentSubmit, type, user: LoginUser) {
         let lastComment = await CommentModel.findOne({ ownerId: data.ownerId }).sort({ floor: -1 });
-        let comment = new CommentModel({
+        let quote: CommentInstanceType;
+        if (data.quoteId)
+            quote = await CommentModel.findById(data.quoteId);
+
+        let obj: any = {
             userId: user._id,
             ownerId: data.ownerId,
             comment: data.comment,
-            quoteId: data.quoteId,
             topId: data.topId,
             type: type,
             floor: lastComment ? lastComment.floor + 1 : 1
-        });
+        };
+        if (quote) {
+            obj.quoteId = quote._id;
+            obj.quoteUserId = quote.userId;
+        }
+        let comment = new CommentModel(obj);
         return comment;
     }
 
@@ -81,9 +90,23 @@ export class CommentMapper {
             extraPipeline,
         });
 
+        let quoteList = rs.rows.filter(ele => ele.quoteUserId);
+        let quoteUserList: UserDocType[];
+        if (quoteList.length) {
+            quoteUserList = await UserModel.find({ _id: quoteList.map(ele => ele.quoteUserId) }, {
+                account: 1,
+                nickname: 1,
+                avatar: 1,
+            }).lean();
+            quoteUserList.forEach(ele => {
+                UserMapper.resetDetail(ele, { imgHost: resetOpt.imgHost });
+            });
+        }
+
         rs.rows = rs.rows.map(detail => {
             return this.resetDetail(detail, {
                 ...resetOpt,
+                quoteUserList
                 // authorId: owner && owner.userId
             });
         });
@@ -106,6 +129,10 @@ export class CommentMapper {
     }
 
     static resetDetail(detail, opt: CommentResetOption) {
+        let { quoteUserList } = opt;
+        if (quoteUserList && quoteUserList.length) {
+            detail.quoteUser = quoteUserList.find(u => u._id.equals(detail.quoteUserId));
+        }
         detail.voteValue = detail.vote ? detail.vote.value : myEnum.voteValue.无;
         delete detail.vote;
         if (detail.status !== myEnum.commentStatus.正常) {
@@ -114,6 +141,7 @@ export class CommentMapper {
                 floor: detail.floor,
                 topId: detail.topId,
                 quoteId: detail.quoteId,
+                quoteUser: detail.quoteUser,
                 createdAt: detail.createdAt,
                 voteValue: detail.voteValue,
                 like: detail.like,
@@ -133,7 +161,7 @@ export class CommentMapper {
             detail.canDel = rs.canDel;
         }
         if (detail.user) {
-            detail.user.avatarUrl = FileMapper.getImgUrl(detail.user.avatar, opt.imgHost);
+            UserMapper.resetDetail(detail.user, { imgHost: opt.imgHost });
             detail.user.followStatus = detail.follow ? detail.follow.status : myEnum.followStatus.未关注;
         }
         delete detail.follow;

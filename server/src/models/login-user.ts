@@ -1,10 +1,11 @@
 import { Type, Transform } from "class-transformer";
 import { Types } from 'mongoose';
+import { objectIdTransform } from "../vaild-schema/class-valid/util";
 
 export class LoginUser {
     isLogin: boolean;
 
-    @Transform(value => Types.ObjectId(value))
+    @Transform(objectIdTransform)
     _id: Types.ObjectId;
     nickname: string;
     account: string;

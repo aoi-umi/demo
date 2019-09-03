@@ -36,8 +36,7 @@ class UserChat extends Base {
         let query = this.$route.query;
         this.detail = await testApi.userDetailQuery(query._id);
         this.loadChat().then(() => {
-            let elm = this.$refs.chat;
-            elm.scrollTop = elm.scrollHeight;
+            this.scrollBottom();
         });
         return this.detail;
     }
@@ -80,7 +79,7 @@ class UserChat extends Base {
         let elm = this.$refs.chat;
         if (elm.scrollTop + elm.clientHeight == elm.scrollHeight) {
             this.$nextTick(() => {
-                elm.scrollTop = elm.scrollHeight;
+                this.scrollBottom();
             });
         }
     }
@@ -119,6 +118,7 @@ class UserChat extends Base {
             }
             let idx = this.chat.findIndex(ele => ele.key === pushData.key);
             this.chat.splice(idx, 1, pushData);
+            this.scrollBottom();
         });
     }
 
@@ -126,6 +126,11 @@ class UserChat extends Base {
         if (!this.noMore && !this.loading) {
             this.loadChat();
         }
+    }
+
+    scrollBottom() {
+        let elm = this.$refs.chat;
+        elm.scrollTop = elm.scrollHeight;
     }
 
     render() {
@@ -178,7 +183,7 @@ class UserChat extends Base {
                                                                 this.chatSubmit(ele);
                                                             }}></Icon>
                                                         }
-                                                        <div class="chat-content" >
+                                                        <div class="chat-content">
                                                             {ele.content}
                                                         </div>
                                                     </div>

@@ -3,10 +3,11 @@ import { IsDefined, MinLength, MaxLength, IsIn } from "class-validator";
 import { Types } from 'mongoose';
 import { myEnum } from "../../config";
 import { ListBase } from "./base";
+import { objectIdTransform } from "./util";
 
 export class FollowSave {
     @IsDefined()
-    @Transform(value => Types.ObjectId(value))
+    @Transform(objectIdTransform)
     userId: Types.ObjectId;
 
     @IsDefined()
@@ -24,6 +25,6 @@ export class FollowQuery extends ListBase {
     anyKey: string;
 
     @IsDefined()
-    @Transform(value => Types.ObjectId(value))
+    @Transform(objectIdTransform)
     userId: Types.ObjectId;
 }
