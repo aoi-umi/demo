@@ -83,7 +83,7 @@ export let detail: RequestHandler = (req, res) => {
 export let detailQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = paramsValid(req.query, VaildSchema.UserMgtQuery);
+        let data = paramsValid(req.query, VaildSchema.UserDetailQuery);
 
         let detail = await UserModel.findById(data._id, { password: 0, roleList: 0, authorityList: 0 });
         if (!detail)

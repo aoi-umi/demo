@@ -1,6 +1,7 @@
 import { IsArray, IsDefined, ArrayMinSize, MinLength } from "class-validator";
-import { Type } from "class-transformer";
-import { ListBase, DelBase } from "./base";
+import { Type, Transform } from "class-transformer";
+import { ListBase, DelBase, DetailQueryBase } from "./base";
+import { objectIdTransform } from "./util";
 
 export class UserAccountExists {
     @IsDefined()
@@ -35,12 +36,11 @@ export class UserUpdate {
     token: string;
 }
 
-export class UserDetailQuery {
-    @IsDefined()
-    _id: string;
+export class UserDetailQuery extends DetailQueryBase {
 }
 
 export class UserMgtQuery extends ListBase {
+    @Transform(objectIdTransform)
     _id?: string;
     account?: string;
     nickname?: string;
@@ -54,7 +54,9 @@ export class UserMgtQuery extends ListBase {
 }
 
 export class UserMgtSave {
-    _id?: string;
+    @IsDefined()
+    @Transform(objectIdTransform)
+    _id: string;
 
     @IsArray()
     delAuthList?: string[];
@@ -70,6 +72,8 @@ export class UserMgtSave {
 }
 
 export class UserMgtDisable {
+    @IsDefined()
+    @Transform(objectIdTransform)
     _id: string;
 
     @Type()

@@ -39,6 +39,8 @@ ValidationTypes.getMessage = function (this: typeof ValidationTypes, type: strin
             return `$property ${eachPrefix}必须包含 $constraint1 字符串`;
         case this.IS_INT:
             return `$property ${eachPrefix}必须是整数`;
+        case this.IS_DEFINED:
+            return `$property ${eachPrefix}不能为空`;
     }
     return _getMessage.apply(ValidationTypes, arguments);
 }
