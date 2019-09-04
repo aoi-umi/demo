@@ -26,15 +26,17 @@ class Comment extends Base {
     $refs: { list: IMyList<any>, replyList: IMyList<any> };
     mounted() {
         this.query();
+        this.$refs.replyList.model.setPage({ size: 3 });
     }
 
-    async query(opt?) {
-        this.refreshLoading = true;
-        if (!this.currComment)
+    async query(opt?, noClear?) {
+        if (!this.currComment) {
+            this.refreshLoading = true;
             await this.$refs.list.query(opt);
-        else
-            await this.$refs.replyList.query(opt);
-        this.refreshLoading = false;
+            this.refreshLoading = false;
+        } else {
+            await this.$refs.replyList.query(opt, noClear);
+        }
     }
 
     refreshLoading = false;
@@ -270,11 +272,12 @@ class Comment extends Base {
                         ref="replyList"
                         hideSearchBox
                         type="custom"
+                        infiniteScroll
 
                         customRenderFn={this.renderResult}
 
-                        on-query={(t) => {
-                            this.query(convert.Test.listModelToQuery(t));
+                        on-query={(t, noClear) => {
+                            this.query(convert.Test.listModelToQuery(t), noClear);
                         }}
 
                         queryFn={async (data) => {
@@ -283,6 +286,11 @@ class Comment extends Base {
                                 ownerId: this.ownerId,
                                 type: this.type,
                                 topId: this.currComment._id,
+                            });
+                            //移除相同key
+                            rs.rows.forEach(ele => {
+                                let idx = this.$refs.replyList.result.data.findIndex(e => e._id === ele._id);
+                                this.$refs.replyList.result.data.splice(idx, 1);
                             });
                             return rs;
                         }}
