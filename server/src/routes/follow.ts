@@ -114,7 +114,7 @@ export let query: RequestHandler = (req, res) => {
             ...BaseMapper.getListOptions(data),
         });
         let opt = {
-            imgHost: req.headers.host
+            imgHost: req.myData.imgHost
         };
         let rows = rs.rows.map(detail => {
             detail.user.avatarUrl = FileMapper.getImgUrl(detail.user.avatar, opt.imgHost);

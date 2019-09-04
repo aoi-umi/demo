@@ -43,7 +43,7 @@ class UserPoptip extends Base {
     @Prop()
     size: iviewTypes.Avatar['size'];
 
-    private innerUser: DetailDataType = {};
+    private userDetail: DetailDataType = {};
     avatarUrl = '';
 
     $refs: { imgViewer: IMyImgViewer };
@@ -80,11 +80,11 @@ class UserPoptip extends Base {
     loading = false;
     loadFailMsg = '';
     getUserDetail() {
-        if (!this.self && (!this.innerUser._id || this.innerUser._id != this.user._id)) {
+        if (!this.self && (!this.userDetail._id || this.userDetail._id != this.user._id)) {
             this.operateHandler('', async () => {
                 this.loadFailMsg = '';
                 this.loading = true;
-                this.innerUser = await testApi.userDetailQuery(this.user._id);
+                this.userDetail = await testApi.userDetailQuery(this.user._id);
             }, { noDefaultHandler: true }).then(rs => {
                 if (!rs.success)
                     this.loadFailMsg = '获取用户信息出错';
@@ -95,6 +95,8 @@ class UserPoptip extends Base {
     }
 
     render() {
+        let loadFail = !!this.loadFailMsg;
+        let notSelf = this.user._id !== this.storeUser.user._id;
         return (
             <div style={{ display: 'inline-block' }}>
                 <Poptip disabled={this.noTips} trigger="hover" style={{
@@ -112,14 +114,14 @@ class UserPoptip extends Base {
                             <p class="ivu-select-item" on-click={this.signOut}>退出</p>
                         </div> :
                         <div slot="content" style={{ position: 'relative', margin: '2px' }}>
-                            {!!this.loadFailMsg ?
+                            {loadFail ?
                                 <div style={{ textAlign: 'center' }}>
                                     {this.loadFailMsg}
                                 </div> :
                                 <div>
                                     {this.loading && <Spin fix />}
                                     <div style={{ textAlign: 'center' }}>
-                                        <Avatar class="shadow" icon="md-person" src={this.innerUser.avatarUrl} size="large"
+                                        <Avatar class="shadow" icon="md-person" src={this.userDetail.avatarUrl} size="large"
                                             nativeOn-click={() => {
                                                 if (this.avatarUrl) {
                                                     this.$refs.imgViewer.show();
@@ -129,9 +131,9 @@ class UserPoptip extends Base {
                                         <div class="not-important">{this.user.nickname}({this.user.account})</div>
                                     </div>
                                     <br />
-                                    {this.innerUser.profile || dev.defaultProfile}
+                                    {this.userDetail.profile || dev.defaultProfile}
                                     <br />
-                                    关注: {this.innerUser.following}  粉丝: {this.innerUser.follower}
+                                    关注: {this.userDetail.following}  粉丝: {this.userDetail.follower}
                                 </div>
                             }
                             <br />
@@ -146,14 +148,13 @@ class UserPoptip extends Base {
                                         query: { _id: this.user._id }
                                     });
                                 }}>主页</Button>
-                                {this.user._id !== this.storeUser.user._id && [
-                                    <FollowButtonView user={this.user} />,
-                                    <Button on-click={() => {
-                                        this.$router.push({
-                                            path: dev.routeConfig.userChat.path,
-                                            query: { _id: this.user._id }
-                                        });
-                                    }}>私信</Button>]}
+                                {!loadFail && notSelf && <FollowButtonView user={this.userDetail} />}
+                                {notSelf && <Button on-click={() => {
+                                    this.$router.push({
+                                        path: dev.routeConfig.userChat.path,
+                                        query: { _id: this.user._id }
+                                    });
+                                }}>私信</Button>}
                             </div>
                         </div>
                     }

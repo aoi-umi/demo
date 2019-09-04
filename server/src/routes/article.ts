@@ -18,7 +18,7 @@ export let mgtQuery: RequestHandler = (req, res) => {
             userId: user._id,
             audit: Auth.contains(user, config.auth.articleMgtAudit),
             resetOpt: {
-                imgHost: req.headers.host,
+                imgHost: req.myData.imgHost,
                 user,
             }
         });
@@ -37,7 +37,7 @@ export let mgtDetailQuery: RequestHandler = (req, res) => {
             userId: user._id,
             audit: Auth.contains(user, config.auth.articleMgtAudit),
             resetOpt: {
-                imgHost: req.headers.host,
+                imgHost: req.myData.imgHost,
                 user,
             }
         });
@@ -127,7 +127,7 @@ export let query: RequestHandler = (req, res) => {
         let { rows, total } = await ArticleMapper.query(data, {
             normal: true,
             resetOpt: {
-                imgHost: req.headers.host,
+                imgHost: req.myData.imgHost,
                 user: user.isLogin ? user : null,
             }
         });
@@ -145,7 +145,7 @@ export let detailQuery: RequestHandler = (req, res) => {
         let rs = await ArticleMapper.detailQuery({ _id: data._id }, {
             normal: true,
             resetOpt: {
-                imgHost: req.headers.host,
+                imgHost: req.myData.imgHost,
                 user: user.isLogin ? user : null,
             }
         });

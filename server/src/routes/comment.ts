@@ -31,10 +31,10 @@ export let submit: RequestHandler = (req, res) => {
         };
         let obj = CommentMapper.resetDetail(ret, {
             user,
-            imgHost: req.headers.host,
+            imgHost: req.myData.imgHost,
         });
         if (comment.quoteUserId) {
-            let list = await CommentMapper.quoteUserQuery(comment.quoteUserId, { imgHost: req.headers.host });
+            let list = await CommentMapper.quoteUserQuery(comment.quoteUserId, { imgHost: req.myData.imgHost });
             obj.quoteUser = list[0];
         }
         return obj;
@@ -47,7 +47,7 @@ export let query: RequestHandler = (req, res) => {
         let data = paramsValid(req.query, VaildSchema.CommentQuery);
         let queryOpt = {
             resetOpt: {
-                imgHost: req.headers.host,
+                imgHost: req.myData.imgHost,
                 user: user.isLogin ? user : null
             }
         };

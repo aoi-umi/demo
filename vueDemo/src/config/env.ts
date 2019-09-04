@@ -163,6 +163,10 @@ const config = {
                     url: '/chat/query',
                     method: 'get',
                 },
+                chatList: {
+                    url: '/chat/list',
+                    method: 'get',
+                },
                 //file
 
                 imgUpload: {
