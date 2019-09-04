@@ -190,6 +190,15 @@ export function getDataInKey(data, keyList: string[]) {
     });
     return newData;
 }
+
+export function distinct<T = any>(list: T[], fn?: (list: T[], val: T) => boolean): T[] {
+    let rtn = [];
+    for (let val of list) {
+        if (fn ? fn(rtn, val) : !rtn.includes(val))
+            rtn.push(val)
+    }
+    return rtn;
+}
 //#endregion
 
 //#region 同名但实现不同

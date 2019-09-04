@@ -202,7 +202,12 @@ export default class App extends Base {
                         </transition>
                     }
                     <Content class="main-content">
-                        <router-view></router-view>
+                        {this.$route.meta.keepAlive ?
+                            <keep-alive>
+                                <router-view></router-view>
+                            </keep-alive> :
+                            <router-view></router-view>
+                        }
                     </Content>
                     <BackTop />
                 </Layout>

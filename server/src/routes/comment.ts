@@ -7,6 +7,7 @@ import * as config from '../config';
 import { responseHandler, paramsValid } from '../helpers';
 import * as VaildSchema from '../vaild-schema/class-valid';
 import { CommentMapper, CommentModel } from '../models/mongo/comment';
+import { UserMapper } from '../models/mongo/user';
 
 export let submit: RequestHandler = (req, res) => {
     responseHandler(async () => {
@@ -34,8 +35,10 @@ export let submit: RequestHandler = (req, res) => {
             imgHost: req.myData.imgHost,
         });
         if (comment.quoteUserId) {
-            let list = await CommentMapper.quoteUserQuery(comment.quoteUserId, { imgHost: req.myData.imgHost });
+            let list = await UserMapper.queryById(comment.quoteUserId, { imgHost: req.myData.imgHost });
             obj.quoteUser = list[0];
+        } else {
+            obj.replyList = [];
         }
         return obj;
     }, req, res);
@@ -45,22 +48,18 @@ export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
         let data = paramsValid(req.query, VaildSchema.CommentQuery);
-        let queryOpt = {
-            resetOpt: {
-                imgHost: req.myData.imgHost,
-                user: user.isLogin ? user : null
-            }
-        };
         let { total, rows } = await CommentMapper.query({
             ...data,
-        }, queryOpt);
+        }, {
+                resetOpt: {
+                    imgHost: req.myData.imgHost,
+                    user: user.isLogin ? user : null
+                },
+            });
 
-        //获取二级回复
-        let { rows: replyList } = await CommentMapper.query({}, { ...queryOpt, replyTopId: rows.map(ele => ele._id) });
         return {
             rows,
             total,
-            replyList
         };
     }, req, res);
 };

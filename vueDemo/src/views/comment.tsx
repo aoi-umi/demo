@@ -3,7 +3,7 @@ import moment from 'moment';
 
 import { testApi } from '@/api';
 import { convClass, convert } from '@/helpers';
-import { MyList, IMyList } from '@/components/my-list';
+import { MyList, IMyList, ResultType } from '@/components/my-list';
 import { MyEditor } from '@/components/my-editor';
 import { Divider, Button, Avatar, Modal, Icon, Time } from '@/components/iview';
 import { MyConfirm } from '@/components/my-confirm';
@@ -23,7 +23,7 @@ class Comment extends Base {
     @Prop()
     type: number;
 
-    $refs: { list: IMyList<any> };
+    $refs: { list: IMyList<any>, replyList: IMyList<any> };
     mounted() {
         this.query();
     }
@@ -49,15 +49,17 @@ class Comment extends Base {
                 quoteId: quote._id || null,
                 topId,
             });
-            rs.replyList = [];
             let data = this.$refs.list.result.data;
             if (!topId)
                 data.unshift(rs);
             else {
-                let top = data.find(ele => ele._id === topId);
-                if (top) {
-                    rs.quoteUser = top.user;
-                    top.replyList.push(rs);
+                if (this.currComment) {
+                    this.$refs.replyList.result.data.unshift(rs);
+                } else {
+                    let top = data.find(ele => ele._id === topId);
+                    if (top) {
+                        top.replyList.push(rs);
+                    }
                 }
             }
             this.resetReply();
@@ -67,6 +69,13 @@ class Comment extends Base {
     }
 
     delShow = false;
+    replyShow = false;
+    @Watch('replyShow')
+    private watchReplyShow(newVal) {
+        if (!newVal)
+            this.currComment = null;
+    }
+    currComment;
     delList = [];
     handleDel(ele) {
         this.delList = [ele];
@@ -99,7 +108,7 @@ class Comment extends Base {
     private reply = {
         floor: -1,
         quote: null,
-        content: ''
+        content: '',
     };
 
     private resetReply(comment?) {
@@ -140,9 +149,6 @@ class Comment extends Base {
 
     renderComment(ele, reply?: boolean) {
         let tab = '42px';
-        let rootStyle: any = {
-            marginTop: '5px',
-        };
         let textStyle = {
             marginBottom: '10px',
         };
@@ -153,17 +159,12 @@ class Comment extends Base {
             contentStyle.marginBottom = '10px';
         let dividerStyle: any = {};
         if (reply) {
-            rootStyle = {
-                marginLeft: tab,
-                background: '#eef1f3',
-                padding: '24px 0 0 5px',
-            };
             dividerStyle = {
                 marginBottom: 0,
             };
         }
         return (
-            <div style={rootStyle}>
+            <div class={!reply ? "comment" : "comment-reply"} key={ele._id}>
                 <div style={{ position: 'relative' }}>
                     {ele.user && <UserAvatarView user={ele.user} isAuthor={ele.user._id === this.ownUserId} />}
                     <span style={{ position: 'absolute', right: '5px' }}>
@@ -195,12 +196,36 @@ class Comment extends Base {
                             }} />
                         </div>
                     </div>
-                    {this.reply.floor === ele.floor && this.renderSubmitBox()}
+                    {this.reply.quote === ele && this.renderSubmitBox()}
                 </div>
-                {!!ele.replyList && ele.replyList.map(reply => this.renderComment(reply, true))}
+                {(ele.replyList && ele.replyList.length > 0)
+                    && ele.replyList.map(reply => this.renderComment(reply, true)).concat(
+                        <div class="comment-reply center" style={{ padding: '5px' }}>
+                            <a on-click={() => {
+                                this.replyShow = true;
+                                this.currComment = {
+                                    ...ele,
+                                    replyList: []
+                                };
+                                this.$refs.replyList.query({ resetReply: true });
+                            }}>更多</a>
+                        </div>)
+                }
                 <Divider style={dividerStyle} size='small' />
             </div>
         );
+    }
+
+    renderResult(rs: ResultType) {
+        if (!rs.success || !rs.data.length) {
+            let msg = !rs.success ? rs.msg : '暂无评论';
+            return (
+                <div class="center" style={{ marginTop: '5px', minHeight: '50px' }}>{msg}</div>
+            );
+        }
+        return rs.data.map((ele) => {
+            return this.renderComment(ele);
+        });
     }
 
     render() {
@@ -220,17 +245,7 @@ class Comment extends Base {
                     hideSearchBox
                     type="custom"
 
-                    customRenderFn={(rs) => {
-                        if (!rs.success || !rs.data.length) {
-                            let msg = !rs.success ? rs.msg : '暂无评论';
-                            return (
-                                <div class="center" style={{ marginTop: '5px', minHeight: '50px' }}>{msg}</div>
-                            );
-                        }
-                        return rs.data.map((ele) => {
-                            return this.renderComment(ele);
-                        });
-                    }}
+                    customRenderFn={this.renderResult}
 
                     on-query={(t) => {
                         this.query(convert.Test.listModelToQuery(t));
@@ -245,6 +260,31 @@ class Comment extends Base {
                         return rs;
                     }}
                 ></MyList>
+                <Modal v-model={this.replyShow} style={{ paddingTop: '30px' }} footer-hide>
+                    <h3>更多回复</h3>
+                    {this.currComment && this.renderComment(this.currComment)}
+                    <MyList
+                        ref="replyList"
+                        hideSearchBox
+                        type="custom"
+
+                        customRenderFn={this.renderResult}
+
+                        on-query={(t) => {
+                            this.query(convert.Test.listModelToQuery(t));
+                        }}
+
+                        queryFn={async (data) => {
+                            let rs = await testApi.commentQuery({
+                                ...data,
+                                ownerId: this.ownerId,
+                                type: this.type,
+                                topId: this.currComment._id
+                            });
+                            return rs;
+                        }}
+                    ></MyList>
+                </Modal>
                 <Modal v-model={this.delShow} footer-hide>
                     <MyConfirm title='确认删除?' loading={true}
                         cancel={() => {
