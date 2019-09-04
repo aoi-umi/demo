@@ -92,6 +92,11 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
     @Prop()
     hidePage?: boolean;
 
+    @Prop({
+        default: true
+    })
+    showSizer?: boolean;
+
     //下拉刷新
     @Prop()
     infiniteScroll?: boolean;
@@ -126,7 +131,7 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
         let scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
         let clientHeight = document.documentElement.clientHeight || document.body.clientHeight;
         let scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
-        return scrollTop + clientHeight == scrollHeight;
+        return (scrollTop + clientHeight == scrollHeight);
     }
 
     private scrollEndHandler() {
@@ -147,6 +152,7 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
             this.result.total = 0;
             this.result.msg = '加载中';
             let rs = this.queryFn && await this.queryFn(data);
+            this.result.msg = '';
             if (rs) {
                 if (this.infiniteScroll)
                     this.result.data = [...this.result.data, ...rs.rows];
@@ -343,7 +349,7 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
                             placement="top"
                             current={this.model.page.index}
                             page-size={this.model.page.size}
-                            show-total show-elevator show-sizer
+                            show-total show-elevator show-sizer={this.showSizer}
                             on-on-change={(page) => {
                                 this.model.page.index = page;
                                 this.handleQuery();
@@ -361,15 +367,19 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
                         this.loading && <Spin size="large" fix /> :
                         <div class={(() => {
                             let cls = [clsPrefix + 'bottom-loading'];
-                            if (this.loading || !this.result.success) {
+                            if (this.loading || !this.result.success || !this.isScrollEnd()) {
                             } else {
                                 cls.push('invisibility');
                             }
                             return cls;
                         })()}>
-                            <Card>{this.result.msg}
+                            <div>
+                                {this.result.msg}
+                                {!this.isScrollEnd() && !this.loadedLastPage && <a on-click={() => {
+                                    this.scrollEndHandler();
+                                }}>更多</a>}
                                 {this.loading && <Spin size="large" fix />}
-                            </Card>
+                            </div>
                         </div>
                     }
                 </div>
