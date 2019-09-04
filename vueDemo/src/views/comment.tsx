@@ -30,7 +30,10 @@ class Comment extends Base {
 
     async query(opt?) {
         this.refreshLoading = true;
-        await this.$refs.list.query(opt);
+        if (!this.currComment)
+            await this.$refs.list.query(opt);
+        else
+            await this.$refs.replyList.query(opt);
         this.refreshLoading = false;
     }
 
@@ -207,7 +210,7 @@ class Comment extends Base {
                                     ...ele,
                                     replyList: []
                                 };
-                                this.$refs.replyList.query({ resetReply: true });
+                                this.$refs.replyList.handleQuery({ resetPage: true });
                             }}>更多</a>
                         </div>)
                 }
@@ -279,7 +282,7 @@ class Comment extends Base {
                                 ...data,
                                 ownerId: this.ownerId,
                                 type: this.type,
-                                topId: this.currComment._id
+                                topId: this.currComment._id,
                             });
                             return rs;
                         }}
