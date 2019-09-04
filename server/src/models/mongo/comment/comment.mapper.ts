@@ -1,22 +1,23 @@
 import { Types } from 'mongoose';
 import * as VaildSchema from '../../../vaild-schema/class-valid';
 import { Auth } from '../../../_system/auth';
+import * as common from '../../../_system/common';
 import * as config from '../../../config';
 import { myEnum } from '../../../config';
 import { LoginUser } from '../../login-user';
 import { BaseMapper, ContentBaseInstanceType } from '../_base';
 import { ArticleMapper } from '../article';
 import { UserModel, UserMapper, UserDocType, UserResetOption } from '../user';
-import { FileMapper } from '../file';
 import { CommentModel, CommentDocType, CommentInstanceType } from './comment';
-import { VoteModel, VoteMapper } from '../vote';
-import { FollowMapper } from '../follow';
+import { VoteModel, VoteMapper, VoteInstanceType } from '../vote';
+import { FollowMapper, FollowModel, FollowInstanceType } from '../follow';
 
 type CommentResetOption = {
     imgHost?: string;
     user?: LoginUser
     authorId?: Types.ObjectId;
-    quoteUserList?: UserDocType[];
+    userList?: UserDocType[];
+    voteList?: VoteInstanceType[];
 };
 export class CommentMapper {
     static async create(data: VaildSchema.CommentSubmit, type, user: LoginUser) {
@@ -41,21 +42,21 @@ export class CommentMapper {
         return comment;
     }
 
-    static async query(data: Partial<VaildSchema.CommentQuery>, opt: {
+    static async query(data: VaildSchema.CommentQuery, opt: {
         resetOpt?: CommentResetOption,
-        replyTopId?: any
     }) {
         let match: any;
-        if (opt.replyTopId) {
-            let topId = opt.replyTopId instanceof Array ? { $in: opt.replyTopId.map(ele => Types.ObjectId(ele)) } : Types.ObjectId(opt.replyTopId);
-            match = { topId: topId };
+        let getReply = true;
+        if (data.topId) {
+            match = { topId: data.topId };
             data.orderBy = '_id';
             data.sortOrder = 1;
+            getReply = false;
         } else {
             match = {
                 ownerId: data.ownerId,
                 type: data.type,
-                topId: data.topId || { $exists: 0 }
+                topId: { $exists: 0 }
             }
         }
 
@@ -68,42 +69,92 @@ export class CommentMapper {
             {
                 $match: match
             },
-            ...UserMapper.lookupPipeline(),
         ];
         let resetOpt = { ...opt.resetOpt };
-        let extraPipeline = [];
-        if (resetOpt.user) {
-            extraPipeline = [
-                ...VoteMapper.lookupPipeline({
-                    userId: resetOpt.user._id
-                }),
-                ...FollowMapper.lookupPipeline({
-                    userId: resetOpt.user._id,
-                })
-            ];
-        }
 
         let rs = await CommentModel.aggregatePaginate(pipeline, {
             ...BaseMapper.getListOptions({
                 ...data,
             }),
-            extraPipeline,
         });
 
         let quoteList = rs.rows.filter(ele => ele.quoteUserId);
-        let quoteUserList: UserDocType[];
-        if (quoteList.length) {
-            quoteUserList = await CommentMapper.quoteUserQuery(quoteList.map(ele => ele.quoteUserId), { imgHost: resetOpt.imgHost });
+
+        let replyList = [];
+        //获取二级回复
+        if (getReply) {
+            replyList = await CommentMapper.childQuery({ replyTopId: rs.rows.map(ele => ele._id) });
         }
 
+        //获取用户信息
+        let allComment = [...rs.rows, ...replyList];
+        let userIdList = common.distinct([
+            ...allComment.map(ele => ele.userId),
+            ...quoteList.map(ele => ele.quoteUserId)
+        ], (list, val) => {
+            return list.findIndex(l => l.equals(val)) < 0;
+        });
+        let userList = await UserMapper.queryById(userIdList, { imgHost: resetOpt.imgHost });
+
+        let voteList: VoteInstanceType[];
+        if (resetOpt.user) {
+            [
+                voteList
+            ] = await Promise.all([
+                //点赞
+                VoteModel.find({ userId: resetOpt.user._id, ownerId: allComment.map(ele => ele._id) })
+            ]);
+        }
+
+        let commentResetOpt = {
+            ...resetOpt,
+            userList,
+            voteList,
+        };
+        replyList = replyList.map(ele => CommentMapper.resetDetail(ele, commentResetOpt));
         rs.rows = rs.rows.map(detail => {
-            return this.resetDetail(detail, {
-                ...resetOpt,
-                quoteUserList
-                // authorId: owner && owner.userId
-            });
+            let obj = CommentMapper.resetDetail(detail, commentResetOpt);
+            if (getReply) {
+                obj.replyList = replyList.filter(reply => reply.topId.equals(detail._id));
+            }
+            return obj;
         });
         return rs;
+    }
+
+    //获取子级评论
+    static async childQuery(opt: {
+        replyTopId: any,
+        rows?: number,
+        resetOpt?: CommentResetOption,
+    }) {
+        let topId = opt.replyTopId instanceof Array ? { $in: opt.replyTopId.map(ele => Types.ObjectId(ele)) } : Types.ObjectId(opt.replyTopId);
+        let match = { _id: topId };
+        let pipeline: any[] = [
+            {
+                $match: match
+            },
+            {
+                $project: { _id: 1 }
+            },
+            {
+                $lookup: {
+                    from: CommentModel.collection.collectionName,
+                    let: { topId: '$_id' },
+                    pipeline: [
+                        { $match: { $expr: { $eq: ['$topId', '$$topId'] } } },
+                        { $sort: { _id: 1 } },
+                        { $limit: opt.rows || 3 }
+                    ],
+                    as: 'replyList',
+                }
+            },
+            { $unwind: '$replyList' }
+
+        ];
+
+        let rs = await CommentModel.aggregate(pipeline);
+        return rs.map(ele => ele.replyList);
     }
 
     static async findOwner(opt: {
@@ -122,14 +173,12 @@ export class CommentMapper {
     }
 
     static resetDetail(detail, opt: CommentResetOption) {
-        let { quoteUserList } = opt;
-        if (quoteUserList && quoteUserList.length) {
-            detail.quoteUser = quoteUserList.find(u => u._id.equals(detail.quoteUserId));
-        }
-        detail.voteValue = detail.vote ? detail.vote.value : myEnum.voteValue.无;
-        delete detail.vote;
-        let { user } = opt;
+        let { userList, user, voteList } = opt;
         if (user) {
+            if (voteList && voteList.length) {
+                let vote = voteList.find(ele => ele.ownerId.equals(detail._id) && ele.userId.equals(user._id));
+                detail.voteValue = vote ? vote.value : myEnum.voteValue.无;
+            }
             let rs = {
                 canDel: detail.status !== myEnum.commentStatus.已删除
                     && (user.equalsId(detail.userId)
@@ -139,28 +188,20 @@ export class CommentMapper {
             };
             detail.canDel = rs.canDel;
         }
+        if (userList && userList.length) {
+            detail.quoteUser = userList.find(u => u._id.equals(detail.quoteUserId));
+            detail.user = userList.find(u => u._id.equals(detail.userId));
+        }
         if (detail.user) {
             UserMapper.resetDetail(detail.user, { imgHost: opt.imgHost });
-            detail.user.followStatus = detail.follow ? detail.follow.status : myEnum.followStatus.未关注;
         }
-        delete detail.follow;
         if (detail.status !== myEnum.commentStatus.正常) {
             detail.isDel = true;
             delete detail.comment;
             delete detail.user;
         }
+        delete detail.updatedAt;
+        delete detail.__v;
         return detail;
-    }
-
-    static async quoteUserQuery(userId, opt?: UserResetOption) {
-        let quoteUserList = await UserModel.find({ _id: userId }, {
-            account: 1,
-            nickname: 1,
-            avatar: 1,
-        }).lean();
-        quoteUserList.forEach(ele => {
-            UserMapper.resetDetail(ele, opt);
-        });
-        return quoteUserList;
     }
 }

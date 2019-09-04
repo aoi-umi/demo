@@ -13,9 +13,10 @@ import { BaseMapper } from '../_base';
 import { UserLogModel } from './user-log';
 import { UserModel, UserInstanceType } from ".";
 import { FileMapper } from '../file';
-import { FollowModel } from '../follow';
+import { FollowModel, FollowDocType } from '../follow';
 import { ArticleModel } from '../article';
 import { plainToClass } from 'class-transformer';
+import { UserDocType } from './user';
 
 export type UserResetOption = {
     imgHost?: string;
@@ -347,6 +348,18 @@ export class UserMapper {
             },
             { $unwind: '$' + asName },
         ];
+    }
+
+    static async queryById(userId, opt?: UserResetOption) {
+        let list: (UserDocType & { avatarUrl?: string })[] = await UserModel.find({ _id: userId }, {
+            account: 1,
+            nickname: 1,
+            avatar: 1,
+        }).lean();
+        list.forEach(ele => {
+            UserMapper.resetDetail(ele, opt);
+        });
+        return list;
     }
 }
 
