@@ -31,6 +31,11 @@ export async function init() {
 export let register = function (app: Express) {
     app.use((req, res, next) => {
         req.realIp = req.header('X-Real-IP') || req.ip;
+        req.myData = {
+            startTime: new Date().getTime(),
+            ip: req.realIp,
+            imgHost: req.headers.host,
+        }
         next();
     });
     const routes = require('./routes').default;

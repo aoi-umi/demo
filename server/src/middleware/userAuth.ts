@@ -48,13 +48,8 @@ export class UserAuthMid {
         let fn: RequestHandler = async (req, res, next) => {
             try {
                 let token = req.header(config.dev.cacheKey.user);
-                let user = await UserAuthMid.getUser(token, { imgHost: req.headers.host });
-                req.myData = {
-                    user,
-                    startTime: new Date().getTime(),
-                    accessableUrl: {},
-                    ip: req.realIp,
-                };
+                let user = await UserAuthMid.getUser(token, { imgHost: req.myData.imgHost });
+                req.myData.user = user;
 
                 //url权限认证
                 if (authData)

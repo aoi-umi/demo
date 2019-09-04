@@ -51,6 +51,7 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
     followQuery,
     chatSubmit,
     chatQuery,
+    chatList,
 
     //file
     imgUpload,
@@ -265,6 +266,9 @@ export class TestApi extends ApiModel<TestApiMethod> {
     }
     async chatQuery(data) {
         return this.requestByConfig<ListResult>(this.apiConfig.method.chatQuery, { data });
+    }
+    async chatList(data) {
+        return this.requestByConfig<ListResult>(this.apiConfig.method.chatList, { data });
     }
     //#endregion
 }

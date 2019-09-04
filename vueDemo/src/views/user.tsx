@@ -6,7 +6,7 @@ import { convClass, convert } from '@/helpers';
 import * as helpers from '@/helpers';
 import { dev, myEnum } from '@/config';
 import { testApi, testSocket } from '@/api';
-import { Modal, Input, Form, FormItem, Button, Card, TabPane, Tabs } from '@/components/iview';
+import { Modal, Input, Form, FormItem, Button, Card, TabPane, Tabs, Time } from '@/components/iview';
 import { MyTagModel } from '@/components/my-tag';
 import { MyUpload, IMyUpload } from '@/components/my-upload';
 import { MyList, IMyList, ResultType } from '@/components/my-list';
@@ -223,19 +223,20 @@ export default class UserInfo extends Base {
         this.load();
     }
 
-    load() {
-        for (let key in this.tabLoaded) {
-            this.tabLoaded[key] = false;
-        }
+    async load() {
+        // for (let key in this.tabLoaded) {
+        //     this.tabLoaded[key] = false;
+        // }
         let query = this.$route.query as { [key: string]: string };
-        this.$refs.loadView.loadData().then(() => {
-            if (this.$refs.loadView.result.success) {
-                if (myEnum.userTab.getAllValue().includes(query.tab)) {
-                    this.tab = query.tab;
-                }
-                this.changeTab();
+        let loadRs = this.$refs.loadView.result;
+        if (!loadRs.success)
+            await this.$refs.loadView.loadData();
+        if (loadRs.success) {
+            if (myEnum.userTab.getAllValue().includes(query.tab)) {
+                this.tab = query.tab;
             }
-        });
+            this.changeTab();
+        }
     }
 
     private changeTab() {
@@ -245,6 +246,8 @@ export default class UserInfo extends Base {
             this.handleFollowSearch(myEnum.followQueryType.关注);
         } else if (this.tab === myEnum.userTab.文章 && !this.tabLoaded.article) {
             this.handleArticleSearch();
+        } else if (this.tab === myEnum.userTab.私信 && !this.tabLoaded.chat) {
+            this.handleChatSearch();
         }
     }
 
@@ -265,7 +268,7 @@ export default class UserInfo extends Base {
     $refs: {
         formVaild: IForm, loadView: IMyLoad, upload: IMyUpload,
         followerList: IMyList<any>, followingList: IMyList<any>,
-        articleList: IMyList<any>,
+        articleList: IMyList<any>, chatList: IMyList<any>,
     };
     updateLoading = false;
     private getUpdateUser() {
@@ -406,6 +409,7 @@ export default class UserInfo extends Base {
         following: false,
         follower: false,
         article: false,
+        chat: false,
     };
     private async followQuery(type, opt?) {
         opt = {
@@ -413,14 +417,6 @@ export default class UserInfo extends Base {
             userId: this.detail._id,
             type,
         };
-
-        // this.$router.push({
-        //     path: this.$route.path,
-        //     query: {
-        //         ...this.$route.query,
-        //         tab: name
-        //     }
-        // });
 
         if (type == myEnum.followQueryType.粉丝)
             await this.$refs.followerList.query(opt);
@@ -443,8 +439,18 @@ export default class UserInfo extends Base {
         this.tabLoaded.article = true;
     }
 
+    private handleChatSearch() {
+        this.$refs.chatList.handleQuery({ resetPage: true });
+        this.tabLoaded.chat = true;
+    }
+
     private async followQueryFn(data) {
         let rs = await testApi.followQuery(data);
+        return rs;
+    }
+
+    private async chatListFn(data) {
+        let rs = await testApi.chatList(data);
         return rs;
     }
 
@@ -462,9 +468,7 @@ export default class UserInfo extends Base {
                     <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline' }}>
                         <UserAvatarView user={user} />
                         <span style={{ marginLeft: '5px' }}>{user.profile || dev.defaultProfile}</span>
-                        <div style={{
-                            flexGrow: 1
-                        }} >
+                        <div class="flex-stretch">
                         </div>
                         <FollowButtonView user={user} />
                     </div>
@@ -473,10 +477,48 @@ export default class UserInfo extends Base {
         });
     }
 
+    private toChat(userId) {
+        this.$router.push({
+            path: dev.routeConfig.userChat.path,
+            query: { _id: userId }
+        });
+    }
+    private renderChat(rs: ResultType) {
+        if (!rs.success || !rs.data.length) {
+            let msg = !rs.success ? rs.msg : '空空的';
+            return (
+                <Card class="center" style={{ marginTop: '5px' }}>{msg}</Card>
+            );
+        }
+        return rs.data.map(ele => {
+            let user = ele.user;
+            return (
+                <Card style={{ marginTop: '5px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline' }}>
+                        <UserAvatarView user={user} />
+                        <div class="flex-stretch" style={{
+                            cursor: 'pointer'
+                        }} on-click={() => {
+                            this.toChat(user._id);
+                        }}>
+                        </div>
+                        <Time class="not-important" time={ele.createdAt} />
+                    </div>
+                    <span style={{
+                        marginLeft: '42px', textOverflow: 'ellipsis',
+                        cursor: 'pointer'
+                    }} on-click={() => {
+                        this.toChat(user._id);
+                    }}>{ele.content}</span>
+                </Card>
+            )
+        });
+    }
+
     renderInfo() {
         let detail = this.detail;
         return (
-            <Card style={{
+            <div style={{
                 // background: 'rgba(255,255,255,0.6)'
             }}>
                 <div style={{ display: 'flex', alignItems: 'baseline' }}>
@@ -488,7 +530,14 @@ export default class UserInfo extends Base {
                     {!detail.self && <FollowButtonView style={{ alignItems: 'flex-end' }} user={detail} />}
                 </div>
                 <Tabs v-model={this.tab} style={{ minHeight: '300px' }} on-on-click={(name: string) => {
-                    this.changeTab();
+                    // this.changeTab();
+                    this.$router.push({
+                        path: this.$route.path,
+                        query: {
+                            ...this.$route.query,
+                            tab: name
+                        }
+                    });
                 }}>
                     <TabPane label="概览">
                         {detail.self ?
@@ -552,7 +601,8 @@ export default class UserInfo extends Base {
                                 });
                             }}
                         />
-                    </TabPane><TabPane name={myEnum.userTab.粉丝} label={() => {
+                    </TabPane>
+                    <TabPane name={myEnum.userTab.粉丝} label={() => {
                         return <div>粉丝: {detail.follower}</div>
                     }}>
                         <Input v-model={this.followerAnyKey} search on-on-search={() => {
@@ -594,8 +644,26 @@ export default class UserInfo extends Base {
                             }}
                         />
                     </TabPane>
+                    <TabPane name={myEnum.userTab.私信} label={() => {
+                        return <div>私信</div>
+                    }}>
+                        <MyList
+                            ref="chatList"
+                            type="custom"
+                            hideSearchBox
+                            on-query={(t) => {
+                                this.$refs.chatList.query();
+                            }}
+
+                            queryFn={this.chatListFn}
+
+                            customRenderFn={(rs) => {
+                                return this.renderChat(rs);
+                            }}
+                        />
+                    </TabPane>
                 </Tabs>
-            </Card>
+            </div>
         );
     }
 

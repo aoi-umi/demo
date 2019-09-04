@@ -373,13 +373,13 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
                         </div>
                     }
                 </div>
-                <Card class={this.bottomBarClass}>
+                {this.multiOperateBtnList.length > 0 && <Card class={this.bottomBarClass}>
                     {this.multiOperateBtnList.map(ele => {
                         return (
                             <Button on-click={() => { ele.onClick && ele.onClick(this.selectedRows); }}>{ele.text}</Button>
                         );
                     })}
-                </Card>
+                </Card>}
             </div>
         );
     }

@@ -24,7 +24,7 @@ const uplaod = (option: { fileType: string }, req: Request, res: Response) => {
         });
         let obj = fs.toOutObject();
         if (option.fileType == myEnum.fileType.图片) {
-            obj.url = FileMapper.getImgUrl(fs.fileId, req.headers.host);
+            obj.url = FileMapper.getImgUrl(fs.fileId, req.myData.imgHost);
         }
         return obj;
     }, req, res);

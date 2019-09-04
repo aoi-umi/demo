@@ -78,6 +78,7 @@ router.get('/follow/query', UserAuthMid.normal(), follow.query);
 import * as chat from './chat';
 router.post('/chat/submit', UserAuthMid.normal([auth.login]), chat.submit);
 router.get('/chat/query', UserAuthMid.normal([auth.login]), chat.query);
+router.get('/chat/list', UserAuthMid.normal([auth.login]), chat.list);
 //#endregion
 
 //#region file 

@@ -14,16 +14,14 @@ declare global {
         }
 
         interface MyData {
-            user: LoginUser;
-            viewPath?: string;
-            noNav?: boolean;
+            user?: LoginUser;
             autoSignIn?: boolean;
             noLog?: boolean;
             startTime: number;
             useStatus?: boolean;
-            accessableUrl: { [url: string]: boolean };
             ip: string;
             lang?: string;
+            imgHost?: string;
         }
 
         interface Response {

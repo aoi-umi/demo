@@ -22,3 +22,6 @@ export class ChatQuery extends ListBase {
     @Transform(objectIdTransform)
     destUserId: Types.ObjectId;
 }
+
+export class ChatList extends ListBase {
+}

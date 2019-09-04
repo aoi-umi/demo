@@ -42,7 +42,7 @@ export let signIn: RequestHandler = (req, res) => {
         let token = req.myData.user.key;
         let { user, disableResult } = await UserMapper.accountCheck(data.account);
 
-        let returnUser = await UserMapper.login(token, user, data, disableResult.disabled, { imgHost: req.headers.host });
+        let returnUser = await UserMapper.login(token, user, data, disableResult.disabled, { imgHost: req.myData.imgHost });
         let userInfoKey = config.dev.cacheKey.user + token;
         await cache.set(userInfoKey, returnUser, config.dev.cacheTime.user);
         return returnUser;
@@ -72,9 +72,9 @@ export let info: RequestHandler = (req, res) => {
 export let detail: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let detail = await UserMapper.detail(user._id, { imgHost: req.headers.host });
+        let detail = await UserMapper.detail(user._id, { imgHost: req.myData.imgHost });
         let dbUser = await UserModel.findById(user._id);
-        UserMapper.resetDetail(detail, { imgHost: req.headers.host });
+        UserMapper.resetDetail(detail, { imgHost: req.myData.imgHost });
         await UserMapper.resetStat(dbUser, detail);
         return detail;
     }, req, res);
@@ -89,7 +89,7 @@ export let detailQuery: RequestHandler = (req, res) => {
         if (!detail)
             throw common.error('', config.error.USER_NOT_FOUND);
         let obj = detail.toJSON({ virtuals: false });
-        UserMapper.resetDetail(obj, { imgHost: req.headers.host });
+        UserMapper.resetDetail(obj, { imgHost: req.myData.imgHost });
         await UserMapper.resetStat(detail, obj);
         let follow: FollowInstanceType;
         obj.followEachOther = false;
@@ -130,7 +130,7 @@ export let update: RequestHandler = (req, res) => {
             await log.save({ session });
         });
         if (updateCache.avatar)
-            updateCache.avatarUrl = FileMapper.getImgUrl(updateCache.avatar, req.headers.host);
+            updateCache.avatarUrl = FileMapper.getImgUrl(updateCache.avatar, req.myData.imgHost);
 
         if (!common.isObjectEmpty(updateCache)) {
             for (let key in updateCache) {
@@ -148,9 +148,9 @@ export let mgtQuery: RequestHandler = (req, res) => {
         let data = paramsValid(req.query, VaildSchema.UserMgtQuery);
         let { rows, total } = await UserMapper.query({
             ...data, includeDelAuth: true
-        }, { imgHost: req.headers.host });
+        }, { imgHost: req.myData.imgHost });
         rows.forEach(detail => {
-            UserMapper.resetDetail(detail, { imgHost: req.headers.host });
+            UserMapper.resetDetail(detail, { imgHost: req.myData.imgHost });
         });
         return {
             rows,
