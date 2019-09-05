@@ -290,7 +290,8 @@ class Comment extends Base {
                             //移除相同key
                             rs.rows.forEach(ele => {
                                 let idx = this.$refs.replyList.result.data.findIndex(e => e._id === ele._id);
-                                this.$refs.replyList.result.data.splice(idx, 1);
+                                if (idx > -1)
+                                    this.$refs.replyList.result.data.splice(idx, 1);
                             });
                             return rs;
                         }}
