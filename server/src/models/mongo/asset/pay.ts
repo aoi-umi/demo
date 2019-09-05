@@ -26,9 +26,7 @@ export class Pay extends Base {
     })
     type: number;
 
-    @prop({
-        index: { unique: true },
-    })
+    @prop({})
     outPayOrderId: string;
 
     @prop({
