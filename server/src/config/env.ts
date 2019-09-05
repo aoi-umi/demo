@@ -2,18 +2,25 @@
 import * as path from 'path';
 import { ConnectionOptions } from 'mongoose';
 
+let processEnv: {
+    Port?: string;
+    RedisUri?: string;
+    MongoUri?: string;
+    Host?: string
+} = process.env;
 const urlPrefix = '/devMgt';
+const envDir = path.resolve(__dirname, '../../env');
+let host = processEnv.Host || 'http://localhost';
 let env = {
     name: 'devMgt',
-    port: process.env.PORT || 8000,
+    port: processEnv.Port || 8000,
     version: '0.0.1',
-    errorDir: path.resolve(__dirname + '/../file/error'),
     cachePrefix: 'myService',
     redis: {
-        uri: process.env.RedisUri || 'redis://localhost',
+        uri: processEnv.RedisUri || 'redis://localhost',
     },
     mongoose: {
-        uri: process.env.MongoUri || "mongodb://localhost",
+        uri: processEnv.MongoUri || "mongodb://localhost",
         options: {
             useNewUrlParser: true,
             autoReconnect: true,
@@ -28,7 +35,15 @@ let env = {
         name: 'devMgt',
         appenders: { type: 'stdout' }
     },
-    imgPrefix: `${urlPrefix}/img`
+    imgPrefix: `${urlPrefix}/img`,
+    ali: {
+        sandbox: true,
+        appId: '2016100100641227',
+        payNotifyUrl: host + urlPrefix + '/alipay/notify',
+        refundNotifyUrl: host + urlPrefix + '/alipay/refund/notify',
+        rsaPublicPath: path.join(envDir, '/alipay/pub.txt'),
+        rsaPrivatePath: path.join(envDir, '/alipay/pri.txt'),
+    }
 };
 
 export default env;

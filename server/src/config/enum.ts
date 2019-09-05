@@ -46,6 +46,25 @@ export const enumDefine = {
         关注: 1,
         粉丝: 2
     },
+    assetSourceType: {
+        微信: 1,
+        支付宝: 2,
+    },
+    assetLogStatus: {
+        未完成: 0,
+        已完成: 1,
+    },
+    payStatus: {
+        未支付: 0,
+        待处理: 1,
+        已完成: 2,
+        已取消: -1,
+    },
+    payRefundStatus: {
+        未退款: 0,
+        退款中: 1,
+        已退款: 2,
+    },
 
     socket: {
         弹幕发送: 'danmakuSend',
