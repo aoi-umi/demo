@@ -37,9 +37,7 @@ export class AssetLog extends Base {
     })
     status: number;
 
-    @prop({
-        index: { unique: true },
-    })
+    @prop({})
     outOrderId: string;
 
     @prop({

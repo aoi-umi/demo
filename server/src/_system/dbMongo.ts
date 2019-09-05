@@ -70,26 +70,31 @@ export async function transaction(fn: (session: ClientSession) => any, conn?: mo
 
 mongoose.connection.once('open', () => {
     let orgModel = mongoose.model;
-
+    let coll = {};
     //事务中无法创建表，定义的时候创建
     function createCollection(model) {
         (async () => {
+            let collectionName = model.collection.collectionName;
+            //防止重复处理
+            if (coll[collectionName])
+                return;
+            coll[collectionName] = true;
             let listCol = model.collection.conn.db.listCollections({
-                name: model.collection.collectionName
+                name: collectionName,
             });
             let t = await Q.denodeify<any[]>(listCol.toArray.bind(listCol))();
             if (!t.length) {
-                let x = await model.collection.conn.createCollection(model.collection.collectionName);
+                let x = await model.collection.conn.createCollection(collectionName);
             }
         })().catch(e => {
             console.log(e);
         });
     }
 
-    for (let key in mongoose.models) {
-        let model = mongoose.models[key];
-        createCollection(model);
-    }
+    // for (let key in mongoose.models) {
+    //     let model = mongoose.models[key];
+    //     createCollection(model);
+    // }
 
     (mongoose.model as any) = function () {
         let model: Model<any> = orgModel.apply(mongoose, arguments);
