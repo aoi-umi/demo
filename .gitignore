@@ -30,3 +30,4 @@ MyService/**/routes/dal/models/_auto
 MyService/file
 pm2.json
 _test
+env

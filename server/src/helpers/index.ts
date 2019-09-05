@@ -73,8 +73,10 @@ export function paramsValid(data, schema?) {
     let rtnData = schema ? plainToClass(schema, data) : data;
     // console.log(rtnData);
     let err = valid(rtnData);
-    if (err.length)
+    if (err.length) {
+        logger.info(JSON.stringify(rtnData));
         throw common.error('', config.error.ARGS_ERROR, { remark: err.join(';') });
+    }
 
     if (rtnData instanceof VaildSchema.ListBase) {
         if (!rtnData.page)

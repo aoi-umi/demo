@@ -81,6 +81,13 @@ router.get('/chat/query', UserAuthMid.normal([auth.login]), chat.query);
 router.get('/chat/list', UserAuthMid.normal([auth.login]), chat.list);
 //#endregion
 
+//#region pay 
+import * as pay from './pay';
+router.post('/pay/create', UserAuthMid.normal([auth.login]), pay.create);
+router.get('/pay/query', UserAuthMid.normal([auth.login]), pay.query);
+router.post('/alipay/notify', pay.alipayNotify);
+//#endregion
+
 //#region file 
 import * as file from './file';
 router.post('/img/upload', UserAuthMid.normal([auth.login]), FileMid.single, file.imgUpload);
