@@ -24,7 +24,7 @@ export const Col = convClass<iviewTypes.Col>(iview.Col);
 export const ColorPicker = convClass<iviewTypes.ColorPicker>(iview.ColorPicker);
 
 export const Header = convClass<iviewTypes.Header>(iview.Header);
-export const Icon = convClass<iviewTypes.Icon>(iview.Icon);
+export const Icon = convClass<iviewTypes.Icon & { custom: string }>(iview.Icon);
 export const Input = convClass<iviewTypes.Input>(iview.Input);
 export const Layout = convClass<iviewTypes.Layout>(iview.Layout);
 export const Modal = convClass<iviewTypes.Modal>(iview.Modal);

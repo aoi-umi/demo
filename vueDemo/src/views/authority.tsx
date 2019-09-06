@@ -14,6 +14,7 @@ type DetailDataType = {
     name?: string;
     code?: string;
     status?: number;
+    statusText?: string;
     isDel?: boolean;
 };
 @Component
@@ -151,6 +152,7 @@ export default class Authority extends Base {
             let toStatus = detail.status == myEnum.authorityStatus.启用 ? myEnum.authorityStatus.禁用 : myEnum.authorityStatus.启用;
             await testApi.authorityUpdate({ _id: detail._id, status: toStatus });
             detail.status = toStatus;
+            detail.statusText = myEnum.roleStatus.getKey(toStatus);
         });
     }
 
@@ -187,12 +189,8 @@ export default class Authority extends Base {
             minWidth: 120,
         }, {
             title: '状态',
-            key: 'status',
+            key: 'statusText',
             minWidth: 80,
-            render: (h, params) => {
-                let text = myEnum.authorityStatus.getKey(params.row.status);
-                return <span>{text}</span>;
-            }
         }, {
             title: '操作',
             key: 'action',
@@ -202,7 +200,7 @@ export default class Authority extends Base {
             render: (h, params) => {
                 let detail = params.row;
                 return (
-                    <div class={MyTableConst.clsPrefix + "action-box"}>
+                    <div class={MyTableConst.clsActBox}>
                         {this.storeUser.user.hasAuth(authority.authoritySave) && [
                             <a on-click={() => {
                                 this.updateStatus(detail);

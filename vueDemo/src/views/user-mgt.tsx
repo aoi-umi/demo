@@ -222,7 +222,7 @@ export default class UserMgt extends Base {
             render: (h, params) => {
                 let detail = params.row;
                 return (
-                    <div class={MyTableConst.clsPrefix + "action-box"}>
+                    <div class={MyTableConst.clsActBox}>
                         {this.storeUser.user.hasAuth(authority.userMgtEdit) && detail.canEdit &&
                             <a on-click={() => {
                                 this.showDetail(myEnum.userEditType.修改, detail);

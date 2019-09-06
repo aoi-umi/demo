@@ -219,7 +219,7 @@ export default class Bookmark extends Base {
                         width: 120,
                         render: (h, params) => {
                             return (
-                                <div class={MyTableConst.clsPrefix + "action-box"}>
+                                <div class={MyTableConst.clsActBox}>
                                     <a on-click={() => {
                                         this.detail = params.row;
                                         this.detailShow = true;

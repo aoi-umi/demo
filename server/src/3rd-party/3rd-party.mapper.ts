@@ -49,7 +49,7 @@ export class ThirdPartyPayMapper {
             if (!assetLog)
                 throw common.error('无对应资金记录');
             if (!assetLog.notifyId) {
-                await assetLog.update({ notifyId: data.notifyLog._id });
+                await assetLog.update({ notifyId: data.notifyLog._id, outOrderNo: data.notifyLog.outOrderNo });
             } else if (!assetLog.notifyId.equals(data.notifyLog._id))
                 throw common.error('通知id不一致');
             if (data.type === myEnum.notifyType.支付宝) {
@@ -64,7 +64,7 @@ export class ThirdPartyPayMapper {
             }
             if (assetLog.status !== myEnum.assetLogStatus.已完成)
                 await assetLog.update({ status: myEnum.assetLogStatus.已完成 });
-            await PayModel.updateOne({ _id: assetLog.orderId, status: { $in: [myEnum.payStatus.待处理, myEnum.payStatus.未支付] } }, { status: myEnum.payStatus.已支付 });
+            await PayModel.updateOne({ assetLogId: assetLog._id, status: { $in: [myEnum.payStatus.待处理, myEnum.payStatus.未支付] } }, { status: myEnum.payStatus.已支付 });
         } catch (e) {
             if (assetLog)
                 await assetLog.update({ remark: e.message, $push: { remarkList: { msg: e.message } } });

@@ -52,6 +52,8 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
     chatSubmit,
     chatQuery,
     chatList,
+    payCreate,
+    payQuery,
 
     //file
     imgUpload,
@@ -266,6 +268,15 @@ export class TestApi extends ApiModel<TestApiMethod> {
     }
     async chatList(data) {
         return this.requestByConfig<ListResult>(this.apiConfig.method.chatList, { data });
+    }
+    //#endregion
+
+    //#region pay 
+    async payCreate(data) {
+        return this.requestByConfig(this.apiConfig.method.payCreate, { data });
+    }
+    async payQuery(data) {
+        return this.requestByConfig<ListResult>(this.apiConfig.method.payQuery, { data });
     }
     //#endregion
 }

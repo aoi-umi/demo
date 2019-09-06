@@ -37,14 +37,14 @@ export class AssetLog extends Base {
     })
     status: number;
 
-    @prop()
-    outOrderId: string;
-
     @prop({
         type: SchemaTypes.ObjectId,
         required: true,
     })
     orderId: Types.ObjectId;
+
+    @prop()
+    outOrderNo: string;
 
     @prop({
         required: true,

@@ -39,6 +39,10 @@ var authority = {
     commentMgtDel: {
         name: '评论管理删除'
     },
+
+    payMgt: {
+        name: '支付管理'
+    },
 };
 
 var authList = [];

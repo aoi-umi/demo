@@ -15,4 +15,5 @@ export default {
 
     articleMgtDel: 'articleMgtDel',
     articleMgtAudit: 'articleMgtAudit',
+    payMgt: 'payMgt',
 };

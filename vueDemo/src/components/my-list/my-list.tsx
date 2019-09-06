@@ -23,7 +23,8 @@ const event = {
 const clsPrefix = 'my-list-';
 
 export const Const = {
-    clsPrefix
+    clsPrefix,
+    clsActBox: clsPrefix + "action-box"
 };
 
 export type ResultType = {

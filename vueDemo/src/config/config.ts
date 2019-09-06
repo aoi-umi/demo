@@ -47,6 +47,10 @@ export const routeConfig = {
         path: '/articleMgt/edit',
         authority: [authorityConfig.login],
     },
+    payMgt: {
+        path: '/payMgt',
+        authority: [authorityConfig.login],
+    },
     test: { path: '/test' },
     error: { path: '/error' },
 };

@@ -2,37 +2,15 @@ import { RequestHandler } from 'express';
 
 import { responseHandler, paramsValid } from '../helpers';
 import * as config from '../config';
-import { error, escapeRegExp } from '../_system/common';
+import { error } from '../_system/common';
 import * as VaildSchema from '../vaild-schema/class-valid';
 import { AuthorityModel, AuthorityInstanceType, AuthorityMapper } from '../models/mongo/authority';
-import { BaseMapper } from '../models/mongo/_base';
 
 export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let data = paramsValid(req.query, VaildSchema.AuthorityQuery);
-        let query: any = {};
-        if (data.anyKey) {
-            delete data.name;
-            delete data.code;
-            let anykey = new RegExp(escapeRegExp(data.anyKey), 'i');
-            query.$or = [
-                { code: anykey },
-                { name: anykey },
-            ];
-        }
+        let { rows, total } = await AuthorityMapper.query(data);
 
-        if (data.name)
-            query.name = new RegExp(escapeRegExp(data.name), 'i');
-        if (data.code)
-            query.code = new RegExp(escapeRegExp(data.code), 'i');
-        if (data.status)
-            query.status = { $in: data.status.split(',') };
-
-        let { rows, total } = await AuthorityModel.findAndCountAll({
-            conditions: query,
-            getAll: data.getAll,
-            ...BaseMapper.getListOptions(data),
-        });
         return {
             rows,
             total
