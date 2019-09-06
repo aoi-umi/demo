@@ -11,7 +11,10 @@ export class NotifyMapper {
         let notify = await NotifyModel.findOne({ orderNo: orderNoRs.outOrderNo });
         let exists = !!notify;
         if (!notify) {
-            notify = new NotifyModel({ type: data.type, value: data.value, raw: data.raw, orderNo: orderNoRs.outOrderNo, outOrderNo: orderNoRs.orderNo });
+            notify = new NotifyModel({
+                type: data.type, value: data.value, raw: data.raw,
+                orderNo: orderNoRs.outOrderNo, outOrderNo: orderNoRs.orderNo
+            });
         }
         return {
             notify,
@@ -19,6 +22,7 @@ export class NotifyMapper {
         };
     }
 
+    //获取通知单号
     static getOrderNo(data: { type: number, value: any }) {
         let obj = {
             outOrderNo: '',

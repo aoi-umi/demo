@@ -22,6 +22,7 @@ const enumDefineBack = {
     },
     commentType: {
         文章: 0,
+        // 视频: 1,
     },
     commentStatus: {
         正常: 0,
@@ -45,6 +46,29 @@ const enumDefineBack = {
         关注: 1,
         粉丝: 2
     },
+    assetSourceType: {
+        微信: 1,
+        支付宝: 2,
+    },
+    assetLogStatus: {
+        未完成: 0,
+        已完成: 1,
+    },
+    payStatus: {
+        未支付: 0,
+        待处理: 1,
+        已支付: 2,
+        已取消: -1,
+    },
+    payRefundStatus: {
+        未退款: 0,
+        退款中: 1,
+        已退款: 2,
+    },
+    notifyType: {
+        微信: 1,
+        支付宝: 2,
+    },
 
     socket: {
         弹幕发送: 'danmakuSend',
@@ -53,6 +77,9 @@ const enumDefineBack = {
         登出: 'logout',
         私信接收: 'chatRecv',
     },
+    fileType: {
+        图片: 'image'
+    }
 };
 
 const enumDefineFront = {

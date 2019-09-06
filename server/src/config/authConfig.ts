@@ -64,5 +64,9 @@ export const authConfig = {
 
     commentMgtDel: {
         code: 'commentMgtDel'
-    }
+    },
+
+    payMgt: {
+        code: 'payMgt'
+    },
 };

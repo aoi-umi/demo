@@ -167,8 +167,15 @@ const config = {
                     url: '/chat/list',
                     method: 'get',
                 },
-                //file
+                payCreate: {
+                    url: '/pay/create',
+                },
+                payQuery: {
+                    url: '/pay/query',
+                    method: 'get',
+                },
 
+                //file
                 imgUpload: {
                     url: '/img/upload'
                 },

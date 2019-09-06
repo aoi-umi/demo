@@ -182,6 +182,11 @@ export default class App extends Base {
                                     icon: 'md-lock',
                                     text: routeConfig.authority.text,
                                     show: this.storeUser.user.hasAuth(authority.authorityQuery)
+                                }, {
+                                    to: routeConfig.payMgt.path,
+                                    icon: 'logo-usd',
+                                    text: routeConfig.payMgt.text,
+                                    show: this.storeUser.user.hasAuth(authority.login)
                                 },].filter((ele: MenuConfig) => {
                                     let show = ele.show;
                                     if (!ele.hasOwnProperty('show')) {
@@ -220,6 +225,6 @@ type MenuConfig = {
     name?: string;
     to: string;
     text: string;
-    icon: string;
+    icon?: string;
     show?: boolean;
 };

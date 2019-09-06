@@ -12,7 +12,13 @@ export type PayInstanceType = InstanceType<Pay>;
 export type PayModelType = ModelType<Pay, typeof Pay>;
 export type PayDocType = DocType<PayInstanceType>;
 
-@setSchema()
+@setSchema({
+    schemaOptions: {
+        toJSON: {
+            virtuals: true
+        }
+    }
+})
 export class Pay extends Base {
     @prop({
         type: SchemaTypes.ObjectId,
@@ -21,13 +27,20 @@ export class Pay extends Base {
     userId: Types.ObjectId;
 
     @prop({
+        type: SchemaTypes.ObjectId,
+    })
+    assetLogId: Types.ObjectId;
+
+    @prop({
         enum: myEnum.assetSourceType.getAllValue(),
         required: true,
     })
     type: number;
 
-    @prop({})
-    outPayOrderId: string;
+    @prop()
+    get typeText() {
+        return myEnum.assetSourceType.getKey(this.type);
+    };
 
     @prop()
     title: string;
@@ -41,11 +54,21 @@ export class Pay extends Base {
     })
     status: number;
 
+    @prop()
+    get statusText() {
+        return myEnum.payStatus.getKey(this.status);
+    };
+
     @prop({
         enum: myEnum.payStatus.getAllValue(),
         default: myEnum.payRefundStatus.未退款,
     })
     refundStatus: number;
+
+    @prop()
+    get refundStatusText() {
+        return myEnum.payRefundStatus.getKey(this.refundStatus);
+    };
 
     @prop()
     get money() {

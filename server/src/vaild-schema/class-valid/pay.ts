@@ -22,4 +22,10 @@ export class PayCreate {
     content?: string;
 }
 
-export class PayQuery extends ListBase { }
+export class PayQuery extends ListBase {
+    status?: string;
+    type?: string;
+    orderNo?: string;
+    outOrderNo?: string;
+    anyKey?: string;
+}

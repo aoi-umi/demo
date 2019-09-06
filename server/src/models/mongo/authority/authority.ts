@@ -9,7 +9,11 @@ export type AuthorityInstanceType = InstanceType<Authority>;
 export type AuthorityModelType = ModelType<Authority, typeof Authority>;
 export type AuthorityDocType = DocType<AuthorityInstanceType>;
 @setSchema({
-    schemaOptions: {}
+    schemaOptions: {
+        toJSON: {
+            virtuals: true
+        }
+    }
 })
 export class Authority extends Base {
     @prop({
@@ -32,6 +36,11 @@ export class Authority extends Base {
         default: myEnum.authorityStatus.启用,
     })
     status: number;
+
+    @prop()
+    get statusText() {
+        return myEnum.authorityStatus.getKey(this.status);
+    }
 }
 
 export const AuthorityModel = getModelForClass<Authority, typeof Authority>(Authority);

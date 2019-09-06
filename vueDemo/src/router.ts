@@ -104,6 +104,15 @@ export const routerConfig = {
         component: () => import('./views/article-mgt-detail')
     },
 
+    payMgt: {
+        path: '/payMgt',
+        text: '支付',
+        meta: {
+            authority: dev.routeConfig.payMgt.authority,
+        },
+        component: () => import('./views/pay-mgt')
+    },
+
     test: {
         path: '/test',
         text: '测试',

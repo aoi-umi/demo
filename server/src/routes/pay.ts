@@ -5,8 +5,7 @@ import { transaction } from '../_system/dbMongo';
 import * as VaildSchema from '../vaild-schema/class-valid';
 import { myEnum } from '../config';
 import { alipayInst, ThirdPartyPayMapper } from '../3rd-party';
-import { PayModel, AssetLogModel } from '../models/mongo/asset';
-import { BaseMapper } from '../models/mongo/_base';
+import { PayModel, AssetLogModel, PayMapper } from '../models/mongo/asset';
 import { NotifyMapper } from '../models/mongo/notify';
 
 export let create: RequestHandler = (req, res) => {
@@ -20,7 +19,8 @@ export let create: RequestHandler = (req, res) => {
         let { assetLog, payResult } = await ThirdPartyPayMapper.create({
             type: data.type,
             pay,
-        })
+        });
+        pay.assetLogId = assetLog._id;
 
         await transaction(async (session) => {
             await pay.save({ session });
@@ -33,10 +33,8 @@ export let create: RequestHandler = (req, res) => {
 export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let data = paramsValid(req.query, VaildSchema.PayQuery);
-        let rs = await PayModel.findAndCountAll({
-            ...BaseMapper.getListOptions(data)
-        });
-        return rs;
+        let rs = await PayMapper.query(data, { user: req.myData.user, imgHost: req.myData.imgHost });
+        return { rows: rs.rows, total: rs.total };
     }, req, res);
 };
 

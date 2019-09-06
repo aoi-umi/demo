@@ -9,7 +9,11 @@ export type RoleInstanceType = InstanceType<Role>;
 export type RoleModelType = ModelType<Role, typeof Role>;
 export type RoleDocType = DocType<RoleInstanceType>;
 @setSchema({
-    schemaOptions: {}
+    schemaOptions: {
+        toJSON: {
+            virtuals: true
+        }
+    }
 })
 export class Role extends Base {
     @prop({
@@ -32,6 +36,11 @@ export class Role extends Base {
         default: myEnum.roleStatus.启用,
     })
     status: number;
+
+    @prop()
+    get statusText() {
+        return myEnum.roleStatus.getKey(this.status);
+    }
 
     @arrayProp({
         type: String,
