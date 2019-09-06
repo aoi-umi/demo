@@ -29,6 +29,12 @@ export class Pay extends Base {
     @prop({})
     outPayOrderId: string;
 
+    @prop()
+    title: string;
+
+    @prop()
+    content: string;
+
     @prop({
         enum: myEnum.payStatus.getAllValue(),
         default: myEnum.payStatus.未支付,

@@ -1,48 +1,32 @@
 import { RequestHandler } from 'express';
 
 import { responseHandler, paramsValid } from '../helpers';
-import * as VaildSchema from '../vaild-schema/class-valid';
-import { PayModel, AssetLogModel } from '../models/mongo/asset';
-import { myEnum } from '../config';
-import { alipayInst } from '../3rd-party/alipay';
-import { BaseMapper } from '../models/mongo/_base';
 import { transaction } from '../_system/dbMongo';
+import * as VaildSchema from '../vaild-schema/class-valid';
+import { myEnum } from '../config';
+import { alipayInst, ThirdPartyPayMapper } from '../3rd-party';
+import { PayModel, AssetLogModel } from '../models/mongo/asset';
+import { BaseMapper } from '../models/mongo/_base';
+import { NotifyMapper } from '../models/mongo/notify';
 
 export let create: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
         let data = paramsValid(req.body, VaildSchema.PayCreate);
-        let detail = new PayModel({
+        let pay = new PayModel({
+            ...data,
             userId: user._id,
+        });
+        let { assetLog, payResult } = await ThirdPartyPayMapper.create({
             type: data.type,
-            money: data.money
-        });
-        let assetLog = new AssetLogModel({
-            sourceType: data.type,
-            orderId: detail._id,
-            orderNo: detail._id,
-            moneyCent: detail.moneyCent,
-        });
-        let rtn: {
-            url?: string
-        } = {};
-        switch (data.type) {
-            case myEnum.assetSourceType.微信:
-                break;
-            case myEnum.assetSourceType.支付宝:
-                assetLog.req = rtn.url = alipayInst.pagePay({
-                    out_trade_no: detail._id,
-                    subject: 'test',
-                    total_amount: detail.money,
-                    body: 'test',
-                });
-                break;
-        }
+            pay,
+        })
+
         await transaction(async (session) => {
-            await detail.save({ session });
+            await pay.save({ session });
             await assetLog.save({ session });
         });
-        return rtn;
+        return payResult;
     }, req, res);
 };
 
@@ -56,9 +40,15 @@ export let query: RequestHandler = (req, res) => {
     }, req, res);
 };
 
-export let alipayNotify: RequestHandler = (req, res) => {
+export let alipayNotify: RequestHandler = async (req, res) => {
     let data = req.body;
-    alipayInst.payNotifyHandler(data, (notify) => {
-        console.log(notify);
+    let rs = await alipayInst.payNotifyHandler(data, async (notify) => {
+        let notifyType = myEnum.notifyType.支付宝;
+        let notifyObj = await NotifyMapper.create({ type: notifyType, value: notify, raw: data });
+        await notifyObj.notify.save();
+
+        //记录通知后马上返回，下面的方法不用await    
+        ThirdPartyPayMapper.notifyHandler({ type: notifyType, notifyLog: notifyObj.notify });
     });
+    res.send(rs);
 };

@@ -57,13 +57,17 @@ export const enumDefine = {
     payStatus: {
         未支付: 0,
         待处理: 1,
-        已完成: 2,
+        已支付: 2,
         已取消: -1,
     },
     payRefundStatus: {
         未退款: 0,
         退款中: 1,
         已退款: 2,
+    },
+    notifyType: {
+        微信: 1,
+        支付宝: 2,
     },
 
     socket: {

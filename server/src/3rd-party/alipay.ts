@@ -4,7 +4,7 @@ let aliConfig = config.env.ali;
 alipay.AliPayStatic.config({
     sandbox: aliConfig.sandbox,
     requestLog: (log) => {
-        console.log('ali', log);
+        // console.log('ali', log);
     }
 });
 
