@@ -7,6 +7,7 @@ import { Modal, Input, Form, FormItem, Button, Checkbox, RadioGroup, Radio } fro
 import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
 import { convClass, convert } from '@/helpers';
 import { Base } from './base';
+import { UserAvatarView } from './comps/user-avatar';
 
 type DetailDataType = {
     _id?: string;
@@ -163,7 +164,21 @@ export default class Pay extends Base {
     statusList: { key: string; value: any, checked?: boolean }[] = [];
 
     private getColumns() {
-        let columns = [{
+        let columns = [];
+        if (this.storeUser.user.hasAuth(authority.payMgt)) {
+            columns.push({
+                title: '用户',
+                key: 'user',
+                minWidth: 120,
+                render: (h, params) => {
+                    let detail = params.row;
+                    return (
+                        <UserAvatarView user={detail.user} style={{ margin: '5px' }} />
+                    );
+                }
+            });
+        }
+        columns = [...columns, {
             title: '单号',
             key: 'orderNo',
             minWidth: 120,
@@ -206,7 +221,6 @@ export default class Pay extends Base {
             key: 'action',
             fixed: 'right',
             width: 150,
-            hide: !this.storeUser.user.existsAuth([authority.authoritySave, authority.authorityDel]),
             render: (h, params) => {
                 let detail = params.row;
                 return (
@@ -250,10 +264,6 @@ export default class Pay extends Base {
                             </label>
                         );
                     })}
-
-                    hideQueryBtn={{
-                        add: !this.storeUser.user.hasAuth(authority.authoritySave)
-                    }}
 
                     columns={this.getColumns()}
 
