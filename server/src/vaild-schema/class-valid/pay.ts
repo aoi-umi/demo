@@ -17,6 +17,9 @@ export class PayCreate {
     @IsIn(myEnum.assetSourceType.getAllValue())
     @Type()
     type: number;
+
+    title?: string;
+    content?: string;
 }
 
 export class PayQuery extends ListBase { }

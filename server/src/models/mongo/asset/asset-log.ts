@@ -37,7 +37,7 @@ export class AssetLog extends Base {
     })
     status: number;
 
-    @prop({})
+    @prop()
     outOrderId: string;
 
     @prop({
@@ -66,8 +66,10 @@ export class AssetLog extends Base {
     @prop()
     req: string;
 
-    @prop()
-    notify: string;
+    @prop({
+        type: SchemaTypes.ObjectId,
+    })
+    notifyId: Types.ObjectId;
 
     @prop()
     remark: string;
