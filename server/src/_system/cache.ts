@@ -1,63 +1,70 @@
 import * as Redis from 'ioredis';
+import * as moment from 'moment';
 import * as config from '../config';
 import * as common from './common';
-import * as moment from 'moment';
-
-let client = new Redis(config.env.redis.uri);
-let cachePrefix = config.env.cachePrefix ? config.env.cachePrefix + ':' : '';
 
 function writeCacheErr(err) {
     console.error(moment().format('yyyy-MM-dd HH:mm:ss'), 'Cache Error [' + err + ']');
 }
 
 let connectErrorTimes = 0;
-client.on('error', function (err) {
-    if (err.code == 'ECONNREFUSED') {
-        if (connectErrorTimes % 10 == 0) {
-            writeCacheErr(err);
-            connectErrorTimes = 0;
-        }
-        connectErrorTimes++;
-    } else {
-        writeCacheErr(err);
-    }
-});
 
-export let get = function (key) {
-    return common.promise((defer: Q.Deferred<any>) => {
-        client.get(cachePrefix + key).then(result => {
-            if (result && typeof result == 'string') {
-                try {
-                    result = JSON.parse(result);
+export class Cache {
+    client: Redis.Redis;
+    cachePrefix: string;
+    constructor(uri: string, cachePrefix?: string) {
+        let client = this.client = new Redis(uri);
+        client.on('error', function (err) {
+            if (err.code == 'ECONNREFUSED') {
+                if (connectErrorTimes % 10 == 0) {
+                    writeCacheErr(err);
+                    connectErrorTimes = 0;
                 }
-                catch (e) {
-                }
+                connectErrorTimes++;
+            } else {
+                writeCacheErr(err);
             }
-            defer.resolve(result);
-        }).catch(defer.reject);
-        //超时
-        setTimeout(function () {
-            defer.reject(common.error('Cache Get Timeout', config.error.CACHE_TIMEOUT));
-        }, 10 * 1000);
-        return defer.promise;
-    });
+        });
+        this.cachePrefix = cachePrefix || '';
+    }
+
+    get(key) {
+        return common.promise((defer: Q.Deferred<any>) => {
+            this.client.get(this.cachePrefix + key).then(result => {
+                if (result && typeof result == 'string') {
+                    try {
+                        result = JSON.parse(result);
+                    }
+                    catch (e) {
+                    }
+                }
+                defer.resolve(result);
+            }).catch(defer.reject);
+            //超时
+            setTimeout(function () {
+                defer.reject(common.error('Cache Get Timeout', config.error.CACHE_TIMEOUT));
+            }, 10 * 1000);
+            return defer.promise;
+        });
+    }
+
+    //expire seconds
+    set(key, value, expire?) {
+        return common.promise(() => {
+            if (typeof value == 'object')
+                value = JSON.stringify(value);
+            let args = [this.cachePrefix + key, value];
+            if (expire)
+                args = [...args, 'EX', expire];
+            return (this.client.set as any)(...args);
+        });
+    }
+
+    del(key) {
+        return this.client.del(this.cachePrefix + key);
+    }
+
+    keys(pattern: string) {
+        return this.client.keys(pattern);
+    }
 }
-//expire seconds
-export let set = function (key, value, expire?) {
-    return common.promise(() => {
-        if (typeof value == 'object')
-            value = JSON.stringify(value);
-        let args = [cachePrefix + key, value];
-        if (expire)
-            args = [...args, 'EX', expire];
-        return (client.set as any)(...args);
-    });
-};
-
-export let del = function (key) {
-    return client.del(cachePrefix + key);
-};
-
-export let keys = client.keys;
-
-export let select = client.select;

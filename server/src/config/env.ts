@@ -6,16 +6,18 @@ let processEnv: {
     Port?: string;
     RedisUri?: string;
     MongoUri?: string;
-    Host?: string
+    Host?: string;
+    MQUri?: string;
 } = process.env;
 const urlPrefix = '/devMgt';
 const envDir = path.resolve(__dirname, '../../env');
 let host = processEnv.Host || 'http://localhost';
+let name = 'devMgt';
 let env = {
-    name: 'devMgt',
+    name,
     port: processEnv.Port || 8000,
     version: '0.0.1',
-    cachePrefix: 'myService',
+    cachePrefix: name,
     redis: {
         uri: processEnv.RedisUri || 'redis://localhost',
     },
@@ -29,10 +31,14 @@ let env = {
             useCreateIndex: true,
         } as ConnectionOptions
     },
+    mq: {
+        exchange: name,
+        mqUri: processEnv.MQUri || 'amqp://localhost'
+    },
     api: {},
     urlPrefix,
     logger: {
-        name: 'devMgt',
+        name,
         appenders: { type: 'stdout' }
     },
     imgPrefix: `${urlPrefix}/img`,
