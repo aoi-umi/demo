@@ -1,12 +1,12 @@
 import { RequestHandler } from 'express';
 
 import * as common from '../_system/common';
-import * as cache from '../_system/cache';
+import { transaction } from '../_system/dbMongo';
 import { responseHandler, paramsValid, } from '../helpers';
 import { myEnum } from '../config';
 import * as config from '../config';
+import { cache } from '../_main';
 import * as VaildSchema from '../vaild-schema/class-valid';
-import { transaction } from '../_system/dbMongo';
 import { UserModel, UserMapper, UserLogMapper } from '../models/mongo/user';
 import { FileMapper } from '../models/mongo/file';
 import { LoginUser } from '../models/login-user';

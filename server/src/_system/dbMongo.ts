@@ -7,7 +7,6 @@ import {
 import * as mongodb from 'mongodb';
 import { ClientSession, CommonOptions } from 'mongodb';
 
-import * as config from '../config';
 mongooseTsConfig.schemaOptions = { timestamps: true };
 
 require('mongoose').Promise = Q.Promise;
@@ -42,9 +41,6 @@ declare module 'mongoose' {
 
         bulkWrite(writes: any[], options?: CommonOptions): Promise<mongodb.BulkWriteOpResultObject>;
     }
-}
-export async function connect() {
-    let conn = await mongoose.connect(config.env.mongoose.uri, config.env.mongoose.options);
 }
 
 export async function transaction(fn: (session: ClientSession) => any, conn?: mongoose.Connection) {

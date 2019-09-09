@@ -2,9 +2,8 @@ import { RequestHandler } from "express";
 import { plainToClass } from "class-transformer";
 
 import * as config from '../config';
-import * as cache from '../_system/cache';
 import { AuthType } from "../_system/auth";
-import { auth, logger } from '../_main';
+import { auth, logger, cache } from '../_main';
 import { UserMapper } from "../models/mongo/user";
 import { LoginUser } from "../models/login-user";
 
