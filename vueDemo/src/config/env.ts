@@ -170,6 +170,12 @@ const config = {
                 payCreate: {
                     url: '/pay/create',
                 },
+                paySubmit: {
+                    url: '/pay/submit',
+                },
+                payCancel: {
+                    url: '/pay/cancel',
+                },
                 payQuery: {
                     url: '/pay/query',
                     method: 'get',

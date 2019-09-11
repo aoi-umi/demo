@@ -1,8 +1,10 @@
 import { IsDefined, IsIn, IsNumber, IsDecimal } from "class-validator";
-import { Type } from "class-transformer";
+import { Type, Transform } from "class-transformer";
+import { Types } from 'mongoose';
 
 import { myEnum } from "../../config";
 import { ListBase } from "./base";
+import { objectIdTransform } from "./util";
 
 export class PayCreate {
     // @IsDecimal({
@@ -20,6 +22,18 @@ export class PayCreate {
 
     title?: string;
     content?: string;
+}
+
+export class PaySubmit {
+    @IsDefined()
+    @Transform(objectIdTransform)
+    _id: Types.ObjectId;
+}
+
+export class PayCancel {
+    @IsDefined()
+    @Transform(objectIdTransform)
+    _id: Types.ObjectId;
 }
 
 export class PayQuery extends ListBase {

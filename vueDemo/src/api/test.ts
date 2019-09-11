@@ -53,6 +53,8 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
     chatQuery,
     chatList,
     payCreate,
+    paySubmit,
+    payCancel,
     payQuery,
 
     //file
@@ -274,6 +276,12 @@ export class TestApi extends ApiModel<TestApiMethod> {
     //#region pay 
     async payCreate(data) {
         return this.requestByConfig(this.apiConfig.method.payCreate, { data });
+    }
+    async paySubmit(data) {
+        return this.requestByConfig(this.apiConfig.method.paySubmit, { data });
+    }
+    async payCancel(data) {
+        return this.requestByConfig(this.apiConfig.method.payCancel, { data });
     }
     async payQuery(data) {
         return this.requestByConfig<ListResult>(this.apiConfig.method.payQuery, { data });

@@ -1,14 +1,18 @@
 import { Request, Response, Express } from 'express';
 import { configure, getLogger } from 'log4js';
-import * as mongoose from 'mongoose';
 import { ConfirmChannel } from 'amqplib';
+import * as SocketIO from 'socket.io';
+import { Server } from 'http';
 
 import * as config from './config';
+import { myEnum } from './config';
 import * as helpers from './helpers';
 import { MySocket } from './_system/socket';
 import { Auth } from './_system/auth';
 import { MQ } from './_system/mq';
 import { Cache } from './_system/cache';
+import routes from './routes';
+import { ThirdPartyPayMapper } from './3rd-party';
 
 export const logger = getLogger();
 
@@ -26,47 +30,29 @@ configure({
 });
 
 export const auth = new Auth();
-export const mq = new MQ({
-    exchange: config.env.mq.exchange,
-});
+export const mq = new MQ();
 export const cache = new Cache(config.env.redis.uri, config.env.cachePrefix ? config.env.cachePrefix + ':' : '');
 export async function init() {
-    await mongoose.connect(config.env.mongoose.uri, config.env.mongoose.options);
 
     await mq.connect(config.env.mq.mqUri);
-    let queue = 'test';
-    let delay = mq.delayConfig;
-    let delayCfg = {
-        ...MQ.createQueueKey('testDelay'),
-        expiration: 5,
-        retryExpire: [
-            delay.expireTime["15s"],
-            delay.expireTime["30s"],
-            delay.expireTime["1m"]
-        ],
-    };
-    await mq.ch.addSetup(async (ch: ConfirmChannel) => {
-        let delayTest = await MQ.delayTask(ch, delayCfg);
-        return Promise.all([
-            ch.assertQueue(queue, { durable: true }),
-            mq.consume(ch, queue, (msg, content) => {
-                console.log(11111111, content)
-            }, { noAck: true }),
-            ...delayTest,
-            mq.consumeRetry(ch, delayCfg.deadLetterQueue, (msg, content) => {
-                console.log(content);
-                throw new Error('test');
-            }),
-        ] as any);
-    });
 
+    //创建重试延时队列
     await mq.ch.addSetup(async (ch: ConfirmChannel) => {
         return Promise.all([
             mq.createDelayQueue(ch)
         ]);
     });
-    mq.sendToQueue(queue, '11111111111');
-    mq.sendToQueueRetryByConfig(delayCfg, 'delay test');
+
+    await mq.ch.addSetup(async (ch: ConfirmChannel) => {
+        let pnhCfg = config.dev.mq.payNotifyHandler;
+        let payNotifyHandler = await MQ.delayTask(ch, config.dev.mq.payNotifyHandler);
+        return Promise.all([
+            ...payNotifyHandler,
+            mq.consumeRetry(ch, pnhCfg.deadLetterQueue, async (msg, content) => {
+                await ThirdPartyPayMapper.notifyHandler(content);
+            }),
+        ] as any);
+    });
 }
 
 export let register = function (app: Express) {
@@ -79,7 +65,6 @@ export let register = function (app: Express) {
         }
         next();
     });
-    const routes = require('./routes').default;
     app.use(config.env.urlPrefix, routes);
 }
 
@@ -90,18 +75,18 @@ export let errorHandler = function (err, req: Request, res: Response, next) {
 };
 
 export var mySocket: MySocket = null;
-export let initSocket = function (io: SocketIO.Server) {
-    const { MySocket } = require('./_system/socket');
+export let initSocket = function (server: Server) {
+    const io = SocketIO(server, { path: config.env.urlPrefix + '/socket.io' });
     mySocket = new MySocket(io, (socket, mySocket) => {
         let { socketUser } = mySocket;
         socket.myData = {};
-        socket.on(config.myEnum.socket.弹幕发送, (msg) => {
+        socket.on(myEnum.socket.弹幕发送, (msg) => {
             socket.broadcast.emit(config.myEnum.socket.弹幕接收, msg);
         });
-        socket.on(config.myEnum.socket.登录, (msg) => {
+        socket.on(myEnum.socket.登录, (msg) => {
             socketUser.addUser(msg, socket);
         });
-        socket.on(config.myEnum.socket.登出, (msg) => {
+        socket.on(myEnum.socket.登出, (msg) => {
             socketUser.delUserBySocket(socket);
         });
 

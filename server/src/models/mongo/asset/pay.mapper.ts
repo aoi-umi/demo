@@ -3,6 +3,7 @@
 import * as VaildSchema from '../../../vaild-schema/class-valid';
 import { Auth } from '../../../_system/auth';
 import * as config from '../../../config';
+import { myEnum } from '../../../config';
 import { LoginUser } from '../../login-user';
 import { BaseMapper } from "../_base";
 import { UserMapper } from '../user';
@@ -49,16 +50,25 @@ export class PayMapper {
             ...AssetLogMapper.lookupPipeline(),
             { $match: match2 },
         ], {
-                ...BaseMapper.getListOptions(data)
-            });
+            ...BaseMapper.getListOptions(data)
+        });
         rs.rows = rs.rows.map(ele => {
             let obj = new PayModel(ele).toJSON();
             UserMapper.resetDetail(ele.user, { imgHost: opt.imgHost });
             obj.user = ele.user;
             obj.orderNo = ele.assetLog.orderNo;
             obj.outOrderNo = ele.assetLog.outOrderNo || '';
+            PayMapper.resetDetail(obj, { user: opt.user });
             return obj;
         });
         return rs;
+    }
+
+    static resetDetail(detail, opt: { user: LoginUser }) {
+        detail.canPay = detail.canCancel = false;
+        if (opt.user.equalsId(detail.userId)) {
+            detail.canPay = [myEnum.payStatus.未支付].includes(detail.status);
+            detail.canCancel = [myEnum.payStatus.未支付].includes(detail.status);
+        }
     }
 }

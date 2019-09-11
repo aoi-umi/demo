@@ -5,21 +5,21 @@ import * as cookieParser from 'cookie-parser';
 import * as bodyParser from 'body-parser';
 import * as cors from 'cors';
 import { AddressInfo } from 'net';
-import * as SocketIO from 'socket.io';
 import 'reflect-metadata';
+import * as mongoose from 'mongoose';
 import * as config from './config';
-import * as main from './_main';
 
 
 debug('my-application');
-
-process.on('unhandledRejection', function (e) {
-    main.logger.error('unhandledRejection');
-    main.logger.error(e);
-});
-
-//init
-main.init().then(() => {
+(async () => {
+    await mongoose.connect(config.env.mongoose.uri, config.env.mongoose.options);
+})().then(async () => {
+    const main = require('./_main');
+    process.on('unhandledRejection', function (e) {
+        main.logger.error('unhandledRejection');
+        main.logger.error(e);
+    });
+    await main.init();
     const app = express();
     app.set('port', process.env.PORT || config.env.port);
 
@@ -52,6 +52,5 @@ main.init().then(() => {
             '#################',
         ].join('\r\n'));
     });
-    const io = SocketIO(server, { path: config.env.urlPrefix + '/socket.io' });
-    main.initSocket(io);
+    main.initSocket(server);
 });

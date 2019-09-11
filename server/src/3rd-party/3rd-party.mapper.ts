@@ -1,10 +1,14 @@
 import { myEnum } from "../config";
+import * as config from "../config";
+import { logger, mq } from "../_main";
 import { AssetLogModel, PayInstanceType, AssetLogInstanceType, PayModel } from "../models/mongo/asset";
-import { alipayInst } from "./alipay";
-import { logger } from "../_main";
-import { NotifyMapper, NotifyInstanceType } from "../models/mongo/notify";
+import { NotifyMapper, NotifyInstanceType, NotifyModel } from "../models/mongo/notify";
 import * as common from "../_system/common";
+import { alipayInst } from "./alipay";
 
+type NotifyType = {
+    notifyId: any,
+};
 export class ThirdPartyPayMapper {
 
     static async create(data: {
@@ -39,20 +43,22 @@ export class ThirdPartyPayMapper {
         };
     }
 
-    static async notifyHandler(data: {
-        type: number,
-        notifyLog: NotifyInstanceType,
-    }) {
+    static sendNotifyQueue(data: NotifyType) {
+        return mq.sendToQueueDelayByConfig(config.dev.mq.payNotifyHandler, data);
+    }
+
+    static async notifyHandler(data: NotifyType) {
+        let notify = await NotifyModel.findById(data.notifyId);
         let assetLog: AssetLogInstanceType;
         try {
-            assetLog = await AssetLogModel.findOne({ orderNo: data.notifyLog.orderNo });
+            assetLog = await AssetLogModel.findOne({ orderNo: notify.orderNo });
             if (!assetLog)
                 throw common.error('无对应资金记录');
             if (!assetLog.notifyId) {
-                await assetLog.update({ notifyId: data.notifyLog._id, outOrderNo: data.notifyLog.outOrderNo });
-            } else if (!assetLog.notifyId.equals(data.notifyLog._id))
+                await assetLog.update({ notifyId: notify._id, outOrderNo: notify.outOrderNo });
+            } else if (!assetLog.notifyId.equals(notify._id))
                 throw common.error('通知id不一致');
-            if (data.type === myEnum.notifyType.支付宝) {
+            if (notify.type === myEnum.notifyType.支付宝) {
                 let rs = await alipayInst.query({
                     out_trade_no: assetLog.orderNo
                 });
@@ -67,9 +73,10 @@ export class ThirdPartyPayMapper {
             await PayModel.updateOne({ assetLogId: assetLog._id, status: { $in: [myEnum.payStatus.待处理, myEnum.payStatus.未支付] } }, { status: myEnum.payStatus.已支付 });
         } catch (e) {
             if (assetLog)
-                await assetLog.update({ remark: e.message, $push: { remarkList: { msg: e.message } } });
+                await assetLog.update({ remark: e.message, $push: { remarkList: { msg: e.message, notifyId: notify._id } } });
             logger.error('处理通知出错');
             logger.error(e);
+            throw e;
         }
     }
 }
