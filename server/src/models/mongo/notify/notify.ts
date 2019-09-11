@@ -9,13 +9,22 @@ import { Base } from '../_base';
 export type NotifyInstanceType = InstanceType<Notify>;
 export type NotifyModelType = ModelType<Notify, typeof Notify>;
 export type NotifyDocType = DocType<NotifyInstanceType>;
-@setSchema()
+@setSchema({
+    schemaOptions: {
+        toJSON: { virtuals: true }
+    }
+})
 export class Notify extends Base {
     @prop({
         enum: myEnum.notifyType.getAllValue(),
         required: true,
     })
     type: number;
+
+    @prop()
+    get typeText() {
+        return myEnum.notifyType.getKey(this.type);
+    }
 
     @prop({
         required: true,
