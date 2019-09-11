@@ -13,7 +13,7 @@ const urlPrefix = '/devMgt';
 const envDir = path.resolve(__dirname, '../../env');
 let host = processEnv.Host || 'http://localhost';
 let name = 'devMgt';
-let env = {
+export default {
     name,
     port: processEnv.Port || 8000,
     version: '0.0.1',
@@ -51,5 +51,3 @@ let env = {
         rsaPrivatePath: path.join(envDir, '/alipay/pri.txt'),
     }
 };
-
-export default env;

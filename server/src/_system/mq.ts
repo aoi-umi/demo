@@ -3,8 +3,8 @@
  */
 import * as amqp from 'amqp-connection-manager';
 import { Channel, Options, ConfirmChannel, ConsumeMessage } from 'amqplib';
-import { logger } from '../_main';
 
+const logger = console;
 type DelayKey = {
     queue: string;
     exchange: string;
@@ -26,38 +26,41 @@ type DelayContentData = {
     data: RetryContent
 };
 type QueueConfigType = DelayKey & {
-    expiration?: number;
+    delay: number;
     retryExpire?: string[];
 };
 
-export type DelayConfig = {
-    expireTime: { [key: string]: string },
+export type DelayConfig<T = { [key: string]: string }> = {
+    expireTime: T,
     queuePrefix: string;
 };
 
+export const defaultExpTime = {
+    '15s': '15s',
+    '30s': '30s',
+    '1m': '1m',
+};
+
 //固定延时
-const delayConfig: DelayConfig = {
-    expireTime: {
-        '15s': '15s',
-        '30s': '30s',
-        '1m': '1m',
-    },
+const delayConfig: DelayConfig<typeof defaultExpTime> = {
+    expireTime: defaultExpTime,
     queuePrefix: 'retry_queue'
 };
 
-export class MQ {
-    delayConfig: DelayConfig;
-    exchange: string;
-    constructor(opt: {
-        delayConfig?: DelayConfig,
-        exchange: string;
+export class MQ<T = typeof defaultExpTime> {
+    delayConfig: DelayConfig<T> = delayConfig as any;
+    constructor(opt?: {
+        delayConfig?: Partial<DelayConfig<T>>,
     }) {
         opt = {
-            delayConfig,
             ...opt
         };
-        this.delayConfig = opt.delayConfig;
-        this.exchange = opt.exchange || '';
+        if (opt.delayConfig) {
+            this.delayConfig = {
+                ...this.delayConfig,
+                ...opt.delayConfig,
+            };
+        }
     }
     conn: amqp.AmqpConnectionManager;
     ch: amqp.ChannelWrapper;
@@ -76,9 +79,9 @@ export class MQ {
     async sendToQueue(queue: string, content: any, options?: Options.Publish) {
         let msg = JSON.stringify(content);
         let msgBuffer = Buffer.from(msg);
-        logger.info(`${new Date()} 发送队列 ${queue}`);
+        logger.info(`${new Date()} send queue [${queue}]`);
         return this.ch.sendToQueue(queue, msgBuffer, options).catch(e => {
-            logger.error(`发送队列失败,key: ${queue}`);
+            logger.error(`send queue [${queue}] fail:`);
             logger.error(msg);
             throw e;
         });
@@ -87,31 +90,35 @@ export class MQ {
     async consume(ch: ConfirmChannel, queue: string, onMessage: (msg: ConsumeMessage | null, content: any) => any, options?: Options.Consume) {
         return ch.consume(queue, (msg) => {
             let msgStr = msg.content.toString();
-            logger.info(`处理队列 ${queue} ${msgStr}`);
+            logger.info(`handle queue [${queue}] ${msgStr}`);
             let obj = JSON.parse(msg.content.toString());
             return onMessage(msg, obj);
         }, options);
     }
 
-    async sendToQueueDelay(content: DelayContent) {
+    private async sendToQueueDelay(content: DelayContent) {
         let rs = MQ.getDelayQueue(this.delayConfig.queuePrefix, content.delay);
         return this.sendToQueue(rs.queue, content.data, {
             expiration: rs.expire,
         });
     }
 
-    async sendToQueueRetryByConfig(cfg: QueueConfigType, data: any) {
+    /**
+     * 队列是按顺序处理的，每个queue的延迟时间必须固定
+     */
+    async sendToQueueDelayByConfig(cfg: QueueConfigType, data: any) {
         let content: RetryContent = {
             data,
             retryExpire: cfg.retryExpire
         };
         let options: Options.Publish = {};
-        if (cfg.expiration)
-            options.expiration = cfg.expiration;
+        if (!cfg.delay)
+            throw new Error('delay is required');
+        options.expiration = cfg.delay;
         return this.sendToQueueRetry(cfg.queue, content, options);
     }
 
-    async sendToQueueRetry(queue: string, content: RetryContent, options?: Options.Publish) {
+    private async sendToQueueRetry(queue: string, content: RetryContent, options?: Options.Publish) {
         if (!content.sendAt)
             content.sendAt = new Date();
         return this.sendToQueue(queue, content, options);
@@ -139,7 +146,7 @@ export class MQ {
                         this.sendToQueueRetry(queue, obj);
                     }
                 }
-                logger.error(`队列处理失败:[${queue}],${e.message}`);
+                logger.error(`handle queue [${queue}] fail: ${e.message}`);
                 logger.error(JSON.stringify(obj));
             }
         }, { noAck: true });
@@ -164,7 +171,7 @@ export class MQ {
         let matchTime = timeUnit[unit];
         let timeNum = parseInt(num);
         if (!matchTime || isNaN(timeNum)) {
-            throw new Error(`error time [${time}]`);
+            throw new Error(`invalid time [${time}]`);
         }
         return timeNum * matchTime;
     }
@@ -180,13 +187,11 @@ export class MQ {
     }
 
     static async delayTask(ch: ConfirmChannel, queue: DelayKey) {
-        ch.assertExchange(queue.exchange, 'direct', { durable: false });
         let producer = await ch.assertQueue(queue.queue, {
             exclusive: false,
             deadLetterExchange: queue.deadLetterExchange,
             deadLetterRoutingKey: queue.deadLetterRoutingKey,
         });
-        ch.bindQueue(producer.queue, queue.exchange, queue.deadLetterRoutingKey);
 
         ch.assertExchange(queue.deadLetterExchange, 'direct', { durable: false });
         let consumer = await ch.assertQueue(queue.deadLetterQueue, { exclusive: false });
@@ -194,7 +199,9 @@ export class MQ {
         return [producer, consumer];
     }
 
-    //创建延时队列
+    /**
+     * 创建延时队列
+     */
     async createDelayQueue(ch: ConfirmChannel) {
         let mq = this;
         let delayCfg = this.delayConfig;

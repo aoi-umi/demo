@@ -81,8 +81,8 @@ class PayMgtDetail extends Base {
             this.$emit('save-success', rs);
             this.initDetail(this.getDetailData());
         }, {
-                validate: this.$refs.formVaild.validate
-            }
+            validate: this.$refs.formVaild.validate
+        }
         ).finally(() => {
             this.saving = false;
         });
@@ -225,7 +225,26 @@ export default class Pay extends Base {
                 let detail = params.row;
                 return (
                     <div class={MyTableConst.clsActBox}>
-
+                        {detail.canPay && <a on-click={() => {
+                            this.operateHandler('发起支付', async () => {
+                                let rs = await testApi.paySubmit({
+                                    _id: detail._id,
+                                });
+                                window.open(rs.url, '_blank');
+                            }, { noSuccessHandler: true });
+                        }}>支付</a>}
+                        {detail.canCancel && <a on-click={() => {
+                            this.operateHandler('取消', async () => {
+                                let rs = await testApi.payCancel({
+                                    _id: detail._id,
+                                });
+                                let data = this.$refs.list.result.data;
+                                data.splice(data.findIndex(ele => ele._id === detail._id), 1, {
+                                    ...detail,
+                                    ...rs,
+                                });
+                            });
+                        }}>取消</a>}
                     </div>
                 );
             }

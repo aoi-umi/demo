@@ -70,3 +70,5 @@ export const authConfig = {
         code: 'payMgt'
     },
 };
+
+export default authConfig;

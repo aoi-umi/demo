@@ -12,8 +12,15 @@ export type AssetLogInstanceType = InstanceType<AssetLog>;
 export type AssetLogModelType = ModelType<AssetLog, typeof AssetLog>;
 export type AssetLogDocType = DocType<AssetLogInstanceType>;
 
-@setSchema()
+@setSchema({
+    schemaOptions: { _id: false }
+})
 class AssetLogRemark {
+    @prop({
+        type: SchemaTypes.ObjectId,
+    })
+    notifyId: Types.ObjectId;
+
     @prop()
     msg: string;
 
@@ -25,6 +32,7 @@ class AssetLogRemark {
 
 @setSchema()
 export class AssetLog extends Base {
+
     @prop({
         enum: myEnum.assetSourceType.getAllValue(),
         required: true,
