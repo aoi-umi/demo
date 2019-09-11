@@ -30,7 +30,13 @@ class AssetLogRemark {
     at: Date;
 }
 
-@setSchema()
+@setSchema({
+    schemaOptions: {
+        toJSON: {
+            virtuals: true
+        }
+    }
+})
 export class AssetLog extends Base {
 
     @prop({
@@ -39,11 +45,21 @@ export class AssetLog extends Base {
     })
     sourceType: number;
 
+    @prop()
+    get sourceTypeText() {
+        return myEnum.assetSourceType.getKey(this.sourceType);
+    }
+
     @prop({
         enum: myEnum.assetLogStatus.getAllValue(),
         default: myEnum.assetLogStatus.未完成
     })
     status: number;
+
+    @prop()
+    get statusText() {
+        return myEnum.assetLogStatus.getKey(this.status);
+    }
 
     @prop({
         type: SchemaTypes.ObjectId,

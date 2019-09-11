@@ -90,6 +90,12 @@ router.get('/pay/query', UserAuthMid.normal([auth.login]), pay.query);
 router.post('/alipay/notify', pay.alipayNotify);
 //#endregion
 
+//#region asset 
+import * as asset from './asset';
+router.get('/asset/notifyQuery', UserAuthMid.normal([]), asset.notifyQuery);
+router.get('/asset/logQuery', UserAuthMid.normal([]), asset.logQuery);
+//#endregion
+
 //#region file 
 import * as file from './file';
 router.post('/img/upload', UserAuthMid.normal([auth.login]), FileMid.single, file.imgUpload);

@@ -1,4 +1,4 @@
-import { MQ, defaultExpTime } from "../_system/mq";
+import { MQ, defaultDelayTime } from "amqplib-delay";
 
 export default {
     //#region 缓存 
@@ -22,9 +22,9 @@ export default {
             ...MQ.createQueueKey('payNotifyHandler'),
             delay: 1,
             retryExpire: [
-                defaultExpTime["15s"],
-                defaultExpTime["30s"],
-                defaultExpTime["1m"],
+                defaultDelayTime["15s"],
+                defaultDelayTime["30s"],
+                defaultDelayTime["1m"],
             ],
         }
     }

@@ -1,4 +1,5 @@
 export * from './article';
+export * from './asset';
 export * from './authority';
 export * from './base';
 export * from './bookmark';

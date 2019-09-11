@@ -3,13 +3,13 @@ import { configure, getLogger } from 'log4js';
 import { ConfirmChannel } from 'amqplib';
 import * as SocketIO from 'socket.io';
 import { Server } from 'http';
+import { MQ } from 'amqplib-delay';
 
 import * as config from './config';
 import { myEnum } from './config';
 import * as helpers from './helpers';
 import { MySocket } from './_system/socket';
 import { Auth } from './_system/auth';
-import { MQ } from './_system/mq';
 import { Cache } from './_system/cache';
 import routes from './routes';
 import { ThirdPartyPayMapper } from './3rd-party';
@@ -45,10 +45,10 @@ export async function init() {
 
     await mq.ch.addSetup(async (ch: ConfirmChannel) => {
         let pnhCfg = config.dev.mq.payNotifyHandler;
-        let payNotifyHandler = await MQ.delayTask(ch, config.dev.mq.payNotifyHandler);
+        let payNotifyHandler = await MQ.delayTask(ch, pnhCfg);
         return Promise.all([
             ...payNotifyHandler,
-            mq.consumeRetry(ch, pnhCfg.deadLetterQueue, async (msg, content) => {
+            mq.consumeRetry(ch, pnhCfg.deadLetterQueue, async (content) => {
                 await ThirdPartyPayMapper.notifyHandler(content);
             }),
         ] as any);
