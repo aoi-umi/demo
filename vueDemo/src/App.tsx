@@ -25,7 +25,9 @@ export default class App extends Base {
     $refs: { sider: any, menu: iView.Menu };
 
     getActiveNameByPath(path: string) {
-        return path;//.split('/')[1];
+        let name = path.split('/').slice(0, 3).join('/');
+        console.log(name);
+        return name;
     }
 
     protected created() {
