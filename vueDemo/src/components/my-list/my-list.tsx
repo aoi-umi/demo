@@ -12,6 +12,7 @@ type QueryArgsType = {
     [key: string]: {
         label?: string;
         placeholder?: string;
+        comp?: (query, ele) => any;
     }
 }
 
@@ -276,7 +277,7 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
                                     return (
                                         <Col style={{ marginBottom: '5px' }} xs={24} sm={8} md={6}>
                                             {ele.label || key}
-                                            <Input placeholder={ele.placeholder} v-model={this.model.query[key]} />
+                                            {ele.comp ? ele.comp(this.model.query, ele) : <Input placeholder={ele.placeholder} v-model={this.model.query[key]} />}
                                         </Col>
                                     );
                                 })}

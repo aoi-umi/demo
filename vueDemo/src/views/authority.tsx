@@ -1,5 +1,5 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
-import { Form as IForm } from 'iview';
+import * as iview from 'iview';
 import { testApi } from '@/api';
 import { myEnum, authority } from '@/config';
 import { Modal, Input, Form, FormItem, Button, Checkbox, Switch, Transfer } from '@/components/iview';
@@ -49,7 +49,7 @@ class AuthorityDetail extends Base {
             { required: true, trigger: 'blur' }
         ],
     };
-    $refs: { formVaild: IForm };
+    $refs: { formVaild: iview.Form };
 
     saving = false;
     async handleSave() {
@@ -65,8 +65,8 @@ class AuthorityDetail extends Base {
             this.$emit('save-success', rs);
             this.initDetail(this.getDetailData());
         }, {
-                validate: this.$refs.formVaild.validate
-            }
+            validate: this.$refs.formVaild.validate
+        }
         ).finally(() => {
             this.saving = false;
         });

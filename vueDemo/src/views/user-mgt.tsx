@@ -1,5 +1,5 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
-import { Form as IForm } from 'iview';
+import * as iview from 'iview';
 import moment from 'moment';
 
 import { testApi } from '@/api';
@@ -59,7 +59,7 @@ class UserMgtDetail extends Base {
     }
 
     private rules = {};
-    $refs: { formVaild: IForm; roleTransfer: IRoleTransfer, authTransfer: IAuthorityTransfer };
+    $refs: { formVaild: iview.Form; roleTransfer: IRoleTransfer, authTransfer: IAuthorityTransfer };
     private disableType = myEnum.userDisableType.解封;
 
     private saving = false;

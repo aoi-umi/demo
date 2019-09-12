@@ -1,5 +1,5 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
-import { Form as IForm } from 'iview';
+import * as iview from 'iview';
 import { testApi } from '@/api';
 import { Tag, Modal, Input, Row, Col, Form, FormItem, Button } from '@/components/iview';
 import { MyList, IMyList, Const as MyTableConst, OnSortChangeOptions, MyListModel } from '@/components/my-list';
@@ -51,7 +51,7 @@ class BookmarkDetail extends Base {
         ],
     };
 
-    $refs: { formVaild: IForm };
+    $refs: { formVaild: iview.Form };
 
     addTag() {
         let tag = this.tag && this.tag.trim();
@@ -77,8 +77,8 @@ class BookmarkDetail extends Base {
             this.$emit('save-success', rs);
             this.initDetail(this.getDetailData());
         }, {
-                validate: this.$refs.formVaild.validate
-            }
+            validate: this.$refs.formVaild.validate
+        }
         ).finally(() => {
             this.saving = false;
         });

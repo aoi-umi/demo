@@ -1,5 +1,5 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
-import { Form as IForm } from 'iview';
+import * as iview from 'iview';
 import moment from 'moment';
 
 import { convClass, convert } from '@/helpers';
@@ -7,7 +7,6 @@ import * as helpers from '@/helpers';
 import { dev, myEnum } from '@/config';
 import { testApi, testSocket } from '@/api';
 import { Modal, Input, Form, FormItem, Button, Card, TabPane, Tabs, Time } from '@/components/iview';
-import { MyTagModel } from '@/components/my-tag';
 import { MyUpload, IMyUpload } from '@/components/my-upload';
 import { MyList, IMyList, ResultType } from '@/components/my-list';
 import { MyLoad, IMyLoad } from '@/components/my-load';
@@ -48,7 +47,7 @@ class SignIn extends Base {
         ],
     };
 
-    $refs: { formVaild: IForm };
+    $refs: { formVaild: iview.Form };
     private loading = false;
 
     private async handleSignIn() {
@@ -66,8 +65,8 @@ class SignIn extends Base {
             if (this.to)
                 this.$router.push({ path: this.to, query: this.toQuery });
         }, {
-                validate: this.$refs.formVaild.validate
-            }
+            validate: this.$refs.formVaild.validate
+        }
         ).finally(() => {
             this.loading = false;
         });
@@ -156,7 +155,7 @@ class SignUp extends Base {
         }],
     };
 
-    $refs: { formVaild: IForm };
+    $refs: { formVaild: iview.Form };
 
     private loading = false;
 
@@ -168,8 +167,8 @@ class SignUp extends Base {
             this.$emit('success');
             this.$router.push(dev.routeConfig.userSignIn.path);
         }, {
-                validate: this.$refs.formVaild.validate
-            }
+            validate: this.$refs.formVaild.validate
+        }
         ).finally(() => {
             this.loading = false;
         });
@@ -266,7 +265,7 @@ export default class UserInfo extends Base {
     }
 
     $refs: {
-        formVaild: IForm, loadView: IMyLoad, upload: IMyUpload,
+        formVaild: iview.Form, loadView: IMyLoad, upload: IMyUpload,
         followerList: IMyList<any>, followingList: IMyList<any>,
         articleList: IMyList<any>, chatList: IMyList<any>,
     };
@@ -389,8 +388,8 @@ export default class UserInfo extends Base {
             }
             this.toggleUpdate(false);
         }, {
-                validate: this.$refs.formVaild.validate
-            }
+            validate: this.$refs.formVaild.validate
+        }
         ).finally(() => {
             this.updateLoading = false;
         });

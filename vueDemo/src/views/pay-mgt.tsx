@@ -1,9 +1,9 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
-import { Form as IForm } from 'iview';
+import * as iview from 'iview';
 import moment from 'moment';
 import { testApi } from '@/api';
 import { myEnum, authority, dev } from '@/config';
-import { Modal, Input, Form, FormItem, Button, Checkbox, RadioGroup, Radio } from '@/components/iview';
+import { Modal, Input, Form, FormItem, Button, Checkbox, RadioGroup, Radio, InputNumber, DatePicker, Row, Col } from '@/components/iview';
 import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
 import { convClass, convert } from '@/helpers';
 import { Base } from './base';
@@ -36,7 +36,7 @@ class PayMgtDetail extends Base {
             _id: '',
             title: '',
             content: '',
-            money: '',
+            money: 1,
             type: myEnum.assetSourceType.支付宝
         };
     }
@@ -60,11 +60,8 @@ class PayMgtDetail extends Base {
         content: [
             { required: true, trigger: 'blur' }
         ],
-        money: [
-            { required: true, trigger: 'blur' }
-        ],
     };
-    $refs: { formVaild: IForm };
+    $refs: { formVaild: iview.Form };
 
     saving = false;
     async handleSave() {
@@ -102,7 +99,7 @@ class PayMgtDetail extends Base {
                         <Input v-model={detail.content} />
                     </FormItem>
                     <FormItem label="价格" prop="money">
-                        <Input v-model={detail.money} />
+                        <InputNumber v-model={detail.money} min={0.01} precision={2} active-change={false} />
                     </FormItem>
                     <FormItem label="支付方式" prop="type">
                         <RadioGroup v-model={detail.type}>
@@ -150,7 +147,10 @@ export default class Pay extends Base {
     query() {
         let list = this.$refs.list;
         let query = this.$route.query;
-        list.setQueryByKey(query, ['orderNo', 'outOrderNo', 'anyKey']);
+        list.setQueryByKey({
+            ...query,
+            createdAt: [query.createdAtFrom || '', query.createdAtTo || ''],
+        }, ['orderNo', 'outOrderNo', 'anyKey', 'createdAt']);
         let status = this.$route.query.status as string;
         let statusList = status ? status.split(',') : [];
         this.statusList.forEach(ele => {
@@ -165,7 +165,7 @@ export default class Pay extends Base {
 
     private getColumns() {
         let columns = [];
-        if (this.storeUser.user.hasAuth(authority.payMgt)) {
+        if (this.storeUser.user.hasAuth(authority.payMgtQuery)) {
             columns.push({
                 title: '用户',
                 key: 'user',
@@ -274,15 +274,22 @@ export default class Pay extends Base {
                         anyKey: {
                             label: '任意字',
                         },
+                        createdAt: {
+                            label: '创建时间',
+                            comp: (query) => <DatePicker class="ivu-input-wrapper" type="daterange" v-model={query['createdAt']} />
+                        },
 
                     }}
-                    customQueryNode={this.statusList.map(ele => {
-                        return (
-                            <label style={{ marginRight: '5px' }}>
-                                <Checkbox v-model={ele.checked} />{ele.key}
-                            </label>
-                        );
-                    })}
+                    customQueryNode={
+                        <div>
+                            {this.statusList.map(ele => {
+                                return (
+                                    <label style={{ marginRight: '5px' }}>
+                                        <Checkbox v-model={ele.checked} />{ele.key}
+                                    </label>
+                                );
+                            })}
+                        </div>}
 
                     columns={this.getColumns()}
 
@@ -292,11 +299,13 @@ export default class Pay extends Base {
                     }}
 
                     on-query={(model) => {
-                        let q = { ...model.query };
+                        let { createdAt, ...q } = model.query;
                         this.$router.push({
                             path: this.$route.path,
                             query: {
                                 ...q,
+                                createdAtFrom: createdAt[0] ? createdAt[0].toISOString() : undefined,
+                                createdAtTo: createdAt[1] ? createdAt[1].toISOString() : undefined,
                                 status: this.statusList.filter(ele => ele.checked).map(ele => ele.value).join(','),
                                 ...convert.Test.listModelToQuery(model),
                             }

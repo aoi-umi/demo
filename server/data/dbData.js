@@ -40,8 +40,11 @@ var authority = {
         name: '评论管理删除'
     },
 
-    payMgt: {
-        name: '支付管理'
+    payMgtQuery: {
+        name: '支付管理查询'
+    },
+    payMgtOperate: {
+        name: '支付管理操作'
     },
 };
 

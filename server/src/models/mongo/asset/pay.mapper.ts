@@ -2,6 +2,8 @@
 
 import * as VaildSchema from '../../../vaild-schema/class-valid';
 import { Auth } from '../../../_system/auth';
+import { escapeRegExp } from '../../../_system/common';
+import * as helpers from '../../../helpers';
 import * as config from '../../../config';
 import { myEnum } from '../../../config';
 import { LoginUser } from '../../login-user';
@@ -9,7 +11,6 @@ import { BaseMapper } from "../_base";
 import { UserMapper } from '../user';
 import { AssetLogMapper } from './asset-log.mapper';
 import { PayModel } from "./pay";
-import { escapeRegExp } from '../../../_system/common';
 
 export class PayMapper {
     static async query(data: VaildSchema.PayQuery, opt: {
@@ -21,7 +22,7 @@ export class PayMapper {
         };
         let match: any = {};
 
-        if (!Auth.includes(opt.user, config.auth.payMgt)) {
+        if (!Auth.includes(opt.user, config.auth.payMgtQuery)) {
             match.userId = opt.user._id;
         }
 
@@ -37,6 +38,9 @@ export class PayMapper {
                 content: reg,
             }];
         }
+        let createdAt = helpers.dbDateMatch(data.createdAtFrom, data.createdAtTo).mongoDate;
+        if (createdAt)
+            match.createdAt = createdAt;
 
         let match2: any = {};
         if (data.orderNo)

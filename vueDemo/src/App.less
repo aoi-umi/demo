@@ -85,7 +85,8 @@ body {
   }
 }
 
-.menu-item {
+.menu-item,
+.menu-sub-menu > .ivu-menu-submenu-title {
   padding: 14px !important;
 }
 
@@ -173,6 +174,13 @@ img[lazy="loading"] {
 .ivu-tabs {
   overflow: visible;
 }
+.ivu-layout-sider-collapsed {
+  .ivu-menu-submenu-title-icon,
+  .ivu-menu-submenu .menu-text {
+    display: none;
+  }
+}
+
 .shadow {
   box-shadow: 1px 1px 5px #888888;
 }

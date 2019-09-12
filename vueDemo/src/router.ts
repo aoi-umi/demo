@@ -19,14 +19,6 @@ export const routerConfig = {
         text: '书签',
         component: () => import('./views/bookmark')
     },
-    user: {
-        path: dev.routeConfig.userMgt.path,
-        text: '用户',
-        meta: {
-            authority: dev.routeConfig.userMgt.authority,
-        },
-        component: () => import('./views/user-mgt')
-    },
     userInfo: {
         path: dev.routeConfig.userInfo.path,
         text: '个人主页',
@@ -53,6 +45,23 @@ export const routerConfig = {
         text: '注册',
         component: () => import('./views/user').then(t => t.SignUpView)
     },
+
+    admin: {
+        path: dev.routeConfig.admin.path,
+        text: '管理',
+        meta: {
+            authority: dev.routeConfig.admin.authority,
+        },
+    },
+
+    userMgt: {
+        path: dev.routeConfig.userMgt.path,
+        text: '用户',
+        meta: {
+            authority: dev.routeConfig.userMgt.authority,
+        },
+        component: () => import('./views/user-mgt')
+    },
     role: {
         path: dev.routeConfig.role.path,
         text: '角色',
@@ -69,6 +78,31 @@ export const routerConfig = {
         },
         component: () => import('./views/authority')
     },
+    assetMgt: {
+        path: dev.routeConfig.assetMgt.path,
+        text: '资金',
+        meta: {
+            authority: dev.routeConfig.assetMgt.authority,
+        },
+        component: () => import('./views/asset-mgt')
+    },
+    assetMgtLog: {
+        path: dev.routeConfig.assetMgtLog.path,
+        text: '资金记录',
+        meta: {
+            authority: dev.routeConfig.assetMgtLog.authority,
+        },
+        component: () => import('./views/asset-mgt').then(t => t.AssetMgtLog)
+    },
+    assetMgtNotify: {
+        path: dev.routeConfig.assetMgtNotify.path,
+        text: '回调通知',
+        meta: {
+            authority: dev.routeConfig.assetMgtNotify.authority,
+        },
+        component: () => import('./views/asset-mgt').then(t => t.AssetMgtNotify)
+    },
+
     article: {
         path: dev.routeConfig.article.path,
         text: '文章',
@@ -105,7 +139,7 @@ export const routerConfig = {
     },
 
     payMgt: {
-        path: '/payMgt',
+        path: dev.routeConfig.payMgt.path,
         text: '支付',
         meta: {
             authority: dev.routeConfig.payMgt.authority,
@@ -161,8 +195,8 @@ router.beforeEach((to, from, next) => {
         return next(routerConfig.article.path);
     }
     let auth = to.meta && to.meta.authority;
-    let mod = getModule(LoginUserStore, store);
-    if (auth && auth.includes(authority.login) && !mod.user.isLogin) {
+    let userMod = getModule(LoginUserStore, store);
+    if (auth && auth.includes(authority.login) && !userMod.user.isLogin) {
         return next({ path: routerConfig.userSignIn.path, query: { to: to.path, ...to.query } });
     }
     next();

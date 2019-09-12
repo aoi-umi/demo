@@ -3,7 +3,7 @@ import { Component, Vue, Watch, Prop } from "vue-property-decorator";
 import * as router from '@/router';
 import {
     Menu, MenuItem,
-    Icon, Content, Sider, Layout, Header, Button, Modal, BackTop,
+    Icon, Content, Sider, Layout, Header, Button, Modal, BackTop, Submenu,
 } from "@/components/iview";
 import * as style from '@/components/style';
 
@@ -22,10 +22,10 @@ export default class App extends Base {
     theme = "light" as any;
     title = '';
     activeName = this.getActiveNameByPath(location.pathname);
-    $refs: { sider: any };
+    $refs: { sider: any, menu: iView.Menu };
 
     getActiveNameByPath(path: string) {
-        return path.split('/')[1];
+        return path;//.split('/')[1];
     }
 
     protected created() {
@@ -77,25 +77,120 @@ export default class App extends Base {
         this.$refs.sider.toggleCollapse();
     }
 
-    renderMenu(data: MenuConfig) {
+    getMenuName(data: MenuConfig) {
         let name = data.name;
         if (!name)
             name = this.getActiveNameByPath(data.to);
+        return name;
+    }
+
+    filterMenu(list: MenuConfig[]) {
+        return list.filter((ele: MenuConfig) => {
+            let show = ele.show;
+            if (!ele.hasOwnProperty('show')) {
+                show = true;
+            } else if (typeof ele.show === 'function') {
+                show = ele.show();
+            }
+            return show;
+        });
+    }
+
+    renderMenu(data: MenuConfig) {
+        if (!data.children) {
+            return this.getMenu(data);
+        }
+
+        let name = this.getMenuName(data);
+        return (
+            <Submenu class="menu-sub-menu" name={name}>
+                <template slot="title">
+                    <Icon type={data.icon} />
+                    <span class="menu-text">{data.text}</span>
+                </template>
+                {this.filterMenu(data.children).map(ele => this.getMenu(ele))}
+            </Submenu>
+        );
+    }
+
+    getMenu(data: MenuConfig) {
+        let name = this.getMenuName(data);
         return (
             <MenuItem class="menu-item" name={name} to={data.to}>
                 <Icon type={data.icon} />
-                <span>{data.text}</span>
+                <span class="menu-text">{data.text}</span>
             </MenuItem>
         );
+    }
+
+    private openNames = [];
+    @Watch('openNames')
+    private watchOpenNames() {
+        this.$nextTick(() => {
+            this.$refs.menu.updateOpened();
+        });
     }
 
     @Watch('$route')
     route(to, from) {
         this.setTitle();
         this.activeName = this.getActiveNameByPath(location.pathname);
+        this.openNames = this.menuCfg.map(ele => this.getMenuName(ele)).filter(ele => this.activeName.includes(ele));
+        //其他特殊处理。。。
     }
 
-    private siderWidth = 160;
+    private menuCfg: MenuConfig[] = [{
+        to: routeConfig.bookmark.path,
+        icon: 'md-home',
+        text: routeConfig.bookmark.text,
+        show: false,
+    }, {
+        to: routeConfig.article.path,
+        icon: 'md-paper',
+        text: routeConfig.article.text,
+    }, {
+        to: routeConfig.articleMgt.path,
+        icon: 'md-create',
+        text: routeConfig.articleMgt.text,
+        show: () => this.storeUser.user.hasAuth(routeConfig.articleMgt.meta.authority)
+    }, {
+        to: routeConfig.payMgt.path,
+        icon: 'logo-usd',
+        text: routeConfig.payMgt.text,
+        show: () => this.storeUser.user.hasAuth(routeConfig.payMgt.meta.authority)
+    }, {
+        to: routeConfig.admin.path,
+        icon: 'md-list',
+        text: routeConfig.admin.text,
+        show: () => this.storeUser.user.existsAuth([
+            authority.authorityQuery,
+            authority.roleQuery,
+            authority.userMgtQuery,
+        ]),
+        children: [{
+            to: routeConfig.userMgt.path,
+            icon: 'md-people',
+            text: routeConfig.userMgt.text,
+            show: () => this.storeUser.user.hasAuth(routeConfig.userMgt.meta.authority)
+        }, {
+            to: routeConfig.role.path,
+            icon: 'md-person',
+            text: routeConfig.role.text,
+            show: () => this.storeUser.user.hasAuth(routeConfig.role.meta.authority)
+        }, {
+            to: routeConfig.authority.path,
+            icon: 'md-lock',
+            text: routeConfig.authority.text,
+            show: () => this.storeUser.user.hasAuth(routeConfig.authority.meta.authority)
+        }, {
+            to: routeConfig.assetMgt.path,
+            icon: 'md-stats',
+            text: routeConfig.assetMgt.text,
+            show: () => this.storeUser.user.hasAuth(routeConfig.assetMgt.meta.authority)
+        },]
+    },];
+
+    private siderWidth = 180;
     render() {
         let collapsedWidth = this.isSmall ? 0 : 56;
         return (
@@ -143,57 +238,19 @@ export default class App extends Base {
                         v-model={this.isCollapsed}
                     >
                         <Menu
+                            ref='menu'
                             active-name={this.activeName}
                             theme={"dark"}
                             width="auto"
                             class={this.menuitemClasses}
+                            open-names={this.openNames}
                             on-on-select={() => {
                                 if (this.isSmall)
                                     this.isCollapsed = true;
                             }}
                         >
                             {
-                                [{
-                                    to: routeConfig.bookmark.path,
-                                    icon: 'md-home',
-                                    text: routeConfig.bookmark.text,
-                                    show: false,
-                                }, {
-                                    to: routeConfig.article.path,
-                                    icon: 'md-paper',
-                                    text: routeConfig.article.text,
-                                }, {
-                                    to: routeConfig.articleMgt.path,
-                                    icon: 'md-create',
-                                    text: routeConfig.articleMgt.text,
-                                    show: this.storeUser.user.hasAuth(authority.login)
-                                }, {
-                                    to: routeConfig.user.path,
-                                    icon: 'md-people',
-                                    text: routeConfig.user.text,
-                                    show: this.storeUser.user.hasAuth(authority.userMgtQuery)
-                                }, {
-                                    to: routeConfig.role.path,
-                                    icon: 'md-person',
-                                    text: routeConfig.role.text,
-                                    show: this.storeUser.user.hasAuth(authority.roleQuery)
-                                }, {
-                                    to: routeConfig.authority.path,
-                                    icon: 'md-lock',
-                                    text: routeConfig.authority.text,
-                                    show: this.storeUser.user.hasAuth(authority.authorityQuery)
-                                }, {
-                                    to: routeConfig.payMgt.path,
-                                    icon: 'logo-usd',
-                                    text: routeConfig.payMgt.text,
-                                    show: this.storeUser.user.hasAuth(authority.login)
-                                },].filter((ele: MenuConfig) => {
-                                    let show = ele.show;
-                                    if (!ele.hasOwnProperty('show')) {
-                                        show = true;
-                                    }
-                                    return show;
-                                }).map(data => { return this.renderMenu(data); })
+                                this.filterMenu(this.menuCfg).map(data => { return this.renderMenu(data); })
                             }
                         </Menu>
                     </Sider>
@@ -226,5 +283,6 @@ type MenuConfig = {
     to: string;
     text: string;
     icon?: string;
-    show?: boolean;
+    show?: boolean | (() => boolean);
+    children?: MenuConfig[];
 };
