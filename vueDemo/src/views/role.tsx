@@ -1,5 +1,5 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
-import { Form as IForm } from 'iview';
+import * as iview from 'iview';
 import { testApi } from '@/api';
 import { myEnum, authority } from '@/config';
 import { convClass, convert } from '@/helpers';
@@ -54,7 +54,7 @@ class RoleDetail extends Base {
             { required: true, trigger: 'blur' }
         ],
     };
-    $refs: { formVaild: IForm, authTransfer: IAuthorityTransfer };
+    $refs: { formVaild: iview.Form, authTransfer: IAuthorityTransfer };
 
     private saving = false;
     private async handleSave() {
@@ -73,8 +73,8 @@ class RoleDetail extends Base {
             this.$emit('save-success', rs);
             this.initDetail(this.getDetailData());
         }, {
-                validate: this.$refs.formVaild.validate
-            }
+            validate: this.$refs.formVaild.validate
+        }
         ).finally(() => {
             this.saving = false;
         });

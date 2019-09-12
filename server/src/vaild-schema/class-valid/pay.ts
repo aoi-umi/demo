@@ -1,4 +1,4 @@
-import { IsDefined, IsIn, IsNumber, IsDecimal } from "class-validator";
+import { IsDefined, IsIn, IsNumber, IsDecimal, IsDate } from "class-validator";
 import { Type, Transform } from "class-transformer";
 import { Types } from 'mongoose';
 
@@ -42,4 +42,12 @@ export class PayQuery extends ListBase {
     orderNo?: string;
     outOrderNo?: string;
     anyKey?: string;
+
+    @IsDate()
+    @Type()
+    createdAtFrom?: Date;
+
+    @IsDate()
+    @Type()
+    createdAtTo?: Date;
 }

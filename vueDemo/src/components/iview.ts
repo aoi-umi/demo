@@ -22,10 +22,15 @@ export const FormItem = convClass<iviewTypes.FormItem>(iview.FormItem);
 export const Row = convClass<iviewTypes.Row>(iview.Row);
 export const Col = convClass<iviewTypes.Col>(iview.Col);
 export const ColorPicker = convClass<iviewTypes.ColorPicker>(iview.ColorPicker);
+export const Dropdown = convClass<iviewTypes.Dropdown>(iview.Dropdown);
+export const DropdownMenu = convClass<iviewTypes.DropdownMenu>(iview.DropdownMenu);
+export const DropdownItem = convClass<iviewTypes.DropdownItem>(iview.DropdownItem);
+
 
 export const Header = convClass<iviewTypes.Header>(iview.Header);
 export const Icon = convClass<iviewTypes.Icon & { custom: string }>(iview.Icon);
 export const Input = convClass<iviewTypes.Input>(iview.Input);
+export const InputNumber = convClass<iviewTypes.InputNumber>(iview.InputNumber);
 export const Layout = convClass<iviewTypes.Layout>(iview.Layout);
 export const Modal = convClass<iviewTypes.Modal>(iview.Modal);
 

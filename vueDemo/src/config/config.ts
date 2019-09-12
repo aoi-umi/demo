@@ -6,6 +6,7 @@ export type RouteConfigType = {
     path: string;
     authority?: string[]
 };
+let adminPath = '/admin';
 export const routeConfig = {
     index: { path: '/' },
     //个人中心
@@ -21,17 +22,17 @@ export const routeConfig = {
     },
     //管理
     userMgt: {
-        path: '/userMgt',
-        authority: [authorityConfig.login],
+        path: adminPath + '/userMgt',
+        authority: [authorityConfig.login, authorityConfig.userMgtQuery],
     },
     bookmark: { path: '/bookmark' },
     authority: {
-        path: '/authority',
-        authority: [authorityConfig.login],
+        path: adminPath + '/authorityMgt',
+        authority: [authorityConfig.login, authorityConfig.authorityQuery],
     },
     role: {
-        path: '/role',
-        authority: [authorityConfig.login],
+        path: adminPath + '/roleMgt',
+        authority: [authorityConfig.login, authorityConfig.roleQuery],
     },
     article: { path: '/article' },
     articleDetail: { path: '/article/detail' },
@@ -50,6 +51,22 @@ export const routeConfig = {
     payMgt: {
         path: '/payMgt',
         authority: [authorityConfig.login],
+    },
+    admin: {
+        path: adminPath,
+        authority: [authorityConfig.login],
+    },
+    assetMgt: {
+        path: adminPath + '/assetMgt',
+        authority: [authorityConfig.login, authorityConfig.payMgtQuery],
+    },
+    assetMgtLog: {
+        path: adminPath + '/assetMgt/log',
+        authority: [authorityConfig.login, authorityConfig.payMgtQuery],
+    },
+    assetMgtNotify: {
+        path: adminPath + '/assetMgt/notify',
+        authority: [authorityConfig.login, authorityConfig.payMgtQuery],
     },
     test: { path: '/test' },
     error: { path: '/error' },

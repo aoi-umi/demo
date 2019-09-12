@@ -92,8 +92,8 @@ router.post('/alipay/notify', pay.alipayNotify);
 
 //#region asset 
 import * as asset from './asset';
-router.get('/asset/notifyQuery', UserAuthMid.normal([]), asset.notifyQuery);
-router.get('/asset/logQuery', UserAuthMid.normal([]), asset.logQuery);
+router.get('/asset/notifyQuery', UserAuthMid.normal([auth.payMgtQuery]), asset.notifyQuery);
+router.get('/asset/logQuery', UserAuthMid.normal([auth.payMgtQuery]), asset.logQuery);
 //#endregion
 
 //#region file 

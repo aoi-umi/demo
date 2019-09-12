@@ -1,5 +1,5 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
-import { Form as IForm } from 'iview';
+import * as iview from 'iview';
 import moment from 'moment';
 
 import { testApi } from '@/api';
@@ -92,7 +92,7 @@ export default class ArticleDetail extends ArticleMgtBase {
         }
     }
 
-    $refs: { formVaild: IForm, editor: IMyEditor, upload: IMyUpload, loadView: IMyLoad };
+    $refs: { formVaild: iview.Form, editor: IMyEditor, upload: IMyUpload, loadView: IMyLoad };
 
     mounted() {
         this.init();
@@ -148,11 +148,11 @@ export default class ArticleDetail extends ArticleMgtBase {
                 submit
             });
         }, {
-                validate: this.$refs.formVaild.validate,
-                onSuccessClose: () => {
-                    this.toList();
-                }
+            validate: this.$refs.formVaild.validate,
+            onSuccessClose: () => {
+                this.toList();
             }
+        }
         ).finally(() => {
             this.saving = false;
         });

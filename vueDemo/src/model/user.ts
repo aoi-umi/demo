@@ -17,11 +17,12 @@ export class LoginUser {
     }
 
     hasAuth(this: LoginUserType, auth: string | string[]) {
-        let authList = auth instanceof Array ? auth : [auth];
-        let rs = false;
-        for (let ele of authList) {
-            if (!this.authority || !this.authority[ele])
-                return false;
+        if (auth) {
+            let authList = auth instanceof Array ? auth : [auth];
+            for (let ele of authList) {
+                if (!this.authority || !this.authority[ele])
+                    return false;
+            }
         }
         return true;
     }
