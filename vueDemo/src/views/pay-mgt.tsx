@@ -4,7 +4,7 @@ import moment from 'moment';
 import { testApi } from '@/api';
 import { myEnum, authority, dev } from '@/config';
 import { Modal, Input, Form, FormItem, Button, Checkbox, RadioGroup, Radio, InputNumber, DatePicker, Row, Col } from '@/components/iview';
-import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
+import { MyList, IMyList, Const as MyListConst } from '@/components/my-list';
 import { convClass, convert } from '@/helpers';
 import { Base } from './base';
 import { UserAvatarView } from './comps/user-avatar';
@@ -224,7 +224,7 @@ export default class Pay extends Base {
             render: (h, params) => {
                 let detail = params.row;
                 return (
-                    <div class={MyTableConst.clsActBox}>
+                    <div class={MyListConst.clsActBox}>
                         {detail.canPay && <a on-click={() => {
                             this.operateHandler('发起支付', async () => {
                                 let rs = await testApi.paySubmit({

@@ -4,7 +4,7 @@ import { testApi } from '@/api';
 import { myEnum, authority } from '@/config';
 import { convClass, convert } from '@/helpers';
 import { Modal, Input, Form, FormItem, Button, Checkbox, Switch } from '@/components/iview';
-import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
+import { MyList, IMyList, Const as MyListConst } from '@/components/my-list';
 import { MyConfirm } from '@/components/my-confirm';
 import { IMyTransfer, MyTransfer } from '@/components/my-transfer';
 
@@ -219,7 +219,7 @@ export default class Role extends Base {
             render: (h, params) => {
                 let detail = params.row;
                 return (
-                    <div class={MyTableConst.clsActBox}>
+                    <div class={MyListConst.clsActBox}>
                         {this.storeUser.user.hasAuth(authority.roleSave) && [
                             <a on-click={() => {
                                 this.updateStatus(detail);

@@ -64,38 +64,37 @@ export async function transaction(fn: (session: ClientSession) => any, conn?: mo
     return result;
 }
 
-mongoose.connection.once('open', () => {
-    let orgModel = mongoose.model;
-    let coll = {};
-    //事务中无法创建表，定义的时候创建
-    function createCollection(model) {
-        (async () => {
-            let collectionName = model.collection.collectionName;
-            //防止重复处理
-            if (coll[collectionName])
-                return;
-            coll[collectionName] = true;
-            let listCol = model.collection.conn.db.listCollections({
-                name: collectionName,
-            });
-            let t = await Q.denodeify<any[]>(listCol.toArray.bind(listCol))();
-            if (!t.length) {
-                let x = await model.collection.conn.createCollection(collectionName);
-            }
-        })().catch(e => {
-            console.log(e);
+let orgModel = mongoose.model;
+let coll = {};
+//事务中无法创建表，定义的时候创建
+function createCollection(model) {
+    (async () => {
+        let collectionName = model.collection.collectionName;
+        //防止重复处理
+        if (coll[collectionName])
+            return;
+        coll[collectionName] = true;
+        let listCol = model.collection.conn.db.listCollections({
+            name: collectionName,
         });
-    }
+        let t = await Q.denodeify<any[]>(listCol.toArray.bind(listCol))();
+        if (!t.length) {
+            let x = await model.collection.conn.createCollection(collectionName);
+        }
+    })().catch(e => {
+        console.log(e);
+    });
+}
+(mongoose.model as any) = function () {
+    let model: Model<any> = orgModel.apply(mongoose, arguments);
+    createCollection(model);
+    return model;
+};
 
-    // for (let key in mongoose.models) {
-    //     let model = mongoose.models[key];
-    //     createCollection(model);
-    // }
-
-    (mongoose.model as any) = function () {
-        let model: Model<any> = orgModel.apply(mongoose, arguments);
-        createCollection(model);
-        return model;
-    };
-});
+// mongoose.connection.once('open', () => {
+//     for (let key in mongoose.models) {
+//         let model = mongoose.models[key];
+//         createCollection(model);
+//     }
+// });
 
