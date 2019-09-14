@@ -5,9 +5,9 @@ import { convClass, convert } from '@/helpers';
 import * as helpers from '@/helpers';
 import { dev, myEnum } from '@/config';
 import { testApi, testSocket } from '@/api';
-import { Modal, Input, Form, FormItem, Button, Card, TabPane, Tabs, Time, Row, Col } from '@/components/iview';
+import { Modal, Input, Button, Card, Row, Col, Checkbox, Tabs, TabPane } from '@/components/iview';
 import { Base } from './base';
-import { MyList, IMyList } from '@/components/my-list';
+import { MyList, IMyList, Const as MyListConst } from '@/components/my-list';
 
 
 @Component
@@ -33,9 +33,102 @@ export default class AssetMgt extends Base {
 @Component
 export class AssetMgtLog extends Base {
     $refs: { list: IMyList<any> };
+    protected created() {
+        this.statusList = myEnum.assetLogStatus.toArray().map(ele => {
+            ele['checked'] = false;
+            return ele;
+        });
+    }
+
+    mounted() {
+        this.query();
+    }
+
+    @Watch('$route')
+    route(to, from) {
+        this.query();
+    }
+
+    query() {
+        let list = this.$refs.list;
+        let query = this.$route.query;
+        list.setQueryByKey(query, ['orderNo', 'outOrderNo']);
+        let status = this.$route.query.status as string;
+        let statusList = status ? status.split(',') : [];
+        this.statusList.forEach(ele => {
+            ele.checked = statusList.includes(ele.value.toString());
+        });
+        convert.Test.queryToListModel(query, list.model);
+        this.$refs.list.query(query);
+    }
+
+    statusList: { key: string; value: any, checked?: boolean }[] = [];
+
     render() {
         return (
-            <MyList ref="list" columns={[]} />
+            <MyList
+                ref="list"
+                queryArgs={{
+                    orderNo: {
+                        label: '订单号',
+                    },
+                    outOrderNo: {
+                        label: '外部订单号',
+                    },
+                }}
+
+                customQueryNode={this.statusList.map(ele => {
+                    return (
+                        <label style={{ marginRight: '5px' }}>
+                            <Checkbox v-model={ele.checked} />{ele.key}
+                        </label>
+                    );
+                })}
+
+                columns={[{
+                    title: '订单号',
+                    key: 'orderNo',
+                }, {
+                    title: '外部订单号',
+                    key: 'outOrderNo',
+                }, {
+                    title: '金额',
+                    key: 'money',
+                }, {
+                    title: '支付方式',
+                    key: 'sourceTypeText',
+                }, {
+                    title: '状态',
+                    key: 'statusText',
+                }, {
+                    title: '通知id',
+                    key: 'notifyId',
+                }, {
+                    title: '创建时间',
+                    key: 'createdAt',
+                    render: (h, params) => {
+                        return <span>{moment(params.row.createdAt).format(dev.dateFormat)}</span>
+                    }
+                }]}
+
+                queryFn={async (data) => {
+                    let rs = await testApi.assetLogQuery(data);
+                    return rs;
+                }}
+
+                on-query={(model) => {
+                    let q = { ...model.query };
+                    this.$router.push({
+                        path: this.$route.path,
+                        query: {
+                            ...q,
+                            status: this.statusList.filter(ele => ele.checked).map(ele => ele.value).join(','),
+                            ...convert.Test.listModelToQuery(model),
+                        }
+                    });
+                }}
+
+            />
         );
     }
 }
@@ -43,9 +136,107 @@ export class AssetMgtLog extends Base {
 @Component
 export class AssetMgtNotify extends Base {
     $refs: { list: IMyList<any> };
+    protected created() {
+    }
+
+    mounted() {
+        this.query();
+    }
+
+    @Watch('$route')
+    route(to, from) {
+        this.query();
+    }
+
+    query() {
+        let list = this.$refs.list;
+        let query = this.$route.query;
+        list.setQueryByKey(query, ['orderNo', 'outOrderNo']);
+        let status = this.$route.query.status as string;
+        convert.Test.queryToListModel(query, list.model);
+        this.$refs.list.query(query);
+    }
+
     render() {
         return (
-            <MyList ref="list" columns={[]} />
+            <MyList
+                ref="list"
+                queryArgs={{
+                    orderNo: {
+                        label: '订单号',
+                    },
+                    outOrderNo: {
+                        label: '外部订单号',
+                    },
+                }}
+
+                columns={[{
+                    key: '_expand',
+                    type: 'expand',
+                    width: 30,
+                    render: (h, params) => {
+                        let detail = params.row;
+                        return (
+                            <Tabs>
+                                <TabPane label="通知">
+                                    <pre>{JSON.stringify(detail.value, null, '\t')}</pre>
+                                </TabPane>
+                                <TabPane label="原通知">
+                                    <div style={{ wordWrap: 'break-word' }}>{JSON.stringify(detail.raw)}</div>
+                                </TabPane>
+                            </Tabs>
+                        );
+                    }
+                }, {
+                    title: '订单号',
+                    key: 'orderNo',
+                }, {
+                    title: '外部订单号',
+                    key: 'outOrderNo',
+                }, {
+                    title: '类型',
+                    key: 'typeText',
+                }, {
+                    title: '创建时间',
+                    key: 'createdAt',
+                    render: (h, params) => {
+                        return <span>{moment(params.row.createdAt).format(dev.dateFormat)}</span>
+                    }
+                }, {
+                    title: '操作',
+                    key: 'action',
+                    fixed: 'right',
+                    width: 150,
+                    render: (h, params) => {
+                        let detail = params.row;
+                        return (
+                            <div class={MyListConst.clsActBox}>
+                                {true &&
+                                    <a on-click={() => {
+                                    }}>重试</a>
+                                }
+                            </div>
+                        );
+                    }
+                }]}
+
+                queryFn={async (data) => {
+                    let rs = await testApi.assetNotifyQuery(data);
+                    return rs;
+                }}
+
+                on-query={(model) => {
+                    let q = { ...model.query };
+                    this.$router.push({
+                        path: this.$route.path,
+                        query: {
+                            ...q,
+                            ...convert.Test.listModelToQuery(model),
+                        }
+                    });
+                }}
+
+            />
         );
     }
 }

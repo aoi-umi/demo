@@ -180,6 +180,14 @@ const config = {
                     url: '/pay/query',
                     method: 'get',
                 },
+                assetLogQuery: {
+                    url: '/asset/logQuery',
+                    method: 'get',
+                },
+                assetNotifyQuery: {
+                    url: '/asset/notifyQuery',
+                    method: 'get',
+                },
 
                 //file
                 imgUpload: {

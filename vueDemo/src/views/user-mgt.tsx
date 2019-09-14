@@ -6,7 +6,7 @@ import { testApi } from '@/api';
 import { myEnum, authority, dev } from '@/config';
 import { convClass, convert } from '@/helpers';
 import { Modal, Form, FormItem, Button, RadioGroup, Radio, Input, DatePicker } from '@/components/iview';
-import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
+import { MyList, IMyList, Const as MyListConst } from '@/components/my-list';
 import { AuthorityTransferView, IAuthorityTransfer } from './authority';
 import { IRoleTransfer, RoleTransferView } from './role';
 import { Base } from './base';
@@ -222,7 +222,7 @@ export default class UserMgt extends Base {
             render: (h, params) => {
                 let detail = params.row;
                 return (
-                    <div class={MyTableConst.clsActBox}>
+                    <div class={MyListConst.clsActBox}>
                         {this.storeUser.user.hasAuth(authority.userMgtEdit) && detail.canEdit &&
                             <a on-click={() => {
                                 this.showDetail(myEnum.userEditType.修改, detail);

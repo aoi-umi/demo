@@ -3,7 +3,7 @@ import * as iview from 'iview';
 import { testApi } from '@/api';
 import { myEnum, authority } from '@/config';
 import { Modal, Input, Form, FormItem, Button, Checkbox, Switch, Transfer } from '@/components/iview';
-import { MyList, IMyList, Const as MyTableConst } from '@/components/my-list';
+import { MyList, IMyList, Const as MyListConst } from '@/components/my-list';
 import { MyTransfer, IMyTransfer } from '@/components/my-transfer';
 import { MyConfirm } from '@/components/my-confirm';
 import { convClass, convert } from '@/helpers';
@@ -200,7 +200,7 @@ export default class Authority extends Base {
             render: (h, params) => {
                 let detail = params.row;
                 return (
-                    <div class={MyTableConst.clsActBox}>
+                    <div class={MyListConst.clsActBox}>
                         {this.storeUser.user.hasAuth(authority.authoritySave) && [
                             <a on-click={() => {
                                 this.updateStatus(detail);

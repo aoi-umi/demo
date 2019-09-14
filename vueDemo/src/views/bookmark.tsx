@@ -2,7 +2,7 @@ import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import * as iview from 'iview';
 import { testApi } from '@/api';
 import { Tag, Modal, Input, Row, Col, Form, FormItem, Button } from '@/components/iview';
-import { MyList, IMyList, Const as MyTableConst, OnSortChangeOptions, MyListModel } from '@/components/my-list';
+import { MyList, IMyList, Const as MyListConst, OnSortChangeOptions, MyListModel } from '@/components/my-list';
 import { MyTagModel, MyTag } from '@/components/my-tag';
 import { MyConfirm } from '@/components/my-confirm';
 import { convClass, convert } from '@/helpers';
@@ -219,7 +219,7 @@ export default class Bookmark extends Base {
                         width: 120,
                         render: (h, params) => {
                             return (
-                                <div class={MyTableConst.clsActBox}>
+                                <div class={MyListConst.clsActBox}>
                                     <a on-click={() => {
                                         this.detail = params.row;
                                         this.detailShow = true;
