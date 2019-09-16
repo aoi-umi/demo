@@ -106,8 +106,8 @@ class Comment extends Base {
             }
             detail.voteValue = value;
         }, {
-                noSuccessHandler: true
-            });
+            noSuccessHandler: true
+        });
     }
 
     private reply = {
@@ -187,7 +187,7 @@ class Comment extends Base {
                         {ele.isDel ?
                             <p style={textStyle}>评论已删除</p> : <p domPropsInnerHTML={ele.comment} style={{ ...textStyle, overflowWrap: 'break-word' }} />
                         }
-                        <div style={{ display: 'flex', justifyContent: 'flex-start', cursor: 'pointer', marginRight: '5px' }}>
+                        <div class="pointer" style={{ display: 'flex', justifyContent: 'flex-start', marginRight: '5px' }}>
                             <span class="not-important" ><Time time={new Date(ele.createdAt)} /></span>
                             <div class='flex-stretch'></div>
                             {ele.canDel && <Icon style={{ marginRight: '20px' }} type="md-trash" size={20} on-click={() => {

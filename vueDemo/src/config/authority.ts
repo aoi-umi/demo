@@ -16,5 +16,5 @@ export default {
     articleMgtDel: 'articleMgtDel',
     articleMgtAudit: 'articleMgtAudit',
     payMgtQuery: 'payMgtQuery',
-    payMgtOperate: 'assetMgtOperate',
+    payMgtOperate: 'payMgtOperate',
 };
