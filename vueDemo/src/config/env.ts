@@ -188,6 +188,9 @@ const config = {
                     url: '/asset/notifyQuery',
                     method: 'get',
                 },
+                assetNotifyRetry: {
+                    url: '/asset/notifyRetry',
+                },
 
                 //file
                 imgUpload: {
