@@ -6,8 +6,9 @@ import * as helpers from '@/helpers';
 import { dev, myEnum, authority } from '@/config';
 import { testApi, testSocket } from '@/api';
 import { Modal, Input, Button, Card, Row, Col, Checkbox, Tabs, TabPane } from '@/components/iview';
-import { Base } from './base';
 import { MyList, IMyList, Const as MyListConst } from '@/components/my-list';
+import { TagType, MyTag } from '@/components/my-tag';
+import { Base } from './base';
 
 
 @Component
@@ -35,8 +36,11 @@ export class AssetMgtLog extends Base {
     $refs: { list: IMyList<any> };
     protected created() {
         this.statusList = myEnum.assetLogStatus.toArray().map(ele => {
-            ele['checked'] = false;
-            return ele;
+            return {
+                tag: ele.key,
+                key: ele.value,
+                checkable: true
+            }
         });
     }
 
@@ -56,13 +60,13 @@ export class AssetMgtLog extends Base {
         let status = this.$route.query.status as string;
         let statusList = status ? status.split(',') : [];
         this.statusList.forEach(ele => {
-            ele.checked = statusList.includes(ele.value.toString());
+            ele.checked = statusList.includes(ele.key.toString());
         });
         convert.Test.queryToListModel(query, list.model);
         this.$refs.list.query(query);
     }
 
-    statusList: { key: string; value: any, checked?: boolean }[] = [];
+    statusList: TagType[] = [];
 
     render() {
         return (
@@ -80,13 +84,7 @@ export class AssetMgtLog extends Base {
                     add: true,
                 }}
 
-                customQueryNode={this.statusList.map(ele => {
-                    return (
-                        <label style={{ marginRight: '5px' }}>
-                            <Checkbox v-model={ele.checked} />{ele.key}
-                        </label>
-                    );
-                })}
+                customQueryNode={<MyTag v-model={this.statusList} />}
 
                 columns={[{
                     title: '订单号',
@@ -137,7 +135,7 @@ export class AssetMgtLog extends Base {
                         path: this.$route.path,
                         query: {
                             ...q,
-                            status: this.statusList.filter(ele => ele.checked).map(ele => ele.value).join(','),
+                            status: this.statusList.filter(ele => ele.checked).map(ele => ele.key).join(','),
                             ...convert.Test.listModelToQuery(model),
                         }
                     });

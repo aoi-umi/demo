@@ -7,6 +7,7 @@ import { Modal, Input, Form, FormItem, Button, Checkbox, Switch } from '@/compon
 import { MyList, IMyList, Const as MyListConst } from '@/components/my-list';
 import { MyConfirm } from '@/components/my-confirm';
 import { IMyTransfer, MyTransfer } from '@/components/my-transfer';
+import { TagType, MyTag } from '@/components/my-tag';
 
 import { AuthorityTagView, AuthorityDetail } from './comps/authority-tag';
 import { AuthorityTransferView, IAuthorityTransfer } from './authority';
@@ -121,8 +122,11 @@ export default class Role extends Base {
 
     protected created() {
         this.statusList = myEnum.roleStatus.toArray().map(ele => {
-            ele['checked'] = false;
-            return ele;
+            return {
+                tag: ele.key,
+                key: ele.value,
+                checkable: true
+            }
         });
     }
 
@@ -142,14 +146,14 @@ export default class Role extends Base {
         let status = query.status as string;
         let statusList = status ? status.split(',') : [];
         this.statusList.forEach(ele => {
-            ele.checked = statusList.includes(ele.value.toString());
+            ele.checked = statusList.includes(ele.key.toString());
         });
         convert.Test.queryToListModel(query, list.model);
         this.$refs.list.query(query);
     }
 
     delIds = [];
-    statusList: { key: string; value: any, checked?: boolean }[] = [];
+    statusList: TagType[] = [];
     async delClick() {
         await this.operateHandler('删除', async () => {
             await testApi.roleDel(this.delIds);
@@ -278,13 +282,7 @@ export default class Role extends Base {
                             label: '任意字'
                         }
                     }}
-                    customQueryNode={this.statusList.map(ele => {
-                        return (
-                            <label style={{ marginRight: '5px' }}>
-                                <Checkbox v-model={ele.checked} />{ele.key}
-                            </label>
-                        );
-                    })}
+                    customQueryNode={<MyTag v-model={this.statusList} />}
 
                     hideQueryBtn={{
                         add: !this.storeUser.user.hasAuth(authority.roleSave)
@@ -311,7 +309,7 @@ export default class Role extends Base {
                             path: this.$route.path,
                             query: {
                                 ...q,
-                                status: this.statusList.filter(ele => ele.checked).map(ele => ele.value).join(','),
+                                status: this.statusList.filter(ele => ele.checked).map(ele => ele.key).join(','),
                                 ...convert.Test.listModelToQuery(model)
                             }
                         });

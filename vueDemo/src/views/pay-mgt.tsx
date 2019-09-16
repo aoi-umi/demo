@@ -3,12 +3,12 @@ import * as iview from 'iview';
 import moment from 'moment';
 import { testApi } from '@/api';
 import { myEnum, authority, dev } from '@/config';
+import { convClass, convert } from '@/helpers';
 import { Modal, Input, Form, FormItem, Button, Checkbox, RadioGroup, Radio, InputNumber, DatePicker, Row, Col } from '@/components/iview';
 import { MyList, IMyList, Const as MyListConst } from '@/components/my-list';
-import { convClass, convert } from '@/helpers';
+import { TagType, MyTag } from '@/components/my-tag';
 import { Base } from './base';
 import { UserAvatarView } from './comps/user-avatar';
-
 type DetailDataType = {
     _id?: string;
     type?: string;
@@ -130,8 +130,11 @@ export default class Pay extends Base {
 
     protected created() {
         this.statusList = myEnum.payStatus.toArray().map(ele => {
-            ele['checked'] = false;
-            return ele;
+            return {
+                tag: ele.key,
+                key: ele.value,
+                checkable: true
+            }
         });
     }
 
@@ -154,14 +157,14 @@ export default class Pay extends Base {
         let status = this.$route.query.status as string;
         let statusList = status ? status.split(',') : [];
         this.statusList.forEach(ele => {
-            ele.checked = statusList.includes(ele.value.toString());
+            ele.checked = statusList.includes(ele.key.toString());
         });
         convert.Test.queryToListModel(query, list.model);
         this.$refs.list.query(query);
     }
 
     delIds = [];
-    statusList: { key: string; value: any, checked?: boolean }[] = [];
+    statusList: TagType[] = [];
 
     private getColumns() {
         let columns = [];
@@ -291,16 +294,7 @@ export default class Pay extends Base {
                         },
 
                     }}
-                    customQueryNode={
-                        <div>
-                            {this.statusList.map(ele => {
-                                return (
-                                    <label style={{ marginRight: '5px' }}>
-                                        <Checkbox v-model={ele.checked} />{ele.key}
-                                    </label>
-                                );
-                            })}
-                        </div>}
+                    customQueryNode={<MyTag v-model={this.statusList} />}
 
                     columns={this.getColumns()}
 
@@ -317,7 +311,7 @@ export default class Pay extends Base {
                                 ...q,
                                 createdAtFrom: createdAt[0] ? createdAt[0].toISOString() : undefined,
                                 createdAtTo: createdAt[1] ? createdAt[1].toISOString() : undefined,
-                                status: this.statusList.filter(ele => ele.checked).map(ele => ele.value).join(','),
+                                status: this.statusList.filter(ele => ele.checked).map(ele => ele.key).join(','),
                                 ...convert.Test.listModelToQuery(model),
                             }
                         });
