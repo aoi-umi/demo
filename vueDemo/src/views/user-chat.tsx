@@ -179,7 +179,7 @@ class UserChat extends Base {
                                                     }}>
                                                         {ele.sendStatus === myEnum.chatSendStatus.发送中 && <Icon type="ios-loading" size={18} class="loading-icon" />}
                                                         {ele.sendStatus === myEnum.chatSendStatus.发送失败 &&
-                                                            <Icon type="ios-refresh-circle" size={18} style={{ cursor: 'pointer' }} on-click={() => {
+                                                            <Icon class="pointer" type="ios-refresh-circle" size={18} on-click={() => {
                                                                 this.chatSubmit(ele);
                                                             }}></Icon>
                                                         }

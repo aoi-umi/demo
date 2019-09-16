@@ -495,17 +495,14 @@ export default class UserInfo extends Base {
                 <Card style={{ marginTop: '5px' }}>
                     <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline' }}>
                         <UserAvatarView user={user} />
-                        <div class="flex-stretch" style={{
-                            cursor: 'pointer'
-                        }} on-click={() => {
+                        <div class="flex-stretch pointer" on-click={() => {
                             this.toChat(user._id);
                         }}>
                         </div>
                         <Time class="not-important" time={ele.createdAt} />
                     </div>
-                    <span style={{
+                    <span class="pointer" style={{
                         marginLeft: '42px', textOverflow: 'ellipsis',
-                        cursor: 'pointer'
                     }} on-click={() => {
                         this.toChat(user._id);
                     }}>{ele.content}</span>

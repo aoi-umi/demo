@@ -202,6 +202,15 @@ export default class Pay extends Base {
             title: '外部单号',
             key: 'outOrderNo',
             minWidth: 120,
+            render: (h, params) => {
+                let detail = params.row;
+                return (this.storeUser.user.hasAuth(authority.payMgtQuery) ? <a on-click={() => {
+                    this.$router.push({
+                        path: dev.routeConfig.assetMgtLog.path,
+                        query: { outOrderNo: detail.outOrderNo }
+                    })
+                }}>{detail.outOrderNo}</a> : <span>{detail.outOrderNo}</span>)
+            }
         }, {
             title: '状态',
             key: 'statusText',
@@ -232,6 +241,8 @@ export default class Pay extends Base {
                                 });
                                 window.open(rs.url, '_blank');
                             }, { noSuccessHandler: true });
+
+                            //调用支付宝 `alipays://platformapi/startapp?appId=20000067&url=${encodeURI(url)}`
                         }}>支付</a>}
                         {detail.canCancel && <a on-click={() => {
                             this.operateHandler('取消', async () => {

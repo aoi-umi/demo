@@ -3,7 +3,7 @@ import moment from 'moment';
 
 import { convClass, convert } from '@/helpers';
 import * as helpers from '@/helpers';
-import { dev, myEnum } from '@/config';
+import { dev, myEnum, authority } from '@/config';
 import { testApi, testSocket } from '@/api';
 import { Modal, Input, Button, Card, Row, Col, Checkbox, Tabs, TabPane } from '@/components/iview';
 import { Base } from './base';
@@ -16,12 +16,12 @@ export default class AssetMgt extends Base {
         return (
             <Row gutter={5}>
                 <Col xs={8}>
-                    <Card nativeOn-click={() => {
+                    <Card class="pointer" nativeOn-click={() => {
                         this.$router.push(dev.routeConfig.assetMgtLog.path);
                     }}>资金记录</Card>
                 </Col>
                 <Col xs={8}>
-                    <Card nativeOn-click={() => {
+                    <Card class="pointer" nativeOn-click={() => {
                         this.$router.push(dev.routeConfig.assetMgtNotify.path);
                     }}>回调通知</Card>
                 </Col>
@@ -76,6 +76,9 @@ export class AssetMgtLog extends Base {
                         label: '外部订单号',
                     },
                 }}
+                hideQueryBtn={{
+                    add: true,
+                }}
 
                 customQueryNode={this.statusList.map(ele => {
                     return (
@@ -88,6 +91,15 @@ export class AssetMgtLog extends Base {
                 columns={[{
                     title: '订单号',
                     key: 'orderNo',
+                    render: (h, params) => {
+                        let detail = params.row;
+                        return <a on-click={() => {
+                            this.$router.push({
+                                path: dev.routeConfig.assetMgtNotify.path,
+                                query: { orderNo: detail.orderNo }
+                            })
+                        }}>{detail.orderNo}</a>
+                    }
                 }, {
                     title: '外部订单号',
                     key: 'outOrderNo',
@@ -172,6 +184,9 @@ export class AssetMgtNotify extends Base {
                         label: '外部订单号',
                     },
                 }}
+                hideQueryBtn={{
+                    add: true,
+                }}
 
                 columns={[{
                     key: '_expand',
@@ -193,6 +208,15 @@ export class AssetMgtNotify extends Base {
                 }, {
                     title: '订单号',
                     key: 'orderNo',
+                    render: (h, params) => {
+                        let detail = params.row;
+                        return <a on-click={() => {
+                            this.$router.push({
+                                path: dev.routeConfig.assetMgtLog.path,
+                                query: { orderNo: detail.orderNo }
+                            })
+                        }}>{detail.orderNo}</a>
+                    }
                 }, {
                     title: '外部订单号',
                     key: 'outOrderNo',
@@ -208,12 +232,14 @@ export class AssetMgtNotify extends Base {
                             !!detail.assetLog &&
                             <div>
                                 <span>{detail.assetLog.statusText}</span>
-                                {myEnum.assetLogStatus.未完成 === detail.assetLog.status && <a on-click={() => {
-                                    this.operateHandler('重试', async () => {
-                                        await testApi.assetNotifyRetry({ _id: detail._id });
-                                        detail.assetLog.status = myEnum.assetLogStatus.已完成;
-                                    });
-                                }}>重试</a>}
+                                {myEnum.assetLogStatus.未完成 === detail.assetLog.status
+                                    && this.storeUser.user.hasAuth(authority.payMgtOperate)
+                                    && <a on-click={() => {
+                                        this.operateHandler('重试', async () => {
+                                            await testApi.assetNotifyRetry({ _id: detail._id });
+                                            detail.assetLog.status = myEnum.assetLogStatus.已完成;
+                                        });
+                                    }}>重试</a>}
                             </div>
                         );
                     }
