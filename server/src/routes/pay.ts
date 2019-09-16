@@ -1,14 +1,14 @@
 import { RequestHandler } from 'express';
 
-import { responseHandler, paramsValid } from '../helpers';
-import { transaction } from '../_system/dbMongo';
-import * as VaildSchema from '../vaild-schema/class-valid';
-import { myEnum } from '../config';
-import * as config from '../config';
-import { alipayInst, ThirdPartyPayMapper } from '../3rd-party';
-import { PayModel, AssetLogModel, PayMapper } from '../models/mongo/asset';
-import { NotifyMapper } from '../models/mongo/notify';
-import { error } from '../_system/common';
+import { responseHandler, paramsValid } from '@/helpers';
+import { transaction } from '@/_system/dbMongo';
+import { error } from '@/_system/common';
+import { myEnum } from '@/config';
+import { alipayInst, ThirdPartyPayMapper } from '@/3rd-party';
+import * as VaildSchema from '@/vaild-schema/class-valid';
+
+import { PayModel, AssetLogModel, PayMapper } from '@/models/mongo/asset';
+import { NotifyMapper } from '@/models/mongo/notify';
 
 export let create: RequestHandler = (req, res) => {
     responseHandler(async () => {

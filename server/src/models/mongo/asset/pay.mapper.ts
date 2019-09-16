@@ -1,11 +1,12 @@
 
 
-import * as VaildSchema from '../../../vaild-schema/class-valid';
-import { Auth } from '../../../_system/auth';
-import { escapeRegExp } from '../../../_system/common';
-import * as helpers from '../../../helpers';
-import * as config from '../../../config';
-import { myEnum } from '../../../config';
+import * as VaildSchema from '@/vaild-schema/class-valid';
+import { Auth } from '@/_system/auth';
+import { escapeRegExp } from '@/_system/common';
+import * as helpers from '@/helpers';
+import * as config from '@/config';
+import { myEnum } from '@/config';
+
 import { LoginUser } from '../../login-user';
 import { BaseMapper } from "../_base";
 import { UserMapper } from '../user';

@@ -1,8 +1,10 @@
 import { Types } from 'mongoose';
-import * as VaildSchema from '../../../vaild-schema/class-valid';
-import { escapeRegExp } from '../../../_system/common';
-import { AuthorityModel } from ".";
+
+import * as VaildSchema from '@/vaild-schema/class-valid';
+import { escapeRegExp } from '@/_system/common';
+
 import { BaseMapper } from '../_base';
+import { AuthorityModel } from ".";
 
 export class AuthorityMapper {
     static async codeExists(code: string, _id?: any) {

@@ -5,14 +5,14 @@ import * as SocketIO from 'socket.io';
 import { Server } from 'http';
 import { MQ } from 'amqplib-delay';
 
-import * as config from './config';
-import { myEnum } from './config';
-import * as helpers from './helpers';
-import { MySocket } from './_system/socket';
-import { Auth } from './_system/auth';
-import { Cache } from './_system/cache';
-import routes from './routes';
-import { ThirdPartyPayMapper } from './3rd-party';
+import * as config from '@/config';
+import { myEnum } from '@/config';
+import * as helpers from '@/helpers';
+import { MySocket } from '@/_system/socket';
+import { Auth } from '@/_system/auth';
+import { Cache } from '@/_system/cache';
+import routes from '@/routes';
+import { ThirdPartyPayMapper } from '@/3rd-party';
 
 export const logger = getLogger();
 

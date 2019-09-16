@@ -4,8 +4,7 @@ import {
 } from 'mongoose-ts-ua';
 import { Types, SchemaTypes } from 'mongoose';
 
-import { Base } from '../_base';
-import { myEnum } from '../../../config';
+import { myEnum } from '@/config';
 import { ContentBase } from '../_base/contentBase';
 
 export type ArticleInstanceType = InstanceType<Article>;

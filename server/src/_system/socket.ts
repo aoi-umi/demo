@@ -1,5 +1,5 @@
-import { SocketOnConnect } from '../typings/libs';
-import { SocketUser } from '../models/socket-user';
+import { SocketOnConnect } from '@/typings/libs';
+import { SocketUser } from '@/models/socket-user';
 
 export function tryFn(socket: Socket, fn: () => void) {
     try {

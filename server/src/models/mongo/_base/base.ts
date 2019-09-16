@@ -5,7 +5,7 @@ import {
 import * as Q from 'q';
 import * as mongoose from 'mongoose';
 import { Document } from 'mongoose';
-import { parseBool } from '../../../_system/common';
+import { parseBool } from '@/_system/common';
 
 export type BaseInstanceType = InstanceType<Base>;
 export type BaseModelType = ModelType<Base, typeof Base>;

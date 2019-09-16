@@ -3,7 +3,9 @@ import {
     setSchema, prop, arrayProp, setMethod
 } from 'mongoose-ts-ua';
 import * as moment from 'moment';
-import { myEnum, dev } from '../../../config';
+
+import { myEnum, dev } from '@/config';
+
 import { Base } from '../_base';
 
 export type UserInstanceType = InstanceType<User>;

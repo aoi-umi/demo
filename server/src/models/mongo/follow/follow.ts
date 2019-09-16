@@ -3,8 +3,10 @@ import {
     setSchema, prop, arrayProp, getSchema
 } from 'mongoose-ts-ua';
 import { Types, SchemaTypes } from 'mongoose';
+
+import { myEnum } from '@/config';
+
 import { Base } from '../_base';
-import { myEnum } from '../../../config';
 
 export type FollowInstanceType = InstanceType<Follow>;
 export type FollowModelType = ModelType<Follow, typeof Follow>;

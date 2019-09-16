@@ -1,8 +1,8 @@
 import * as express from 'express';
 let router = express.Router();
 export default router;
-import { UserAuthMid, FileMid } from '../middleware';
-import { auth } from '../config';
+import { UserAuthMid, FileMid } from '@/middleware';
+import { auth } from '@/config';
 
 //#region user 
 import * as user from './user';

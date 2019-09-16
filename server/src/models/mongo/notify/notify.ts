@@ -3,7 +3,9 @@ import {
     setSchema, prop, arrayProp, getSchema
 } from 'mongoose-ts-ua';
 import { Types, SchemaTypes } from 'mongoose';
-import { myEnum } from '../../../config/enum';
+
+import { myEnum } from '@/config';
+
 import { Base } from '../_base';
 
 export type NotifyInstanceType = InstanceType<Notify>;

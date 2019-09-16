@@ -1,12 +1,12 @@
 import { RequestHandler } from 'express';
 
-import { transaction } from '../_system/dbMongo';
-import { error } from '../_system/common';
-import * as config from '../config';
-import { myEnum } from '../config';
-import { responseHandler, paramsValid } from '../helpers';
-import * as VaildSchema from '../vaild-schema/class-valid';
-import { VoteModel, VoteMapper } from '../models/mongo/vote';
+import { transaction } from '@/_system/dbMongo';
+import { error } from '@/_system/common';
+import * as config from '@/config';
+import { myEnum } from '@/config';
+import { responseHandler, paramsValid } from '@/helpers';
+import * as VaildSchema from '@/vaild-schema/class-valid';
+import { VoteModel, VoteMapper } from '@/models/mongo/vote';
 
 export let submit: RequestHandler = (req, res) => {
     responseHandler(async () => {

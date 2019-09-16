@@ -1,6 +1,8 @@
 import { Model, InstanceType } from "mongoose-ts-ua";
 import { Types } from "mongoose";
-import { myEnum } from "../../../config";
+
+import { myEnum } from "@/config";
+
 import { ArticleMapper, ArticleModel } from "../article";
 import { CommentModel } from "../comment";
 import { IVoteOwner, VoteModel } from "./vote";

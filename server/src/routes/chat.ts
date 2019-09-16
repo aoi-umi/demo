@@ -1,11 +1,13 @@
 import { RequestHandler } from "express";
-import { responseHandler, paramsValid } from "../helpers";
-import * as VaildSchema from '../vaild-schema/class-valid';
-import { ChatModel, ChatMapper } from "../models/mongo/chat";
-import { error } from "../_system/common";
-import { mySocket } from "../_main";
-import { BaseMapper } from "../models/mongo/_base";
-import { UserMapper } from "../models/mongo/user";
+
+import { responseHandler, paramsValid } from "@/helpers";
+import { error } from "@/_system/common";
+import { mySocket } from "@/_main";
+import * as VaildSchema from '@/vaild-schema/class-valid';
+
+import { ChatModel, ChatMapper } from "@/models/mongo/chat";
+import { BaseMapper } from "@/models/mongo/_base";
+import { UserMapper } from "@/models/mongo/user";
 
 export let submit: RequestHandler = (req, res) => {
     responseHandler(async () => {

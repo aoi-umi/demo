@@ -1,13 +1,14 @@
 import { RequestHandler } from 'express';
 
-import { responseHandler, paramsValid } from '../helpers';
-import { myEnum } from '../config';
-import * as config from '../config';
-import { error } from '../_system/common';
-import { transaction } from '../_system/dbMongo';
-import * as VaildSchema from '../vaild-schema/class-valid';
-import { ArticleModel, ArticleInstanceType, ArticleMapper, ArticleLogMapper, ArticleDocType } from '../models/mongo/article';
-import { Auth } from '../_system/auth';
+import { responseHandler, paramsValid } from '@/helpers';
+import { myEnum } from '@/config';
+import * as config from '@/config';
+import { error } from '@/_system/common';
+import { Auth } from '@/_system/auth';
+import { transaction } from '@/_system/dbMongo';
+import * as VaildSchema from '@/vaild-schema/class-valid';
+
+import { ArticleModel, ArticleInstanceType, ArticleMapper, ArticleLogMapper, ArticleDocType } from '@/models/mongo/article';
 
 export let mgtQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {

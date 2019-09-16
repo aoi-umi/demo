@@ -1,11 +1,11 @@
 import { RequestHandler } from "express";
 import { plainToClass } from "class-transformer";
 
-import * as config from '../config';
-import { AuthType } from "../_system/auth";
-import { auth, logger, cache } from '../_main';
-import { UserMapper } from "../models/mongo/user";
-import { LoginUser } from "../models/login-user";
+import * as config from '@/config';
+import { AuthType } from "@/_system/auth";
+import { auth, logger, cache } from '@/_main';
+import { UserMapper } from "@/models/mongo/user";
+import { LoginUser } from "@/models/login-user";
 
 export class UserAuthMid {
     static async  getUser(token, resetOpt?) {

@@ -3,7 +3,7 @@ import {
     setSchema, prop, arrayProp, setMethod
 } from 'mongoose-ts-ua';
 import { Types, SchemaTypes } from 'mongoose';
-import { myEnum, dev } from '../../../config';
+
 import { Base } from '../_base';
 
 export type UserLogInstanceType = InstanceType<UserLog>;

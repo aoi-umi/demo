@@ -1,6 +1,6 @@
 import { Types } from 'mongoose';
 
-import * as config from '../../../config';
+import * as config from '@/config';
 
 export class FileMapper {
     static getImgUrl(_id, host?: string) {

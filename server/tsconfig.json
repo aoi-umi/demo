@@ -2,6 +2,12 @@
     "compilerOptions": {
         "outDir": "./dest",
         "rootDir": "./src",
+        "baseUrl": "./src",
+        "paths": {
+            "@/*": [
+                "./*"
+            ]
+        },
         "typeRoots": [
             "./node_modules/@types",
             "./src/typings"
@@ -13,11 +19,11 @@
         "target": "es2018",
         "lib": [
             "es6",
-            "es7",         
+            "es7"
         ],
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
         "strictPropertyInitialization": false,
-        "moduleResolution": "node",        
+        "moduleResolution": "node"
     }
 }
