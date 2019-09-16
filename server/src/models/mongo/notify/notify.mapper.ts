@@ -1,5 +1,9 @@
 import { myEnum } from "../../../config";
+import * as VaildSchema from '../../../vaild-schema/class-valid';
+import { escapeRegExp } from "../../../_system/common";
+import { BaseMapper } from "../_base";
 import { NotifyModel } from "./notify";
+import { AssetLogModel } from "../asset";
 
 export class NotifyMapper {
     static async create(data: {
@@ -36,5 +40,38 @@ export class NotifyMapper {
                 break;
         }
         return obj;
+    }
+
+    static async query(data: VaildSchema.AssetNotifyQuery) {
+        let match: any = {};
+        if (data.orderNo)
+            match.orderNo = new RegExp(escapeRegExp(data.orderNo), 'i');
+        if (data.outOrderNo)
+            match.outOrderNo = new RegExp(escapeRegExp(data.outOrderNo), 'i');
+        let rs = await NotifyModel.aggregatePaginate([
+            { $match: match },
+            {
+                $lookup: {
+                    from: AssetLogModel.collection.collectionName,
+                    localField: 'orderNo',
+                    foreignField: 'orderNo',
+                    as: 'assetLog'
+                }
+            },
+            { $unwind: { path: '$assetLog', preserveNullAndEmptyArrays: true } }
+        ], {
+            ...BaseMapper.getListOptions(data)
+        });
+        rs.rows = rs.rows.map(ele => {
+            let obj = new NotifyModel(ele).toJSON();
+            if (ele.assetLog) {
+                obj.assetLog = {
+                    status: ele.assetLog.status,
+                    statusText: myEnum.assetLogStatus.getKey(ele.assetLog.status)
+                };
+            }
+            return obj;
+        });
+        return rs;
     }
 }

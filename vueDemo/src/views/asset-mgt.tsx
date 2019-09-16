@@ -104,6 +104,9 @@ export class AssetMgtLog extends Base {
                     title: '通知id',
                     key: 'notifyId',
                 }, {
+                    title: '备注',
+                    key: 'remark',
+                }, {
                     title: '创建时间',
                     key: 'createdAt',
                     render: (h, params) => {
@@ -197,26 +200,28 @@ export class AssetMgtNotify extends Base {
                     title: '类型',
                     key: 'typeText',
                 }, {
+                    title: '资金记录状态',
+                    key: 'assetLogStatus',
+                    render: (h, params) => {
+                        let detail = params.row;
+                        return (
+                            !!detail.assetLog &&
+                            <div>
+                                <span>{detail.assetLog.statusText}</span>
+                                {myEnum.assetLogStatus.未完成 === detail.assetLog.status && <a on-click={() => {
+                                    this.operateHandler('重试', async () => {
+                                        await testApi.assetNotifyRetry({ _id: detail._id });
+                                        detail.assetLog.status = myEnum.assetLogStatus.已完成;
+                                    });
+                                }}>重试</a>}
+                            </div>
+                        );
+                    }
+                }, {
                     title: '创建时间',
                     key: 'createdAt',
                     render: (h, params) => {
                         return <span>{moment(params.row.createdAt).format(dev.dateFormat)}</span>
-                    }
-                }, {
-                    title: '操作',
-                    key: 'action',
-                    fixed: 'right',
-                    width: 150,
-                    render: (h, params) => {
-                        let detail = params.row;
-                        return (
-                            <div class={MyListConst.clsActBox}>
-                                {true &&
-                                    <a on-click={() => {
-                                    }}>重试</a>
-                                }
-                            </div>
-                        );
                     }
                 }]}
 

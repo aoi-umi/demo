@@ -58,6 +58,7 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
     payQuery,
     assetLogQuery,
     assetNotifyQuery,
+    assetNotifyRetry,
 
     //file
     imgUpload,
@@ -293,6 +294,9 @@ export class TestApi extends ApiModel<TestApiMethod> {
     }
     async assetNotifyQuery(data) {
         return this.requestByConfig<ListResult>(this.apiConfig.method.assetNotifyQuery, { data });
+    }
+    async assetNotifyRetry(data) {
+        return this.requestByConfig<ListResult>(this.apiConfig.method.assetNotifyRetry, { data });
     }
     //#endregion
 }

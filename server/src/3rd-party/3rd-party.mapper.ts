@@ -54,22 +54,23 @@ export class ThirdPartyPayMapper {
             assetLog = await AssetLogModel.findOne({ orderNo: notify.orderNo });
             if (!assetLog)
                 throw common.error('无对应资金记录');
-            if (!assetLog.notifyId) {
-                await assetLog.update({ notifyId: notify._id, outOrderNo: notify.outOrderNo });
-            } else if (!assetLog.notifyId.equals(notify._id))
-                throw common.error('通知id不一致');
-            if (notify.type === myEnum.notifyType.支付宝) {
-                let rs = await alipayInst.query({
-                    out_trade_no: assetLog.orderNo
-                });
-                if (parseFloat(rs.total_amount as any) !== assetLog.money) {
-                    throw common.error('金额不一致');
+            if (assetLog.status !== myEnum.assetLogStatus.已完成) {
+                if (!assetLog.notifyId) {
+                    await assetLog.update({ notifyId: notify._id, outOrderNo: notify.outOrderNo });
+                } else if (!assetLog.notifyId.equals(notify._id))
+                    throw common.error('通知id不一致');
+                if (notify.type === myEnum.notifyType.支付宝) {
+                    let rs = await alipayInst.query({
+                        out_trade_no: assetLog.orderNo
+                    });
+                    if (parseFloat(rs.total_amount as any) !== assetLog.money) {
+                        throw common.error('金额不一致');
+                    }
+                } else {
+                    throw common.error('未实现');
                 }
-            } else {
-                throw common.error('未实现');
-            }
-            if (assetLog.status !== myEnum.assetLogStatus.已完成)
                 await assetLog.update({ status: myEnum.assetLogStatus.已完成 });
+            }
             await PayModel.updateOne({ assetLogId: assetLog._id, status: { $in: [myEnum.payStatus.待处理, myEnum.payStatus.未支付] } }, { status: myEnum.payStatus.已支付 });
         } catch (e) {
             if (assetLog)

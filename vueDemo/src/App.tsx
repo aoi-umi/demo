@@ -26,7 +26,6 @@ export default class App extends Base {
 
     getActiveNameByPath(path: string) {
         let name = path.split('/').slice(0, 3).join('/');
-        console.log(name);
         return name;
     }
 
@@ -137,7 +136,13 @@ export default class App extends Base {
     route(to, from) {
         this.setTitle();
         this.activeName = this.getActiveNameByPath(location.pathname);
-        this.openNames = this.menuCfg.map(ele => this.getMenuName(ele)).filter(ele => this.activeName.includes(ele));
+        this.menuCfg.map(ele => this.getMenuName(ele)).filter(ele => this.activeName.includes(ele));
+        // this.menuCfg.forEach(ele => {
+        //     let name = this.getMenuName(ele);
+        //     if (this.activeName.includes(name) && !this.openNames.includes(name)) {
+        //         this.openNames.push(name);
+        //     }
+        // });
         //其他特殊处理。。。
     }
 
@@ -161,35 +166,25 @@ export default class App extends Base {
         text: routeConfig.payMgt.text,
         show: () => this.storeUser.user.hasAuth(routeConfig.payMgt.meta.authority)
     }, {
-        to: routeConfig.admin.path,
-        icon: 'md-list',
-        text: routeConfig.admin.text,
-        show: () => this.storeUser.user.existsAuth([
-            authority.authorityQuery,
-            authority.roleQuery,
-            authority.userMgtQuery,
-        ]),
-        children: [{
-            to: routeConfig.userMgt.path,
-            icon: 'md-people',
-            text: routeConfig.userMgt.text,
-            show: () => this.storeUser.user.hasAuth(routeConfig.userMgt.meta.authority)
-        }, {
-            to: routeConfig.role.path,
-            icon: 'md-person',
-            text: routeConfig.role.text,
-            show: () => this.storeUser.user.hasAuth(routeConfig.role.meta.authority)
-        }, {
-            to: routeConfig.authority.path,
-            icon: 'md-lock',
-            text: routeConfig.authority.text,
-            show: () => this.storeUser.user.hasAuth(routeConfig.authority.meta.authority)
-        }, {
-            to: routeConfig.assetMgt.path,
-            icon: 'md-stats',
-            text: routeConfig.assetMgt.text,
-            show: () => this.storeUser.user.hasAuth(routeConfig.assetMgt.meta.authority)
-        },]
+        to: routeConfig.userMgt.path,
+        icon: 'md-people',
+        text: routeConfig.userMgt.text,
+        show: () => this.storeUser.user.hasAuth(routeConfig.userMgt.meta.authority)
+    }, {
+        to: routeConfig.role.path,
+        icon: 'md-person',
+        text: routeConfig.role.text,
+        show: () => this.storeUser.user.hasAuth(routeConfig.role.meta.authority)
+    }, {
+        to: routeConfig.authority.path,
+        icon: 'md-lock',
+        text: routeConfig.authority.text,
+        show: () => this.storeUser.user.hasAuth(routeConfig.authority.meta.authority)
+    }, {
+        to: routeConfig.assetMgt.path,
+        icon: 'md-stats',
+        text: routeConfig.assetMgt.text,
+        show: () => this.storeUser.user.hasAuth(routeConfig.assetMgt.meta.authority)
     },];
 
     private siderWidth = 180;
