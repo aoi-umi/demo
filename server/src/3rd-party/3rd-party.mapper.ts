@@ -1,9 +1,11 @@
-import { myEnum } from "../config";
-import * as config from "../config";
-import { logger, mq } from "../_main";
-import { AssetLogModel, PayInstanceType, AssetLogInstanceType, PayModel } from "../models/mongo/asset";
-import { NotifyMapper, NotifyInstanceType, NotifyModel } from "../models/mongo/notify";
-import * as common from "../_system/common";
+import { myEnum } from "@/config";
+import * as config from "@/config";
+import { logger, mq } from "@/_main";
+import * as common from "@/_system/common";
+
+import { AssetLogModel, PayInstanceType, AssetLogInstanceType, PayModel } from "@/models/mongo/asset";
+import { NotifyMapper, NotifyInstanceType, NotifyModel } from "@/models/mongo/notify";
+
 import { alipayInst } from "./alipay";
 
 type NotifyType = {

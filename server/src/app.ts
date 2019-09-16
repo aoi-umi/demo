@@ -1,3 +1,4 @@
+import 'module-alias/register';
 import * as debug from 'debug';
 import * as express from 'express';
 import * as logger from 'morgan';
@@ -7,8 +8,8 @@ import * as cors from 'cors';
 import { AddressInfo } from 'net';
 import 'reflect-metadata';
 import * as mongoose from 'mongoose';
-import * as config from './config';
 
+import * as config from '@/config';
 
 debug('my-application');
 (async () => {

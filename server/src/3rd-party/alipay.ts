@@ -1,5 +1,7 @@
 import { alipay } from '3rd-party-pay';
-import * as config from '../config';
+
+import * as config from '@/config';
+
 let aliConfig = config.env.ali;
 alipay.AliPayStatic.config({
     sandbox: aliConfig.sandbox,

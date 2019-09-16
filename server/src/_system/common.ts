@@ -9,7 +9,7 @@ import * as crypto from 'crypto';
 import * as Q from 'q';
 import * as zlib from 'zlib';
 import { Request } from 'express';
-import * as config from '../config';
+import * as config from '@/config';
 
 
 //#region 前后通用

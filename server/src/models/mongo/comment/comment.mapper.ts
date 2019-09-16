@@ -1,16 +1,17 @@
 import { Types } from 'mongoose';
-import * as VaildSchema from '../../../vaild-schema/class-valid';
-import { Auth } from '../../../_system/auth';
-import * as common from '../../../_system/common';
-import * as config from '../../../config';
-import { myEnum } from '../../../config';
+
+import * as VaildSchema from '@/vaild-schema/class-valid';
+import { Auth } from '@/_system/auth';
+import * as common from '@/_system/common';
+import * as config from '@/config';
+import { myEnum } from '@/config';
+
 import { LoginUser } from '../../login-user';
 import { BaseMapper, ContentBaseInstanceType } from '../_base';
 import { ArticleMapper } from '../article';
 import { UserModel, UserMapper, UserDocType, UserResetOption } from '../user';
-import { CommentModel, CommentDocType, CommentInstanceType } from './comment';
 import { VoteModel, VoteMapper, VoteInstanceType } from '../vote';
-import { FollowMapper, FollowModel, FollowInstanceType } from '../follow';
+import { CommentModel, CommentDocType, CommentInstanceType } from './comment';
 
 type CommentResetOption = {
     imgHost?: string;

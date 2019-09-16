@@ -1,10 +1,10 @@
 import { RequestHandler } from 'express';
 
-import { responseHandler, paramsValid } from '../helpers';
-import * as config from '../config';
-import { error } from '../_system/common';
-import * as VaildSchema from '../vaild-schema/class-valid';
-import { AuthorityModel, AuthorityInstanceType, AuthorityMapper } from '../models/mongo/authority';
+import { responseHandler, paramsValid } from '@/helpers';
+import * as config from '@/config';
+import { error } from '@/_system/common';
+import * as VaildSchema from '@/vaild-schema/class-valid';
+import { AuthorityModel, AuthorityInstanceType, AuthorityMapper } from '@/models/mongo/authority';
 
 export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {

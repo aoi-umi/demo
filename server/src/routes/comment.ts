@@ -1,13 +1,14 @@
 import { RequestHandler } from 'express';
 
-import { transaction } from '../_system/dbMongo';
-import { error } from '../_system/common';
-import { Auth } from '../_system/auth';
-import * as config from '../config';
-import { responseHandler, paramsValid } from '../helpers';
-import * as VaildSchema from '../vaild-schema/class-valid';
-import { CommentMapper, CommentModel } from '../models/mongo/comment';
-import { UserMapper } from '../models/mongo/user';
+import { transaction } from '@/_system/dbMongo';
+import { error } from '@/_system/common';
+import { Auth } from '@/_system/auth';
+import * as config from '@/config';
+import { responseHandler, paramsValid } from '@/helpers';
+import * as VaildSchema from '@/vaild-schema/class-valid';
+
+import { CommentMapper, CommentModel } from '@/models/mongo/comment';
+import { UserMapper } from '@/models/mongo/user';
 
 export let submit: RequestHandler = (req, res) => {
     responseHandler(async () => {

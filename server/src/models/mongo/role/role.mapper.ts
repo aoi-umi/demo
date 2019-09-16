@@ -1,7 +1,8 @@
 import { Types } from 'mongoose';
-import { myEnum, getEnumValueByStr } from '../../../config/enum';
-import { escapeRegExp } from '../../../_system/common';
-import * as VaildSchema from '../../../vaild-schema/class-valid';
+
+import { myEnum } from '@/config';
+import { escapeRegExp } from '@/_system/common';
+import * as VaildSchema from '@/vaild-schema/class-valid';
 
 import { AuthorityModel } from '../authority';
 import { UserMapper } from '../user';
@@ -31,10 +32,7 @@ export class RoleMapper {
         if (data.code)
             query.code = new RegExp(escapeRegExp(data.code), 'i');
         if (data.status) {
-            let status = getEnumValueByStr(myEnum.roleStatus, data.status);
-            if (status.length) {
-                query.status = { $in: status };
-            }
+            query.status = { $in: data.status.split(',') };
         }
 
         let query2: any = {};

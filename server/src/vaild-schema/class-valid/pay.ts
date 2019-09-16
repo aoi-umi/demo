@@ -2,7 +2,7 @@ import { IsDefined, IsIn, IsNumber, IsDecimal, IsDate } from "class-validator";
 import { Type, Transform } from "class-transformer";
 import { Types } from 'mongoose';
 
-import { myEnum } from "../../config";
+import { myEnum } from "@/config";
 import { ListBase } from "./base";
 import { objectIdTransform } from "./util";
 

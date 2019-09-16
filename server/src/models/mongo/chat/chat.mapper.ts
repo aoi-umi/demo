@@ -1,7 +1,8 @@
 import { Model, InstanceType } from "mongoose-ts-ua";
 import { Types } from "mongoose";
-import { myEnum } from "../../../config";
-import * as VaildSchema from '../../../vaild-schema/class-valid';
+
+import * as VaildSchema from '@/vaild-schema/class-valid';
+
 import { UserMapper, UserResetOption } from "../user";
 import { ChatModel } from "./chat";
 
@@ -24,8 +25,8 @@ export class ChatMapper {
                 $match: match
             },
         ], {
-                rows: data.rows,
-            });
+            rows: data.rows,
+        });
 
         rs.rows = rs.rows.reverse();
         return rs;

@@ -1,6 +1,7 @@
 import { Types } from "mongoose";
 
-import { myEnum } from "../../../config";
+import { myEnum } from "@/config";
+
 import { FollowModel } from "./follow";
 
 export class FollowMapper {

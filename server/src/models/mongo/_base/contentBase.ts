@@ -2,9 +2,10 @@ import {
     getModelForClass, ModelType, DocType, InstanceType,
     setSchema, prop, arrayProp
 } from 'mongoose-ts-ua';
-import { Base } from './base';
 import { Types, SchemaTypes } from 'mongoose';
+
 import { IVoteOwner } from '../vote';
+import { Base } from './base';
 
 export type ContentBaseInstanceType = InstanceType<ContentBase>;
 export type ContentBaseDocType = DocType<ContentBaseInstanceType>;

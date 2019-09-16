@@ -1,22 +1,21 @@
 import { Types } from 'mongoose';
+import { plainToClass } from 'class-transformer';
 
-import { escapeRegExp } from '../../../_system/common';
-import * as common from '../../../_system/common';
-import { myEnum } from '../../../config/enum';
-import * as config from '../../../config';
-import * as VaildSchema from '../../../vaild-schema/class-valid';
+import { escapeRegExp } from '@/_system/common';
+import * as common from '@/_system/common';
+import { myEnum } from '@/config/enum';
+import * as config from '@/config';
+import * as VaildSchema from '@/vaild-schema/class-valid';
+
 import { LoginUser } from '../../login-user';
-
 import { AuthorityModel } from '../authority';
 import { RoleModel } from '../role';
 import { BaseMapper } from '../_base';
-import { UserLogModel } from './user-log';
-import { UserModel, UserInstanceType } from ".";
 import { FileMapper } from '../file';
 import { FollowModel, FollowDocType } from '../follow';
 import { ArticleModel } from '../article';
-import { plainToClass } from 'class-transformer';
-import { UserDocType } from './user';
+import { UserLogModel } from './user-log';
+import { UserDocType, UserModel, UserInstanceType } from './user';
 
 export type UserResetOption = {
     imgHost?: string;

@@ -1,6 +1,6 @@
 import { Type, Transform } from "class-transformer";
 import { Types } from 'mongoose';
-import { objectIdTransform } from "../vaild-schema/class-valid/util";
+import { objectIdTransform } from "@/vaild-schema/class-valid/util";
 
 export class LoginUser {
     isLogin: boolean;

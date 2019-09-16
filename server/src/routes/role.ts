@@ -1,10 +1,10 @@
 import { RequestHandler } from 'express';
 
-import { responseHandler, paramsValid } from '../helpers';
-import { error } from '../_system/common';
-import * as config from '../config';
-import * as VaildSchema from '../vaild-schema/class-valid';
-import { RoleModel, RoleInstanceType, RoleMapper } from '../models/mongo/role';
+import { responseHandler, paramsValid } from '@/helpers';
+import { error } from '@/_system/common';
+import * as config from '@/config';
+import * as VaildSchema from '@/vaild-schema/class-valid';
+import { RoleModel, RoleInstanceType, RoleMapper } from '@/models/mongo/role';
 
 export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {

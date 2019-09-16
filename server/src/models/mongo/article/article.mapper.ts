@@ -1,20 +1,20 @@
 import { Types } from 'mongoose';
 
-import * as config from '../../../config';
-import { myEnum } from '../../../config';
-import { ListBase, AritcleQuery } from '../../../vaild-schema/class-valid';
-import { error, escapeRegExp } from '../../../_system/common';
-import { Auth } from '../../../_system/auth';
-import { transaction } from '../../../_system/dbMongo';
+import * as config from '@/config';
+import { myEnum } from '@/config';
+import { ListBase, AritcleQuery } from '@/vaild-schema/class-valid';
+import { error, escapeRegExp } from '@/_system/common';
+import { Auth } from '@/_system/auth';
+import { transaction } from '@/_system/dbMongo';
+
 import { LoginUser } from '../../login-user';
 import { BaseMapper } from '../_base';
 import { UserModel, UserMapper } from '../user';
 import { FileMapper } from '../file';
-
+import { FollowMapper } from '../follow';
 import { VoteModel, VoteMapper } from '../vote';
 import { ArticleInstanceType, ArticleModel } from "./article";
 import { ArticleLogModel } from './article-log';
-import { FollowMapper } from '../follow';
 
 type ArticleResetOption = {
     user?: LoginUser,

@@ -1,9 +1,7 @@
-/**
- * Created by umi on 2017-5-29.
- */
+import * as config from '@/config';
+import { AuthConfigType } from '@/config/authConfig';
+
 import * as common from './common';
-import * as config from '../config';
-import { AuthConfigType } from '../config/authConfig';
 
 export type AuthType = AuthorityType | AuthorityType[] | AuthorityType[][];
 

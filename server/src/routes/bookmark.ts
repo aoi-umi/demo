@@ -1,11 +1,12 @@
 import { RequestHandler } from 'express';
 
-import { responseHandler, paramsValid } from '../helpers';
-import { error, escapeRegExp } from '../_system/common';
-import * as config from '../config';
-import * as VaildSchema from '../vaild-schema/class-valid';
-import { BookmarkModel, BookmarkInstanceType } from '../models/mongo/bookmark';
-import { BaseMapper } from '../models/mongo/_base';
+import { responseHandler, paramsValid } from '@/helpers';
+import { error, escapeRegExp } from '@/_system/common';
+import * as config from '@/config';
+import * as VaildSchema from '@/vaild-schema/class-valid';
+
+import { BookmarkModel, BookmarkInstanceType } from '@/models/mongo/bookmark';
+import { BaseMapper } from '@/models/mongo/_base';
 
 export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {

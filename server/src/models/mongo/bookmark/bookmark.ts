@@ -2,6 +2,7 @@ import {
     getModelForClass, ModelType, DocType, InstanceType,
     setSchema, prop, arrayProp
 } from 'mongoose-ts-ua';
+
 import { Base } from '../_base';
 
 export type BookmarkInstanceType = InstanceType<Bookmark>;

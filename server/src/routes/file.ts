@@ -1,10 +1,10 @@
 import { RequestHandler, Request, Response } from "express";
 import { Types } from 'mongoose';
 
-import { responseHandler, paramsValid } from "../helpers";
-import { myEnum } from "../config";
-import { FileMapper, FileModel } from "../models/mongo/file";
-import * as VaildSchema from '../vaild-schema/class-valid';
+import { responseHandler, paramsValid } from "@/helpers";
+import { myEnum } from "@/config";
+import * as VaildSchema from '@/vaild-schema/class-valid';
+import { FileMapper, FileModel } from "@/models/mongo/file";
 
 const uplaod = (option: { fileType: string }, req: Request, res: Response) => {
     responseHandler(async () => {

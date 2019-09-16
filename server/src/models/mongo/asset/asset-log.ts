@@ -5,8 +5,10 @@ import {
 import { Types, SchemaTypes } from 'mongoose';
 import * as Int32 from 'mongoose-int32';
 import * as mathjs from 'mathjs';
+
+import { myEnum } from '@/config';
+
 import { Base } from '../_base';
-import { myEnum } from '../../../config';
 
 export type AssetLogInstanceType = InstanceType<AssetLog>;
 export type AssetLogModelType = ModelType<AssetLog, typeof AssetLog>;

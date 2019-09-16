@@ -1,9 +1,10 @@
-import { myEnum } from "../../../config";
-import * as VaildSchema from '../../../vaild-schema/class-valid';
-import { escapeRegExp } from "../../../_system/common";
+import { myEnum } from "@/config";
+import * as VaildSchema from '@/vaild-schema/class-valid';
+import { escapeRegExp } from "@/_system/common";
+
 import { BaseMapper } from "../_base";
-import { NotifyModel } from "./notify";
 import { AssetLogModel } from "../asset";
+import { NotifyModel } from "./notify";
 
 export class NotifyMapper {
     static async create(data: {
