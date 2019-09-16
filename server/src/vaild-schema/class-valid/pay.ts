@@ -1,4 +1,4 @@
-import { IsDefined, IsIn, IsNumber, IsDecimal, IsDate } from "class-validator";
+import { IsDefined, IsIn, IsNumber, IsDecimal, IsDate, Min, IsPositive } from "class-validator";
 import { Type, Transform } from "class-transformer";
 import { Types } from 'mongoose';
 
@@ -10,7 +10,7 @@ export class PayCreate {
     // @IsDecimal({
     //     decimal_digits: '0,2'
     // })
-    @IsNumber()
+    @IsPositive()
     @IsDefined()
     @Type()
     money: number;

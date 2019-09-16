@@ -2,11 +2,12 @@ import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import * as iview from 'iview';
 import { testApi } from '@/api';
 import { myEnum, authority } from '@/config';
+import { convClass, convert } from '@/helpers';
 import { Modal, Input, Form, FormItem, Button, Checkbox, Switch, Transfer } from '@/components/iview';
 import { MyList, IMyList, Const as MyListConst } from '@/components/my-list';
 import { MyTransfer, IMyTransfer } from '@/components/my-transfer';
 import { MyConfirm } from '@/components/my-confirm';
-import { convClass, convert } from '@/helpers';
+import { MyTag, TagType } from '@/components/my-tag';
 import { Base } from './base';
 
 type DetailDataType = {
@@ -110,8 +111,11 @@ export default class Authority extends Base {
 
     protected created() {
         this.statusList = myEnum.authorityStatus.toArray().map(ele => {
-            ele['checked'] = false;
-            return ele;
+            return {
+                tag: ele.key,
+                key: ele.value,
+                checkable: true
+            }
         });
     }
 
@@ -131,14 +135,14 @@ export default class Authority extends Base {
         let status = this.$route.query.status as string;
         let statusList = status ? status.split(',') : [];
         this.statusList.forEach(ele => {
-            ele.checked = statusList.includes(ele.value.toString());
+            ele.checked = statusList.includes(ele.key.toString());
         });
         convert.Test.queryToListModel(query, list.model);
         this.$refs.list.query(query);
     }
 
     delIds = [];
-    statusList: { key: string; value: any, checked?: boolean }[] = [];
+    statusList: TagType[] = [];
     async delClick() {
         await this.operateHandler('删除', async () => {
             await testApi.authorityDel(this.delIds);
@@ -257,13 +261,7 @@ export default class Authority extends Base {
                             label: '任意字'
                         }
                     }}
-                    customQueryNode={this.statusList.map(ele => {
-                        return (
-                            <label style={{ marginRight: '5px' }}>
-                                <Checkbox v-model={ele.checked} />{ele.key}
-                            </label>
-                        );
-                    })}
+                    customQueryNode={<MyTag v-model={this.statusList} />}
 
                     hideQueryBtn={{
                         add: !this.storeUser.user.hasAuth(authority.authoritySave)
@@ -282,7 +280,7 @@ export default class Authority extends Base {
                             path: this.$route.path,
                             query: {
                                 ...q,
-                                status: this.statusList.filter(ele => ele.checked).map(ele => ele.value).join(','),
+                                status: this.statusList.filter(ele => ele.checked).map(ele => ele.key).join(','),
                                 ...convert.Test.listModelToQuery(model),
                             }
                         });

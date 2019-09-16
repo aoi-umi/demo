@@ -1,11 +1,11 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { testApi } from '@/api';
 import { myEnum, authority, dev } from '@/config';
+import { convert } from '@/helpers';
 import { Modal, Checkbox, Row, Input, Card, Button } from '@/components/iview';
 import { MyList, IMyList } from '@/components/my-list';
 import { MyConfirm } from '@/components/my-confirm';
 import { MyTag, TagType } from '@/components/my-tag';
-import { convert } from '@/helpers';
 import { DetailDataType } from './article-mgt-detail';
 import { Base } from './base';
 import { ArticleListItemView } from './article';

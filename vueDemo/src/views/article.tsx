@@ -1,13 +1,13 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { testApi } from '@/api';
 import { myEnum, authority, dev } from '@/config';
+import { convert, convClass } from '@/helpers';
 import { Card, Input, Row, Col, Icon, Divider, Time, Checkbox } from '@/components/iview';
 import { MyList, IMyList } from '@/components/my-list';
-import { convert, convClass } from '@/helpers';
+import { MyTag } from '@/components/my-tag';
 import { DetailDataType } from './article-mgt-detail';
 import { UserAvatarView } from './comps/user-avatar';
 import { Base } from './base';
-import { MyTag } from '@/components/my-tag';
 
 @Component
 export default class Article extends Base {
