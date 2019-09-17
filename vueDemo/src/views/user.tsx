@@ -501,11 +501,15 @@ export default class UserInfo extends Base {
                         </div>
                         <Time class="not-important" time={ele.createdAt} />
                     </div>
-                    <span class="pointer" style={{
-                        marginLeft: '42px', textOverflow: 'ellipsis',
-                    }} on-click={() => {
+                    <div class="pointer" style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline' }} on-click={() => {
                         this.toChat(user._id);
-                    }}>{ele.content}</span>
+                    }}>
+                        <span style={{
+                            marginLeft: '42px', textOverflow: 'ellipsis',
+                        }}>{ele.content}</span>
+                        <div class="flex-stretch" >
+                        </div>
+                    </div>
                 </Card>
             )
         });
@@ -522,7 +526,7 @@ export default class UserInfo extends Base {
                     {detail.self && <a on-click={() => {
                         this.toggleUpdate(true);
                     }} style={{ marginLeft: '5px' }}>修改</a>}
-                    <div style="flex-grow: 1;"></div>
+                    <div style={{ flexGrow: 1 }}></div>
                     {!detail.self && <FollowButtonView style={{ alignItems: 'flex-end' }} user={detail} />}
                 </div>
                 <Tabs v-model={this.tab} style={{ minHeight: '300px' }} on-on-click={(name: string) => {

@@ -47,94 +47,10 @@ export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
         let data = paramsValid(req.query, VaildSchema.FollowQuery);
-        let cond: any = {
-            status: myEnum.followStatus.已关注
-        };
-        let userId = data.userId;
-        let userIdKey = '';
-        let asName = '';
-        if (data.type == myEnum.followQueryType.关注) {
-            cond.userId = userId
-            userIdKey = 'followUserId';
-            asName = 'followingUser';
-        } else {
-            cond.followUserId = userId;
-            userIdKey = 'userId';
-            asName = 'followerUser';
-        }
-        let userMatch;
-        if (data.anyKey) {
-            let anyKey = new RegExp(escapeRegExp(data.anyKey), 'i');
-            userMatch = {
-                $or: [
-                    { account: anyKey },
-                    { nickname: anyKey },
-                    { profile: anyKey },
-                ]
-            };
-        }
-
-        let pipeline: any[] = [
-            { $match: cond },
-            ...UserMapper.lookupPipeline({
-                userIdKey,
-                match: userMatch,
-                project: {
-                    profile: 1
-                }
-            }),
-        ];
-        if (user.equalsId(data.userId)) {
-            pipeline = [
-                ...pipeline,
-                //获取相互关注状态
-                {
-                    $lookup: {
-                        from: FollowModel.collection.collectionName,
-                        let: { followUserId: '$followUserId', userId: '$userId' },
-                        pipeline: [{
-                            $match: {
-                                $expr: {
-                                    $and: [
-                                        { $eq: ['$$followUserId', '$userId'] },
-                                        { $eq: ['$$userId', '$followUserId'] }
-                                    ]
-
-                                }
-                            }
-                        }],
-                        as: 'follow'
-                    }
-                },
-                { $unwind: { path: '$follow', preserveNullAndEmptyArrays: true } },
-            ];
-        }
-        let rs = await FollowModel.aggregatePaginate(pipeline, {
-            ...BaseMapper.getListOptions(data),
-        });
-        let opt = {
-            imgHost: req.myData.imgHost
-        };
-        let rows = rs.rows.map(detail => {
-            detail.user.avatarUrl = FileMapper.getImgUrl(detail.user.avatar, opt.imgHost);
-            detail[asName] = detail.user;
-            let eachFollowStatus = detail.follow ? detail.follow.status : myEnum.followStatus.未关注;
-            detail.user.followEachOther = eachFollowStatus === myEnum.followStatus.已关注;
-            if (data.type == myEnum.followQueryType.关注) {
-                detail.user.followStatus = detail.status;
-            } else {
-                detail.user.followStatus = eachFollowStatus;
-            }
-            UserMapper.resetDetail(detail.user, {
-                imgHost: opt.imgHost
-            });
-            delete detail.user;
-            delete detail.follow;
-            return detail;
-        });
+        let { rows, total } = await FollowMapper.query(data, { user, imgHost: req.myData.imgHost });
         return {
             rows,
-            total: rs.total
+            total,
         };
     }, req, res);
 };
