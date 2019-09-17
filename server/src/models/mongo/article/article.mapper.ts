@@ -2,7 +2,7 @@ import { Types } from 'mongoose';
 
 import * as config from '@/config';
 import { myEnum } from '@/config';
-import { ListBase, AritcleQuery } from '@/vaild-schema/class-valid';
+import * as VaildSchema from '@/vaild-schema/class-valid';
 import { error, escapeRegExp } from '@/_system/common';
 import { Auth } from '@/_system/auth';
 import { transaction } from '@/_system/dbMongo';
@@ -13,7 +13,7 @@ import { UserModel, UserMapper } from '../user';
 import { FileMapper } from '../file';
 import { FollowMapper } from '../follow';
 import { VoteModel, VoteMapper } from '../vote';
-import { ArticleInstanceType, ArticleModel } from "./article";
+import { ArticleInstanceType, ArticleModel, ArticleDocType } from "./article";
 import { ArticleLogModel } from './article-log';
 
 type ArticleResetOption = {
@@ -29,7 +29,7 @@ type ArticleQueryOption = {
 };
 
 export class ArticleMapper {
-    static async query(data: AritcleQuery, opt: {
+    static async query(data: VaildSchema.AritcleQuery, opt: {
         noTotal?: boolean,
     } & ArticleQueryOption) {
         opt = { ...opt };
@@ -241,6 +241,49 @@ export class ArticleMapper {
             status: status,
             statusText: myEnum.articleStatus.getKey(status)
         };
+    }
+
+    static async mgtSave(data: VaildSchema.AritcleSave, opt: { user: LoginUser }) {
+        let { user } = opt;
+        let detail: ArticleInstanceType;
+        let status = data.submit ? myEnum.articleStatus.待审核 : myEnum.articleStatus.草稿;
+        if (!data._id) {
+            delete data._id;
+            detail = new ArticleModel({
+                ...data,
+                status,
+                userId: user._id,
+            });
+            let log = ArticleLogMapper.create(detail, user, { srcStatus: myEnum.articleStatus.草稿, destStatus: status, remark: detail.remark });
+            await transaction(async (session) => {
+                await detail.save({ session });
+                await log.save({ session });
+            });
+        } else {
+            detail = await ArticleMapper.findOne({ _id: data._id });
+            if (!user.equalsId(detail.userId))
+                throw error('', config.error.NO_PERMISSIONS);
+            if (!detail.canUpdate) {
+                throw error('当前状态无法修改');
+            }
+            let update: any = {
+                status,
+            };
+            let updateKey: (keyof ArticleDocType)[] = [
+                'cover', 'title', 'profile', 'content', 'remark',
+                'setPublish', 'setPublishAt'
+            ];
+            updateKey.forEach(key => {
+                update[key] = data[key];
+            });
+            let logRemark = update.remark == detail.remark ? null : update.remark;
+            let log = ArticleLogMapper.create(detail, user, { srcStatus: detail.status, destStatus: status, remark: logRemark });
+            await transaction(async (session) => {
+                await detail.update(update);
+                await log.save({ session });
+            });
+        }
+        return detail;
     }
 };
 

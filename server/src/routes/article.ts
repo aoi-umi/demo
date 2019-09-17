@@ -50,44 +50,7 @@ export let mgtSave: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
         let data = paramsValid(req.body, VaildSchema.AritcleSave);
-        let detail: ArticleInstanceType;
-        let status = data.submit ? myEnum.articleStatus.待审核 : myEnum.articleStatus.草稿;
-        if (!data._id) {
-            delete data._id;
-            detail = new ArticleModel({
-                ...data,
-                status,
-                userId: user._id,
-            });
-            let log = ArticleLogMapper.create(detail, user, { srcStatus: myEnum.articleStatus.草稿, destStatus: status, remark: detail.remark });
-            await transaction(async (session) => {
-                await detail.save({ session });
-                await log.save({ session });
-            });
-        } else {
-            detail = await ArticleMapper.findOne({ _id: data._id });
-            if (!user.equalsId(detail.userId))
-                throw error('', config.error.NO_PERMISSIONS);
-            if (!detail.canUpdate) {
-                throw error('当前状态无法修改');
-            }
-            let update: any = {
-                status,
-            };
-            let updateKey: (keyof ArticleDocType)[] = [
-                'cover', 'title', 'profile', 'content', 'remark',
-                'setPublish', 'setPublishAt'
-            ];
-            updateKey.forEach(key => {
-                update[key] = data[key];
-            });
-            let logRemark = update.remark == detail.remark ? null : update.remark;
-            let log = ArticleLogMapper.create(detail, user, { srcStatus: detail.status, destStatus: status, remark: logRemark });
-            await transaction(async (session) => {
-                await detail.update(update);
-                await log.save({ session });
-            });
-        }
+        let detail = await ArticleMapper.mgtSave(data, { user });
         return {
             _id: detail._id
         };
