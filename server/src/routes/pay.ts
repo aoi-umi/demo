@@ -2,9 +2,9 @@ import { RequestHandler } from 'express';
 
 import { responseHandler, paramsValid } from '@/helpers';
 import { transaction } from '@/_system/dbMongo';
-import { error } from '@/_system/common';
 import { myEnum } from '@/config';
 import { alipayInst, ThirdPartyPayMapper } from '@/3rd-party';
+import { SendQueue } from '@/task';
 import * as VaildSchema from '@/vaild-schema/class-valid';
 
 import { PayModel, AssetLogModel, PayMapper } from '@/models/mongo/asset';
@@ -18,7 +18,7 @@ export let create: RequestHandler = (req, res) => {
             ...data,
             userId: user._id,
         });
-        let { assetLog, payResult } = await ThirdPartyPayMapper.create({
+        let { assetLog, payResult } = await ThirdPartyPayMapper.createPay({
             type: data.type,
             pay,
         });
@@ -28,6 +28,7 @@ export let create: RequestHandler = (req, res) => {
             await pay.save({ session });
             await assetLog.save({ session });
         });
+        SendQueue.payAutoCancel({ _id: pay._id });
         return payResult;
     }, req, res);
 };
@@ -48,20 +49,7 @@ export let cancel: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
         let data = paramsValid(req.body, VaildSchema.PayCancel);
-        let pay = await PayModel.findOne({ _id: data._id, userId: user._id });
-        if (![myEnum.payStatus.未支付].includes(pay.status))
-            throw error('当前状态无法取消');
-        let toStatus = myEnum.payStatus.已取消;
-        await pay.update({ status: toStatus });
-        pay.status = toStatus;
-        let obj = pay.toJSON();
-        let rtn = {
-            userId: obj.userId,
-            status: obj.status,
-            statusText: obj.statusText,
-        };
-        PayMapper.resetDetail(rtn, { user });
-        return rtn;
+        return PayMapper.cancel(data, { user });
     }, req, res);
 };
 
@@ -80,7 +68,7 @@ export let alipayNotify: RequestHandler = async (req, res) => {
         let notifyObj = await NotifyMapper.create({ type: notifyType, value: notify, raw: data });
         await notifyObj.notify.save();
 
-        ThirdPartyPayMapper.sendNotifyQueue({ notifyId: notifyObj.notify._id });
+        SendQueue.payNotify({ notifyId: notifyObj.notify._id });
     });
     res.send(rs);
 };

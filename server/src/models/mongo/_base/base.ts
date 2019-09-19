@@ -31,13 +31,17 @@ export class Base extends Model<Base> {
             getAll = true;
         }
         if (!getAll) {
+            if (opt.page)
+                opt.page = parseInt(opt.page as any);
+            if (opt.rows)
+                opt.rows = parseInt(opt.rows as any);
             if (opt.rows && opt.page)
                 query.skip((opt.page - 1) * opt.rows);
             if (opt.rows)
                 query.limit(opt.rows);
         }
-        let sortCondition = this.getSortCondition(opt);
-        query.sort(sortCondition);
+        let sort = this.getSortCondition(opt);
+        query.sort(sort);
         let rs = await Q.all([
             query.exec(),
             getAll ? null : self.find(opt.conditions).countDocuments().exec(),
@@ -62,11 +66,11 @@ export class Base extends Model<Base> {
         extraPipeline?: any[];
 
         //只按其中一个排序
-        sortCondition?: Object;
+        sort?: Object;
         orderBy?: string;
         sortOrder?: any;
 
-        groupCondition?: U;
+        group?: U;
 
         page?: number;
         rows?: number;
@@ -105,12 +109,12 @@ export class Base extends Model<Base> {
             _id: null,
             total: { $sum: 1 },
         };
-        if (opt.groupCondition) {
-            group = { ...group, ...opt.groupCondition };
+        if (opt.group) {
+            group = { ...group, ...opt.group };
         }
         let [rows, totalRs] = await Promise.all([
             model.aggregate([...pipeline, ...extraPipeline]).exec() as T[],
-            !opt.groupCondition && (noTotal || getAll) ?
+            !opt.group && (noTotal || getAll) ?
                 [] :
                 model.aggregate([...pipeline, {
                     $group: group
@@ -130,16 +134,16 @@ export class Base extends Model<Base> {
         orderBy?: string;
         sortOrder?: any;
     }) {
-        let sortCondition: any = {};
+        let sort: any = {};
         if (options.sort) {
             for (let key in options.sort) {
-                sortCondition[key] = parseInt(options.sort[key] || -1);
+                sort[key] = parseInt(options.sort[key] || -1);
             }
         } else if (options.orderBy) {
-            sortCondition[options.orderBy] = parseInt(options.sortOrder || -1);
+            sort[options.orderBy] = parseInt(options.sortOrder || -1);
         }
-        if (!sortCondition._id)
-            sortCondition._id = -1;
-        return sortCondition;
+        if (!sort._id)
+            sort._id = -1;
+        return sort;
     }
 }

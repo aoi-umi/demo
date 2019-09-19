@@ -13,6 +13,7 @@ import { Auth } from '@/_system/auth';
 import { Cache } from '@/_system/cache';
 import routes from '@/routes';
 import { ThirdPartyPayMapper } from '@/3rd-party';
+import { PayMapper } from './models/mongo/asset';
 
 export const logger = getLogger();
 
@@ -44,12 +45,22 @@ export async function init() {
     });
 
     await mq.ch.addSetup(async (ch: ConfirmChannel) => {
+        //支付通知处理
         let pnhCfg = config.dev.mq.payNotifyHandler;
         let payNotifyHandler = await MQ.delayTask(ch, pnhCfg);
+
+        //自动取消订单
+        let pacCfg = config.dev.mq.payAutoCancel;
+        let payAutoCancel = await MQ.delayTask(ch, pacCfg);
         return Promise.all([
             ...payNotifyHandler,
             mq.consumeRetry(ch, pnhCfg.deadLetterQueue, async (content) => {
                 await ThirdPartyPayMapper.notifyHandler(content);
+            }),
+
+            ...payAutoCancel,
+            mq.consumeRetry(ch, pacCfg.deadLetterQueue, async (content) => {
+                await PayMapper.cancel(content, { auto: true });
             }),
         ] as any);
     });

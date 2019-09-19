@@ -2,7 +2,7 @@
 
 import * as VaildSchema from '@/vaild-schema/class-valid';
 import { Auth } from '@/_system/auth';
-import { escapeRegExp } from '@/_system/common';
+import { escapeRegExp, error } from '@/_system/common';
 import * as helpers from '@/helpers';
 import * as config from '@/config';
 import { myEnum } from '@/config';
@@ -70,10 +70,40 @@ export class PayMapper {
     }
 
     static resetDetail(detail, opt: { user: LoginUser }) {
-        detail.canPay = detail.canCancel = false;
-        if (opt.user.equalsId(detail.userId)) {
-            detail.canPay = [myEnum.payStatus.未支付].includes(detail.status);
-            detail.canCancel = [myEnum.payStatus.未支付].includes(detail.status);
+        if (!opt.user.equalsId(detail.userId)) {
+            detail.canPay = detail.canCancel = false;
+        }
+    }
+
+    static async cancel(data: VaildSchema.PayCancel, opt: { auto?: boolean, user?: LoginUser }) {
+        let { user, auto } = opt;
+        let match: any = { _id: data._id };
+        if (!auto)
+            match.userId = user._id;
+        let detail = await PayModel.findOne(match);
+        if (!detail)
+            throw error('', config.error.NO_MATCH_DATA);
+        if (detail.status !== myEnum.payStatus.已取消) {
+            if (!detail.canCancel) {
+                if (auto)
+                    return;
+                throw error('当前状态无法取消');
+            }
+            let toStatus = myEnum.payStatus.已取消;
+            await detail.update({ status: toStatus });
+            detail.status = toStatus;
+        }
+        if (!auto) {
+            let obj = detail.toJSON();
+            let rtn = {
+                userId: obj.userId,
+                status: obj.status,
+                statusText: obj.statusText,
+                canCancel: obj.canCancel,
+                canPay: obj.canPay,
+            };
+            PayMapper.resetDetail(rtn, { user });
+            return rtn;
         }
     }
 }

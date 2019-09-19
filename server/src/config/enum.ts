@@ -50,6 +50,10 @@ export const enumDefine = {
         微信: 1,
         支付宝: 2,
     },
+    assetType: {
+        支付: 1,
+        退款: 2,
+    },
     assetLogStatus: {
         未完成: 0,
         已完成: 1,

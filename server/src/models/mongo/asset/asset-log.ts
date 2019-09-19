@@ -42,6 +42,17 @@ class AssetLogRemark {
 export class AssetLog extends Base {
 
     @prop({
+        enum: myEnum.assetType.getAllValue(),
+        required: true,
+    })
+    type: number;
+
+    @prop()
+    get typeText() {
+        return myEnum.assetType.getKey(this.type);
+    }
+
+    @prop({
         enum: myEnum.assetSourceType.getAllValue(),
         required: true,
     })

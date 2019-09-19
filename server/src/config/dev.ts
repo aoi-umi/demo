@@ -26,6 +26,10 @@ export default {
                 defaultDelayTime["30s"],
                 defaultDelayTime["1m"],
             ],
-        }
+        },
+        payAutoCancel: {
+            ...MQ.createQueueKey('payAutoCancel'),
+            delay: 1000 * 60 * 15,
+        },
     }
 };

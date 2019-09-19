@@ -8,12 +8,12 @@ import { NotifyMapper, NotifyInstanceType, NotifyModel } from "@/models/mongo/no
 
 import { alipayInst } from "./alipay";
 
-type NotifyType = {
+export type NotifyType = {
     notifyId: any,
 };
 export class ThirdPartyPayMapper {
 
-    static async create(data: {
+    static async createPay(data: {
         type: number,
         pay: PayInstanceType
     }) {
@@ -23,6 +23,7 @@ export class ThirdPartyPayMapper {
             orderId: pay._id,
             orderNo: pay._id,
             moneyCent: pay.moneyCent,
+            type: myEnum.assetType.支付
         });
         let payRs: {
             url?: string
@@ -43,10 +44,6 @@ export class ThirdPartyPayMapper {
             assetLog,
             payResult: payRs
         };
-    }
-
-    static sendNotifyQueue(data: NotifyType) {
-        return mq.sendToQueueDelayByConfig(config.dev.mq.payNotifyHandler, data);
     }
 
     static async notifyHandler(data: NotifyType) {
