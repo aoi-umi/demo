@@ -66,7 +66,7 @@ export const enumDefine = {
     },
     payRefundStatus: {
         未退款: 0,
-        退款中: 1,
+        已申请: 1,
         已退款: 2,
     },
     notifyType: {

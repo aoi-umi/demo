@@ -3,7 +3,7 @@ import { Type, Transform } from "class-transformer";
 import { Types } from 'mongoose';
 
 import { myEnum } from "@/config";
-import { ListBase } from "./base";
+import { ListBase, DetailQueryBase } from "./base";
 import { objectIdTransform } from "./util";
 
 export class PayCreate {
@@ -30,10 +30,13 @@ export class PaySubmit {
     _id: Types.ObjectId;
 }
 
-export class PayCancel {
-    @IsDefined()
-    @Transform(objectIdTransform)
-    _id: Types.ObjectId;
+export class PayCancel extends DetailQueryBase {
+}
+
+export class PayRefundApply extends DetailQueryBase {
+}
+
+export class PayRefund extends DetailQueryBase {
 }
 
 export class PayQuery extends ListBase {

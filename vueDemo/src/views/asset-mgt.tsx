@@ -108,6 +108,9 @@ export class AssetMgtLog extends Base {
                     title: '支付方式',
                     key: 'sourceTypeText',
                 }, {
+                    title: '类型',
+                    key: 'typeText',
+                }, {
                     title: '状态',
                     key: 'statusText',
                 }, {

@@ -56,6 +56,9 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
     paySubmit,
     payCancel,
     payQuery,
+    payRefundApply,
+    payRefund,
+
     assetLogQuery,
     assetNotifyQuery,
     assetNotifyRetry,
@@ -289,6 +292,13 @@ export class TestApi extends ApiModel<TestApiMethod> {
     async payQuery(data) {
         return this.requestByConfig<ListResult>(this.apiConfig.method.payQuery, { data });
     }
+    async payRefundApply(data) {
+        return this.requestByConfig(this.apiConfig.method.payRefundApply, { data });
+    }
+    async payRefund(data) {
+        return this.requestByConfig(this.apiConfig.method.payRefund, { data });
+    }
+
     async assetLogQuery(data) {
         return this.requestByConfig<ListResult>(this.apiConfig.method.assetLogQuery, { data });
     }

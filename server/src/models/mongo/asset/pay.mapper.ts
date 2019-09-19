@@ -12,6 +12,9 @@ import { BaseMapper } from "../_base";
 import { UserMapper } from '../user';
 import { AssetLogMapper } from './asset-log.mapper';
 import { PayModel } from "./pay";
+import { AssetLogModel } from './asset-log';
+import { transaction } from '@/_system/dbMongo';
+import { RefundModel } from './refund';
 
 export class PayMapper {
     static async query(data: VaildSchema.PayQuery, opt: {
@@ -71,8 +74,18 @@ export class PayMapper {
 
     static resetDetail(detail, opt: { user: LoginUser }) {
         if (!opt.user.equalsId(detail.userId)) {
-            detail.canPay = detail.canCancel = false;
+            detail.canPay = detail.canCancel = detail.canRefundApply = false;
         }
+        if (!Auth.contains(opt.user, config.auth.payMgtOperate)) {
+            detail.canRefund = false;
+        }
+    }
+
+    static async queryOne(match) {
+        let detail = await PayModel.findOne(match);
+        if (!detail)
+            throw error('', config.error.NO_MATCH_DATA);
+        return detail;
     }
 
     static async cancel(data: VaildSchema.PayCancel, opt: { auto?: boolean, user?: LoginUser }) {
@@ -80,9 +93,7 @@ export class PayMapper {
         let match: any = { _id: data._id };
         if (!auto)
             match.userId = user._id;
-        let detail = await PayModel.findOne(match);
-        if (!detail)
-            throw error('', config.error.NO_MATCH_DATA);
+        let detail = await PayMapper.queryOne(match);
         if (detail.status !== myEnum.payStatus.已取消) {
             if (!detail.canCancel) {
                 if (auto)
@@ -105,5 +116,42 @@ export class PayMapper {
             PayMapper.resetDetail(rtn, { user });
             return rtn;
         }
+    }
+
+    static async refundApply(data: VaildSchema.PayRefundApply, opt: { user: LoginUser }) {
+        let { user } = opt;
+        let pay = await PayMapper.queryOne({ _id: data._id, userId: user._id });
+        if (!pay.canRefundApply)
+            throw error('当前状态无法申请退款');
+
+        let refund = new RefundModel({
+            userId: user._id,
+            type: pay.type,
+            moneyCent: pay.moneyCent,
+            payOrderNo: pay.orderNo
+        });
+        let payAssetLog = await AssetLogModel.findById(pay.assetLogId);
+        let assetLog = new AssetLogModel({
+            sourceType: pay.type,
+            orderId: refund._id,
+            orderNo: refund.orderNo,
+            moneyCent: refund.moneyCent,
+            type: myEnum.assetType.退款,
+            status: myEnum.assetLogStatus.未完成,
+            outOrderNo: payAssetLog.outOrderNo,
+        });
+        let refundStatus = myEnum.payRefundStatus.已申请;
+        await transaction(async (session) => {
+            await refund.save({ session });
+            await assetLog.save({ session });
+            await pay.update({ refundStatus }, { session });
+        });
+        return {
+            pay: {
+                refundStatus,
+                refundStatusText: myEnum.payRefundStatus.getKey(refundStatus),
+                canRefundApply: false,
+            }
+        };
     }
 }
