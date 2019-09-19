@@ -1,14 +1,12 @@
 import { RequestHandler } from 'express';
 
 import { transaction } from '@/_system/dbMongo';
-import { error, escapeRegExp } from '@/_system/common';
+import { error } from '@/_system/common';
 import { myEnum } from '@/config';
 import { responseHandler, paramsValid } from '@/helpers';
 import * as VaildSchema from '@/vaild-schema/class-valid';
-import { FollowMapper, FollowModel } from '@/models/mongo/follow';
+import { FollowMapper } from '@/models/mongo/follow';
 import { UserModel, UserMapper } from '@/models/mongo/user';
-import { BaseMapper } from '@/models/mongo/_base';
-import { FileMapper } from '@/models/mongo/file';
 
 export let save: RequestHandler = (req, res) => {
     responseHandler(async () => {

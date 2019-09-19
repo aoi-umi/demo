@@ -94,6 +94,16 @@ export class Pay extends Base {
         }
     })
     refundMoneyCent: number;
+
+    @prop()
+    get canPay() {
+        return [myEnum.payStatus.未支付].includes(this.status);
+    }
+
+    @prop()
+    get canCancel() {
+        return [myEnum.payStatus.未支付].includes(this.status);
+    }
 }
 
 export const PayModel = getModelForClass<Pay, typeof Pay>(Pay);
