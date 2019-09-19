@@ -180,6 +180,13 @@ const config = {
                     url: '/pay/query',
                     method: 'get',
                 },
+                payRefundApply: {
+                    url: '/pay/refundApply',
+                },
+                payRefund: {
+                    url: '/pay/refund',
+                },
+
                 assetLogQuery: {
                     url: '/asset/logQuery',
                     method: 'get',

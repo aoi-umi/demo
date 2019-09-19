@@ -29,7 +29,7 @@ export default {
         },
         payAutoCancel: {
             ...MQ.createQueueKey('payAutoCancel'),
-            delay: 1000 * 60 * 15,
+            delay: 1000 * 60 * 16,
         },
     }
 };

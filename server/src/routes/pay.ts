@@ -5,10 +5,10 @@ import { transaction } from '@/_system/dbMongo';
 import { myEnum } from '@/config';
 import { alipayInst, ThirdPartyPayMapper } from '@/3rd-party';
 import { SendQueue } from '@/task';
+import { error } from '@/_system/common';
 import * as VaildSchema from '@/vaild-schema/class-valid';
 
 import { PayModel, AssetLogModel, PayMapper } from '@/models/mongo/asset';
-import { NotifyMapper } from '@/models/mongo/notify';
 
 export let create: RequestHandler = (req, res) => {
     responseHandler(async () => {
@@ -19,7 +19,6 @@ export let create: RequestHandler = (req, res) => {
             userId: user._id,
         });
         let { assetLog, payResult } = await ThirdPartyPayMapper.createPay({
-            type: data.type,
             pay,
         });
         pay.assetLogId = assetLog._id;
@@ -61,14 +60,20 @@ export let query: RequestHandler = (req, res) => {
     }, req, res);
 };
 
-export let alipayNotify: RequestHandler = async (req, res) => {
-    let data = req.body;
-    let rs = await alipayInst.payNotifyHandler({ ...data }, async (notify) => {
-        let notifyType = myEnum.notifyType.支付宝;
-        let notifyObj = await NotifyMapper.create({ type: notifyType, value: notify, raw: data });
-        await notifyObj.notify.save();
+export let refundApply: RequestHandler = (req, res) => {
+    responseHandler(async () => {
+        let user = req.myData.user;
+        let data = paramsValid(req.body, VaildSchema.PayRefundApply);
+        let rs = await PayMapper.refundApply(data, { user });
+        return rs.pay;
+    }, req, res);
+};
 
-        SendQueue.payNotify({ notifyId: notifyObj.notify._id });
-    });
-    res.send(rs);
+export let refund: RequestHandler = (req, res) => {
+    responseHandler(async () => {
+        let user = req.myData.user;
+        let data = paramsValid(req.body, VaildSchema.PayRefund);
+        let rs = await ThirdPartyPayMapper.refund({ _id: data._id });
+        return rs.pay;
+    }, req, res);
 };

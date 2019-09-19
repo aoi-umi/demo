@@ -1,12 +1,14 @@
 import { myEnum } from "@/config";
-import * as config from "@/config";
-import { logger, mq } from "@/_main";
+import { logger } from "@/_main";
 import * as common from "@/_system/common";
 
-import { AssetLogModel, PayInstanceType, AssetLogInstanceType, PayModel } from "@/models/mongo/asset";
+import { AssetLogModel, PayInstanceType, AssetLogInstanceType, PayModel, PayMapper } from "@/models/mongo/asset";
 import { NotifyMapper, NotifyInstanceType, NotifyModel } from "@/models/mongo/notify";
 
 import { alipayInst } from "./alipay";
+import { PayRefund } from "@/vaild-schema/class-valid";
+import { RefundModel } from "@/models/mongo/asset/refund";
+import { transaction } from "@/_system/dbMongo";
 
 export type NotifyType = {
     notifyId: any,
@@ -14,35 +16,64 @@ export type NotifyType = {
 export class ThirdPartyPayMapper {
 
     static async createPay(data: {
-        type: number,
         pay: PayInstanceType
     }) {
         let pay = data.pay;
         let assetLog = new AssetLogModel({
-            sourceType: data.type,
+            sourceType: pay.type,
             orderId: pay._id,
-            orderNo: pay._id,
+            orderNo: pay.orderNo,
             moneyCent: pay.moneyCent,
             type: myEnum.assetType.支付
         });
         let payRs: {
             url?: string
         } = {};
-        switch (data.type) {
-            case myEnum.assetSourceType.微信:
-                break;
-            case myEnum.assetSourceType.支付宝:
-                assetLog.req = payRs.url = alipayInst.pagePay({
-                    out_trade_no: pay._id,
-                    subject: pay.title || '无标题',
-                    total_amount: pay.money,
-                    body: pay.content || '无内容',
-                });
-                break;
+        if (assetLog.sourceType === myEnum.assetSourceType.微信) {
+
+        } else if (assetLog.sourceType === myEnum.assetSourceType.支付宝) {
+            assetLog.req = payRs.url = alipayInst.pagePay({
+                out_trade_no: assetLog.orderNo,
+                subject: pay.title || '无标题',
+                total_amount: pay.money,
+                body: pay.content || '无内容',
+                timeout_express: '15m',
+            });
         }
         return {
             assetLog,
             payResult: payRs
+        };
+    }
+
+    static async refund(data: PayRefund) {
+        let pay = await PayMapper.queryOne({ _id: data._id });
+        if (!pay.canRefund)
+            throw common.error('当前状态无法退款');
+        let refund = await RefundModel.findOne({ payOrderNo: pay.orderNo });
+        let assetLog = await AssetLogModel.findOne({ orderId: refund._id });
+
+        if (assetLog.sourceType === myEnum.assetSourceType.微信) {
+
+        } else if (assetLog.sourceType === myEnum.assetSourceType.支付宝) {
+            await alipayInst.refund({
+                out_trade_no: pay.orderNo,
+                refund_amount: pay.money,
+                out_request_no: refund.orderNo,
+            });
+        }
+        let refundStatus = myEnum.payRefundStatus.已退款;
+        await transaction(async (session) => {
+            await refund.update({ status: refundStatus }, { session });
+            await assetLog.update({ status: myEnum.assetLogStatus.已完成 }, { session });
+            await pay.update({ refundStatus, refundMoneyCent: refund.moneyCent + pay.refundMoneyCent }, { session });
+        });
+        return {
+            pay: {
+                refundStatus,
+                refundStatusText: myEnum.payRefundStatus.getKey(refundStatus),
+                canRefund: false,
+            }
         };
     }
 

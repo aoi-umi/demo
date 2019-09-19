@@ -87,7 +87,13 @@ router.post('/pay/create', UserAuthMid.normal([auth.login]), pay.create);
 router.post('/pay/submit', UserAuthMid.normal([auth.login]), pay.submit);
 router.post('/pay/cancel', UserAuthMid.normal([auth.login]), pay.cancel);
 router.get('/pay/query', UserAuthMid.normal([auth.login]), pay.query);
-router.post('/alipay/notify', pay.alipayNotify);
+router.post('/pay/refundApply', UserAuthMid.normal([auth.login]), pay.refundApply);
+router.post('/pay/refund', UserAuthMid.normal([auth.payMgtOperate]), pay.refund);
+//#endregion
+
+//#region notify 
+import * as notify from './notify';
+router.post('/alipay/notify', notify.alipayNotify);
 //#endregion
 
 //#region asset 

@@ -166,6 +166,14 @@ export default class Pay extends Base {
     delIds = [];
     statusList: TagType[] = [];
 
+    private updateRow(detail, rs) {
+        let data = this.$refs.list.result.data;
+        data.splice(data.findIndex(ele => ele._id === detail._id), 1, {
+            ...detail,
+            ...rs,
+        });
+    }
+
     private getColumns() {
         let columns = [];
         if (this.storeUser.user.hasAuth(authority.payMgtQuery)) {
@@ -219,6 +227,10 @@ export default class Pay extends Base {
             key: 'statusText',
             minWidth: 80,
         }, {
+            title: '退款状态',
+            key: 'refundStatusText',
+            minWidth: 80,
+        }, {
             title: '创建时间',
             key: 'createdAt',
             minWidth: 80,
@@ -247,16 +259,28 @@ export default class Pay extends Base {
 
                             //调用支付宝 `alipays://platformapi/startapp?appId=20000067&url=${encodeURI(url)}`
                         }}>支付</a>}
-                        {detail.canCancel && <a on-click={() => {
+                        {detail.canRefundApply && <a on-click={() => {
+                            this.operateHandler('申请退款', async () => {
+                                let rs = await testApi.payRefundApply({
+                                    _id: detail._id,
+                                });
+                                this.updateRow(detail, rs);
+                            });
+                        }}>申请退款</a>}
+                        {detail.canRefund && <a on-click={() => {
+                            this.operateHandler('退款', async () => {
+                                let rs = await testApi.payRefund({
+                                    _id: detail._id,
+                                });
+                                this.updateRow(detail, rs);
+                            });
+                        }}>退款</a>}
+                        {detail.canCancel && this.storeUser.user.hasAuth(authority.payMgtOperate) && <a on-click={() => {
                             this.operateHandler('取消', async () => {
                                 let rs = await testApi.payCancel({
                                     _id: detail._id,
                                 });
-                                let data = this.$refs.list.result.data;
-                                data.splice(data.findIndex(ele => ele._id === detail._id), 1, {
-                                    ...detail,
-                                    ...rs,
-                                });
+                                this.updateRow(detail, rs);
                             });
                         }}>取消</a>}
                     </div>

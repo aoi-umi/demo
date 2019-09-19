@@ -22,6 +22,12 @@ export type PayDocType = DocType<PayInstanceType>;
     }
 })
 export class Pay extends Base {
+    @prop()
+    get orderNo() {
+        //临时
+        return this._id.toString()
+    };
+
     @prop({
         type: SchemaTypes.ObjectId,
         required: true
@@ -89,8 +95,9 @@ export class Pay extends Base {
 
     @prop({
         type: Int32,
+        default: 0,
         validate: (val) => {
-            return val > 0;
+            return val >= 0;
         }
     })
     refundMoneyCent: number;
@@ -103,6 +110,16 @@ export class Pay extends Base {
     @prop()
     get canCancel() {
         return [myEnum.payStatus.未支付].includes(this.status);
+    }
+
+    @prop()
+    get canRefundApply() {
+        return [myEnum.payStatus.已支付].includes(this.status) && [myEnum.payRefundStatus.未退款].includes(this.refundStatus);
+    }
+
+    @prop()
+    get canRefund() {
+        return [myEnum.payRefundStatus.已申请].includes(this.refundStatus);
     }
 }
 
