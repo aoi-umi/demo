@@ -12,6 +12,14 @@ class MyLoad extends Vue {
     @Prop()
     renderFn: (data: any) => any;
 
+    @Prop()
+    width?: number;
+
+    @Prop({
+        default: 200
+    })
+    height?: number;
+
     loading = false;
     result = {
         success: false,
@@ -36,7 +44,7 @@ class MyLoad extends Vue {
         if (!this.result.success) {
             return (
                 <div style={{ position: 'relative', }}>
-                    <Card class="center" style={{ height: '200px', }}>
+                    <Card class="center" style={{ height: this.height ? this.height + 'px' : null, width: this.width ? this.width + 'px' : null }}>
                         {this.loading ? <Spin size="large" fix /> :
                             <div class="center" style={{ flexFlow: 'column' }}>
                                 {this.result.msg}
