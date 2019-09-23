@@ -6,6 +6,7 @@ import * as echarts from 'echarts/lib/echarts';
 import 'video.js/dist/video-js.css';
 import 'vue-video-player/src/custom-theme.css';
 import { videoPlayer } from 'vue-video-player';
+import * as  QRCode from 'qrcode';
 
 import { Input, Card, Button, ColorPicker, Row, Col, Checkbox } from '@/components/iview';
 import { MyList, IMyList } from '@/components/my-list';
@@ -37,7 +38,7 @@ export default class App extends Base {
         dom?: HTMLElement,
         refName?: string;
     }[] = [];
-    $refs: { board: HTMLElement; list: IMyList<any>; echart: HTMLDivElement };
+    $refs: { board: HTMLElement; list: IMyList<any>; echart: HTMLDivElement, canvas: HTMLDivElement };
     richText = '';
     chart: echarts.ECharts;
     chartAddData = '';
@@ -51,6 +52,13 @@ export default class App extends Base {
         this.$refs.list.query();
         this.chart = echarts.init(this.$refs.echart);
         this.setECharts();
+        this.qrcode();
+    }
+
+    async qrcode() {
+        await QRCode.toCanvas(this.$refs.canvas, 'qrcode').catch(e => {
+            console.error(e);
+        });
     }
 
     setECharts() {
@@ -270,6 +278,7 @@ export default class App extends Base {
                         }
                     }} />
                 </div>
+                <canvas ref="canvas"></canvas>
 
                 <MyList ref="list" type="custom" infiniteScroll
                     customQueryNode={
