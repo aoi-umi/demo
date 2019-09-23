@@ -94,6 +94,7 @@ router.post('/pay/refund', UserAuthMid.normal([auth.payMgtOperate]), pay.refund)
 //#region notify 
 import * as notify from './notify';
 router.post('/alipay/notify', notify.alipayNotify);
+router.post('/wxpay/notify', notify.wxpayNotify);
 //#endregion
 
 //#region asset 

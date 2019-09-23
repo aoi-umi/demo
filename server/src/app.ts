@@ -4,6 +4,7 @@ import * as express from 'express';
 import * as logger from 'morgan';
 import * as cookieParser from 'cookie-parser';
 import * as bodyParser from 'body-parser';
+import * as bodyParserXml from 'body-parser-xml';
 import * as cors from 'cors';
 import { AddressInfo } from 'net';
 import 'reflect-metadata';
@@ -11,6 +12,7 @@ import * as mongoose from 'mongoose';
 
 import * as config from '@/config';
 
+bodyParserXml(bodyParser);
 debug('my-application');
 (async () => {
     await mongoose.connect(config.env.mongoose.uri, config.env.mongoose.options);
@@ -25,6 +27,7 @@ debug('my-application');
     app.set('port', process.env.PORT || config.env.port);
 
     app.use(logger('dev'));
+    app.use(bodyParser['xml']({ xmlParseOptions: { explicitArray: false } }));
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: false }));
     app.use(cookieParser());

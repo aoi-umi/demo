@@ -12,6 +12,7 @@ let processEnv: {
 const urlPrefix = '/devMgt';
 const envDir = path.resolve(__dirname, '../../env');
 let host = processEnv.Host || 'http://localhost';
+let hostWithPrefix = host + urlPrefix;
 let name = 'devMgt';
 export default {
     name,
@@ -45,9 +46,21 @@ export default {
     ali: {
         sandbox: true,
         appId: '2016100100641227',
-        payNotifyUrl: host + urlPrefix + '/alipay/notify',
-        refundNotifyUrl: host + urlPrefix + '/alipay/refund/notify',
+        payNotifyUrl: hostWithPrefix + '/alipay/notify',
+        refundNotifyUrl: hostWithPrefix + '/alipay/refund/notify',
         rsaPublicPath: path.join(envDir, '/alipay/pub.txt'),
         rsaPrivatePath: path.join(envDir, '/alipay/pri.txt'),
+    },
+    wx: {
+        sandbox: true,
+        payNotifyUrl: hostWithPrefix + '/wxpay/notify',
+        mch_id: '',
+        pay: {
+            key: '',
+            certPath: path.join(envDir, 'wxpay/apiclient_cert.p12'),
+        },
+        app: {
+            appId: '',
+        },
     }
 };
