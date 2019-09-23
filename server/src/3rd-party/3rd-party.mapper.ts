@@ -65,7 +65,12 @@ export class ThirdPartyPayMapper {
         let assetLog = await AssetLogModel.findOne({ orderId: refund._id });
 
         if (assetLog.sourceType === myEnum.assetSourceType.微信) {
-
+            await wxpayInst.refund({
+                out_trade_no: pay.orderNo,
+                out_refund_no: refund.orderNo,
+                total_fee: pay.moneyCent,
+                refund_fee: pay.moneyCent,
+            });
         } else if (assetLog.sourceType === myEnum.assetSourceType.支付宝) {
             await alipayInst.refund({
                 out_trade_no: pay.orderNo,
@@ -108,7 +113,12 @@ export class ThirdPartyPayMapper {
                         throw common.error('金额不一致');
                     }
                 } else {
-                    throw common.error('未实现');
+                    let rs = await wxpayInst.orderQuery({
+                        out_trade_no: assetLog.orderNo
+                    });
+                    if (parseFloat(rs.total_fee as any) !== assetLog.moneyCent) {
+                        throw common.error('金额不一致');
+                    }
                 }
                 await assetLog.update({ status: myEnum.assetLogStatus.已完成 });
             }
