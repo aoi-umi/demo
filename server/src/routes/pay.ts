@@ -3,7 +3,7 @@ import { RequestHandler } from 'express';
 import { responseHandler, paramsValid } from '@/helpers';
 import { transaction } from '@/_system/dbMongo';
 import { myEnum } from '@/config';
-import { alipayInst, ThirdPartyPayMapper } from '@/3rd-party';
+import { ThirdPartyPayMapper } from '@/3rd-party';
 import { SendQueue } from '@/task';
 import { error } from '@/_system/common';
 import * as VaildSchema from '@/vaild-schema/class-valid';
