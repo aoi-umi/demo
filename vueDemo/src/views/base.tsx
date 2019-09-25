@@ -3,8 +3,9 @@ import { getModule } from 'vuex-module-decorators';
 import LoginUserStore from '@/store/loginUser';
 import { dev, error } from '@/config';
 import SettingStore from '@/store/setting';
+import { MyBase } from '@/components/MyBase';
 
-export class Base extends Vue {
+export class Base extends MyBase {
     protected get storeUser() {
         return getModule(LoginUserStore, this.$store);
     }

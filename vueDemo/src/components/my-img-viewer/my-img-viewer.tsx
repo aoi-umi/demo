@@ -2,13 +2,12 @@ import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { convClass } from '@/helpers';
 import { Carousel, CarouselItem, Icon, Button } from '../iview';
 import { MyImg } from '../my-img';
+import { MyBase } from '../MyBase';
 import * as style from '../style';
 import './my-img-viewer.less';
 
-const clsPrefix = 'my-img-viewer-';
-
 @Component
-class MyImgViewer extends Vue {
+class MyImgViewer extends MyBase {
     @Prop({
         default: ''
     })
@@ -28,6 +27,7 @@ class MyImgViewer extends Vue {
     hide() {
         this.visible = false;
     }
+    stylePrefix = 'my-img-viewer-';
 
     render() {
         let list = this.src instanceof Array ? this.src : [this.src];
@@ -42,21 +42,21 @@ class MyImgViewer extends Vue {
                 }} on-mousewheel={(event) => {
                     event.preventDefault();
                 }}>
-                    <div class={clsPrefix + 'box'} on-click={(event) => {
+                    <div class={this.getStyleName('box')} on-click={(event) => {
                         event.stopPropagation();
                     }}>
                         <Carousel easing="easing" arrow={mutli ? 'hover' : 'never'} dots={mutli ? 'inside' : 'none'}>
                             {list.map(src => {
                                 return (
                                     <CarouselItem>
-                                        <div class={clsPrefix + 'item'}>
-                                            <MyImg class={clsPrefix + 'img'} src={src} />
+                                        <div class={this.getStyleName('item')}>
+                                            <MyImg class={this.getStyleName('img')} src={src} />
                                         </div>
                                     </CarouselItem>
                                 );
                             })}
                         </Carousel>
-                        <Button shape="circle" icon="md-close" type="error" class={clsPrefix + 'close-btn'} on-click={this.hide} />
+                        <Button shape="circle" icon="md-close" type="error" class={this.getStyleName('close-btn')} on-click={this.hide} />
                     </div>
                 </div >}
             </transition>

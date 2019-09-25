@@ -1,12 +1,11 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { convClass } from '@/helpers';
 import { Icon } from '../iview';
+import { MyBase } from '../MyBase';
 import './my-img.less';
 
-const clsPrefix = 'my-img-';
-
 @Component
-class MyImg extends Vue {
+class MyImg extends MyBase {
     @Prop()
     src?: string;
 
@@ -26,6 +25,7 @@ class MyImg extends Vue {
 
     $refs: { img: HTMLElement }
     private isLoadSuccess = !!this.src;
+    stylePrefix = 'my-img-';
 
     handleError(e) {
         this.isLoadSuccess = false;
@@ -33,10 +33,10 @@ class MyImg extends Vue {
 
     render() {
         return (
-            <div class={clsPrefix + 'root'}>
+            <div class={this.getStyleName('root')}>
                 {!this.src ?
                     <Icon type="md-image" size={40} style={{ lineHeight: '90px' }} /> :
-                    <img ref="img" class={clsPrefix + 'image'} v-show={this.isLoadSuccess} on-error={this.handleError} src={this.src} alt={this.alt} />
+                    <img ref="img" class={this.getStyleName('image')} v-show={this.isLoadSuccess} on-error={this.handleError} src={this.src} alt={this.alt} />
                 }
                 {this.src && !this.isLoadSuccess &&
                     (this.failImg ? <img src={this.failImg} alt={this.alt} /> :

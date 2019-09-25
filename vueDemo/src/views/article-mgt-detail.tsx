@@ -13,6 +13,8 @@ import { ArticleMgtBase } from './article-mgt';
 import { UserAvatarView } from './comps/user-avatar';
 import { MyList } from '@/components/my-list';
 
+import './article.less';
+
 export type DetailType = {
     detail: DetailDataType;
     log?: any[];
@@ -92,6 +94,7 @@ export default class ArticleDetail extends ArticleMgtBase {
         }
     }
 
+    stylePrefix = "article-mgt-";
     $refs: { formVaild: iview.Form, editor: IMyEditor, upload: IMyUpload, loadView: IMyLoad };
 
     mounted() {
@@ -266,7 +269,7 @@ export default class ArticleDetail extends ArticleMgtBase {
                         <Input v-model={detail.profile} type="textarea" />
                     </FormItem>
                     <FormItem label="内容" prop="content">
-                        <MyEditor ref="editor" class="article-mgt-detail-content"
+                        <MyEditor ref="editor" class={this.getStyleName('detail-content')}
                             v-model={detail.content}
                             placeholder='输点啥。。。'
                             img-change={(file) => {

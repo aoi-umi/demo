@@ -12,6 +12,8 @@ import { Base } from './base';
 import { UserAvatarView } from './comps/user-avatar';
 import { UserPoptipView } from './comps/user-poptip';
 
+import './comment.less';
+
 @Component
 class Comment extends Base {
     @Prop()
@@ -23,6 +25,7 @@ class Comment extends Base {
     @Prop()
     type: number;
 
+    stylePrefix = 'comment-';
     $refs: { list: IMyList<any>, replyList: IMyList<any> };
     mounted() {
         this.query();
@@ -125,7 +128,7 @@ class Comment extends Base {
         return (
             <div style={{ marginTop: '10px' }}>
                 <MyEditor
-                    class="comment-send"
+                    class={this.getStyleName('send')}
                     toolbar={
                         [
                             ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
@@ -169,7 +172,7 @@ class Comment extends Base {
             };
         }
         return (
-            <div class={!reply ? "comment" : "comment-reply"} key={ele._id}>
+            <div class={this.getStyleName(!reply ? "main" : "reply")} key={ele._id}>
                 <div style={{ position: 'relative' }}>
                     {ele.user && <UserAvatarView user={ele.user} isAuthor={ele.user._id === this.ownUserId} />}
                     <span style={{ position: 'absolute', right: '5px' }}>
@@ -205,7 +208,7 @@ class Comment extends Base {
                 </div>
                 {(ele.replyList && ele.replyList.length > 0)
                     && ele.replyList.map(reply => this.renderComment(reply, true)).concat(
-                        <div class="comment-reply center" style={{ padding: '5px' }}>
+                        <div class={this.getStyleName('reply').concat(['center'])} style={{ padding: '5px' }}>
                             <a on-click={() => {
                                 this.replyShow = true;
                                 this.currComment = {

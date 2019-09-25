@@ -6,11 +6,11 @@ import axios, { AxiosRequestConfig } from 'axios';
 import { VueCropper } from 'vue-cropper';
 import { MyImg } from '../my-img';
 import { Utils } from '../utils';
+import { MyImgViewer, IMyImgViewer } from '../my-img-viewer';
+import { MyBase } from '../MyBase';
+
 import * as style from '../style';
 import './my-upload.less';
-import { MyImgViewer, IMyImgViewer } from '../my-img-viewer';
-
-const clsPrefix = 'my-upload-';
 
 type FileType = {
     name?: string;
@@ -38,7 +38,7 @@ type CropperOption = {
 @Component({
     VueCropper
 })
-class MyUpload extends Vue {
+class MyUpload extends MyBase {
     @Prop()
     uploadUrl: string;
 
@@ -97,6 +97,7 @@ class MyUpload extends Vue {
 
     @Prop()
     cropperOptions?: CropperOption;
+    stylePrefix = 'my-upload-';
 
     $refs: { upload: iview.Upload & { fileList: FileType[] }, cropper: any, imgViewer: IMyImgViewer };
 
@@ -280,7 +281,7 @@ class MyUpload extends Vue {
             <div>
                 {this.fileList.map(item => {
                     return (
-                        <div class={[clsPrefix + 'item', this.shape == 'circle' ? style.cls.circle : '']} style={{ width, height }}>
+                        <div class={[...this.getStyleName('item'), this.shape == 'circle' ? style.cls.circle : '']} style={{ width, height }}>
                             <div style={{
                                 width: 'inherit',
                                 height: 'inherit',
@@ -289,7 +290,7 @@ class MyUpload extends Vue {
                                     width: 'inherit',
                                     height: 'inherit',
                                 }} src={item.url || item.data} />
-                                <div class={clsPrefix + 'item-cover'} style={{ lineHeight: height }}>
+                                <div class={this.getStyleName('item-cover')} style={{ lineHeight: height }}>
                                     {item.originData && <Icon type="md-create" nativeOn-click={() => { this.handleEdit(item); }} />}
                                     <Icon type="md-camera" nativeOn-click={() => {
                                         this.handleSelectFile(item);
@@ -303,7 +304,7 @@ class MyUpload extends Vue {
                 })}
 
                 <Upload
-                    class={clsPrefix + 'upload'}
+                    class={this.getStyleName('upload')}
                     v-show={!this.getHideUpload()}
                     ref="upload"
                     show-upload-list={false}
@@ -338,7 +339,7 @@ class MyUpload extends Vue {
                                 <VueCropper
                                     ref="cropper"
                                     props={this.cropper}
-                                    class={this.shape == 'circle' ? clsPrefix + 'cropper-circle' : ''}
+                                    class={this.shape == 'circle' ? this.getStyleName('cropper-circle') : ''}
                                 />
                             </div>
                             <div>

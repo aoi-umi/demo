@@ -10,4 +10,8 @@ export class Utils {
         }
         return new File([u8arr], filename, { type: mime });
     }
+
+    static getStyleName(stylePrefix: string, ...args: string[]) {
+        return args.map(ele => stylePrefix + ele);
+    }
 }
