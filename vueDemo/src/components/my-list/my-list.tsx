@@ -7,6 +7,7 @@ import {
 import './my-list.less';
 import { MyListModel } from './model';
 import { ListResult } from '@/api';
+import { MyBase } from '../MyBase';
 
 type QueryArgsType = {
     [key: string]: {
@@ -24,7 +25,6 @@ const event = {
 const clsPrefix = 'my-list-';
 
 export const Const = {
-    clsPrefix,
     clsActBox: clsPrefix + "action-box"
 };
 
@@ -38,7 +38,7 @@ export type ResultType = {
 export type OnSortChangeOptions = { column: any, key: string, order: string };
 
 @Component
-class MyList<QueryArgs extends QueryArgsType> extends Vue {
+class MyList<QueryArgs extends QueryArgsType> extends MyBase {
     @Prop({
         default: 'table'
     })
@@ -108,6 +108,8 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
 
     @Prop()
     queryFn?: (data: any) => ListResult | Promise<ListResult>;
+
+    stylePrefix = clsPrefix;
 
     protected created() {
         if (this.type == 'table' && !this.columns) {
@@ -237,7 +239,7 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
     loadedLastPage = false;
 
     private get bottomBarClass() {
-        let cls = [clsPrefix + 'bottom-bar'];
+        let cls = this.getStyleName('bottom-bar');
         if (this.multiOperateBtnList.length && this.selectedRows.length) {
             cls.push('active');
         }
@@ -269,7 +271,7 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
                                 <Icon type={this.showQuery ? 'ios-arrow-up' : 'ios-arrow-down'} />
                             </div>
                         </div>
-                        <div class={[clsPrefix + 'query-args-box'].concat(this.showQuery ? '' : 'collapsed')} on-keypress={this.handlePress}>
+                        <div class={this.getStyleName('query-args-box').concat(this.showQuery ? '' : 'collapsed')} on-keypress={this.handlePress}>
                             <Row gutter={5}>
                                 {this.queryArgs && Object.entries(this.queryArgs).map(entry => {
                                     let key = entry[0];
@@ -347,7 +349,7 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
                     {!this.infiniteScroll && !this.hidePage && (this.result.total / this.model.page.size > 1) &&
                         <Page
                             ref="page"
-                            class={clsPrefix + "page"} total={this.result.total}
+                            class={this.getStyleName('page')} total={this.result.total}
                             placement="top"
                             current={this.model.page.index}
                             page-size={this.model.page.size}
@@ -368,7 +370,7 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue {
                     {!this.infiniteScroll ?
                         this.loading && <Spin size="large" fix /> :
                         <div class={(() => {
-                            let cls = [clsPrefix + 'bottom-loading'];
+                            let cls = this.getStyleName('bottom-loading');
                             if (this.loading || !this.result.success || !this.isScrollEnd()) {
                             } else {
                                 cls.push('invisibility');

@@ -1,37 +1,39 @@
 @prefix: my-list-;
-.@{prefix}page {
-  text-align: right;
-  margin: 5px;
-}
-
-.@{prefix}action-box > * {
-  margin: 5px;
-}
-
-.@{prefix}bottom-bar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 12;
-  transform: translateY(100%);
-
-  &.active {
-    transform: translateY(0%);
+.@{prefix} {
+  &page {
+    text-align: right;
+    margin: 5px;
   }
-}
 
-.@{prefix}query-args-box {
-  transition: max-height 0.3s ease;
-  max-height: 600px;
-  &.collapsed {
-    max-height: 0;
-    overflow: hidden;
+  &action-box > * {
+    margin: 5px;
   }
-}
 
-.@{prefix}bottom-loading {
-  min-height: 37px;
-  margin-top: 5px;
-  text-align: center;
+  &bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 12;
+    transform: translateY(100%);
+
+    &.active {
+      transform: translateY(0%);
+    }
+  }
+
+  &query-args-box {
+    transition: max-height 0.3s ease;
+    max-height: 600px;
+    &.collapsed {
+      max-height: 0;
+      overflow: hidden;
+    }
+  }
+
+  &bottom-loading {
+    min-height: 37px;
+    margin-top: 5px;
+    text-align: center;
+  }
 }

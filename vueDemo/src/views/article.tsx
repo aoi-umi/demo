@@ -9,6 +9,8 @@ import { DetailDataType } from './article-mgt-detail';
 import { UserAvatarView } from './comps/user-avatar';
 import { Base } from './base';
 
+import './article.less';
+
 @Component
 export default class Article extends Base {
     $refs: { list: IMyList<any> };
@@ -99,6 +101,8 @@ class ArticleListItem extends Base {
     @Prop()
     mgt?: boolean;
 
+    stylePrefix = "article-";
+
     private toDetail(ele: DetailDataType) {
         if (this.mgt) {
             return;
@@ -117,8 +121,8 @@ class ArticleListItem extends Base {
             }
             detail.voteValue = value;
         }, {
-                noSuccessHandler: true
-            });
+            noSuccessHandler: true
+        });
     }
 
     render() {
@@ -130,7 +134,7 @@ class ArticleListItem extends Base {
                         <Col style={{ marginLeft: '40px', display: 'flex', alignItems: 'baseline' }} nativeOn-click={() => {
                             this.toDetail(ele);
                         }}>
-                            <h3 class="article-list-title" style={{ display: 'inline' }} title={ele.title}>{ele.title}</h3>
+                            <h3 class={this.getStyleName('list-title')} style={{ display: 'inline' }} title={ele.title}>{ele.title}</h3>
                             <div class="flex-stretch" on-click={() => {
                                 this.toDetail(ele);
                             }}>
