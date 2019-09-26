@@ -203,7 +203,6 @@ export default class App extends Base {
                     <Icon
                         on-click={this.collapsedSider}
                         class="menu-icon"
-                        style={{ margin: "0 20px" }}
                         type="md-menu"
                         size="24"
                     />
