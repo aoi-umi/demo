@@ -1,11 +1,10 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import * as iview from 'iview';
-import { Upload, Modal, Icon, Progress, Button } from '@/components/iview';
-import { convClass } from '@/helpers';
 import axios, { AxiosRequestConfig } from 'axios';
 import { VueCropper } from 'vue-cropper';
+import { Upload, Modal, Icon, Progress, Button } from '../iview';
+import { Utils, convClass } from '../utils';
 import { MyImg } from '../my-img';
-import { Utils } from '../utils';
 import { MyImgViewer, IMyImgViewer } from '../my-img-viewer';
 import { MyBase } from '../MyBase';
 

@@ -1,5 +1,5 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
-import { convClass } from '@/helpers';
+import { convClass } from '../utils';
 import { Icon } from '../iview';
 import { MyBase } from '../MyBase';
 import './my-img.less';

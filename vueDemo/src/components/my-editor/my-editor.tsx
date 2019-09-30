@@ -1,6 +1,6 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
-import { convClass } from '@/helpers';
 import { MyInputBase } from '../my-input/my-input';
+import { convClass } from '../utils';
 
 
 @Component

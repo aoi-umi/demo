@@ -1,3 +1,8 @@
+export function convClass<typeofT, T = {}>(t) {
+    return t as {
+        new(props: Partial<typeofT & T> & VueComponentOptions): any
+    };
+}
 export class Utils {
     static base64ToFile = (dataUrl: string, filename: string) => {
         let arr = dataUrl.split(',');

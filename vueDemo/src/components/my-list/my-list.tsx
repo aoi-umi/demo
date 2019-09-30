@@ -3,11 +3,10 @@ import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
 import {
     Table, Page, Row, Col,
     Input, Button, Divider, Card, Icon, Spin
-} from '@/components/iview';
-import './my-list.less';
-import { MyListModel } from './model';
-import { ListResult } from '@/api';
+} from '../iview';
 import { MyBase } from '../MyBase';
+import { MyListModel, MyListResult } from './model';
+import './my-list.less';
 
 type QueryArgsType = {
     [key: string]: {
@@ -107,7 +106,7 @@ class MyList<QueryArgs extends QueryArgsType> extends MyBase {
     customOperateView: any;
 
     @Prop()
-    queryFn?: (data: any) => ListResult | Promise<ListResult>;
+    queryFn?: (data: any) => MyListResult | Promise<MyListResult>;
 
     stylePrefix = clsPrefix;
 

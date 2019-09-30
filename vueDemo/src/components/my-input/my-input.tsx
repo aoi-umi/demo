@@ -1,5 +1,5 @@
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
-import { convClass } from '@/helpers';
+import { convClass } from '../utils';
 import { Option, Select, Input } from '../iview';
 
 @Component

@@ -1,7 +1,7 @@
 import * as iviewTypes from "iview";
 const iview = require("iview");
 
-import { convClass } from "../helpers";
+import { convClass } from "./utils";
 
 export const AutoComplete = convClass<iviewTypes.AutoComplete>(iview.AutoComplete);
 export const Avatar = convClass<iviewTypes.Avatar>(iview.Avatar);

@@ -1,8 +1,8 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 
-import { convClass } from '@/helpers';
-import { myEnum } from '@/config';
+import { convClass } from '@/components/utils';
 import { MyTagBase } from '@/components/my-tag/my-tag';
+import { myEnum } from '@/config';
 
 export type AuthorityDetail = {
     isDel?: boolean;

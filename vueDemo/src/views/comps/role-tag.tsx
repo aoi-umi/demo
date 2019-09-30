@@ -1,7 +1,7 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 
-import { convClass } from '@/helpers';
 import { myEnum } from '@/config';
+import { convClass } from '@/components/utils';
 import { MyTagBase } from '@/components/my-tag/my-tag';
 import { Tooltip } from '@/components/iview';
 import { DetailDataType } from '../role';

@@ -1,7 +1,7 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 
-import { convClass } from '@/helpers';
-import { Spin, Button, Card } from '@/components/iview';
+import { convClass } from '../utils';
+import { Spin, Button, Card } from '../iview';
 
 
 @Component

@@ -1,6 +1,6 @@
 import { Vue, Prop, Watch, Component } from 'vue-property-decorator';
-import { Tag, Tooltip } from '@/components/iview';
-import { convClass } from '@/helpers';
+import { convClass } from '../utils';
+import { Tag, Tooltip } from '../iview';
 import { TagType } from './model';
 export type RenderTagType = string | TagType;
 

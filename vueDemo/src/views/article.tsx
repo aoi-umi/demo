@@ -1,7 +1,8 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { testApi } from '@/api';
 import { myEnum, authority, dev } from '@/config';
-import { convert, convClass } from '@/helpers';
+import { convert } from '@/helpers';
+import { convClass } from '@/components/utils';
 import { Card, Input, Row, Col, Icon, Divider, Time, Checkbox } from '@/components/iview';
 import { MyList, IMyList } from '@/components/my-list';
 import { MyTag } from '@/components/my-tag';

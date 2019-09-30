@@ -1,6 +1,6 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 
-import { convClass } from '@/helpers';
+import { convClass } from '@/components/utils';
 import { Spin, Button, Card } from '@/components/iview';
 import { myEnum } from '@/config';
 import { testApi } from '@/api';

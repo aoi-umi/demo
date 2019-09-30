@@ -2,7 +2,8 @@ import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import moment from 'moment';
 
 import { testApi } from '@/api';
-import { convClass, convert } from '@/helpers';
+import { convert } from '@/helpers';
+import { convClass } from '@/components/utils';
 import { MyList, IMyList, ResultType } from '@/components/my-list';
 import { MyEditor } from '@/components/my-editor';
 import { Divider, Button, Avatar, Modal, Icon, Time } from '@/components/iview';

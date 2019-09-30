@@ -4,7 +4,8 @@ import moment from 'moment';
 
 import { testApi } from '@/api';
 import { myEnum, authority, dev } from '@/config';
-import { convClass, convert } from '@/helpers';
+import { convert } from '@/helpers';
+import { convClass } from '@/components/utils';
 import { Modal, Form, FormItem, Button, RadioGroup, Radio, Input, DatePicker } from '@/components/iview';
 import { MyList, IMyList, Const as MyListConst } from '@/components/my-list';
 import { AuthorityTransferView, IAuthorityTransfer } from './authority';

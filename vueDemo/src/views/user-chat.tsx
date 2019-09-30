@@ -1,7 +1,8 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
+import { convClass } from '@/components/utils';
 import { Card, Split, Input, Button, Time, Icon } from '@/components/iview';
 import { IMyLoad, MyLoad } from '@/components/my-load';
-import { convClass, randStr } from '@/helpers';
+import { randStr } from '@/helpers';
 import { testApi, testSocket } from '@/api';
 import { Base } from './base';
 import { DetailDataType as UserDetailDataType } from './user-mgt';

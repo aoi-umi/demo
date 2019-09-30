@@ -2,8 +2,8 @@ import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import * as iviewTypes from 'iview';
 
 import { testApi, testSocket } from '@/api';
-import { convClass } from '@/helpers';
 import { dev, myEnum, authority } from '@/config';
+import { convClass } from '@/components/utils';
 import { Button, Avatar, Poptip, Spin } from '@/components/iview';
 import { MyImgViewer, IMyImgViewer } from '@/components/my-img-viewer';
 import { Base } from '../base';

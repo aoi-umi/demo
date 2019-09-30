@@ -1,7 +1,8 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import * as iview from 'iview';
 import { testApi } from '@/api';
-import { convClass, convert } from '@/helpers';
+import { convert } from '@/helpers';
+import { convClass } from '@/components/utils';
 import { Tag, Modal, Input, Row, Col, Form, FormItem, Button } from '@/components/iview';
 import { MyList, IMyList, Const as MyListConst, OnSortChangeOptions, MyListModel } from '@/components/my-list';
 import { MyTagModel, MyTag } from '@/components/my-tag';

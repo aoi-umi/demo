@@ -2,13 +2,6 @@ import axios, { AxiosRequestConfig } from 'axios';
 import { AnimeInstance } from 'animejs';
 import * as md from 'node-forge/lib/md.all';
 
-
-export function convClass<typeofT, T = {}>(t) {
-    return t as {
-        new(props: Partial<typeofT & T> & VueComponentOptions): any
-    };
-}
-
 export function request(options: AxiosRequestConfig) {
     if (!options.url)
         throw new Error('url can not empty!');

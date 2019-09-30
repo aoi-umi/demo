@@ -1,7 +1,7 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import moment from 'moment';
 
-import { convClass, convert } from '@/helpers';
+import { convert } from '@/helpers';
 import * as helpers from '@/helpers';
 import { dev, myEnum, authority } from '@/config';
 import { testApi, testSocket } from '@/api';
