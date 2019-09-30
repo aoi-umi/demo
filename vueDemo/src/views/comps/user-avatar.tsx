@@ -1,14 +1,9 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import * as iviewTypes from 'iview';
 
-import { testApi, testSocket } from '@/api';
-import { convClass } from '@/helpers';
-import { dev, myEnum, authority } from '@/config';
-import { Button, Avatar, Poptip, Spin } from '@/components/iview';
-import { MyImgViewer, IMyImgViewer } from '@/components/my-img-viewer';
+import { convClass } from '@/components/utils';
+import { Avatar } from '@/components/iview';
 import { Base } from '../base';
-import { DetailDataType } from '../user-mgt';
-import { FollowButtonView } from './follow-button';
 import { UserPoptipView } from './user-poptip';
 
 export type User = {

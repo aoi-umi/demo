@@ -1,6 +1,6 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
-import { Button, Transfer } from '@/components/iview';
-import { convClass } from '@/helpers';
+import { convClass } from '../utils';
+import { Button, Transfer } from '../iview';
 
 type DataType = {
     key: string;

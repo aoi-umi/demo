@@ -2,14 +2,15 @@ import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import * as iview from 'iview';
 import moment from 'moment';
 
-import { convClass, convert } from '@/helpers';
 import * as helpers from '@/helpers';
 import { dev, myEnum } from '@/config';
 import { testApi, testSocket } from '@/api';
+import { convClass } from '@/components/utils';
 import { Modal, Input, Form, FormItem, Button, Card, TabPane, Tabs, Time } from '@/components/iview';
 import { MyUpload, IMyUpload } from '@/components/my-upload';
 import { MyList, IMyList, ResultType } from '@/components/my-list';
 import { MyLoad, IMyLoad } from '@/components/my-load';
+import { Utils } from '@/components/utils';
 import { LoginUser } from '@/model/user';
 
 import { UserAvatarView } from './comps/user-avatar';

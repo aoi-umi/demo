@@ -1,6 +1,6 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
-import { convClass } from '@/helpers';
 import { Button, Row, Col } from '../iview';
+import { convClass } from '../utils';
 
 type BtnType = {
     text: string;

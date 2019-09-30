@@ -29,3 +29,8 @@ export class MyListModel<T = any> {
         this.sort.sortOrder = sort.sortOrder;
     }
 }
+
+export type MyListResult<T = any> = {
+    total: number;
+    rows: T[];
+};
