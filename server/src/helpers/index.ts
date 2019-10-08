@@ -1,6 +1,6 @@
 import { Request, Response, Express } from 'express';
 import * as Q from 'q';
-import * as moment from 'moment';
+import * as moment from 'dayjs';
 import { MongooseDocument, Error } from 'mongoose';
 import { ClassType } from 'class-transformer/ClassTransformer';
 
@@ -123,20 +123,20 @@ export let dbDateMatch = function (dateFrom, dateTo) {
     if (dateFrom || dateTo) {
         mongoDate = {};
         sqlDate = {};
-        if (dateFrom) {
-            if (typeof dateFrom == 'string' && dateFrom.includes('T')) {
-                dateFrom = new Date(dateFrom)
+        function convertDate(d) {
+            if (typeof d == 'string' && d.includes('T')) {
+                d = new Date(d)
             }
-            let from = moment(dateFrom, 'YYYY-MM-DD').toDate();
+            return moment(d, 'YYYY-MM-DD').toDate();
+        }
+        if (dateFrom) {
+            let from = convertDate(dateFrom);
 
             mongoDate.$gte = from;
             // sqlDate[Op.gte] = from;
         }
         if (dateTo) {
-            if (typeof dateTo == 'string' && dateTo.includes('T')) {
-                dateTo = new Date(dateTo)
-            }
-            let to = moment(dateTo, 'YYYY-MM-DD').add({ day: 1 }).toDate();
+            let to = convertDate(dateTo);
             mongoDate.$lt = to;
             // sqlDate[Op.lt] = to;
         }

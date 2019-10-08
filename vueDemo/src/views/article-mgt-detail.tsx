@@ -1,6 +1,6 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import * as iview from 'iview';
-import moment from 'moment';
+import moment from 'dayjs';
 
 import { testApi } from '@/api';
 import { myEnum, dev } from '@/config';
@@ -291,7 +291,7 @@ export default class ArticleDetail extends ArticleMgtBase {
                         <DatePicker v-model={detail.setPublishAt} type="datetime" options={{
                             disabledDate: (date?: Date) => {
                                 let start = moment().startOf('day');
-                                let end = moment(start).add({ d: 3 });
+                                let end = moment(start).add(3, 'd');
                                 return date && (date.valueOf() < start.valueOf() || date.valueOf() >= end.valueOf());
                             }
                         }} />

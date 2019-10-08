@@ -1,6 +1,6 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import * as iview from 'iview';
-import moment from 'moment';
+import moment from 'dayjs';
 
 import * as helpers from '@/helpers';
 import { dev, myEnum } from '@/config';

@@ -1,5 +1,5 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
-import moment from 'moment';
+import moment from 'dayjs';
 
 import { convert } from '@/helpers';
 import * as helpers from '@/helpers';
