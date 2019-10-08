@@ -1,5 +1,5 @@
 import * as Redis from 'ioredis';
-import * as moment from 'moment';
+import * as moment from 'dayjs';
 
 import * as config from '@/config';
 import * as common from './common';

@@ -2,7 +2,7 @@ import {
     getModelForClass, ModelType, DocType, InstanceType,
     setSchema, prop, arrayProp, setMethod
 } from 'mongoose-ts-ua';
-import * as moment from 'moment';
+import * as moment from 'dayjs';
 
 import { myEnum, dev } from '@/config';
 
