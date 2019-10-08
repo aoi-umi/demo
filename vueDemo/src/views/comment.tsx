@@ -34,13 +34,15 @@ class Comment extends Base {
     }
 
     async query(opt?, noClear?) {
-        if (!this.currComment) {
-            this.refreshLoading = true;
-            await this.$refs.list.query(opt);
-            this.refreshLoading = false;
-        } else {
+        this.refreshLoading = true;
+        await this.$refs.list.query(opt);
+        this.refreshLoading = false;
+
+    }
+
+    async replyQuery(opt?, noClear?) {
+        if (this.replyShow)
             await this.$refs.replyList.query(opt, noClear);
-        }
     }
 
     refreshLoading = false;
@@ -276,12 +278,13 @@ class Comment extends Base {
                         ref="replyList"
                         hideSearchBox
                         type="custom"
-                        infiniteScroll
+                        showSizer={false}
+                        // infiniteScroll
 
                         customRenderFn={this.renderResult}
 
                         on-query={(t, noClear) => {
-                            this.query(convert.Test.listModelToQuery(t), noClear);
+                            this.replyQuery(convert.Test.listModelToQuery(t), noClear);
                         }}
 
                         queryFn={async (data) => {

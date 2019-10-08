@@ -25,6 +25,14 @@ export default class App extends Base {
     $refs: { sider: any, menu: iView.Menu };
 
     getActiveNameByPath(path: string) {
+        if (path === routeConfig.articleDetail.path) {
+            path = routeConfig.article.path;
+        } else if ([
+            routeConfig.articleMgtDetail.path,
+            routeConfig.articleMgtEdit.path
+        ].includes(path)) {
+            path = routeConfig.articleMgt.path;
+        }
         let name = path.split('/').slice(0, 3).join('/');
         return name;
     }
@@ -136,7 +144,7 @@ export default class App extends Base {
     route(to, from) {
         this.setTitle();
         this.activeName = this.getActiveNameByPath(location.pathname);
-        this.menuCfg.map(ele => this.getMenuName(ele)).filter(ele => this.activeName.includes(ele));
+        // this.menuCfg.map(ele => this.getMenuName(ele)).filter(ele => this.activeName.includes(ele));
         // this.menuCfg.forEach(ele => {
         //     let name = this.getMenuName(ele);
         //     if (this.activeName.includes(name) && !this.openNames.includes(name)) {
