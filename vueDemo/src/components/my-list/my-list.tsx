@@ -5,6 +5,7 @@ import {
     Input, Button, Divider, Card, Icon, Spin
 } from '../iview';
 import { MyBase } from '../MyBase';
+import * as style from '../style';
 import { MyListModel, MyListResult } from './model';
 import './my-list.less';
 
@@ -313,10 +314,10 @@ class MyList<QueryArgs extends QueryArgsType> extends MyBase {
                         </div>
                     </Card>
                 }
-                <div style={{ position: 'relative', }}>
+                <div class={this.getStyleName('content')}>
                     {this.$slots.default}
                     {this.type == 'table' ?
-                        <Table style={{ marginTop: '10px', overflow: 'visible' }} columns={this.columns.filter(ele => {
+                        <Table class={this.getStyleName('table')} columns={this.columns.filter(ele => {
                             let sort = this.model.sort;
                             ele.sortType = '' as any;
                             if (sort.orderBy && sort.sortOrder) {
@@ -369,20 +370,18 @@ class MyList<QueryArgs extends QueryArgsType> extends MyBase {
                     {!this.infiniteScroll ?
                         this.loading && <Spin size="large" fix /> :
                         <div class={(() => {
-                            let cls = this.getStyleName('bottom-loading');
+                            let cls = this.getStyleName('bottom-loading').concat(style.cls.center);
                             if (this.loading || !this.result.success || !this.isScrollEnd()) {
                             } else {
                                 cls.push('invisibility');
                             }
                             return cls;
                         })()}>
-                            <div>
-                                {this.result.msg}
-                                {!this.isScrollEnd() && !this.loadedLastPage && <a on-click={() => {
-                                    this.scrollEndHandler();
-                                }}>更多</a>}
-                                {this.loading && <Spin size="large" fix />}
-                            </div>
+                            {this.result.msg}
+                            {!this.isScrollEnd() && !this.loadedLastPage && <a on-click={() => {
+                                this.scrollEndHandler();
+                            }}>更多</a>}
+                            {this.loading && <Spin size="large" fix />}
                         </div>
                     }
                 </div>

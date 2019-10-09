@@ -312,7 +312,7 @@ export default class App extends Base {
 
                     customRenderFn={(rs) => {
                         let list = rs.data.map(ele => {
-                            return <Card style={{ marginTop: '10px' }}>{ele.test}</Card>;
+                            return <Card style={{ marginBottom: '10px' }}>{ele.test}</Card>;
                         });
                         return list;
                     }}></MyList>
