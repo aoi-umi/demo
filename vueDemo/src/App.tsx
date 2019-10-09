@@ -25,15 +25,9 @@ export default class App extends Base {
     $refs: { sider: any, menu: iView.Menu };
 
     getActiveNameByPath(path: string) {
-        if (path === routeConfig.articleDetail.path) {
-            path = routeConfig.article.path;
-        } else if ([
-            routeConfig.articleMgtDetail.path,
-            routeConfig.articleMgtEdit.path
-        ].includes(path)) {
-            path = routeConfig.articleMgt.path;
-        }
-        let name = path.split('/').slice(0, 3).join('/');
+        let split = path.split('/');
+        let slice = split[1] === 'admin' ? 3 : 2;
+        let name = split.slice(0, slice).join('/');
         return name;
     }
 
