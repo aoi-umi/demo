@@ -28,3 +28,6 @@ web 管理
 
 > rabbitmqctl add_user admin admin  
 > rabbitmqctl set_user_tags admin administrator  
+
+## apidoc
+### 插件 apidoc-plugin-class-validator
