@@ -10,6 +10,11 @@ import * as VaildSchema from '@/vaild-schema/class-valid';
 
 import { ArticleModel, ArticleInstanceType, ArticleMapper, ArticleLogMapper, ArticleDocType } from '@/models/mongo/article';
 
+/**
+ * @api {get} /article/mgt/query mgt query
+ * @apiGroup article
+ * @apiParamClass (src/vaild-schema/class-valid/article.ts) {AritcleQuery}
+ */
 export let mgtQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
@@ -46,6 +51,11 @@ export let mgtDetailQuery: RequestHandler = (req, res) => {
     }, req, res);
 };
 
+/**
+ * @api {post} /article/mgt/save mgt save
+ * @apiGroup article
+ * @apiParamClass (src/vaild-schema/class-valid/article.ts) {AritcleSave}
+ */
 export let mgtSave: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
