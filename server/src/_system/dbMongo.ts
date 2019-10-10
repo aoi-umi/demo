@@ -6,6 +6,7 @@ import {
 } from 'mongoose-ts-ua';
 import * as mongodb from 'mongodb';
 import { ClientSession, CommonOptions } from 'mongodb';
+import * as common from './common';
 
 require('mongoose').Promise = Q.Promise;
 declare module 'mongoose' {
@@ -101,6 +102,7 @@ export type MongoOpt = {
 }
 export async function init(mongoOpt: MongoOpt) {
     mongooseTsConfig.schemaOptions = { timestamps: true };
+    mongooseTsConfig.toCollectionName = common.stringToLowerCaseWithUnderscore;
     await mongoose.connect(mongoOpt.uri, mongoOpt.options);
 }
 
