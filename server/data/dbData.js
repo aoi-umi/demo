@@ -59,7 +59,7 @@ for (let key in authority) {
         updatedAt: ISODate(),
     });
 }
-db.getCollection('authorities').insert(authList);
+db.getCollection('authority').insert(authList);
 
 var role = {
     root: {
@@ -79,4 +79,4 @@ for (let key in role) {
         updatedAt: ISODate(),
     });
 }
-db.getCollection('roles').insert(roleList);
+db.getCollection('role').insert(roleList);

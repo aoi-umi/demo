@@ -541,7 +541,7 @@ export let parseBool = function (b) {
     return b && (b == 1 || b.toLocaleString() == 'true');
 };
 
-export let escapeRegExp = function (string) {
+export let escapeRegExp = function (string: string) {
     return string.replace(/([.*+?^${}()|\[\]\/\\])/g, "\\$1");
 };
 

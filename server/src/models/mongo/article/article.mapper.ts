@@ -53,16 +53,23 @@ export class ArticleMapper {
             });
         }
         if (data.anyKey) {
-            let anykey = new RegExp(escapeRegExp(data.anyKey), 'i');
-            and.push({
-                $or: [
-                    { title: anykey },
-                    { content: anykey },
-                    { profile: anykey },
-                    { 'user.nickname': anykey },
-                    { 'user.account': anykey },
-                ]
-            });
+            let keyList = escapeRegExp(data.anyKey.trim()).split(' ');
+            if (keyList.length) {
+                and.push({
+                    $and: keyList.map(ele => {
+                        let anykey = new RegExp(ele, 'i');
+                        return {
+                            $or: [
+                                { title: anykey },
+                                { content: anykey },
+                                { profile: anykey },
+                                { 'user.nickname': anykey },
+                                { 'user.account': anykey },
+                            ]
+                        };
+                    })
+                });
+            }
         }
         if (and.length)
             match.$and = and;
