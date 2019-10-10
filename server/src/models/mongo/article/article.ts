@@ -2,7 +2,6 @@ import {
     getModelForClass, ModelType, DocType, InstanceType,
     setSchema, prop, arrayProp
 } from 'mongoose-ts-ua';
-import { Types, SchemaTypes } from 'mongoose';
 
 import { myEnum } from '@/config';
 import { ContentBase } from '../_base/contentBase';

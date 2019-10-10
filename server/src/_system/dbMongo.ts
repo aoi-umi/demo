@@ -1,13 +1,11 @@
 import * as Q from 'q';
 import * as mongoose from 'mongoose';
-import { Model, Types } from 'mongoose';
+import { Model, Types, ConnectionOptions } from 'mongoose';
 import {
     config as mongooseTsConfig
 } from 'mongoose-ts-ua';
 import * as mongodb from 'mongodb';
 import { ClientSession, CommonOptions } from 'mongodb';
-
-mongooseTsConfig.schemaOptions = { timestamps: true };
 
 require('mongoose').Promise = Q.Promise;
 declare module 'mongoose' {
@@ -97,4 +95,12 @@ function createCollection(model) {
 //         createCollection(model);
 //     }
 // });
+export type MongoOpt = {
+    uri: string;
+    options?: ConnectionOptions
+}
+export async function init(mongoOpt: MongoOpt) {
+    mongooseTsConfig.schemaOptions = { timestamps: true };
+    await mongoose.connect(mongoOpt.uri, mongoOpt.options);
+}
 

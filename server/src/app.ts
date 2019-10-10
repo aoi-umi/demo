@@ -8,14 +8,14 @@ import * as bodyParserXml from 'body-parser-xml';
 import * as cors from 'cors';
 import { AddressInfo } from 'net';
 import 'reflect-metadata';
-import * as mongoose from 'mongoose';
 
 import * as config from '@/config';
+import * as db from '@/_system/dbMongo';
 
 bodyParserXml(bodyParser);
 debug('my-application');
 (async () => {
-    await mongoose.connect(config.env.mongoose.uri, config.env.mongoose.options);
+    await db.init(config.env.mongoose);
 })().then(async () => {
     const main = require('./_main');
     process.on('unhandledRejection', function (e) {

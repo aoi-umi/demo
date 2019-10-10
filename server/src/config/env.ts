@@ -1,6 +1,6 @@
 
 import * as path from 'path';
-import { ConnectionOptions } from 'mongoose';
+import { MongoOpt } from '@/_system/dbMongo';
 
 let processEnv: {
     Port?: string;
@@ -30,8 +30,8 @@ export default {
             useFindAndModify: false,
             dbName: 'devMgt',
             useCreateIndex: true,
-        } as ConnectionOptions
-    },
+        }
+    } as MongoOpt,
     mq: {
         exchange: name,
         mqUri: processEnv.MQUri || 'amqp://localhost'
