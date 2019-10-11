@@ -205,6 +205,12 @@ const config = {
                 },
                 imgGet: {
                     url: '/img'
+                },
+                videoUpload: {
+                    url: '/video/upload'
+                },
+                videoGet: {
+                    url: '/video'
                 }
             },
         } as TestApiConfigType

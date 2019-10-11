@@ -43,6 +43,7 @@ export default {
         appenders: { type: 'stdout' }
     },
     imgPrefix: `${urlPrefix}/img`,
+    videoPrefix: `${urlPrefix}/video`,
     ali: {
         sandbox: true,
         appId: '2016100100641227',

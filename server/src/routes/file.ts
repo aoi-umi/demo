@@ -5,6 +5,7 @@ import { responseHandler, paramsValid } from "@/helpers";
 import { myEnum } from "@/config";
 import * as VaildSchema from '@/vaild-schema/class-valid';
 import { FileMapper, FileModel } from "@/models/mongo/file";
+import { logger } from "@/_main";
 
 const uplaod = (option: { fileType: string }, req: Request, res: Response) => {
     responseHandler(async () => {
@@ -23,15 +24,9 @@ const uplaod = (option: { fileType: string }, req: Request, res: Response) => {
             contentType: file.mimetype,
         });
         let obj = fs.toOutObject();
-        if (option.fileType == myEnum.fileType.图片) {
-            obj.url = FileMapper.getImgUrl(fs.fileId, req.myData.imgHost);
-        }
+        obj.url = FileMapper.getUrl(fs.fileId, option.fileType, req.myData.imgHost);
         return obj;
     }, req, res);
-};
-
-export const imgUpload: RequestHandler = (req, res) => {
-    uplaod({ fileType: myEnum.fileType.图片 }, req, res);
 };
 
 export const download = async (option: { fileType: string }, req: Request, res: Response) => {
@@ -62,19 +57,30 @@ export const download = async (option: { fileType: string }, req: Request, res: 
     }, req, res);
 };
 
+export const imgUpload: RequestHandler = (req, res) => {
+    uplaod({ fileType: myEnum.fileType.图片 }, req, res);
+};
+
 export const imgGet: RequestHandler = (req, res) => {
     download({ fileType: myEnum.fileType.图片 }, req, res);
 };
 
+export const videoUpload: RequestHandler = (req, res) => {
+    uplaod({ fileType: myEnum.fileType.视频 }, req, res);
+};
+
 export const vedioGet: RequestHandler = (req, res) => {
     responseHandler(async (opt) => {
-        let data = req.query;
-
+        let data = paramsValid(req.query, VaildSchema.FileGet);
         let range = req.headers.range as string;
         let pos = range.replace(/bytes=/, "").split("-");
-        data._id = '5d521fca691ea819d8db4ea7';
         opt.noSend = true;
-        let file = await FileModel.rawFindOne({ _id: Types.ObjectId(data._id) });
+        let file = await FileModel.rawFindOne({ _id: data._id });
+        if (!file) {
+            res.status(404);
+            res.end();
+            return;
+        }
 
         let total = file.length;
         let start = parseInt(pos[0], 10);
@@ -88,10 +94,12 @@ export const vedioGet: RequestHandler = (req, res) => {
             'Content-Type': 'video/mp4'
         });
 
-        let { stream } = await new FileModel({ fileId: file._id }).download({ returnStream: true, streamOpt: { start, end } });
-        stream.on('error', function (err) {
-            res.end(err);
-        });
-        stream.pipe(res);
+        let { stream } = await new FileModel({ fileId: file._id }).download({ returnStream: true, streamOpt: { start, end: end + 1 } });
+        stream
+            .pipe(res, { end: true })
+            .on('error', function (err) {
+                logger.log('file stream error:', err.message);
+                res.sendStatus(500);
+            });
     }, req, res);
 };

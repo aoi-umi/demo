@@ -66,6 +66,8 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
     //file
     imgUpload,
     imgGet,
+    videoUpload,
+    videoGet,
 }>;
 export type TestApiConfigType = ApiConfigModel<TestApiMethod>;
 
@@ -98,6 +100,8 @@ export class TestApi extends ApiModel<TestApiMethod> {
         });
         this.imgUploadUrl = this.getRequestConfig(this.apiConfig.method.imgUpload).url;
         this.imgUrl = this.getRequestConfig(this.apiConfig.method.imgGet).url;
+        this.videoUploadUrl = this.getRequestConfig(this.apiConfig.method.videoUpload).url;
+        this.videoUrl = this.getRequestConfig(this.apiConfig.method.videoGet).url;
     }
 
     defaultHeaders() {
@@ -109,6 +113,7 @@ export class TestApi extends ApiModel<TestApiMethod> {
     }
     //#region file 
     imgUploadUrl = '';
+    videoUploadUrl = '';
     imgUplodaHandler(res: Result) {
         return this.afterResponse(res) as FileUploadRes;
     }
@@ -124,6 +129,11 @@ export class TestApi extends ApiModel<TestApiMethod> {
     imgUrl = '';
     getImgUrl(str) {
         return this.imgUrl + '?_id=' + str;
+    }
+
+    videoUrl = '';
+    getVideoUrl(str) {
+        return this.videoUrl + '?_id=' + str;
     }
     //#endregion  
 
