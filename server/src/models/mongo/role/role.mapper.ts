@@ -32,7 +32,7 @@ export class RoleMapper {
         if (data.code)
             query.code = new RegExp(escapeRegExp(data.code), 'i');
         if (data.status) {
-            query.status = { $in: data.status.split(',') };
+            query.status = { $in: data.status.split(',').map(ele => parseInt(ele)) };
         }
 
         let query2: any = {};

@@ -40,7 +40,7 @@ export default class App extends Base {
     }[] = [];
     $refs: {
         board: HTMLElement; list: IMyList<any>; echart: HTMLDivElement; canvas: HTMLDivElement;
-        upload: IMyUpload; video: HTMLVideoElement
+        upload: IMyUpload; video: HTMLVideoElement; videoCover: any;
     };
     richText = '';
     chart: echarts.ECharts;
@@ -203,6 +203,15 @@ export default class App extends Base {
         contents.push({ idx, refName: Date.now() + '', ...data });
     }
 
+    captureImage() {
+        let canvas = document.createElement("canvas");
+        let video = this.$refs.video;
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+        return canvas.toDataURL('image/png');
+    }
+
     fail = false;
     protected render() {
         let contents = this.contents;
@@ -233,7 +242,7 @@ export default class App extends Base {
                         display: 'flex',
                         alignItems: 'center'
                     }}>
-                        <video ref="video" class="video-js vjs-default-skin" style={{
+                        <video ref="video" class="video-js vjs-default-skin" crossOrigin="*" style={{
                             width: 'inherit',
                             height: 'inherit',
                         }}>
@@ -272,6 +281,10 @@ export default class App extends Base {
                             </Col>
                         </Row>
                         <Button on-click={() => { this.contents = []; }}>clear anime</Button>
+                        <Button on-click={() => {
+                            this.$refs.videoCover.src = this.captureImage();
+                        }}>截取</Button>
+                        <img width="160" height="90" ref='videoCover' />
                     </div>
                 </div>
                 <div style={{
