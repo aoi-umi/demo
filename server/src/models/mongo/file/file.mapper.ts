@@ -16,6 +16,7 @@ export class FileMapper {
         }[fileType];
         return url ? host + url + '?_id=' + _id : '';
     }
+    
     static getImgUrl(_id, host?: string) {
         return this.getUrl(_id, myEnum.fileType.图片, host);
     }

@@ -164,10 +164,12 @@ class MyList<QueryArgs extends QueryArgsType> extends MyBase {
                     this.result.data = rs.rows;
                 this.result.total = rs.total;
             }
-            if (!this.result.data.length)
-                this.result.msg = '暂无数据';
             let lastPage = Math.ceil(this.result.total / this.model.page.size);
             this.loadedLastPage = this.model.page.index >= lastPage;
+            if (!this.result.data.length)
+                this.result.msg = '暂无数据';
+            else if (this.loadedLastPage)
+                this.result.msg = '无更多数据';
             if (this.infiniteScroll && !this.loadedLastPage) {
                 this.model.page.index++;
             }
@@ -369,19 +371,14 @@ class MyList<QueryArgs extends QueryArgsType> extends MyBase {
                     }
                     {!this.infiniteScroll ?
                         this.loading && <Spin size="large" fix /> :
-                        <div class={(() => {
-                            let cls = this.getStyleName('bottom-loading').concat(style.cls.center);
-                            if (this.loading || !this.result.success || !this.isScrollEnd()) {
-                            } else {
-                                cls.push('invisibility');
-                            }
-                            return cls;
-                        })()}>
-                            {this.result.msg}
-                            {!this.isScrollEnd() && !this.loadedLastPage && <a on-click={() => {
-                                this.scrollEndHandler();
-                            }}>更多</a>}
+                        <div class={this.getStyleName('bottom-loading').concat(style.cls.center)}>
                             {this.loading && <Spin size="large" fix />}
+                            <Divider class={this.getStyleName('bottom-loading-msg')} size="small">
+                                <span>{this.result.msg}</span>
+                                {!this.loadedLastPage && !this.loading && <a on-click={() => {
+                                    this.scrollEndHandler();
+                                }}>{!this.result.success ? '重试' : '更多'}</a>}
+                            </Divider>
                         </div>
                     }
                 </div>

@@ -114,7 +114,7 @@ export class TestApi extends ApiModel<TestApiMethod> {
     //#region file 
     imgUploadUrl = '';
     videoUploadUrl = '';
-    imgUplodaHandler(res: Result) {
+    uplodaHandler(res: Result) {
         return this.afterResponse(res) as FileUploadRes;
     }
 

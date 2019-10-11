@@ -318,9 +318,16 @@ export default class App extends Base {
                 <canvas ref="canvas"></canvas>
                 <MyUpload ref='upload' width={100} height={100}
                     headers={testApi.defaultHeaders}
-                    uploadUrl={testApi.videoUploadUrl} maxSize={10240} />
+                    uploadUrl={testApi.videoUploadUrl} maxSize={10240} successHandler={(res, file) => {
+                        testApi.uplodaHandler(res);
+                    }} />
                 <Button on-click={() => {
-                    this.$refs.upload.upload();
+                    this.operateHandler('上传', async () => {
+                        let err = await this.$refs.upload.upload();
+                        if (err.length) {
+                            throw new Error(err.join(','));
+                        }
+                    });
                 }}>upload</Button>
 
                 <MyList ref="list" type="custom" infiniteScroll

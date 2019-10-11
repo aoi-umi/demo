@@ -690,7 +690,7 @@ export default class UserInfo extends Base {
                                     headers={testApi.defaultHeaders}
                                     uploadUrl={testApi.imgUploadUrl}
                                     successHandler={(res, file) => {
-                                        let rs = testApi.imgUplodaHandler(res);
+                                        let rs = testApi.uplodaHandler(res);
                                         file.url = rs.url;
                                         return rs.fileId;
                                     }}
