@@ -94,7 +94,13 @@ export const vedioGet: RequestHandler = (req, res) => {
             'Content-Type': 'video/mp4'
         });
 
-        let { stream } = await new FileModel({ fileId: file._id }).download({ returnStream: true, streamOpt: { start, end: end + 1 } });
+        let { stream } = await new FileModel({ fileId: file._id }).download({
+            returnStream: true, streamOpt: {
+                start,
+                end: end + 1
+                //不加1会提示 ERR_CONTENT_LENGTH_MISMATCH
+            }
+        });
         stream
             .pipe(res, { end: true })
             .on('error', function (err) {

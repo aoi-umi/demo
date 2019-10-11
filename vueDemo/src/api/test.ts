@@ -127,13 +127,13 @@ export class TestApi extends ApiModel<TestApiMethod> {
     }
 
     imgUrl = '';
-    getImgUrl(str) {
-        return this.imgUrl + '?_id=' + str;
+    getImgUrl(id) {
+        return id ? this.imgUrl + '?_id=' + id : '';
     }
 
     videoUrl = '';
-    getVideoUrl(str) {
-        return this.videoUrl + '?_id=' + str;
+    getVideoUrl(id) {
+        return id ? this.videoUrl + '?_id=' + id : '';
     }
     //#endregion  
 
