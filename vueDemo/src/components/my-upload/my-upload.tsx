@@ -11,6 +11,12 @@ import { MyBase } from '../MyBase';
 import * as style from '../style';
 import './my-upload.less';
 
+const FileDataType = {
+    未知: 0,
+    图片: 1,
+    视频: 2
+};
+
 type FileType = {
     name?: string;
     url?: string;
@@ -19,6 +25,7 @@ type FileType = {
     showProgress?: boolean;
 
     file?: File;
+    fileType?: any;
     data?: string;
     originData?: string;
     willUpload?: boolean;
@@ -108,6 +115,7 @@ class MyUpload extends MyBase {
     private editIndex = -1;
     private selectedIndex = -1;
     private file: File;
+    private fileType = FileDataType.未知;
     private cropper: CropperOption = {
         img: '',
         autoCrop: true,
@@ -231,26 +239,37 @@ class MyUpload extends MyBase {
     }
 
     private handleBeforeUpload(file: File) {
-        this.file = file;
         let rs = this.checkFormat(file);
         if (!rs)
             return false;
+        this.file = file;
+        if (file.type.includes('image/')) {
+            this.fileType = FileDataType.图片;
+        } else if (file.type.includes('video/')) {
+            this.fileType = FileDataType.视频;
+        }
 
-        let reader = new FileReader()
+        let reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = e => {
-            this.cropper.img = (e.target as any).result;
-            this.cropperShow = true;
+            let fileData = (e.target as any).result;
+            if (this.fileType === FileDataType.图片) {
+                this.cropper.img = fileData;
+                this.cropperShow = true;
+            } else {
+                this.pushFile(fileData);
+            }
         };
         return false;
     }
 
-    private pushImg(data, originData?) {
+    private pushFile(data, originData?) {
         let file = {
             data: data,
             originData: originData || data,
             status: 'finished',
             file: this.file,
+            fileType: this.fileType,
             willUpload: true,
         };
         let rs = this.checkSize(this.file, data);
@@ -279,25 +298,30 @@ class MyUpload extends MyBase {
         return (
             <div>
                 {this.fileList.map(item => {
+                    let isImg = item.fileType === FileDataType.图片;
                     return (
                         <div class={[...this.getStyleName('item'), this.shape == 'circle' ? style.cls.circle : '']} style={{ width, height }}>
-                            <div style={{
+                            {/* <div style={{
                                 width: 'inherit',
                                 height: 'inherit',
-                            }}>
-                                <MyImg style={{
-                                    width: 'inherit',
-                                    height: 'inherit',
-                                }} src={item.url || item.data} />
-                                <div class={this.getStyleName('item-cover')} style={{ lineHeight: height }}>
-                                    {item.originData && <Icon type="md-create" nativeOn-click={() => { this.handleEdit(item); }} />}
-                                    <Icon type="md-camera" nativeOn-click={() => {
-                                        this.handleSelectFile(item);
-                                    }} />
-                                    <Icon type="md-eye" nativeOn-click={() => { this.handleView(item); }} />
-                                    <Icon type="md-trash" nativeOn-click={() => { this.handleRemove(item); }} />
-                                </div>
+                            }}> */}
+                            {isImg && <MyImg style={{
+                                width: 'inherit',
+                                height: 'inherit',
+                            }} src={item.url || item.data} />}
+                            {item.fileType === FileDataType.视频 && <video style={{
+                                width: 'inherit',
+                                height: 'inherit',
+                            }} src={item.data} />}
+                            <div class={this.getStyleName('item-cover')} style={{ lineHeight: height }}>
+                                {isImg && item.originData && <Icon type="md-create" nativeOn-click={() => { this.handleEdit(item); }} />}
+                                <Icon type="md-camera" nativeOn-click={() => {
+                                    this.handleSelectFile(item);
+                                }} />
+                                {isImg && <Icon type="md-eye" nativeOn-click={() => { this.handleView(item); }} />}
+                                <Icon type="md-trash" nativeOn-click={() => { this.handleRemove(item); }} />
                             </div>
+                            {/* </div> */}
                         </div>
                     )
                 })}
@@ -347,11 +371,11 @@ class MyUpload extends MyBase {
                                 }}>取消</Button>
                                 <Button type="primary" on-click={() => {
                                     this.$refs.cropper.getCropData((data) => {
-                                        this.pushImg(data, this.cropper.img);
+                                        this.pushFile(data, this.cropper.img);
                                     });
                                 }}>截取</Button>
                                 <Button on-click={() => {
-                                    this.pushImg(this.cropper.img);
+                                    this.pushFile(this.cropper.img);
                                 }}>原图</Button>
                             </div>
                         </div>

@@ -82,7 +82,8 @@ export const enumDefine = {
         私信接收: 'chatRecv',
     },
     fileType: {
-        图片: 'image'
+        图片: 'image',
+        视频: 'video'
     }
 };
 export const myEnum = Enum.createInstance(enumDefine);

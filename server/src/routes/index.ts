@@ -109,5 +109,6 @@ import * as file from './file';
 router.post('/img/upload', UserAuthMid.normal([auth.login]), FileMid.single, file.imgUpload);
 router.get('/img', UserAuthMid.normal(), file.imgGet);
 
-router.get('/video/detail', file.vedioGet);
+router.post('/video/upload', UserAuthMid.normal([auth.login]), FileMid.single, file.videoUpload);
+router.get('/video', file.vedioGet);
 //#endregion

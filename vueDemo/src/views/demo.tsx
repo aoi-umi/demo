@@ -10,8 +10,10 @@ import * as  QRCode from 'qrcode';
 
 import { Input, Card, Button, ColorPicker, Row, Col, Checkbox } from '@/components/iview';
 import { MyList, IMyList } from '@/components/my-list';
+import { MyUpload, IMyUpload } from '@/components/my-upload';
 import { testSocket, testApi } from '@/api';
 import { Base } from './base';
+import './demo.less';
 
 @Component({
     components: {
@@ -19,6 +21,7 @@ import { Base } from './base';
     }
 })
 export default class App extends Base {
+    protected stylePrefix = 'demo-';
     public value = '';
     public msg = '';
     public list: { test: string }[] = [];
@@ -38,7 +41,10 @@ export default class App extends Base {
         dom?: HTMLElement,
         refName?: string;
     }[] = [];
-    $refs: { board: HTMLElement; list: IMyList<any>; echart: HTMLDivElement, canvas: HTMLDivElement };
+    $refs: {
+        board: HTMLElement; list: IMyList<any>; echart: HTMLDivElement, canvas: HTMLDivElement,
+        upload: IMyUpload
+    };
     richText = '';
     chart: echarts.ECharts;
     chartAddData = '';
@@ -178,14 +184,21 @@ export default class App extends Base {
     }
 
     fail = false;
+    videoIdText = '';
+    videoId = '5d9eeeb0f8b93d22548dd6cc';
     protected render() {
         let contents = this.contents;
+        let url = 'http://localhost:8000/devMgt/video?_id=' + this.videoId;
+        // url = 'https://www.w3school.com.cn/i/movie.ogg';
         return (
             <div>
-                <div style={{
+                <div class={this.getStyleName('danmaku-main')} style={{
                     width: '500px',
                     display: 'inline-block',
                 }}>
+                    <Input v-model={this.videoIdText} search enter-button="确认" on-on-search={() => {
+                        this.videoId = this.videoIdText;
+                    }} />
                     <div style={{
                         position: 'relative',
                         height: '400px',
@@ -204,7 +217,7 @@ export default class App extends Base {
                                     playbackRates: [0.7, 1.0, 1.5, 2.0],
                                     sources: [{
                                         type: "video/mp4",
-                                        src: "http://localhost:8000/devMgt/video/detail?_id=test"
+                                        src: url
                                     }],
                                     // poster: "/static/images/author.jpg",
                                     aspectRatio: '16:9',
@@ -214,7 +227,7 @@ export default class App extends Base {
                                 width: '100%'
                             }}
                         />
-                        {/* <video style={{ width: '100%' }} src="http://localhost:8000/devMgt/video/detail?_id=test" controls="conrtols"/> */}
+                        {/* <video style={{ width: '100%' }} src={url} controls="conrtols" /> */}
                         <div ref='board' style={{
                             overflow: 'hidden', position: 'absolute',
                             fontSize: '30px', color: 'white',
@@ -236,15 +249,16 @@ export default class App extends Base {
                     </div>
                     <div>
                         <Row >
-                            <Col span={21}>
-                                <Input v-model={this.danmaku} on-on-keypress={(e) => {
-                                    if (this.isPressEnter(e)) {
-                                        this.sendDanmaku();
-                                    }
-                                }} search enter-button="danmaku" on-on-search={this.sendDanmaku} />
-                            </Col>
-                            <Col span={3}>
-                                <ColorPicker v-model={this.color} />
+                            <Col span={24}>
+                                <div style={{ display: 'flex' }}>
+                                    <Input class="input" v-model={this.danmaku} on-on-keypress={(e) => {
+                                        if (this.isPressEnter(e)) {
+                                            this.sendDanmaku();
+                                        }
+                                    }} style={{ flexGrow: 1 }} />
+                                    <ColorPicker class="color-picker" v-model={this.color} />
+                                    <Button class="send" type="primary" on-click={this.sendDanmaku}>danmaku</Button>
+                                </div>
                             </Col>
                         </Row>
                         <Button on-click={() => { this.contents = []; }}>clear anime</Button>
@@ -279,6 +293,12 @@ export default class App extends Base {
                     }} />
                 </div>
                 <canvas ref="canvas"></canvas>
+                <MyUpload ref='upload' width={100} height={100}
+                    headers={testApi.defaultHeaders}
+                    uploadUrl={testApi.videoUploadUrl} maxSize={10240} />
+                <Button on-click={() => {
+                    this.$refs.upload.upload();
+                }}>upload</Button>
 
                 <MyList ref="list" type="custom" infiniteScroll
                     customQueryNode={
