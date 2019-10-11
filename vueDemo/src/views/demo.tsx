@@ -3,10 +3,10 @@ import anime from 'animejs';
 import 'echarts/lib/chart/line';
 import * as echarts from 'echarts/lib/echarts';
 
-import 'video.js/dist/video-js.css';
-import 'vue-video-player/src/custom-theme.css';
-import { videoPlayer } from 'vue-video-player';
 import * as  QRCode from 'qrcode';
+
+import videojs from 'video.js';
+import 'video.js/dist/video-js.min.css';
 
 import { Input, Card, Button, ColorPicker, Row, Col, Checkbox } from '@/components/iview';
 import { MyList, IMyList } from '@/components/my-list';
@@ -15,11 +15,8 @@ import { testSocket, testApi } from '@/api';
 import { Base } from './base';
 import './demo.less';
 
-@Component({
-    components: {
-        videoPlayer
-    }
-})
+
+@Component
 export default class App extends Base {
     protected stylePrefix = 'demo-';
     public value = '';
@@ -42,16 +39,34 @@ export default class App extends Base {
         refName?: string;
     }[] = [];
     $refs: {
-        board: HTMLElement; list: IMyList<any>; echart: HTMLDivElement, canvas: HTMLDivElement,
-        upload: IMyUpload
+        board: HTMLElement; list: IMyList<any>; echart: HTMLDivElement; canvas: HTMLDivElement;
+        upload: IMyUpload; video: HTMLVideoElement
     };
     richText = '';
     chart: echarts.ECharts;
     chartAddData = '';
+    player: any;
 
     public created() {
         this.setList();
         testSocket.bindDanmakuRecv(this.recvDanmaku);
+    }
+
+    videoIdText = '';
+    videoId = '5d9eeeb0f8b93d22548dd6cc';
+
+    videoOpt = {
+        // videojs options
+        muted: true,
+        controls: true,
+        language: 'en',
+        playbackRates: [0.7, 1.0, 1.5, 2.0],
+        sources: [{
+            type: "video/mp4",
+            src: testApi.getVideoUrl(this.videoId)
+        }],
+        poster: "http://vjs.zencdn.net/v/oceans.png",
+        aspectRatio: '16:9',
     }
 
     mounted() {
@@ -59,6 +74,11 @@ export default class App extends Base {
         this.chart = echarts.init(this.$refs.echart);
         this.setECharts();
         this.qrcode();
+        this.player = videojs(this.$refs.video, this.videoOpt);
+    }
+
+    beforeDestroy() {
+        videojs(this.$refs.video).dispose();
     }
 
     async qrcode() {
@@ -184,21 +204,27 @@ export default class App extends Base {
     }
 
     fail = false;
-    videoIdText = '';
-    videoId = '5d9eeeb0f8b93d22548dd6cc';
     protected render() {
         let contents = this.contents;
-        let url = 'http://localhost:8000/devMgt/video?_id=' + this.videoId;
-        // url = 'https://www.w3school.com.cn/i/movie.ogg';
+
         return (
             <div>
                 <div class={this.getStyleName('danmaku-main')} style={{
                     width: '500px',
                     display: 'inline-block',
                 }}>
-                    <Input v-model={this.videoIdText} search enter-button="确认" on-on-search={() => {
-                        this.videoId = this.videoIdText;
-                    }} />
+                    <Input v-model={this.videoIdText} search enter-button="确认"
+                        on-on-search={() => {
+                            this.videoId = this.videoIdText;
+                            let url = testApi.getVideoUrl(this.videoId) || 'http://vjs.zencdn.net/v/oceans.mp4';
+                            this.player.src({
+                                type: "video/mp4",
+                                src: url
+                            });
+                            this.player.load();
+                            this.player.currentTime(0);
+                            this.player.play();
+                        }} />
                     <div style={{
                         position: 'relative',
                         height: '400px',
@@ -207,27 +233,11 @@ export default class App extends Base {
                         display: 'flex',
                         alignItems: 'center'
                     }}>
-                        <video-player
-                            class="video-player vjs-custom-skin"
-                            options={
-                                {
-                                    // videojs options
-                                    muted: true,
-                                    language: 'en',
-                                    playbackRates: [0.7, 1.0, 1.5, 2.0],
-                                    sources: [{
-                                        type: "video/mp4",
-                                        src: url
-                                    }],
-                                    // poster: "/static/images/author.jpg",
-                                    aspectRatio: '16:9',
-                                }
-                            }
-                            style={{
-                                width: '100%'
-                            }}
-                        />
-                        {/* <video style={{ width: '100%' }} src={url} controls="conrtols" /> */}
+                        <video ref="video" class="video-js vjs-default-skin" style={{
+                            width: 'inherit',
+                            height: 'inherit',
+                        }}>
+                        </video>
                         <div ref='board' style={{
                             overflow: 'hidden', position: 'absolute',
                             fontSize: '30px', color: 'white',
