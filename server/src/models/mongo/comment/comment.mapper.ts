@@ -7,7 +7,8 @@ import * as config from '@/config';
 import { myEnum } from '@/config';
 
 import { LoginUser } from '../../login-user';
-import { BaseMapper, ContentBaseInstanceType } from '../_base';
+import { BaseMapper } from '../_base';
+import { ContentBaseInstanceType } from '../content';
 import { ArticleMapper } from '../article';
 import { UserModel, UserMapper, UserDocType, UserResetOption } from '../user';
 import { VoteModel, VoteMapper, VoteInstanceType } from '../vote';
@@ -165,7 +166,7 @@ export class CommentMapper {
     }) {
         let owner: ContentBaseInstanceType;
         let match: any = { _id: opt.ownerId };
-        if (opt.type == myEnum.commentType.文章) {
+        if (opt.type == myEnum.contentType.文章) {
             if (!opt.mgt)
                 match.status = myEnum.articleStatus.审核通过
             owner = await ArticleMapper.findOne(match);

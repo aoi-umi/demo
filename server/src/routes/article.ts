@@ -8,7 +8,7 @@ import { Auth } from '@/_system/auth';
 import { transaction } from '@/_system/dbMongo';
 import * as VaildSchema from '@/vaild-schema/class-valid';
 
-import { ArticleModel, ArticleInstanceType, ArticleMapper, ArticleLogMapper, ArticleDocType } from '@/models/mongo/article';
+import { ArticleModel, ArticleInstanceType, ArticleMapper, ArticleDocType } from '@/models/mongo/article';
 
 /**
  * @api {get} /article/mgt/query mgt query

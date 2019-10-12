@@ -5,7 +5,7 @@ import moment from 'dayjs';
 import { testApi } from '@/api';
 import { myEnum, dev } from '@/config';
 import { Input, Form, FormItem, Button, Divider, Table, Checkbox, DatePicker } from '@/components/iview';
-import { MyUpload, IMyUpload } from '@/components/my-upload';
+import { MyUpload, IMyUpload, FileDataType } from '@/components/my-upload';
 import { MyEditor } from '@/components/my-editor';
 import { IMyEditor } from '@/components/my-editor/my-editor';
 import { MyLoad, IMyLoad } from '@/components/my-load';
@@ -123,7 +123,7 @@ export default class ArticleDetail extends ArticleMgtBase {
         } else {
             detail = this.getDetailData() as any;
         }
-        this.coverList = detail.detail.coverUrl ? [{ url: detail.detail.coverUrl }] : [];
+        this.coverList = detail.detail.coverUrl ? [{ url: detail.detail.coverUrl, fileType: FileDataType.图片 }] : [];
         this.innerDetail = detail;
         this.setRules();
         return detail;

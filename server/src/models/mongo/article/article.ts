@@ -4,7 +4,7 @@ import {
 } from 'mongoose-ts-ua';
 
 import { myEnum } from '@/config';
-import { ContentBase } from '../_base/contentBase';
+import { ContentBase } from '../content/content-base';
 
 export type ArticleInstanceType = InstanceType<Article>;
 export type ArticleModelType = ModelType<Article, typeof Article>;
@@ -23,7 +23,8 @@ export class Article extends ContentBase {
     content: string;
 
     @prop({
-        enum: myEnum.articleStatus
+        enum: myEnum.articleStatus.getAllValue(),
+        required: true
     })
     status: number;
 

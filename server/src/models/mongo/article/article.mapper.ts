@@ -10,28 +10,19 @@ import { transaction } from '@/_system/dbMongo';
 import { LoginUser } from '../../login-user';
 import { BaseMapper } from '../_base';
 import { UserModel, UserMapper } from '../user';
-import { FileMapper } from '../file';
 import { FollowMapper } from '../follow';
 import { VoteModel, VoteMapper } from '../vote';
+import {
+    ContentLogModel, ContentLogMapper,
+    ContentQueryOption, ContentResetOption, ContentMapper
+} from '../content';
 import { ArticleInstanceType, ArticleModel, ArticleDocType } from "./article";
-import { ArticleLogModel } from './article-log';
 
-type ArticleResetOption = {
-    user?: LoginUser,
-    imgHost?: string;
-};
-
-type ArticleQueryOption = {
-    audit?: boolean;
-    normal?: boolean;
-    userId?: Types.ObjectId;
-    resetOpt: ArticleResetOption;
-};
 
 export class ArticleMapper {
     static async query(data: VaildSchema.AritcleQuery, opt: {
         noTotal?: boolean,
-    } & ArticleQueryOption) {
+    } & ContentQueryOption) {
         opt = { ...opt };
         let match: any = {};
 
@@ -131,7 +122,7 @@ export class ArticleMapper {
         return rs;
     }
 
-    static async detailQuery(data, opt: ArticleQueryOption) {
+    static async detailQuery(data, opt: ContentQueryOption) {
         let { rows } = await this.query(data, { ...opt, noTotal: true });
         let detail = rows[0];
         if (!detail)
@@ -141,13 +132,13 @@ export class ArticleMapper {
             log: null as any[]
         };
         if (!opt.normal) {
-            let logRs = await ArticleLogModel.aggregatePaginate([
-                { $match: { articleId: detail._id } },
+            let logRs = await ContentLogModel.aggregatePaginate([
+                { $match: { contentId: detail._id } },
                 ...UserMapper.lookupPipeline(),
                 { $sort: { _id: -1 } }
             ]);
             rs.log = logRs.rows.map(ele => {
-                let obj = new ArticleLogModel(ele).toJSON();
+                let obj = new ContentLogModel(ele).toJSON();
                 UserMapper.resetDetail(ele.user, { imgHost: opt.resetOpt.imgHost });
                 obj.user = ele.user;
                 return obj;
@@ -163,7 +154,7 @@ export class ArticleMapper {
         return detail;
     }
 
-    static resetDetail(detail, opt: ArticleResetOption) {
+    static resetDetail(detail, opt: ContentResetOption) {
         let { user } = opt;
         if (user) {
             let rs = {
@@ -173,15 +164,7 @@ export class ArticleMapper {
             detail.canDel = rs.canDel;
             detail.canUpdate = rs.canUpdate;
         }
-
-        detail.coverUrl = FileMapper.getImgUrl(detail.cover, opt.imgHost);
-        if (detail.user) {
-            detail.user.avatarUrl = FileMapper.getImgUrl(detail.user.avatar, opt.imgHost);
-            detail.user.followStatus = detail.follow ? detail.follow.status : myEnum.followStatus.未关注;
-        }
-        delete detail.follow;
-        detail.voteValue = detail.vote ? detail.vote.value : myEnum.voteValue.无;
-        delete detail.vote;
+        ContentMapper.resetDetail(detail, opt);
         return detail;
     }
 
@@ -235,14 +218,17 @@ export class ArticleMapper {
             }]
         }
         let log = list.map(ele => {
-            return ArticleLogMapper.create(ele, user, { srcStatus: ele.status, destStatus: status, remark: opt.logRemark });
+            return ContentLogMapper.create(ele, user, {
+                contentType: myEnum.contentType.文章,
+                srcStatus: ele.status, destStatus: status, remark: opt.logRemark
+            });
         });
 
         await transaction(async (session) => {
             if (articleChange)
                 await dbUser.update({ article: dbUser.article + articleChange }, { session });
             await ArticleModel.bulkWrite(bulk, { session });
-            await ArticleLogModel.insertMany(log, { session });
+            await ContentLogModel.insertMany(log, { session });
         });
         return {
             status: status,
@@ -261,7 +247,10 @@ export class ArticleMapper {
                 status,
                 userId: user._id,
             });
-            let log = ArticleLogMapper.create(detail, user, { srcStatus: myEnum.articleStatus.草稿, destStatus: status, remark: detail.remark });
+            let log = ContentLogMapper.create(detail, user, {
+                contentType: myEnum.contentType.文章,
+                srcStatus: myEnum.articleStatus.草稿, destStatus: status, remark: detail.remark
+            });
             await transaction(async (session) => {
                 await detail.save({ session });
                 await log.save({ session });
@@ -284,34 +273,15 @@ export class ArticleMapper {
                 update[key] = data[key];
             });
             let logRemark = update.remark == detail.remark ? null : update.remark;
-            let log = ArticleLogMapper.create(detail, user, { srcStatus: detail.status, destStatus: status, remark: logRemark });
+            let log = ContentLogMapper.create(detail, user, {
+                contentType: myEnum.contentType.文章,
+                srcStatus: detail.status, destStatus: status, remark: logRemark
+            });
             await transaction(async (session) => {
                 await detail.update(update);
                 await log.save({ session });
             });
         }
         return detail;
-    }
-};
-
-export class ArticleLogMapper {
-    static create(article: ArticleInstanceType, user: LoginUser, opt: {
-        srcStatus: number,
-        destStatus: number,
-        remark?: string;
-    }) {
-        let log = new ArticleLogModel({
-            articleId: article._id,
-            userId: user._id,
-            srcStatus: opt.srcStatus,
-            destStatus: opt.destStatus,
-            logUser: user.nameToString(),
-        });
-        log.remark = opt.remark || (myEnum.articleStatus.getKey(log.srcStatus) + '=>' + myEnum.articleStatus.getKey(log.destStatus));
-        return log;
-    }
-
-    static resetDetail(log: any) {
-        return log;
     }
 }

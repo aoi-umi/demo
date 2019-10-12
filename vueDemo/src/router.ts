@@ -138,6 +138,33 @@ export const routerConfig = {
         component: () => import('./views/article-mgt-detail')
     },
 
+    video: {
+        path: dev.routeConfig.article.path,
+        text: '视频',
+        component: () => import('./views/article')
+    },
+    videoDetail: {
+        path: dev.routeConfig.articleDetail.path,
+        text: '视频',
+        component: () => import('./views/article-detail')
+    },
+    videoMgtEdit: {
+        path: dev.routeConfig.articleMgtEdit.path,
+        text: '编辑文章',
+        meta: {
+            authority: dev.routeConfig.articleMgtEdit.authority,
+        },
+        component: () => import('./views/article-mgt-detail')
+    },
+    videoMgtDetail: {
+        path: dev.routeConfig.articleMgtDetail.path,
+        text: '查看文章',
+        meta: {
+            authority: dev.routeConfig.articleMgtDetail.authority,
+        },
+        component: () => import('./views/article-mgt-detail')
+    },
+
     payMgt: {
         path: dev.routeConfig.payMgt.path,
         text: '支付',

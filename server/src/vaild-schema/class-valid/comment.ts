@@ -23,7 +23,7 @@ export class CommentSubmit {
     topId: Types.ObjectId;
 
     @IsDefined()
-    @IsIn(myEnum.commentType.getAllValue())
+    @IsIn(myEnum.contentType.getAllValue())
     @Type()
     type: number;
 }

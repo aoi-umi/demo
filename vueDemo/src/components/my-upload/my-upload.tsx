@@ -11,7 +11,7 @@ import { MyBase } from '../MyBase';
 import * as style from '../style';
 import './my-upload.less';
 
-const FileDataType = {
+export const FileDataType = {
     未知: 0,
     图片: 1,
     视频: 2

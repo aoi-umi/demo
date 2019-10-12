@@ -138,14 +138,6 @@ export default class App extends Base {
     route(to, from) {
         this.setTitle();
         this.activeName = this.getActiveNameByPath(location.pathname);
-        // this.menuCfg.map(ele => this.getMenuName(ele)).filter(ele => this.activeName.includes(ele));
-        // this.menuCfg.forEach(ele => {
-        //     let name = this.getMenuName(ele);
-        //     if (this.activeName.includes(name) && !this.openNames.includes(name)) {
-        //         this.openNames.push(name);
-        //     }
-        // });
-        //其他特殊处理。。。
     }
 
     private menuCfg: MenuConfig[] = [{
@@ -153,6 +145,10 @@ export default class App extends Base {
         icon: 'md-home',
         text: routeConfig.bookmark.text,
         show: false,
+    }, {
+        to: routeConfig.video.path,
+        icon: 'logo-youtube',
+        text: routeConfig.video.text,
     }, {
         to: routeConfig.article.path,
         icon: 'md-paper',

@@ -206,7 +206,9 @@ export default class Article extends ArticleMgtBase {
     }
 
     protected auditSuccessHandler(detail) {
-        this.$refs.list.result.data.splice(detail._index, 1, detail);
+        let data = this.$refs.list.result.data;
+        let idx = data.findIndex(ele => ele._id === detail._id);
+        this.$refs.list.result.data.splice(idx, 1, detail);
     }
 
     private get multiOperateBtnList() {
