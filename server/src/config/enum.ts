@@ -1,4 +1,11 @@
 import { Enum, EnumInstanceObject, EnumInstance } from 'enum-ts';
+const contentStatus = {
+    草稿: 0,
+    待审核: 1,
+    审核通过: 2,
+    审核不通过: 3,
+    已删除: -1,
+};
 export const enumDefine = {
     authorityStatus: {
         禁用: 0,
@@ -13,16 +20,11 @@ export const enumDefine = {
         待审核: 1,
         正常: 2
     },
-    articleStatus: {
-        草稿: 0,
-        待审核: 1,
-        审核通过: 2,
-        审核不通过: 3,
-        已删除: -1,
-    },
-    commentType: {
+    articleStatus: contentStatus,
+    videoStatus: contentStatus,
+    contentType: {
         文章: 0,
-        // 视频: 1,
+        视频: 1,
     },
     commentStatus: {
         正常: 0,

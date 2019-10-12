@@ -31,7 +31,7 @@ export class Comment extends Base implements IVoteOwner {
 
     @prop({
         required: true,
-        enum: myEnum.commentType.getAllValue(),
+        enum: myEnum.contentType.getAllValue(),
     })
     type: number;
 

@@ -5,13 +5,13 @@ import {
 import { Types, SchemaTypes } from 'mongoose';
 
 import { IVoteOwner } from '../vote';
-import { Base } from './base';
+import { Base } from '../_base/base';
 
 export type ContentBaseInstanceType = InstanceType<ContentBase>;
 export type ContentBaseDocType = DocType<ContentBaseInstanceType>;
 
 @setSchema()
-export class ContentBase extends Base implements IVoteOwner {
+export abstract class ContentBase extends Base implements IVoteOwner {
     @prop({
         type: SchemaTypes.ObjectId,
         required: true,
@@ -30,6 +30,9 @@ export class ContentBase extends Base implements IVoteOwner {
         required: true,
     })
     title: string;
+
+    abstract status: number;
+    abstract get statusText(): string;
 
     @arrayProp({
         type: String
