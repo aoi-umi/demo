@@ -139,7 +139,7 @@ export const routerConfig = {
     },
 
     video: {
-        path: dev.routeConfig.article.path,
+        path: dev.routeConfig.video.path,
         text: '视频',
         component: () => import('./views/article')
     },

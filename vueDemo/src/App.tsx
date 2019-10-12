@@ -149,6 +149,7 @@ export default class App extends Base {
         to: routeConfig.video.path,
         icon: 'logo-youtube',
         text: routeConfig.video.text,
+        show: false,
     }, {
         to: routeConfig.article.path,
         icon: 'md-paper',

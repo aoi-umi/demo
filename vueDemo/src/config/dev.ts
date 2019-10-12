@@ -34,6 +34,7 @@ export const routeConfig = {
         path: adminPath + '/roleMgt',
         authority: [authorityConfig.login, authorityConfig.roleQuery],
     },
+
     article: { path: '/article' },
     articleDetail: { path: '/article/detail' },
     articleMgt: {
@@ -48,6 +49,9 @@ export const routeConfig = {
         path: '/articleMgt/edit',
         authority: [authorityConfig.login],
     },
+
+    video: { path: '/video' },
+
     payMgt: {
         path: '/payMgt',
         authority: [authorityConfig.login],
