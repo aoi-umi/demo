@@ -7,7 +7,7 @@ import { dev, myEnum } from '@/config';
 import { testApi, testSocket } from '@/api';
 import { convClass } from '@/components/utils';
 import { Modal, Input, Form, FormItem, Button, Card, TabPane, Tabs, Time } from '@/components/iview';
-import { MyUpload, IMyUpload } from '@/components/my-upload';
+import { MyUpload, IMyUpload, FileDataType } from '@/components/my-upload';
 import { MyList, IMyList, ResultType } from '@/components/my-list';
 import { MyLoad, IMyLoad } from '@/components/my-load';
 import { Utils } from '@/components/utils';
@@ -295,7 +295,7 @@ export default class UserInfo extends Base {
                 nickname: this.detail.nickname,
                 profile: this.detail.profile,
             };
-            this.avatarList = this.updateDetail.avatarUrl ? [{ url: this.updateDetail.avatarUrl }] : [];
+            this.avatarList = this.updateDetail.avatarUrl ? [{ url: this.updateDetail.avatarUrl, fileType: FileDataType.图片 }] : [];
             this.setRules();
         }
     }
