@@ -56,6 +56,18 @@ router.get('/article/query', UserAuthMid.normal(), article.query);
 router.get('/article/detailQuery', UserAuthMid.normal(), article.detailQuery);
 //#endregion
 
+//#region video 
+import * as video from './video';
+router.get('/video/mgt/query', UserAuthMid.normal([auth.login]), video.mgtQuery);
+router.get('/video/mgt/detailQuery', UserAuthMid.normal([auth.login]), video.mgtDetailQuery);
+router.post('/video/mgt/save', UserAuthMid.normal([auth.login]), video.mgtSave);
+router.post('/video/mgt/del', UserAuthMid.normal(), video.mgtDel);
+router.post('/video/mgt/audit', UserAuthMid.normal([auth.videoMgtAudit]), video.mgtAudit);
+
+router.get('/video/query', UserAuthMid.normal(), video.query);
+router.get('/video/detailQuery', UserAuthMid.normal(), video.detailQuery);
+//#endregion
+
 //#region comment 
 import * as comment from './comment';
 router.post('/comment/submit', UserAuthMid.normal([auth.login]), comment.submit);

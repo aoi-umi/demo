@@ -62,6 +62,13 @@ export const authConfig = {
         code: 'articleMgtAudit'
     },
 
+    videoMgtDel: {
+        code: 'videoMgtDel'
+    },
+    videoMgtAudit: {
+        code: 'videoMgtAudit'
+    },
+
     commentMgtDel: {
         code: 'commentMgtDel'
     },

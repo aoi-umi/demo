@@ -108,6 +108,11 @@ export class User extends Base {
         default: 0
     })
     article: number;
+
+    @prop({
+        default: 0
+    })
+    video: number;
 }
 
 export const UserModel = getModelForClass<User, typeof User>(User);

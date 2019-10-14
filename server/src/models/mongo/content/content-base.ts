@@ -9,6 +9,7 @@ import { Base } from '../_base/base';
 
 export type ContentBaseInstanceType = InstanceType<ContentBase>;
 export type ContentBaseDocType = DocType<ContentBaseInstanceType>;
+export type ContentBaseModelType = ModelType<ContentBase, typeof ContentBase>;
 
 @setSchema()
 export abstract class ContentBase extends Base implements IVoteOwner {
@@ -73,4 +74,6 @@ export abstract class ContentBase extends Base implements IVoteOwner {
     //发布时间
     @prop()
     publishAt: Date;
+
+    abstract get canUpdate(): boolean;
 }

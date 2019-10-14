@@ -3,13 +3,28 @@ import * as Q from 'q';
 import * as moment from 'dayjs';
 import { MongooseDocument, Error } from 'mongoose';
 import { ClassType } from 'class-transformer/ClassTransformer';
+import { plainToClass } from 'class-transformer';
+import { configure, getLogger } from 'log4js';
 
 import * as common from '../_system/common';
 import * as config from '../config';
-import { logger } from '../_main';
 import * as VaildSchema from '../vaild-schema/class-valid';
 import { valid } from './class-valid';
-import { plainToClass } from 'class-transformer';
+
+export const logger = getLogger();
+
+let appenders = {};
+appenders[config.env.logger.name] = config.env.logger.appenders;
+
+configure({
+    appenders,
+    categories: {
+        default: {
+            appenders: [config.env.logger.name],
+            level: 'info'
+        }
+    }
+});
 
 type ResponseHandlerOptType = {
     json?: boolean;

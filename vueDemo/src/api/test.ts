@@ -37,14 +37,23 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
 
     articleQuery,
     articleDetailQuery,
-    commentSubmit,
-    commentQuery,
-    commentDel,
     articleMgtQuery,
     articleMgtDetailQuery,
     articleMgtSave,
     articleMgtDel,
     articleMgtAudit,
+
+    videoQuery,
+    videoDetailQuery,
+    videoMgtQuery,
+    videoMgtDetailQuery,
+    videoMgtSave,
+    videoMgtDel,
+    videoMgtAudit,
+
+    commentSubmit,
+    commentQuery,
+    commentDel,
 
     voteSubmit,
     followSave,
@@ -245,6 +254,30 @@ export class TestApi extends ApiModel<TestApiMethod> {
     }
     async articleMgtAudit(data: { idList: string[], status, remark?}) {
         return this.requestByConfig(this.apiConfig.method.articleMgtAudit, { data });
+    }
+    //#endregion  
+
+    //#region video 
+    async videoQuery(data?: { anyKey?} & ApiListQueryArgs) {
+        return this.requestByConfig<ListResult>(this.apiConfig.method.videoQuery, { data });
+    }
+    async videoDetailQuery(data) {
+        return this.requestByConfig(this.apiConfig.method.videoDetailQuery, { data });
+    }
+    async videoMgtQuery(data?: { anyKey?} & ApiListQueryArgs) {
+        return this.requestByConfig<ListResult>(this.apiConfig.method.videoMgtQuery, { data });
+    }
+    async videoMgtDetailQuery(data) {
+        return this.requestByConfig(this.apiConfig.method.videoMgtDetailQuery, { data });
+    }
+    async videoMgtSave(data) {
+        return this.requestByConfig(this.apiConfig.method.videoMgtSave, { data });
+    }
+    async videoMgtDel(data: { idList: string[], remark?: string }) {
+        return this.requestByConfig(this.apiConfig.method.videoMgtDel, { data });
+    }
+    async videoMgtAudit(data: { idList: string[], status, remark?}) {
+        return this.requestByConfig(this.apiConfig.method.videoMgtAudit, { data });
     }
     //#endregion  
 

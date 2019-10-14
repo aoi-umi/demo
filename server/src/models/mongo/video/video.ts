@@ -2,6 +2,7 @@ import {
     getModelForClass, ModelType, DocType, InstanceType,
     setSchema, prop, arrayProp
 } from 'mongoose-ts-ua';
+import { Types, SchemaTypes } from 'mongoose';
 
 import { myEnum } from '@/config';
 import { ContentBase } from '../content/content-base';
@@ -19,8 +20,9 @@ export type VideoDocType = DocType<VideoInstanceType>;
 export class Video extends ContentBase {
     @prop({
         required: true,
+        type: SchemaTypes.ObjectId
     })
-    content: string;
+    videoIdList: Types.ObjectId;
 
     @prop({
         enum: myEnum.videoStatus.getAllValue()

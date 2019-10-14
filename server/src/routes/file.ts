@@ -6,7 +6,7 @@ import { responseHandler, paramsValid } from "@/helpers";
 import { myEnum } from "@/config";
 import * as VaildSchema from '@/vaild-schema/class-valid';
 import { FileMapper, FileModel } from "@/models/mongo/file";
-import { logger } from "@/_main";
+import { logger } from "@/helpers";
 
 const uplaod = (option: { fileType: string }, req: Request, res: Response) => {
     responseHandler(async () => {

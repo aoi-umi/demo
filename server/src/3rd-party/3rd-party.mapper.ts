@@ -1,7 +1,7 @@
 import * as wxpay from "3rd-party-pay/dest/lib/wxpay";
 
 import { myEnum } from "@/config";
-import { logger } from "@/_main";
+import { logger } from "@/helpers";
 import * as common from "@/_system/common";
 
 import { AssetLogModel, PayInstanceType, AssetLogInstanceType, PayModel, PayMapper } from "@/models/mongo/asset";

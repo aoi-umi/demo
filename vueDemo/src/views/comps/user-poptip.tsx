@@ -3,6 +3,7 @@ import * as iviewTypes from 'iview';
 
 import { testApi, testSocket } from '@/api';
 import { dev, myEnum, authority } from '@/config';
+import { routerConfig } from '@/router';
 import { convClass } from '@/components/utils';
 import { Button, Avatar, Poptip, Spin } from '@/components/iview';
 import { MyImgViewer, IMyImgViewer } from '@/components/my-img-viewer';
@@ -67,8 +68,8 @@ class UserPoptip extends Base {
             testApi.userSignOut();
             testSocket.logout({ [dev.cacheKey.testUser]: token });
         }
-        for (let key in dev.routeConfig) {
-            let rtCfg = dev.routeConfig[key];
+        for (let key in routerConfig) {
+            let rtCfg = routerConfig[key];
             if (rtCfg.path === this.$route.path) {
                 if (rtCfg.authority && rtCfg.authority.includes(authority.login))
                     this.$router.go(0);
@@ -108,7 +109,7 @@ class UserPoptip extends Base {
                     {this.self ?
                         <div slot="content">
                             <p class="ivu-select-item" on-click={() => {
-                                this.$router.push(dev.routeConfig.userInfo.path);
+                                this.$router.push(routerConfig.userInfo.path);
                             }}>主页</p>
                             <p class="ivu-select-item" on-click={this.signOut}>退出</p>
                         </div> :
@@ -143,14 +144,14 @@ class UserPoptip extends Base {
                                     }}>重试</Button>}
                                 <Button on-click={() => {
                                     this.$router.push({
-                                        path: dev.routeConfig.userInfo.path,
+                                        path: routerConfig.userInfo.path,
                                         query: { _id: this.user._id }
                                     });
                                 }}>主页</Button>
                                 {!loadFail && notSelf && <FollowButtonView user={this.userDetail} />}
                                 {notSelf && <Button on-click={() => {
                                     this.$router.push({
-                                        path: dev.routeConfig.userChat.path,
+                                        path: routerConfig.userChat.path,
                                         query: { _id: this.user._id }
                                     });
                                 }}>私信</Button>}

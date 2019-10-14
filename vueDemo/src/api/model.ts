@@ -22,6 +22,8 @@ export class ApiModel<T = ApiMethodConfigType> {
     }
 
     getRequestConfig(config: ApiMethodConfigType) {
+        if (!config)
+            throw new Error('config is null');
         let cfg = clone<ApiMethodConfigType>(config as any);
         let args = clone(this.apiConfig.defaultArgs);
         if (!cfg.isUseDefault && cfg.args) {

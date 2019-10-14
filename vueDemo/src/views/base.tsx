@@ -2,6 +2,7 @@ import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { getModule } from 'vuex-module-decorators';
 import LoginUserStore from '@/store/loginUser';
 import { dev, error } from '@/config';
+import { routerConfig } from '@/router';
 import SettingStore from '@/store/setting';
 import { MyBase } from '@/components/MyBase';
 
@@ -79,7 +80,7 @@ export class Base extends MyBase {
 
     protected toError(query: { code?: string; msg?: string }) {
         this.$router.push({
-            path: dev.routeConfig.error.path,
+            path: routerConfig.error.path,
             query,
         });
     }

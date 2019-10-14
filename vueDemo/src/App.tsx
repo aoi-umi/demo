@@ -149,16 +149,15 @@ export default class App extends Base {
         to: routeConfig.video.path,
         icon: 'logo-youtube',
         text: routeConfig.video.text,
-        show: false,
     }, {
         to: routeConfig.article.path,
         icon: 'md-paper',
         text: routeConfig.article.text,
     }, {
-        to: routeConfig.articleMgt.path,
+        to: routeConfig.contentMgt.path,
         icon: 'md-create',
-        text: routeConfig.articleMgt.text,
-        show: () => this.storeUser.user.hasAuth(routeConfig.articleMgt.meta.authority)
+        text: routeConfig.contentMgt.text,
+        show: () => this.storeUser.user.hasAuth(routeConfig.contentMgt.meta.authority)
     }, {
         to: routeConfig.payMgt.path,
         icon: 'logo-usd',

@@ -36,6 +36,13 @@ var authority = {
         name: '文章管理审核'
     },
 
+    videoMgtDel: {
+        code: 'videoMgtDel'
+    },
+    videoMgtAudit: {
+        code: 'videoMgtAudit'
+    },
+
     commentMgtDel: {
         name: '评论管理删除'
     },

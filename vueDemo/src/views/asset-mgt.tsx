@@ -4,6 +4,7 @@ import moment from 'dayjs';
 import { convert } from '@/helpers';
 import * as helpers from '@/helpers';
 import { dev, myEnum, authority } from '@/config';
+import { routerConfig } from '@/router';
 import { testApi, testSocket } from '@/api';
 import { Modal, Input, Button, Card, Row, Col, Checkbox, Tabs, TabPane } from '@/components/iview';
 import { MyList, IMyList, Const as MyListConst } from '@/components/my-list';
@@ -18,12 +19,12 @@ export default class AssetMgt extends Base {
             <Row gutter={5}>
                 <Col xs={8}>
                     <Card class="pointer" nativeOn-click={() => {
-                        this.$router.push(dev.routeConfig.assetMgtLog.path);
+                        this.$router.push(routerConfig.assetMgtLog.path);
                     }}>资金记录</Card>
                 </Col>
                 <Col xs={8}>
                     <Card class="pointer" nativeOn-click={() => {
-                        this.$router.push(dev.routeConfig.assetMgtNotify.path);
+                        this.$router.push(routerConfig.assetMgtNotify.path);
                     }}>回调通知</Card>
                 </Col>
             </Row>
@@ -93,7 +94,7 @@ export class AssetMgtLog extends Base {
                         let detail = params.row;
                         return <a on-click={() => {
                             this.$router.push({
-                                path: dev.routeConfig.assetMgtNotify.path,
+                                path: routerConfig.assetMgtNotify.path,
                                 query: { orderNo: detail.orderNo }
                             })
                         }}>{detail.orderNo}</a>
@@ -213,7 +214,7 @@ export class AssetMgtNotify extends Base {
                         let detail = params.row;
                         return <a on-click={() => {
                             this.$router.push({
-                                path: dev.routeConfig.assetMgtLog.path,
+                                path: routerConfig.assetMgtLog.path,
                                 query: { orderNo: detail.orderNo }
                             })
                         }}>{detail.orderNo}</a>

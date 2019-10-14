@@ -6,21 +6,16 @@ import * as config from '@/config';
 import { Auth } from '@/_system/auth';
 import * as VaildSchema from '@/vaild-schema/class-valid';
 
-import { ArticleModel, ArticleMapper } from '@/models/mongo/article';
+import { VideoMapper, VideoModel } from '@/models/mongo/video';
 
-/**
- * @api {get} /article/mgt/query mgt query
- * @apiGroup article
- * @apiParamClass (src/vaild-schema/class-valid/article.ts) {AritcleQuery}
- */
 export let mgtQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = paramsValid(req.query, VaildSchema.ArticleQuery);
+        let data = paramsValid(req.query, VaildSchema.VideoQuery);
 
-        let { rows, total } = await ArticleMapper.query(data, {
+        let { rows, total } = await VideoMapper.query(data, {
             userId: user._id,
-            audit: Auth.contains(user, config.auth.articleMgtAudit),
+            audit: Auth.contains(user, config.auth.videoMgtAudit),
             resetOpt: {
                 imgHost: req.myData.imgHost,
                 user,
@@ -36,10 +31,10 @@ export let mgtQuery: RequestHandler = (req, res) => {
 export let mgtDetailQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = paramsValid(req.query, VaildSchema.ArticleDetailQuery);
-        let rs = await ArticleMapper.detailQuery({ _id: data._id }, {
+        let data = paramsValid(req.query, VaildSchema.VideoDetailQuery);
+        let rs = await VideoMapper.detailQuery({ _id: data._id }, {
             userId: user._id,
-            audit: Auth.contains(user, config.auth.articleMgtAudit),
+            audit: Auth.contains(user, config.auth.videoMgtAudit),
             resetOpt: {
                 imgHost: req.myData.imgHost,
                 user,
@@ -49,16 +44,11 @@ export let mgtDetailQuery: RequestHandler = (req, res) => {
     }, req, res);
 };
 
-/**
- * @api {post} /article/mgt/save mgt save
- * @apiGroup article
- * @apiParamClass (src/vaild-schema/class-valid/article.ts) {AritcleSave}
- */
 export let mgtSave: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = paramsValid(req.body, VaildSchema.ArticleSave);
-        let detail = await ArticleMapper.mgtSave(data, { user });
+        let data = paramsValid(req.body, VaildSchema.VideoSave);
+        let detail = await VideoMapper.mgtSave(data, { user });
         return {
             _id: detail._id
         };
@@ -68,11 +58,11 @@ export let mgtSave: RequestHandler = (req, res) => {
 export let mgtDel: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = paramsValid(req.body, VaildSchema.ArticleDel);
-        await ArticleMapper.updateStatus({
-            idList: data.idList, toStatus: myEnum.articleStatus.已删除, user,
-            includeUserId: Auth.contains(user, config.auth.articleMgtDel) ? null : user._id,
-            status: { $ne: myEnum.articleStatus.已删除 },
+        let data = paramsValid(req.body, VaildSchema.VideoDel);
+        await VideoMapper.updateStatus({
+            idList: data.idList, toStatus: myEnum.videoStatus.已删除, user,
+            includeUserId: Auth.contains(user, config.auth.videoMgtDel) ? null : user._id,
+            status: { $ne: myEnum.videoStatus.已删除 },
             logRemark: data.remark,
         });
     }, req, res);
@@ -81,11 +71,11 @@ export let mgtDel: RequestHandler = (req, res) => {
 export let mgtAudit: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = paramsValid(req.body, VaildSchema.ArticleMgtAudit);
-        let rs = await ArticleMapper.updateStatus({
+        let data = paramsValid(req.body, VaildSchema.VideoMgtAudit);
+        let rs = await VideoMapper.updateStatus({
             idList: data.idList,
             toStatus: data.status, user,
-            status: myEnum.articleStatus.待审核,
+            status: myEnum.videoStatus.待审核,
             logRemark: data.remark,
         });
         return rs;
@@ -96,9 +86,9 @@ export let mgtAudit: RequestHandler = (req, res) => {
 export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = paramsValid(req.query, VaildSchema.ArticleQuery);
+        let data = paramsValid(req.query, VaildSchema.VideoQuery);
 
-        let { rows, total } = await ArticleMapper.query(data, {
+        let { rows, total } = await VideoMapper.query(data, {
             normal: true,
             resetOpt: {
                 imgHost: req.myData.imgHost,
@@ -115,8 +105,8 @@ export let query: RequestHandler = (req, res) => {
 export let detailQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = paramsValid(req.query, VaildSchema.ArticleDetailQuery);
-        let rs = await ArticleMapper.detailQuery({ _id: data._id }, {
+        let data = paramsValid(req.query, VaildSchema.VideoDetailQuery);
+        let rs = await VideoMapper.detailQuery({ _id: data._id }, {
             normal: true,
             resetOpt: {
                 imgHost: req.myData.imgHost,
@@ -124,7 +114,7 @@ export let detailQuery: RequestHandler = (req, res) => {
             }
         });
         let detail = rs.detail;
-        ArticleModel.update({ _id: detail._id }, { readTimes: detail.readTimes + 1 }).exec();
+        VideoModel.update({ _id: detail._id }, { readTimes: detail.readTimes + 1 }).exec();
         return rs;
     }, req, res);
 };

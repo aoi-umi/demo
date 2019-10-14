@@ -3,7 +3,8 @@ import { plainToClass } from "class-transformer";
 
 import * as config from '@/config';
 import { AuthType } from "@/_system/auth";
-import { auth, logger, cache } from '@/_main';
+import { auth, cache } from '@/_main';
+import { logger } from '@/helpers';
 import { UserMapper } from "@/models/mongo/user";
 import { LoginUser } from "@/models/login-user";
 
