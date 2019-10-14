@@ -5,145 +5,80 @@ import { myEnum } from '@/config';
 import * as VaildSchema from '@/vaild-schema/class-valid';
 import { error, escapeRegExp } from '@/_system/common';
 import { Auth } from '@/_system/auth';
-import { transaction } from '@/_system/dbMongo';
 
 import { LoginUser } from '../../login-user';
-import { BaseMapper } from '../_base';
-import { UserModel, UserMapper } from '../user';
-import { FollowMapper } from '../follow';
-import { VoteModel, VoteMapper } from '../vote';
+import { UserMapper } from '../user';
 import {
-    ContentLogModel, ContentLogMapper,
-    ContentQueryOption, ContentResetOption, ContentMapper
+    ContentLogModel,
+    ContentQueryOption, ContentResetOption, ContentMapper, ContentUpdateStatusOutOption
 } from '../content';
-import { ArticleInstanceType, ArticleModel, ArticleDocType } from "./article";
+import { ArticleModel, ArticleDocType } from "./article";
+import { BaseMapper } from '../_base';
 
 
 export class ArticleMapper {
-    static async query(data: VaildSchema.AritcleQuery, opt: {
+    static async query(data: VaildSchema.ArticleQuery, opt: {
         noTotal?: boolean,
     } & ContentQueryOption) {
-        opt = { ...opt };
-        let match: any = {};
+        function setMatch(match) {
+            let userId = opt.userId;
+            if (opt.normal) {
+                match.status = myEnum.articleStatus.审核通过;
+                match.publishAt = { $lte: new Date() };
+            } else if (opt.audit) {
+                //排除非本人的草稿
+                match.$expr = {
+                    $not: {
+                        $and: [
+                            { $ne: ['$userId', userId] },
+                            { $eq: ['$status', myEnum.articleStatus.草稿] }
+                        ]
+                    }
 
-        if (data._id) {
-            match._id = data._id;
-        }
-
-        if (data.userId) {
-            match.userId = data.userId;
-        }
-        let and = [];
-        if (data.user) {
-            let user = new RegExp(escapeRegExp(data.user), 'i');
-            and.push({
-                $or: [
-                    { 'user.nickname': user },
-                    { 'user.account': user },
-                ]
+                };
+            } else {
+                match.userId = userId;
+            }
+            let and = [];
+            let anyKeyAnd = BaseMapper.multiKeyLike(data.anyKey, (anykey) => {
+                return {
+                    $or: [
+                        { title: anykey },
+                        { content: anykey },
+                        { profile: anykey },
+                        { 'user.nickname': anykey },
+                        { 'user.account': anykey },
+                    ]
+                };
             });
-        }
-        if (data.anyKey) {
-            let keyList = escapeRegExp(data.anyKey.trim()).split(' ');
-            if (keyList.length) {
+            if (anyKeyAnd.length) {
                 and.push({
-                    $and: keyList.map(ele => {
-                        let anykey = new RegExp(ele, 'i');
-                        return {
-                            $or: [
-                                { title: anykey },
-                                { content: anykey },
-                                { profile: anykey },
-                                { 'user.nickname': anykey },
-                                { 'user.account': anykey },
-                            ]
-                        };
-                    })
+                    $and: anyKeyAnd
                 });
             }
+            if (and.length) {
+                match.$and = match.$and ? [...match.$and, ...and] : and;
+            }
         }
-        if (and.length)
-            match.$and = and;
-
-        if (data.title)
-            match.title = new RegExp(escapeRegExp(data.title), 'i');
-
-        if (data.status)
-            match.status = { $in: data.status.split(',').map(ele => parseInt(ele)) };
-
-        let userId = opt.userId;
-        if (opt.normal) {
-            match.status = myEnum.articleStatus.审核通过;
-            match.publishAt = { $lte: new Date() };
-        } else if (opt.audit) {
-            //排除非本人的草稿
-            match.$expr = {
-                $not: {
-                    $and: [
-                        { $ne: ['$userId', userId] },
-                        { $eq: ['$status', myEnum.articleStatus.草稿] }
-                    ]
-                }
-
-            };
-        } else {
-            match.userId = userId;
-        }
-
-        let pipeline: any[] = [
-            ...UserMapper.lookupPipeline(),
-            { $match: match },
-        ];
-        let resetOpt = { ...opt.resetOpt };
-        let extraPipeline = [];
-        if (opt.normal && resetOpt.user) {
-            extraPipeline = [
-                ...VoteMapper.lookupPipeline({
-                    userId: resetOpt.user._id
-                }),
-                ...FollowMapper.lookupPipeline({
-                    userId: resetOpt.user._id,
-                })
-            ];
-        }
-
-        let rs = await ArticleModel.aggregatePaginate(pipeline, {
-            ...BaseMapper.getListOptions(data),
+        return ContentMapper.query(data, {
             ...opt,
-            extraPipeline,
+            model: ArticleModel,
+            setMatch,
+            resetDetail: (data) => {
+                return this.resetDetail(data, opt.resetOpt);
+            }
         });
-        rs.rows = rs.rows.map(ele => {
-            let e = {
-                ...ele,
-                ...new ArticleModel(ele).toJSON()
-            };
-            return this.resetDetail(e, resetOpt);
-        });
-        return rs;
     }
 
     static async detailQuery(data, opt: ContentQueryOption) {
-        let { rows } = await this.query(data, { ...opt, noTotal: true });
-        let detail = rows[0];
-        if (!detail)
-            throw error('', config.error.NOT_FOUND);
-        let rs = {
-            detail,
-            log: null as any[]
-        };
-        if (!opt.normal) {
-            let logRs = await ContentLogModel.aggregatePaginate([
-                { $match: { contentId: detail._id } },
-                ...UserMapper.lookupPipeline(),
-                { $sort: { _id: -1 } }
-            ]);
-            rs.log = logRs.rows.map(ele => {
-                let obj = new ContentLogModel(ele).toJSON();
-                UserMapper.resetDetail(ele.user, { imgHost: opt.resetOpt.imgHost });
-                obj.user = ele.user;
-                return obj;
-            });
-        }
+        let rs = ContentMapper.detailQuery({
+            ...opt,
+            query: async () => {
+                let { rows } = await this.query(data, { ...opt, noTotal: true });
+                let detail = rows[0];
+                return detail;
+            }
+        });
         return rs;
     }
 
@@ -168,120 +103,44 @@ export class ArticleMapper {
         return detail;
     }
 
-    static async updateStatus(idList: Types.ObjectId[], status: number, user: LoginUser, opt?: {
-        includeUserId?: Types.ObjectId | string;
-        status?: any;
-        logRemark?: string;
-    }) {
-        opt = {
+    static async updateStatus(opt: ContentUpdateStatusOutOption) {
+        let toStatus = opt.toStatus;
+        await ContentMapper.updateStatus({
             ...opt,
-        };
-        let cond: any = { _id: { $in: idList } };
-        if (opt.status !== undefined)
-            cond.status = opt.status;
-        if (opt.includeUserId)
-            cond.userId = Types.ObjectId(opt.includeUserId as any);
-        let list = await ArticleModel.find(cond);
-        if (!list.length)
-            throw error('', config.error.NO_MATCH_DATA);
-        let bulk = [];
-        let dbUser = await UserModel.findById(user._id);
-        let articleChange = 0;
-        if (status === myEnum.articleStatus.审核通过) {
-            articleChange = 1;
-            let now = new Date();
-            bulk = list.map(ele => {
-                let update = { status, publishAt: now };
-                //指定时间发布
-                if (ele.setPublish && ele.setPublishAt && ele.setPublishAt.getTime() > now.getTime()) {
-                    update.publishAt = ele.setPublishAt;
-                }
-                return {
-                    updateOne: {
-                        filter: { ...cond, _id: ele._id },
-                        update: {
-                            $set: update
-                        }
-                    }
-                }
-            });
-        } else {
-            if (status === myEnum.articleStatus.已删除)
-                articleChange = 1;
-            bulk = [{
-                updateMany: {
-                    filter: cond,
-                    update: {
-                        $set: { status }
-                    }
-                }
-            }]
-        }
-        let log = list.map(ele => {
-            return ContentLogMapper.create(ele, user, {
-                contentType: myEnum.contentType.文章,
-                srcStatus: ele.status, destStatus: status, remark: opt.logRemark
-            });
-        });
-
-        await transaction(async (session) => {
-            if (articleChange)
-                await dbUser.update({ article: dbUser.article + articleChange }, { session });
-            await ArticleModel.bulkWrite(bulk, { session });
-            await ContentLogModel.insertMany(log, { session });
+            model: ArticleModel,
+            contentType: myEnum.contentType.文章,
+            passCond: () => toStatus === myEnum.articleStatus.审核通过,
+            delCond: (detail) => {
+                return detail.status === myEnum.articleStatus.审核通过
+                    && toStatus === myEnum.articleStatus.已删除;
+            },
+            updateCountInUser: async (changeNum, dbUser, session) => {
+                await dbUser.update({ article: dbUser.article + changeNum }, { session });
+            }
         });
         return {
-            status: status,
-            statusText: myEnum.articleStatus.getKey(status)
+            status: toStatus,
+            statusText: myEnum.articleStatus.getKey(toStatus)
         };
     }
 
-    static async mgtSave(data: VaildSchema.AritcleSave, opt: { user: LoginUser }) {
-        let { user } = opt;
-        let detail: ArticleInstanceType;
+    static async mgtSave(data: VaildSchema.ArticleSave, opt: { user: LoginUser }) {
         let status = data.submit ? myEnum.articleStatus.待审核 : myEnum.articleStatus.草稿;
-        if (!data._id) {
-            delete data._id;
-            detail = new ArticleModel({
-                ...data,
-                status,
-                userId: user._id,
-            });
-            let log = ContentLogMapper.create(detail, user, {
-                contentType: myEnum.contentType.文章,
-                srcStatus: myEnum.articleStatus.草稿, destStatus: status, remark: detail.remark
-            });
-            await transaction(async (session) => {
-                await detail.save({ session });
-                await log.save({ session });
-            });
-        } else {
-            detail = await ArticleMapper.findOne({ _id: data._id });
-            if (!user.equalsId(detail.userId))
-                throw error('', config.error.NO_PERMISSIONS);
-            if (!detail.canUpdate) {
-                throw error('当前状态无法修改');
+        let saveKey: (keyof ArticleDocType)[] = [
+            'cover', 'title', 'profile', 'content', 'remark',
+            'setPublish', 'setPublishAt'
+        ];
+        let rs = await ContentMapper.mgtSave(data, {
+            ...opt,
+            contentType: myEnum.contentType.文章,
+            model: ArticleModel,
+            status,
+            saveKey,
+            getDetail: async () => {
+                let detail = await ArticleMapper.findOne({ _id: data._id });
+                return detail;
             }
-            let update: any = {
-                status,
-            };
-            let updateKey: (keyof ArticleDocType)[] = [
-                'cover', 'title', 'profile', 'content', 'remark',
-                'setPublish', 'setPublishAt'
-            ];
-            updateKey.forEach(key => {
-                update[key] = data[key];
-            });
-            let logRemark = update.remark == detail.remark ? null : update.remark;
-            let log = ContentLogMapper.create(detail, user, {
-                contentType: myEnum.contentType.文章,
-                srcStatus: detail.status, destStatus: status, remark: logRemark
-            });
-            await transaction(async (session) => {
-                await detail.update(update);
-                await log.save({ session });
-            });
-        }
-        return detail;
+        });
+        return rs;
     }
 }

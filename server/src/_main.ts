@@ -1,5 +1,4 @@
 import { Request, Response, Express } from 'express';
-import { configure, getLogger } from 'log4js';
 import { ConfirmChannel } from 'amqplib';
 import * as SocketIO from 'socket.io';
 import { Server } from 'http';
@@ -13,22 +12,8 @@ import { Auth } from '@/_system/auth';
 import { Cache } from '@/_system/cache';
 import routes from '@/routes';
 import { ThirdPartyPayMapper } from '@/3rd-party';
+
 import { PayMapper } from './models/mongo/asset';
-
-export const logger = getLogger();
-
-let appenders = {};
-appenders[config.env.logger.name] = config.env.logger.appenders;
-
-configure({
-    appenders,
-    categories: {
-        default: {
-            appenders: [config.env.logger.name],
-            level: 'info'
-        }
-    }
-});
 
 export const auth = new Auth();
 export const mq = new MQ();

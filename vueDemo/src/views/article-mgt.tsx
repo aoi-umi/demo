@@ -1,11 +1,14 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { testApi } from '@/api';
 import { myEnum, authority, dev } from '@/config';
+import { routerConfig } from '@/router';
 import { convert } from '@/helpers';
 import { Modal, Checkbox, Row, Input, Card, Button } from '@/components/iview';
 import { MyList, IMyList } from '@/components/my-list';
 import { MyConfirm } from '@/components/my-confirm';
 import { MyTag, TagType } from '@/components/my-tag';
+import { convClass } from '@/components/utils';
+
 import { DetailDataType } from './article-mgt-detail';
 import { Base } from './base';
 import { ArticleListItemView } from './article';
@@ -45,7 +48,7 @@ export class ArticleMgtBase extends Base {
 
     protected toList() {
         this.$router.push({
-            path: dev.routeConfig.articleMgt.path,
+            path: routerConfig.contentMgt.path,
         });
     }
 
@@ -57,7 +60,7 @@ export class ArticleMgtBase extends Base {
             ...opt
         };
         this.$router.push({
-            path: opt.preview ? dev.routeConfig.articleMgtDetail.path : dev.routeConfig.articleMgtEdit.path,
+            path: opt.preview ? routerConfig.articleMgtDetail.path : routerConfig.articleMgtEdit.path,
             query: { _id: _id || '', repost: opt.repost ? 'true' : '' }
         });
     }
@@ -164,7 +167,7 @@ export class ArticleMgtBase extends Base {
     }
 }
 @Component
-export default class Article extends ArticleMgtBase {
+export default class ArticleMgt extends ArticleMgtBase {
     $refs: { list: IMyList<any> };
 
     protected created() {
@@ -318,3 +321,5 @@ export default class Article extends ArticleMgtBase {
         );
     }
 }
+
+export const ArticleMgtView = convClass<ArticleMgt>(ArticleMgt);

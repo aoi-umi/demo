@@ -4,6 +4,7 @@ import moment from 'dayjs';
 
 import * as helpers from '@/helpers';
 import { dev, myEnum } from '@/config';
+import { routerConfig } from '@/router';
 import { testApi, testSocket } from '@/api';
 import { convClass } from '@/components/utils';
 import { Modal, Input, Form, FormItem, Button, Card, TabPane, Tabs, Time } from '@/components/iview';
@@ -19,7 +20,7 @@ import { AuthorityTagView } from './comps/authority-tag';
 
 import { Base } from './base';
 import { DetailDataType as UserDetailDataType } from './user-mgt';
-import { ArticleListItemView } from './article';
+import Article, { ArticleListItemView, ArticleView } from './article';
 import { RoleTagView } from './comps/role-tag';
 
 
@@ -82,9 +83,9 @@ class SignIn extends Base {
     to = '';
     toQuery = null;
     mounted() {
-        if (location.pathname === dev.routeConfig.userSignIn.path) {
+        if (location.pathname === routerConfig.userSignIn.path) {
             let { to, ...query } = this.$route.query;
-            this.to = (to as string) || dev.routeConfig.index.path;
+            this.to = (to as string) || routerConfig.index.path;
             this.toQuery = query;
         }
     }
@@ -166,7 +167,7 @@ class SignUp extends Base {
             let rs = await testApi.userSignUp(this.innerDetail);
             this.innerDetail = this.getDetailData();
             this.$emit('success');
-            this.$router.push(dev.routeConfig.userSignIn.path);
+            this.$router.push(routerConfig.userSignIn.path);
         }, {
             validate: this.$refs.formVaild.validate
         }
@@ -268,7 +269,7 @@ export default class UserInfo extends Base {
     $refs: {
         formVaild: iview.Form, loadView: IMyLoad, upload: IMyUpload,
         followerList: IMyList<any>, followingList: IMyList<any>,
-        articleList: IMyList<any>, chatList: IMyList<any>,
+        articleList: Article, chatList: IMyList<any>,
     };
     updateLoading = false;
     private getUpdateUser() {
@@ -435,7 +436,7 @@ export default class UserInfo extends Base {
     }
 
     private handleArticleSearch() {
-        this.$refs.articleList.handleQuery({ resetPage: true });
+        this.$refs.articleList.$refs.list.handleQuery({ resetPage: true });
         this.tabLoaded.article = true;
     }
 
@@ -479,7 +480,7 @@ export default class UserInfo extends Base {
 
     private toChat(userId) {
         this.$router.push({
-            path: dev.routeConfig.userChat.path,
+            path: routerConfig.userChat.path,
             query: { _id: userId }
         });
     }
@@ -508,7 +509,7 @@ export default class UserInfo extends Base {
                         <span style={{
                             marginLeft: '42px', textOverflow: 'ellipsis',
                         }}>{ele.content}</span>
-                        <div class="flex-stretch" >
+                        <div class="flex-stretch">
                         </div>
                     </div>
                 </Card>
@@ -575,33 +576,7 @@ export default class UserInfo extends Base {
                     <TabPane name={myEnum.userTab.文章} label={() => {
                         return <div>文章: {detail.article}</div>
                     }}>
-                        <Input v-model={this.articleAnyKey} search on-on-search={this.handleArticleSearch} />
-                        <MyList
-                            ref="articleList"
-                            type="custom"
-                            hideSearchBox
-                            on-query={(t) => {
-                                this.$refs.articleList.query({ userId: detail._id, anyKey: this.articleAnyKey });
-                            }}
-
-                            queryFn={(data) => {
-                                return testApi.articleQuery(data);
-                            }}
-
-                            customRenderFn={(rs) => {
-                                if (!rs.success || !rs.data.length) {
-                                    let msg = !rs.success ? rs.msg : '暂无数据';
-                                    return (
-                                        <Card style={{ marginTop: '5px', textAlign: 'center' }}>{msg}</Card>
-                                    );
-                                }
-                                return rs.data.map(ele => {
-                                    return (
-                                        <ArticleListItemView value={ele} />
-                                    );
-                                });
-                            }}
-                        />
+                        <ArticleView ref="articleList" notQueryOnRoute notQueryToRoute notQueryOnMounted />
                     </TabPane>
                     <TabPane name={myEnum.userTab.粉丝} label={() => {
                         return <div>粉丝: {detail.follower}</div>

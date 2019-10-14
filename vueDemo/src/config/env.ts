@@ -108,7 +108,6 @@ const config = {
                     url: '/role/del',
                 },
 
-
                 articleQuery: {
                     url: '/article/query',
                     method: 'GET',
@@ -133,6 +132,32 @@ const config = {
                 },
                 articleMgtAudit: {
                     url: '/article/mgt/audit',
+                },
+
+                videoQuery: {
+                    url: '/video/query',
+                    method: 'GET',
+                },
+                videoDetailQuery: {
+                    url: '/video/detailQuery',
+                    method: 'GET',
+                },
+                videoMgtQuery: {
+                    url: '/video/mgt/query',
+                    method: 'GET',
+                },
+                videoMgtDetailQuery: {
+                    url: '/video/mgt/detailQuery',
+                    method: 'GET',
+                },
+                videoMgtSave: {
+                    url: '/video/mgt/save',
+                },
+                videoMgtDel: {
+                    url: '/video/mgt/del',
+                },
+                videoMgtAudit: {
+                    url: '/video/mgt/audit',
                 },
 
                 commentQuery: {

@@ -7,50 +7,32 @@ import { convClass } from '@/components/utils';
 import { Card, Input, Row, Col, Icon, Divider, Time, Checkbox } from '@/components/iview';
 import { MyList, IMyList } from '@/components/my-list';
 import { MyTag } from '@/components/my-tag';
+
 import { DetailDataType } from './article-mgt-detail';
 import { UserAvatarView } from './comps/user-avatar';
 import { Base } from './base';
 
-import './article.less';
+import './video.less';
 
 @Component
-export default class Article extends Base {
-    @Prop()
-    queryOpt: any;
-
-    @Prop()
-    notQueryOnMounted: boolean;
-    
-    @Prop()
-    notQueryOnRoute: boolean;
-
-    @Prop()
-    notQueryToRoute: boolean;
-
+export default class Video extends Base {
     $refs: { list: IMyList<any> };
 
     anyKey = '';
 
     mounted() {
-        if (!this.notQueryOnMounted)
-            this.query();
+        this.query();
     }
 
     @Watch('$route')
     route(to, from) {
-        if (!this.notQueryOnRoute)
-            this.query();
+        this.query();
     }
 
     query() {
         let list = this.$refs.list;
-        let query;
-        if (!this.notQueryOnRoute) {
-            query = this.$route.query;
-            list.setQueryByKey(query, ['user', 'title', 'anyKey']);
-        } else {
-            query = {};
-        }
+        let query = this.$route.query;
+        list.setQueryByKey(query, ['user', 'title', 'anyKey']);
         convert.Test.queryToListModel(query, list.model);
         this.$refs.list.query(query);
     }
@@ -79,29 +61,25 @@ export default class Article extends Base {
                         }
                         return rs.data.map(ele => {
                             return (
-                                <ArticleListItemView value={ele} />
+                                <VideoListItemView value={ele} />
                             );
                         });
                     }}
 
                     queryFn={async (data) => {
-                        let rs = await testApi.articleQuery({ ...data, ...this.queryOpt });
+                        let rs = await testApi.videoQuery(data);
                         return rs;
                     }}
 
-                    on-query={(model, noClear, list: IMyList<any>) => {
+                    on-query={(model) => {
                         let q = { ...model.query, anyKey: this.anyKey };
-                        if (!this.notQueryToRoute) {
-                            this.$router.push({
-                                path: this.$route.path,
-                                query: {
-                                    ...q,
-                                    ...convert.Test.listModelToQuery(model),
-                                }
-                            });
-                        } else {
-                            list.query(q);
-                        }
+                        this.$router.push({
+                            path: this.$route.path,
+                            query: {
+                                ...q,
+                                ...convert.Test.listModelToQuery(model),
+                            }
+                        });
                     }}
                 >
                 </MyList>
@@ -110,10 +88,9 @@ export default class Article extends Base {
     }
 }
 
-export const ArticleView = convClass<Article>(Article);
 
 @Component
-class ArticleListItem extends Base {
+class VideoListItem extends Base {
     @Prop({
         required: true
     })
@@ -127,14 +104,14 @@ class ArticleListItem extends Base {
     @Prop()
     mgt?: boolean;
 
-    stylePrefix = "article-";
+    stylePrefix = "video-";
 
     private toDetail(ele: DetailDataType) {
         if (this.mgt) {
             return;
         }
         this.$router.push({
-            path: routerConfig.articleDetail.path,
+            path: routerConfig.videoDetail.path,
             query: { _id: ele._id }
         });
     }
@@ -201,7 +178,7 @@ class ArticleListItem extends Base {
                             }} v-lazy={ele.coverUrl} />}
                             <p style={{
                                 overflowY: 'hidden', maxHeight: '150px', minWidth: '200px', whiteSpace: 'pre-wrap'
-                            }}>{ele.profile || dev.defaultArticleProfile}</p>
+                            }}>{ele.profile || dev.defaultVideoProfile}</p>
                         </Col>
                         {this.mgt && <p class="not-important" on-click={() => {
                             this.toDetail(ele);
@@ -252,4 +229,4 @@ class ArticleListItem extends Base {
     }
 }
 
-export const ArticleListItemView = convClass<ArticleListItem>(ArticleListItem);
+export const VideoListItemView = convClass<VideoListItem>(VideoListItem);

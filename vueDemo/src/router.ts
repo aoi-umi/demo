@@ -9,9 +9,12 @@ import LoginUserStore from './store/loginUser';
 Vue.use(Router);
 type MyRouteConfig = RouteConfig & { text?: string; };
 
+
+let adminPath = '/admin';
+let errPath = '/error';
 export const routerConfig = {
     index: {
-        path: dev.routeConfig.index.path,
+        path: '/',
         text: 'Home',
     },
     bookmark: {
@@ -20,156 +23,157 @@ export const routerConfig = {
         component: () => import('./views/bookmark')
     },
     userInfo: {
-        path: dev.routeConfig.userInfo.path,
+        path: '/user/info',
         text: '个人主页',
         meta: {
-            authority: dev.routeConfig.userInfo.authority,
+            authority: [authority.login],
         },
         component: () => import('./views/user')
     },
     userChat: {
-        path: dev.routeConfig.userChat.path,
+        path: '/user/chat',
         text: '私信',
         meta: {
-            authority: dev.routeConfig.userChat.authority,
+            authority: [authority.login],
         },
         component: () => import('./views/user-chat')
     },
     userSignIn: {
-        path: dev.routeConfig.userSignIn.path,
+        path: '/user/signIn',
         text: '登录',
         component: () => import('./views/user').then(t => t.SignInView)
     },
     userSignUp: {
-        path: dev.routeConfig.userSignUp.path,
+        path: '/user/signUp',
         text: '注册',
         component: () => import('./views/user').then(t => t.SignUpView)
     },
 
     admin: {
-        path: dev.routeConfig.admin.path,
+        path: adminPath,
         text: '管理',
         meta: {
-            authority: dev.routeConfig.admin.authority,
+            authority: [authority.login],
         },
     },
 
     userMgt: {
-        path: dev.routeConfig.userMgt.path,
+        path: adminPath + '/userMgt',
         text: '用户',
         meta: {
-            authority: dev.routeConfig.userMgt.authority,
+            authority: [authority.login, authority.userMgtQuery],
         },
         component: () => import('./views/user-mgt')
     },
     role: {
-        path: dev.routeConfig.role.path,
+        path: adminPath + '/roleMgt',
         text: '角色',
         meta: {
-            authority: dev.routeConfig.role.authority,
+            authority: [authority.login, authority.roleQuery],
         },
         component: () => import('./views/role')
     },
     authority: {
-        path: dev.routeConfig.authority.path,
+        path: adminPath + '/authorityMgt',
         text: '权限',
         meta: {
-            authority: dev.routeConfig.authority.authority,
+            authority: [authority.login, authority.authorityQuery],
         },
         component: () => import('./views/authority')
     },
     assetMgt: {
-        path: dev.routeConfig.assetMgt.path,
+        path: adminPath + '/assetMgt',
         text: '资金',
         meta: {
-            authority: dev.routeConfig.assetMgt.authority,
+            authority: [authority.login, authority.payMgtQuery],
         },
         component: () => import('./views/asset-mgt')
     },
     assetMgtLog: {
-        path: dev.routeConfig.assetMgtLog.path,
+        path: adminPath + '/assetMgt/log',
         text: '资金记录',
         meta: {
-            authority: dev.routeConfig.assetMgtLog.authority,
+            authority: [authority.login, authority.payMgtQuery],
         },
         component: () => import('./views/asset-mgt').then(t => t.AssetMgtLog)
     },
     assetMgtNotify: {
-        path: dev.routeConfig.assetMgtNotify.path,
+        path: adminPath + '/assetMgt/notify',
         text: '回调通知',
         meta: {
-            authority: dev.routeConfig.assetMgtNotify.authority,
+            authority: [authority.login, authority.payMgtQuery],
         },
         component: () => import('./views/asset-mgt').then(t => t.AssetMgtNotify)
     },
 
+    contentMgt: {
+        path: '/contentMgt',
+        text: '投稿管理',
+        meta: {
+            authority: [authority.login],
+        },
+        component: () => import('./views/content-mgt')
+    },
+
     article: {
-        path: dev.routeConfig.article.path,
+        path: '/article',
         text: '文章',
         component: () => import('./views/article')
     },
     articleDetail: {
-        path: dev.routeConfig.articleDetail.path,
+        path: '/articleMgt/detail',
         text: '文章',
         component: () => import('./views/article-detail')
     },
-    articleMgt: {
-        path: dev.routeConfig.articleMgt.path,
-        text: '文章管理',
-        meta: {
-            authority: dev.routeConfig.articleMgt.authority,
-        },
-        component: () => import('./views/article-mgt')
-    },
     articleMgtEdit: {
-        path: dev.routeConfig.articleMgtEdit.path,
+        path: '/articleMgt/edit',
         text: '编辑文章',
         meta: {
-            authority: dev.routeConfig.articleMgtEdit.authority,
+            authority: [authority.login],
         },
         component: () => import('./views/article-mgt-detail')
     },
     articleMgtDetail: {
-        path: dev.routeConfig.articleMgtDetail.path,
+        path: '/articleMgt/detail',
         text: '查看文章',
         meta: {
-            authority: dev.routeConfig.articleMgtDetail.authority,
+            authority: [authority.login],
         },
         component: () => import('./views/article-mgt-detail')
     },
 
     video: {
-        path: dev.routeConfig.video.path,
+        path: '/video',
         text: '视频',
-        component: () => import('./views/article')
+        component: () => import('./views/video')
     },
     videoDetail: {
-        path: dev.routeConfig.articleDetail.path,
+        path: '/video',
         text: '视频',
         component: () => import('./views/article-detail')
     },
     videoMgtEdit: {
-        path: dev.routeConfig.articleMgtEdit.path,
-        text: '编辑文章',
+        path: '/video',
+        text: '编辑管理',
         meta: {
-            authority: dev.routeConfig.articleMgtEdit.authority,
+            authority: [authority.login],
         },
         component: () => import('./views/article-mgt-detail')
     },
     videoMgtDetail: {
-        path: dev.routeConfig.articleMgtDetail.path,
+        path: '/video',
         text: '查看文章',
         meta: {
-            authority: dev.routeConfig.articleMgtDetail.authority,
+            authority: [authority.login],
         },
         component: () => import('./views/article-mgt-detail')
     },
 
     payMgt: {
-        path: dev.routeConfig.payMgt.path,
+        path: '/payMgt',
         text: '支付',
         meta: {
-            authority: dev.routeConfig.payMgt.authority,
+            authority: [authority.login],
         },
         component: () => import('./views/pay-mgt')
     },
@@ -181,14 +185,14 @@ export const routerConfig = {
     },
 
     error: {
-        path: dev.routeConfig.error.path,
+        path: errPath,
         text: '出错啦',
         component: () => import('./views/error')
     },
     notFound: {
         path: "*",
         redirect: {
-            path: dev.routeConfig.error.path,
+            path: errPath,
             query: { code: error.NOT_FOUND.code }
         }
     },

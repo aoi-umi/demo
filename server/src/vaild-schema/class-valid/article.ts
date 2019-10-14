@@ -1,57 +1,27 @@
-import { IsArray, IsDefined, ArrayMinSize, MinLength, IsIn } from "class-validator";
-import { Types } from 'mongoose';
-import { Type, Transform } from "class-transformer";
+import { IsDefined, MinLength, IsIn } from "class-validator";
 
 import { myEnum } from "@/config";
-import { ListBase, DelBase, DetailQueryBase } from "./base";
-import { arrayTransform, objectIdTransform } from "./util";
+import {
+    ContentQuery, ContentDetailQuery,
+    ContentSave, ContentDel, ContentMgtAudit
+} from "./content";
 
-export class AritcleQuery extends ListBase {
-    @Transform(objectIdTransform)
-    _id: string;
-    title: string;
-    user: string;
-    @Transform(objectIdTransform)
-    userId: string;
-    anyKey: string;
-    status: string;
+export class ArticleQuery extends ContentQuery {
 }
 
-export class AritcleDetailQuery extends DetailQueryBase {
+export class ArticleDetailQuery extends ContentDetailQuery {
 }
 
-export class AritcleSave {
-
-    _id?: string;
-
-    @IsDefined()
-    @MinLength(1)
-    title: string;
-
+export class ArticleSave extends ContentSave {
     @IsDefined()
     @MinLength(1)
     content: string;
-
-    @Type()
-    submit?: boolean;
 }
 
-export class ArticleDel extends DelBase {
-    remark: string;
+export class ArticleDel extends ContentDel {
 }
 
-export class ArticleMgtAudit {
-    @IsDefined()
-    @IsArray()
-    @Transform(value => {
-        return arrayTransform(value, Types.ObjectId);
-    })
-    idList: Types.ObjectId[];
-
-    @IsDefined()
+export class ArticleMgtAudit extends ContentMgtAudit {
     @IsIn([myEnum.articleStatus.审核通过, myEnum.articleStatus.审核不通过])
-    @Type()
     status: number;
-
-    remark: string;
 }

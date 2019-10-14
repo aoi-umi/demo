@@ -4,6 +4,7 @@ import moment from 'dayjs';
 
 import { testApi } from '@/api';
 import { myEnum, dev } from '@/config';
+import { routerConfig } from '@/router';
 import { Input, Form, FormItem, Button, Divider, Table, Checkbox, DatePicker } from '@/components/iview';
 import { MyUpload, IMyUpload, FileDataType } from '@/components/my-upload';
 import { MyEditor } from '@/components/my-editor';
@@ -115,7 +116,7 @@ export default class ArticleDetail extends ArticleMgtBase {
         let query = this.$route.query;
         let detail: DetailType;
         if (query._id) {
-            this.preview = this.$route.path == dev.routeConfig.articleMgtDetail.path;
+            this.preview = this.$route.path == routerConfig.articleMgtDetail.path;
             detail = await testApi.articleMgtDetailQuery({ _id: query._id });
             if (query.repost) {
                 detail.detail._id = '';

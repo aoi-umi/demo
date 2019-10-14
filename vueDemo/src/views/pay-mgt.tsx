@@ -3,6 +3,7 @@ import * as iview from 'iview';
 import moment from 'dayjs';
 import { testApi } from '@/api';
 import { myEnum, authority, dev } from '@/config';
+import { routerConfig } from '@/router';
 import { convert } from '@/helpers';
 import { convClass } from '@/components/utils';
 import { Modal, Input, Form, FormItem, Button, Checkbox, RadioGroup, Radio, InputNumber, DatePicker, Row, Col } from '@/components/iview';
@@ -218,7 +219,7 @@ export default class Pay extends Base {
                 let detail = params.row;
                 return (this.storeUser.user.hasAuth(authority.payMgtQuery) ? <a on-click={() => {
                     this.$router.push({
-                        path: dev.routeConfig.assetMgtLog.path,
+                        path: routerConfig.assetMgtLog.path,
                         query: { outOrderNo: detail.outOrderNo }
                     })
                 }}>{detail.outOrderNo}</a> : <span>{detail.outOrderNo}</span>)

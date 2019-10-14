@@ -194,7 +194,7 @@ class MyList<QueryArgs extends QueryArgsType> extends MyBase {
         (this.model.query as any)._t = Date.now();
         if (opt.resetPage)
             this.model.page.index = 1;
-        this.$emit('query', this.model, opt.noClear);
+        this.$emit('query', this.model, opt.noClear, this);
     }
 
     private handlePress(e) {
