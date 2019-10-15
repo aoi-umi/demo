@@ -12,10 +12,10 @@ import { IMyEditor } from '@/components/my-editor/my-editor';
 import { MyLoad, IMyLoad } from '@/components/my-load';
 import { ArticleMgtBase } from './article-mgt';
 import { UserAvatarView } from '../comps/user-avatar';
-import { MyList } from '@/components/my-list';
+
+import { ContentDataType, ContentLogListView } from './content-mgt-base';
 
 import './article.less';
-import { ContentDataType } from './content-mgt-base';
 
 export type DetailType = {
     detail: DetailDataType;
@@ -27,20 +27,9 @@ export type DetailDataType = ContentDataType & {
 @Component
 export default class ArticleMgtDetail extends ArticleMgtBase {
     private getDetailData() {
-        let data = {
-            detail: {
-                _id: '',
-                cover: '',
-                coverUrl: '',
-                title: '',
-                profile: '',
-                content: '',
-                status: myEnum.articleStatus.草稿,
-                statusText: '',
-                remark: '',
-            },
-            log: []
-        };
+        let data = this.getDefaultDetail<DetailDataType>();
+        data.detail.content = '';
+        data.detail.status = myEnum.articleStatus.草稿;
         data.detail.statusText = myEnum.articleStatus.getKey(data.detail.status);
         return data;
     }
@@ -68,7 +57,7 @@ export default class ArticleMgtDetail extends ArticleMgtBase {
                 },
                 trigger: 'blur'
             }],
-        }
+        };
     }
 
     stylePrefix = "article-mgt-";
@@ -178,40 +167,7 @@ export default class ArticleMgtDetail extends ArticleMgtBase {
     renderLog() {
         let { log } = this.innerDetail;
         return (
-            <div>
-                {log.length > 0 &&
-                    <div>
-                        <Divider size='small' />
-                        <MyList
-                            hideSearchBox
-                            hidePage
-                            columns={[{
-                                title: '操作人',
-                                key: 'user',
-                                render: (h, params) => {
-                                    return <UserAvatarView style={{ margin: '5px' }} user={params.row.user} />;
-                                }
-                            }, {
-                                title: '源状态',
-                                key: 'srcStatusText',
-                            }, {
-                                title: '目状态',
-                                key: 'destStatusText',
-                            }, {
-                                title: '备注',
-                                key: 'remark',
-                            }, {
-                                title: '操作时间',
-                                key: 'createdAt',
-                                render: (h, params) => {
-                                    return <span>{moment(params.row.createdAt).format(dev.dateFormat)}</span>
-                                }
-                            }]}
-                            data={log}>
-                        </MyList>
-                    </div>
-                }
-            </div>
+            <ContentLogListView log={log} />
         );
     }
 

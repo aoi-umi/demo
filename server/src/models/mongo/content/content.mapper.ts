@@ -95,7 +95,7 @@ export class ContentMapper {
         }
 
         let model = opt.model;
-        if (!data.orderBy)
+        if (!data.orderBy && opt.normal)
             data.orderBy = 'publishAt';
         let rs = await model.aggregatePaginate(pipeline, {
             ...BaseMapper.getListOptions(data),
