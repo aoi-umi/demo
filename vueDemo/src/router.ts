@@ -41,12 +41,12 @@ export const routerConfig = {
     userSignIn: {
         path: '/user/signIn',
         text: '登录',
-        component: () => import('./views/user').then(t => t.SignInView)
+        component: () => import('./views/user-sign').then(t => t.SignInView)
     },
     userSignUp: {
         path: '/user/signUp',
         text: '注册',
-        component: () => import('./views/user').then(t => t.SignUpView)
+        component: () => import('./views/user-sign').then(t => t.SignUpView)
     },
 
     admin: {

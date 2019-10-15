@@ -9,38 +9,16 @@ import { MyList, IMyList } from '@/components/my-list';
 import { MyTag } from '@/components/my-tag';
 import { DetailDataType } from './article-mgt-detail';
 import { UserAvatarView } from './comps/user-avatar';
+import { ListBase } from './comps/list-base';
 import { Base } from './base';
 
 import './article.less';
 
 @Component
-export default class Article extends Base {
-    @Prop()
-    queryOpt: any;
-
-    @Prop()
-    notQueryOnMounted: boolean;
-    
-    @Prop()
-    notQueryOnRoute: boolean;
-
-    @Prop()
-    notQueryToRoute: boolean;
-
+export default class Article extends ListBase {
     $refs: { list: IMyList<any> };
 
     anyKey = '';
-
-    mounted() {
-        if (!this.notQueryOnMounted)
-            this.query();
-    }
-
-    @Watch('$route')
-    route(to, from) {
-        if (!this.notQueryOnRoute)
-            this.query();
-    }
 
     query() {
         let list = this.$refs.list;

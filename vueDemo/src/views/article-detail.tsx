@@ -39,7 +39,7 @@ export default class ArticleDetail extends Base {
                             <div class="ql-editor" domPropsInnerHTML={detail.content}>
                             </div>
                             <Divider size='small' />
-                            {detail._id && <CommentView ownerId={detail._id} ownUserId={detail.userId} type={myEnum.commentType.文章} />}
+                            {detail._id && <CommentView ownerId={detail._id} ownUserId={detail.userId} type={myEnum.contentType.文章} />}
                         </div>
                     );
                 }} />
