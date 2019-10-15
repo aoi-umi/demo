@@ -1,7 +1,8 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 
 import { myEnum } from '@/config';
-import { Tabs, TabPane } from '@/components/iview';
+import { Tabs, TabPane, Modal, Input } from '@/components/iview';
+
 import ArticleMgt, { ArticleMgtView } from './article-mgt';
 
 @Component
@@ -24,7 +25,7 @@ export default class ContentMgt extends Vue {
         }
         this.changeTab();
     }
-    
+
     private tabLoaded = {
         article: false,
         video: false,

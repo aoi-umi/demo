@@ -121,12 +121,12 @@ export const routerConfig = {
         component: () => import('./views/content/article')
     },
     articleDetail: {
-        path: '/articleMgt/detail',
+        path: '/article/detail',
         text: '文章',
         component: () => import('./views/content/article-detail')
     },
     articleMgtEdit: {
-        path: '/articleMgt/edit',
+        path: '/contentMgt/article/edit',
         text: '编辑文章',
         meta: {
             authority: [authority.login],
@@ -134,7 +134,7 @@ export const routerConfig = {
         component: () => import('./views/content/article-mgt-detail')
     },
     articleMgtDetail: {
-        path: '/articleMgt/detail',
+        path: '/contentMgt/article/detail',
         text: '查看文章',
         meta: {
             authority: [authority.login],
@@ -148,21 +148,21 @@ export const routerConfig = {
         component: () => import('./views/content/video')
     },
     videoDetail: {
-        path: '/video',
+        path: '/video/detail',
         text: '视频',
         component: () => import('./views/content/article-detail')
     },
     videoMgtEdit: {
-        path: '/video',
-        text: '编辑管理',
+        path: '/contentMgt/video/edit',
+        text: '编辑视频',
         meta: {
             authority: [authority.login],
         },
         component: () => import('./views/content/article-mgt-detail')
     },
     videoMgtDetail: {
-        path: '/video',
-        text: '查看文章',
+        path: '/contentMgt/article/detail',
+        text: '查看视频',
         meta: {
             authority: [authority.login],
         },

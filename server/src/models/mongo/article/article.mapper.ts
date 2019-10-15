@@ -71,7 +71,7 @@ export class ArticleMapper {
     }
 
     static async detailQuery(data, opt: ContentQueryOption) {
-        let rs = ContentMapper.detailQuery({
+        let rs = await ContentMapper.detailQuery({
             ...opt,
             query: async () => {
                 let { rows } = await this.query(data, { ...opt, noTotal: true });
