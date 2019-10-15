@@ -87,7 +87,7 @@ export const routerConfig = {
         meta: {
             authority: [authority.login, authority.payMgtQuery],
         },
-        component: () => import('./views/content/asset-mgt')
+        component: () => import('./views/asset-mgt')
     },
     assetMgtLog: {
         path: adminPath + '/assetMgt/log',
@@ -95,7 +95,7 @@ export const routerConfig = {
         meta: {
             authority: [authority.login, authority.payMgtQuery],
         },
-        component: () => import('./views/content/asset-mgt').then(t => t.AssetMgtLog)
+        component: () => import('./views/asset-mgt').then(t => t.AssetMgtLog)
     },
     assetMgtNotify: {
         path: adminPath + '/assetMgt/notify',
@@ -103,7 +103,7 @@ export const routerConfig = {
         meta: {
             authority: [authority.login, authority.payMgtQuery],
         },
-        component: () => import('./views/content/asset-mgt').then(t => t.AssetMgtNotify)
+        component: () => import('./views/asset-mgt').then(t => t.AssetMgtNotify)
     },
 
     contentMgt: {
