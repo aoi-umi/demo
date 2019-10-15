@@ -49,7 +49,7 @@ export type DetailDataType = {
     _checked?: boolean;
 };
 @Component
-export default class ArticleDetail extends ArticleMgtBase {
+export default class ArticleMgtDetail extends ArticleMgtBase {
     private getDetailData() {
         let data = {
             detail: {
