@@ -348,7 +348,7 @@ class MyList<QueryArgs extends QueryArgsType> extends MyBase {
                         </Table> :
                         this.customRenderFn(this.result)
                     }
-                    {!this.infiniteScroll && !this.hidePage && (this.result.total / this.model.page.size > 1) &&
+                    {!this.infiniteScroll && !this.hidePage && this.result.total !== 0 &&
                         <Page
                             ref="page"
                             class={this.getStyleName('page')} total={this.result.total}

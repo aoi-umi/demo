@@ -4,11 +4,12 @@ import { myEnum } from '@/config';
 import { Tabs, TabPane, Modal, Input } from '@/components/iview';
 
 import ArticleMgt, { ArticleMgtView } from './article-mgt';
+import VideoMgt, { VideoMgtView } from './video-mgt';
 
 @Component
 export default class ContentMgt extends Vue {
-    $refs: { articleMgt: ArticleMgt }
-    tab = '';
+    $refs: { articleMgt: ArticleMgt, videoMgt: VideoMgt }
+    tab = myEnum.contentMgtType.文章.toString();
     mounted() {
         this.load();
     }
@@ -20,7 +21,8 @@ export default class ContentMgt extends Vue {
 
     async load() {
         let query = this.$route.query as any;
-        if (myEnum.contentMgtType.getAllValue().includes(query.tab)) {
+        let tab = parseInt(query.tab);
+        if (myEnum.contentMgtType.getAllValue().includes(tab)) {
             this.tab = query.tab;
         }
         this.changeTab();
@@ -33,10 +35,12 @@ export default class ContentMgt extends Vue {
 
     private changeTab() {
         let tab = parseInt(this.tab);
-        if ((tab === myEnum.contentMgtType.文章 || !tab) && !this.tabLoaded.article) {
+        if (tab === myEnum.contentMgtType.文章 && !this.tabLoaded.article) {
             this.$refs.articleMgt.query();
             this.tabLoaded.article = true;
         } else if (tab === myEnum.contentMgtType.视频 && !this.tabLoaded.video) {
+            this.$refs.videoMgt.query();
+            this.tabLoaded.video = true;
         }
     }
 
@@ -55,7 +59,9 @@ export default class ContentMgt extends Vue {
                     <TabPane name={myEnum.contentMgtType.文章.toString()} label='文章管理'>
                         <ArticleMgtView ref='articleMgt' notQueryOnMounted notQueryOnRoute notQueryToRoute />
                     </TabPane>
-                    <TabPane label='视频管理'></TabPane>
+                    <TabPane label='视频管理'>
+                        <VideoMgtView ref='videoMgt' notQueryOnMounted notQueryOnRoute notQueryToRoute />
+                    </TabPane>
                 </Tabs>
             </div>
         );

@@ -161,7 +161,7 @@ export const routerConfig = {
         component: () => import('./views/content/article-mgt-detail')
     },
     videoMgtDetail: {
-        path: '/contentMgt/article/detail',
+        path: '/contentMgt/video/detail',
         text: '查看视频',
         meta: {
             authority: [authority.login],

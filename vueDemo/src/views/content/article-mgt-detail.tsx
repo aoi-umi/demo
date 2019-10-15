@@ -15,38 +15,14 @@ import { UserAvatarView } from '../comps/user-avatar';
 import { MyList } from '@/components/my-list';
 
 import './article.less';
+import { ContentDataType } from './content-mgt-base';
 
 export type DetailType = {
     detail: DetailDataType;
     log?: any[];
 }
-export type DetailDataType = {
-    _id: string;
-    cover: string;
-    coverUrl: string;
-    title: string;
-    profile: string;
+export type DetailDataType = ContentDataType & {
     content: string;
-    status: number;
-    statusText: string;
-    createdAt: string;
-    remark: string;
-    readTimes: number;
-    commentCount: number;
-    like: number;
-    dislike: number;
-    setPublish: boolean;
-    setPublishAt: string;
-    publishAt: string;
-    userId: string;
-
-    voteValue: number;
-    canUpdate: boolean;
-    canDel: boolean;
-    user: { _id: string; nickname: string; account: string };
-
-    _disabled?: boolean;
-    _checked?: boolean;
 };
 @Component
 export default class ArticleMgtDetail extends ArticleMgtBase {
