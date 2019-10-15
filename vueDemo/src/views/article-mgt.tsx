@@ -4,10 +4,11 @@ import { myEnum, authority, dev } from '@/config';
 import { routerConfig } from '@/router';
 import { convert } from '@/helpers';
 import { Modal, Checkbox, Row, Input, Card, Button } from '@/components/iview';
+import { convClass } from '@/components/utils';
 import { MyList, IMyList } from '@/components/my-list';
 import { MyConfirm } from '@/components/my-confirm';
 import { MyTag, TagType } from '@/components/my-tag';
-import { convClass } from '@/components/utils';
+import { ListBase, IListBase } from './comps/list-base';
 
 import { DetailDataType } from './article-mgt-detail';
 import { Base } from './base';
@@ -167,7 +168,19 @@ export class ArticleMgtBase extends Base {
     }
 }
 @Component
-export default class ArticleMgt extends ArticleMgtBase {
+export default class ArticleMgt extends ArticleMgtBase implements IListBase {
+    @Prop()
+    queryOpt: any;
+
+    @Prop()
+    notQueryOnMounted: boolean;
+
+    @Prop()
+    notQueryOnRoute: boolean;
+
+    @Prop()
+    notQueryToRoute: boolean;
+
     $refs: { list: IMyList<any> };
 
     protected created() {
@@ -181,12 +194,14 @@ export default class ArticleMgt extends ArticleMgtBase {
     }
 
     mounted() {
-        this.query();
+        if (!this.notQueryOnMounted)
+            this.query();
     }
 
     @Watch('$route')
     route(to, from) {
-        this.query();
+        if (!this.notQueryOnRoute)
+            this.query();
     }
 
     query() {
@@ -292,16 +307,20 @@ export default class ArticleMgt extends ArticleMgtBase {
                         return rs;
                     }}
 
-                    on-query={(model) => {
+                    on-query={(model, noClear, list: IMyList<any>) => {
                         let q = { ...model.query };
-                        this.$router.push({
-                            path: this.$route.path,
-                            query: {
-                                ...q,
-                                status: this.statusList.filter(ele => ele.checked).map(ele => ele.key).join(','),
-                                ...convert.Test.listModelToQuery(model),
-                            }
-                        });
+                        if (!this.notQueryToRoute) {
+                            this.$router.push({
+                                path: this.$route.path,
+                                query: {
+                                    ...q,
+                                    status: this.statusList.filter(ele => ele.checked).map(ele => ele.key).join(','),
+                                    ...convert.Test.listModelToQuery(model),
+                                }
+                            });
+                        } else {
+                            list.query(q);
+                        }
                     }}
 
                     on-add-click={() => {

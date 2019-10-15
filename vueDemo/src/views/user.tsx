@@ -17,200 +17,13 @@ import { LoginUser } from '@/model/user';
 import { UserAvatarView } from './comps/user-avatar';
 import { FollowButtonView } from './comps/follow-button';
 import { AuthorityTagView } from './comps/authority-tag';
+import { RoleTagView } from './comps/role-tag';
 
 import { Base } from './base';
 import { DetailDataType as UserDetailDataType } from './user-mgt';
 import Article, { ArticleListItemView, ArticleView } from './article';
-import { RoleTagView } from './comps/role-tag';
+import { ChatList, ChatListView } from './user-chat';
 
-
-type SignInDataType = {
-    account?: string;
-    password?: string;
-};
-
-@Component
-class SignIn extends Base {
-
-    private innerDetail: SignInDataType = this.getDetailData();
-    private getDetailData() {
-        return {
-            account: '',
-            password: '',
-        };
-    }
-
-    private rules = {
-        account: [
-            { required: true, trigger: 'blur' }
-        ],
-        password: [
-            { required: true, trigger: 'blur' }
-        ],
-    };
-
-    $refs: { formVaild: iview.Form };
-    private loading = false;
-
-    private async handleSignIn() {
-        await this.operateHandler('登录', async () => {
-            this.loading = true;
-            let { account, password } = this.innerDetail;
-            let req = { account, rand: helpers.randStr() };
-            let token = LoginUser.createToken(account, password, req);
-            localStorage.setItem(dev.cacheKey.testUser, token);
-            let rs = await testApi.userSignIn(req);
-            testSocket.login({ [dev.cacheKey.testUser]: token });
-            this.storeUser.setUser(rs);
-            this.innerDetail = this.getDetailData();
-            this.$emit('success');
-            if (this.to)
-                this.$router.push({ path: this.to, query: this.toQuery });
-        }, {
-            validate: this.$refs.formVaild.validate
-        }
-        ).finally(() => {
-            this.loading = false;
-        });
-    }
-
-    private handlePress(e) {
-        if (this.isPressEnter(e)) {
-            this.handleSignIn();
-        }
-    }
-
-    to = '';
-    toQuery = null;
-    mounted() {
-        if (location.pathname === routerConfig.userSignIn.path) {
-            let { to, ...query } = this.$route.query;
-            this.to = (to as string) || routerConfig.index.path;
-            this.toQuery = query;
-        }
-    }
-    render() {
-        let detail = this.innerDetail;
-        return (
-            <div class="dialog-view" on-keypress={this.handlePress}>
-                <h3>登录</h3>
-                <br />
-                <Form class="dialog-content" label-position="top" ref="formVaild" props={{ model: detail }} rules={this.rules}>
-                    <FormItem label="账号" prop="account">
-                        <Input v-model={detail.account} />
-                    </FormItem>
-                    <FormItem label="密码" prop="password">
-                        <Input v-model={detail.password} type="password" />
-                    </FormItem>
-                    <FormItem>
-                        <Button type="primary" long on-click={this.handleSignIn} loading={this.loading}>登录</Button>
-                    </FormItem>
-                </Form>
-            </div >
-        );
-    }
-}
-
-export const SignInView = convClass<SignIn>(SignIn);
-
-type SignUpDataType = {
-    account: string;
-    nickname: string;
-    password: string;
-    passwordRepeat: string;
-}
-
-@Component
-class SignUp extends Base {
-
-    private innerDetail: SignUpDataType = this.getDetailData();
-    private getDetailData() {
-        return {
-            account: '',
-            nickname: '',
-            password: '',
-            passwordRepeat: '',
-        };
-    }
-
-    private rules = {
-        account: [
-            { required: true, trigger: 'blur' }
-        ],
-        nickname: [
-            { required: true, trigger: 'blur' }
-        ],
-        password: [
-            { required: true, trigger: 'blur' }
-        ],
-        passwordRepeat: [{
-            required: true, trigger: 'blur'
-        }, {
-            validator: (rule, value, callback) => {
-                if (value !== this.innerDetail.password) {
-                    callback(new Error('两次输入密码不一致'));
-                } else {
-                    callback();
-                }
-            },
-            trigger: 'blur'
-        }],
-    };
-
-    $refs: { formVaild: iview.Form };
-
-    private loading = false;
-
-    private async handleSignUp() {
-        await this.operateHandler('注册', async () => {
-            this.loading = true;
-            let rs = await testApi.userSignUp(this.innerDetail);
-            this.innerDetail = this.getDetailData();
-            this.$emit('success');
-            this.$router.push(routerConfig.userSignIn.path);
-        }, {
-            validate: this.$refs.formVaild.validate
-        }
-        ).finally(() => {
-            this.loading = false;
-        });
-    }
-
-    private handlePress(e) {
-        if (this.isPressEnter(e)) {
-            this.handleSignUp();
-        }
-    }
-
-    render() {
-        let detail = this.innerDetail;
-        return (
-            <div class="dialog-view" on-keypress={this.handlePress}>
-                <h3>注册</h3>
-                <br />
-                <Form class="dialog-content" label-position="top" ref="formVaild" props={{ model: detail }} rules={this.rules}>
-                    <FormItem label="账号" prop="account">
-                        <Input v-model={detail.account} />
-                    </FormItem>
-                    <FormItem label="昵称" prop="nickname">
-                        <Input v-model={detail.nickname} />
-                    </FormItem>
-                    <FormItem label="密码" prop="password">
-                        <Input v-model={detail.password} type="password" />
-                    </FormItem>
-                    <FormItem label="确认密码" prop="passwordRepeat">
-                        <Input v-model={detail.passwordRepeat} type="password" />
-                    </FormItem>
-                    <FormItem>
-                        <Button type="primary" long on-click={this.handleSignUp} loading={this.loading}>注册</Button>
-                    </FormItem>
-                </Form>
-            </div >
-        );
-    }
-}
-
-export const SignUpView = convClass<SignUp>(SignUp);
 @Component
 export default class UserInfo extends Base {
     detail: UserDetailDataType = {};
@@ -225,9 +38,6 @@ export default class UserInfo extends Base {
     }
 
     async load() {
-        // for (let key in this.tabLoaded) {
-        //     this.tabLoaded[key] = false;
-        // }
         let query = this.$route.query as { [key: string]: string };
         let loadRs = this.$refs.loadView.result;
         if (!loadRs.success)
@@ -268,8 +78,8 @@ export default class UserInfo extends Base {
 
     $refs: {
         formVaild: iview.Form, loadView: IMyLoad, upload: IMyUpload,
-        followerList: IMyList<any>, followingList: IMyList<any>,
-        articleList: Article, chatList: IMyList<any>,
+        followerList: FollowList, followingList: FollowList,
+        articleList: Article, chatList: ChatList,
     };
     updateLoading = false;
     private getUpdateUser() {
@@ -403,118 +213,31 @@ export default class UserInfo extends Base {
         }
     }
 
-    private followerAnyKey = '';
-    private followingAnyKey = '';
-    private articleAnyKey = '';
     private tabLoaded = {
         following: false,
         follower: false,
         article: false,
         chat: false,
     };
-    private async followQuery(type, opt?) {
-        opt = {
-            ...opt,
-            userId: this.detail._id,
-            type,
-        };
-
-        if (type == myEnum.followQueryType.粉丝)
-            await this.$refs.followerList.query(opt);
-        else
-            await this.$refs.followingList.query(opt);
-    }
 
     private handleFollowSearch(type) {
         if (type == myEnum.followQueryType.粉丝) {
-            this.$refs.followerList.handleQuery({ resetPage: true });
+            this.$refs.followerList.query();
             this.tabLoaded.follower = true;
         } else {
-            this.$refs.followingList.handleQuery({ resetPage: true });
+            this.$refs.followingList.query();
             this.tabLoaded.following = true;
         }
     }
 
     private handleArticleSearch() {
-        this.$refs.articleList.$refs.list.handleQuery({ resetPage: true });
+        this.$refs.articleList.query();
         this.tabLoaded.article = true;
     }
 
     private handleChatSearch() {
-        this.$refs.chatList.handleQuery({ resetPage: true });
+        this.$refs.chatList.query();
         this.tabLoaded.chat = true;
-    }
-
-    private async followQueryFn(data) {
-        let rs = await testApi.followQuery(data);
-        return rs;
-    }
-
-    private async chatListFn(data) {
-        let rs = await testApi.chatList(data);
-        return rs;
-    }
-
-    private renderFollow(type: number, rs: ResultType) {
-        if (!rs.success || !rs.data.length) {
-            let msg = !rs.success ? rs.msg : '空空的';
-            return (
-                <Card class="center" style={{ marginTop: '5px' }}>{msg}</Card>
-            );
-        }
-        return rs.data.map(ele => {
-            let user = type == myEnum.followQueryType.粉丝 ? ele.followerUser : ele.followingUser;
-            return (
-                <Card style={{ marginTop: '5px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline' }}>
-                        <UserAvatarView user={user} />
-                        <span style={{ marginLeft: '5px' }}>{user.profile || dev.defaultProfile}</span>
-                        <div class="flex-stretch">
-                        </div>
-                        <FollowButtonView user={user} />
-                    </div>
-                </Card>
-            )
-        });
-    }
-
-    private toChat(userId) {
-        this.$router.push({
-            path: routerConfig.userChat.path,
-            query: { _id: userId }
-        });
-    }
-    private renderChat(rs: ResultType) {
-        if (!rs.success || !rs.data.length) {
-            let msg = !rs.success ? rs.msg : '空空的';
-            return (
-                <Card class="center" style={{ marginTop: '5px' }}>{msg}</Card>
-            );
-        }
-        return rs.data.map(ele => {
-            let user = ele.user;
-            return (
-                <Card style={{ marginTop: '5px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline' }}>
-                        <UserAvatarView user={user} />
-                        <div class="flex-stretch pointer" on-click={() => {
-                            this.toChat(user._id);
-                        }}>
-                        </div>
-                        <Time class="not-important" time={ele.createdAt} />
-                    </div>
-                    <div class="pointer" style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline' }} on-click={() => {
-                        this.toChat(user._id);
-                    }}>
-                        <span style={{
-                            marginLeft: '42px', textOverflow: 'ellipsis',
-                        }}>{ele.content}</span>
-                        <div class="flex-stretch">
-                        </div>
-                    </div>
-                </Card>
-            )
-        });
     }
 
     renderInfo() {
@@ -531,8 +254,7 @@ export default class UserInfo extends Base {
                     <div style={{ flexGrow: 1 }}></div>
                     {!detail.self && <FollowButtonView style={{ alignItems: 'flex-end' }} user={detail} />}
                 </div>
-                <Tabs v-model={this.tab} style={{ minHeight: '300px' }} on-on-click={(name: string) => {
-                    // this.changeTab();
+                <Tabs animated={false} v-model={this.tab} style={{ minHeight: '300px' }} on-on-click={(name: string) => {
                     this.$router.push({
                         path: this.$route.path,
                         query: {
@@ -581,62 +303,17 @@ export default class UserInfo extends Base {
                     <TabPane name={myEnum.userTab.粉丝} label={() => {
                         return <div>粉丝: {detail.follower}</div>
                     }}>
-                        <Input v-model={this.followerAnyKey} search on-on-search={() => {
-                            this.handleFollowSearch(myEnum.followQueryType.粉丝);
-                        }} />
-                        <MyList
-                            ref="followerList"
-                            type="custom"
-                            hideSearchBox
-                            on-query={(t) => {
-                                this.followQuery(myEnum.followQueryType.粉丝, { anyKey: this.followerAnyKey });
-                            }}
-
-                            queryFn={this.followQueryFn}
-
-                            customRenderFn={(rs) => {
-                                return this.renderFollow(myEnum.followQueryType.粉丝, rs);
-                            }}
-                        />
+                        <FollowListView ref="followerList" userId={this.detail._id} followType={myEnum.followQueryType.粉丝} />
                     </TabPane>
                     <TabPane name={myEnum.userTab.关注} label={() => {
                         return <div>关注: {detail.following}</div>
                     }}>
-                        <Input v-model={this.followingAnyKey} search on-on-search={() => {
-                            this.handleFollowSearch(myEnum.followQueryType.关注);
-                        }} />
-                        <MyList
-                            ref="followingList"
-                            type="custom"
-                            hideSearchBox
-                            on-query={(t) => {
-                                this.followQuery(myEnum.followQueryType.关注, { anyKey: this.followingAnyKey });
-                            }}
-
-                            queryFn={this.followQueryFn}
-
-                            customRenderFn={(rs) => {
-                                return this.renderFollow(myEnum.followQueryType.关注, rs);
-                            }}
-                        />
+                        <FollowListView ref="followingList" userId={this.detail._id} followType={myEnum.followQueryType.关注} />
                     </TabPane>
                     <TabPane name={myEnum.userTab.私信} label={() => {
                         return <div>私信</div>
                     }}>
-                        <MyList
-                            ref="chatList"
-                            type="custom"
-                            hideSearchBox
-                            on-query={(t) => {
-                                this.$refs.chatList.query();
-                            }}
-
-                            queryFn={this.chatListFn}
-
-                            customRenderFn={(rs) => {
-                                return this.renderChat(rs);
-                            }}
-                        />
+                        <ChatListView ref="chatList" />
                     </TabPane>
                 </Tabs>
             </div>
@@ -710,3 +387,90 @@ export default class UserInfo extends Base {
         );
     }
 }
+
+/**
+ * 粉丝/关注
+ */
+@Component
+class FollowList extends Base {
+    @Prop({
+        required: true
+    })
+    userId: string;
+
+    @Prop({
+        required: true
+    })
+    followType: number;
+
+    $refs: {
+        list: IMyList<any>,
+    };
+    followerAnyKey = '';
+
+    query() {
+        this.$refs.list.handleQuery({ resetPage: true });
+    }
+
+    private async followQuery() {
+        let opt = {
+            anyKey: this.followerAnyKey,
+            userId: this.userId,
+            type: this.followType,
+        };
+
+        await this.$refs.list.query(opt);
+    }
+
+    private renderFollow(rs: ResultType) {
+        if (!rs.success || !rs.data.length) {
+            let msg = !rs.success ? rs.msg : '空空的';
+            return (
+                <Card class="center" style={{ marginTop: '5px' }}>{msg}</Card>
+            );
+        }
+        return rs.data.map(ele => {
+            let user = this.followType == myEnum.followQueryType.粉丝 ? ele.followerUser : ele.followingUser;
+            return (
+                <Card style={{ marginTop: '5px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline' }}>
+                        <UserAvatarView user={user} />
+                        <span style={{ marginLeft: '5px' }}>{user.profile || dev.defaultProfile}</span>
+                        <div class="flex-stretch">
+                        </div>
+                        <FollowButtonView user={user} />
+                    </div>
+                </Card>
+            )
+        });
+    }
+
+    render() {
+        return (
+            <div>
+                <Input v-model={this.followerAnyKey} search on-on-search={() => {
+                    this.query();
+                }} />
+                <MyList
+                    ref="list"
+                    type="custom"
+                    hideSearchBox
+                    on-query={(t) => {
+                        this.followQuery();
+                    }}
+
+                    queryFn={async (data) => {
+                        let rs = await testApi.followQuery(data);
+                        return rs;
+                    }}
+
+                    customRenderFn={(rs) => {
+                        return this.renderFollow(rs);
+                    }}
+                />
+            </div>
+        );
+    }
+}
+
+const FollowListView = convClass<FollowList>(FollowList);

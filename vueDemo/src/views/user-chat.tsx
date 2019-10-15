@@ -8,9 +8,11 @@ import { Base } from './base';
 import { DetailDataType as UserDetailDataType } from './user-mgt';
 import { UserAvatarView } from './comps/user-avatar';
 import { myEnum } from '@/config';
+import { MyList, IMyList, ResultType } from '@/components/my-list';
+import { routerConfig } from '@/router';
 
 @Component
-class UserChat extends Base {
+class ChatDetail extends Base {
     detail: UserDetailDataType = {};
     created() {
         testSocket.bindChatRecv((data) => {
@@ -228,5 +230,80 @@ class UserChat extends Base {
     }
 }
 
-const UserChatView = convClass<UserChat>(UserChat);
-export default UserChatView;
+const ChatDetailView = convClass<ChatDetail>(ChatDetail);
+export default ChatDetailView;
+
+@Component
+export class ChatList extends Base {
+    $refs: { list: IMyList };
+
+    query() {
+        this.$refs.list.handleQuery({ resetPage: true });
+    }
+
+    private async chatListFn(data) {
+        let rs = await testApi.chatList(data);
+        return rs;
+    }
+
+    private toChat(userId) {
+        this.$router.push({
+            path: routerConfig.userChat.path,
+            query: { _id: userId }
+        });
+    }
+
+    private renderChat(rs: ResultType) {
+        if (!rs.success || !rs.data.length) {
+            let msg = !rs.success ? rs.msg : '空空的';
+            return (
+                <Card class="center" style={{ marginTop: '5px' }}>{msg}</Card>
+            );
+        }
+        return rs.data.map(ele => {
+            let user = ele.user;
+            return (
+                <Card style={{ marginTop: '5px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline' }}>
+                        <UserAvatarView user={user} />
+                        <div class="flex-stretch pointer" on-click={() => {
+                            this.toChat(user._id);
+                        }}>
+                        </div>
+                        <Time class="not-important" time={ele.createdAt} />
+                    </div>
+                    <div class="pointer" style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline' }} on-click={() => {
+                        this.toChat(user._id);
+                    }}>
+                        <span style={{
+                            marginLeft: '42px', textOverflow: 'ellipsis',
+                        }}>{ele.content}</span>
+                        <div class="flex-stretch">
+                        </div>
+                    </div>
+                </Card>
+            )
+        });
+    }
+
+    render() {
+        return (
+            <MyList
+                ref="list"
+                type="custom"
+                hideSearchBox
+                on-query={(t, noClear, list: IMyList) => {
+                    list.query();
+                }}
+
+                queryFn={this.chatListFn}
+
+                customRenderFn={(rs) => {
+                    return this.renderChat(rs);
+                }}
+            />
+        );
+    }
+}
+
+export const ChatListView = convClass<ChatList>(ChatList);

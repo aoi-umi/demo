@@ -394,7 +394,7 @@ class MyList<QueryArgs extends QueryArgsType> extends MyBase {
     }
 }
 
-export interface IMyList<T extends QueryArgsType> extends MyList<T> { }
+export interface IMyList<T extends QueryArgsType = any> extends MyList<T> { }
 const MyListView = MyList as {
     new <T extends QueryArgsType>(props: Partial<MyList<T>> & VueComponentOptions): any;
 };
