@@ -9,12 +9,32 @@ import { Base } from '../base';
 
 export type ContentDataType = {
     _id: string;
+    cover: string;
+    coverUrl: string;
+    title: string;
+    profile: string;
     status: number;
     statusText: string;
+    createdAt: string;
+    remark: string;
+    readTimes: number;
+    commentCount: number;
+    like: number;
+    dislike: number;
+    setPublish: boolean;
+    setPublishAt: string;
+    publishAt: string;
+    userId: string;
+
+    voteValue: number;
     canUpdate: boolean;
     canDel: boolean;
-    user: { _id: string };
+    user: { _id: string; nickname: string; account: string };
+
+    _disabled?: boolean;
+    _checked?: boolean;
 };
+
 export abstract class ContentMgtBase extends Base {
     contentMgtType: number;
     delShow = false;

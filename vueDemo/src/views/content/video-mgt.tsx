@@ -10,34 +10,34 @@ import { MyTag, TagType } from '@/components/my-tag';
 
 import { ListBase, IListBase } from '../comps/list-base';
 import { DetailDataType } from './article-mgt-detail';
-import { ArticleListItemView } from './article';
+import { VideoListItemView } from './video';
 import { ContentMgtBase, ContentDataType } from './content-mgt-base';
 
-export class ArticleMgtBase extends ContentMgtBase {
+export class VideoMgtBase extends ContentMgtBase {
     contentMgtType = myEnum.contentMgtType.文章;
 
     protected async auditFn(detail, pass) {
-        let toStatus = pass ? myEnum.articleStatus.审核通过 : myEnum.articleStatus.审核不通过;
-        let rs = await testApi.articleMgtAudit({ idList: [detail._id], status: toStatus, remark: this.notPassRemark });
+        let toStatus = pass ? myEnum.videoStatus.审核通过 : myEnum.videoStatus.审核不通过;
+        let rs = await testApi.videoMgtAudit({ idList: [detail._id], status: toStatus, remark: this.notPassRemark });
         return rs;
     }
 
     protected canAudit(detail: ContentDataType) {
-        return detail.status == myEnum.articleStatus.待审核 && this.storeUser.user.hasAuth(authority.articleMgtAudit)
+        return detail.status == myEnum.videoStatus.待审核 && this.storeUser.user.hasAuth(authority.videoMgtAudit)
     }
 
     toDetailUrl(preview) {
-        return preview ? routerConfig.articleMgtDetail.path : routerConfig.articleMgtEdit.path;
+        return preview ? routerConfig.videoMgtDetail.path : routerConfig.videoMgtEdit.path;
     }
 
     protected async delFn() {
-        await testApi.articleMgtDel({ idList: this.delIds, remark: this.delRemark });
+        await testApi.videoMgtDel({ idList: this.delIds, remark: this.delRemark });
     }
 }
 
 
 @Component
-export default class ArticleMgt extends ArticleMgtBase implements IListBase {
+export default class VideoMgt extends VideoMgtBase implements IListBase {
     @Prop()
     queryOpt: any;
 
@@ -53,7 +53,7 @@ export default class ArticleMgt extends ArticleMgtBase implements IListBase {
     $refs: { list: IMyList<any> };
 
     protected created() {
-        this.statusList = myEnum.articleStatus.toArray().map(ele => {
+        this.statusList = myEnum.videoStatus.toArray().map(ele => {
             return {
                 tag: ele.key,
                 key: ele.value,
@@ -149,7 +149,7 @@ export default class ArticleMgt extends ArticleMgtBase implements IListBase {
                         return rs.data.map((ele: DetailDataType) => {
                             ele._disabled = !ele.canDel;
                             return (
-                                <ArticleListItemView value={ele} mgt
+                                <VideoListItemView value={ele} mgt
                                     selectable={!!this.multiOperateBtnList.length}
                                     on-selected-change={(val) => {
                                         ele._checked = val;
@@ -166,13 +166,13 @@ export default class ArticleMgt extends ArticleMgtBase implements IListBase {
                                             })
                                         }
                                     </div>
-                                </ArticleListItemView>
+                                </VideoListItemView>
                             );
                         });
                     }}
 
                     queryFn={async (data) => {
-                        let rs = await testApi.articleMgtQuery(data);
+                        let rs = await testApi.videoMgtQuery(data);
                         return rs;
                     }}
 
@@ -210,4 +210,4 @@ export default class ArticleMgt extends ArticleMgtBase implements IListBase {
     }
 }
 
-export const ArticleMgtView = convClass<ArticleMgt>(ArticleMgt);
+export const VideoMgtView = convClass<VideoMgt>(VideoMgt);

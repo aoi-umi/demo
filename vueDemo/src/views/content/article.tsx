@@ -68,14 +68,14 @@ export default class Article extends ListBase {
                     }}
 
                     on-query={(model, noClear, list: IMyList<any>) => {
-                        let q = { ...model.query, anyKey: this.anyKey };
+                        let q = {
+                            ...model.query, anyKey: this.anyKey,
+                            ...convert.Test.listModelToQuery(model),
+                        };
                         if (!this.notQueryToRoute) {
                             this.$router.push({
                                 path: this.$route.path,
-                                query: {
-                                    ...q,
-                                    ...convert.Test.listModelToQuery(model),
-                                }
+                                query: q
                             });
                         } else {
                             list.query(q);
