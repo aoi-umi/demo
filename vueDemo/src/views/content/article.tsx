@@ -8,9 +8,9 @@ import { Card, Input, Row, Col, Icon, Divider, Time, Checkbox } from '@/componen
 import { MyList, IMyList } from '@/components/my-list';
 import { MyTag } from '@/components/my-tag';
 import { DetailDataType } from './article-mgt-detail';
-import { UserAvatarView } from './comps/user-avatar';
-import { ListBase } from './comps/list-base';
-import { Base } from './base';
+import { UserAvatarView } from '../comps/user-avatar';
+import { ListBase } from '../comps/list-base';
+import { Base } from '../base';
 
 import './article.less';
 

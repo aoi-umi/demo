@@ -11,7 +11,7 @@ import { testApi, testSocket } from './api';
 import { dev, authority } from './config';
 const routeConfig = router.routerConfig;
 import "./App.less";
-import { SignInView } from './views/user-sign';
+import { SignInView } from './views/user/user-sign';
 import { Base } from './views/base';
 import { UserAvatarView } from './views/comps/user-avatar';
 

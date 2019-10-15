@@ -11,7 +11,7 @@ import { MyEditor } from '@/components/my-editor';
 import { IMyEditor } from '@/components/my-editor/my-editor';
 import { MyLoad, IMyLoad } from '@/components/my-load';
 import { ArticleMgtBase } from './article-mgt';
-import { UserAvatarView } from './comps/user-avatar';
+import { UserAvatarView } from '../comps/user-avatar';
 import { MyList } from '@/components/my-list';
 
 import './article.less';

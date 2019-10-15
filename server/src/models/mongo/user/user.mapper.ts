@@ -16,6 +16,7 @@ import { FollowModel, FollowDocType } from '../follow';
 import { ArticleModel } from '../article';
 import { UserLogModel } from './user-log';
 import { UserDocType, UserModel, UserInstanceType } from './user';
+import { VideoModel } from '../video';
 
 export type UserResetOption = {
     imgHost?: string;
@@ -286,25 +287,34 @@ export class UserMapper {
     }
 
     static async resetStat(detail: UserInstanceType, obj: any) {
+        let contentMatch = {
+            userId: detail._id,
+            publishAt: { $lte: new Date() }
+        };
         //实时查数据
         let [
             following,
             follower,
             article,
+            video,
         ] = await Promise.all([
             FollowModel.countDocuments({ userId: detail._id, status: myEnum.followStatus.已关注 }),
             FollowModel.countDocuments({ followUserId: detail._id, status: myEnum.followStatus.已关注 }),
             ArticleModel.countDocuments({
-                userId: detail._id,
+                ...contentMatch,
                 status: myEnum.articleStatus.审核通过,
-                publishAt: { $lte: new Date() }
+            }),
+            VideoModel.countDocuments({
+                ...contentMatch,
+                status: myEnum.videoStatus.审核通过,
             })
         ]);
         obj.following = following;
         obj.follower = follower;
         obj.article = article;
+        obj.video = video;
         let update = {};
-        ['following', 'follower', 'article'].forEach(key => {
+        ['following', 'follower', 'article', 'video'].forEach(key => {
             if (obj[key] != detail[key]) {
                 update[key] = obj[key];
             }

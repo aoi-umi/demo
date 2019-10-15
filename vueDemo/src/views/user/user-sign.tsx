@@ -9,7 +9,7 @@ import { convClass } from '@/components/utils';
 import { Input, Form, FormItem, Button } from '@/components/iview';
 import { LoginUser } from '@/model/user';
 
-import { Base } from './base';
+import { Base } from '../base';
 
 
 type SignInDataType = {

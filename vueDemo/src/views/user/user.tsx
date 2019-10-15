@@ -14,14 +14,14 @@ import { MyLoad, IMyLoad } from '@/components/my-load';
 import { Utils } from '@/components/utils';
 import { LoginUser } from '@/model/user';
 
-import { UserAvatarView } from './comps/user-avatar';
-import { FollowButtonView } from './comps/follow-button';
-import { AuthorityTagView } from './comps/authority-tag';
-import { RoleTagView } from './comps/role-tag';
+import { UserAvatarView } from '../comps/user-avatar';
+import { FollowButtonView } from '../comps/follow-button';
+import { AuthorityTagView } from '../comps/authority-tag';
+import { RoleTagView } from '../comps/role-tag';
 
-import { Base } from './base';
+import { Base } from '../base';
 import { DetailDataType as UserDetailDataType } from './user-mgt';
-import Article, { ArticleListItemView, ArticleView } from './article';
+import Article, { ArticleListItemView, ArticleView } from '../content/article';
 import { ChatList, ChatListView } from './user-chat';
 
 @Component

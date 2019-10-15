@@ -8,10 +8,10 @@ import { convClass } from '@/components/utils';
 import { MyList, IMyList } from '@/components/my-list';
 import { MyConfirm } from '@/components/my-confirm';
 import { MyTag, TagType } from '@/components/my-tag';
-import { ListBase, IListBase } from './comps/list-base';
+import { ListBase, IListBase } from '../comps/list-base';
 
 import { DetailDataType } from './article-mgt-detail';
-import { Base } from './base';
+import { Base } from '../base';
 import { ArticleListItemView } from './article';
 
 export class ArticleMgtBase extends Base {

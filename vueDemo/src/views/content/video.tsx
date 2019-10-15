@@ -9,8 +9,8 @@ import { MyList, IMyList } from '@/components/my-list';
 import { MyTag } from '@/components/my-tag';
 
 import { DetailDataType } from './article-mgt-detail';
-import { UserAvatarView } from './comps/user-avatar';
-import { Base } from './base';
+import { UserAvatarView } from '../comps/user-avatar';
+import { Base } from '../base';
 
 import './video.less';
 

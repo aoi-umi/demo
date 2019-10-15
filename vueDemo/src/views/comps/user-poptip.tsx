@@ -8,7 +8,7 @@ import { convClass } from '@/components/utils';
 import { Button, Avatar, Poptip, Spin } from '@/components/iview';
 import { MyImgViewer, IMyImgViewer } from '@/components/my-img-viewer';
 import { Base } from '../base';
-import { DetailDataType } from '../user-mgt';
+import { DetailDataType } from '../user/user-mgt';
 import { FollowButtonView } from './follow-button';
 
 export type User = {
