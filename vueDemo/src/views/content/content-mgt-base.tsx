@@ -1,10 +1,14 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
+import moment from 'dayjs';
 
-import { myEnum } from '@/config';
-import { Tabs, TabPane, Modal, Input } from '@/components/iview';
-import { MyConfirm } from '@/components/my-confirm';
+import { myEnum, dev } from '@/config';
 import { routerConfig } from '@/router';
+import { Tabs, TabPane, Modal, Input, Divider } from '@/components/iview';
+import { MyConfirm } from '@/components/my-confirm';
+import { convClass } from '@/components/utils';
+import { MyList } from '@/components/my-list';
 
+import { UserAvatarView } from '../comps/user-avatar';
 import { Base } from '../base';
 
 export type ContentDataType = {
@@ -44,6 +48,22 @@ export abstract class ContentMgtBase extends Base {
     notPassRemark = '';
     operateDetail: ContentDataType;
     protected preview = false;
+
+    protected getDefaultDetail<T extends ContentDataType = ContentDataType>() {
+        let data = {
+            detail: {
+                _id: '',
+                cover: '',
+                coverUrl: '',
+                title: '',
+                profile: '',
+                statusText: '',
+                remark: '',
+            } as T,
+            log: []
+        };
+        return data;
+    }
 
     protected toggleNotPass(show: boolean) {
         this.notPassShow = show;
@@ -194,3 +214,53 @@ export abstract class ContentMgtBase extends Base {
         });
     }
 }
+
+@Component
+export class ContentLogList extends Base {
+    @Prop({
+        default: () => []
+    })
+    log: any[];
+
+    render() {
+        let log = this.log;
+        return (
+            <div>
+                {log.length > 0 &&
+                    <div>
+                        <Divider size='small' />
+                        <MyList
+                            hideSearchBox
+                            hidePage
+                            columns={[{
+                                title: '操作人',
+                                key: 'user',
+                                render: (h, params) => {
+                                    return <UserAvatarView style={{ margin: '5px' }} user={params.row.user} />;
+                                }
+                            }, {
+                                title: '源状态',
+                                key: 'srcStatusText',
+                            }, {
+                                title: '目状态',
+                                key: 'destStatusText',
+                            }, {
+                                title: '备注',
+                                key: 'remark',
+                            }, {
+                                title: '操作时间',
+                                key: 'createdAt',
+                                render: (h, params) => {
+                                    return <span>{moment(params.row.createdAt).format(dev.dateFormat)}</span>
+                                }
+                            }]}
+                            data={log}>
+                        </MyList>
+                    </div>
+                }
+            </div>
+        );
+    }
+}
+
+export const ContentLogListView = convClass<ContentLogList>(ContentLogList)

@@ -59,7 +59,7 @@ export default class ContentMgt extends Vue {
                     <TabPane name={myEnum.contentMgtType.文章.toString()} label='文章管理'>
                         <ArticleMgtView ref='articleMgt' notQueryOnMounted notQueryOnRoute notQueryToRoute />
                     </TabPane>
-                    <TabPane label='视频管理'>
+                    <TabPane name={myEnum.contentMgtType.视频.toString()} label='视频管理'>
                         <VideoMgtView ref='videoMgt' notQueryOnMounted notQueryOnRoute notQueryToRoute />
                     </TabPane>
                 </Tabs>
