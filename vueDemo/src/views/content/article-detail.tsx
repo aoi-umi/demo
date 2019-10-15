@@ -7,8 +7,8 @@ import { Divider, Spin } from '@/components/iview';
 import { MyLoad, IMyLoad } from '@/components/my-load';
 import { DetailType, DetailDataType } from './article-mgt-detail';
 import { CommentView } from './comment';
-import { UserAvatarView } from './comps/user-avatar';
-import { Base } from './base';
+import { UserAvatarView } from '../comps/user-avatar';
+import { Base } from '../base';
 
 @Component
 export default class ArticleDetail extends Base {

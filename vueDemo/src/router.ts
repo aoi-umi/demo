@@ -28,7 +28,7 @@ export const routerConfig = {
         meta: {
             authority: [authority.login],
         },
-        component: () => import('./views/user')
+        component: () => import('./views/user/user')
     },
     userChat: {
         path: '/user/chat',
@@ -36,17 +36,17 @@ export const routerConfig = {
         meta: {
             authority: [authority.login],
         },
-        component: () => import('./views/user-chat')
+        component: () => import('./views/user/user-chat')
     },
     userSignIn: {
         path: '/user/signIn',
         text: '登录',
-        component: () => import('./views/user-sign').then(t => t.SignInView)
+        component: () => import('./views/user/user-sign').then(t => t.SignInView)
     },
     userSignUp: {
         path: '/user/signUp',
         text: '注册',
-        component: () => import('./views/user-sign').then(t => t.SignUpView)
+        component: () => import('./views/user/user-sign').then(t => t.SignUpView)
     },
 
     admin: {
@@ -63,7 +63,7 @@ export const routerConfig = {
         meta: {
             authority: [authority.login, authority.userMgtQuery],
         },
-        component: () => import('./views/user-mgt')
+        component: () => import('./views/user/user-mgt')
     },
     role: {
         path: adminPath + '/roleMgt',
@@ -87,7 +87,7 @@ export const routerConfig = {
         meta: {
             authority: [authority.login, authority.payMgtQuery],
         },
-        component: () => import('./views/asset-mgt')
+        component: () => import('./views/content/asset-mgt')
     },
     assetMgtLog: {
         path: adminPath + '/assetMgt/log',
@@ -95,7 +95,7 @@ export const routerConfig = {
         meta: {
             authority: [authority.login, authority.payMgtQuery],
         },
-        component: () => import('./views/asset-mgt').then(t => t.AssetMgtLog)
+        component: () => import('./views/content/asset-mgt').then(t => t.AssetMgtLog)
     },
     assetMgtNotify: {
         path: adminPath + '/assetMgt/notify',
@@ -103,7 +103,7 @@ export const routerConfig = {
         meta: {
             authority: [authority.login, authority.payMgtQuery],
         },
-        component: () => import('./views/asset-mgt').then(t => t.AssetMgtNotify)
+        component: () => import('./views/content/asset-mgt').then(t => t.AssetMgtNotify)
     },
 
     contentMgt: {
@@ -112,18 +112,18 @@ export const routerConfig = {
         meta: {
             authority: [authority.login],
         },
-        component: () => import('./views/content-mgt')
+        component: () => import('./views/content/content-mgt')
     },
 
     article: {
         path: '/article',
         text: '文章',
-        component: () => import('./views/article')
+        component: () => import('./views/content/article')
     },
     articleDetail: {
         path: '/articleMgt/detail',
         text: '文章',
-        component: () => import('./views/article-detail')
+        component: () => import('./views/content/article-detail')
     },
     articleMgtEdit: {
         path: '/articleMgt/edit',
@@ -131,7 +131,7 @@ export const routerConfig = {
         meta: {
             authority: [authority.login],
         },
-        component: () => import('./views/article-mgt-detail')
+        component: () => import('./views/content/article-mgt-detail')
     },
     articleMgtDetail: {
         path: '/articleMgt/detail',
@@ -139,18 +139,18 @@ export const routerConfig = {
         meta: {
             authority: [authority.login],
         },
-        component: () => import('./views/article-mgt-detail')
+        component: () => import('./views/content/article-mgt-detail')
     },
 
     video: {
         path: '/video',
         text: '视频',
-        component: () => import('./views/video')
+        component: () => import('./views/content/video')
     },
     videoDetail: {
         path: '/video',
         text: '视频',
-        component: () => import('./views/article-detail')
+        component: () => import('./views/content/article-detail')
     },
     videoMgtEdit: {
         path: '/video',
@@ -158,7 +158,7 @@ export const routerConfig = {
         meta: {
             authority: [authority.login],
         },
-        component: () => import('./views/article-mgt-detail')
+        component: () => import('./views/content/article-mgt-detail')
     },
     videoMgtDetail: {
         path: '/video',
@@ -166,7 +166,7 @@ export const routerConfig = {
         meta: {
             authority: [authority.login],
         },
-        component: () => import('./views/article-mgt-detail')
+        component: () => import('./views/content/article-mgt-detail')
     },
 
     payMgt: {

@@ -9,9 +9,9 @@ import { MyEditor } from '@/components/my-editor';
 import { Divider, Button, Avatar, Modal, Icon, Time } from '@/components/iview';
 import { MyConfirm } from '@/components/my-confirm';
 import { dev, myEnum } from '@/config';
-import { Base } from './base';
-import { UserAvatarView } from './comps/user-avatar';
-import { UserPoptipView } from './comps/user-poptip';
+import { Base } from '../base';
+import { UserAvatarView } from '../comps/user-avatar';
+import { UserPoptipView } from '../comps/user-poptip';
 
 import './comment.less';
 

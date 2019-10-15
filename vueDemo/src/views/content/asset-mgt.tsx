@@ -9,7 +9,7 @@ import { testApi, testSocket } from '@/api';
 import { Modal, Input, Button, Card, Row, Col, Checkbox, Tabs, TabPane } from '@/components/iview';
 import { MyList, IMyList, Const as MyListConst } from '@/components/my-list';
 import { TagType, MyTag } from '@/components/my-tag';
-import { Base } from './base';
+import { Base } from '../base';
 
 
 @Component
