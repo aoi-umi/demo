@@ -4,39 +4,41 @@ import moment from 'dayjs';
 import { testApi } from '@/api';
 import { myEnum, dev } from '@/config';
 import { routerConfig } from '@/router';
-import { FormItem, Button, Divider } from '@/components/iview';
-import { MyEditor, IMyEditor } from '@/components/my-editor';
-import { ArticleMgtBase } from './article-mgt';
-import { UserAvatarView } from '../comps/user-avatar';
+import { FormItem, Button, Divider, Input, Icon } from '@/components/iview';
+import { MyVideo, IMyVideo } from '@/components/my-video';
+import { MyUpload, IMyUpload, FileDataType } from '@/components/my-upload';
 
+import { UserAvatarView } from '../comps/user-avatar';
+import { VideoMgtBase } from './video-mgt';
 import { ContentDetailType, ContentDataType, ContentMgtDetail, ContentMgtDetailView, ContentLogListView } from './content-mgt-base';
 
-import './article.less';
+
+import './video.less';
 
 export type DetailDataType = ContentDataType & {
-    content: string;
+    videoIdList: string[];
 };
 export type DetailType = ContentDetailType<DetailDataType>;
 
 @Component
-export default class ArticleMgtDetail extends ArticleMgtBase {
-    stylePrefix = "article-mgt-";
-    $refs: { detailView: ContentMgtDetail, editor: IMyEditor };
+export default class VideoMgtDetail extends VideoMgtBase {
+    stylePrefix = "video-mgt-";
+    $refs: { detailView: ContentMgtDetail, upload: IMyUpload, video: IMyVideo };
 
     private innerDetail: DetailType = this.getDetailData();
     protected getDetailData() {
         let data = this.getDefaultDetail<DetailDataType>();
-        data.detail.content = '';
-        data.detail.status = myEnum.articleStatus.草稿;
-        data.detail.statusText = myEnum.articleStatus.getKey(data.detail.status);
+        data.detail.videoIdList = [];
+        data.detail.status = myEnum.videoStatus.草稿;
+        data.detail.statusText = myEnum.videoStatus.getKey(data.detail.status);
         return data;
     }
 
     private getRules() {
         return {
-            content: [
-                { required: true, trigger: 'blur' }
-            ],
+            videoIdList: {
+                required: true
+            }
         };
     }
 
@@ -44,8 +46,8 @@ export default class ArticleMgtDetail extends ArticleMgtBase {
         let query = this.$route.query;
         let detail: DetailType;
         if (query._id) {
-            this.preview = this.$route.path == routerConfig.articleMgtDetail.path;
-            detail = await testApi.articleMgtDetailQuery({ _id: query._id });
+            this.preview = this.$route.path == routerConfig.videoMgtDetail.path;
+            detail = await testApi.videoMgtDetailQuery({ _id: query._id });
             if (query.repost) {
                 detail.detail._id = '';
             }
@@ -56,9 +58,23 @@ export default class ArticleMgtDetail extends ArticleMgtBase {
         return detail;
     }
 
+    private async beforeValidFn(detail: DetailDataType) {
+        await this.operateHandler('上传视频', async () => {
+            let upload = this.$refs.upload;
+            let err = await upload.upload();
+            if (err.length) {
+                throw new Error(err.join(','));
+            }
+            let file = upload.fileList[0];
+            if (file && file.uploadRes) {
+                detail.videoIdList = [file.uploadRes];
+            }
+        });
+    }
+
     private async saveFn(detail: DetailDataType, submit) {
         let { user, ...restDetail } = detail;
-        let rs = await testApi.articleMgtSave({
+        let rs = await testApi.videoMgtSave({
             ...restDetail,
             submit
         });
@@ -96,8 +112,7 @@ export default class ArticleMgtDetail extends ArticleMgtBase {
                 <br />
                 {this.renderHeader(detail)}
                 <br />
-                <div class="ql-editor" domPropsInnerHTML={detail.content}>
-                </div>
+
                 {operate.length > 0 && <Divider size='small' />}
                 <div>
                     {operate.map(ele => {
@@ -115,49 +130,43 @@ export default class ArticleMgtDetail extends ArticleMgtBase {
         );
     }
 
-    uploadFile = [];
-    async fileChangeHandler(file) {
-        //todo 判断是否同一文件
-        let match = this.uploadFile.find(ele => ele.file === file);
-        if (!match) {
-            try {
-                let t = await testApi.imgUpload(file);
-                match = {
-                    file,
-                    url: t.url,
-                };
-                this.uploadFile.push(match);
-            } catch (e) {
-                this.$Notice.error({
-                    title: '上传出错',
-                    desc: e,
-                });
-            }
-        }
-        if (match)
-            this.$refs.editor.insertEmbed('image', match.url);
-    }
 
     render() {
-        let { detail } = this.innerDetail;
+        let videoSize = 20;
         return (
             <ContentMgtDetailView ref="detailView"
                 preview={this.preview}
                 loadDetailData={this.loadDetailData}
                 getRules={this.getRules}
+                beforeValidFn={this.beforeValidFn}
                 saveFn={this.saveFn}
                 saveSuccessFn={() => {
                     this.toList();
                 }}
                 renderPreviewFn={this.renderPreview}
             >
-                <FormItem label="内容" prop="content">
-                    <MyEditor ref="editor" class={this.getStyleName('detail-content')}
-                        v-model={detail.content}
-                        placeholder='输点啥。。。'
-                        on-img-change={(file) => {
-                            this.fileChangeHandler(file);
-                        }} />
+                <FormItem label="视频" prop="videoIdList">
+                    <MyUpload ref='upload' width={videoSize * 16} height={videoSize * 9}
+                        headers={testApi.defaultHeaders}
+                        uploadUrl={testApi.videoUploadUrl}
+                        maxSize={10240}
+                        format={['mp4']}
+                        successHandler={(res, file) => {
+                            let rs = testApi.uplodaHandler(res);
+                            file.url = rs.url;
+                            return rs.fileId;
+                        }}
+                        uploadIconType={FileDataType.视频}
+                        showVideoCrop
+                        on-video-crop={(data, item) => {
+                            this.$refs.detailView.$refs.cover.setFile({
+                                data,
+                                file: item.file,
+                                fileType: FileDataType.图片
+                            });
+                        }}
+                    >
+                    </MyUpload>
                 </FormItem>
             </ContentMgtDetailView>
         )

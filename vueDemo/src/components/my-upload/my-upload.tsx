@@ -10,6 +10,7 @@ import { MyBase } from '../MyBase';
 
 import * as style from '../style';
 import './my-upload.less';
+import { MyVideo, IMyVideo } from '../my-video';
 
 export const FileDataType = {
     未知: 0,
@@ -25,6 +26,7 @@ type FileType = {
     showProgress?: boolean;
 
     file?: File;
+    originFileType?: string;
     fileType?: any;
     data?: string;
     originData?: string;
@@ -87,6 +89,11 @@ class MyUpload extends MyBase {
     value: FileType[];
     fileList: FileType[] = [];
 
+    @Prop({
+        default: FileDataType.图片
+    })
+    uploadIconType: number;
+
     @Watch('value')
     private watchValue(newVal: any[]) {
         if (newVal) {
@@ -103,6 +110,10 @@ class MyUpload extends MyBase {
 
     @Prop()
     cropperOptions?: CropperOption;
+
+    @Prop()
+    showVideoCrop?: boolean;
+
     stylePrefix = 'my-upload-';
 
     $refs: { upload: iview.Upload & { fileList: FileType[] }, cropper: any, imgViewer: IMyImgViewer };
@@ -186,7 +197,7 @@ class MyUpload extends MyBase {
                     file.uploadRes = this.successHandler && this.successHandler(rs.data, file);
                     file.willUpload = false;
                 } catch (e) {
-                    errorList.push(`[图${idx + 1}]:${e.message}`);
+                    errorList.push(`[文件${idx + 1}]:${e.message}`);
                 }
             }
         }
@@ -263,6 +274,20 @@ class MyUpload extends MyBase {
         return false;
     }
 
+    setFile(data: {
+        data: string;
+        fileType: number;
+        file: File,
+        originFileType?: string;
+    }) {
+        this.fileList = [{
+            ...data,
+            originData: data.data,
+            status: 'finished',
+            willUpload: true,
+        }];
+    }
+
     private pushFile(data, originData?) {
         let file = {
             data: data,
@@ -271,6 +296,7 @@ class MyUpload extends MyBase {
             file: this.file,
             fileType: this.fileType,
             willUpload: true,
+            originFileType: this.file.type
         };
         let rs = this.checkSize(this.file, data);
         if (!rs)
@@ -295,33 +321,44 @@ class MyUpload extends MyBase {
                 height: (window.innerHeight - 200) + 'px'
             }
         }
+        let coverHeight = '50px' || height;
         return (
             <div>
-                {this.fileList.map(item => {
+                {this.fileList.map((item, idx) => {
                     let isImg = item.fileType === FileDataType.图片;
+                    let isVideo = item.fileType === FileDataType.视频;
+                    let itemRefName = 'itemRef' + idx;
                     return (
                         <div class={[...this.getStyleName('item'), this.shape == 'circle' ? style.cls.circle : '']} style={{ width, height }}>
-                            {/* <div style={{
-                                width: 'inherit',
-                                height: 'inherit',
-                            }}> */}
-                            {isImg && <MyImg style={{
+                            {isImg && <MyImg ref={itemRefName} style={{
                                 width: 'inherit',
                                 height: 'inherit',
                             }} src={item.url || item.data} />}
-                            {item.fileType === FileDataType.视频 && <video style={{
-                                width: 'inherit',
-                                height: 'inherit',
-                            }} src={item.data} />}
-                            <div class={this.getStyleName('item-cover')} style={{ lineHeight: height }}>
+                            {isVideo &&
+                                <MyVideo ref={itemRefName} style={{
+                                    width: 'inherit',
+                                    height: 'inherit',
+                                }} options={{
+                                    sources: [{
+                                        type: item.originFileType,
+                                        src: item.url || item.data
+                                    }]
+                                }} />}
+                            <div class={this.getStyleName('item-cover')} style={{ lineHeight: coverHeight }}>
                                 {isImg && item.originData && <Icon type="md-create" nativeOn-click={() => { this.handleEdit(item); }} />}
                                 <Icon type="md-camera" nativeOn-click={() => {
                                     this.handleSelectFile(item);
                                 }} />
                                 {isImg && <Icon type="md-eye" nativeOn-click={() => { this.handleView(item); }} />}
                                 <Icon type="md-trash" nativeOn-click={() => { this.handleRemove(item); }} />
+                                {isVideo && this.showVideoCrop && <Icon type="md-crop" nativeOn-click={() => {
+                                    let ref: IMyVideo = this.$refs[itemRefName];
+                                    let data = '';
+                                    if (ref)
+                                        data = ref.capture();
+                                    this.$emit('video-crop', data, item);
+                                }} />}
                             </div>
-                            {/* </div> */}
                         </div>
                     )
                 })}
@@ -352,7 +389,10 @@ class MyUpload extends MyBase {
                         if (this.headers)
                             this.uploadHeaders = this.headers();
                     }}>
-                        <Icon type="md-camera" size="20"></Icon>
+                        <Icon type={{
+                            [FileDataType.图片]: "md-camera",
+                            [FileDataType.视频]: "logo-youtube",
+                        }[this.uploadIconType]} size="20"></Icon>
                     </div>
                 </Upload>
                 <transition name="fade">
