@@ -158,7 +158,7 @@ export const routerConfig = {
         meta: {
             authority: [authority.login],
         },
-        component: () => import('./views/content/article-mgt-detail')
+        component: () => import('./views/content/video-mgt-detail')
     },
     videoMgtDetail: {
         path: '/contentMgt/video/detail',
@@ -166,7 +166,7 @@ export const routerConfig = {
         meta: {
             authority: [authority.login],
         },
-        component: () => import('./views/content/article-mgt-detail')
+        component: () => import('./views/content/video-mgt-detail')
     },
 
     payMgt: {

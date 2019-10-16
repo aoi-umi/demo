@@ -23,7 +23,7 @@ export class VideoSave extends ContentSave {
     @Transform(value => {
         return arrayTransform(value, Types.ObjectId);
     })
-    videoIdList: Types.ObjectId;
+    videoIdList: Types.ObjectId[];
 }
 
 export class VideoDel extends ContentDel {

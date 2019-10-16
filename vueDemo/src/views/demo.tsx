@@ -5,15 +5,13 @@ import * as echarts from 'echarts/lib/echarts';
 
 import * as  QRCode from 'qrcode';
 
-import videojs from 'video.js';
-import 'video.js/dist/video-js.min.css';
-
 import { Input, Card, Button, ColorPicker, Row, Col, Checkbox } from '@/components/iview';
 import { MyList, IMyList } from '@/components/my-list';
 import { MyUpload, IMyUpload } from '@/components/my-upload';
 import { testSocket, testApi } from '@/api';
 import { Base } from './base';
 import './demo.less';
+import { MyVideo, IMyVideo } from '@/components/my-video';
 
 
 @Component
@@ -40,7 +38,7 @@ export default class App extends Base {
     }[] = [];
     $refs: {
         board: HTMLElement; list: IMyList<any>; echart: HTMLDivElement; canvas: HTMLDivElement;
-        upload: IMyUpload; video: HTMLVideoElement; videoCover: any;
+        upload: IMyUpload; video: IMyVideo; videoCover: any;
     };
     richText = '';
     chart: echarts.ECharts;
@@ -55,30 +53,12 @@ export default class App extends Base {
     videoIdText = '';
     videoId = '5d9eeeb0f8b93d22548dd6cc';
 
-    videoOpt = {
-        // videojs options
-        muted: true,
-        controls: true,
-        language: 'en',
-        playbackRates: [0.7, 1.0, 1.5, 2.0],
-        sources: [{
-            type: "video/mp4",
-            src: testApi.getVideoUrl(this.videoId)
-        }],
-        poster: "http://vjs.zencdn.net/v/oceans.png",
-        aspectRatio: '16:9',
-    }
-
     mounted() {
         this.$refs.list.query();
         this.chart = echarts.init(this.$refs.echart);
         this.setECharts();
         this.qrcode();
-        this.player = videojs(this.$refs.video, this.videoOpt);
-    }
-
-    beforeDestroy() {
-        videojs(this.$refs.video).dispose();
+        this.player = this.$refs.video.player;
     }
 
     async qrcode() {
@@ -204,12 +184,7 @@ export default class App extends Base {
     }
 
     captureImage() {
-        let canvas = document.createElement("canvas");
-        let video = this.$refs.video;
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-        return canvas.toDataURL('image/png');
+        return this.$refs.video.capture();
     }
 
     fail = false;
@@ -242,11 +217,12 @@ export default class App extends Base {
                         display: 'flex',
                         alignItems: 'center'
                     }}>
-                        <video ref="video" class="video-js vjs-default-skin" crossOrigin="*" style={{
-                            width: 'inherit',
-                            height: 'inherit',
-                        }}>
-                        </video>
+                        <MyVideo ref="video" options={{
+                            sources: [{
+                                type: "video/mp4",
+                                src: testApi.getVideoUrl(this.videoId)
+                            }]
+                        }} />
                         <div ref='board' style={{
                             overflow: 'hidden', position: 'absolute',
                             fontSize: '30px', color: 'white',

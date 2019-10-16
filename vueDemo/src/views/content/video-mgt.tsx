@@ -14,7 +14,7 @@ import { VideoListItemView } from './video';
 import { ContentMgtBase, ContentDataType } from './content-mgt-base';
 
 export class VideoMgtBase extends ContentMgtBase {
-    contentMgtType = myEnum.contentMgtType.文章;
+    contentMgtType = myEnum.contentMgtType.视频;
 
     protected async auditFn(detail, pass) {
         let toStatus = pass ? myEnum.videoStatus.审核通过 : myEnum.videoStatus.审核不通过;

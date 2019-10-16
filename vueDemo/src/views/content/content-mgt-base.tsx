@@ -63,7 +63,7 @@ export type ContentDataType = {
 };
 
 export abstract class ContentMgtBase extends Base {
-    contentMgtType: string;
+    abstract contentMgtType: string;
     delShow = false;
     delIds = [];
     delRemark = '';
@@ -101,6 +101,7 @@ export abstract class ContentMgtBase extends Base {
     protected abstract canAudit(detail: ContentDataType): boolean;
 
     protected toList() {
+        console.log(this.contentMgtType);
         this.$router.push({
             path: routerConfig.contentMgt.path,
             query: {
@@ -241,6 +242,9 @@ export class ContentMgtDetail extends Base {
     @Prop()
     getRules: () => any;
 
+    @Prop()
+    beforeValidFn: (detail) => Promise<any>;
+
     @Prop({
         required: true
     })
@@ -320,19 +324,22 @@ export class ContentMgtDetail extends Base {
         let { detail } = this.innerDetail;
         let rs;
         await this.operateHandler('保存', async () => {
-            let upload = this.$refs.cover;
-            let err = await upload.upload();
-            if (err.length) {
-                throw new Error(err.join(','));
-            }
-            let file = upload.fileList[0];
-            if (!file)
-                detail.cover = '';
-            else if (file.uploadRes)
-                detail.cover = file.uploadRes;
             rs = await this.saveFn(detail, submit);
         }, {
             validate: this.$refs.formVaild.validate,
+            beforeValid: async () => {
+                let upload = this.$refs.cover;
+                let err = await upload.upload();
+                if (err.length) {
+                    throw new Error('上传封面出错:' + err.join(','));
+                }
+                let file = upload.fileList[0];
+                if (!file)
+                    detail.cover = '';
+                else if (file.uploadRes)
+                    detail.cover = file.uploadRes;
+                this.beforeValidFn && await this.beforeValidFn(detail);
+            },
             onSuccessClose: () => {
                 this.saveSuccessFn(rs);
             }
@@ -441,7 +448,7 @@ export class ContentMgtDetail extends Base {
                 {this.renderLog()}
             </div >
         );
-    }    
+    }
 }
 
 export const ContentMgtDetailView = convClass<ContentMgtDetail>(ContentMgtDetail)

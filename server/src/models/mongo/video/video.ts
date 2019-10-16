@@ -18,11 +18,11 @@ export type VideoDocType = DocType<VideoInstanceType>;
     }
 })
 export class Video extends ContentBase {
-    @prop({
+    @arrayProp({
         required: true,
         type: SchemaTypes.ObjectId
     })
-    videoIdList: Types.ObjectId;
+    videoIdList: Types.ObjectId[];
 
     @prop({
         enum: myEnum.videoStatus.getAllValue()

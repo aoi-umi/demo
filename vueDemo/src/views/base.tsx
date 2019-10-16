@@ -15,6 +15,7 @@ export class Base extends MyBase {
     }
 
     async operateHandler(operate: string, fn: () => any, opt?: {
+        beforeValid?: () => any;
         onSuccessClose?: () => any;
         validate?: (callback?: (valid?: boolean) => void) => void,
         noDefaultHandler?: boolean;
@@ -28,6 +29,7 @@ export class Base extends MyBase {
         };
         try {
             opt = { ...opt };
+            opt.beforeValid && await opt.beforeValid();
             let valid = await new Promise((reso, rej) => {
                 if (opt.validate) {
                     opt.validate((valid) => {
