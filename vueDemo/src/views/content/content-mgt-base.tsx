@@ -1,15 +1,38 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import moment from 'dayjs';
+import * as iview from 'iview';
+import { testApi } from '@/api';
 
 import { myEnum, dev } from '@/config';
 import { routerConfig } from '@/router';
-import { Tabs, TabPane, Modal, Input, Divider } from '@/components/iview';
-import { MyConfirm } from '@/components/my-confirm';
 import { convClass } from '@/components/utils';
+import { Form, FormItem, Button, Modal, Input, Divider, Checkbox, DatePicker } from '@/components/iview';
+import { MyConfirm } from '@/components/my-confirm';
 import { MyList } from '@/components/my-list';
+import { MyUpload, IMyUpload, FileDataType } from '@/components/my-upload';
 
 import { UserAvatarView } from '../comps/user-avatar';
 import { Base } from '../base';
+import { IMyLoad, MyLoad } from '@/components/my-load';
+export class ContentDetailType<T extends ContentDataType = ContentDataType> {
+    detail: T;
+    log?: any[];
+    static create<T extends ContentDataType>(): ContentDetailType<T> {
+        let data = {
+            detail: {
+                _id: '',
+                cover: '',
+                coverUrl: '',
+                title: '',
+                profile: '',
+                statusText: '',
+                remark: '',
+            } as any as T,
+            log: []
+        };
+        return data;
+    }
+}
 
 export type ContentDataType = {
     _id: string;
@@ -40,7 +63,7 @@ export type ContentDataType = {
 };
 
 export abstract class ContentMgtBase extends Base {
-    contentMgtType: number;
+    contentMgtType: string;
     delShow = false;
     delIds = [];
     delRemark = '';
@@ -50,18 +73,7 @@ export abstract class ContentMgtBase extends Base {
     protected preview = false;
 
     protected getDefaultDetail<T extends ContentDataType = ContentDataType>() {
-        let data = {
-            detail: {
-                _id: '',
-                cover: '',
-                coverUrl: '',
-                title: '',
-                profile: '',
-                statusText: '',
-                remark: '',
-            } as T,
-            log: []
-        };
+        let data = ContentDetailType.create<T>();
         return data;
     }
 
@@ -71,7 +83,7 @@ export abstract class ContentMgtBase extends Base {
     }
 
     protected auditSuccessHandler(detail) {
-
+        this.toList();
     }
 
     protected abstract auditFn(detail: ContentDataType, pass: boolean): Promise<{ status, statusText }>;
@@ -111,6 +123,8 @@ export abstract class ContentMgtBase extends Base {
             query: { _id: _id || '', repost: opt.repost ? 'true' : '' }
         });
     }
+
+    protected abstract isDel(detail: ContentDataType): boolean;
 
     protected getOperate(detail: ContentDataType, opt?: { noPreview?: boolean; isDetail?: boolean; }) {
         opt = { ...opt };
@@ -158,7 +172,7 @@ export abstract class ContentMgtBase extends Base {
                 }
             });
         }
-        if (detail.user._id === this.storeUser.user._id && detail.status === myEnum.articleStatus.已删除) {
+        if (detail.user._id === this.storeUser.user._id && this.isDel(detail)) {
             operate.push({
                 text: '重投',
                 fn: () => {
@@ -202,7 +216,9 @@ export abstract class ContentMgtBase extends Base {
         );
     }
 
-    protected delSuccessHandler() { }
+    protected delSuccessHandler() {
+        this.toList();
+    }
     protected abstract delFn(): Promise<any>;
     async delClick() {
         await this.operateHandler('删除', async () => {
@@ -214,6 +230,222 @@ export abstract class ContentMgtBase extends Base {
         });
     }
 }
+
+@Component
+export class ContentMgtDetail extends Base {
+    @Prop({
+        required: true
+    })
+    loadDetailData: () => Promise<ContentDetailType>;
+
+    @Prop()
+    getRules: () => any;
+
+    @Prop({
+        required: true
+    })
+    saveFn: (detail, submit: boolean) => Promise<any>;
+
+    @Prop({
+        required: true
+    })
+    saveSuccessFn: (rs) => void;
+
+    @Prop()
+    preview: boolean;
+
+    @Prop({
+        required: true
+    })
+    renderPreviewFn: (detail) => any;
+
+    $refs: { formVaild: iview.Form, cover: IMyUpload, loadView: IMyLoad };
+
+    mounted() {
+        this.init();
+    }
+
+    @Watch('$route')
+    route(to, from) {
+        this.init();
+    }
+
+    private init() {
+        this.$refs.loadView.loadData();
+    }
+
+    innerDetail: ContentDetailType = null;
+
+    rules = {};
+    private getCommonRules() {
+        return {
+            title: [
+                { required: true, trigger: 'blur' }
+            ],
+            setPublishAt: [{
+                validator: (rule, value, callback) => {
+                    let { detail } = this.innerDetail;
+                    if (detail.setPublish && !detail.setPublishAt) {
+                        callback(new Error('请填写发布时间'));
+                    } else {
+                        callback();
+                    }
+                },
+                trigger: 'blur'
+            }],
+        };
+    }
+
+    private setRules() {
+        let rule = this.getRules ? this.getRules() : {};
+        this.rules = {
+            ...this.getCommonRules(),
+            ...rule,
+        };
+    }
+
+    private coverList = [];
+    private async loadDetail() {
+        let detail: ContentDetailType;
+        detail = await this.loadDetailData();
+        this.coverList = detail.detail.coverUrl ? [{ url: detail.detail.coverUrl, fileType: FileDataType.图片 }] : [];
+        this.innerDetail = detail;
+        this.setRules();
+        return detail;
+    }
+
+    private saving = false;
+    private async handleSave(submit?: boolean) {
+        this.saving = true;
+        let { detail } = this.innerDetail;
+        let rs;
+        await this.operateHandler('保存', async () => {
+            let upload = this.$refs.cover;
+            let err = await upload.upload();
+            if (err.length) {
+                throw new Error(err.join(','));
+            }
+            let file = upload.fileList[0];
+            if (!file)
+                detail.cover = '';
+            else if (file.uploadRes)
+                detail.cover = file.uploadRes;
+            rs = await this.saveFn(detail, submit);
+        }, {
+            validate: this.$refs.formVaild.validate,
+            onSuccessClose: () => {
+                this.saveSuccessFn(rs);
+            }
+        }).finally(() => {
+            this.saving = false;
+        });
+    }
+
+    protected render() {
+        return (
+            <MyLoad
+                ref="loadView"
+                loadFn={this.loadDetail}
+                renderFn={() => {
+                    if (!this.preview)
+                        return this.renderEdit();
+                    return this.renderPreviewFn(this.innerDetail);
+                }}
+            />
+        );
+    }
+
+    protected renderHeader(detail: ContentDataType) {
+        return (
+            <div>
+                <UserAvatarView user={detail.user} />
+                {[
+                    '状态: ' + detail.statusText,
+                    '创建于: ' + moment(detail.createdAt).format(dev.dateFormat),
+                    detail.publishAt && ('发布于:' + moment(detail.publishAt).format(dev.dateFormat)),
+                ].map(ele => {
+                    return (<span class="not-important" style={{ marginLeft: '5px' }}>{ele}</span>);
+                })}
+            </div>
+        );
+    }
+
+    protected renderLog() {
+        let { log } = this.innerDetail;
+        return (
+            <ContentLogListView log={log} />
+        );
+    }
+
+    protected renderEdit() {
+        let { detail } = this.innerDetail;
+        return (
+            <div>
+                <h3>{detail._id ? '修改' : '新增'}</h3>
+                <Form ref="formVaild" label-position="top" props={{ model: detail }} rules={this.rules}>
+                    <FormItem label="" prop="header" v-show={!detail._id}>
+                        {!!detail._id && this.renderHeader(detail)}
+                    </FormItem>
+                    <FormItem label="封面" prop="cover">
+                        <MyUpload
+                            ref='cover'
+                            headers={testApi.defaultHeaders}
+                            uploadUrl={testApi.imgUploadUrl}
+                            successHandler={(res, file) => {
+                                let rs = testApi.uplodaHandler(res);
+                                file.url = rs.url;
+                                return rs.fileId;
+                            }}
+                            format={['jpg', 'png', 'bmp', 'gif']}
+                            width={160} height={90}
+                            v-model={this.coverList}
+                        />
+                    </FormItem>
+                    <FormItem label="标题" prop="title">
+                        <Input v-model={detail.title} />
+                    </FormItem>
+                    <FormItem label="简介" prop="profile">
+                        <Input v-model={detail.profile} type="textarea" />
+                    </FormItem>
+                    {this.$slots.default}
+                    <FormItem prop="setPublishAt">
+                        <label style={{ marginRight: '5px' }}>
+                            <Checkbox v-model={detail.setPublish} />
+                            指定时间发布
+                        </label>
+                        <DatePicker v-model={detail.setPublishAt} type="datetime" options={{
+                            disabledDate: (date?: Date) => {
+                                let start = moment().startOf('day');
+                                let end = moment(start).add(3, 'd');
+                                return date && (date.valueOf() < start.valueOf() || date.valueOf() >= end.valueOf());
+                            }
+                        }} />
+                    </FormItem>
+                    <FormItem label="备注" prop="remark">
+                        <Input v-model={detail.remark} />
+                    </FormItem>
+                    {(!detail._id || detail.canUpdate) &&
+                        <div>
+                            <Divider size='small' />
+                            <FormItem>
+                                <Button on-click={() => {
+                                    this.handleSave(false);
+                                }} loading={this.saving}>保存草稿</Button>
+                                <Button type="primary" on-click={() => {
+                                    this.handleSave(true);
+                                }} loading={this.saving}>发布</Button>
+                            </FormItem>
+                        </div>
+                    }
+                </Form>
+                {this.renderLog()}
+            </div >
+        );
+    }    
+}
+
+export const ContentMgtDetailView = convClass<ContentMgtDetail>(ContentMgtDetail)
+
 
 @Component
 export class ContentLogList extends Base {

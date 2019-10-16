@@ -14,7 +14,7 @@ export class Base extends MyBase {
         return getModule(SettingStore, this.$store);
     }
 
-    protected async operateHandler(operate: string, fn: () => any, opt?: {
+    async operateHandler(operate: string, fn: () => any, opt?: {
         onSuccessClose?: () => any;
         validate?: (callback?: (valid?: boolean) => void) => void,
         noDefaultHandler?: boolean;

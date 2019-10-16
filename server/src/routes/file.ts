@@ -31,7 +31,7 @@ const uplaod = (option: { fileType: string }, req: Request, res: Response) => {
             contentType: file.mimetype,
         });
         let obj = fs.toOutObject();
-        obj.url = FileMapper.getUrl(fs.fileId, option.fileType, req.myData.imgHost);
+        obj.url = FileMapper.getUrl(fs._id, option.fileType, req.myData.imgHost);
         return obj;
     }, req, res);
 };

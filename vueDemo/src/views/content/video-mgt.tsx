@@ -33,6 +33,10 @@ export class VideoMgtBase extends ContentMgtBase {
     protected async delFn() {
         await testApi.videoMgtDel({ idList: this.delIds, remark: this.delRemark });
     }
+
+    protected isDel(detail) {
+        return detail.status === myEnum.videoStatus.已删除;
+    }
 }
 
 
@@ -58,7 +62,7 @@ export default class VideoMgt extends VideoMgtBase implements IListBase {
                 tag: ele.key,
                 key: ele.value,
                 checkable: true
-            }
+            };
         });
     }
 

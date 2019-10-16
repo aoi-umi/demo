@@ -49,6 +49,7 @@ class MyEditor extends MyInputBase {
             fileInput.addEventListener('change', () => {
                 if (fileInput.files != null && fileInput.files[0] != null) {
                     this.$emit('img-change', fileInput.files[0]);
+                    fileInput.value = '';
                 }
             });
             toolbar.container.appendChild(fileInput);

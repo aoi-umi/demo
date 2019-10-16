@@ -90,7 +90,10 @@ const enumDefine = {
 };
 
 const enumDefineFront = {
-    contentMgtType: enumDefine.contentType,
+    contentMgtType: {
+        文章: 'article',
+        视频: 'video',
+    },
     userEditType: {
         修改: 'edit',
         封禁: 'disable',

@@ -33,6 +33,10 @@ export class ArticleMgtBase extends ContentMgtBase {
     protected async delFn() {
         await testApi.articleMgtDel({ idList: this.delIds, remark: this.delRemark });
     }
+
+    protected isDel(detail) {
+        return detail.status === myEnum.articleStatus.已删除;
+    }
 }
 
 
