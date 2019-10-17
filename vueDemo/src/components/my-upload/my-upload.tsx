@@ -18,7 +18,7 @@ export const FileDataType = {
     视频: 2
 };
 
-type FileType = {
+export type FileType = {
     name?: string;
     url?: string;
     percentage?: number;
@@ -42,6 +42,13 @@ type CropperOption = {
     fixed?: boolean;
     fixedNumber?: [number, number]
     outputType?: 'jpeg' | 'png' | 'webp'
+};
+
+type SetFileType = {
+    data: string;
+    fileType: number;
+    file: File,
+    originFileType?: string;
 };
 @Component({
     VueCropper
@@ -274,18 +281,16 @@ class MyUpload extends MyBase {
         return false;
     }
 
-    setFile(data: {
-        data: string;
-        fileType: number;
-        file: File,
-        originFileType?: string;
-    }) {
-        this.fileList = [{
-            ...data,
-            originData: data.data,
-            status: 'finished',
-            willUpload: true,
-        }];
+    setFile(data: SetFileType | SetFileType[]) {
+        let list = data instanceof Array ? data : [data];
+        this.fileList = list.map(ele => {
+            return {
+                ...ele,
+                originData: ele.data,
+                status: 'finished',
+                willUpload: true,
+            };
+        });
     }
 
     private pushFile(data, originData?) {
@@ -330,20 +335,13 @@ class MyUpload extends MyBase {
                     let itemRefName = 'itemRef' + idx;
                     return (
                         <div class={[...this.getStyleName('item'), this.shape == 'circle' ? style.cls.circle : '']} style={{ width, height }}>
-                            {isImg && <MyImg ref={itemRefName} style={{
-                                width: 'inherit',
-                                height: 'inherit',
-                            }} src={item.url || item.data} />}
-                            {isVideo &&
-                                <MyVideo ref={itemRefName} style={{
-                                    width: 'inherit',
-                                    height: 'inherit',
-                                }} options={{
-                                    sources: [{
-                                        type: item.originFileType,
-                                        src: item.url || item.data
-                                    }]
-                                }} />}
+                            {isImg && <MyImg ref={itemRefName} class={this.getStyleName('item-cont')} src={item.url || item.data} />}
+                            {isVideo && <MyVideo ref={itemRefName} class={this.getStyleName('item-cont')} options={{
+                                sources: [{
+                                    type: item.originFileType,
+                                    src: item.url || item.data
+                                }]
+                            }} />}
                             <div class={this.getStyleName('item-cover')} style={{ lineHeight: coverHeight }}>
                                 {isImg && item.originData && <Icon type="md-create" nativeOn-click={() => { this.handleEdit(item); }} />}
                                 <Icon type="md-camera" nativeOn-click={() => {
@@ -353,7 +351,7 @@ class MyUpload extends MyBase {
                                 <Icon type="md-trash" nativeOn-click={() => { this.handleRemove(item); }} />
                                 {isVideo && this.showVideoCrop && <Icon type="md-crop" nativeOn-click={() => {
                                     let ref: IMyVideo = this.$refs[itemRefName];
-                                    let data = '';
+                                    let data = null;
                                     if (ref)
                                         data = ref.capture();
                                     this.$emit('video-crop', data, item);

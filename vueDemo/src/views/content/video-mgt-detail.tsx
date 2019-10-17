@@ -6,7 +6,7 @@ import { myEnum, dev } from '@/config';
 import { routerConfig } from '@/router';
 import { FormItem, Button, Divider, Input, Icon } from '@/components/iview';
 import { MyVideo, IMyVideo } from '@/components/my-video';
-import { MyUpload, IMyUpload, FileDataType } from '@/components/my-upload';
+import { MyUpload, IMyUpload, FileDataType, FileType } from '@/components/my-upload';
 
 import { UserAvatarView } from '../comps/user-avatar';
 import { VideoMgtBase } from './video-mgt';
@@ -17,6 +17,7 @@ import './video.less';
 
 export type DetailDataType = ContentDataType & {
     videoIdList: string[];
+    videoList: { _id: string, url: string, contentType: string }[];
 };
 export type DetailType = ContentDetailType<DetailDataType>;
 
@@ -42,12 +43,16 @@ export default class VideoMgtDetail extends VideoMgtBase {
         };
     }
 
+    videoList: FileType[] = [];
     private async loadDetailData() {
         let query = this.$route.query;
         let detail: DetailType;
         if (query._id) {
             this.preview = this.$route.path == routerConfig.videoMgtDetail.path;
             detail = await testApi.videoMgtDetailQuery({ _id: query._id });
+            this.videoList = detail.detail.videoList.map(ele => {
+                return { url: ele.url, fileType: FileDataType.视频, originFileType: ele.contentType };
+            });
             if (query.repost) {
                 detail.detail._id = '';
             }
@@ -69,7 +74,7 @@ export default class VideoMgtDetail extends VideoMgtBase {
             if (file && file.uploadRes) {
                 detail.videoIdList = [file.uploadRes];
             }
-        });
+        }, { noSuccessHandler: true });
     }
 
     private async saveFn(detail: DetailDataType, submit) {
@@ -112,6 +117,18 @@ export default class VideoMgtDetail extends VideoMgtBase {
                 <br />
                 {this.renderHeader(detail)}
                 <br />
+                <div class={this.getStyleName('video-box')}>
+                    <div class={this.getStyleName('video')}>
+                        <MyVideo options={{
+                            sources: this.videoList.map(ele => {
+                                return {
+                                    src: ele.url,
+                                    type: ele.originFileType,
+                                }
+                            })
+                        }} />
+                    </div>
+                </div>
 
                 {operate.length > 0 && <Divider size='small' />}
                 <div>
@@ -158,13 +175,17 @@ export default class VideoMgtDetail extends VideoMgtBase {
                         }}
                         uploadIconType={FileDataType.视频}
                         showVideoCrop
-                        on-video-crop={(data, item) => {
+                        on-video-crop={(crop, item) => {
+                            if (!crop || !crop.data)
+                                return;
+                            let file = new File([], '截图', { type: crop.type });
                             this.$refs.detailView.$refs.cover.setFile({
-                                data,
-                                file: item.file,
+                                data: crop.data,
+                                file: file,
                                 fileType: FileDataType.图片
                             });
                         }}
+                        v-model={this.videoList}
                     >
                     </MyUpload>
                 </FormItem>

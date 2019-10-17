@@ -115,7 +115,7 @@ export class ContentMapper {
     static async detailQuery(opt: ContentQueryOption & { query: () => Promise<any> }) {
         let detail = await opt.query();
         if (!detail)
-            throw error('', config.error.NOT_FOUND);
+            throw error('', config.error.DB_NO_DATA);
         let rs = {
             detail,
             log: null as any[]

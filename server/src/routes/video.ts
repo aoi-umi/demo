@@ -10,14 +10,15 @@ import { VideoMapper, VideoModel } from '@/models/mongo/video';
 
 export let mgtQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let user = req.myData.user;
+        let myData = req.myData;
+        let user = myData.user;
         let data = paramsValid(req.query, VaildSchema.VideoQuery);
 
         let { rows, total } = await VideoMapper.query(data, {
             userId: user._id,
             audit: Auth.contains(user, config.auth.videoMgtAudit),
             resetOpt: {
-                imgHost: req.myData.imgHost,
+                imgHost: myData.imgHost,
                 user,
             }
         });
@@ -30,13 +31,15 @@ export let mgtQuery: RequestHandler = (req, res) => {
 
 export let mgtDetailQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let user = req.myData.user;
+        let myData = req.myData;
+        let user = myData.user;
         let data = paramsValid(req.query, VaildSchema.VideoDetailQuery);
         let rs = await VideoMapper.detailQuery({ _id: data._id }, {
             userId: user._id,
             audit: Auth.contains(user, config.auth.videoMgtAudit),
             resetOpt: {
-                imgHost: req.myData.imgHost,
+                imgHost: myData.imgHost,
+                videoHost: myData.videoHost,
                 user,
             }
         });
@@ -85,13 +88,14 @@ export let mgtAudit: RequestHandler = (req, res) => {
 
 export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let user = req.myData.user;
+        let myData = req.myData;
+        let user = myData.user;
         let data = paramsValid(req.query, VaildSchema.VideoQuery);
 
         let { rows, total } = await VideoMapper.query(data, {
             normal: true,
             resetOpt: {
-                imgHost: req.myData.imgHost,
+                imgHost: myData.imgHost,
                 user: user.isLogin ? user : null,
             }
         });
@@ -104,12 +108,14 @@ export let query: RequestHandler = (req, res) => {
 
 export let detailQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let user = req.myData.user;
+        let myData = req.myData;
+        let user = myData.user;
         let data = paramsValid(req.query, VaildSchema.VideoDetailQuery);
         let rs = await VideoMapper.detailQuery({ _id: data._id }, {
             normal: true,
             resetOpt: {
-                imgHost: req.myData.imgHost,
+                imgHost: myData.imgHost,
+                videoHost: myData.videoHost,
                 user: user.isLogin ? user : null,
             }
         });

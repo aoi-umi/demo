@@ -85,7 +85,7 @@ export class ArticleMapper {
     static async findOne(data) {
         let detail = await ArticleModel.findOne(data);
         if (!detail)
-            throw error('', config.error.NOT_FOUND);
+            throw error('', config.error.DB_NO_DATA);
         return detail;
     }
 

@@ -22,6 +22,7 @@ declare global {
             ip: string;
             lang?: string;
             imgHost?: string;
+            videoHost?: string;
         }
 
         interface Response {

@@ -58,6 +58,7 @@ export let register = function (app: Express) {
             startTime: new Date().getTime(),
             ip: req.realIp,
             imgHost: req.headers.host,
+            videoHost: req.headers.host,
         }
         next();
     });

@@ -32,6 +32,7 @@ export const enumDefine = {
     },
     voteType: {
         文章: 0,
+        视频: 1,
         评论: 10
     },
     voteValue: {

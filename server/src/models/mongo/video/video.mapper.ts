@@ -12,12 +12,17 @@ import { UserModel, UserMapper } from '../user';
 import { ContentMapper, ContentResetOption, ContentQueryOption, ContentUpdateStatusOutOption, ContentLogModel } from '../content';
 import { VideoInstanceType, VideoModel, VideoDocType } from "./video";
 import { BaseMapper } from '../_base';
+import { FileMapper, FileModel } from '../file';
 
+type VideoResetOption = ContentResetOption & {
+    videoHost?: string;
+}
+type VideoQueryOption = ContentQueryOption<VideoResetOption>;
 export class VideoMapper {
 
     static async query(data: VaildSchema.VideoQuery, opt: {
         noTotal?: boolean,
-    } & ContentQueryOption) {
+    } & VideoQueryOption) {
         function setMatch(match) {
             let userId = opt.userId;
             if (opt.normal) {
@@ -68,8 +73,8 @@ export class VideoMapper {
         });
     }
 
-    static async detailQuery(data, opt: ContentQueryOption) {
-        let rs = ContentMapper.detailQuery({
+    static async detailQuery(data, opt: VideoQueryOption) {
+        let rs = await ContentMapper.detailQuery({
             ...opt,
             query: async () => {
                 let { rows } = await this.query(data, { ...opt, noTotal: true });
@@ -77,17 +82,38 @@ export class VideoMapper {
                 return detail;
             }
         });
+        let detail = rs.detail;
+        let fileList = await FileMapper.findWithRaw({ _id: detail.videoIdList });
+        detail.videoList = detail.videoIdList.map(ele => {
+            let file = fileList.find(f => f.file._id.equals(ele));
+            let rawFile = file.rawFile;
+            let meg = {
+                contentType: '',
+            };
+            if (rawFile) {
+                for (let key in meg) {
+                    if (rawFile[key])
+                        meg[key] = rawFile[key];
+                }
+            }
+            return {
+                _id: ele,
+                url: FileMapper.getVideoUrl(ele, opt.resetOpt.videoHost),
+                ...meg,
+            };
+        });
+        //获取文件类型
         return rs;
     }
 
     static async findOne(data) {
         let detail = await VideoModel.findOne(data);
         if (!detail)
-            throw error('', config.error.NOT_FOUND);
+            throw error('', config.error.DB_NO_DATA);
         return detail;
     }
 
-    static resetDetail(detail, opt: ContentResetOption) {
+    static resetDetail(detail, opt: VideoResetOption) {
         let { user } = opt;
         if (user) {
             let rs = {

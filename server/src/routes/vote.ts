@@ -13,8 +13,6 @@ export let submit: RequestHandler = (req, res) => {
         let user = req.myData.user;
         let data = paramsValid(req.body, VaildSchema.VoteSubmit);
         let owner = await VoteMapper.findOwner({ ownerId: data.ownerId, type: data.type });
-        if (!owner)
-            throw error('', config.error.NO_MATCH_DATA);
         let detail = await VoteMapper.create({ ownerId: data.ownerId, userId: user._id, type: data.type });
         //没变化，返回最新的数据
         if (data.value == detail.value) {
