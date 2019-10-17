@@ -10,10 +10,10 @@ import { Form, FormItem, Button, Modal, Input, Divider, Checkbox, DatePicker } f
 import { MyConfirm } from '@/components/my-confirm';
 import { MyList } from '@/components/my-list';
 import { MyUpload, IMyUpload, FileDataType } from '@/components/my-upload';
+import { IMyLoad, MyLoad } from '@/components/my-load';
 
 import { UserAvatarView } from '../comps/user-avatar';
 import { Base } from '../base';
-import { IMyLoad, MyLoad } from '@/components/my-load';
 export class ContentDetailType<T extends ContentDataType = ContentDataType> {
     detail: T;
     log?: any[];
@@ -318,6 +318,16 @@ export class ContentMgtDetail extends Base {
         return detail;
     }
 
+    async uploadCover() {
+        let upload = this.$refs.cover;
+        let err = await upload.upload();
+        if (err.length) {
+            throw new Error('上传封面出错:' + err.join(','));
+        }
+        let file = upload.fileList[0];
+        return file;
+    }
+
     private saving = false;
     private async handleSave(submit?: boolean) {
         this.saving = true;
@@ -328,12 +338,7 @@ export class ContentMgtDetail extends Base {
         }, {
             validate: this.$refs.formVaild.validate,
             beforeValid: async () => {
-                let upload = this.$refs.cover;
-                let err = await upload.upload();
-                if (err.length) {
-                    throw new Error('上传封面出错:' + err.join(','));
-                }
-                let file = upload.fileList[0];
+                let file = await this.uploadCover();
                 if (!file)
                     detail.cover = '';
                 else if (file.uploadRes)

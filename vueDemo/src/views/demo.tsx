@@ -218,6 +218,7 @@ export default class App extends Base {
                         alignItems: 'center'
                     }}>
                         <MyVideo ref="video" options={{
+                            poster: '//localhost:8000/devMgt/img?_id=5da818d6433fe2209054c290',
                             sources: [{
                                 type: "video/mp4",
                                 src: testApi.getVideoUrl(this.videoId)

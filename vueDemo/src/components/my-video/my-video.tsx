@@ -31,7 +31,7 @@ class MyVideo extends MyBase {
     private getDefaultOpt() {
         return {
             // videojs options
-            muted: true,
+            // muted: true,
             controls: true,
             language: 'en',
             playbackRates: [0.7, 1.0, 1.5, 2.0],

@@ -14,6 +14,7 @@ import { ContentDetailType, ContentDataType, ContentMgtDetail, ContentMgtDetailV
 
 
 import './video.less';
+import { VideoDetailMainView } from './video-detail';
 
 export type DetailDataType = ContentDataType & {
     videoIdList: string[];
@@ -37,6 +38,9 @@ export default class VideoMgtDetail extends VideoMgtBase {
 
     private getRules() {
         return {
+            cover: {
+                required: true,
+            },
             videoIdList: {
                 required: true
             }
@@ -86,49 +90,19 @@ export default class VideoMgtDetail extends VideoMgtBase {
         return rs;
     }
 
-    protected renderHeader(detail: ContentDataType) {
-        return (
-            <div>
-                <UserAvatarView user={detail.user} />
-                {[
-                    '状态: ' + detail.statusText,
-                    '创建于: ' + moment(detail.createdAt).format(dev.dateFormat),
-                    detail.publishAt && ('发布于:' + moment(detail.publishAt).format(dev.dateFormat)),
-                ].map(ele => {
-                    return (<span class="not-important" style={{ marginLeft: '5px' }}>{ele}</span>);
-                })}
-            </div>
-        );
-    }
-
-    protected renderLog() {
+    private renderLog() {
         let { log } = this.innerDetail;
         return (
             <ContentLogListView log={log} />
         );
     }
 
-    renderPreview() {
+    private renderPreview() {
         let { detail } = this.innerDetail;
         let operate = this.getOperate(detail, { noPreview: true, isDetail: true });
         return (
             <div>
-                <h1>{detail.title}</h1>
-                <br />
-                {this.renderHeader(detail)}
-                <br />
-                <div class={this.getStyleName('video-box')}>
-                    <div class={this.getStyleName('video')}>
-                        <MyVideo options={{
-                            sources: this.videoList.map(ele => {
-                                return {
-                                    src: ele.url,
-                                    type: ele.originFileType,
-                                }
-                            })
-                        }} />
-                    </div>
-                </div>
+                <VideoDetailMainView data={detail} />
 
                 {operate.length > 0 && <Divider size='small' />}
                 <div>
@@ -146,7 +120,6 @@ export default class VideoMgtDetail extends VideoMgtBase {
             </div>
         );
     }
-
 
     render() {
         let videoSize = 20;

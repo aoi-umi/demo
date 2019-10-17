@@ -10,6 +10,7 @@ import { UserAvatarView } from '../comps/user-avatar';
 import { Base } from '../base';
 import { DetailType, DetailDataType } from './article-mgt-detail';
 import { CommentView } from './comment';
+import { convClass } from '@/components/utils';
 
 @Component
 export default class ArticleDetail extends Base {
@@ -18,19 +19,6 @@ export default class ArticleDetail extends Base {
 
     mounted() {
         this.$refs.loadView.loadData();
-    }
-
-    renderHeader(detail: DetailDataType) {
-        return (
-            <div>
-                <UserAvatarView user={detail.user} />
-                {[
-                    '发布于: ' + moment(detail.publishAt).format(dev.dateFormat),
-                ].map(ele => {
-                    return (<span class="not-important" style={{ marginLeft: '5px' }}>{ele}</span>);
-                })}
-            </div>
-        );
     }
 
     render() {
@@ -46,17 +34,51 @@ export default class ArticleDetail extends Base {
                     let { detail } = t;
                     return (
                         <div>
-                            <h1>{detail.title}</h1>
-                            <br />
-                            {this.renderHeader(detail)}
-                            <br />
-                            <div class="ql-editor" domPropsInnerHTML={detail.content}>
-                            </div>
+                            <ArticleDetailMainView data={detail} />
                             <Divider size='small' />
-                            {detail._id && <CommentView ownerId={detail._id} ownUserId={detail.userId} type={myEnum.contentType.文章} />}
+                            <CommentView ownerId={detail._id} ownUserId={detail.userId} type={myEnum.contentType.文章} />
                         </div>
                     );
                 }} />
         );
     }
 }
+
+@Component
+class ArticleDetailMain extends Base {
+    stylePrefix = 'article-';
+
+    @Prop({
+        required: true
+    })
+    data: DetailDataType;
+
+    renderHeader(detail: DetailDataType) {
+        return (
+            <div>
+                <UserAvatarView user={detail.user} />
+                {[
+                    '发布于: ' + moment(detail.publishAt).format(dev.dateFormat),
+                ].map(ele => {
+                    return (<span class="not-important" style={{ marginLeft: '5px' }}>{ele}</span>);
+                })}
+            </div>
+        );
+    }
+
+    render() {
+        let detail = this.data;
+        return (
+            <div>
+                <h1>{detail.title}</h1>
+                <br />
+                {this.renderHeader(detail)}
+                <br />
+                <div class="ql-editor" domPropsInnerHTML={detail.content}>
+                </div>
+            </div>
+        )
+    }
+}
+
+export const ArticleDetailMainView = convClass<ArticleDetailMain>(ArticleDetailMain);

@@ -6,10 +6,10 @@ import { myEnum, dev } from '@/config';
 import { routerConfig } from '@/router';
 import { FormItem, Button, Divider } from '@/components/iview';
 import { MyEditor, IMyEditor } from '@/components/my-editor';
-import { ArticleMgtBase } from './article-mgt';
-import { UserAvatarView } from '../comps/user-avatar';
 
 import { ContentDetailType, ContentDataType, ContentMgtDetail, ContentMgtDetailView, ContentLogListView } from './content-mgt-base';
+import { ArticleMgtBase } from './article-mgt';
+import { ArticleDetailMainView } from './article-detail';
 
 import './article.less';
 
@@ -65,39 +65,19 @@ export default class ArticleMgtDetail extends ArticleMgtBase {
         return rs;
     }
 
-    protected renderHeader(detail: ContentDataType) {
-        return (
-            <div>
-                <UserAvatarView user={detail.user} />
-                {[
-                    '状态: ' + detail.statusText,
-                    '创建于: ' + moment(detail.createdAt).format(dev.dateFormat),
-                    detail.publishAt && ('发布于:' + moment(detail.publishAt).format(dev.dateFormat)),
-                ].map(ele => {
-                    return (<span class="not-important" style={{ marginLeft: '5px' }}>{ele}</span>);
-                })}
-            </div>
-        );
-    }
-
-    protected renderLog() {
+    private renderLog() {
         let { log } = this.innerDetail;
         return (
             <ContentLogListView log={log} />
         );
     }
 
-    renderPreview() {
+    private renderPreview() {
         let { detail } = this.innerDetail;
         let operate = this.getOperate(detail, { noPreview: true, isDetail: true });
         return (
             <div>
-                <h1>{detail.title}</h1>
-                <br />
-                {this.renderHeader(detail)}
-                <br />
-                <div class="ql-editor" domPropsInnerHTML={detail.content}>
-                </div>
+                <ArticleDetailMainView data={detail} />
                 {operate.length > 0 && <Divider size='small' />}
                 <div>
                     {operate.map(ele => {
@@ -116,7 +96,7 @@ export default class ArticleMgtDetail extends ArticleMgtBase {
     }
 
     uploadFile = [];
-    async fileChangeHandler(file) {
+    private async fileChangeHandler(file) {
         //todo 判断是否同一文件
         let match = this.uploadFile.find(ele => ele.file === file);
         if (!match) {
@@ -138,7 +118,7 @@ export default class ArticleMgtDetail extends ArticleMgtBase {
             this.$refs.editor.insertEmbed('image', match.url);
     }
 
-    render() {
+    protected render() {
         let { detail } = this.innerDetail;
         return (
             <ContentMgtDetailView ref="detailView"
