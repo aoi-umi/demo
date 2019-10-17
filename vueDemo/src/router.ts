@@ -150,7 +150,7 @@ export const routerConfig = {
     videoDetail: {
         path: '/video/detail',
         text: '视频',
-        component: () => import('./views/content/article-detail')
+        component: () => import('./views/content/video-detail')
     },
     videoMgtEdit: {
         path: '/contentMgt/video/edit',

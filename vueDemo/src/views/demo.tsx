@@ -51,7 +51,7 @@ export default class App extends Base {
     }
 
     videoIdText = '';
-    videoId = '5d9eeeb0f8b93d22548dd6cc';
+    videoId = '5da6efd5929f9b23549931ef';
 
     mounted() {
         this.$refs.list.query();
@@ -184,7 +184,7 @@ export default class App extends Base {
     }
 
     captureImage() {
-        return this.$refs.video.capture();
+        return this.$refs.video.capture().data;
     }
 
     fail = false;

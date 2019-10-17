@@ -8,9 +8,10 @@ import { Card, Input, Row, Col, Icon, Divider, Time, Checkbox } from '@/componen
 import { MyList, IMyList } from '@/components/my-list';
 import { MyTag } from '@/components/my-tag';
 
-import { DetailDataType } from './article-mgt-detail';
 import { UserAvatarView } from '../comps/user-avatar';
 import { Base } from '../base';
+import { DetailDataType } from './article-mgt-detail';
+import { ContentOperateView } from './content';
 
 import './video.less';
 
@@ -116,18 +117,6 @@ class VideoListItem extends Base {
         });
     }
 
-    private handleVote(detail, value) {
-        this.operateHandler('', async () => {
-            let rs = await testApi.voteSubmit({ ownerId: detail._id, value, type: myEnum.voteType.文章 });
-            for (let key in rs) {
-                detail[key] = rs[key];
-            }
-            detail.voteValue = value;
-        }, {
-            noSuccessHandler: true
-        });
-    }
-
     render() {
         let ele = this.value;
         return (
@@ -186,42 +175,9 @@ class VideoListItem extends Base {
                     </Row>
                     <Divider size="small" />
                     {this.$slots.default || (!this.mgt ?
-                        <div style={{ display: 'flex' }}>
-                            {[{
-                                icon: 'md-eye',
-                                text: ele.readTimes,
-                            }, {
-                                icon: 'md-text',
-                                text: ele.commentCount
-                            }, {
-                                icon: 'md-thumbs-up',
-                                text: ele.like,
-                                color: ele.voteValue == myEnum.voteValue.喜欢 ? 'red' : '',
-                                onClick: () => {
-                                    this.handleVote(ele, ele.voteValue == myEnum.voteValue.喜欢 ? myEnum.voteValue.无 : myEnum.voteValue.喜欢);
-                                }
-                            }, {
-                                icon: 'md-thumbs-down',
-                                text: ele.dislike,
-                                color: ele.voteValue == myEnum.voteValue.不喜欢 ? 'red' : '',
-                                onClick: () => {
-                                    this.handleVote(ele, ele.voteValue == myEnum.voteValue.不喜欢 ? myEnum.voteValue.无 : myEnum.voteValue.不喜欢);
-                                }
-                            }].map(iconEle => {
-                                return (
-                                    <div class="center" style={{ flex: 1 }}
-                                        on-click={iconEle.onClick || (() => {
-                                            this.toDetail(ele);
-                                        })} >
-                                        <Icon
-                                            type={iconEle.icon}
-                                            size={24}
-                                            color={iconEle.color} />
-                                        <b style={{ marginLeft: '4px' }}>{iconEle.text}</b>
-                                    </div>
-                                );
-                            })}
-                        </div> :
+                        <ContentOperateView data={ele} voteType={myEnum.voteType.视频} toDetail={() => {
+                            this.toDetail(ele);
+                        }} /> :
                         <div />)}
                 </Card>
             </div>

@@ -146,7 +146,7 @@ class Comment extends Base {
                     placeholder='请输入评论'
                     v-model={this.reply.content}
                 />
-                <div style={{ textAlign: 'right', marginTop: '5px' }}>
+                <div class={this.getStyleName('send-op-box')}>
                     <Button on-click={() => {
                         this.resetReply();
                     }} >取消</Button>
@@ -242,15 +242,15 @@ class Comment extends Base {
     render() {
         return (
             <div>
-                <div style={{ textAlign: 'right', marginTop: '5px', marginBottom: '10px' }}>
+                <div class={this.getStyleName('send-op-box')}>
                     <Button on-click={() => {
                         this.query();
                     }} loading={this.refreshLoading}>刷新评论</Button>
                     <Button type="primary" on-click={() => {
                         this.resetReply({ floor: 0 });
                     }}>发送评论</Button>
-                    {this.reply.floor === 0 && this.renderSubmitBox()}
                 </div>
+                {this.reply.floor === 0 && this.renderSubmitBox()}
                 <MyList
                     ref="list"
                     hideSearchBox

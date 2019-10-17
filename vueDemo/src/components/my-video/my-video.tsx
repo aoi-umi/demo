@@ -45,7 +45,12 @@ class MyVideo extends MyBase {
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-        return canvas.toDataURL('image/png');
+        let type = 'image/png';
+        let img = canvas.toDataURL(type);
+        return {
+            type,
+            data: img === 'data:,' ? '' : img
+        };
     }
 
     src(src) {

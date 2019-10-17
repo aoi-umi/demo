@@ -10,6 +10,7 @@ import { LoginUser } from '../../login-user';
 import { BaseMapper } from '../_base';
 import { ContentBaseInstanceType } from '../content';
 import { ArticleMapper } from '../article';
+import { VideoMapper } from '../video';
 import { UserModel, UserMapper, UserDocType, UserResetOption } from '../user';
 import { VoteModel, VoteMapper, VoteInstanceType } from '../vote';
 import { CommentModel, CommentDocType, CommentInstanceType } from './comment';
@@ -170,7 +171,13 @@ export class CommentMapper {
             if (!opt.mgt)
                 match.status = myEnum.articleStatus.审核通过
             owner = await ArticleMapper.findOne(match);
+        } else if (opt.type == myEnum.contentType.视频) {
+            if (!opt.mgt)
+                match.status = myEnum.videoStatus.审核通过
+            owner = await VideoMapper.findOne(match);
         }
+        if (!owner)
+            throw common.error('', config.error.DB_NO_DATA);
         return owner;
     }
 

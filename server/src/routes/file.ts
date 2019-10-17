@@ -80,16 +80,16 @@ export const vedioGet: RequestHandler = (req, res) => {
     responseHandler(async (opt) => {
         opt.noSend = true;
         let data = paramsValid(req.query, VaildSchema.FileGet);
-        let range = req.headers.range as string;
-        let pos = range.replace(/bytes=/, "").split("-");
-        let file = await FileModel.rawFindOne({ _id: data._id });
-        if (!file) {
-            res.status(404);
-            res.end();
+        let fileList = await FileMapper.findWithRaw({ _id: data._id, fileType: myEnum.fileType.视频 });
+        let rawFile = fileList[0] && fileList[0].rawFile;
+        if (!rawFile) {
+            res.status(404).end();
             return;
         }
+        let range = req.headers.range as string;
+        let pos = range ? range.replace(/bytes=/, "").split("-") : ['0'];
 
-        let total = file.length;
+        let total = rawFile.length;
         let start = parseInt(pos[0], 10);
         let end = pos[1] ? parseInt(pos[1], 10) : total - 1;
         let chunksize = (end - start) + 1;
@@ -101,7 +101,7 @@ export const vedioGet: RequestHandler = (req, res) => {
             'Content-Type': 'video/mp4'
         });
 
-        let { stream } = await new FileModel({ fileId: file._id }).download({
+        let { stream } = await new FileModel({ fileId: rawFile._id }).download({
             returnStream: true, streamOpt: {
                 start,
                 end: end + 1
