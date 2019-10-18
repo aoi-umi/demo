@@ -2,16 +2,16 @@ import { Component, Vue, Watch } from 'vue-property-decorator';
 import anime from 'animejs';
 import 'echarts/lib/chart/line';
 import * as echarts from 'echarts/lib/echarts';
-
 import * as  QRCode from 'qrcode';
 
+import { testSocket, testApi } from '@/api';
 import { Input, Card, Button, ColorPicker, Row, Col, Checkbox } from '@/components/iview';
 import { MyList, IMyList } from '@/components/my-list';
 import { MyUpload, IMyUpload } from '@/components/my-upload';
-import { testSocket, testApi } from '@/api';
+import { MyVideo, IMyVideo } from '@/components/my-video';
+
 import { Base } from './base';
 import './demo.less';
-import { MyVideo, IMyVideo } from '@/components/my-video';
 
 
 @Component
@@ -27,7 +27,7 @@ export default class App extends Base {
 
 
     danmaku = '';
-    contents: {
+    danmakuList: {
         idx: number,
         msg: string,
         color?: string;
@@ -110,7 +110,7 @@ export default class App extends Base {
         let height = this.$refs.board.offsetHeight;
         let v = 1;
         let transXReg = /\.*translateX\((.*)px\)/i;
-        let { contents } = this;
+        let { danmakuList: contents } = this;
         contents.forEach((ele, idx) => {
             let dom = this.$refs[ele.refName];//ele.dom;
             if (dom && !ele.animeInst) {
@@ -166,7 +166,7 @@ export default class App extends Base {
     }
 
     sendDanmaku() {
-        let contents = this.contents;
+        let contents = this.danmakuList;
         let danmaku = this.danmaku && this.danmaku.trim();
         if (danmaku) {
             let idx = contents.length;
@@ -178,7 +178,7 @@ export default class App extends Base {
     }
 
     recvDanmaku(data) {
-        let contents = this.contents;
+        let contents = this.danmakuList;
         let idx = contents.length;
         contents.push({ idx, refName: Date.now() + '', ...data });
     }
@@ -189,7 +189,7 @@ export default class App extends Base {
 
     fail = false;
     protected render() {
-        let contents = this.contents;
+        let contents = this.danmakuList;
 
         return (
             <div>
@@ -257,7 +257,7 @@ export default class App extends Base {
                                 </div>
                             </Col>
                         </Row>
-                        <Button on-click={() => { this.contents = []; }}>clear anime</Button>
+                        <Button on-click={() => { this.danmakuList = []; }}>clear anime</Button>
                         <Button on-click={() => {
                             this.$refs.videoCover.src = this.captureImage();
                         }}>截取</Button>
