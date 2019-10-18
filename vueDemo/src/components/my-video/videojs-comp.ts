@@ -1,20 +1,30 @@
 import videojs, { VideoJsPlayer } from 'video.js';
+import anime from 'animejs';
 import 'video.js/dist/video-js.min.css';
 
 import './videojs-comp.less';
 
-const VjsButton = videojs.getComponent('Button');
 const clsPrefix = 'vjs-danmaku-';
 function getClsName(prefix, ...cls) {
     return cls.map(ele => prefix + ele).join(' ');
 }
 type DanmakOptions = {
     hide?: boolean;
+    danmakuList?: DanmakuDataType[]
 };
+type DanmakuDataType = {
+    msg: string,
+    color?: string;
+    time: number;
+    isSelf?: boolean;
+}
 export type DanmakuPlayerOptions = videojs.PlayerOptions & {
     danmaku?: DanmakOptions
 }
 export class DanmakuPlayer {
+    static Event = {
+        danmakuSend: 'danmakuSend'.toLocaleLowerCase()
+    };
     player: VideoJsPlayer;
     input: HTMLInputElement;
     sendBtn: HTMLButtonElement;
@@ -29,6 +39,15 @@ export class DanmakuPlayer {
         this.player = videojs(id, options, ready);
         this.initView();
         this.bindEvent();
+        //test
+        let list = [];
+        for (let i = 0; i < 10; i++) {
+            list.push({
+                msg: 'test' + i,
+                time: i * 3,
+            })
+        }
+        this.addDanmaku(list);
     }
 
     private initView() {
@@ -74,6 +93,9 @@ export class DanmakuPlayer {
         this.player.on('keydown', (e: KeyboardEvent) => {
             this.keydownHandler(e);
         });
+        this.player.on('timeupdate', (e, ...arg) => {
+            this.timeUpdateHandler(e);
+        });
 
         this.input.addEventListener('keydown', (e: KeyboardEvent) => {
             e.stopPropagation();
@@ -111,7 +133,6 @@ export class DanmakuPlayer {
 
     private handleBoardClick(e: MouseEvent) {
         let player = this.player;
-        // We don't want a click to trigger playback when controls are disabled
         if (!(player.controls() as any)) {
             return;
         }
@@ -127,15 +148,24 @@ export class DanmakuPlayer {
         }
     }
 
-    danmakuList: {
-        idx: number,
-        msg: string,
-        color?: string;
+    private timeUpdateHandler(e) {
+        // console.log(e.manuallyTriggered, this.player.currentTime());
+        if (e.manuallyTriggered) {
+            this.danmakuList.forEach(ele => {
+                delete ele.animeInst;
+                delete ele.dom;
+            })
+            this.updateDanmaku();
+        }
+    }
+
+    danmakuList: (DanmakuDataType & {
+        idx?: number,
         animeInst?: anime.AnimeInstance,
         finished?: boolean,
         dom?: HTMLElement,
         refName?: string;
-    }[] = [];
+    })[] = [];
 
     private get danmaku() {
         return this.input.value;
@@ -147,15 +177,90 @@ export class DanmakuPlayer {
         return '';
     }
 
-    sendDanmaku() {
+    private sendDanmaku() {
         let danmakuList = this.danmakuList;
+        let player = this.player;
         let danmaku = this.danmaku && this.danmaku.trim();
         if (danmaku) {
             let idx = danmakuList.length;
-            let data = { msg: danmaku, color: this.color };
+            let data = { msg: danmaku, color: this.color, time: player.currentTime() };
             danmakuList.push({ idx, refName: Date.now() + '', ...data });
-            this.player.trigger('danmaku-send', data);
+            this.player.trigger(DanmakuPlayer.Event.danmakuSend, data);
             this.danmaku = '';
         }
+    }
+
+    addDanmaku(danmaku: DanmakuDataType | DanmakuDataType[]) {
+        let list = danmaku instanceof Array ? danmaku : [danmaku];
+        this.danmakuList = [
+            ...this.danmakuList,
+            ...list,
+        ];
+    }
+
+    private updateDanmaku() {
+        let width = this.danmakuBoard.offsetWidth;
+        let height = this.danmakuBoard.offsetHeight;
+        let speed = 1;
+        let transXReg = /\.*translateX\((.*)px\)/i;
+        let { danmakuList } = this;
+        danmakuList.forEach((ele, idx) => {
+            let dom = ele.dom;
+            //创建dom
+            if (!dom) {
+                ele.dom = dom = videojs.dom.createEl('div', {
+                    className: getClsName(clsPrefix, 'danmaku'),
+                    innerText: ele.msg,
+                    style: {
+                        color: ele.color
+                    }
+                }) as any;
+                this.danmakuBoard.appendChild(dom);
+            }
+            //计算高度,移动动画
+            if (!ele.animeInst) {
+                let topLevelDict = { 0: 0 };
+                danmakuList.forEach((ele2, idx2) => {
+                    let dom2 = ele2.dom;
+                    if (idx != idx2 && dom2) {
+                        let x = Math.abs(parseFloat(transXReg.exec(dom2.style.transform)[1]));
+                        if (!isNaN(x) && x < dom2.offsetWidth) {
+                            let top = dom2.offsetTop;
+                            if (!topLevelDict[top])
+                                topLevelDict[top] = 0;
+                            topLevelDict[top]++;
+                            let newTop = dom2.offsetHeight + dom2.offsetTop;
+                            console.log(dom2.offsetHeight, dom2.offsetTop, dom2.style.top);
+                            if (newTop + dom.offsetHeight >= height)
+                                newTop = 0;
+                            if (!topLevelDict[newTop])
+                                topLevelDict[newTop] = 0;
+                        }
+                    }
+                });
+                let danmakuWidth = width + dom.offsetWidth;
+                let top = 0;
+                let minLevel = -1;
+                for (let key in topLevelDict) {
+                    let level = topLevelDict[key];
+                    if (minLevel < 0 || level < minLevel) {
+                        minLevel = level;
+                        top = parseFloat(key);
+                    }
+                }
+                if (top)
+                    dom.style.top = top + 'px';
+                let duration = danmakuWidth * 10 / speed;
+                ele.animeInst = anime({
+                    targets: dom,
+                    translateX: -danmakuWidth,
+                    duration,
+                    easing: 'linear'
+                });
+                ele.animeInst.finished.then(() => {
+                    ele.finished = true;
+                });
+            }
+        });
     }
 }
