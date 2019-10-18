@@ -34,6 +34,7 @@
     "@types/animejs": "^2.0.2",
     "@types/echarts": "^4.1.9",
     "@types/socket.io-client": "^1.4.32",
+    "@types/video.js": "^7.2.15",
     "@vue/cli-plugin-babel": "^3.7.0",
     "@vue/cli-plugin-typescript": "^3.7.0",
     "@vue/cli-service": "^3.7.0",

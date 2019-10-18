@@ -1,27 +1,36 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 
-import videojs from 'video.js';
-import 'video.js/dist/video-js.min.css';
+import videojs, { VideoJsPlayer, VideoJsPlayerOptions } from 'video.js';
 
 import { MyBase } from '../MyBase';
 import { convClass } from '../utils';
 
+import './my-video.less';
+import { DanmakuPlayer, DanmakuPlayerOptions } from './videojs-comp';
 
 @Component
 class MyVideo extends MyBase {
+    stylePrefix = 'my-video-'
     @Prop()
-    options: any;
+    options: DanmakuPlayerOptions;
 
-    player: any;
+    player: VideoJsPlayer;
 
     $refs: { video: HTMLVideoElement; };
 
     mounted() {
+        this.initPlayer();
+    }
+
+    initPlayer() {
         let opt = {
             ...this.getDefaultOpt(),
             ...this.options,
         };
-        this.player = videojs(this.$refs.video, opt);
+        this.player = new DanmakuPlayer(this.$refs.video, opt).player;
+        this.player.on('danmaku-send', (e, data) => {
+            console.log(data);
+        });
     }
 
     beforeDestroy() {
@@ -36,7 +45,7 @@ class MyVideo extends MyBase {
             language: 'en',
             playbackRates: [0.7, 1.0, 1.5, 2.0],
             aspectRatio: '16:9',
-        };
+        } as VideoJsPlayerOptions;
     }
 
     capture() {
@@ -61,11 +70,10 @@ class MyVideo extends MyBase {
 
     render() {
         return (
-            <video ref="video" class="video-js vjs-default-skin" crossOrigin="*" style={{
-                width: 'inherit',
-                height: 'inherit',
-            }}>
-            </video>
+            <div class={this.getStyleName('root')}>
+                <video ref="video" class={this.getStyleName('video').concat(["video-js vjs-default-skin vjs-big-play-centered"])} crossOrigin="*">
+                </video>
+            </div>
         );
     }
 }
