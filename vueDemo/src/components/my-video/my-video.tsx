@@ -28,7 +28,7 @@ class MyVideo extends MyBase {
             ...this.options,
         };
         this.player = new DanmakuPlayer(this.$refs.video, opt).player;
-        this.player.on('danmaku-send', (e, data) => {
+        this.player.on(DanmakuPlayer.Event.danmakuSend, (e, data) => {
             console.log(data);
         });
     }
