@@ -48,6 +48,11 @@ export default class App extends Base {
     public created() {
         this.setList();
         testSocket.bindDanmakuRecv(this.recvDanmaku);
+        let query: any = this.$route.query;
+        if (query.videoId)
+            this.videoId =
+                this.videoIdText =
+                query.videoId as any;
     }
 
     videoIdText = '';

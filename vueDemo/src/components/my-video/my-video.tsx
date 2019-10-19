@@ -43,7 +43,7 @@ class MyVideo extends MyBase {
             // muted: true,
             controls: true,
             language: 'en',
-            playbackRates: [0.7, 1.0, 1.5, 2.0],
+            // playbackRates: [0.7, 1.0, 1.5, 2.0],
             aspectRatio: '16:9',
         } as VideoJsPlayerOptions;
     }
