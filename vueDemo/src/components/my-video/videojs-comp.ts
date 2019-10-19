@@ -58,7 +58,7 @@ export class DanmakuPlayer {
 
         let danmakuHide = this.options.danmaku.hide;
         let danmakuBar = videojs.dom.createEl('div', {
-            className: getClsName(clsPrefix, 'bar') + ' ' + danmakuHide ? 'vjs-hidden' : '',
+            className: getClsName(clsPrefix, 'bar') + ' ' + (danmakuHide ? 'vjs-hidden' : ''),
         });
         let input = this.input = videojs.dom.createEl('input', {
             placeholder: '输点啥',
@@ -67,7 +67,7 @@ export class DanmakuPlayer {
 
         let sendBtn = this.sendBtn = videojs.dom.createEl('button', {
             innerText: '发送',
-            calssName: getClsName(clsPrefix, 'send') + ' vjs-control vjs-button',
+            className: getClsName(clsPrefix, 'send') + ' vjs-control vjs-button',
         }) as any;
         danmakuBar.append(input, sendBtn);
 
@@ -94,8 +94,31 @@ export class DanmakuPlayer {
             this.keydownHandler(e);
         });
         this.player.on('timeupdate', (e, ...arg) => {
-            this.timeUpdateHandler(e);
+            // this.timeUpdateHandler(e);
         });
+        //暂停/播放
+        this.player.on('play', () => {
+            if (!this.player.seeking())
+                this.handlePlayPause(true);
+        });
+        this.player.on('pause', () => {
+            this.handlePlayPause(false);
+        });
+        this.player.on('seeking', () => {
+            this.seek();
+        });
+        this.player.on('seeked', () => {
+            if (!this.player.paused())
+                this.handlePlayPause(true);
+        });
+
+        // this.player.on('waiting', () => {
+        //     this.handlePlayPause(false);
+        // });
+        // this.player.on('playing', () => {
+        //     if (!this.player.paused())
+        //         this.handlePlayPause(true);
+        // });
 
         this.input.addEventListener('keydown', (e: KeyboardEvent) => {
             e.stopPropagation();
@@ -148,15 +171,30 @@ export class DanmakuPlayer {
         }
     }
 
-    private timeUpdateHandler(e) {
+    private handlePlayPause(play: boolean) {
+        // console.log('danmaku play', play);
+        // console.log(new Error().stack);
+        this.danmakuList.forEach(ele => {
+            if (ele.animeInst && !ele.finished) {
+                if (play) {
+                    ele.animeInst.play();
+                } else {
+                    ele.animeInst.pause();
+                }
+            }
+        });
+    }
+
+    private seek() {
         // console.log(e.manuallyTriggered, this.player.currentTime());
-        if (e.manuallyTriggered) {
-            this.danmakuList.forEach(ele => {
-                delete ele.animeInst;
+        this.danmakuList.forEach(ele => {
+            delete ele.animeInst;
+            if (ele.dom) {
+                ele.dom.remove();
                 delete ele.dom;
-            })
-            this.updateDanmaku();
-        }
+            }
+        })
+        this.updateDanmaku(true);
     }
 
     danmakuList: (DanmakuDataType & {
@@ -198,7 +236,7 @@ export class DanmakuPlayer {
         ];
     }
 
-    private updateDanmaku() {
+    private updateDanmaku(pause?: boolean) {
         let width = this.danmakuBoard.offsetWidth;
         let height = this.danmakuBoard.offsetHeight;
         let speed = 1;
@@ -230,7 +268,6 @@ export class DanmakuPlayer {
                                 topLevelDict[top] = 0;
                             topLevelDict[top]++;
                             let newTop = dom2.offsetHeight + dom2.offsetTop;
-                            console.log(dom2.offsetHeight, dom2.offsetTop, dom2.style.top);
                             if (newTop + dom.offsetHeight >= height)
                                 newTop = 0;
                             if (!topLevelDict[newTop])
@@ -257,6 +294,9 @@ export class DanmakuPlayer {
                     duration,
                     easing: 'linear'
                 });
+                if (pause) {
+                    ele.animeInst.pause();
+                }
                 ele.animeInst.finished.then(() => {
                     ele.finished = true;
                 });

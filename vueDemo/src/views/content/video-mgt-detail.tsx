@@ -139,7 +139,7 @@ export default class VideoMgtDetail extends VideoMgtBase {
                     <MyUpload ref='upload' width={videoSize * 16} height={videoSize * 9}
                         headers={testApi.defaultHeaders}
                         uploadUrl={testApi.videoUploadUrl}
-                        maxSize={10240}
+                        maxSize={1024 * 500}
                         format={['mp4']}
                         successHandler={(res, file) => {
                             let rs = testApi.uplodaHandler(res);
