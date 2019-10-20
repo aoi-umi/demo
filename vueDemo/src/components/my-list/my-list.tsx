@@ -4,7 +4,7 @@ import {
     Table, Page, Row, Col,
     Input, Button, Divider, Card, Icon, Spin
 } from '../iview';
-import { MyBase } from '../MyBase';
+import { MyBase } from '../my-base';
 import * as style from '../style';
 import { MyListModel, MyListResult } from './model';
 import './my-list.less';

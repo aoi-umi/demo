@@ -6,7 +6,7 @@ import { Upload, Modal, Icon, Progress, Button } from '../iview';
 import { Utils, convClass } from '../utils';
 import { MyImg } from '../my-img';
 import { MyImgViewer, IMyImgViewer } from '../my-img-viewer';
-import { MyBase } from '../MyBase';
+import { MyBase } from '../my-base';
 
 import * as style from '../style';
 import './my-upload.less';
