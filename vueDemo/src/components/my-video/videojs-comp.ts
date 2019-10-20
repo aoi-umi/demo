@@ -15,12 +15,20 @@ type DanmakOptions = {
 type DanmakuDataType = {
     msg: string,
     color?: string;
-    time: number;
+    pos: number;
     isSelf?: boolean;
 }
+type DanmakuDataTypeInner = DanmakuDataType & { add?: boolean };
 export type DanmakuPlayerOptions = videojs.PlayerOptions & {
     danmaku?: DanmakOptions
 }
+const KeyCode = {
+    space: 32,
+    left: 37,
+    up: 38,
+    right: 39,
+    down: 40,
+};
 export class DanmakuPlayer {
     static Event = {
         danmakuSend: 'danmakuSend'.toLocaleLowerCase()
@@ -40,14 +48,14 @@ export class DanmakuPlayer {
         this.initView();
         this.bindEvent();
         //test
-        let list = [];
         for (let i = 0; i < 10; i++) {
-            list.push({
-                msg: 'test' + i,
-                time: i * 3,
-            })
+            for (let j = 0; j < 3; j++) {
+                this.danmakuDataList.push({
+                    msg: 'test' + (i * 3 + j),
+                    pos: i * 1000 + j * 500,
+                });
+            }
         }
-        this.addDanmaku(list);
     }
 
     private initView() {
@@ -88,13 +96,21 @@ export class DanmakuPlayer {
         poster.after(danmakuBoard);
     }
 
+    private startPos = 0;
     private bindEvent() {
         //快进/快退
         this.player.on('keydown', (e: KeyboardEvent) => {
             this.keydownHandler(e);
         });
-        this.player.on('timeupdate', (e, ...arg) => {
-            // this.timeUpdateHandler(e);
+        this.player.on('keypress', (e: KeyboardEvent) => {
+            if (e.keyCode === KeyCode.space) {
+                this.player.paused() ? this.player.play() : this.player.pause();
+            }
+            // if ([KeyCode.space, KeyCode.left, KeyCode.right].includes(e.keyCode))
+            e.preventDefault();
+        });
+        this.player.on('timeupdate', () => {
+            this.timeUpdateHandler();
         });
         //暂停/播放
         this.player.on('play', () => {
@@ -105,20 +121,13 @@ export class DanmakuPlayer {
             this.handlePlayPause(false);
         });
         this.player.on('seeking', () => {
+            this.startPos = this.player.currentTime() * 1000;
             this.seek();
         });
         this.player.on('seeked', () => {
             if (!this.player.paused())
                 this.handlePlayPause(true);
         });
-
-        // this.player.on('waiting', () => {
-        //     this.handlePlayPause(false);
-        // });
-        // this.player.on('playing', () => {
-        //     if (!this.player.paused())
-        //         this.handlePlayPause(true);
-        // });
 
         this.input.addEventListener('keydown', (e: KeyboardEvent) => {
             e.stopPropagation();
@@ -127,6 +136,7 @@ export class DanmakuPlayer {
         this.input.addEventListener('keypress', (e: KeyboardEvent) => {
             if (e.keyCode === 13)
                 this.sendDanmaku();
+            e.stopPropagation();
         });
 
         this.sendBtn.addEventListener('click', () => {
@@ -140,18 +150,33 @@ export class DanmakuPlayer {
 
     private keydownHandler(e: KeyboardEvent) {
         let player = this.player;
-        let right = 39, left = 37;
         let skipTime = 5;
         let skip = 0;
-        if (e.keyCode === right) {
+        if (e.keyCode === KeyCode.right) {
             skip = skipTime;
-        } else if (e.keyCode === left) {
+        } else if (e.keyCode === KeyCode.left) {
             skip = skipTime * -1;
         }
 
-        let curr = player.currentTime();
+        let currTime = player.currentTime();
         if (skip !== 0)
-            player.currentTime(curr + skip);
+            player.currentTime(currTime + skip);
+
+        let vol = 0.1;
+        let changeVol = 0;
+        if (e.keyCode === KeyCode.up) {
+            changeVol = vol;
+        } else if (e.keyCode === KeyCode.down) {
+            changeVol = vol * -1;
+        }
+
+        let currVol = player.volume();
+        if (changeVol !== 0)
+            player.volume(currVol + changeVol);
+
+        if ([KeyCode.right, KeyCode.left, KeyCode.up, KeyCode.down].includes(e.keyCode)) {
+            e.preventDefault();
+        }
     }
 
     private handleBoardClick(e: MouseEvent) {
@@ -186,23 +211,33 @@ export class DanmakuPlayer {
     }
 
     private seek() {
-        // console.log(e.manuallyTriggered, this.player.currentTime());
         this.danmakuList.forEach(ele => {
             delete ele.animeInst;
             if (ele.dom) {
                 ele.dom.remove();
                 delete ele.dom;
             }
-        })
+        });
+        this.danmakuList = [];
+        this.danmakuDataList.forEach(ele => {
+            ele.add = false;
+        });
         this.updateDanmaku(true);
     }
 
+    private timeUpdateHandler() {
+        let currPos = this.player.currentTime() * 1000;
+        let list = this.danmakuDataList.filter(ele => !ele.add && ele.pos >= this.startPos && ele.pos <= currPos);
+        this.addDanmaku(list);
+    }
+
+    danmakuDataList: DanmakuDataTypeInner[] = [];
     danmakuList: (DanmakuDataType & {
         idx?: number,
         animeInst?: anime.AnimeInstance,
         finished?: boolean,
         dom?: HTMLElement,
-        refName?: string;
+        playNow?: boolean;
     })[] = [];
 
     private get danmaku() {
@@ -216,24 +251,26 @@ export class DanmakuPlayer {
     }
 
     private sendDanmaku() {
-        let danmakuList = this.danmakuList;
         let player = this.player;
         let danmaku = this.danmaku && this.danmaku.trim();
         if (danmaku) {
-            let idx = danmakuList.length;
-            let data = { msg: danmaku, color: this.color, time: player.currentTime() };
-            danmakuList.push({ idx, refName: Date.now() + '', ...data });
+            let data: DanmakuDataType = { msg: danmaku, color: this.color, pos: parseInt(player.currentTime() * 1000 as any) };
+            this.danmakuDataList.push(data);
             this.player.trigger(DanmakuPlayer.Event.danmakuSend, data);
             this.danmaku = '';
         }
     }
 
-    addDanmaku(danmaku: DanmakuDataType | DanmakuDataType[]) {
+    addDanmaku(danmaku: DanmakuDataTypeInner | DanmakuDataTypeInner[]) {
         let list = danmaku instanceof Array ? danmaku : [danmaku];
+        list.forEach(ele => {
+            ele.add = true;
+        });
         this.danmakuList = [
             ...this.danmakuList,
             ...list,
-        ];
+        ]
+        this.updateDanmaku();
     }
 
     private updateDanmaku(pause?: boolean) {

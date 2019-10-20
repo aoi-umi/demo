@@ -9,6 +9,8 @@ import * as cors from 'cors';
 import { AddressInfo } from 'net';
 import 'reflect-metadata';
 
+import './moduleAlias';
+
 import * as config from '@/config';
 import * as db from '@/_system/dbMongo';
 

@@ -2,7 +2,7 @@ import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { convClass } from '../utils';
 import { Carousel, CarouselItem, Icon, Button } from '../iview';
 import { MyImg } from '../my-img';
-import { MyBase } from '../MyBase';
+import { MyBase } from '../my-base';
 import * as style from '../style';
 import './my-img-viewer.less';
 

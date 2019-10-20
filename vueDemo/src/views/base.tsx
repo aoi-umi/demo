@@ -4,7 +4,7 @@ import LoginUserStore from '@/store/loginUser';
 import { dev, error } from '@/config';
 import { routerConfig } from '@/router';
 import SettingStore from '@/store/setting';
-import { MyBase } from '@/components/MyBase';
+import { MyBase } from '@/components/my-base';
 
 export class Base extends MyBase {
     protected get storeUser() {

@@ -2,7 +2,7 @@ import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 
 import videojs, { VideoJsPlayer, VideoJsPlayerOptions } from 'video.js';
 
-import { MyBase } from '../MyBase';
+import { MyBase } from '../my-base';
 import { convClass } from '../utils';
 
 import './my-video.less';
