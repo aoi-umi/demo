@@ -1,21 +1,27 @@
 .video- {
-  & {
-    &video-box {
-      position: relative;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    &video {
-      height: 400px;
-      width: 500px;
-      background: #000;
-    }
+  &video-box {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  &video {
+    height: 400px;
+    width: 500px;
+    background: #000;
   }
 
   &list-title {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+}
+
+@media (max-width: 500px) {
+  .video- {
+    &video {
+      width: 100%;
+    }
   }
 }

@@ -75,6 +75,12 @@ router.get('/comment/query', UserAuthMid.normal(), comment.query);
 router.post('/comment/del', UserAuthMid.normal(), comment.del);
 //#endregion
 
+//#region danmaku 
+import * as danmaku from './danmaku';
+router.post('/danmaku/submit', UserAuthMid.normal([auth.login]), danmaku.submit);
+router.get('/danmaku/query', UserAuthMid.normal(), danmaku.query);
+//#endregion
+
 //#region vote 
 import * as vote from './vote';
 router.post('/vote/submit', UserAuthMid.normal([auth.login]), vote.submit);

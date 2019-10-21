@@ -10,18 +10,19 @@ const envConfig = {
         host: `//${location.hostname}:8000`
     }
 };
+let currEnvCfg = envConfig[env];
 const config = {
     title: '开发',
     socket: {
         test: {
-            host: `${envConfig[env].host}`,
+            host: `${currEnvCfg.host}`,
             path: '/devMgt/socket.io'
         }
     },
     api: {
         test: {
             defaultArgs: {
-                host: `${envConfig[env].host}/devMgt`,
+                host: `${currEnvCfg.host}/devMgt`,
             },
             method: {
                 userSignUp: {
@@ -158,6 +159,14 @@ const config = {
                 },
                 videoMgtAudit: {
                     url: '/video/mgt/audit',
+                },
+
+                danmakuSubmit: {
+                    url: '/danmaku/submit'
+                },
+                danmakuQuery: {
+                    url: '/danmaku/query',
+                    method: 'GET',
                 },
 
                 commentQuery: {

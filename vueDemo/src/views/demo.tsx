@@ -12,6 +12,8 @@ import { MyVideo, IMyVideo } from '@/components/my-video';
 
 import { Base } from './base';
 import './demo.less';
+import { DanmakuPlayer } from '@/components/my-video/videojs-comp';
+import { VideoJsPlayer } from 'video.js';
 
 
 @Component
@@ -25,17 +27,6 @@ export default class App extends Base {
         return this.value.length;
     }
 
-
-    danmaku = '';
-    danmakuList: {
-        idx: number,
-        msg: string,
-        color?: string;
-        animeInst?: anime.AnimeInstance,
-        finished?: boolean,
-        dom?: HTMLElement,
-        refName?: string;
-    }[] = [];
     $refs: {
         board: HTMLElement; list: IMyList<any>; echart: HTMLDivElement; canvas: HTMLDivElement;
         upload: IMyUpload; video: IMyVideo; videoCover: any;
@@ -43,7 +34,7 @@ export default class App extends Base {
     richText = '';
     chart: echarts.ECharts;
     chartAddData = '';
-    player: any;
+    player: VideoJsPlayer;
 
     public created() {
         this.setList();
@@ -64,6 +55,9 @@ export default class App extends Base {
         this.setECharts();
         this.qrcode();
         this.player = this.$refs.video.player;
+        // this.player.on(DanmakuPlayer.Event.danmakuSend, (e, data) => {
+        //     console.log(data);
+        // });
     }
 
     async qrcode() {
@@ -107,85 +101,9 @@ export default class App extends Base {
     protected valueWatch(newV: any, oldV: any) {
         this.msg = `new value：${newV}`;
     }
-    updated() {
-        this.updateDanmaku();
-    }
-    updateDanmaku() {
-        let width = this.$refs.board.offsetWidth;
-        let height = this.$refs.board.offsetHeight;
-        let v = 1;
-        let transXReg = /\.*translateX\((.*)px\)/i;
-        let { danmakuList: contents } = this;
-        contents.forEach((ele, idx) => {
-            let dom = this.$refs[ele.refName];//ele.dom;
-            if (dom && !ele.animeInst) {
-                let topLevelDict = { 0: 0 };
-                contents.forEach((cont, idx2) => {
-                    let d = this.$refs[cont.refName];//cont.dom;
-                    if (idx != idx2 && d) {
-                        let x = Math.abs(parseFloat(transXReg.exec(d.style.transform)[1]));
-                        if (!isNaN(x) && x < d.offsetWidth) {
-                            let top = d.offsetTop;
-                            if (!topLevelDict[top])
-                                topLevelDict[top] = 0;
-                            topLevelDict[top]++;
-                            let newTop = d.offsetHeight + d.offsetTop;
-                            if (newTop + dom.offsetHeight >= height)
-                                newTop = 0;
-                            if (!topLevelDict[newTop])
-                                topLevelDict[newTop] = 0;
-                        }
-                    }
-                });
-                let s = width + dom.offsetWidth;
-                let top = 0;
-                let minLevel = -1;
-                // console.log(topLevelDict);
-                for (let key in topLevelDict) {
-                    let level = topLevelDict[key];
-                    if (minLevel < 0 || level < minLevel) {
-                        minLevel = level;
-                        top = parseFloat(key);
-                    }
-                }
-                if (top)
-                    dom.style.top = top + 'px';
-                let duration = s * 10 / v;
-                ele.animeInst = anime({
-                    targets: dom,
-                    translateX: -s,
-                    duration,
-                    easing: 'linear'
-                });
-                ele.animeInst.finished.then(() => {
-                    ele.finished = true;
-                });
-            }
-        });
-        //移除已结束
-        // for (let idx = contents.length - 1; idx >= 0; idx--) {
-        //     let ele = contents[idx];
-        //     if (ele.finished)
-        //         contents.splice(idx, 1);
-        // }
-    }
-
-    sendDanmaku() {
-        let contents = this.danmakuList;
-        let danmaku = this.danmaku && this.danmaku.trim();
-        if (danmaku) {
-            let idx = contents.length;
-            let data = { msg: danmaku, color: this.color };
-            contents.push({ idx, refName: Date.now() + '', ...data });
-            testSocket.danmakuSend(data);
-            this.danmaku = '';
-        }
-    }
 
     recvDanmaku(data) {
-        let contents = this.danmakuList;
-        let idx = contents.length;
-        contents.push({ idx, refName: Date.now() + '', ...data });
+        this.$refs.video.danmakuPlayer.danmakuPush(data);
     }
 
     captureImage() {
@@ -194,8 +112,16 @@ export default class App extends Base {
 
     fail = false;
     protected render() {
-        let contents = this.danmakuList;
-
+        let danmakuList = [];
+        //test
+        for (let i = 0; i < 10; i++) {
+            for (let j = 0; j < 3; j++) {
+                danmakuList.push({
+                    msg: 'test' + (i * 3 + j),
+                    pos: i * 1000 + j * 500,
+                });
+            }
+        }
         return (
             <div>
                 <div class={this.getStyleName('danmaku-main')} style={{
@@ -214,55 +140,24 @@ export default class App extends Base {
                             this.player.currentTime(0);
                             this.player.play();
                         }} />
-                    <div style={{
-                        position: 'relative',
-                        height: '400px',
-                        width: '100%',
-                        background: '#000',
-                        display: 'flex',
-                        alignItems: 'center'
-                    }}>
-                        <MyVideo ref="video" options={{
-                            poster: '//localhost:8000/devMgt/img?_id=5da818d6433fe2209054c290',
-                            sources: [{
-                                type: "video/mp4",
-                                src: testApi.getVideoUrl(this.videoId)
-                            }]
-                        }} />
-                        <div ref='board' style={{
-                            overflow: 'hidden', position: 'absolute',
-                            fontSize: '30px', color: 'white',
-                            textStroke: '0.5px #000',
-                            left: 0, right: 0,
-                            top: 0, bottom: 0,
-                            pointerEvents: 'none'
-                        }}>
-                            {
-                                contents.map(ele => {
-                                    let idx = ele.idx;
-                                    return (
-                                        <div key={idx} ref={ele.refName} style={{ display: 'inline-block', position: 'absolute', left: '100%', whiteSpace: 'nowrap', color: ele.color }}>
-                                            {ele.msg}
-                                        </div>);
-                                })
+                    <MyVideo ref="video" options={{
+                        poster: '//localhost:8000/devMgt/img?_id=5da818d6433fe2209054c290',
+                        sources: [{
+                            type: "video/mp4",
+                            src: testApi.getVideoUrl(this.videoId)
+                        }],
+                        danmaku: {
+                            danmakuList,
+                            sendFn: async (data) => {
+                                let rs = await this.operateHandler('发送弹幕', async () => {
+                                    data.videoId = this.videoId;
+                                    await testApi.danmakuSubmit(data);
+                                }, { noSuccessHandler: true });
+                                return rs.success;
                             }
-                        </div>
-                    </div>
+                        }
+                    }} />
                     <div>
-                        <Row >
-                            <Col span={24}>
-                                <div style={{ display: 'flex' }}>
-                                    <Input class="input" v-model={this.danmaku} on-on-keypress={(e) => {
-                                        if (this.isPressEnter(e)) {
-                                            this.sendDanmaku();
-                                        }
-                                    }} style={{ flexGrow: 1 }} />
-                                    <ColorPicker class="color-picker" v-model={this.color} />
-                                    <Button class="send" type="primary" on-click={this.sendDanmaku}>danmaku</Button>
-                                </div>
-                            </Col>
-                        </Row>
-                        <Button on-click={() => { this.danmakuList = []; }}>clear anime</Button>
                         <Button on-click={() => {
                             this.$refs.videoCover.src = this.captureImage();
                         }}>截取</Button>

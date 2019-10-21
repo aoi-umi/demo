@@ -15,6 +15,7 @@ class MyVideo extends MyBase {
     options: DanmakuPlayerOptions;
 
     player: VideoJsPlayer;
+    danmakuPlayer: DanmakuPlayer;
 
     $refs: { video: HTMLVideoElement; };
 
@@ -27,10 +28,8 @@ class MyVideo extends MyBase {
             ...this.getDefaultOpt(),
             ...this.options,
         };
-        this.player = new DanmakuPlayer(this.$refs.video, opt).player;
-        this.player.on(DanmakuPlayer.Event.danmakuSend, (e, data) => {
-            console.log(data);
-        });
+        this.danmakuPlayer = new DanmakuPlayer(this.$refs.video, opt);
+        this.player = this.danmakuPlayer.player;
     }
 
     beforeDestroy() {

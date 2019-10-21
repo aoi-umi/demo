@@ -11,10 +11,6 @@ export class TestSocket extends Socket {
         });
     }
 
-    danmakuSend(data) {
-        this.socket.emit(myEnum.socket.弹幕发送, data);
-    }
-
     bindDanmakuRecv(fn: (data) => void) {
         this.socket.on(myEnum.socket.弹幕接收, (msg) => {
             fn(msg);
@@ -33,5 +29,14 @@ export class TestSocket extends Socket {
         this.socket.on(myEnum.socket.私信接收, (msg) => {
             fn(msg);
         });
+    }
+
+    danmakuConnect(data) {
+        this.socket.emit(myEnum.socket.弹幕池连接, data);
+
+    }
+
+    danmakuDisconnect(data) {
+        this.socket.emit(myEnum.socket.弹幕池断开, data);
     }
 }

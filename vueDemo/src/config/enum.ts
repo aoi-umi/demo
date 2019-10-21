@@ -78,8 +78,9 @@ const enumDefine = {
     },
 
     socket: {
-        弹幕发送: 'danmakuSend',
         弹幕接收: 'danmakuRecv',
+        弹幕池连接: 'danmakuConnect',
+        弹幕池断开: 'danmakuDisconnect',
         登录: 'login',
         登出: 'logout',
         私信接收: 'chatRecv',

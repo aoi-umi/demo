@@ -51,6 +51,9 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
     videoMgtDel,
     videoMgtAudit,
 
+    danmakuSubmit,
+    danmakuQuery,
+
     commentSubmit,
     commentQuery,
     commentDel,
@@ -280,6 +283,16 @@ export class TestApi extends ApiModel<TestApiMethod> {
         return this.requestByConfig(this.apiConfig.method.videoMgtAudit, { data });
     }
     //#endregion  
+
+    //#region danmaku 
+
+    async danmakuSubmit(data) {
+        return this.requestByConfig(this.apiConfig.method.danmakuSubmit, { data });
+    }
+    async danmakuQuery(data) {
+        return this.requestByConfig<ListResult>(this.apiConfig.method.danmakuQuery, { data });
+    }
+    //#endregion
 
     //#region comment 
 
