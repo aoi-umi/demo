@@ -10,7 +10,8 @@ function getClsName(prefix, ...cls) {
 }
 type DanmakOptions = {
     hide?: boolean;
-    danmakuList?: DanmakuDataType[]
+    danmakuList?: DanmakuDataType[],
+    sendFn?: (data) => boolean | Promise<boolean>,
 };
 type DanmakuDataType = {
     msg: string,
@@ -45,17 +46,13 @@ export class DanmakuPlayer {
             ...options.danmaku
         };
         this.player = videojs(id, options, ready);
+        if (options.danmaku.danmakuList) {
+            this.danmakuDataList = [
+                ...options.danmaku.danmakuList
+            ];
+        }
         this.initView();
         this.bindEvent();
-        //test
-        for (let i = 0; i < 10; i++) {
-            for (let j = 0; j < 3; j++) {
-                this.danmakuDataList.push({
-                    msg: 'test' + (i * 3 + j),
-                    pos: i * 1000 + j * 500,
-                });
-            }
-        }
     }
 
     private initView() {
@@ -246,22 +243,42 @@ export class DanmakuPlayer {
     private set danmaku(val) {
         this.input.value = val;
     }
+
+    //todo 颜色
     private get color() {
         return '';
     }
 
-    private sendDanmaku() {
+    danmakuPush(danmaku: DanmakuDataType | DanmakuDataType[]) {
+        let list = danmaku instanceof Array ? danmaku : [danmaku];
+        list.forEach(ele => {
+            this.danmakuDataList.push(ele);
+        });
+    }
+
+    private async sendDanmaku() {
         let player = this.player;
         let danmaku = this.danmaku && this.danmaku.trim();
         if (danmaku) {
-            let data: DanmakuDataType = { msg: danmaku, color: this.color, pos: parseInt(player.currentTime() * 1000 as any) };
-            this.danmakuDataList.push(data);
-            this.player.trigger(DanmakuPlayer.Event.danmakuSend, data);
-            this.danmaku = '';
+            let data: DanmakuDataType = {
+                msg: danmaku, color: this.color,
+                pos: player.ended() ? 0 : parseInt(player.currentTime() * 1000 as any)
+            };
+            let sendSuccess = false;
+            if (this.options.danmaku.sendFn)
+                sendSuccess = await this.options.danmaku.sendFn(data)
+            else {
+                this.danmakuPush(data);
+                sendSuccess = true;
+            }
+            if (sendSuccess) {
+                this.player.trigger(DanmakuPlayer.Event.danmakuSend, data);
+                this.danmaku = '';
+            }
         }
     }
 
-    addDanmaku(danmaku: DanmakuDataTypeInner | DanmakuDataTypeInner[]) {
+    private addDanmaku(danmaku: DanmakuDataTypeInner | DanmakuDataTypeInner[]) {
         let list = danmaku instanceof Array ? danmaku : [danmaku];
         list.forEach(ele => {
             ele.add = true;

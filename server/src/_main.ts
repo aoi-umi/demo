@@ -77,14 +77,19 @@ export let initSocket = function (server: Server) {
     mySocket = new MySocket(io, (socket, mySocket) => {
         let { socketUser } = mySocket;
         socket.myData = {};
-        socket.on(myEnum.socket.弹幕发送, (msg) => {
-            socket.broadcast.emit(config.myEnum.socket.弹幕接收, msg);
-        });
         socket.on(myEnum.socket.登录, (msg) => {
             socketUser.addUser(msg, socket);
         });
         socket.on(myEnum.socket.登出, (msg) => {
             socketUser.delUserBySocket(socket);
+        });
+
+        socket.on(myEnum.socket.弹幕池连接, (msg) => {
+            socketUser.danmakuConn(msg.videoId, socket);
+        });
+
+        socket.on(myEnum.socket.弹幕池断开, (msg) => {
+            socketUser.danmakuDisConn(msg.videoId, socket);
         });
 
         socket.on('disconnect', function () {

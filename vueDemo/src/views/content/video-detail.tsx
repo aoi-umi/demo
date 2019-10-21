@@ -1,12 +1,12 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import moment from 'dayjs';
 
-import { testApi } from '@/api';
+import { testApi, testSocket } from '@/api';
 import { myEnum, dev } from '@/config';
 import { convClass } from '@/components/utils';
 import { Divider, Spin } from '@/components/iview';
 import { MyLoad, IMyLoad } from '@/components/my-load';
-import { MyVideo } from '@/components/my-video';
+import { MyVideo, IMyVideo } from '@/components/my-video';
 import { FileType, FileDataType } from '@/components/my-upload';
 
 import { UserAvatarView } from '../comps/user-avatar';
@@ -57,12 +57,38 @@ class VideoDetailMain extends Base {
     })
     data: DetailDataType;
 
+    $refs: { video: IMyVideo };
+
+    videoId: string;
+
     created() {
         this.videoList = this.data.videoList.map(ele => {
             return { url: ele.url, fileType: FileDataType.视频, originFileType: ele.contentType };
         });
+        this.videoId = this.data.videoIdList[0];
+        testSocket.danmakuConnect({ videoId: this.videoId });
+        testSocket.bindDanmakuRecv(this.recvDanmaku);
     }
+
+    mounted() {
+        this.loadDanmaku();
+    }
+
+    destroyed() {
+        testSocket.danmakuDisconnect({ videoId: this.videoId });
+    }
+
     videoList: FileType[] = [];
+
+    async loadDanmaku() {
+        let rs = await testApi.danmakuQuery({ videoId: this.videoId });
+        this.$refs.video.danmakuPlayer.danmakuPush(rs.rows);
+    }
+
+    recvDanmaku(data) {
+        if (data.videoId == this.videoId)
+            this.$refs.video.danmakuPlayer.danmakuPush(data);
+    }
 
     renderHeader(detail: DetailDataType) {
         return (
@@ -87,15 +113,26 @@ class VideoDetailMain extends Base {
                 <br />
                 <div class={this.getStyleName('video-box')}>
                     <div class={this.getStyleName('video')}>
-                        <MyVideo options={{
-                            sources: this.videoList.map(ele => {
-                                return {
-                                    src: ele.url,
-                                    type: ele.originFileType,
+                        <MyVideo
+                            ref='video'
+                            options={{
+                                sources: this.videoList.map(ele => {
+                                    return {
+                                        src: ele.url,
+                                        type: ele.originFileType,
+                                    }
+                                }),
+                                poster: detail.coverUrl,
+                                danmaku: {
+                                    sendFn: async (data) => {
+                                        let rs = await this.operateHandler('发送弹幕', async () => {
+                                            data.videoId = this.videoId;
+                                            await testApi.danmakuSubmit(data);
+                                        }, { noSuccessHandler: true });
+                                        return rs.success;
+                                    }
                                 }
-                            }),
-                            poster: detail.coverUrl,
-                        }} />
+                            }} />
                     </div>
                 </div>
             </div>
