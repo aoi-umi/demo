@@ -5,7 +5,7 @@ import { UserAuthMid, FileMid } from '@/middleware';
 import { auth } from '@/config';
 
 //#region user 
-import * as user from './user';
+import * as user from './user/user';
 router.post('/user/accountExists', UserAuthMid.normal(), user.accountExists);
 router.post('/user/signUp', UserAuthMid.normal(), user.signUp);
 router.post('/user/signIn', UserAuthMid.normal(), user.signIn);
@@ -27,7 +27,7 @@ router.post('/bookmark/del', UserAuthMid.normal(), bookmark.del);
 //#endregion
 
 //#region authority 
-import * as authority from './authority';
+import * as authority from './user/authority';
 router.get('/authority/query', UserAuthMid.normal([auth.authorityQuery]), authority.query);
 router.post('/authority/codeExists', UserAuthMid.normal(), authority.codeExists);
 router.post('/authority/save', UserAuthMid.normal([auth.authoritySave]), authority.save);
@@ -36,7 +36,7 @@ router.post('/authority/del', UserAuthMid.normal([auth.authorityDel]), authority
 //#endregion
 
 //#region role 
-import * as role from './role';
+import * as role from './user/role';
 router.get('/role/query', UserAuthMid.normal([auth.roleQuery]), role.query);
 router.post('/role/codeExists', UserAuthMid.normal(), role.codeExists);
 router.post('/role/save', UserAuthMid.normal([auth.roleSave]), role.save);
@@ -45,7 +45,7 @@ router.post('/role/del', UserAuthMid.normal([auth.roleDel]), role.del);
 //#endregion
 
 //#region article 
-import * as article from './article';
+import * as article from './content/article';
 router.get('/article/mgt/query', UserAuthMid.normal([auth.login]), article.mgtQuery);
 router.get('/article/mgt/detailQuery', UserAuthMid.normal([auth.login]), article.mgtDetailQuery);
 router.post('/article/mgt/save', UserAuthMid.normal([auth.login]), article.mgtSave);
@@ -57,7 +57,7 @@ router.get('/article/detailQuery', UserAuthMid.normal(), article.detailQuery);
 //#endregion
 
 //#region video 
-import * as video from './video';
+import * as video from './content/video';
 router.get('/video/mgt/query', UserAuthMid.normal([auth.login]), video.mgtQuery);
 router.get('/video/mgt/detailQuery', UserAuthMid.normal([auth.login]), video.mgtDetailQuery);
 router.post('/video/mgt/save', UserAuthMid.normal([auth.login]), video.mgtSave);
@@ -69,31 +69,31 @@ router.get('/video/detailQuery', UserAuthMid.normal(), video.detailQuery);
 //#endregion
 
 //#region comment 
-import * as comment from './comment';
+import * as comment from './content/comment';
 router.post('/comment/submit', UserAuthMid.normal([auth.login]), comment.submit);
 router.get('/comment/query', UserAuthMid.normal(), comment.query);
 router.post('/comment/del', UserAuthMid.normal(), comment.del);
 //#endregion
 
 //#region danmaku 
-import * as danmaku from './danmaku';
+import * as danmaku from './content/danmaku';
 router.post('/danmaku/submit', UserAuthMid.normal([auth.login]), danmaku.submit);
 router.get('/danmaku/query', UserAuthMid.normal(), danmaku.query);
 //#endregion
 
 //#region vote 
-import * as vote from './vote';
+import * as vote from './content/vote';
 router.post('/vote/submit', UserAuthMid.normal([auth.login]), vote.submit);
 //#endregion
 
 //#region follow 
-import * as follow from './follow';
+import * as follow from './user/follow';
 router.post('/follow/save', UserAuthMid.normal([auth.login]), follow.save);
 router.get('/follow/query', UserAuthMid.normal(), follow.query);
 //#endregion
 
 //#region chat 
-import * as chat from './chat';
+import * as chat from './user/chat';
 router.post('/chat/submit', UserAuthMid.normal([auth.login]), chat.submit);
 router.get('/chat/query', UserAuthMid.normal([auth.login]), chat.query);
 router.get('/chat/list', UserAuthMid.normal([auth.login]), chat.list);
