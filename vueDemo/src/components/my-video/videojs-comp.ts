@@ -30,10 +30,15 @@ const KeyCode = {
     right: 39,
     down: 40,
 };
+const Event = {
+    danmakuSend: 'danmakuSend',
+    widthChange: 'widthChange',
+};
+for (let key in Event) {
+    Event[key] = Event[key].toLocaleLowerCase();
+}
 export class DanmakuPlayer {
-    static Event = {
-        danmakuSend: 'danmakuSend'.toLocaleLowerCase()
-    };
+    static Event = Event;
     player: VideoJsPlayer;
     input: HTMLInputElement;
     sendBtn: HTMLButtonElement;
@@ -75,14 +80,25 @@ export class DanmakuPlayer {
             className: getClsName(clsPrefix, 'send') + ' vjs-control vjs-button',
         }) as any;
         danmakuBar.append(input, sendBtn);
-
-        let oldBar = videojs.dom.createEl('div', {
+        let statusBar2 = videojs.dom.createEl('div', {
             tabIndex: -1,
             className: getClsName(clsPrefix, 'status-bar'),
         });
         let child = controlBarEl.children;
-        oldBar.append(...child);
-        controlBarEl.append(danmakuBar, oldBar);
+        statusBar2.append(...child);
+
+        // let statusBar1 = videojs.dom.createEl('div', {
+        //     tabIndex: -1,
+        //     className: getClsName(clsPrefix, 'status-bar'),
+        // });
+        // let progress = controlBarEl.querySelector('.vjs-progress-control');
+        // let remainingTime = controlBarEl.querySelector('.vjs-remaining-time');
+        // controlBarEl.querySelector('.vjs-fullscreen-control').before(videojs.dom.createEl('div', {
+        //     tabIndex: -1,
+        //     style: 'flex:auto'
+        // }));
+        // statusBar1.append(progress, remainingTime);
+        controlBarEl.append(danmakuBar, /*statusBar1,*/ statusBar2);
 
         //弹幕层
         let poster = player.el().querySelector('.vjs-poster');
@@ -94,11 +110,10 @@ export class DanmakuPlayer {
     }
 
     private startPos = 0;
+    private videoWidth = 0;
     private bindEvent() {
         //快进/快退
-        this.player.on('keydown', (e: KeyboardEvent) => {
-            this.keydownHandler(e);
-        });
+        this.player.on('keydown', this.keydownHandler.bind(this));
         this.player.on('keypress', (e: KeyboardEvent) => {
             if (e.keyCode === KeyCode.space) {
                 this.player.paused() ? this.player.play() : this.player.pause();
@@ -106,9 +121,7 @@ export class DanmakuPlayer {
             // if ([KeyCode.space, KeyCode.left, KeyCode.right].includes(e.keyCode))
             e.preventDefault();
         });
-        this.player.on('timeupdate', () => {
-            this.timeUpdateHandler();
-        });
+        this.player.on('timeupdate', this.timeUpdateHandler.bind(this));
         //暂停/播放
         this.player.on('play', () => {
             if (!this.player.seeking())
@@ -136,13 +149,14 @@ export class DanmakuPlayer {
             e.stopPropagation();
         });
 
-        this.sendBtn.addEventListener('click', () => {
-            this.sendDanmaku();
-        });
+        this.sendBtn.addEventListener('click', this.sendDanmaku.bind(this));
 
-        this.danmakuBoard.addEventListener('click', (e) => {
-            this.handleBoardClick(e);
-        });
+        this.danmakuBoard.addEventListener('click', this.handleBoardClick.bind(this));
+
+        //大小改变
+        this.videoWidth = this.danmakuBoard.clientWidth;
+        window.addEventListener('resize', this.resizeHandler.bind(this));
+        this.player.on(Event.widthChange, this.resize.bind(this));
     }
 
     private keydownHandler(e: KeyboardEvent) {
@@ -228,6 +242,20 @@ export class DanmakuPlayer {
         this.addDanmaku(list);
     }
 
+    private resizeHandler() {
+        let clientWidth = this.danmakuBoard.clientWidth;
+        if (this.videoWidth != clientWidth) {
+            this.player.trigger(DanmakuPlayer.Event.widthChange)
+            this.videoWidth = clientWidth;
+        }
+    }
+
+    private resize() {
+        this.danmakuList.forEach(ele => {
+            // ele.animeInst.
+        });
+    }
+
     danmakuDataList: DanmakuDataTypeInner[] = [];
     danmakuList: (DanmakuDataType & {
         idx?: number,
@@ -256,10 +284,17 @@ export class DanmakuPlayer {
         });
     }
 
+    private sending = false;
     private async sendDanmaku() {
         let player = this.player;
         let danmaku = this.danmaku && this.danmaku.trim();
-        if (danmaku) {
+        if (!danmaku)
+            return;
+        //冷却中
+        if (this.sending)
+            return;
+        try {
+            this.sending = true;
             let data: DanmakuDataType = {
                 msg: danmaku, color: this.color,
                 pos: player.ended() ? 0 : parseInt(player.currentTime() * 1000 as any)
@@ -275,6 +310,8 @@ export class DanmakuPlayer {
                 this.player.trigger(DanmakuPlayer.Event.danmakuSend, data);
                 this.danmaku = '';
             }
+        } finally {
+            this.sending = false;
         }
     }
 
@@ -286,14 +323,22 @@ export class DanmakuPlayer {
         this.danmakuList = [
             ...this.danmakuList,
             ...list,
-        ]
+        ];
         this.updateDanmaku();
+    }
+
+    private getTransOption(danmakuWidth) {
+        let speed = 1;
+        let duration = danmakuWidth * 10 / speed;
+        return {
+            translateX: -danmakuWidth,
+            duration,
+        };
     }
 
     private updateDanmaku(pause?: boolean) {
         let width = this.danmakuBoard.offsetWidth;
         let height = this.danmakuBoard.offsetHeight;
-        let speed = 1;
         let transXReg = /\.*translateX\((.*)px\)/i;
         let { danmakuList } = this;
         danmakuList.forEach((ele, idx) => {
@@ -303,9 +348,8 @@ export class DanmakuPlayer {
                 ele.dom = dom = videojs.dom.createEl('div', {
                     className: getClsName(clsPrefix, 'danmaku'),
                     innerText: ele.msg,
-                    style: {
-                        color: ele.color
-                    }
+                }, {
+                    style: `color: ${ele.color};left: ${width}px`
                 }) as any;
                 this.danmakuBoard.appendChild(dom);
             }
@@ -329,7 +373,7 @@ export class DanmakuPlayer {
                         }
                     }
                 });
-                let danmakuWidth = width + dom.offsetWidth;
+                let danmakuWidth = width + dom.offsetWidth + 5;
                 let top = 0;
                 let minLevel = -1;
                 for (let key in topLevelDict) {
@@ -341,12 +385,10 @@ export class DanmakuPlayer {
                 }
                 if (top)
                     dom.style.top = top + 'px';
-                let duration = danmakuWidth * 10 / speed;
                 ele.animeInst = anime({
                     targets: dom,
-                    translateX: -danmakuWidth,
-                    duration,
-                    easing: 'linear'
+                    easing: 'linear',
+                    ...this.getTransOption(danmakuWidth),
                 });
                 if (pause) {
                     ele.animeInst.pause();
@@ -356,5 +398,14 @@ export class DanmakuPlayer {
                 });
             }
         });
+    }
+
+    dispose() {
+        this.player.dispose();
+        this.unbindEvent();
+    }
+
+    private unbindEvent() {
+        window.removeEventListener('resize', this.resizeHandler)
     }
 }
