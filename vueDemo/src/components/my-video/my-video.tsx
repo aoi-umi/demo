@@ -1,6 +1,6 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 
-import videojs, { VideoJsPlayer, VideoJsPlayerOptions } from 'video.js';
+import { VideoJsPlayer, VideoJsPlayerOptions } from 'video.js';
 
 import { MyBase } from '../my-base';
 import { convClass } from '../utils';
@@ -33,7 +33,7 @@ class MyVideo extends MyBase {
     }
 
     beforeDestroy() {
-        videojs(this.$refs.video).dispose();
+        this.danmakuPlayer.dispose();
     }
 
     private getDefaultOpt() {
@@ -44,6 +44,7 @@ class MyVideo extends MyBase {
             language: 'en',
             // playbackRates: [0.7, 1.0, 1.5, 2.0],
             aspectRatio: '16:9',
+            nativeControlsForTouch: false,
         } as VideoJsPlayerOptions;
     }
 
@@ -70,7 +71,11 @@ class MyVideo extends MyBase {
     render() {
         return (
             <div class={this.getStyleName('root')}>
-                <video ref="video" class={this.getStyleName('video').concat(["video-js vjs-default-skin vjs-big-play-centered"])} crossOrigin="*">
+                <video ref="video" class={this.getStyleName('video').concat(["video-js vjs-default-skin vjs-big-play-centered"])} crossOrigin="*"
+                    x5-video-player-type="h5"
+                    x5-video-orientation="landscape"
+                    x5-playsinline="" playsinline="" webkit-playsinline=""
+                >
                 </video>
             </div>
         );
