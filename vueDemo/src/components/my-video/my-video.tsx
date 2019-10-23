@@ -73,7 +73,7 @@ class MyVideo extends MyBase {
             <div class={this.getStyleName('root')}>
                 <video ref="video" class={this.getStyleName('video').concat(["video-js vjs-default-skin vjs-big-play-centered"])} crossOrigin="*"
                     x5-video-player-type="h5"
-                    x5-video-orientation="landscape"
+                    // x5-video-orientation="landscape"
                     x5-playsinline="" playsinline="" webkit-playsinline=""
                 >
                 </video>

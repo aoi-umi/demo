@@ -79,6 +79,15 @@ export const enumDefine = {
         微信: 1,
         支付宝: 2,
     },
+    goodsStatus: {
+        下架: 0,
+        上架: 1,
+    },
+    goodsSkuStatus: {
+        下架: 0,
+        上架: 1,
+        无: 2,
+    },
 
     socket: {
         弹幕接收: 'danmakuRecv',
