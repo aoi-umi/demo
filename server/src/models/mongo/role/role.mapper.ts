@@ -2,7 +2,7 @@ import { Types } from 'mongoose';
 
 import { myEnum } from '@/config';
 import { escapeRegExp } from '@/_system/common';
-import * as VaildSchema from '@/vaild-schema/class-valid';
+import * as ValidSchema from '@/valid-schema/class-valid';
 
 import { AuthorityModel } from '../authority';
 import { UserMapper } from '../user';
@@ -19,7 +19,7 @@ export class RoleMapper {
         return rs;
     }
 
-    static async query(data: VaildSchema.RoleQuery) {
+    static async query(data: ValidSchema.RoleQuery) {
         let query: any = {};
         let noTotal = false;
         if (data._id) {

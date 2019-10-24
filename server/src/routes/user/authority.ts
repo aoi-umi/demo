@@ -3,12 +3,12 @@ import { RequestHandler } from 'express';
 import { responseHandler, paramsValid } from '@/helpers';
 import * as config from '@/config';
 import { error } from '@/_system/common';
-import * as VaildSchema from '@/vaild-schema/class-valid';
+import * as ValidSchema from '@/valid-schema/class-valid';
 import { AuthorityModel, AuthorityInstanceType, AuthorityMapper } from '@/models/mongo/authority';
 
 export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let data = paramsValid(req.query, VaildSchema.AuthorityQuery);
+        let data = paramsValid(req.query, ValidSchema.AuthorityQuery);
         let { rows, total } = await AuthorityMapper.query(data);
 
         return {
@@ -20,7 +20,7 @@ export let query: RequestHandler = (req, res) => {
 
 export let codeExists: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let data = paramsValid(req.body, VaildSchema.AuthorityCodeExists);
+        let data = paramsValid(req.body, ValidSchema.AuthorityCodeExists);
         let rs = await AuthorityMapper.codeExists(data.code, data._id);
         return rs && { _id: rs._id };
     }, req, res);
@@ -83,7 +83,7 @@ export let update: RequestHandler = (req, res) => {
 
 export let del: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let data = paramsValid(req.body, VaildSchema.AuthorityDel);
+        let data = paramsValid(req.body, ValidSchema.AuthorityDel);
         let rs = await AuthorityModel.deleteMany({ _id: { $in: data.idList } });
         if (!rs.n)
             throw error('', config.error.NO_MATCH_DATA);

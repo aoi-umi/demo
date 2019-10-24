@@ -1,5 +1,5 @@
 import { myEnum } from "@/config";
-import * as VaildSchema from '@/vaild-schema/class-valid';
+import * as ValidSchema from '@/valid-schema/class-valid';
 import { escapeRegExp } from "@/_system/common";
 
 import { BaseMapper } from "../_base";
@@ -46,7 +46,7 @@ export class NotifyMapper {
         return obj;
     }
 
-    static async query(data: VaildSchema.AssetNotifyQuery) {
+    static async query(data: ValidSchema.AssetNotifyQuery) {
         let match: any = {};
         if (data.orderNo)
             match.orderNo = new RegExp(escapeRegExp(data.orderNo), 'i');

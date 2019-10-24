@@ -2,7 +2,7 @@ import { Types } from 'mongoose';
 
 import * as config from '@/config';
 import { myEnum } from '@/config';
-import * as VaildSchema from '@/vaild-schema/class-valid';
+import * as ValidSchema from '@/valid-schema/class-valid';
 import { error, escapeRegExp } from '@/_system/common';
 import { Auth } from '@/_system/auth';
 import { transaction } from '@/_system/dbMongo';
@@ -20,7 +20,7 @@ type VideoResetOption = ContentResetOption & {
 type VideoQueryOption = ContentQueryOption<VideoResetOption>;
 export class VideoMapper {
 
-    static async query(data: VaildSchema.VideoQuery, opt: {
+    static async query(data: ValidSchema.VideoQuery, opt: {
         noTotal?: boolean,
     } & VideoQueryOption) {
         function setMatch(match) {
@@ -148,7 +148,7 @@ export class VideoMapper {
         };
     }
 
-    static async mgtSave(data: VaildSchema.VideoSave, opt: { user: LoginUser }) {
+    static async mgtSave(data: ValidSchema.VideoSave, opt: { user: LoginUser }) {
         let status = data.submit ? myEnum.articleStatus.待审核 : myEnum.articleStatus.草稿;
         let saveKey: (keyof VideoDocType)[] = [
             'cover', 'title', 'profile', 'videoIdList', 'remark',

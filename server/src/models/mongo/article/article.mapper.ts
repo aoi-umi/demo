@@ -2,7 +2,7 @@ import { Types } from 'mongoose';
 
 import * as config from '@/config';
 import { myEnum } from '@/config';
-import * as VaildSchema from '@/vaild-schema/class-valid';
+import * as ValidSchema from '@/valid-schema/class-valid';
 import { error, escapeRegExp } from '@/_system/common';
 import { Auth } from '@/_system/auth';
 
@@ -17,7 +17,7 @@ import { BaseMapper } from '../_base';
 
 
 export class ArticleMapper {
-    static async query(data: VaildSchema.ArticleQuery, opt: {
+    static async query(data: ValidSchema.ArticleQuery, opt: {
         noTotal?: boolean,
     } & ContentQueryOption) {
         function setMatch(match) {
@@ -124,7 +124,7 @@ export class ArticleMapper {
         };
     }
 
-    static async mgtSave(data: VaildSchema.ArticleSave, opt: { user: LoginUser }) {
+    static async mgtSave(data: ValidSchema.ArticleSave, opt: { user: LoginUser }) {
         let status = data.submit ? myEnum.articleStatus.待审核 : myEnum.articleStatus.草稿;
         let saveKey: (keyof ArticleDocType)[] = [
             'cover', 'title', 'profile', 'content', 'remark',

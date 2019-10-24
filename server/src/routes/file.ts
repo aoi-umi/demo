@@ -4,7 +4,7 @@ import { Types } from 'mongoose';
 import * as common from "@/_system/common";
 import { responseHandler, paramsValid } from "@/helpers";
 import { myEnum } from "@/config";
-import * as VaildSchema from '@/vaild-schema/class-valid';
+import * as ValidSchema from '@/valid-schema/class-valid';
 import { FileMapper, FileModel } from "@/models/mongo/file";
 import { logger } from "@/helpers";
 
@@ -38,7 +38,7 @@ const uplaod = (option: { fileType: string }, req: Request, res: Response) => {
 
 export const download = async (option: { fileType: string }, req: Request, res: Response) => {
     responseHandler(async (opt) => {
-        let data = paramsValid(req.query, VaildSchema.FileGet);
+        let data = paramsValid(req.query, ValidSchema.FileGet);
         let ifModifiedSince = req.headers['if-modified-since'] as string;
         let detail = await FileModel.findOne({ _id: data._id, fileType: option.fileType });
         opt.noSend = true;
@@ -79,7 +79,7 @@ export const videoUpload: RequestHandler = (req, res) => {
 export const vedioGet: RequestHandler = (req, res) => {
     responseHandler(async (opt) => {
         opt.noSend = true;
-        let data = paramsValid(req.query, VaildSchema.FileGet);
+        let data = paramsValid(req.query, ValidSchema.FileGet);
         let fileList = await FileMapper.findWithRaw({ _id: data._id, fileType: myEnum.fileType.视频 });
         let rawFile = fileList[0] && fileList[0].rawFile;
         if (!rawFile) {

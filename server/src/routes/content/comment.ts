@@ -5,7 +5,7 @@ import { error } from '@/_system/common';
 import { Auth } from '@/_system/auth';
 import * as config from '@/config';
 import { responseHandler, paramsValid } from '@/helpers';
-import * as VaildSchema from '@/vaild-schema/class-valid';
+import * as ValidSchema from '@/valid-schema/class-valid';
 
 import { CommentMapper, CommentModel } from '@/models/mongo/comment';
 import { UserMapper } from '@/models/mongo/user';
@@ -13,7 +13,7 @@ import { UserMapper } from '@/models/mongo/user';
 export let submit: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = paramsValid(req.body, VaildSchema.CommentSubmit);
+        let data = paramsValid(req.body, ValidSchema.CommentSubmit);
         let owner = await CommentMapper.findOwner({ ownerId: data.ownerId, type: data.type });
         let comment = await CommentMapper.create(data, data.type, user);
         comment.ip = req.realIp;
@@ -48,7 +48,7 @@ export let submit: RequestHandler = (req, res) => {
 export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = paramsValid(req.query, VaildSchema.CommentQuery);
+        let data = paramsValid(req.query, ValidSchema.CommentQuery);
         let { total, rows } = await CommentMapper.query({
             ...data,
         }, {
@@ -68,7 +68,7 @@ export let query: RequestHandler = (req, res) => {
 export let del: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = paramsValid(req.body, VaildSchema.CommentDel);
+        let data = paramsValid(req.body, ValidSchema.CommentDel);
         /**
          * 可删除
          * 1.本人

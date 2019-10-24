@@ -1,11 +1,11 @@
 
 import { mq } from '@/_main';
 import * as config from '@/config';
-import * as VaildSchema from '@/vaild-schema/class-valid';
+import * as ValidSchema from '@/valid-schema/class-valid';
 import { NotifyType } from '@/3rd-party';
 
 export class SendQueue {
-    static payAutoCancel(data: VaildSchema.PayCancel) {
+    static payAutoCancel(data: ValidSchema.PayCancel) {
         return mq.sendToQueueDelayByConfig(config.dev.mq.payAutoCancel, data);
     }
 

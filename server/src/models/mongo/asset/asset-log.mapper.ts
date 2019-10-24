@@ -1,5 +1,5 @@
 import { escapeRegExp } from '@/_system/common';
-import * as VaildSchema from '@/vaild-schema/class-valid';
+import * as ValidSchema from '@/valid-schema/class-valid';
 
 import { BaseMapper } from '../_base';
 import { AssetLogModel } from "./asset-log";
@@ -32,7 +32,7 @@ export class AssetLogMapper {
         ];
     }
 
-    static async query(data: VaildSchema.AssetLogQuery) {
+    static async query(data: ValidSchema.AssetLogQuery) {
         let match: any = {};
         if (data.orderNo)
             match.orderNo = new RegExp(escapeRegExp(data.orderNo), 'i');

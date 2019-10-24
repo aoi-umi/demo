@@ -1,13 +1,13 @@
 import { Model, InstanceType } from "mongoose-ts-ua";
 import { Types } from "mongoose";
 
-import * as VaildSchema from '@/vaild-schema/class-valid';
+import * as ValidSchema from '@/valid-schema/class-valid';
 
 import { UserMapper, UserResetOption } from "../user";
 import { ChatModel } from "./chat";
 
 export class ChatMapper {
-    static async query(data: VaildSchema.ChatQuery, opt: { userId: any } & UserResetOption) {
+    static async query(data: ValidSchema.ChatQuery, opt: { userId: any } & UserResetOption) {
         let userId = Types.ObjectId(opt.userId);
         let match: any = {
             $or: [{

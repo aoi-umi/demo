@@ -1,6 +1,6 @@
 import { Types } from 'mongoose';
 
-import * as VaildSchema from '@/vaild-schema/class-valid';
+import * as ValidSchema from '@/valid-schema/class-valid';
 import { escapeRegExp } from '@/_system/common';
 
 import { BaseMapper } from '../_base';
@@ -16,7 +16,7 @@ export class AuthorityMapper {
         return rs;
     }
 
-    static async query(data: VaildSchema.AuthorityQuery) {
+    static async query(data: ValidSchema.AuthorityQuery) {
         let query: any = {};
         if (data.anyKey) {
             delete data.name;

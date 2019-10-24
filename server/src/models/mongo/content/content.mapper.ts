@@ -5,7 +5,7 @@ import { myEnum } from '@/config';
 import * as config from '@/config';
 import { error, escapeRegExp } from '@/_system/common';
 import { transaction } from '@/_system/dbMongo';
-import * as VaildSchema from '@/vaild-schema/class-valid';
+import * as ValidSchema from '@/valid-schema/class-valid';
 
 import { LoginUser } from '../../login-user';
 import { FileMapper } from '../file';
@@ -39,7 +39,7 @@ export type ContentUpdateStatusOutOption = {
 }
 
 export class ContentMapper {
-    static async query(data: VaildSchema.ContentQuery, opt: {
+    static async query(data: ValidSchema.ContentQuery, opt: {
         model: ContentBaseModelType,
         setMatch?: (match) => void;
         resetDetail?: (data: any) => any;
@@ -217,7 +217,7 @@ export class ContentMapper {
         });
     }
 
-    static async mgtSave(data: VaildSchema.ContentSave, opt: {
+    static async mgtSave(data: ValidSchema.ContentSave, opt: {
         user: LoginUser,
         contentType: number,
         saveKey: string[],

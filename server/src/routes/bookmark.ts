@@ -3,14 +3,14 @@ import { RequestHandler } from 'express';
 import { responseHandler, paramsValid } from '@/helpers';
 import { error, escapeRegExp } from '@/_system/common';
 import * as config from '@/config';
-import * as VaildSchema from '@/vaild-schema/class-valid';
+import * as ValidSchema from '@/valid-schema/class-valid';
 
 import { BookmarkModel, BookmarkInstanceType } from '@/models/mongo/bookmark';
 import { BaseMapper } from '@/models/mongo/_base';
 
 export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let data = paramsValid(req.query, VaildSchema.BookmarkQuery);
+        let data = paramsValid(req.query, ValidSchema.BookmarkQuery);
         let query: any = {};
         if (data.anyKey) {
             let anykey = new RegExp(escapeRegExp(data.anyKey), 'i');
@@ -39,7 +39,7 @@ export let query: RequestHandler = (req, res) => {
 
 export let save: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let data = paramsValid(req.body, VaildSchema.BookmarkSave);
+        let data = paramsValid(req.body, ValidSchema.BookmarkSave);
         let detail: BookmarkInstanceType;
         if (!data._id) {
             delete data._id;
@@ -72,7 +72,7 @@ export let save: RequestHandler = (req, res) => {
 
 export let del: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let data = paramsValid(req.body, VaildSchema.BookmarkDel);
+        let data = paramsValid(req.body, ValidSchema.BookmarkDel);
         let rs = await BookmarkModel.deleteMany({ _id: { $in: data.idList } });
         if (!rs.n)
             throw error('', config.error.NO_MATCH_DATA);

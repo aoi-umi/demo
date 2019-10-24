@@ -5,7 +5,7 @@ import { escapeRegExp } from '@/_system/common';
 import * as common from '@/_system/common';
 import { myEnum } from '@/config/enum';
 import * as config from '@/config';
-import * as VaildSchema from '@/vaild-schema/class-valid';
+import * as ValidSchema from '@/valid-schema/class-valid';
 
 import { LoginUser } from '../../login-user';
 import { AuthorityModel } from '../authority';
@@ -33,7 +33,7 @@ export class UserMapper {
         return rs;
     }
 
-    static async query(data: VaildSchema.UserMgtQuery, opt: UserResetOption) {
+    static async query(data: ValidSchema.UserMgtQuery, opt: UserResetOption) {
         let query: any = {};
         let noTotal = false;
         if (data._id) {
@@ -255,7 +255,7 @@ export class UserMapper {
         };
     }
 
-    static async login(token, user: UserInstanceType, data: VaildSchema.UserSignIn, disabled: boolean, opt: UserResetOption) {
+    static async login(token, user: UserInstanceType, data: ValidSchema.UserSignIn, disabled: boolean, opt: UserResetOption) {
         let { checkToken } = UserMapper.createToken(data, user);
         if (token !== checkToken)
             throw common.error('', config.error.TOKEN_WRONG);
