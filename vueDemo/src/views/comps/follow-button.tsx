@@ -18,7 +18,7 @@ class FollowBotton extends Base {
     private innerUser = this.user;
 
     get isFollow() {
-        return this.innerUser.followStatus === myEnum.followStatus.已关注
+        return this.innerUser.followStatus === myEnum.followStatus.已关注;
     }
 
     @Watch('user')
@@ -43,8 +43,8 @@ class FollowBotton extends Base {
             <Button on-click={() => {
                 this.handleFollow();
             }}>{this.innerUser.followEachOther ?
-                '相互关注' :
-                this.isFollow ? '已关注' : '关注'}
+                    '相互关注' :
+                    this.isFollow ? '已关注' : '关注'}
             </Button>
         );
     }

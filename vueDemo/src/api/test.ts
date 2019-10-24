@@ -101,7 +101,7 @@ export class TestApi extends ApiModel<TestApiMethod> {
                 req.headers = {
                     ...this.defaultHeaders(),
                     ...req.headers,
-                }
+                };
                 return req;
             },
             afterResponse: (res: Result) => {

@@ -23,7 +23,7 @@ export class VideoMgtBase extends ContentMgtBase {
     }
 
     protected canAudit(detail: ContentDataType) {
-        return detail.status == myEnum.videoStatus.待审核 && this.storeUser.user.hasAuth(authority.videoMgtAudit)
+        return detail.status == myEnum.videoStatus.待审核 && this.storeUser.user.hasAuth(authority.videoMgtAudit);
     }
 
     toDetailUrl(preview) {

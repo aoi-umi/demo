@@ -136,7 +136,7 @@ export default class Pay extends Base {
                 tag: ele.key,
                 key: ele.value,
                 checkable: true
-            }
+            };
         });
     }
 
@@ -221,8 +221,8 @@ export default class Pay extends Base {
                     this.$router.push({
                         path: routerConfig.assetMgtLog.path,
                         query: { outOrderNo: detail.outOrderNo }
-                    })
-                }}>{detail.outOrderNo}</a> : <span>{detail.outOrderNo}</span>)
+                    });
+                }}>{detail.outOrderNo}</a> : <span>{detail.outOrderNo}</span>);
             }
         }, {
             title: '状态',

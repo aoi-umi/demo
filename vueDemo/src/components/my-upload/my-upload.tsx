@@ -324,7 +324,7 @@ class MyUpload extends MyBase {
             cropperSize = {
                 width: window.innerWidth + 'px',
                 height: (window.innerHeight - 200) + 'px'
-            }
+            };
         }
         let coverHeight = '50px' || height;
         return (
@@ -361,7 +361,7 @@ class MyUpload extends MyBase {
                                 }} />}
                             </div>
                         </div>
-                    )
+                    );
                 })}
 
                 <Upload

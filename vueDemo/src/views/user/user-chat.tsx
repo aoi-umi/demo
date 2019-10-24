@@ -99,7 +99,7 @@ class ChatDetail extends Base {
                 userId: this.storeUser.user._id,
                 createdAt: new Date(),
                 key: randStr(),
-            }
+            };
         } else {
             data = {
                 destUserId: retryData.destUserId,
@@ -282,7 +282,7 @@ export class ChatList extends Base {
                         </div>
                     </div>
                 </Card>
-            )
+            );
         });
     }
 

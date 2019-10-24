@@ -23,7 +23,7 @@ export class ArticleMgtBase extends ContentMgtBase {
     }
 
     protected canAudit(detail: ContentDataType) {
-        return detail.status == myEnum.articleStatus.待审核 && this.storeUser.user.hasAuth(authority.articleMgtAudit)
+        return detail.status == myEnum.articleStatus.待审核 && this.storeUser.user.hasAuth(authority.articleMgtAudit);
     }
 
     toDetailUrl(preview) {
@@ -62,7 +62,7 @@ export default class ArticleMgt extends ArticleMgtBase implements IListBase {
                 tag: ele.key,
                 key: ele.value,
                 checkable: true
-            }
+            };
         });
     }
 

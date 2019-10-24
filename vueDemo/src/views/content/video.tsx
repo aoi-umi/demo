@@ -181,7 +181,7 @@ class VideoListItem extends Base {
                         <div />)}
                 </Card>
             </div>
-        )
+        );
     }
 }
 

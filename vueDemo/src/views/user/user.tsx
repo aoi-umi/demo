@@ -162,7 +162,7 @@ export default class UserInfo extends Base {
             let req: any = {};
             let logOut = false;
             function isUpdate(newVal, oldVal) {
-                return newVal && newVal != oldVal
+                return newVal && newVal != oldVal;
             }
             let detail = this.detail;
             let updateKey = ['nickname', 'profile', 'avatar'];
@@ -296,22 +296,22 @@ export default class UserInfo extends Base {
                         }
                     </TabPane>
                     <TabPane name={myEnum.userTab.文章} label={() => {
-                        return <div>文章: {detail.article}</div>
+                        return <div>文章: {detail.article}</div>;
                     }}>
                         <ArticleView ref="articleList" notQueryOnRoute notQueryToRoute notQueryOnMounted />
                     </TabPane>
                     <TabPane name={myEnum.userTab.粉丝} label={() => {
-                        return <div>粉丝: {detail.follower}</div>
+                        return <div>粉丝: {detail.follower}</div>;
                     }}>
                         <FollowListView ref="followerList" userId={this.detail._id} followType={myEnum.followQueryType.粉丝} />
                     </TabPane>
                     <TabPane name={myEnum.userTab.关注} label={() => {
-                        return <div>关注: {detail.following}</div>
+                        return <div>关注: {detail.following}</div>;
                     }}>
                         <FollowListView ref="followingList" userId={this.detail._id} followType={myEnum.followQueryType.关注} />
                     </TabPane>
                     <TabPane name={myEnum.userTab.私信} label={() => {
-                        return <div>私信</div>
+                        return <div>私信</div>;
                     }}>
                         <ChatListView ref="chatList" />
                     </TabPane>
@@ -441,7 +441,7 @@ class FollowList extends Base {
                         <FollowButtonView user={user} />
                     </div>
                 </Card>
-            )
+            );
         });
     }
 

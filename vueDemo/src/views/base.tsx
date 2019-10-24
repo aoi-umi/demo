@@ -39,7 +39,7 @@ export class Base extends MyBase {
                         } else {
                             reso(true);
                         }
-                    })
+                    });
                 } else {
                     reso(true);
                 }
