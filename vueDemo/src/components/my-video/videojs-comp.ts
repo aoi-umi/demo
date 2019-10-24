@@ -201,7 +201,7 @@ export class DanmakuPlayer {
         }
 
         if (player.paused()) {
-            player.play()
+            player.play();
         } else {
             player.pause();
         }
@@ -245,7 +245,7 @@ export class DanmakuPlayer {
     private resizeHandler() {
         let clientWidth = this.danmakuBoard.clientWidth;
         if (this.videoWidth != clientWidth) {
-            this.player.trigger(DanmakuPlayer.Event.widthChange)
+            this.player.trigger(DanmakuPlayer.Event.widthChange);
             this.videoWidth = clientWidth;
         }
     }
@@ -301,7 +301,7 @@ export class DanmakuPlayer {
             };
             let sendSuccess = false;
             if (this.options.danmaku.sendFn)
-                sendSuccess = await this.options.danmaku.sendFn(data)
+                sendSuccess = await this.options.danmaku.sendFn(data);
             else {
                 this.danmakuPush(data);
                 sendSuccess = true;
@@ -406,6 +406,6 @@ export class DanmakuPlayer {
     }
 
     private unbindEvent() {
-        window.removeEventListener('resize', this.resizeHandler)
+        window.removeEventListener('resize', this.resizeHandler);
     }
 }

@@ -163,6 +163,6 @@ export default class VideoMgtDetail extends VideoMgtBase {
                     </MyUpload>
                 </FormItem>
             </ContentMgtDetailView>
-        )
+        );
     }
 }

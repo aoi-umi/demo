@@ -140,6 +140,6 @@ export default class ArticleMgtDetail extends ArticleMgtBase {
                         }} />
                 </FormItem>
             </ContentMgtDetailView>
-        )
+        );
     }
 }

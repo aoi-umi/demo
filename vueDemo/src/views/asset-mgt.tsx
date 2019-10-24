@@ -41,7 +41,7 @@ export class AssetMgtLog extends Base {
                 tag: ele.key,
                 key: ele.value,
                 checkable: true
-            }
+            };
         });
     }
 
@@ -96,8 +96,8 @@ export class AssetMgtLog extends Base {
                             this.$router.push({
                                 path: routerConfig.assetMgtNotify.path,
                                 query: { orderNo: detail.orderNo }
-                            })
-                        }}>{detail.orderNo}</a>
+                            });
+                        }}>{detail.orderNo}</a>;
                     }
                 }, {
                     title: '外部订单号',
@@ -124,7 +124,7 @@ export class AssetMgtLog extends Base {
                     title: '创建时间',
                     key: 'createdAt',
                     render: (h, params) => {
-                        return <span>{moment(params.row.createdAt).format(dev.dateFormat)}</span>
+                        return <span>{moment(params.row.createdAt).format(dev.dateFormat)}</span>;
                     }
                 }]}
 
@@ -216,8 +216,8 @@ export class AssetMgtNotify extends Base {
                             this.$router.push({
                                 path: routerConfig.assetMgtLog.path,
                                 query: { orderNo: detail.orderNo }
-                            })
-                        }}>{detail.orderNo}</a>
+                            });
+                        }}>{detail.orderNo}</a>;
                     }
                 }, {
                     title: '外部订单号',
@@ -249,7 +249,7 @@ export class AssetMgtNotify extends Base {
                     title: '创建时间',
                     key: 'createdAt',
                     render: (h, params) => {
-                        return <span>{moment(params.row.createdAt).format(dev.dateFormat)}</span>
+                        return <span>{moment(params.row.createdAt).format(dev.dateFormat)}</span>;
                     }
                 }]}
 

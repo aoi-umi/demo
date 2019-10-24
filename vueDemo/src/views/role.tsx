@@ -127,7 +127,7 @@ export default class Role extends Base {
                 tag: ele.key,
                 key: ele.value,
                 checkable: true
-            }
+            };
         });
     }
 

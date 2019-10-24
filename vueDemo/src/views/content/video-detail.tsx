@@ -120,7 +120,7 @@ class VideoDetailMain extends Base {
                                     return {
                                         src: ele.url,
                                         type: ele.originFileType,
-                                    }
+                                    };
                                 }),
                                 poster: detail.coverUrl,
                                 danmaku: {
@@ -136,7 +136,7 @@ class VideoDetailMain extends Base {
                     </div>
                 </div>
             </div>
-        )
+        );
     }
 }
 

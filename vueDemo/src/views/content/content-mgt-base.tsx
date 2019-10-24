@@ -456,7 +456,7 @@ export class ContentMgtDetail extends Base {
     }
 }
 
-export const ContentMgtDetailView = convClass<ContentMgtDetail>(ContentMgtDetail)
+export const ContentMgtDetailView = convClass<ContentMgtDetail>(ContentMgtDetail);
 
 
 @Component
@@ -495,7 +495,7 @@ export class ContentLogList extends Base {
                                 title: '操作时间',
                                 key: 'createdAt',
                                 render: (h, params) => {
-                                    return <span>{moment(params.row.createdAt).format(dev.dateFormat)}</span>
+                                    return <span>{moment(params.row.createdAt).format(dev.dateFormat)}</span>;
                                 }
                             }]}
                             data={log}>
@@ -507,4 +507,4 @@ export class ContentLogList extends Base {
     }
 }
 
-export const ContentLogListView = convClass<ContentLogList>(ContentLogList)
+export const ContentLogListView = convClass<ContentLogList>(ContentLogList);

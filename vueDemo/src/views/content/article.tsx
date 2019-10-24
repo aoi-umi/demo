@@ -184,7 +184,7 @@ class ArticleListItem extends Base {
                         <div />)}
                 </Card>
             </div>
-        )
+        );
     }
 }
 

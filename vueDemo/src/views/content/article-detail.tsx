@@ -77,7 +77,7 @@ class ArticleDetailMain extends Base {
                 <div class="ql-editor" domPropsInnerHTML={detail.content}>
                 </div>
             </div>
-        )
+        );
     }
 }
 

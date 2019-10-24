@@ -116,7 +116,7 @@ export default class Authority extends Base {
                 tag: ele.key,
                 key: ele.value,
                 checkable: true
-            }
+            };
         });
     }
 
