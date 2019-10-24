@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import Router, { RouteConfig } from 'vue-router';
 import { getModule } from 'vuex-module-decorators';
+import iview from "iview";
+const ViewUI = iview as any;
 
 import { authority, error, dev } from './config';
 import store from './store';
@@ -222,6 +224,7 @@ const router = new Router({
     routes,
 });
 router.beforeEach((to, from, next) => {
+    ViewUI.LoadingBar.start();
     if (to.path == routerConfig.index.path) {
         return next(routerConfig.article.path);
     }
@@ -232,5 +235,8 @@ router.beforeEach((to, from, next) => {
     }
     next();
 
+});
+router.afterEach(route => {
+    ViewUI.LoadingBar.finish();
 });
 export default router;
