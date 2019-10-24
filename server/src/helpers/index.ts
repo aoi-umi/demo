@@ -8,7 +8,7 @@ import { configure, getLogger } from 'log4js';
 
 import * as common from '../_system/common';
 import * as config from '../config';
-import * as VaildSchema from '../vaild-schema/class-valid';
+import * as ValidSchema from '../valid-schema/class-valid';
 import { valid } from './class-valid';
 
 export const logger = getLogger();
@@ -93,7 +93,7 @@ export function paramsValid(data, schema?) {
         throw common.error('', config.error.ARGS_ERROR, { remark: err.join(';') });
     }
 
-    if (rtnData instanceof VaildSchema.ListBase) {
+    if (rtnData instanceof ValidSchema.ListBase) {
         if (!rtnData.page)
             rtnData.page = 1;
         if (!rtnData.rows)
@@ -111,12 +111,12 @@ export function paramsValid(data, schema?) {
  */
 export let mongooseValid = function (dict: { [key: string]: MongooseDocument }) {
     let list = [];
-    let invaild = false;
+    let invalid = false;
     for (let key in dict) {
         let ele = dict[key];
         let err: any = ele.validateSync();
         if (err && err.errors) {
-            invaild = true;
+            invalid = true;
             let subList = [];
             for (let errorKey in err.errors) {
                 let error: Error.ValidatorError = err.errors[errorKey];
@@ -125,7 +125,7 @@ export let mongooseValid = function (dict: { [key: string]: MongooseDocument }) 
             list.push(`[${key}] errors:` + subList.join(';'));
         }
     }
-    if (invaild) {
+    if (invalid) {
         throw common.error({ remark: list.join('#') }, config.error.ARGS_ERROR);
     }
 }

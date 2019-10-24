@@ -4,14 +4,14 @@ import { transaction } from '@/_system/dbMongo';
 import { error } from '@/_system/common';
 import { myEnum } from '@/config';
 import { responseHandler, paramsValid } from '@/helpers';
-import * as VaildSchema from '@/vaild-schema/class-valid';
+import * as ValidSchema from '@/valid-schema/class-valid';
 import { FollowMapper } from '@/models/mongo/follow';
 import { UserModel, UserMapper } from '@/models/mongo/user';
 
 export let save: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = paramsValid(req.body, VaildSchema.FollowSave);
+        let data = paramsValid(req.body, ValidSchema.FollowSave);
         if (user.equalsId(data.userId)) {
             throw error('不能关注自己');
         }
@@ -44,7 +44,7 @@ export let save: RequestHandler = (req, res) => {
 export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = paramsValid(req.query, VaildSchema.FollowQuery);
+        let data = paramsValid(req.query, ValidSchema.FollowQuery);
         let { rows, total } = await FollowMapper.query(data, { user, imgHost: req.myData.imgHost });
         return {
             rows,

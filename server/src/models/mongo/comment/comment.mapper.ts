@@ -1,6 +1,6 @@
 import { Types } from 'mongoose';
 
-import * as VaildSchema from '@/vaild-schema/class-valid';
+import * as ValidSchema from '@/valid-schema/class-valid';
 import { Auth } from '@/_system/auth';
 import * as common from '@/_system/common';
 import * as config from '@/config';
@@ -23,7 +23,7 @@ type CommentResetOption = {
     voteList?: VoteInstanceType[];
 };
 export class CommentMapper {
-    static async create(data: VaildSchema.CommentSubmit, type, user: LoginUser) {
+    static async create(data: ValidSchema.CommentSubmit, type, user: LoginUser) {
         let lastComment = await CommentModel.findOne({ ownerId: data.ownerId }).sort({ floor: -1 });
         let quote: CommentInstanceType;
         if (data.quoteId)
@@ -45,7 +45,7 @@ export class CommentMapper {
         return comment;
     }
 
-    static async query(data: VaildSchema.CommentQuery, opt: {
+    static async query(data: ValidSchema.CommentQuery, opt: {
         resetOpt?: CommentResetOption,
     }) {
         let match: any;

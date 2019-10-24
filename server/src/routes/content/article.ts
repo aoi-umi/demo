@@ -4,19 +4,19 @@ import { responseHandler, paramsValid } from '@/helpers';
 import { myEnum } from '@/config';
 import * as config from '@/config';
 import { Auth } from '@/_system/auth';
-import * as VaildSchema from '@/vaild-schema/class-valid';
+import * as ValidSchema from '@/valid-schema/class-valid';
 
 import { ArticleModel, ArticleMapper } from '@/models/mongo/article';
 
 /**
  * @api {get} /article/mgt/query mgt query
  * @apiGroup article
- * @apiParamClass (src/vaild-schema/class-valid/article.ts) {AritcleQuery}
+ * @apiParamClass (src/valid-schema/class-valid/article.ts) {AritcleQuery}
  */
 export let mgtQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = paramsValid(req.query, VaildSchema.ArticleQuery);
+        let data = paramsValid(req.query, ValidSchema.ArticleQuery);
 
         let { rows, total } = await ArticleMapper.query(data, {
             userId: user._id,
@@ -36,7 +36,7 @@ export let mgtQuery: RequestHandler = (req, res) => {
 export let mgtDetailQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = paramsValid(req.query, VaildSchema.ArticleDetailQuery);
+        let data = paramsValid(req.query, ValidSchema.ArticleDetailQuery);
         let rs = await ArticleMapper.detailQuery({ _id: data._id }, {
             userId: user._id,
             audit: Auth.contains(user, config.auth.articleMgtAudit),
@@ -52,12 +52,12 @@ export let mgtDetailQuery: RequestHandler = (req, res) => {
 /**
  * @api {post} /article/mgt/save mgt save
  * @apiGroup article
- * @apiParamClass (src/vaild-schema/class-valid/article.ts) {AritcleSave}
+ * @apiParamClass (src/valid-schema/class-valid/article.ts) {AritcleSave}
  */
 export let mgtSave: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = paramsValid(req.body, VaildSchema.ArticleSave);
+        let data = paramsValid(req.body, ValidSchema.ArticleSave);
         let detail = await ArticleMapper.mgtSave(data, { user });
         return {
             _id: detail._id
@@ -68,7 +68,7 @@ export let mgtSave: RequestHandler = (req, res) => {
 export let mgtDel: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = paramsValid(req.body, VaildSchema.ArticleDel);
+        let data = paramsValid(req.body, ValidSchema.ArticleDel);
         await ArticleMapper.updateStatus({
             idList: data.idList, toStatus: myEnum.articleStatus.已删除, user,
             includeUserId: Auth.contains(user, config.auth.articleMgtDel) ? null : user._id,
@@ -81,7 +81,7 @@ export let mgtDel: RequestHandler = (req, res) => {
 export let mgtAudit: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = paramsValid(req.body, VaildSchema.ArticleMgtAudit);
+        let data = paramsValid(req.body, ValidSchema.ArticleMgtAudit);
         let rs = await ArticleMapper.updateStatus({
             idList: data.idList,
             toStatus: data.status, user,
@@ -96,7 +96,7 @@ export let mgtAudit: RequestHandler = (req, res) => {
 export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = paramsValid(req.query, VaildSchema.ArticleQuery);
+        let data = paramsValid(req.query, ValidSchema.ArticleQuery);
 
         let { rows, total } = await ArticleMapper.query(data, {
             normal: true,
@@ -115,7 +115,7 @@ export let query: RequestHandler = (req, res) => {
 export let detailQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = paramsValid(req.query, VaildSchema.ArticleDetailQuery);
+        let data = paramsValid(req.query, ValidSchema.ArticleDetailQuery);
         let rs = await ArticleMapper.detailQuery({ _id: data._id }, {
             normal: true,
             resetOpt: {

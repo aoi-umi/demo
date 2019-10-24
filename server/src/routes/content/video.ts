@@ -4,7 +4,7 @@ import { responseHandler, paramsValid } from '@/helpers';
 import { myEnum } from '@/config';
 import * as config from '@/config';
 import { Auth } from '@/_system/auth';
-import * as VaildSchema from '@/vaild-schema/class-valid';
+import * as ValidSchema from '@/valid-schema/class-valid';
 
 import { VideoMapper, VideoModel } from '@/models/mongo/video';
 
@@ -12,7 +12,7 @@ export let mgtQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let myData = req.myData;
         let user = myData.user;
-        let data = paramsValid(req.query, VaildSchema.VideoQuery);
+        let data = paramsValid(req.query, ValidSchema.VideoQuery);
 
         let { rows, total } = await VideoMapper.query(data, {
             userId: user._id,
@@ -33,7 +33,7 @@ export let mgtDetailQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let myData = req.myData;
         let user = myData.user;
-        let data = paramsValid(req.query, VaildSchema.VideoDetailQuery);
+        let data = paramsValid(req.query, ValidSchema.VideoDetailQuery);
         let rs = await VideoMapper.detailQuery({ _id: data._id }, {
             userId: user._id,
             audit: Auth.contains(user, config.auth.videoMgtAudit),
@@ -50,7 +50,7 @@ export let mgtDetailQuery: RequestHandler = (req, res) => {
 export let mgtSave: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = paramsValid(req.body, VaildSchema.VideoSave);
+        let data = paramsValid(req.body, ValidSchema.VideoSave);
         let detail = await VideoMapper.mgtSave(data, { user });
         return {
             _id: detail._id
@@ -61,7 +61,7 @@ export let mgtSave: RequestHandler = (req, res) => {
 export let mgtDel: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = paramsValid(req.body, VaildSchema.VideoDel);
+        let data = paramsValid(req.body, ValidSchema.VideoDel);
         await VideoMapper.updateStatus({
             idList: data.idList, toStatus: myEnum.videoStatus.已删除, user,
             includeUserId: Auth.contains(user, config.auth.videoMgtDel) ? null : user._id,
@@ -74,7 +74,7 @@ export let mgtDel: RequestHandler = (req, res) => {
 export let mgtAudit: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = paramsValid(req.body, VaildSchema.VideoMgtAudit);
+        let data = paramsValid(req.body, ValidSchema.VideoMgtAudit);
         let rs = await VideoMapper.updateStatus({
             idList: data.idList,
             toStatus: data.status, user,
@@ -90,7 +90,7 @@ export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let myData = req.myData;
         let user = myData.user;
-        let data = paramsValid(req.query, VaildSchema.VideoQuery);
+        let data = paramsValid(req.query, ValidSchema.VideoQuery);
 
         let { rows, total } = await VideoMapper.query(data, {
             normal: true,
@@ -110,7 +110,7 @@ export let detailQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let myData = req.myData;
         let user = myData.user;
-        let data = paramsValid(req.query, VaildSchema.VideoDetailQuery);
+        let data = paramsValid(req.query, ValidSchema.VideoDetailQuery);
         let rs = await VideoMapper.detailQuery({ _id: data._id }, {
             normal: true,
             resetOpt: {

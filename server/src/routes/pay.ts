@@ -6,14 +6,14 @@ import { myEnum } from '@/config';
 import { ThirdPartyPayMapper } from '@/3rd-party';
 import { SendQueue } from '@/task';
 import { error } from '@/_system/common';
-import * as VaildSchema from '@/vaild-schema/class-valid';
+import * as ValidSchema from '@/valid-schema/class-valid';
 
 import { PayModel, AssetLogModel, PayMapper } from '@/models/mongo/asset';
 
 export let create: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = paramsValid(req.body, VaildSchema.PayCreate);
+        let data = paramsValid(req.body, ValidSchema.PayCreate);
         let pay = new PayModel({
             ...data,
             userId: user._id,
@@ -35,7 +35,7 @@ export let create: RequestHandler = (req, res) => {
 export let submit: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = paramsValid(req.body, VaildSchema.PaySubmit);
+        let data = paramsValid(req.body, ValidSchema.PaySubmit);
         let pay = await PayModel.findOne({ _id: data._id, userId: user._id });
         let assetLog = await AssetLogModel.findById(pay.assetLogId);
         return {
@@ -47,14 +47,14 @@ export let submit: RequestHandler = (req, res) => {
 export let cancel: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = paramsValid(req.body, VaildSchema.PayCancel);
+        let data = paramsValid(req.body, ValidSchema.PayCancel);
         return PayMapper.cancel(data, { user });
     }, req, res);
 };
 
 export let query: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let data = paramsValid(req.query, VaildSchema.PayQuery);
+        let data = paramsValid(req.query, ValidSchema.PayQuery);
         let rs = await PayMapper.query(data, { user: req.myData.user, imgHost: req.myData.imgHost });
         return { rows: rs.rows, total: rs.total };
     }, req, res);
@@ -63,7 +63,7 @@ export let query: RequestHandler = (req, res) => {
 export let refundApply: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = paramsValid(req.body, VaildSchema.PayRefundApply);
+        let data = paramsValid(req.body, ValidSchema.PayRefundApply);
         let rs = await PayMapper.refundApply(data, { user });
         return rs.pay;
     }, req, res);
@@ -72,7 +72,7 @@ export let refundApply: RequestHandler = (req, res) => {
 export let refund: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = paramsValid(req.body, VaildSchema.PayRefund);
+        let data = paramsValid(req.body, ValidSchema.PayRefund);
         let rs = await ThirdPartyPayMapper.refund({ _id: data._id });
         return rs.pay;
     }, req, res);

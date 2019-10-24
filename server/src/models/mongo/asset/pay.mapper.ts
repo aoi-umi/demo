@@ -1,6 +1,6 @@
 
 
-import * as VaildSchema from '@/vaild-schema/class-valid';
+import * as ValidSchema from '@/valid-schema/class-valid';
 import { Auth } from '@/_system/auth';
 import { escapeRegExp, error } from '@/_system/common';
 import * as helpers from '@/helpers';
@@ -17,7 +17,7 @@ import { transaction } from '@/_system/dbMongo';
 import { RefundModel } from './refund';
 
 export class PayMapper {
-    static async query(data: VaildSchema.PayQuery, opt: {
+    static async query(data: ValidSchema.PayQuery, opt: {
         user: LoginUser
         imgHost?: string;
     }) {
@@ -88,7 +88,7 @@ export class PayMapper {
         return detail;
     }
 
-    static async cancel(data: VaildSchema.PayCancel, opt: { auto?: boolean, user?: LoginUser }) {
+    static async cancel(data: ValidSchema.PayCancel, opt: { auto?: boolean, user?: LoginUser }) {
         let { user, auto } = opt;
         let match: any = { _id: data._id };
         if (!auto)
@@ -118,7 +118,7 @@ export class PayMapper {
         }
     }
 
-    static async refundApply(data: VaildSchema.PayRefundApply, opt: { user: LoginUser }) {
+    static async refundApply(data: ValidSchema.PayRefundApply, opt: { user: LoginUser }) {
         let { user } = opt;
         let pay = await PayMapper.queryOne({ _id: data._id, userId: user._id });
         if (!pay.canRefundApply)

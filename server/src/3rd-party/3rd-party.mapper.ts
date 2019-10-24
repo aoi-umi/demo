@@ -7,7 +7,7 @@ import * as common from "@/_system/common";
 import { AssetLogModel, PayInstanceType, AssetLogInstanceType, PayModel, PayMapper } from "@/models/mongo/asset";
 import { NotifyMapper, NotifyInstanceType, NotifyModel } from "@/models/mongo/notify";
 
-import { PayRefund } from "@/vaild-schema/class-valid";
+import { PayRefund } from "@/valid-schema/class-valid";
 import { RefundModel } from "@/models/mongo/asset/refund";
 import { transaction } from "@/_system/dbMongo";
 import { alipayInst } from "./alipay";

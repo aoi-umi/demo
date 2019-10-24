@@ -6,7 +6,7 @@ import { responseHandler, paramsValid, } from '@/helpers';
 import { myEnum } from '@/config';
 import * as config from '@/config';
 import { cache } from '@/_main';
-import * as VaildSchema from '@/vaild-schema/class-valid';
+import * as ValidSchema from '@/valid-schema/class-valid';
 
 import { UserModel, UserMapper, UserLogMapper } from '@/models/mongo/user';
 import { FileMapper } from '@/models/mongo/file';
@@ -15,7 +15,7 @@ import { FollowModel, FollowInstanceType, FollowMapper } from '@/models/mongo/fo
 
 export let accountExists: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let data = paramsValid(req.body, VaildSchema.UserAccountExists);
+        let data = paramsValid(req.body, ValidSchema.UserAccountExists);
         let rs = await UserMapper.accountExists(data.account);
         return rs && { _id: rs._id };
     }, req, res);
@@ -23,7 +23,7 @@ export let accountExists: RequestHandler = (req, res) => {
 
 export let signUp: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let data = paramsValid(req.body, VaildSchema.UserSignUp);
+        let data = paramsValid(req.body, ValidSchema.UserSignUp);
         let rs = await UserMapper.accountExists(data.account);
         if (rs)
             throw common.error('账号已存在');
@@ -39,7 +39,7 @@ export let signUp: RequestHandler = (req, res) => {
 
 export let signIn: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let data = paramsValid(req.body, VaildSchema.UserSignIn);
+        let data = paramsValid(req.body, ValidSchema.UserSignIn);
         let token = req.myData.user.key;
         let { user, disableResult } = await UserMapper.accountCheck(data.account);
 
@@ -84,7 +84,7 @@ export let detail: RequestHandler = (req, res) => {
 export let detailQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = paramsValid(req.query, VaildSchema.UserDetailQuery);
+        let data = paramsValid(req.query, ValidSchema.UserDetailQuery);
 
         let detail = await UserModel.findById(data._id, { password: 0, roleList: 0, authorityList: 0 });
         if (!detail)
@@ -113,7 +113,7 @@ export let detailQuery: RequestHandler = (req, res) => {
 
 export let update: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let data = paramsValid(req.body, VaildSchema.UserUpdate);
+        let data = paramsValid(req.body, ValidSchema.UserUpdate);
         let user = req.myData.user;
         let { token, ...restData } = data;
         let updateCache: any = common.getDataInKey(restData, ['avatar', 'nickname', 'profile']);
@@ -146,7 +146,7 @@ export let update: RequestHandler = (req, res) => {
 
 export let mgtQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let data = paramsValid(req.query, VaildSchema.UserMgtQuery);
+        let data = paramsValid(req.query, ValidSchema.UserMgtQuery);
         let { rows, total } = await UserMapper.query({
             ...data, includeDelAuth: true
         }, { imgHost: req.myData.imgHost });
@@ -163,7 +163,7 @@ export let mgtQuery: RequestHandler = (req, res) => {
 export let mgtSave: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = paramsValid(req.body, VaildSchema.UserMgtSave);
+        let data = paramsValid(req.body, ValidSchema.UserMgtSave);
         let detail = await UserModel.findById(data._id);
         if (!detail.canEdit)
             throw common.error('不可修改此账号');
@@ -204,7 +204,7 @@ export let mgtSave: RequestHandler = (req, res) => {
 export let mgtDisable: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let user = req.myData.user;
-        let data = paramsValid(req.body, VaildSchema.UserMgtDisable);
+        let data = paramsValid(req.body, ValidSchema.UserMgtDisable);
         let detail = await UserModel.findById(data._id);
         if (!detail.canEdit)
             throw common.error('不可禁用此账号');

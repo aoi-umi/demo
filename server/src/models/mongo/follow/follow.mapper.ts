@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 
 import { myEnum } from "@/config";
-import * as VaildSchema from '@/vaild-schema/class-valid';
+import * as ValidSchema from '@/valid-schema/class-valid';
 import { escapeRegExp } from "@/_system/common";
 
 import { LoginUser } from "../../login-user";
@@ -61,7 +61,7 @@ export class FollowMapper {
         };
     }
 
-    static async query(data: VaildSchema.FollowQuery, opt: { user: LoginUser, imgHost?: string }) {
+    static async query(data: ValidSchema.FollowQuery, opt: { user: LoginUser, imgHost?: string }) {
         let { user } = opt;
         let cond: any = {
             status: myEnum.followStatus.已关注
