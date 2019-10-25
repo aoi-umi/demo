@@ -130,3 +130,9 @@ router.get('/img', UserAuthMid.normal(), file.imgGet);
 router.post('/video/upload', UserAuthMid.normal([auth.login]), FileMid.single, file.videoUpload);
 router.get('/video', file.vedioGet);
 //#endregion
+
+//#region goods 
+import * as goods from './goods';
+router.post('/goods/mgtSave', UserAuthMid.normal([auth.login]), goods.mgtSave);
+router.get('/goods/mgtDetailQuery', UserAuthMid.normal([auth.login]), goods.mgtDetailQuery);
+//#endregion
