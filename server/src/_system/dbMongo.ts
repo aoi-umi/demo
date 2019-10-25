@@ -101,7 +101,7 @@ export type MongoOpt = {
     options?: ConnectionOptions
 }
 export async function init(mongoOpt: MongoOpt) {
-    mongooseTsConfig.schemaOptions = { timestamps: true };
+    mongooseTsConfig.schemaOptions = { timestamps: true, versionKey: false };
     mongooseTsConfig.toCollectionName = common.stringToLowerCaseWithUnderscore;
     await mongoose.connect(mongoOpt.uri, mongoOpt.options);
 }

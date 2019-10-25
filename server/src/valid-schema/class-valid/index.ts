@@ -14,3 +14,4 @@ export * from './user';
 export * from './vote';
 export * from './video';
 export * from './danmaku';
+export * from './goods';

@@ -28,7 +28,7 @@ export class GoodsSku extends Base {
     })
     name: string;
 
-    @prop({
+    @arrayProp({
         required: true,
         type: String,
     })
