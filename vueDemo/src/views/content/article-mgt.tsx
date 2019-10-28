@@ -57,13 +57,7 @@ export default class ArticleMgt extends ArticleMgtBase implements IListBase {
     $refs: { list: IMyList<any> };
 
     protected created() {
-        this.statusList = myEnum.articleStatus.toArray().map(ele => {
-            return {
-                tag: ele.key,
-                key: ele.value,
-                checkable: true
-            };
-        });
+        this.statusList = convert.ViewModel.enumToTagArray(myEnum.articleStatus);
     }
 
     mounted() {

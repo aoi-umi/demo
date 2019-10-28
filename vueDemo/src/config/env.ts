@@ -233,6 +233,22 @@ const config = {
                     url: '/asset/notifyRetry',
                 },
 
+
+                goodsMgtQuery: {
+                    url: '/goods/mgt/query',
+                    method: 'get',
+                },
+                goodsMgtDetailQuery: {
+                    url: '/goods/mgt/detailQuery',
+                    method: 'get',
+                },
+                goodsMgtSave: {
+                    url: '/goods/mgt/save',
+                },
+                goodsMgtDel: {
+                    url: '/goods/mgt/del',
+                },
+
                 //file
                 imgUpload: {
                     url: '/img/upload'

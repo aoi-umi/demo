@@ -75,6 +75,11 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
     assetNotifyQuery,
     assetNotifyRetry,
 
+    goodsMgtQuery,
+    goodsMgtDetailQuery,
+    goodsMgtSave,
+    goodsMgtDel,
+
     //file
     imgUpload,
     imgGet,
@@ -364,6 +369,25 @@ export class TestApi extends ApiModel<TestApiMethod> {
     async assetNotifyRetry(data) {
         return this.requestByConfig<ListResult>(this.apiConfig.method.assetNotifyRetry, { data });
     }
+    //#endregion
+
+    //#region goods 
+
+    async goodsMgtQuery(data) {
+        return this.requestByConfig(this.apiConfig.method.goodsMgtQuery, { data });
+    }
+
+    async goodsMgtDetailQuery(data) {
+        return this.requestByConfig(this.apiConfig.method.goodsMgtDetailQuery, { data });
+    }
+
+    async goodsMgtSave(data) {
+        return this.requestByConfig(this.apiConfig.method.goodsMgtSave, { data });
+    }
+    async goodsMgtDel(data) {
+        return this.requestByConfig(this.apiConfig.method.goodsMgtDel, { data });
+    }
+
     //#endregion
 }
 

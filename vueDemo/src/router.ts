@@ -51,6 +51,15 @@ export const routerConfig = {
         component: () => import('./views/user/user-sign').then(t => t.SignUpView)
     },
 
+    goodsMgt: {
+        path: '/goodsMgt',
+        text: '商品管理',
+        component: () => import('./views/goods/goods-mgt'),
+        meta: {
+            authority: [authority.login],
+        },
+    },
+
     admin: {
         path: adminPath,
         text: '管理',

@@ -17,6 +17,8 @@ export default {
     articleMgtAudit: 'articleMgtAudit',
     videoMgtDel: 'videoMgtDel',
     videoMgtAudit: 'videoMgtAudit',
+
+    goodsMgtAudit: 'goodsMgtAudit',
     payMgtQuery: 'payMgtQuery',
     payMgtOperate: 'payMgtOperate',
 };

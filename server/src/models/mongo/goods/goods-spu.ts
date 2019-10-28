@@ -51,6 +51,11 @@ export class GoodsSpu extends Base {
     })
     status: number;
 
+    @prop()
+    get statusText() {
+        return myEnum.goodsStatus.getKey(this.status);
+    }
+
     //上架时间
     @prop({
         required: true

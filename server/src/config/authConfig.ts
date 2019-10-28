@@ -73,6 +73,10 @@ export const authConfig = {
         code: 'commentMgtDel'
     },
 
+    goodsMgtAudit: {
+        code: 'goodsMgtAudit'
+    },
+
     payMgtQuery: {
         code: 'payMgtQuery'
     },

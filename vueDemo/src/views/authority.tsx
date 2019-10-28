@@ -111,13 +111,7 @@ export default class Authority extends Base {
     $refs: { list: IMyList<any> };
 
     protected created() {
-        this.statusList = myEnum.authorityStatus.toArray().map(ele => {
-            return {
-                tag: ele.key,
-                key: ele.value,
-                checkable: true
-            };
-        });
+        this.statusList = convert.ViewModel.enumToTagArray(myEnum.authorityStatus);
     }
 
     mounted() {

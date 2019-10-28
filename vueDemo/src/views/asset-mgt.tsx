@@ -36,13 +36,7 @@ export default class AssetMgt extends Base {
 export class AssetMgtLog extends Base {
     $refs: { list: IMyList<any> };
     protected created() {
-        this.statusList = myEnum.assetLogStatus.toArray().map(ele => {
-            return {
-                tag: ele.key,
-                key: ele.value,
-                checkable: true
-            };
-        });
+        this.statusList = convert.ViewModel.enumToTagArray(myEnum.assetLogStatus);
     }
 
     mounted() {

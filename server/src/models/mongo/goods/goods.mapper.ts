@@ -5,12 +5,14 @@ import * as config from '@/config';
 import { myEnum } from '@/config';
 import * as ValidSchema from '@/valid-schema/class-valid';
 import { error, escapeRegExp } from '@/_system/common';
+import { transaction } from '@/_system/dbMongo';
 import { LoginUser } from '@/models/login-user';
 
 import { GoodsSpuModel, GoodsSpuInstanceType } from './goods-spu';
 import { GoodsSpecGroupModel, GoodsSpecGroupInstanceType } from './goods-spec-group';
 import { GoodsSkuModel, GoodsSkuInstanceType } from './goods-sku';
-import { transaction } from '@/_system/dbMongo';
+import { BaseMapper } from '../_base';
+import { FileMapper } from '../file';
 
 type DetailType = {
     spu: GoodsSpuInstanceType,
@@ -18,7 +20,7 @@ type DetailType = {
     sku: GoodsSkuInstanceType[]
 };
 export class GoodsMapper {
-    static async save(data: ValidSchema.GoodsSave, opt: {
+    static async mgtSave(data: ValidSchema.GoodsSave, opt: {
         user: LoginUser
     }) {
         let { user } = opt;
@@ -80,5 +82,45 @@ export class GoodsMapper {
             specGroup,
             sku
         } as DetailType;
+    }
+
+    static async query(data: ValidSchema.GoodsQuery, opt: {
+        audit?: boolean;
+        user: LoginUser,
+        resetOpt: {
+            imgHost?: string;
+        },
+    }) {
+        let { user } = opt;
+        let match: any = {};
+        if (data.status)
+            match.status = { $in: data.status.split(',') };
+        if (data.name)
+            match.name = new RegExp(escapeRegExp(data.name), 'i');
+        if (!opt.audit) {
+            match.userId = user._id;
+        }
+        let rs = await GoodsSpuModel.findAndCountAll({
+            conditions: match,
+            ...BaseMapper.getListOptions(data)
+        });
+        return {
+            rows: rs.rows.map(ele => {
+                let obj = ele.toJSON();
+                this.resetSpu(obj, opt.resetOpt);
+                return obj;
+            }),
+            total: rs.total
+        };
+    }
+
+    static resetSpu(detail, opt: {
+        imgHost?: string;
+    }) {
+        if (opt.imgHost) {
+            detail.imgUrls = detail.imgs.map(ele => {
+                return FileMapper.getImgUrl(ele, opt.imgHost);
+            });
+        }
     }
 }
