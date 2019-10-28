@@ -232,6 +232,18 @@ class MyList<QueryArgs extends QueryArgsType> extends MyBase {
                 this.$set(this.model.query, key, data[key]);
         });
     }
+    setModel(data, opt: {
+        queryKeyList?: string[];
+        toListModel?: (data, model: MyListModel) => any;
+    }) {
+        if (opt.queryKeyList) {
+            this.setQueryByKey(data, opt.queryKeyList);
+        }
+        if (opt.toListModel) {
+            opt.toListModel(data, this.model);
+        }
+    }
+
     result: ResultType = {
         success: true,
         total: 0,
@@ -329,22 +341,22 @@ class MyList<QueryArgs extends QueryArgsType> extends MyBase {
                             }
                             return !ele.hide;
                         })}
-                        data={this.result.data} no-data-text={this.result.msg}
-                        on-on-selection-change={this.setSelectedRows}
-                        on-on-sort-change={(opt: OnSortChangeOptions) => {
-                            let sortMap = {
-                                asc: 1,
-                                desc: -1
-                            };
-                            let orderBy, sortOrder = sortMap[opt.order];
-                            if (sortOrder)
-                                orderBy = opt.key;
-                            this.model.setSort({
-                                orderBy,
-                                sortOrder,
-                            });
-                            this.handleQuery({ resetPage: true });
-                        }}>
+                            data={this.result.data} no-data-text={this.result.msg}
+                            on-on-selection-change={this.setSelectedRows}
+                            on-on-sort-change={(opt: OnSortChangeOptions) => {
+                                let sortMap = {
+                                    asc: 1,
+                                    desc: -1
+                                };
+                                let orderBy, sortOrder = sortMap[opt.order];
+                                if (sortOrder)
+                                    orderBy = opt.key;
+                                this.model.setSort({
+                                    orderBy,
+                                    sortOrder,
+                                });
+                                this.handleQuery({ resetPage: true });
+                            }}>
                         </Table> :
                         this.customRenderFn(this.result)
                     }

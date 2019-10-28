@@ -8,7 +8,7 @@ import {
 import * as style from '@/components/style';
 
 import { testApi, testSocket } from './api';
-import { dev, authority } from './config';
+import { dev, authority, env } from './config';
 const routeConfig = router.routerConfig;
 import "./App.less";
 import { SignInView } from './views/user/user-sign';
@@ -55,6 +55,7 @@ export default class App extends Base {
 
     setTitle() {
         this.title = this.$route.meta.title || '';
+        document.title = this.title || env.title;
     }
     async getUserInfo() {
         let token = localStorage.getItem(dev.cacheKey.testUser);
@@ -183,6 +184,11 @@ export default class App extends Base {
         icon: 'md-stats',
         text: routeConfig.assetMgt.text,
         show: () => this.storeUser.user.hasAuth(routeConfig.assetMgt.meta.authority)
+    }, {
+        to: routeConfig.goodsMgt.path,
+        icon: 'md-nutrition',
+        text: routeConfig.goodsMgt.text,
+        show: () => this.storeUser.user.hasAuth(routeConfig.goodsMgt.meta.authority)
     },];
 
     private siderWidth = 180;

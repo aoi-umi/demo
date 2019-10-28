@@ -82,11 +82,11 @@ export const enumDefine = {
     goodsStatus: {
         下架: 0,
         上架: 1,
+        已删除: -1,
     },
     goodsSkuStatus: {
         下架: 0,
         上架: 1,
-        无: 2,
     },
 
     socket: {

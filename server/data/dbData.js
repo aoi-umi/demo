@@ -47,6 +47,10 @@ var authority = {
         name: '评论管理删除'
     },
 
+    goodsMgtAudit: {
+        name: '商品管理审核'
+    },
+
     payMgtQuery: {
         name: '支付管理查询'
     },

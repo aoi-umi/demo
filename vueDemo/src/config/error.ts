@@ -12,6 +12,7 @@ export const errConfig = {
         msg: '页面走丢了'
     }
 };
+export default errConfig;
 
 export function getErrorCfgByCode(code: any) {
     if (!code)

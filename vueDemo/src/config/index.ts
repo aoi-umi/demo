@@ -1,6 +1,5 @@
 export { default as env } from './env';
 export { default as authority } from './authority';
-import * as _dev from './dev';
-export const dev = _dev;
-export { errConfig as error } from './error';
+export { default as dev } from './dev';
+export { default as error } from './error';
 export { myEnum } from './enum';

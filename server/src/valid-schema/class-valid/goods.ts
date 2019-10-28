@@ -3,7 +3,7 @@ import { IsDefined, IsIn, IsArray, ArrayMinSize, ValidateNested } from "class-va
 import { Types } from 'mongoose';
 import { myEnum } from "@/config";
 import { objectIdTransform } from "./util";
-import { DetailQueryBase } from "./base";
+import { DetailQueryBase, ListBase } from "./base";
 
 class Spu {
     @Transform(objectIdTransform)
@@ -87,4 +87,9 @@ export class GoodsSave {
 }
 
 export class GoodsDetailQuery extends DetailQueryBase {
+}
+
+export class GoodsQuery extends ListBase {
+    status: string;
+    name: string;
 }

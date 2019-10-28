@@ -57,13 +57,7 @@ export default class VideoMgt extends VideoMgtBase implements IListBase {
     $refs: { list: IMyList<any> };
 
     protected created() {
-        this.statusList = myEnum.videoStatus.toArray().map(ele => {
-            return {
-                tag: ele.key,
-                key: ele.value,
-                checkable: true
-            };
-        });
+        this.statusList = convert.ViewModel.enumToTagArray(myEnum.videoStatus);
     }
 
     mounted() {
@@ -81,7 +75,7 @@ export default class VideoMgt extends VideoMgtBase implements IListBase {
         let list = this.$refs.list;
         let query = this.$route.query;
         list.setQueryByKey(query, ['user', 'title', 'anyKey']);
-        let status = this.$route.query.status as string;
+        let status = query.status as string;
         let statusList = status ? status.split(',') : [];
         this.statusList.forEach(ele => {
             ele.checked = statusList.includes(ele.key.toString());

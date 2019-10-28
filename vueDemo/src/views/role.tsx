@@ -122,13 +122,7 @@ export default class Role extends Base {
     $refs: { list: IMyList<any> };
 
     protected created() {
-        this.statusList = myEnum.roleStatus.toArray().map(ele => {
-            return {
-                tag: ele.key,
-                key: ele.value,
-                checkable: true
-            };
-        });
+        this.statusList = convert.ViewModel.enumToTagArray(myEnum.roleStatus);
     }
 
     mounted() {

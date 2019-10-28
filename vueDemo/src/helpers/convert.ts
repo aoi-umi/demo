@@ -1,3 +1,5 @@
+import { EnumInstance } from 'enum-ts';
+
 import { MyListModel } from '@/components/my-list';
 
 export class Test {
@@ -15,5 +17,17 @@ export class Test {
             orderBy: model.sort.orderBy,
             sortOrder: model.sort.sortOrder,
         };
+    }
+}
+
+export class ViewModel {
+    static enumToTagArray(en: EnumInstance<any, any>) {
+        return en.toArray().map(ele => {
+            return {
+                tag: ele.key,
+                key: ele.value,
+                checkable: true
+            };
+        });
     }
 }
