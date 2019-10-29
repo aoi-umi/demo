@@ -76,4 +76,5 @@ export abstract class ContentBase extends Base implements IVoteOwner {
     publishAt: Date;
 
     abstract get canUpdate(): boolean;
+    abstract get canDel(): boolean;
 }

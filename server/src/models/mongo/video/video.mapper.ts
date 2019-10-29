@@ -117,7 +117,7 @@ export class VideoMapper {
         let { user } = opt;
         if (user) {
             let rs = {
-                canDel: detail.status !== myEnum.videoStatus.已删除 && (user.equalsId(detail.userId) || Auth.contains(user, config.auth.articleMgtAudit)),
+                canDel: detail.canDel && (user.equalsId(detail.userId) || Auth.contains(user, config.auth.articleMgtAudit)),
                 canUpdate: detail.canUpdate && user.equalsId(detail.userId),
             };
             detail.canDel = rs.canDel;

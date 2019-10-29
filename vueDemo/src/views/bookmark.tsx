@@ -149,7 +149,7 @@ export default class Bookmark extends Base {
     delIds = [];
     async delClick() {
         await this.operateHandler('删除', async () => {
-            await testApi.bookmarkDel(this.delIds);
+            await testApi.bookmarkDel({ idList: this.delIds });
             this.delIds = [];
             this.delShow = false;
             this.query();

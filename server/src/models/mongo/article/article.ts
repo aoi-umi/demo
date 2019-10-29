@@ -37,6 +37,11 @@ export class Article extends ContentBase {
     get canUpdate() {
         return [myEnum.articleStatus.草稿, myEnum.articleStatus.审核不通过].includes(this.status);
     }
+
+    @prop()
+    get canDel() {
+        return ![myEnum.articleStatus.已删除].includes(this.status);
+    }
 }
 
 export const ArticleModel = getModelForClass<Article, typeof Article>(Article);

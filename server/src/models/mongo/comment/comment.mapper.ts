@@ -80,17 +80,18 @@ export class CommentMapper {
                 ...data,
             }),
         });
+        let commentList = rs.rows.map(ele => new CommentModel(ele));
 
         let quoteList = rs.rows.filter(ele => ele.quoteUserId);
 
         let replyList = [];
         //获取二级回复
         if (getReply) {
-            replyList = await CommentMapper.childQuery({ replyTopId: rs.rows.map(ele => ele._id) });
+            replyList = await CommentMapper.childQuery({ replyTopId: commentList.map(ele => ele._id) });
         }
 
         //获取用户信息
-        let allComment = [...rs.rows, ...replyList];
+        let allComment = [...commentList, ...replyList];
         let userIdList = common.distinct([
             ...allComment.map(ele => ele.userId),
             ...quoteList.map(ele => ele.quoteUserId)
@@ -114,9 +115,9 @@ export class CommentMapper {
             userList,
             voteList,
         };
-        replyList = replyList.map(ele => CommentMapper.resetDetail(ele, commentResetOpt));
-        rs.rows = rs.rows.map(detail => {
-            let obj = CommentMapper.resetDetail(detail, commentResetOpt);
+        replyList = replyList.map(ele => CommentMapper.resetDetail(ele.toJSON(), commentResetOpt));
+        rs.rows = commentList.map(detail => {
+            let obj = CommentMapper.resetDetail(detail.toJSON(), commentResetOpt);
             if (getReply) {
                 obj.replyList = replyList.filter(reply => reply.topId.equals(detail._id));
             }
@@ -157,7 +158,7 @@ export class CommentMapper {
         ];
 
         let rs = await CommentModel.aggregate(pipeline);
-        return rs.map(ele => ele.replyList);
+        return rs.map(ele => new CommentModel(ele.replyList));
     }
 
     static async findOwner(opt: {
@@ -189,7 +190,7 @@ export class CommentMapper {
                 detail.voteValue = vote ? vote.value : myEnum.voteValue.无;
             }
             let rs = {
-                canDel: detail.status !== myEnum.commentStatus.已删除
+                canDel: detail.canDel
                     && (user.equalsId(detail.userId)
                         || Auth.contains(user, config.auth.commentMgtDel)
                         // || (opt.authorId && opt.authorId.equals(user._id))

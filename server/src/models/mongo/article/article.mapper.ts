@@ -93,7 +93,7 @@ export class ArticleMapper {
         let { user } = opt;
         if (user) {
             let rs = {
-                canDel: detail.status !== myEnum.articleStatus.已删除 && (user.equalsId(detail.userId) || Auth.contains(user, config.auth.articleMgtDel)),
+                canDel: detail.canDel && (user.equalsId(detail.userId) || Auth.contains(user, config.auth.articleMgtDel)),
                 canUpdate: detail.canUpdate && user.equalsId(detail.userId),
             };
             detail.canDel = rs.canDel;

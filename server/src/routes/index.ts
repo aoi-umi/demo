@@ -136,4 +136,5 @@ import * as goods from './goods';
 router.post('/goods/mgt/save', UserAuthMid.normal([auth.login]), goods.mgtSave);
 router.get('/goods/mgt/detailQuery', UserAuthMid.normal([auth.login]), goods.mgtDetailQuery);
 router.get('/goods/mgt/query', UserAuthMid.normal([auth.login]), goods.mgtQuery);
+router.post('/goods/mgt/del', UserAuthMid.normal([auth.login]), goods.mgtDel);
 //#endregion

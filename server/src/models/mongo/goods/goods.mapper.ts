@@ -19,8 +19,13 @@ type DetailType = {
     specGroup: GoodsSpecGroupInstanceType[],
     sku: GoodsSkuInstanceType[]
 };
+
+type SpuResetType = {
+    imgHost?: string;
+    user: LoginUser
+};
 export class GoodsMapper {
-    static async mgtSave(data: ValidSchema.GoodsSave, opt: {
+    static async mgtSave(data: ValidSchema.GoodsMgtSave, opt: {
         user: LoginUser
     }) {
         let { user } = opt;
@@ -84,12 +89,10 @@ export class GoodsMapper {
         } as DetailType;
     }
 
-    static async query(data: ValidSchema.GoodsQuery, opt: {
+    static async query(data: ValidSchema.GoodsMgtQuery, opt: {
         audit?: boolean;
         user: LoginUser,
-        resetOpt: {
-            imgHost?: string;
-        },
+        resetOpt: SpuResetType,
     }) {
         let { user } = opt;
         let match: any = {};
@@ -114,13 +117,52 @@ export class GoodsMapper {
         };
     }
 
-    static resetSpu(detail, opt: {
-        imgHost?: string;
-    }) {
+    static resetSpu(detail, opt: SpuResetType) {
         if (opt.imgHost) {
             detail.imgUrls = detail.imgs.map(ele => {
                 return FileMapper.getImgUrl(ele, opt.imgHost);
             });
         }
+        detail.canUpdate = detail.canUpdate && opt.user.equalsId(detail.userId);
+        detail.canDel = detail.canDel && opt.user.equalsId(detail.userId);
+    }
+
+    static async updateStatus(opt: {
+        cond: {
+            idList: Types.ObjectId[],
+            status?: any;
+            includeUserId?: Types.ObjectId | string;
+        };
+        toStatus: number;
+        user: LoginUser
+    }) {
+        let { user, toStatus } = opt;
+        let { idList, includeUserId, status } = opt.cond;
+        let cond: any = { _id: { $in: idList } };
+        if (status !== undefined)
+            cond.status = status;
+        if (includeUserId)
+            cond.userId = Types.ObjectId(includeUserId as any);
+        let list = await GoodsSpuModel.find(cond);
+        if (!list.length)
+            throw error('', config.error.NO_MATCH_DATA);
+        let bulk = [];
+        for (let detail of list) {
+            if (detail.status === toStatus)
+                continue;
+            let update: any = { status: toStatus };
+            bulk.push({
+                updateOne: {
+                    filter: { ...cond, _id: detail._id },
+                    update: {
+                        $set: update
+                    }
+                }
+            });
+        }
+
+        if (!bulk.length)
+            return;
+        await GoodsSpuModel.bulkWrite(bulk);
     }
 }
