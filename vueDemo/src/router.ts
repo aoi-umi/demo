@@ -59,6 +59,22 @@ export const routerConfig = {
             authority: [authority.login],
         },
     },
+    goodsMgtEdit: {
+        path: '/goodsMgt/edit',
+        text: '商品管理',
+        component: () => import('./views/goods/goods-mgt-detail'),
+        meta: {
+            authority: [authority.login],
+        },
+    },
+    goodsMgtDetail: {
+        path: '/goodsMgt/detail',
+        text: '商品管理',
+        component: () => import('./views/goods/goods-mgt-detail'),
+        meta: {
+            authority: [authority.login],
+        },
+    },
 
     admin: {
         path: adminPath,

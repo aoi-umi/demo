@@ -325,6 +325,7 @@ export default class UserInfo extends Base {
             <div>
                 <MyLoad
                     ref="loadView"
+                    notLoadOnMounted
                     loadFn={this.getUserDetail}
                     renderFn={() => {
                         return this.renderInfo();
