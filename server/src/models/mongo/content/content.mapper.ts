@@ -30,11 +30,13 @@ export type ContentQueryOption<T extends ContentResetOption = ContentResetOption
 };
 
 export type ContentUpdateStatusOutOption = {
-    idList: Types.ObjectId[],
+    cond: {
+        idList: Types.ObjectId[],
+        status?: any;
+        includeUserId?: Types.ObjectId | string;
+    };
     toStatus: number;
     user: LoginUser
-    includeUserId?: Types.ObjectId | string;
-    status?: any;
     logRemark?: string;
 }
 
@@ -156,59 +158,51 @@ export class ContentMapper {
         //更新稿件数量
         updateCountInUser: (changeNum: number, user: UserInstanceType, session: ClientSession) => Promise<any>,
     } & ContentUpdateStatusOutOption) {
-        let { idList, user, toStatus } = opt;
+        let { user, toStatus } = opt;
+        let { idList, includeUserId, status } = opt.cond;
         let cond: any = { _id: { $in: idList } };
-        if (opt.status !== undefined)
-            cond.status = opt.status;
-        if (opt.includeUserId)
-            cond.userId = Types.ObjectId(opt.includeUserId as any);
+        if (status !== undefined)
+            cond.status = status;
+        if (includeUserId)
+            cond.userId = Types.ObjectId(includeUserId as any);
         let model = opt.model;
         let list = await model.find(cond);
         if (!list.length)
             throw error('', config.error.NO_MATCH_DATA);
-        let detail = list[0];
-        if (detail.status === toStatus)
-            return;
-        let bulk = [];
         let dbUser = await UserModel.findById(user._id);
         let changeNum = 0;
-        if (opt.passCond(detail)) {
-            changeNum = 1;
-            let now = new Date();
-            bulk = list.map(ele => {
-                let update = { status: toStatus, publishAt: now };
-                //指定时间发布
-                if (ele.setPublish && ele.setPublishAt && ele.setPublishAt.getTime() > now.getTime()) {
-                    update.publishAt = ele.setPublishAt;
-                }
-                return {
-                    updateOne: {
-                        filter: { ...cond, _id: ele._id },
-                        update: {
-                            $set: update
-                        }
-                    }
-                }
-            });
-        } else {
-            if (opt.delCond(detail))
-                changeNum = -1;
-            bulk = [{
-                updateMany: {
-                    filter: cond,
-                    update: {
-                        $set: { status: toStatus }
-                    }
-                }
-            }]
-        }
-        let log = list.map(ele => {
-            return ContentLogMapper.create(ele, user, {
+        let bulk = [], log = [];
+        for (let detail of list) {
+            if (detail.status === toStatus)
+                continue;
+            log.push(ContentLogMapper.create(detail, user, {
                 contentType: opt.contentType,
-                srcStatus: ele.status, destStatus: toStatus, remark: opt.logRemark
+                srcStatus: detail.status, destStatus: toStatus, remark: opt.logRemark
+            }));
+            let update: any = { status: toStatus };
+            if (opt.passCond(detail)) {
+                changeNum++;
+                let now = new Date();
+                update.publishAt = now;
+                //指定时间发布
+                if (detail.setPublish && detail.setPublishAt && detail.setPublishAt.getTime() > now.getTime()) {
+                    update.publishAt = detail.setPublishAt;
+                }
+            } else if (opt.delCond(detail)) {
+                changeNum--;
+            }
+            bulk.push({
+                updateOne: {
+                    filter: { ...cond, _id: detail._id },
+                    update: {
+                        $set: update
+                    }
+                }
             });
-        });
+        }
 
+        if (!bulk.length)
+            return;
         await transaction(async (session) => {
             if (changeNum)
                 await opt.updateCountInUser(changeNum, dbUser, session);

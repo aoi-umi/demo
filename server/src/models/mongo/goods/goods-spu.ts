@@ -56,6 +56,16 @@ export class GoodsSpu extends Base {
         return myEnum.goodsStatus.getKey(this.status);
     }
 
+    @prop()
+    get canUpdate() {
+        return [myEnum.goodsStatus.下架, myEnum.goodsStatus.上架].includes(this.status);
+    }
+
+    @prop()
+    get canDel() {
+        return ![myEnum.goodsStatus.已删除].includes(this.status);
+    }
+
     //上架时间
     @prop({
         required: true

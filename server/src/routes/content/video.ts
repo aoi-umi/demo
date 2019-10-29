@@ -63,9 +63,12 @@ export let mgtDel: RequestHandler = (req, res) => {
         let user = req.myData.user;
         let data = paramsValid(req.body, ValidSchema.VideoDel);
         await VideoMapper.updateStatus({
-            idList: data.idList, toStatus: myEnum.videoStatus.已删除, user,
-            includeUserId: Auth.contains(user, config.auth.videoMgtDel) ? null : user._id,
-            status: { $ne: myEnum.videoStatus.已删除 },
+            cond: {
+                idList: data.idList,
+                includeUserId: Auth.contains(user, config.auth.videoMgtDel) ? null : user._id,
+                status: { $ne: myEnum.videoStatus.已删除 },
+            },
+            toStatus: myEnum.videoStatus.已删除, user,
             logRemark: data.remark,
         });
     }, req, res);
@@ -76,9 +79,11 @@ export let mgtAudit: RequestHandler = (req, res) => {
         let user = req.myData.user;
         let data = paramsValid(req.body, ValidSchema.VideoMgtAudit);
         let rs = await VideoMapper.updateStatus({
-            idList: data.idList,
+            cond: {
+                idList: data.idList,
+                status: myEnum.videoStatus.待审核,
+            },
             toStatus: data.status, user,
-            status: myEnum.videoStatus.待审核,
             logRemark: data.remark,
         });
         return rs;

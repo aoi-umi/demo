@@ -38,6 +38,11 @@ export class Video extends ContentBase {
     get canUpdate() {
         return [myEnum.videoStatus.草稿, myEnum.videoStatus.审核不通过].includes(this.status);
     }
+
+    @prop()
+    get canDel() {
+        return ![myEnum.videoStatus.已删除].includes(this.status);
+    }
 }
 
 export const VideoModel = getModelForClass<Video, typeof Video>(Video);

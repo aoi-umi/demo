@@ -70,9 +70,12 @@ export let mgtDel: RequestHandler = (req, res) => {
         let user = req.myData.user;
         let data = paramsValid(req.body, ValidSchema.ArticleDel);
         await ArticleMapper.updateStatus({
-            idList: data.idList, toStatus: myEnum.articleStatus.已删除, user,
-            includeUserId: Auth.contains(user, config.auth.articleMgtDel) ? null : user._id,
-            status: { $ne: myEnum.articleStatus.已删除 },
+            cond: {
+                idList: data.idList,
+                status: { $ne: myEnum.articleStatus.已删除 },
+                includeUserId: Auth.contains(user, config.auth.articleMgtDel) ? null : user._id,
+            },
+            toStatus: myEnum.articleStatus.已删除, user,
             logRemark: data.remark,
         });
     }, req, res);
@@ -83,9 +86,11 @@ export let mgtAudit: RequestHandler = (req, res) => {
         let user = req.myData.user;
         let data = paramsValid(req.body, ValidSchema.ArticleMgtAudit);
         let rs = await ArticleMapper.updateStatus({
-            idList: data.idList,
+            cond: {
+                idList: data.idList,
+                status: myEnum.articleStatus.待审核,
+            },
             toStatus: data.status, user,
-            status: myEnum.articleStatus.待审核,
             logRemark: data.remark,
         });
         return rs;

@@ -11,7 +11,7 @@ import { Auth } from '@/_system/auth';
 
 export const mgtSave: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let data = paramsValid(req.body, ValidSchema.GoodsSave);
+        let data = paramsValid(req.body, ValidSchema.GoodsMgtSave);
         let user = req.myData.user;
         let rs = await GoodsMapper.mgtSave(data, { user });
         return {
@@ -22,10 +22,10 @@ export const mgtSave: RequestHandler = (req, res) => {
 
 export const mgtDetailQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let data = paramsValid(req.query, ValidSchema.GoodsDetailQuery);
+        let data = paramsValid(req.query, ValidSchema.GoodsMgtDetailQuery);
         let user = req.myData.user;
         let rs = await GoodsMapper.detailQuery(data);
-        if (!user._id.equals(rs.spu.userId)) {
+        if (!user.equalsId(rs.spu.userId)) {
             throw error('', config.error.NO_PERMISSIONS);
         }
         return rs;
@@ -34,7 +34,7 @@ export const mgtDetailQuery: RequestHandler = (req, res) => {
 
 export const mgtQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
-        let data = paramsValid(req.query, ValidSchema.GoodsQuery);
+        let data = paramsValid(req.query, ValidSchema.GoodsMgtQuery);
         let myData = req.myData;
         let user = myData.user;
         let { rows, total } = await GoodsMapper.query(data, {
@@ -42,11 +42,27 @@ export const mgtQuery: RequestHandler = (req, res) => {
             audit: Auth.contains(user, [config.auth.goodsMgtAudit]),
             resetOpt: {
                 imgHost: myData.imgHost,
+                user,
             }
         });
         return {
             rows,
             total,
         };
+    }, req, res);
+};
+
+export let mgtDel: RequestHandler = (req, res) => {
+    responseHandler(async () => {
+        let user = req.myData.user;
+        let data = paramsValid(req.body, ValidSchema.GoodsMgtDel);
+        await GoodsMapper.updateStatus({
+            cond: {
+                idList: data.idList,
+                includeUserId: Auth.contains(user, config.auth.goodsMgtAudit) ? null : user._id,
+                status: { $ne: myEnum.goodsStatus.已删除 },
+            },
+            toStatus: myEnum.goodsStatus.已删除, user,
+        });
     }, req, res);
 };

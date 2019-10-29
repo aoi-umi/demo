@@ -3,7 +3,7 @@ import { IsDefined, IsIn, IsArray, ArrayMinSize, ValidateNested } from "class-va
 import { Types } from 'mongoose';
 import { myEnum } from "@/config";
 import { objectIdTransform } from "./util";
-import { DetailQueryBase, ListBase } from "./base";
+import { DetailQueryBase, ListBase, DelBase } from "./base";
 
 class Spu {
     @Transform(objectIdTransform)
@@ -65,7 +65,7 @@ class Sku {
     imgs: string[];
 }
 
-export class GoodsSave {
+export class GoodsMgtSave {
     @ValidateNested()
     @IsDefined()
     @Type(() => Spu)
@@ -86,10 +86,13 @@ export class GoodsSave {
     sku: Sku[];
 }
 
-export class GoodsDetailQuery extends DetailQueryBase {
+export class GoodsMgtDetailQuery extends DetailQueryBase {
 }
 
-export class GoodsQuery extends ListBase {
+export class GoodsMgtQuery extends ListBase {
     status: string;
     name: string;
+}
+
+export class GoodsMgtDel extends DelBase {
 }

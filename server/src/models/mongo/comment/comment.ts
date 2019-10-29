@@ -77,6 +77,11 @@ export class Comment extends Base implements IVoteOwner {
         default: 0
     })
     dislike: number;
+
+    @prop()
+    get canDel() {
+        return this.status !== myEnum.commentStatus.已删除;
+    }
 }
 
 export const CommentModel = getModelForClass<Comment, typeof Comment>(Comment);

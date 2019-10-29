@@ -200,8 +200,8 @@ export class TestApi extends ApiModel<TestApiMethod> {
     async bookmarkSave(data) {
         return this.requestByConfig(this.apiConfig.method.bookmarkSave, { data });
     }
-    async bookmarkDel(idList: string[]) {
-        return this.requestByConfig(this.apiConfig.method.bookmarkDel, { data: { idList } });
+    async bookmarkDel(data) {
+        return this.requestByConfig(this.apiConfig.method.bookmarkDel, { data });
     }
     //#endregion
 

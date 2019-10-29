@@ -4,9 +4,8 @@ import moment from 'dayjs';
 import { convert } from '@/helpers';
 import * as helpers from '@/helpers';
 import { dev, myEnum, authority } from '@/config';
-import { routerConfig } from '@/router';
-import { testApi, testSocket } from '@/api';
-import { Modal, Input, Button, Card, Row, Col, Checkbox, Tabs, TabPane } from '@/components/iview';
+import { testApi } from '@/api';
+import { Modal } from '@/components/iview';
 import { MyList, IMyList, Const as MyListConst } from '@/components/my-list';
 import { TagType, MyTag } from '@/components/my-tag';
 import { MyConfirm } from '@/components/my-confirm';
@@ -54,7 +53,7 @@ export default class GoodsMgt extends Base {
     delIds = [];
     async delClick() {
         await this.operateHandler('删除', async () => {
-            await testApi.goodsMgtDel(this.delIds);
+            await testApi.goodsMgtDel({ idList: this.delIds });
             this.delIds = [];
             this.delShow = false;
             this.query();
@@ -114,16 +113,17 @@ export default class GoodsMgt extends Base {
                         fixed: 'right',
                         width: 120,
                         render: (h, params) => {
+                            let detail = params.row;
                             return (
                                 <div class={MyListConst.clsActBox}>
-                                    <a on-click={() => {
-                                        this.detail = params.row;
+                                    {detail.canUpdate && <a on-click={() => {
+                                        this.detail = detail;
                                         this.detailShow = true;
-                                    }}>编辑</a>
-                                    <a on-click={() => {
-                                        this.delIds = [params.row._id];
+                                    }}>编辑</a>}
+                                    {detail.canDel && <a on-click={() => {
+                                        this.delIds = [detail._id];
                                         this.delShow = true;
-                                    }}>删除</a>
+                                    }}>删除</a>}
                                 </div>
                             );
                         }
