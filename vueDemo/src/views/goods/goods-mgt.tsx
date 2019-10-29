@@ -11,15 +11,14 @@ import { TagType, MyTag } from '@/components/my-tag';
 import { MyConfirm } from '@/components/my-confirm';
 
 import { Base } from '../base';
+import { routerConfig } from '@/router';
 
 
 @Component
 export default class GoodsMgt extends Base {
     $refs: { list: IMyList<any> };
 
-    detailShow = false;
     delShow = false;
-    detail: any;
     statusList: TagType[] = [];
 
     protected created() {
@@ -116,9 +115,17 @@ export default class GoodsMgt extends Base {
                             let detail = params.row;
                             return (
                                 <div class={MyListConst.clsActBox}>
+                                    <a on-click={() => {
+                                        this.$router.push({
+                                            path: routerConfig.goodsMgtDetail.path,
+                                            query: { _id: detail._id }
+                                        });
+                                    }}>预览</a>
                                     {detail.canUpdate && <a on-click={() => {
-                                        this.detail = detail;
-                                        this.detailShow = true;
+                                        this.$router.push({
+                                            path: routerConfig.goodsMgtEdit.path,
+                                            query: { _id: detail._id }
+                                        });
                                     }}>编辑</a>}
                                     {detail.canDel && <a on-click={() => {
                                         this.delIds = [detail._id];

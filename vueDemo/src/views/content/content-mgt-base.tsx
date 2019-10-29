@@ -101,7 +101,6 @@ export abstract class ContentMgtBase extends Base {
     protected abstract canAudit(detail: ContentDataType): boolean;
 
     protected toList() {
-        console.log(this.contentMgtType);
         this.$router.push({
             path: routerConfig.contentMgt.path,
             query: {
@@ -265,16 +264,8 @@ export class ContentMgtDetail extends Base {
 
     $refs: { formVaild: iview.Form, cover: IMyUpload, loadView: IMyLoad };
 
-    mounted() {
-        this.init();
-    }
-
     @Watch('$route')
     route(to, from) {
-        this.init();
-    }
-
-    private init() {
         this.$refs.loadView.loadData();
     }
 

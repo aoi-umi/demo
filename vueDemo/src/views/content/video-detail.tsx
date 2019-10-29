@@ -21,10 +21,6 @@ export default class VideoDetail extends Base {
     stylePrefix = 'video-';
     $refs: { loadView: IMyLoad };
 
-    mounted() {
-        this.$refs.loadView.loadData();
-    }
-
     render() {
         return (
             <MyLoad

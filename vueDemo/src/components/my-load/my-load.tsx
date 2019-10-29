@@ -20,12 +20,20 @@ class MyLoad extends Vue {
     })
     height?: number;
 
+    @Prop()
+    notLoadOnMounted?: boolean;
+
     loading = false;
     result = {
         success: false,
         msg: '准备加载',
         data: null,
     };
+
+    mounted() {
+        if (!this.notLoadOnMounted)
+            this.loadData();
+    }
 
     async loadData() {
         this.loading = true;
@@ -40,7 +48,7 @@ class MyLoad extends Vue {
         }
     }
 
-    render() {
+    protected render() {
         if (!this.result.success) {
             return (
                 <div style={{ position: 'relative', }}>

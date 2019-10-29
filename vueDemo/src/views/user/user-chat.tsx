@@ -21,18 +21,11 @@ class ChatDetail extends Base {
             }
         });
     }
-    mounted() {
-        this.load();
-    }
 
     @Watch('$route')
     route(to, from) {
-        this.load();
-    }
-
-    load() {
-        let query = this.$route.query as { [key: string]: string };
         this.$refs.loadView.loadData();
+
     }
 
     async getUserDetail() {

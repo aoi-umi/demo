@@ -17,10 +17,6 @@ export default class ArticleDetail extends Base {
 
     $refs: { loadView: IMyLoad };
 
-    mounted() {
-        this.$refs.loadView.loadData();
-    }
-
     render() {
         return (
             <MyLoad
