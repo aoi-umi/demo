@@ -114,21 +114,17 @@ class UserMgtDetail extends Base {
                         <div>
                             <FormItem label="封禁">
                                 <RadioGroup v-model={this.disableType}>
-                                    <Radio label={myEnum.userDisableType.解封}>解封</Radio>
-                                    <Radio label={myEnum.userDisableType.封禁至}>封禁至</Radio>
+                                    {myEnum.userDisableType.toArray().map(s => {
+                                        return <Radio label={s.value}>{s.key}</Radio>
+                                    })}
                                 </RadioGroup>
                             </FormItem>
-                            <FormItem>
-                                {this.disableType === myEnum.userDisableType.封禁至 &&
-                                    <DatePicker v-model={detail.disabledTo} placeholder="永久" options={{
-                                        disabledDate: (date?) => {
-                                            return date && date.valueOf() < Date.now();
-                                        },
-                                    }} on-on-change={() => {
-                                        if (this.disableType !== myEnum.userDisableType.封禁至) {
-                                            this.disableType = myEnum.userDisableType.封禁至;
-                                        }
-                                    }} />}
+                            <FormItem v-show={this.disableType == myEnum.userDisableType.封禁至}>
+                                <DatePicker v-model={detail.disabledTo} placeholder="永久" options={{
+                                    disabledDate: (date?) => {
+                                        return date && date.valueOf() < Date.now();
+                                    },
+                                }} />
                             </FormItem>
                         </div>
                     }

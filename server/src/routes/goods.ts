@@ -23,12 +23,23 @@ export const mgtSave: RequestHandler = (req, res) => {
 export const mgtDetailQuery: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let data = paramsValid(req.query, ValidSchema.GoodsMgtDetailQuery);
-        let user = req.myData.user;
+        let myData = req.myData;
+        let user = myData.user;
         let rs = await GoodsMapper.detailQuery(data);
         if (!user.equalsId(rs.spu.userId)) {
             throw error('', config.error.NO_PERMISSIONS);
         }
-        return rs;
+
+        let ret = {
+            spu: rs.spu.toJSON(),
+            specGroup: rs.specGroup.map(e => e.toJSON()),
+            sku: rs.sku.map(e => e.toJSON()),
+        };
+        GoodsMapper.resetDetail(ret, {
+            imgHost: myData.imgHost,
+            user,
+        });
+        return ret;
     }, req, res);
 };
 

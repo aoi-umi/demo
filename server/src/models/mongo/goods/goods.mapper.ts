@@ -75,9 +75,8 @@ export class GoodsMapper {
         return detail;
     }
 
-    static async detailQuery(data) {
-        let _id = Types.ObjectId(data._id);
-        let spu = await GoodsSpuModel.findOne({ _id });
+    static async detailQuery(data: ValidSchema.GoodsMgtDetailQuery) {
+        let spu = await GoodsSpuModel.findOne({ _id: data._id });
         if (!spu)
             throw error('', config.error.DB_NO_DATA);
         let specGroup = await GoodsSpecGroupModel.find({ spuId: spu._id });
@@ -125,6 +124,13 @@ export class GoodsMapper {
         }
         detail.canUpdate = detail.canUpdate && opt.user.equalsId(detail.userId);
         detail.canDel = detail.canDel && opt.user.equalsId(detail.userId);
+    }
+
+    static resetDetail(detail, opt: SpuResetType) {
+        this.resetSpu(detail.spu, opt);
+        detail.sku.forEach(e => {
+            e.imgUrls = e.imgs.map(img => FileMapper.getImgUrl(img, opt.imgHost));
+        });
     }
 
     static async updateStatus(opt: {
