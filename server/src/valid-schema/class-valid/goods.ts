@@ -25,11 +25,9 @@ class Spu {
     @Type()
     status: number;
 
-    @Type()
-    putOnAt: Date;
+    putOnAt?: Date;
 
-    @Type()
-    expireAt: Date;
+    expireAt?: Date;
 }
 
 class SpecGroup {

@@ -24,6 +24,7 @@ export type FileType = {
     percentage?: number;
     status?: string;
     showProgress?: boolean;
+    metadata?: any;
 
     file?: File;
     originFileType?: string;
