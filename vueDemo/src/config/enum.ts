@@ -77,13 +77,13 @@ const enumDefine = {
         支付宝: 2,
     },
     goodsStatus: {
-        下架: 0,
         上架: 1,
+        下架: 0,
         已删除: -1,
     },
     goodsSkuStatus: {
-        下架: 0,
         上架: 1,
+        下架: 0,
     },
 
     socket: {
