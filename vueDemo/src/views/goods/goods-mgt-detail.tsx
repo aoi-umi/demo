@@ -5,7 +5,7 @@ import * as iview from 'iview';
 import { dev, myEnum, authority } from '@/config';
 import { testApi } from '@/api';
 import { routerConfig } from '@/router';
-import { Form, FormItem, Input, Row, Col, Button, Divider, RadioGroup, Radio, DatePicker, Table, Select, Option } from '@/components/iview';
+import { Form, FormItem, Input, Row, Col, Button, Divider, RadioGroup, Radio, DatePicker, Table, Select, Option, Checkbox } from '@/components/iview';
 import { MyLoad } from '@/components/my-load';
 import { MyUpload, FileDataType, IMyUpload, FileType } from '@/components/my-upload';
 
@@ -116,6 +116,8 @@ export default class GoodsMgtDetail extends Base {
             let { imgUrls, ...restSpu } = spu;
 
             await this.$refs.imgs.upload();
+            console.log(this.sku);
+            throw new Error('test');
             let saveSku = sku.map(ele => {
                 let { imgUrls, ...restSku } = ele;
                 return restSku;
@@ -220,7 +222,7 @@ export default class GoodsMgtDetail extends Base {
             return (
                 <div>
                     <Row>
-                        <Col xs={3}>
+                        <Col xs={20} sm={10}>
                             <FormItem label={'规格' + (gIdx + 1)} prop={groupProp + '.name'}
                                 rules={{
                                     required: true, trigger: 'blur',
@@ -250,7 +252,7 @@ export default class GoodsMgtDetail extends Base {
                     <Row>
                         {g.value.map((v, vIdx) => {
                             return (
-                                <Col xs={6}>
+                                <Col xs={24} sm={12}>
                                     <FormItem prop={groupProp + '.value.' + vIdx}
                                         rules={{
                                             required: true, trigger: 'blur',
@@ -326,7 +328,7 @@ export default class GoodsMgtDetail extends Base {
                 key: 'specGroup' + idx,
                 render: (h, params) => {
                     return (
-                        <span>{params.row.spec[idx]}</span>
+                        <span>{this.sku[params.index].spec[idx]}</span>
                     );
                 }
             };
@@ -335,7 +337,7 @@ export default class GoodsMgtDetail extends Base {
             key: 'price',
             render: (h, params) => {
                 return (
-                    <Input v-model={params.row.price} type="number" />
+                    <Input v-model={this.sku[params.index].price} type="number" />
                 );
             }
         }, {
@@ -343,7 +345,7 @@ export default class GoodsMgtDetail extends Base {
             key: 'quantity',
             render: (h, params) => {
                 return (
-                    <Input v-model={params.row.quantity} type="number" />
+                    <Input v-model={this.sku[params.index].quantity} type="number" />
                 );
             }
         }, {
@@ -353,13 +355,12 @@ export default class GoodsMgtDetail extends Base {
             title: '状态',
             key: 'status',
             render: (h, params) => {
+                let detail = params.row;
                 return (
-                    <Select on-on-change={(v) => {
-                        params.row.status = v;
-                    }}>
+                    <Select v-model={this.sku[params.index].status} clearable placeholder="不设置">
                         {myEnum.goodsSkuStatus.toArray().map(ele => {
                             let opt = <Option value={ele.value} key={ele.value}>{ele.key}</Option>;
-                            opt.componentOptions.tag = '';
+                            opt.componentOptions.tag = 'Option';
                             return opt;
                         })}
                     </Select>
@@ -368,10 +369,20 @@ export default class GoodsMgtDetail extends Base {
         }];
     }
 
+    private skuShowSetOnly = false;
     private renderSku() {
         return (
             <div class={this.getStyleName('sku-main')}>
-                <Table columns={this.skuCol} data={this.sku} />
+                <label><Checkbox v-model={this.skuShowSetOnly} />仅显示已设置</label>
+                <Table columns={this.skuCol}
+                    data={this.sku.filter(ele =>
+                        !this.skuShowSetOnly
+                        || (myEnum.goodsSkuStatus
+                            .toArray()
+                            .map(e => e.value)
+                            .includes(ele.status))
+                    )}
+                />
             </div>
         );
     }
