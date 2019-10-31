@@ -151,7 +151,7 @@ export default class Authority extends Base {
             let toStatus = detail.status == myEnum.authorityStatus.启用 ? myEnum.authorityStatus.禁用 : myEnum.authorityStatus.启用;
             await testApi.authorityUpdate({ _id: detail._id, status: toStatus });
             detail.status = toStatus;
-            detail.statusText = myEnum.roleStatus.getKey(toStatus);
+            detail.statusText = myEnum.authorityStatus.getKey(toStatus);
         });
     }
 
