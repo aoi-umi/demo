@@ -45,7 +45,7 @@ export const Menu = convClass<iviewTypes.Menu>(iview.Menu);
 export const MenuGroup = convClass<iviewTypes.MenuGroup>(iview.MenuGroup);
 export const MenuItem = convClass<iviewTypes.MenuItem>(iview.MenuItem);
 export const MenuSub = convClass<iviewTypes.MenuSub>(iview.MenuSub);
-export const Option = convClass<iviewTypes.Option>(iview.Option);
+export const Option = convClass<iviewTypes.Option & { key?: string }>(iview.Option);
 export const Submenu = convClass<any>(iview.Submenu);
 
 export const Select = convClass<iviewTypes.Select>(iview.Select);

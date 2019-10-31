@@ -5,7 +5,7 @@ import * as iview from 'iview';
 import { dev, myEnum, authority } from '@/config';
 import { testApi } from '@/api';
 import { routerConfig } from '@/router';
-import { Form, FormItem, Input, Row, Col, Button, Divider, RadioGroup, Radio, DatePicker } from '@/components/iview';
+import { Form, FormItem, Input, Row, Col, Button, Divider, RadioGroup, Radio, DatePicker, Table, Select, Option } from '@/components/iview';
 import { MyLoad } from '@/components/my-load';
 import { MyUpload, FileDataType, IMyUpload, FileType } from '@/components/my-upload';
 
@@ -25,18 +25,20 @@ type DetailType = {
         putOnAt: string;
         expireAt: string;
     };
-    sku: {
-        spec: string[];
-        status: number;
-        price: number;
-        quantity: number;
-        imgs: string[];
-        imgUrls: any[];
-    }[];
+    sku: SkuType[];
     specGroup: SpecGroupType[];
 };
 
 type SpecGroupType = { name: string, value: string[] };
+type SkuType = {
+    spec: string[];
+    status: number;
+    price: number;
+    quantity: number;
+    saleQuantity: number;
+    imgs: string[];
+    imgUrls: any[];
+};
 
 @Component
 export default class GoodsMgtDetail extends Base {
@@ -83,6 +85,8 @@ export default class GoodsMgtDetail extends Base {
             detail = this.getDetailData() as any;
         }
         this.innerDetail = detail;
+        this.resetSku();
+        //赋值到sku
         this.setRules();
         return detail;
     }
@@ -139,66 +143,71 @@ export default class GoodsMgtDetail extends Base {
                 <MyLoad
                     loadFn={this.loadDetailData}
                     renderFn={(detail: DetailType) => {
-                        let spu = detail.spu;
-                        return (
-                            <div>
-                                <Form ref="formVaild" label-position="top" props={{ model: detail }} rules={this.rules}>
-                                    <FormItem label="名称" prop="spu.name">
-                                        <Input v-model={spu.name} />
-                                    </FormItem>
-                                    <FormItem label="简介" prop="spu.profile">
-                                        <Input v-model={spu.profile} type="textarea" />
-                                    </FormItem>
-                                    <FormItem label="状态" prop="spu.status">
-                                        <RadioGroup v-model={spu.status}>
-                                            {myEnum.goodsStatus.toArray().filter(s => s.value !== myEnum.goodsStatus.已删除).map(s => {
-                                                return <Radio label={s.value}>{s.key}</Radio>
-                                            })}
-                                        </RadioGroup>
-                                    </FormItem>
-                                    <FormItem label="上架时间" prop="spu.putOnAt">
-                                        <DatePicker v-model={spu.putOnAt} options={{
-                                            disabledDate: (date?) => {
-                                                return date && date.valueOf() < Date.now();
-                                            },
-                                        }} />
-                                    </FormItem>
-                                    <FormItem label="图片" prop="spu.imgs">
-                                        <MyUpload
-                                            ref='imgs'
-                                            headers={testApi.defaultHeaders}
-                                            uploadUrl={testApi.imgUploadUrl}
-                                            successHandler={(res, file) => {
-                                                let rs = testApi.uplodaHandler(res);
-                                                file.url = rs.url;
-                                                file.metadata = rs.fileId;
-                                                return rs.fileId;
-                                            }}
-                                            format={['jpg', 'png']}
-                                            width={160} height={90}
-                                            v-model={spu.imgUrls}
-                                            maxCount={4}
-                                        />
-                                    </FormItem>
-                                    <FormItem label="失效时间" prop="spu.expireAt">
-                                        <DatePicker v-model={spu.expireAt} options={{
-                                            disabledDate: (date?) => {
-                                                return date && date.valueOf() < Date.now();
-                                            },
-                                        }} />
-                                    </FormItem>
-                                    {this.renderSpecGroup()}
-                                    {this.renderSku()}
-                                </Form>
-                                <Button type="primary" on-click={() => {
-                                    this.save();
-                                }}>
-                                    提交
-                                </Button>
-                            </div>
-                        );
+                        return this.renderEdit();
                     }}
                 />
+            </div>
+        );
+    }
+
+    private renderEdit() {
+        let detail = this.innerDetail;
+        let { spu } = detail;
+        return (
+            <div>
+                <Form ref="formVaild" label-position="top" props={{ model: detail }} rules={this.rules}>
+                    <FormItem label="名称" prop="spu.name">
+                        <Input v-model={spu.name} />
+                    </FormItem>
+                    <FormItem label="简介" prop="spu.profile">
+                        <Input v-model={spu.profile} type="textarea" />
+                    </FormItem>
+                    <FormItem label="状态" prop="spu.status">
+                        <RadioGroup v-model={spu.status}>
+                            {myEnum.goodsStatus.toArray().filter(s => s.value !== myEnum.goodsStatus.已删除).map(s => {
+                                return <Radio label={s.value}>{s.key}</Radio>
+                            })}
+                        </RadioGroup>
+                    </FormItem>
+                    <FormItem label="上架时间" prop="spu.putOnAt">
+                        <DatePicker v-model={spu.putOnAt} options={{
+                            disabledDate: (date?) => {
+                                return date && date.valueOf() < Date.now();
+                            },
+                        }} />
+                    </FormItem>
+                    <FormItem label="失效时间" prop="spu.expireAt">
+                        <DatePicker v-model={spu.expireAt} options={{
+                            disabledDate: (date?) => {
+                                return date && date.valueOf() < Date.now();
+                            },
+                        }} />
+                    </FormItem>
+                    <FormItem label="图片" prop="spu.imgs">
+                        <MyUpload
+                            ref='imgs'
+                            headers={testApi.defaultHeaders}
+                            uploadUrl={testApi.imgUploadUrl}
+                            successHandler={(res, file) => {
+                                let rs = testApi.uplodaHandler(res);
+                                file.url = rs.url;
+                                file.metadata = rs.fileId;
+                                return rs.fileId;
+                            }}
+                            format={['jpg', 'png']}
+                            width={160} height={90}
+                            v-model={spu.imgUrls}
+                            maxCount={4}
+                        />
+                    </FormItem>
+                    {this.renderSpecGroup()}
+                    {this.renderSku()}
+                </Form>
+                <Button type="primary" on-click={() => {
+                    this.save();
+                }}>
+                    提交
+                </Button>
             </div>
         );
     }
@@ -211,15 +220,17 @@ export default class GoodsMgtDetail extends Base {
             return (
                 <div>
                     <Row>
-                        <Col xl={3}>
-                            <FormItem label={'规格' + (gIdx + 1)} prop={`${groupProp}.name`}
+                        <Col xs={3}>
+                            <FormItem label={'规格' + (gIdx + 1)} prop={groupProp + '.name'}
                                 rules={{
                                     required: true, trigger: 'blur',
                                     message: '请填写规格名'
                                 }}
                             >
                                 <div class={this.getStyleName('spec-group')}>
-                                    <Input v-model={g.name} />
+                                    <Input v-model={g.name} on-on-change={() => {
+                                        this.resetSku();
+                                    }} />
                                     <Button type="primary" shape="circle" icon="md-add"
                                         on-click={() => {
                                             specGroup.splice(gIdx + 1, 0, { name: '', value: [''] });
@@ -239,23 +250,27 @@ export default class GoodsMgtDetail extends Base {
                     <Row>
                         {g.value.map((v, vIdx) => {
                             return (
-                                <Col xl={6}>
-                                    <FormItem prop={`${groupProp}.value.${vIdx}`}
+                                <Col xs={6}>
+                                    <FormItem prop={groupProp + '.value.' + vIdx}
                                         rules={{
                                             required: true, trigger: 'blur',
                                             message: '请填写值'
                                         }}
                                     >
                                         <div class={this.getStyleName('spec-group')}>
-                                            <Input v-model={g.value[vIdx]} />
+                                            <Input v-model={g.value[vIdx]} on-on-change={() => {
+                                                this.resetSku();
+                                            }} />
                                             <Button type="primary" shape="circle" icon="md-add"
                                                 on-click={() => {
                                                     g.value.splice(vIdx + 1, 0, '');
+                                                    this.resetSku();
                                                 }}
                                             />
                                             {g.value.length > 1 && <Button type="error" shape="circle" icon="md-remove"
                                                 on-click={() => {
                                                     g.value.splice(vIdx, 1);
+                                                    this.resetSku();
                                                 }}
                                             />}
                                         </div>
@@ -270,14 +285,93 @@ export default class GoodsMgtDetail extends Base {
         });
     }
 
-    private resetSku() {
-        let { specGroup, sku } = this.innerDetail;
-    }
-    private renderSku() {
-        let { sku } = this.innerDetail;
-        return (
-            <div>
+    private sku: SkuType[] = [];
+    private skuCol = [];
+    private createSku(specIdx: number, list: SkuType[] = [], spec?: string[]) {
+        let { specGroup } = this.innerDetail;
+        if (specGroup.length == 0)
+            return [];
 
+        specGroup[specIdx].value.forEach(ele => {
+            if (specIdx == 0)
+                spec = [];
+            let lastLv = specIdx + 1 === specGroup.length;
+            if (!lastLv)
+                spec.push(ele);
+            if (specIdx + 1 < specGroup.length)
+                this.createSku(specIdx + 1, list, spec);
+            else if (lastLv) {
+                list.push({
+                    quantity: 0,
+                    price: 0,
+                    spec: [...spec, ele],
+                    saleQuantity: 0,
+                    imgs: [],
+                    imgUrls: [],
+                    status: null,
+                });
+            }
+        });
+        return list;
+    }
+
+    private resetSku() {
+        let { specGroup } = this.innerDetail;
+        let oldSku = this.sku;
+        this.sku = this.createSku(0);
+        //赋值到sku
+        this.skuCol = [...specGroup.map((ele, idx) => {
+            return {
+                title: ele.name,
+                key: 'specGroup' + idx,
+                render: (h, params) => {
+                    return (
+                        <span>{params.row.spec[idx]}</span>
+                    );
+                }
+            };
+        }), {
+            title: '价格',
+            key: 'price',
+            render: (h, params) => {
+                return (
+                    <Input v-model={params.row.price} type="number" />
+                );
+            }
+        }, {
+            title: '数量',
+            key: 'quantity',
+            render: (h, params) => {
+                return (
+                    <Input v-model={params.row.quantity} type="number" />
+                );
+            }
+        }, {
+            title: '销量',
+            key: 'saleQuantity',
+        }, {
+            title: '状态',
+            key: 'status',
+            render: (h, params) => {
+                return (
+                    <Select on-on-change={(v) => {
+                        params.row.status = v;
+                    }}>
+                        {myEnum.goodsSkuStatus.toArray().map(ele => {
+                            let opt = <Option value={ele.value} key={ele.value}>{ele.key}</Option>;
+                            opt.componentOptions.tag = '';
+                            return opt;
+                        })}
+                    </Select>
+                );
+            }
+        }];
+    }
+
+    private renderSku() {
+        return (
+            <div class={this.getStyleName('sku-main')}>
+                <Table columns={this.skuCol} data={this.sku} />
             </div>
         );
     }

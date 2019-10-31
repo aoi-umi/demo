@@ -37,13 +37,9 @@ export class GoodsMapper {
             delSkuId = detail.sku.map(ele => ele._id);
         } else {
             let spu = new GoodsSpuModel({ _id: data.spu._id });
-            let specGroup = data.specGroup.map(ele => new GoodsSpecGroupModel(ele));
-            let sku = data.sku.map(ele => new GoodsSkuModel(ele));
             detail = {
                 spu,
-                specGroup,
-                sku,
-            };
+            } as any;
         }
 
         ['name', 'typeIds', 'profile', 'imgs', 'status', 'putOnAt', 'expireAt'].forEach(key => {
@@ -53,16 +49,21 @@ export class GoodsMapper {
         if (!detail.spu.putOnAt)
             detail.spu.putOnAt = new Date();
 
-        detail.specGroup.forEach(ele => {
-            ele._id = Types.ObjectId();
-            ele.spuId = detail.spu._id;
+        detail.specGroup = data.specGroup.map(ele => {
+            let obj = new GoodsSpecGroupModel(ele);
+            obj._id = Types.ObjectId();
+            obj.spuId = detail.spu._id;
+            return obj;
         });
 
-        detail.sku.forEach(ele => {
-            ele._id = Types.ObjectId();
-            ele.spuId = detail.spu._id;
-            ele.name = ele.spec.join('');
+        detail.sku = detail.sku.map(ele => {
+            let obj = new GoodsSkuModel(ele);
+            obj._id = Types.ObjectId();
+            obj.spuId = detail.spu._id;
+            obj.name = ele.spec.join('');
+            return obj;
         });
+        
         await transaction(async (session) => {
             await detail.spu.save({ session });
             await GoodsSpecGroupModel.insertMany(detail.specGroup.map(ele => ele.toObject()), { session });

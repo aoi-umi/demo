@@ -75,6 +75,11 @@ export class GoodsSpu extends Base {
     //失效时间
     @prop()
     expireAt: Date;
+
+    @prop({
+        default: 0
+    })
+    saleQuantity: number;
 }
 
 export const GoodsSpuModel = getModelForClass<GoodsSpu, typeof GoodsSpu>(GoodsSpu);

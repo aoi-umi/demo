@@ -15,7 +15,7 @@
     "dayjs": "1.8.16",
     "echarts": "^4.2.1",
     "enum-ts": "1.1.1",
-    "iview": "3.4.1",
+    "iview": "3.5.2",
     "node-forge": "0.8.4",
     "qrcode": "1.4.2",
     "socket.io-client": "2.2.0",
