@@ -35,7 +35,7 @@ export class GoodsSku extends Base {
     spec: string[];
 
     @prop({
-        required: true,
+        // required: true,
     })
     code: string;
 

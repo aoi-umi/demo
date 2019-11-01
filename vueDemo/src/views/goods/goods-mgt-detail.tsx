@@ -46,6 +46,7 @@ export default class GoodsMgtDetail extends Base {
     $refs: { formVaild: iview.Form, imgs: IMyUpload };
     private innerDetail: DetailType = this.getDetailData();
     private preview = false;
+    private skuStatusList = myEnum.goodsSkuStatus.toArray().map(e => e.value);
     protected getDetailData() {
         let data = {
             spu: {
@@ -85,8 +86,8 @@ export default class GoodsMgtDetail extends Base {
             detail = this.getDetailData() as any;
         }
         this.innerDetail = detail;
-        this.resetSku();
-        //赋值到sku
+        this.sku = detail.sku;
+        this.resetSku(myEnum.goodsResetType.规格数量);
         this.setRules();
         return detail;
     }
@@ -116,9 +117,7 @@ export default class GoodsMgtDetail extends Base {
             let { imgUrls, ...restSpu } = spu;
 
             await this.$refs.imgs.upload();
-            console.log(this.sku);
-            throw new Error('test');
-            let saveSku = sku.map(ele => {
+            let saveSku = this.sku.filter(ele => this.skuStatusList.includes(ele.status)).map(ele => {
                 let { imgUrls, ...restSku } = ele;
                 return restSku;
             });
@@ -231,18 +230,18 @@ export default class GoodsMgtDetail extends Base {
                             >
                                 <div class={this.getStyleName('spec-group')}>
                                     <Input v-model={g.name} on-on-change={() => {
-                                        this.resetSku();
+                                        this.setSkuCol();
                                     }} />
                                     <Button type="primary" shape="circle" icon="md-add"
                                         on-click={() => {
                                             specGroup.splice(gIdx + 1, 0, { name: '', value: [''] });
-                                            this.resetSku();
+                                            this.resetSku(myEnum.goodsResetType.规格数量);
                                         }}
                                     />
                                     {specGroup.length > 1 && <Button type="error" shape="circle" icon="md-remove"
                                         on-click={() => {
                                             specGroup.splice(gIdx, 1);
-                                            this.resetSku();
+                                            this.resetSku(myEnum.goodsResetType.规格数量);
                                         }}
                                     />}
                                 </div>
@@ -261,18 +260,18 @@ export default class GoodsMgtDetail extends Base {
                                     >
                                         <div class={this.getStyleName('spec-group')}>
                                             <Input v-model={g.value[vIdx]} on-on-change={() => {
-                                                this.resetSku();
+                                                this.resetSku(myEnum.goodsResetType.规格值);
                                             }} />
                                             <Button type="primary" shape="circle" icon="md-add"
                                                 on-click={() => {
                                                     g.value.splice(vIdx + 1, 0, '');
-                                                    this.resetSku();
+                                                    this.resetSku(myEnum.goodsResetType.规格数量);
                                                 }}
                                             />
                                             {g.value.length > 1 && <Button type="error" shape="circle" icon="md-remove"
                                                 on-click={() => {
                                                     g.value.splice(vIdx, 1);
-                                                    this.resetSku();
+                                                    this.resetSku(myEnum.goodsResetType.规格数量);
                                                 }}
                                             />}
                                         </div>
@@ -303,25 +302,56 @@ export default class GoodsMgtDetail extends Base {
             if (specIdx + 1 < specGroup.length)
                 this.createSku(specIdx + 1, list, spec);
             else if (lastLv) {
+                let currSpec = [...spec, ele];
+
+                let match;
+                //按index匹配
+                if (this.skuResetType === myEnum.goodsResetType.规格值) {
+                    match = this.sku[list.length];
+                } else if (this.skuResetType === myEnum.goodsResetType.规格数量) {
+                    //按规格值,如果不是完全一样,去掉销量,_id,status
+                    let matchLength = 0;
+                    let matchIdx = 0;
+                    this.sku.forEach((s, sIdx) => {
+                        for (let idx = 0; idx < s.spec.length; idx++) {
+                            if (s.spec[idx] !== currSpec[idx]) {
+                                break;
+                            }
+                            let length = idx + 1;
+                            if (s.spec[idx] === currSpec[idx] && length > matchLength) {
+                                matchLength = length;
+                                matchIdx = sIdx;
+                            }
+                        }
+                    });
+                    if (matchLength > 0) {
+                        match = { ...this.sku[matchIdx] };
+                        if (matchLength !== currSpec.length) {
+                            delete match._id;
+                            delete match.saleQuantity;
+                            delete match.status;
+                        }
+                    }
+                }
+                if (!match)
+                    match = {};
                 list.push({
                     quantity: 0,
                     price: 0,
-                    spec: [...spec, ele],
                     saleQuantity: 0,
                     imgs: [],
                     imgUrls: [],
                     status: null,
+                    ...match,
+                    spec: currSpec,
                 });
             }
         });
         return list;
     }
 
-    private resetSku() {
+    private setSkuCol() {
         let { specGroup } = this.innerDetail;
-        let oldSku = this.sku;
-        this.sku = this.createSku(0);
-        //赋值到sku
         this.skuCol = [...specGroup.map((ele, idx) => {
             return {
                 title: ele.name,
@@ -369,6 +399,13 @@ export default class GoodsMgtDetail extends Base {
         }];
     }
 
+    private skuResetType;
+    private resetSku(type) {
+        this.setSkuCol();
+        this.skuResetType = type;
+        this.sku = this.createSku(0);
+    }
+
     private skuShowSetOnly = false;
     private renderSku() {
         return (
@@ -377,10 +414,7 @@ export default class GoodsMgtDetail extends Base {
                 <Table columns={this.skuCol}
                     data={this.sku.filter(ele =>
                         !this.skuShowSetOnly
-                        || (myEnum.goodsSkuStatus
-                            .toArray()
-                            .map(e => e.value)
-                            .includes(ele.status))
+                        || (this.skuStatusList.includes(ele.status))
                     )}
                 />
             </div>
