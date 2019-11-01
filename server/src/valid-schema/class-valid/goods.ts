@@ -31,6 +31,8 @@ class Spu {
 }
 
 class SpecGroup {
+    _id?: string | Types.ObjectId;
+
     @IsDefined()
     name: string;
 
@@ -41,10 +43,12 @@ class SpecGroup {
 }
 
 class Sku {
+    _id?: string | Types.ObjectId;
+
     @IsDefined()
     spec: string[];
 
-    @IsDefined()
+    // @IsDefined()
     code: string;
 
     @IsDefined()

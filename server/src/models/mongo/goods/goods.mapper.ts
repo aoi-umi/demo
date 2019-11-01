@@ -30,11 +30,12 @@ export class GoodsMapper {
     }) {
         let { user } = opt;
         let detail: DetailType;
-        let delGroupId = [], delSkuId = [];
+        let delGroupId = [], delSkuId = [], oldSku: GoodsSkuInstanceType[] = [];
         if (data.spu._id) {
             detail = await GoodsMapper.detailQuery({ _id: data.spu._id });
             delGroupId = detail.specGroup.map(ele => ele._id);
-            delSkuId = detail.sku.map(ele => ele._id);
+            oldSku = detail.sku;
+            delSkuId = oldSku.map(ele => ele._id);
         } else {
             let spu = new GoodsSpuModel({ _id: data.spu._id });
             detail = {
@@ -50,28 +51,37 @@ export class GoodsMapper {
             detail.spu.putOnAt = new Date();
 
         detail.specGroup = data.specGroup.map(ele => {
+            ele._id = Types.ObjectId();
             let obj = new GoodsSpecGroupModel(ele);
-            obj._id = Types.ObjectId();
             obj.spuId = detail.spu._id;
             return obj;
         });
 
-        detail.sku = detail.sku.map(ele => {
+        detail.sku = data.sku.map(ele => {
+            if (ele._id) {
+                let match = oldSku.find(s => s._id.equals(ele._id));
+                if (match) {
+                    ['saleQuantity'].forEach(key => {
+                        ele[key] = match[key];
+                    });
+                }
+            } else {
+                ele._id = Types.ObjectId();
+            }
             let obj = new GoodsSkuModel(ele);
-            obj._id = Types.ObjectId();
             obj.spuId = detail.spu._id;
             obj.name = ele.spec.join('');
             return obj;
         });
-        
+
         await transaction(async (session) => {
-            await detail.spu.save({ session });
-            await GoodsSpecGroupModel.insertMany(detail.specGroup.map(ele => ele.toObject()), { session });
-            await GoodsSkuModel.insertMany(detail.sku.map(ele => ele.toObject()), { session });
             if (delGroupId.length)
                 await GoodsSpecGroupModel.deleteMany({ _id: delGroupId }, { session });
             if (delSkuId.length)
                 await GoodsSkuModel.deleteMany({ _id: delSkuId }, { session });
+            await detail.spu.save({ session });
+            await GoodsSpecGroupModel.insertMany(detail.specGroup.map(ele => ele.toObject()), { session });
+            await GoodsSkuModel.insertMany(detail.sku.map(ele => ele.toObject()), { session });
         });
         return detail;
     }

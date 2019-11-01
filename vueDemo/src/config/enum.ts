@@ -123,7 +123,11 @@ const enumDefineFront = {
         发送中: 0,
         发送成功: 1,
         发送失败: -1
-    }
+    },
+    goodsResetType: {
+        规格数量: 1,
+        规格值: 2,
+    },
 };
 export const enumDef = {
     ...enumDefine,
