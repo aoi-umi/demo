@@ -6,6 +6,7 @@ export type TagType = {
     checked?: boolean;
     color?: string;
     checkable?: boolean;
+    disabled?: boolean;
     data?: any;
     isDel?: boolean;
 };

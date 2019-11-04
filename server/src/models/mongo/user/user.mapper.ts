@@ -255,7 +255,14 @@ export class UserMapper {
         };
     }
 
-    static async login(token, user: UserInstanceType, data: ValidSchema.UserSignIn, disabled: boolean, opt: UserResetOption) {
+    static async login(data: ValidSchema.UserSignIn, opt: {
+        disabled: boolean,
+        resetOpt: UserResetOption,
+        user: UserInstanceType,
+        token,
+        oldData?: any,
+    }) {
+        let { token, disabled, user } = opt;
         let { checkToken } = UserMapper.createToken(data, user);
         if (token !== checkToken)
             throw common.error('', config.error.TOKEN_WRONG);
@@ -263,19 +270,21 @@ export class UserMapper {
             [config.auth.login.code]: 1
         };
         if (!disabled) {
-            let userDetail = await UserMapper.detail(user._id, opt);
+            let userDetail = await UserMapper.detail(user._id, opt.resetOpt);
             for (let key in userDetail.auth) {
                 userAuth[key] = 1;
             }
         }
 
+        let lastLoginAt = (opt.oldData && opt.oldData.lastLoginAt) || new Date();
         let rtn = {
             _id: user._id, account: user.account, nickname: user.nickname, avatar: user.avatar,
             key: token, authority: userAuth,
             loginData: data,
-            lastLoginAt: new Date()
+            cacheAt: new Date(),
+            lastLoginAt
         };
-        UserMapper.resetDetail(rtn, opt);
+        UserMapper.resetDetail(rtn, opt.resetOpt);
         return plainToClass(LoginUser, rtn);
     }
 

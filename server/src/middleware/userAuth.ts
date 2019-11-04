@@ -9,7 +9,11 @@ import { UserMapper } from "@/models/mongo/user";
 import { LoginUser } from "@/models/login-user";
 
 export class UserAuthMid {
-    static async  getUser(token, resetOpt?) {
+    static async  getUser(token, opt?: {
+        resetOpt?;
+        autoLogin?: boolean;
+    }) {
+        opt = { ...opt };
         let user = plainToClass(LoginUser, {
             _id: undefined,
             nickname: '',
@@ -30,9 +34,15 @@ export class UserAuthMid {
                     user.authority = {};
                 }
                 //自动重新登录
-                if (user.cacheAt && user.cacheAt.getTime() < new Date().getTime() - 1000 * 3600 * 2) {
+                if (opt.autoLogin && user.cacheAt && user.cacheAt.getTime() < new Date().getTime() - 1000 * config.dev.autoLoginTime) {
                     try {
-                        let cacheUser = user = await UserMapper.login(token, dbUser, user.loginData, disableResult.disabled, resetOpt);
+                        let cacheUser = user = await UserMapper.login(user.loginData, {
+                            disabled: disableResult.disabled,
+                            resetOpt: opt.resetOpt,
+                            token,
+                            user: dbUser,
+                            oldData: user,
+                        });
                         await cache.set(userCacheKey, cacheUser, config.dev.cacheTime.user);
                     } catch (e) {
                         logger.error(e);
@@ -48,7 +58,10 @@ export class UserAuthMid {
         let fn: RequestHandler = async (req, res, next) => {
             try {
                 let token = req.header(config.dev.cacheKey.user);
-                let user = await UserAuthMid.getUser(token, { imgHost: req.myData.imgHost });
+                let user = await UserAuthMid.getUser(token, {
+                    autoLogin: true,
+                    resetOpt: { imgHost: req.myData.imgHost }
+                });
                 req.myData.user = user;
 
                 //url权限认证
