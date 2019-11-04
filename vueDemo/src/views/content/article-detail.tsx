@@ -5,12 +5,12 @@ import { testApi } from '@/api';
 import { myEnum, dev } from '@/config';
 import { Divider, Spin } from '@/components/iview';
 import { MyLoad, IMyLoad } from '@/components/my-load';
+import { convClass } from '@/components/utils';
 
 import { UserAvatarView } from '../comps/user-avatar';
 import { Base } from '../base';
 import { DetailType, DetailDataType } from './article-mgt-detail';
 import { CommentView } from './comment';
-import { convClass } from '@/components/utils';
 
 @Component
 export default class ArticleDetail extends Base {

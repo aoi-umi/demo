@@ -43,7 +43,12 @@ export let signIn: RequestHandler = (req, res) => {
         let token = req.myData.user.key;
         let { user, disableResult } = await UserMapper.accountCheck(data.account);
 
-        let returnUser = await UserMapper.login(token, user, data, disableResult.disabled, { imgHost: req.myData.imgHost });
+        let returnUser = await UserMapper.login(data, {
+            resetOpt: { imgHost: req.myData.imgHost },
+            token,
+            user,
+            disabled: disableResult.disabled
+        });
         let userInfoKey = config.dev.cacheKey.user + token;
         await cache.set(userInfoKey, returnUser, config.dev.cacheTime.user);
         return returnUser;

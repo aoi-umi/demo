@@ -12,6 +12,8 @@ export default {
         user: 3600 * 24 * 7,
         captcha: 60 * 10
     },
+    //自动重新登录时间 秒
+    autoLoginTime: 3600 * 2,
     //#endregion
     rootRole: 'root',
     dateFormat: 'YYYY-MM-DD HH:mm:ss',

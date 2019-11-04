@@ -125,6 +125,7 @@ const enumDefineFront = {
         发送失败: -1
     },
     goodsResetType: {
+        初始化: 0,
         规格数量: 1,
         规格值: 2,
     },

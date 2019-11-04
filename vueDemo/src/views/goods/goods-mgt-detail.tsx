@@ -5,15 +5,17 @@ import * as iview from 'iview';
 import { dev, myEnum, authority } from '@/config';
 import { testApi } from '@/api';
 import { routerConfig } from '@/router';
+import * as helpers from '@/helpers';
 import { Form, FormItem, Input, Row, Col, Button, Divider, RadioGroup, Radio, DatePicker, Table, Select, Option, Checkbox } from '@/components/iview';
 import { MyLoad } from '@/components/my-load';
 import { MyUpload, FileDataType, IMyUpload, FileType } from '@/components/my-upload';
 
 import { Base } from '../base';
+import { GoodsDetailMainView } from './goods-detail';
 
 import './goods.less';
 
-type DetailType = {
+export type DetailType = {
     spu: {
         _id?: string;
         name: string;
@@ -30,7 +32,7 @@ type DetailType = {
 };
 
 type SpecGroupType = { name: string, value: string[] };
-type SkuType = {
+export type SkuType = {
     spec: string[];
     status: number;
     price: number;
@@ -45,6 +47,7 @@ export default class GoodsMgtDetail extends Base {
     stylePrefix = "goods-mgt-"
     $refs: { formVaild: iview.Form, imgs: IMyUpload };
     private innerDetail: DetailType = this.getDetailData();
+    private oldDetail: DetailType = helpers.clone(this.innerDetail);
     private preview = false;
     private skuStatusList = myEnum.goodsSkuStatus.toArray().map(e => e.value);
     protected getDetailData() {
@@ -75,19 +78,23 @@ export default class GoodsMgtDetail extends Base {
         if (query._id) {
             this.preview = this.$route.path == routerConfig.goodsMgtDetail.path;
             detail = await testApi.goodsMgtDetailQuery({ _id: query._id });
-            let { spu } = detail;
-            spu.imgUrls = spu.imgUrls.map((ele, idx) => {
-                return { url: ele, fileType: FileDataType.图片, metadata: spu.imgs[idx] };
-            });
+            if (!this.preview) {
+                let { spu } = detail;
+                spu.imgUrls = spu.imgUrls.map((ele, idx) => {
+                    return { url: ele, fileType: FileDataType.图片, metadata: spu.imgs[idx] };
+                });
+            }
             if (query.repost) {
                 detail.spu._id = '';
             }
+            this.skuShowSetOnly = true;
         } else {
             detail = this.getDetailData() as any;
         }
         this.innerDetail = detail;
+        this.oldDetail = helpers.clone(detail);
         this.sku = detail.sku;
-        this.resetSku(myEnum.goodsResetType.规格数量);
+        this.resetSku(myEnum.goodsResetType.初始化);
         this.setRules();
         return detail;
     }
@@ -113,7 +120,7 @@ export default class GoodsMgtDetail extends Base {
     async save() {
         await this.operateHandler('提交', async () => {
             this.saving = true;
-            let { spu, specGroup, sku } = this.innerDetail;
+            let { spu, specGroup } = this.innerDetail;
             let { imgUrls, ...restSpu } = spu;
 
             await this.$refs.imgs.upload();
@@ -144,7 +151,9 @@ export default class GoodsMgtDetail extends Base {
                 <MyLoad
                     loadFn={this.loadDetailData}
                     renderFn={(detail: DetailType) => {
-                        return this.renderEdit();
+                        if (!this.preview)
+                            return this.renderEdit();
+                        return <GoodsDetailMainView data={detail} />;
                     }}
                 />
             </div>
@@ -201,7 +210,16 @@ export default class GoodsMgtDetail extends Base {
                             maxCount={4}
                         />
                     </FormItem>
+                    <Divider size="small">规格</Divider>
+                    <Button
+                        class={this.getStyleName('reset-spec')}
+                        on-click={() => {
+                            this.innerDetail.specGroup = helpers.clone(this.oldDetail.specGroup);
+                            this.sku = helpers.clone(this.oldDetail.sku);
+                            this.resetSku(myEnum.goodsResetType.初始化);
+                        }}>重置规格</Button>
                     {this.renderSpecGroup()}
+                    <Divider size="small">sku</Divider>
                     {this.renderSku()}
                 </Form>
                 <Button type="primary" on-click={() => {
@@ -280,7 +298,7 @@ export default class GoodsMgtDetail extends Base {
                             );
                         })}
                     </Row>
-                    <Divider size="small" />
+                    {gIdx < specGroup.length - 1 && <Divider size="small" />}
                 </div>
             )
         });
@@ -308,8 +326,7 @@ export default class GoodsMgtDetail extends Base {
                 //按index匹配
                 if (this.skuResetType === myEnum.goodsResetType.规格值) {
                     match = this.sku[list.length];
-                } else if (this.skuResetType === myEnum.goodsResetType.规格数量) {
-                    //按规格值,如果不是完全一样,去掉销量,_id,status
+                } else {
                     let matchLength = 0;
                     let matchIdx = 0;
                     this.sku.forEach((s, sIdx) => {
@@ -324,7 +341,9 @@ export default class GoodsMgtDetail extends Base {
                             }
                         }
                     });
-                    if (matchLength > 0) {
+                    //按规格值,如果不是完全一样,去掉销量,_id,status
+                    if ((this.skuResetType === myEnum.goodsResetType.规格数量 && matchLength > 0)
+                        || (this.skuResetType === myEnum.goodsResetType.初始化 && matchLength === currSpec.length)) {
                         match = { ...this.sku[matchIdx] };
                         if (matchLength !== currSpec.length) {
                             delete match._id;
@@ -411,13 +430,19 @@ export default class GoodsMgtDetail extends Base {
         return (
             <div class={this.getStyleName('sku-main')}>
                 <label><Checkbox v-model={this.skuShowSetOnly} />仅显示已设置</label>
-                <Table columns={this.skuCol}
-                    data={this.sku.filter(ele =>
-                        !this.skuShowSetOnly
-                        || (this.skuStatusList.includes(ele.status))
-                    )}
+                <Table
+                    row-class-name={this.rowClassName}
+                    columns={this.skuCol}
+                    data={this.sku}
                 />
             </div>
         );
+    }
+
+    private rowClassName(row, index) {
+        if (!this.skuShowSetOnly
+            || (this.skuStatusList.includes(row.status)))
+            return '';
+        return 'hidden';
     }
 }
