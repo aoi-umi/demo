@@ -74,33 +74,30 @@ class GoodsDetailMain extends Base {
             this.sku = null;
         }
 
-        
-        let selectableSpec: { [key: string]: any[] } = {};
-        for (let idx = 0; idx < selectSpec.length; idx++) {
-            selectableSpec[idx] = [];
-        }
-        this.data.sku.forEach(ele => {
-            let rs = true;
-            for (let idx = 0; idx < ele.spec.length; idx++) {
-                if (selectSpec[idx] && selectSpec[idx] !== ele.spec[idx]) {
-                    rs = false;
-                    break;
-                }
-            }
-            if (rs) {
-                ele.spec.forEach((s, idx) => {
-                    if (!selectableSpec[idx].includes(s)) {
-                        selectableSpec[idx].push(s);
+        //不可选项
+        this.specTag.forEach((ele, idx) => {
+            ele.value.forEach(v => {
+                v.disabled = false;
+            });
+        });
+        this.specTag.forEach((ele, idx) => {
+            if (selectSpec[idx]) {
+                this.specTag.forEach((ele2, idx2) => {
+                    if (idx !== idx2) {
+                        ele2.value.forEach((v, vIdx) => {
+                            let match = this.data.sku.find(s => s.spec[idx] === selectSpec[idx] && s.spec[idx2] === v.key);
+                            if (!match)
+                                v.disabled = true;
+                        });
                     }
                 });
             }
         });
-        console.log(selectableSpec)
-        //不可选项
-        this.specTag.forEach((ele, idx) => {
-            ele.value.forEach(v => {
-                v.disabled = !selectableSpec[idx].includes(v.key);
-            });
+    }
+
+    private buy() {
+        this.operateHandler('购买', async () => {
+            throw new Error('没写');
         });
     }
 
@@ -110,7 +107,7 @@ class GoodsDetailMain extends Base {
         return (
             <div>
                 <h2>{spu.name}</h2>
-                <Row>
+                <Row gutter={20}>
                     <Col xs={24} sm={8}>
                         <Carousel loop height={200}
                             arrow={multi ? 'hover' : 'never'}
@@ -145,19 +142,23 @@ class GoodsDetailMain extends Base {
                         })}
                     </Col>
                     <Col xs={24}>
-                        {this.sku &&
-                            <div>
-                                <span>单价: {this.sku.price}</span>
-                                <Input type="number" v-model={this.quantity} style={{ width: '100px' }} />/{this.sku.quantity}
-                                <div class={this.getStyleName('buy')}>
-                                    <span>总价:{(this.sku.price * this.quantity).toFixed(2)}</span>
-                                    <Button>立即购买</Button>
+                        <div>
+                            {this.sku &&
+                                <div>
+                                    <span>单价: {this.sku.price}</span>
+                                    <Input type="number" v-model={this.quantity} style={{ width: '100px' }} />/{this.sku.quantity}
                                 </div>
+                            }
+                            <div class={this.getStyleName('buy')}>
+                                <span>总价:{((this.sku ? this.sku.price : 0) * this.quantity).toFixed(2)}</span>
+                                <Button disabled={!this.sku} on-click={() => {
+                                    this.buy();
+                                }}>立即购买</Button>
                             </div>
-                        }
+                        </div>
                     </Col>
                 </Row>
-            </div >
+            </div>
         );
     }
 }
