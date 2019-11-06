@@ -155,6 +155,10 @@ export default class App extends Base {
         icon: 'md-paper',
         text: routeConfig.article.text,
     }, {
+        to: routeConfig.goods.path,
+        icon: 'md-cart',
+        text: routeConfig.goods.text,
+    }, {
         to: routeConfig.contentMgt.path,
         icon: 'md-create',
         text: routeConfig.contentMgt.text,

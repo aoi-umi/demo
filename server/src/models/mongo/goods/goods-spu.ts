@@ -1,6 +1,6 @@
 import {
     getModelForClass, ModelType, DocType, InstanceType,
-    setSchema, prop, arrayProp, getSchema
+    setSchema, prop, arrayProp, getSchema, setMethod
 } from 'mongoose-ts-ua';
 import { Types, SchemaTypes } from 'mongoose';
 
@@ -80,6 +80,12 @@ export class GoodsSpu extends Base {
         default: 0
     })
     saleQuantity: number;
+
+    @setMethod
+    canView() {
+        let now = new Date().getTime();
+        return this.status === myEnum.goodsStatus.上架 && this.putOnAt.getTime() <= now && (!this.expireAt || this.expireAt.getTime() > now);
+    }
 }
 
 export const GoodsSpuModel = getModelForClass<GoodsSpu, typeof GoodsSpu>(GoodsSpu);

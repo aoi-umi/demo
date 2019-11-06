@@ -290,11 +290,10 @@ export default class UserMgt extends Base {
                     }}
 
                     on-query={(model) => {
-                        let q = { ...model.query };
                         this.$router.push({
                             path: this.$route.path,
                             query: {
-                                ...q,
+                                ...model.query,
                                 ...convert.Test.listModelToQuery(model)
                             }
                         });

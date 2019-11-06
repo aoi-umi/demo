@@ -32,8 +32,9 @@ export default class Video extends Base {
 
     query() {
         let list = this.$refs.list;
-        let query = this.$route.query;
-        list.setQueryByKey(query, ['user', 'title', 'anyKey']);
+        let query: any = this.$route.query;
+        list.setQueryByKey(query, ['user', 'title']);
+        this.anyKey = query.anyKey;
         convert.Test.queryToListModel(query, list.model);
         this.$refs.list.query(query);
     }
@@ -73,11 +74,11 @@ export default class Video extends Base {
                     }}
 
                     on-query={(model) => {
-                        let q = { ...model.query, anyKey: this.anyKey };
                         this.$router.push({
                             path: this.$route.path,
                             query: {
-                                ...q,
+                                ...model.query,
+                                anyKey: this.anyKey,
                                 ...convert.Test.listModelToQuery(model),
                             }
                         });

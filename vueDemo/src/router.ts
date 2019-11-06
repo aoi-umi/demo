@@ -51,6 +51,16 @@ export const routerConfig = {
         component: () => import('./views/user/user-sign').then(t => t.SignUpView)
     },
 
+    goods: {
+        path: '/goods',
+        text: '商品',
+        component: () => import('./views/goods/goods'),
+    },
+    goodsDetail: {
+        path: '/goods/detail',
+        text: '商品',
+        component: () => import('./views/goods/goods-detail'),
+    },
     goodsMgt: {
         path: '/goodsMgt',
         text: '商品管理',

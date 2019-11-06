@@ -23,6 +23,9 @@ class MyLoad extends Vue {
     @Prop()
     notLoadOnMounted?: boolean;
 
+    @Prop()
+    errMsgFn?: (e) => string;
+
     loading = false;
     result = {
         success: false,
@@ -42,7 +45,7 @@ class MyLoad extends Vue {
             this.result.success = true;
         } catch (e) {
             this.result.success = false;
-            this.result.msg = e.message;
+            this.result.msg = (this.errMsgFn && this.errMsgFn(e)) || e.message;
         } finally {
             this.loading = false;
         }

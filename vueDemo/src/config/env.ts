@@ -233,7 +233,6 @@ const config = {
                     url: '/asset/notifyRetry',
                 },
 
-
                 goodsMgtQuery: {
                     url: '/goods/mgt/query',
                     method: 'get',
@@ -247,6 +246,14 @@ const config = {
                 },
                 goodsMgtDel: {
                     url: '/goods/mgt/del',
+                },
+                goodsQuery: {
+                    url: '/goods/query',
+                    method: 'get',
+                },
+                goodsDetailQuery: {
+                    url: '/goods/detailQuery',
+                    method: 'get',
                 },
 
                 //file

@@ -16,21 +16,21 @@ import { GoodsDetailMainView } from './goods-detail';
 import './goods.less';
 
 export type DetailType = {
-    spu: {
-        _id?: string;
-        name: string;
-        profile: string;
-        imgs: string[];
-        imgUrls: any[];
-        status: number;
-        statusText: string;
-        putOnAt: string;
-        expireAt: string;
-    };
+    spu: SpuType;
     sku: SkuType[];
     specGroup: SpecGroupType[];
 };
-
+export type SpuType = {
+    _id?: string;
+    name: string;
+    profile: string;
+    imgs: string[];
+    imgUrls: any[];
+    status: number;
+    statusText: string;
+    putOnAt: string;
+    expireAt: string;
+};
 type SpecGroupType = { name: string, value: string[] };
 export type SkuType = {
     spec: string[];

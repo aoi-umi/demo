@@ -247,11 +247,10 @@ export default class Bookmark extends Base {
                     }}
 
                     on-query={(model: MyListModel) => {
-                        let q = { ...model.query };
                         this.$router.push({
                             path: this.$route.path,
                             query: {
-                                ...q,
+                                ...model.query,
                                 ...convert.Test.listModelToQuery(model)
                             }
                         });

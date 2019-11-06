@@ -30,11 +30,7 @@ export const mgtDetailQuery: RequestHandler = (req, res) => {
             throw error('', config.error.NO_PERMISSIONS);
         }
 
-        let ret = {
-            spu: rs.spu.toJSON(),
-            specGroup: rs.specGroup.map(e => e.toJSON()),
-            sku: rs.sku.map(e => e.toJSON()),
-        };
+        let ret = rs.toJSON();
         GoodsMapper.resetDetail(ret, {
             imgHost: myData.imgHost,
             user,
@@ -75,5 +71,41 @@ export let mgtDel: RequestHandler = (req, res) => {
             },
             toStatus: myEnum.goodsStatus.已删除, user,
         });
+    }, req, res);
+};
+
+export const detailQuery: RequestHandler = (req, res) => {
+    responseHandler(async () => {
+        let data = paramsValid(req.query, ValidSchema.GoodsDetailQuery);
+        let myData = req.myData;
+        let user = myData.user;
+        let rs = await GoodsMapper.detailQuery(data, { normal: true });
+
+        let ret = rs.toJSON();
+        GoodsMapper.resetDetail(ret, {
+            imgHost: myData.imgHost,
+            user,
+        });
+        return ret;
+    }, req, res);
+};
+
+export const query: RequestHandler = (req, res) => {
+    responseHandler(async () => {
+        let data = paramsValid(req.query, ValidSchema.GoodsQuery);
+        let myData = req.myData;
+        let user = myData.user;
+        let { rows, total } = await GoodsMapper.query(data, {
+            user,
+            normal: true,
+            resetOpt: {
+                imgHost: myData.imgHost,
+                user,
+            }
+        });
+        return {
+            rows,
+            total,
+        };
     }, req, res);
 };

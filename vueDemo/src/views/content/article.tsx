@@ -28,7 +28,8 @@ export default class Article extends ListBase {
         let query;
         if (!this.notQueryOnRoute) {
             query = this.$route.query;
-            list.setQueryByKey(query, ['user', 'title', 'anyKey']);
+            list.setQueryByKey(query, ['user', 'title']);
+            this.anyKey = query.anyKey;
         } else {
             query = {};
         }
