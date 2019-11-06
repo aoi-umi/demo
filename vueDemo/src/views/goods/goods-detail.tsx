@@ -1,12 +1,47 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
+
+import { testApi } from '@/api';
+import errConfig, { getErrorCfgByCode } from '@/config/error';
 import { convClass } from '@/components/utils';
-import { Carousel, CarouselItem, Row, Col, Divider, Input, Button } from '@/components/iview';
+import { Carousel, CarouselItem, Row, Col, Divider, Input, Button, Card } from '@/components/iview';
 import { MyTag, TagType } from '@/components/my-tag';
+import { MyLoad } from '@/components/my-load';
+import { MyImg } from '@/components/my-img';
 
 import { Base } from '../base';
 import { DetailType, SkuType } from './goods-mgt-detail';
 
 import './goods.less';
+
+@Component
+export default class GoodsDetail extends Base {
+    stylePrefix = "goods-";
+    private innerDetail: DetailType = {} as any;
+    private async loadDetailData() {
+        let query = this.$route.query;
+        let detail = await testApi.goodsDetailQuery({ _id: query._id });
+        this.innerDetail = detail;
+        return detail;
+    }
+
+    protected render() {
+        return (
+            <div>
+                <MyLoad
+                    loadFn={this.loadDetailData}
+                    renderFn={(detail: DetailType) => {
+                        return <GoodsDetailMainView data={detail} />;
+                    }}
+                    errMsgFn={(e) => {
+                        if (getErrorCfgByCode(e.code))
+                            return '商品不存在或已删除';
+                        return e.message;
+                    }}
+                />
+            </div>
+        );
+    }
+}
 
 @Component
 class GoodsDetailMain extends Base {
@@ -97,7 +132,7 @@ class GoodsDetailMain extends Base {
 
     private buy() {
         this.operateHandler('购买', async () => {
-            throw new Error('没写');
+            throw new Error('还没写');
         });
     }
 
@@ -109,15 +144,15 @@ class GoodsDetailMain extends Base {
                 <h2>{spu.name}</h2>
                 <Row gutter={20}>
                     <Col xs={24} sm={8}>
-                        <Carousel loop height={200}
+                        <Carousel class={this.getStyleName('carousel')} loop height={200}
                             arrow={multi ? 'hover' : 'never'}
                             dots={multi ? 'inside' : 'none'}
                         >
                             {spu.imgUrls.map(ele => {
                                 return (
                                     <CarouselItem>
-                                        <div class={this.getStyleName('carousel')}>
-                                            <img src={ele} />
+                                        <div class={this.getStyleName('carousel-img')}>
+                                            <MyImg src={ele} />
                                         </div>
                                     </CarouselItem>
                                 );
@@ -141,12 +176,12 @@ class GoodsDetailMain extends Base {
                             );
                         })}
                     </Col>
-                    <Col xs={24}>
-                        <div>
+                    <Card class={this.getStyleName('buy-box')}>
+                        <div class={this.getStyleName('buy-box-cont')}>
                             {this.sku &&
                                 <div>
                                     <span>单价: {this.sku.price}</span>
-                                    <Input type="number" v-model={this.quantity} style={{ width: '100px' }} />/{this.sku.quantity}
+                                    <Input type="number" v-model={this.quantity} style={{ width: '60px', marginLeft: '10px' }} />/{this.sku.quantity}
                                 </div>
                             }
                             <div class={this.getStyleName('buy')}>
@@ -156,7 +191,7 @@ class GoodsDetailMain extends Base {
                                 }}>立即购买</Button>
                             </div>
                         </div>
-                    </Col>
+                    </Card>
                 </Row>
             </div>
         );

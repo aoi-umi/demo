@@ -79,6 +79,8 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
     goodsMgtDetailQuery,
     goodsMgtSave,
     goodsMgtDel,
+    goodsQuery,
+    goodsDetailQuery,
 
     //file
     imgUpload,
@@ -376,11 +378,9 @@ export class TestApi extends ApiModel<TestApiMethod> {
     async goodsMgtQuery(data) {
         return this.requestByConfig(this.apiConfig.method.goodsMgtQuery, { data });
     }
-
     async goodsMgtDetailQuery(data) {
         return this.requestByConfig(this.apiConfig.method.goodsMgtDetailQuery, { data });
     }
-
     async goodsMgtSave(data) {
         return this.requestByConfig(this.apiConfig.method.goodsMgtSave, { data });
     }
@@ -388,6 +388,12 @@ export class TestApi extends ApiModel<TestApiMethod> {
         return this.requestByConfig(this.apiConfig.method.goodsMgtDel, { data });
     }
 
+    async goodsQuery(data) {
+        return this.requestByConfig(this.apiConfig.method.goodsQuery, { data });
+    }
+    async goodsDetailQuery(data) {
+        return this.requestByConfig(this.apiConfig.method.goodsDetailQuery, { data });
+    }
     //#endregion
 }
 

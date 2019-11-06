@@ -10,6 +10,10 @@ export const errConfig = {
     NOT_FOUND: {
         code: 'NOT_FOUND',
         msg: '页面走丢了'
+    },
+    NO_PERMISSIONS: {
+        code: 'NO_PERMISSIONS',
+        msg: '无权限'
     }
 };
 export default errConfig;

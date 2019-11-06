@@ -94,7 +94,14 @@ export class GoodsMgtDetailQuery extends DetailQueryBase {
 export class GoodsMgtQuery extends ListBase {
     status: string;
     name: string;
+    anyKey: string;
 }
 
 export class GoodsMgtDel extends DelBase {
+}
+
+export class GoodsDetailQuery extends GoodsMgtDetailQuery {
+}
+
+export class GoodsQuery extends GoodsMgtQuery {
 }

@@ -5,17 +5,18 @@ import { convert } from '@/helpers';
 import * as helpers from '@/helpers';
 import { dev, myEnum, authority } from '@/config';
 import { testApi } from '@/api';
+import { routerConfig } from '@/router';
 import { Modal } from '@/components/iview';
 import { MyList, IMyList, Const as MyListConst } from '@/components/my-list';
 import { TagType, MyTag } from '@/components/my-tag';
 import { MyConfirm } from '@/components/my-confirm';
 
 import { Base } from '../base';
-import { routerConfig } from '@/router';
 
 
 @Component
 export default class GoodsMgt extends Base {
+    stylePrefix = "goods-mgt-";
     $refs: { list: IMyList<any> };
 
     delShow = false;
@@ -139,6 +140,9 @@ export default class GoodsMgt extends Base {
 
                     queryFn={async (data) => {
                         let rs = await testApi.goodsMgtQuery(data);
+                        rs.rows.forEach(ele => {
+                            ele._disabled = !ele.canDel;
+                        });
                         return rs;
                     }}
 

@@ -14,22 +14,40 @@ import { GoodsSkuModel, GoodsSkuInstanceType } from './goods-sku';
 import { BaseMapper } from '../_base';
 import { FileMapper } from '../file';
 
-type DetailType = {
-    spu: GoodsSpuInstanceType,
-    specGroup: GoodsSpecGroupInstanceType[],
-    sku: GoodsSkuInstanceType[]
+class DetailDataType {
+    spu: GoodsSpuInstanceType;
+    specGroup: GoodsSpecGroupInstanceType[];
+    sku: GoodsSkuInstanceType[];
 };
 
 type SpuResetType = {
     imgHost?: string;
     user: LoginUser
 };
+
+class Detail extends DetailDataType {
+    constructor(data: DetailDataType) {
+        super();
+        this.spu = data.spu;
+        this.specGroup = data.specGroup;
+        this.sku = data.sku;
+    }
+
+    toJSON() {
+        return {
+            spu: this.spu.toJSON(),
+            specGroup: this.specGroup.map(e => e.toJSON()),
+            sku: this.sku.map(e => e.toJSON()),
+        };
+    }
+}
+
 export class GoodsMapper {
     static async mgtSave(data: ValidSchema.GoodsMgtSave, opt: {
         user: LoginUser
     }) {
         let { user } = opt;
-        let detail: DetailType;
+        let detail: DetailDataType;
         let delGroupId = [], delSkuId = [], oldSku: GoodsSkuInstanceType[] = [];
         if (data.spu._id) {
             detail = await GoodsMapper.detailQuery({ _id: data.spu._id });
@@ -86,33 +104,67 @@ export class GoodsMapper {
         return detail;
     }
 
-    static async detailQuery(data: ValidSchema.GoodsMgtDetailQuery) {
+    static async detailQuery(data: ValidSchema.GoodsMgtDetailQuery, opt?: { normal?: boolean }) {
+        opt = {
+            ...opt
+        };
         let spu = await GoodsSpuModel.findOne({ _id: data._id });
         if (!spu)
             throw error('', config.error.DB_NO_DATA);
+        if (opt.normal && !spu.canView())
+            throw error('', config.error.NO_PERMISSIONS);
         let specGroup = await GoodsSpecGroupModel.find({ spuId: spu._id });
         let sku = await GoodsSkuModel.find({ spuId: spu._id });
-        return {
+        let rs = {
             spu,
             specGroup,
             sku
-        } as DetailType;
+        };
+        return new Detail(rs);
     }
 
     static async query(data: ValidSchema.GoodsMgtQuery, opt: {
         audit?: boolean;
+        normal?: boolean;
         user: LoginUser,
         resetOpt: SpuResetType,
     }) {
         let { user } = opt;
         let match: any = {};
-        if (data.status)
-            match.status = { $in: data.status.split(',') };
+        let and = [];
         if (data.name)
             match.name = new RegExp(escapeRegExp(data.name), 'i');
-        if (!opt.audit) {
-            match.userId = user._id;
+        if (data.anyKey) {
+            let anykey = new RegExp(escapeRegExp(data.anyKey), 'i');
+            and = [...and, {
+                $or: [{
+                    name: anykey
+                }, {
+                    profile: anykey
+                }]
+            }];
         }
+
+        if (opt.normal) {
+            let now = new Date();
+            match.status = myEnum.goodsStatus.上架;
+            match.putOnAt = { $lte: now };
+            and = [...and, {
+                $or: [{
+                    expireAt: null
+                }, {
+                    expireAt: { $gt: now }
+                }]
+            }];
+        } else {
+            if (data.status)
+                match.status = { $in: data.status.split(',') };
+            if (!opt.audit) {
+                match.userId = user._id;
+            }
+        }
+        if (and.length)
+            match.$and = and;
         let rs = await GoodsSpuModel.findAndCountAll({
             conditions: match,
             ...BaseMapper.getListOptions(data)

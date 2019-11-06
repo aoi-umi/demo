@@ -299,11 +299,10 @@ export default class Role extends Base {
                     }}
 
                     on-query={(model) => {
-                        let q = { ...model.query };
                         this.$router.push({
                             path: this.$route.path,
                             query: {
-                                ...q,
+                                ...model.query,
                                 status: this.statusList.filter(ele => ele.checked).map(ele => ele.key).join(','),
                                 ...convert.Test.listModelToQuery(model)
                             }
