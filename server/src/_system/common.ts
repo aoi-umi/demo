@@ -216,7 +216,7 @@ export let md5 = function (data: string | Buffer, option?: { encoding: string })
 };
 
 //code: string || errorConfig
-export let error = function (msg, code?, option?) {
+export let error = function (msg, code?, option?: { remark?: string, format?: string; lang?: string }) {
     let opt = {
         lang: 'zh',
         format: null,

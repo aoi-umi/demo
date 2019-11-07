@@ -1,11 +1,15 @@
 
 
-import * as ValidSchema from '@/valid-schema/class-valid';
-import { Auth } from '@/_system/auth';
-import { escapeRegExp, error } from '@/_system/common';
+
 import * as helpers from '@/helpers';
 import * as config from '@/config';
 import { myEnum } from '@/config';
+import * as ValidSchema from '@/valid-schema/class-valid';
+import { Auth } from '@/_system/auth';
+import { escapeRegExp, error } from '@/_system/common';
+import { transaction } from '@/_system/dbMongo';
+import { ThirdPartyPayMapper } from '@/3rd-party';
+import { SendQueue } from '@/task';
 
 import { LoginUser } from '../../login-user';
 import { BaseMapper } from "../_base";
@@ -13,7 +17,6 @@ import { UserMapper } from '../user';
 import { AssetLogMapper } from './asset-log.mapper';
 import { PayModel } from "./pay";
 import { AssetLogModel } from './asset-log';
-import { transaction } from '@/_system/dbMongo';
 import { RefundModel } from './refund';
 
 export class PayMapper {
@@ -153,5 +156,24 @@ export class PayMapper {
                 canRefundApply: false,
             }
         };
+    }
+
+    static async create(data: ValidSchema.PayCreate, opt: { user: LoginUser }) {
+        let { user } = opt;
+        let pay = new PayModel({
+            ...data,
+            userId: user._id,
+        });
+        let { assetLog, payInfo } = await ThirdPartyPayMapper.createPay({
+            pay,
+        });
+        pay.assetLogId = assetLog._id;
+
+        await transaction(async (session) => {
+            await pay.save({ session });
+            await assetLog.save({ session });
+        });
+        SendQueue.payAutoCancel({ _id: pay._id });
+        return payInfo;
     }
 }

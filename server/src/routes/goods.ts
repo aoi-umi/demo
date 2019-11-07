@@ -109,3 +109,13 @@ export const query: RequestHandler = (req, res) => {
         };
     }, req, res);
 };
+
+export const buy: RequestHandler = (req, res) => {
+    responseHandler(async () => {
+        let data = paramsValid(req.body, ValidSchema.GoodsBuy);
+        let myData = req.myData;
+        let user = myData.user;
+        let rs = await GoodsMapper.buy(data, { user });
+        return rs;
+    }, req, res);
+};

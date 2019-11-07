@@ -53,7 +53,7 @@ export class ThirdPartyPayMapper {
         }
         return {
             assetLog,
-            payResult: payRs
+            payInfo: payRs
         };
     }
 
