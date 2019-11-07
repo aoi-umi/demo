@@ -298,6 +298,9 @@ export default class Pay extends Base {
                 </Modal>
                 <MyList
                     ref="list"
+                    hideQueryBtn={{
+                        add: true
+                    }}
                     queryArgs={{
                         orderNo: {
                             label: '单号'

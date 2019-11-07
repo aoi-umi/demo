@@ -1,9 +1,10 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
+import * as mathjs from 'mathjs';
 
 import { testApi } from '@/api';
 import errConfig, { getErrorCfgByCode } from '@/config/error';
 import { convClass } from '@/components/utils';
-import { Carousel, CarouselItem, Row, Col, Divider, Input, Button, Card } from '@/components/iview';
+import { Carousel, CarouselItem, Row, Col, Divider, Input, Button, Card, Modal, RadioGroup, Radio } from '@/components/iview';
 import { MyTag, TagType } from '@/components/my-tag';
 import { MyLoad } from '@/components/my-load';
 import { MyImg } from '@/components/my-img';
@@ -12,6 +13,7 @@ import { Base } from '../base';
 import { DetailType, SkuType } from './goods-mgt-detail';
 
 import './goods.less';
+import { myEnum } from '@/config';
 
 @Component
 export default class GoodsDetail extends Base {
@@ -69,12 +71,24 @@ class GoodsDetailMain extends Base {
         });
     }
 
+    typeList: { key: string; value: any, checked?: boolean }[] = [];
     created() {
+        this.typeList = myEnum.assetSourceType.toArray().filter(ele => ele.value === myEnum.assetSourceType.支付宝).map(ele => {
+            ele['checked'] = false;
+            return ele;
+        });
         this.watchData(this.data);
     }
 
     sku: SkuType = null;
-    quantity = 1;
+    buyInfo = {
+        name: '',
+        payType: myEnum.assetSourceType.支付宝,
+        quantity: 1,
+    };
+    get totalPrice() {
+        return mathjs.round((this.sku ? this.sku.price : 0) * this.buyInfo.quantity, 2) as number;
+    }
 
     selectSpec() {
         let selectSpec = [];
@@ -108,6 +122,7 @@ class GoodsDetailMain extends Base {
         } else {
             this.sku = null;
         }
+        this.buyInfo.name = this.sku ? this.data.spu.name + '-' + this.sku.name : '';
 
         //不可选项
         this.specTag.forEach((ele, idx) => {
@@ -120,7 +135,9 @@ class GoodsDetailMain extends Base {
                 this.specTag.forEach((ele2, idx2) => {
                     if (idx !== idx2) {
                         ele2.value.forEach((v, vIdx) => {
-                            let match = this.data.sku.find(s => s.spec[idx] === selectSpec[idx] && s.spec[idx2] === v.key);
+                            let match = this.data.sku.find(s =>
+                                s.status === myEnum.goodsSkuStatus.上架
+                                && s.spec[idx] === selectSpec[idx] && s.spec[idx2] === v.key);
                             if (!match)
                                 v.disabled = true;
                         });
@@ -130,9 +147,16 @@ class GoodsDetailMain extends Base {
         });
     }
 
+    private payShow = false;
     private buy() {
         this.operateHandler('购买', async () => {
-            throw new Error('还没写');
+            let { payInfo } = await testApi.goodsBuy({
+                quantity: this.buyInfo.quantity,
+                payType: this.buyInfo.payType,
+                totalPrice: this.totalPrice,
+                skuId: this.sku._id,
+            });
+            window.open(payInfo.url, '_blank');
         });
     }
 
@@ -141,6 +165,22 @@ class GoodsDetailMain extends Base {
         let multi = spu.imgUrls.length > 1;
         return (
             <div>
+                <Modal v-model={this.payShow} footer-hide>
+                    <div class={this.getStyleName('pay-box')}>
+                        <p>{this.buyInfo.name}</p>
+                        <p>支付金额: {this.totalPrice.toFixed(2)}</p>
+                        <RadioGroup v-model={this.buyInfo.payType}>
+                            {this.typeList.map(ele => {
+                                return <Radio label={ele.value}>{ele.key}</Radio>;
+                            })}
+                        </RadioGroup>
+                        <div class={this.getStyleName('pay-btn')}>
+                            <Button type="primary" on-click={() => {
+                                this.buy();
+                            }}>支付</Button>
+                        </div>
+                    </div>
+                </Modal>
                 <h2>{spu.name}</h2>
                 <Row gutter={20}>
                     <Col xs={24} sm={8}>
@@ -181,13 +221,13 @@ class GoodsDetailMain extends Base {
                             {this.sku &&
                                 <div>
                                     <span>单价: {this.sku.price}</span>
-                                    <Input type="number" v-model={this.quantity} style={{ width: '60px', marginLeft: '10px' }} />/{this.sku.quantity}
+                                    <Input type="number" v-model={this.buyInfo.quantity} style={{ width: '60px', marginLeft: '10px' }} />/{this.sku.quantity}
                                 </div>
                             }
                             <div class={this.getStyleName('buy')}>
-                                <span>总价:{((this.sku ? this.sku.price : 0) * this.quantity).toFixed(2)}</span>
+                                <span>总价:{this.totalPrice.toFixed(2)}</span>
                                 <Button disabled={!this.sku} on-click={() => {
-                                    this.buy();
+                                    this.payShow = true;
                                 }}>立即购买</Button>
                             </div>
                         </div>

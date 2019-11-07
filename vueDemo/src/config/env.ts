@@ -255,6 +255,9 @@ const config = {
                     url: '/goods/detailQuery',
                     method: 'get',
                 },
+                goodsBuy: {
+                    url: '/goods/buy',
+                },
 
                 //file
                 imgUpload: {

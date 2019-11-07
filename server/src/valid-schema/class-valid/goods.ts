@@ -1,5 +1,5 @@
 import { Transform, Type } from "class-transformer";
-import { IsDefined, IsIn, IsArray, ArrayMinSize, ValidateNested } from "class-validator";
+import { IsDefined, IsIn, IsArray, ArrayMinSize, ValidateNested, IsInt, Min } from "class-validator";
 import { Types } from 'mongoose';
 import { myEnum } from "@/config";
 import { objectIdTransform } from "./util";
@@ -104,4 +104,26 @@ export class GoodsDetailQuery extends GoodsMgtDetailQuery {
 }
 
 export class GoodsQuery extends GoodsMgtQuery {
+}
+
+export class GoodsBuy {
+    @IsDefined()
+    @Transform(objectIdTransform)
+    skuId: Types.ObjectId;
+
+    @IsDefined()
+    @IsIn(myEnum.assetSourceType.getAllValue())
+    @Type()
+    payType: number;
+
+    @Min(1)
+    @IsInt()
+    @IsDefined()
+    @Type()
+    quantity: number;
+
+    @Min(0)
+    @IsDefined()
+    @Type()
+    totalPrice: number;
 }

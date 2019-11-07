@@ -140,4 +140,5 @@ router.post('/goods/mgt/del', UserAuthMid.normal([auth.login]), goods.mgtDel);
 
 router.get('/goods/detailQuery', UserAuthMid.normal(), goods.detailQuery);
 router.get('/goods/query', UserAuthMid.normal(), goods.query);
+router.post('/goods/buy', UserAuthMid.normal(), goods.buy);
 //#endregion

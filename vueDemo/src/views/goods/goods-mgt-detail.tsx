@@ -33,6 +33,8 @@ export type SpuType = {
 };
 type SpecGroupType = { name: string, value: string[] };
 export type SkuType = {
+    _id: string;
+    name: string;
     spec: string[];
     status: number;
     price: number;

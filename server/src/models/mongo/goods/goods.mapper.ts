@@ -1,5 +1,6 @@
 
 import { Types } from 'mongoose';
+import * as mathjs from 'mathjs';
 
 import * as config from '@/config';
 import { myEnum } from '@/config';
@@ -13,6 +14,7 @@ import { GoodsSpecGroupModel, GoodsSpecGroupInstanceType } from './goods-spec-gr
 import { GoodsSkuModel, GoodsSkuInstanceType } from './goods-sku';
 import { BaseMapper } from '../_base';
 import { FileMapper } from '../file';
+import { PayMapper } from '../asset';
 
 class DetailDataType {
     spu: GoodsSpuInstanceType;
@@ -233,5 +235,31 @@ export class GoodsMapper {
         if (!bulk.length)
             return;
         await GoodsSpuModel.bulkWrite(bulk);
+    }
+
+    static async buy(data: ValidSchema.GoodsBuy, opt: { user: LoginUser }) {
+        let sku = await GoodsSkuModel.findOne({ _id: data.skuId });
+        if (!sku)
+            throw error('', config.error.DB_NO_DATA);
+        if (sku.status !== myEnum.goodsSkuStatus.上架)
+            throw error('商品已下架');
+        if (sku.quantity - data.quantity < 0) {
+            throw error(`${sku.name}库存不足`);
+        }
+        let totalPrice = mathjs.round(data.quantity * sku.price, 2) as number;
+        if (totalPrice !== data.totalPrice)
+            throw error('总价不一致', null, { remark: `c:${data.totalPrice};s:${totalPrice}` });
+        let { spu } = await GoodsMapper.detailQuery({ _id: sku.spuId }, { normal: true });
+
+        let name = spu.name + sku.name;
+        let payInfo = await PayMapper.create({
+            money: totalPrice,
+            type: data.payType,
+            title: name,
+            content: name + ' * ' + data.quantity,
+        }, { user: opt.user });
+        return {
+            payInfo: payInfo
+        };
     }
 }
