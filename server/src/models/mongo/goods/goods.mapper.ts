@@ -171,7 +171,7 @@ export class GoodsMapper {
             { $match: match },
             {
                 $lookup: {
-                    from: 'goods_sku',
+                    from: GoodsSkuModel.collection.collectionName,
                     let: { spuId: '$_id' },
                     pipeline: [
                         { $match: { $expr: { $eq: ['$spuId', '$$spuId'] } } },
