@@ -106,6 +106,10 @@ export default class GoodsMgt extends Base {
                         key: 'statusText',
                         minWidth: 120,
                     }, {
+                        title: '销量',
+                        key: 'saleQuantity',
+                        minWidth: 120,
+                    }, {
                         title: '上架时间',
                         key: 'putOnAt',
                         minWidth: 120,

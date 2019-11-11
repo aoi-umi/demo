@@ -167,13 +167,27 @@ export class GoodsMapper {
         }
         if (and.length)
             match.$and = and;
-        let rs = await GoodsSpuModel.findAndCountAll({
-            conditions: match,
+        let rs = await GoodsSpuModel.aggregatePaginate([
+            { $match: match },
+            {
+                $lookup: {
+                    from: 'goods_sku',
+                    let: { spuId: '$_id' },
+                    pipeline: [
+                        { $match: { $expr: { $eq: ['$spuId', '$$spuId'] } } },
+                        { $group: { _id: null, saleQuantity: { $sum: '$saleQuantity' } } }
+                    ],
+                    as: 'skuGroup'
+                }
+            },
+            { $unwind: '$skuGroup' },
+        ], {
             ...BaseMapper.getListOptions(data)
         });
         return {
             rows: rs.rows.map(ele => {
-                let obj = ele.toJSON();
+                let obj = new GoodsSpuModel(ele).toJSON();
+                obj.saleQuantity = ele.skuGroup.saleQuantity;
                 this.resetSpu(obj, opt.resetOpt);
                 return obj;
             }),
