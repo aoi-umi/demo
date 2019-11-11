@@ -76,11 +76,6 @@ export class GoodsSpu extends Base {
     @prop()
     expireAt: Date;
 
-    @prop({
-        default: 0
-    })
-    saleQuantity: number;
-
     @setMethod
     canView() {
         let now = new Date().getTime();
