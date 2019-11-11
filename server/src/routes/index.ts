@@ -101,7 +101,7 @@ router.get('/chat/list', UserAuthMid.normal([auth.login]), chat.list);
 
 //#region pay 
 import * as pay from './pay';
-router.post('/pay/create', UserAuthMid.normal([auth.login]), pay.create);
+// router.post('/pay/create', UserAuthMid.normal([auth.login]), pay.create);
 router.post('/pay/submit', UserAuthMid.normal([auth.login]), pay.submit);
 router.post('/pay/cancel', UserAuthMid.normal([auth.login]), pay.cancel);
 router.get('/pay/query', UserAuthMid.normal([auth.login]), pay.query);

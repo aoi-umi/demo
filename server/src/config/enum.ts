@@ -64,6 +64,9 @@ export const enumDefine = {
         未完成: 0,
         已完成: 1,
     },
+    payContactType: {
+        商品: 1,
+    },
     payStatus: {
         未支付: 0,
         待处理: 1,

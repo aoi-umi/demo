@@ -50,6 +50,20 @@ export class Pay extends Base {
         return myEnum.assetSourceType.getKey(this.type);
     };
 
+    @prop({
+        enum: myEnum.payContactType.getAllValue(),
+        required: true,
+    })
+    contactType: number;
+
+    @prop()
+    get contactTypeText() {
+        return myEnum.payContactType.getKey(this.type);
+    };
+
+    @prop()
+    contactObj: any;
+
     @prop()
     title: string;
 

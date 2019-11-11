@@ -1,5 +1,4 @@
-
-
+import { Types } from 'mongoose';
 
 import * as helpers from '@/helpers';
 import * as config from '@/config';
@@ -15,9 +14,10 @@ import { LoginUser } from '../../login-user';
 import { BaseMapper } from "../_base";
 import { UserMapper } from '../user';
 import { AssetLogMapper } from './asset-log.mapper';
-import { PayModel } from "./pay";
+import { PayModel, PayInstanceType } from "./pay";
 import { AssetLogModel } from './asset-log';
 import { RefundModel } from './refund';
+import { GoodsSkuModel } from '../goods';
 
 export class PayMapper {
     static async query(data: ValidSchema.PayQuery, opt: {
@@ -107,17 +107,29 @@ export class PayMapper {
             await detail.update({ status: toStatus });
             detail.status = toStatus;
         }
-        if (!auto) {
-            let obj = detail.toJSON();
-            let rtn = {
-                userId: obj.userId,
-                status: obj.status,
-                statusText: obj.statusText,
-                canCancel: obj.canCancel,
-                canPay: obj.canPay,
-            };
-            PayMapper.resetDetail(rtn, { user });
-            return rtn;
+        await this.contactCancel(detail);
+        if (auto)
+            return;
+
+        let obj = detail.toJSON();
+        let rtn = {
+            userId: obj.userId,
+            status: obj.status,
+            statusText: obj.statusText,
+            canCancel: obj.canCancel,
+            canPay: obj.canPay,
+        };
+        PayMapper.resetDetail(rtn, { user });
+        return rtn;
+    }
+
+    static async contactCancel(pay: PayInstanceType) {
+        if (pay.contactType === myEnum.payContactType.商品) {
+            let sku = await GoodsSkuModel.findById(pay.contactObj.skuId);
+            if (sku) {
+                let saleQuantity = sku.saleQuantity - pay.contactObj.quantity;
+                await sku.update({ saleQuantity: saleQuantity < 0 ? 0 : saleQuantity });
+            }
         }
     }
 
@@ -158,11 +170,17 @@ export class PayMapper {
         };
     }
 
-    static async create(data: ValidSchema.PayCreate, opt: { user: LoginUser }) {
+    static async create(data: ValidSchema.PayCreate, opt: {
+        user: LoginUser,
+        contactType: number,
+        contactObj: any
+    }) {
         let { user } = opt;
         let pay = new PayModel({
             ...data,
             userId: user._id,
+            contactType: opt.contactType,
+            contactObj: opt.contactObj
         });
         let { assetLog, payInfo } = await ThirdPartyPayMapper.createPay({
             pay,
