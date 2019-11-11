@@ -3,11 +3,18 @@
     border: 1px solid #dcdee2;
     border-color: #e8eaec;
   }
+  &carousel-item {
+    height: 200px !important;
+  }
   &carousel-img {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100%;
+    height: inherit;
+    > * {
+      height: inherit;
+      object-fit: cover;
+    }
   }
 
   &spec-name {

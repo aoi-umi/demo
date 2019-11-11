@@ -106,8 +106,8 @@ export class PayMapper {
             let toStatus = myEnum.payStatus.已取消;
             await detail.update({ status: toStatus });
             detail.status = toStatus;
+            await this.contactCancel(detail);
         }
-        await this.contactCancel(detail);
         if (auto)
             return;
 
