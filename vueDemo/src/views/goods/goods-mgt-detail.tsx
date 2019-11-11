@@ -19,6 +19,7 @@ export type DetailType = {
     spu: SpuType;
     sku: SkuType[];
     specGroup: SpecGroupType[];
+    saveSku?: any[];
 };
 export type SpuType = {
     _id?: string;
@@ -93,6 +94,7 @@ export default class GoodsMgtDetail extends Base {
         } else {
             detail = this.getDetailData() as any;
         }
+        detail.saveSku = [];
         this.innerDetail = detail;
         this.oldDetail = helpers.clone(detail);
         this.sku = detail.sku;
@@ -111,7 +113,11 @@ export default class GoodsMgtDetail extends Base {
                 { required: true, trigger: 'blur', message: '请填写简介' }
             ],
         };
-        let rules = {};
+        let rules = {
+            saveSku: [
+                { type: 'array', required: true, trigger: 'blur', message: '请设置sku', }
+            ]
+        };
         for (let key in spuRules) {
             rules['spu.' + key] = spuRules[key];
         }
@@ -122,14 +128,10 @@ export default class GoodsMgtDetail extends Base {
     async save() {
         await this.operateHandler('提交', async () => {
             this.saving = true;
-            let { spu, specGroup } = this.innerDetail;
+            let { spu, specGroup, saveSku } = this.innerDetail;
             let { imgUrls, ...restSpu } = spu;
 
             await this.$refs.imgs.upload();
-            let saveSku = this.sku.filter(ele => this.skuStatusList.includes(ele.status)).map(ele => {
-                let { imgUrls, ...restSku } = ele;
-                return restSku;
-            });
             restSpu.imgs = imgUrls.map((ele: FileType) => ele.metadata);
             let saveData = {
                 spu: restSpu,
@@ -138,10 +140,16 @@ export default class GoodsMgtDetail extends Base {
             };
             await testApi.goodsMgtSave(saveData);
         }, {
+            beforeValid: () => {
+                this.innerDetail.saveSku = this.sku.filter(ele => this.skuStatusList.includes(ele.status)).map(ele => {
+                    let { imgUrls, ...restSku } = ele;
+                    return restSku;
+                });
+            },
             validate: this.$refs.formVaild.validate,
             onSuccessClose: () => {
                 this.$router.push(routerConfig.goodsMgt.path);
-            }
+            },
         }).finally(() => {
             this.saving = false;
         });
@@ -222,9 +230,11 @@ export default class GoodsMgtDetail extends Base {
                         }}>重置规格</Button>
                     {this.renderSpecGroup()}
                     <Divider size="small">sku</Divider>
+                    <FormItem label="sku" prop="saveSku">
+                    </FormItem>
                     {this.renderSku()}
                 </Form>
-                <Button type="primary" on-click={() => {
+                <Button type="primary" loading={this.saving} on-click={() => {
                     this.save();
                 }}>
                     提交

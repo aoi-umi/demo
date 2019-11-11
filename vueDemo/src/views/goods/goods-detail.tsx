@@ -3,17 +3,18 @@ import * as mathjs from 'mathjs';
 
 import { testApi } from '@/api';
 import errConfig, { getErrorCfgByCode } from '@/config/error';
+import { myEnum } from '@/config';
 import { convClass } from '@/components/utils';
 import { Carousel, CarouselItem, Row, Col, Divider, Input, Button, Card, Modal, RadioGroup, Radio } from '@/components/iview';
 import { MyTag, TagType } from '@/components/my-tag';
 import { MyLoad } from '@/components/my-load';
 import { MyImg } from '@/components/my-img';
+import { MyImgViewer, IMyImgViewer } from '@/components/my-img-viewer';
 
 import { Base } from '../base';
 import { DetailType, SkuType } from './goods-mgt-detail';
 
 import './goods.less';
-import { myEnum } from '@/config';
 
 @Component
 export default class GoodsDetail extends Base {
@@ -48,6 +49,7 @@ export default class GoodsDetail extends Base {
 @Component
 class GoodsDetailMain extends Base {
     stylePrefix = 'goods-';
+    $refs: { imgViewer: IMyImgViewer };
 
     @Prop({
         required: true
@@ -148,7 +150,9 @@ class GoodsDetailMain extends Base {
     }
 
     private payShow = false;
+    private creatingBuy = false;
     private buy() {
+        this.creatingBuy = true;
         this.operateHandler('购买', async () => {
             let { payInfo } = await testApi.goodsBuy({
                 quantity: this.buyInfo.quantity,
@@ -157,9 +161,12 @@ class GoodsDetailMain extends Base {
                 skuId: this.sku._id,
             });
             window.open(payInfo.url, '_blank');
+        }).finally(() => {
+            this.creatingBuy = false;
         });
     }
 
+    showUrl = '';
     render() {
         let { spu } = this.data;
         let multi = spu.imgUrls.length > 1;
@@ -175,23 +182,27 @@ class GoodsDetailMain extends Base {
                             })}
                         </RadioGroup>
                         <div class={this.getStyleName('pay-btn')}>
-                            <Button type="primary" on-click={() => {
+                            <Button type="primary" loading={this.creatingBuy} on-click={() => {
                                 this.buy();
                             }}>支付</Button>
                         </div>
                     </div>
                 </Modal>
                 <h2>{spu.name}</h2>
+                <MyImgViewer ref="imgViewer" src={this.showUrl} />
                 <Row gutter={20}>
                     <Col xs={24} sm={8}>
-                        <Carousel class={this.getStyleName('carousel')} loop height={200}
+                        <Carousel class={this.getStyleName('carousel')} loop
                             arrow={multi ? 'hover' : 'never'}
                             dots={multi ? 'inside' : 'none'}
                         >
                             {spu.imgUrls.map(ele => {
                                 return (
-                                    <CarouselItem>
-                                        <div class={this.getStyleName('carousel-img')}>
+                                    <CarouselItem class={this.getStyleName('carousel-item')}>
+                                        <div class={this.getStyleName('carousel-img')} on-click={() => {
+                                            this.showUrl = ele;
+                                            this.$refs.imgViewer.show();
+                                        }} >
                                             <MyImg src={ele} />
                                         </div>
                                     </CarouselItem>
