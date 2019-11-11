@@ -60,6 +60,13 @@ export default class GoodsMgt extends Base {
         });
     }
 
+    private toEdit(data?) {
+        this.$router.push({
+            path: routerConfig.goodsMgtEdit.path,
+            query: data
+        });
+    }
+
     render() {
         return (
             <div>
@@ -123,10 +130,7 @@ export default class GoodsMgt extends Base {
                                         });
                                     }}>预览</a>
                                     {detail.canUpdate && <a on-click={() => {
-                                        this.$router.push({
-                                            path: routerConfig.goodsMgtEdit.path,
-                                            query: { _id: detail._id }
-                                        });
+                                        this.toEdit({ _id: detail._id });
                                     }}>编辑</a>}
                                     {detail.canDel && <a on-click={() => {
                                         this.delIds = [detail._id];
@@ -144,6 +148,16 @@ export default class GoodsMgt extends Base {
                             ele._disabled = !ele.canDel;
                         });
                         return rs;
+                    }}
+
+                    on-add-click={() => {
+                        this.toEdit();
+                    }}
+
+                    on-reset-click={() => {
+                        this.statusList.forEach(ele => {
+                            ele.checked = false;
+                        });
                     }}
 
                     on-query={(model) => {
