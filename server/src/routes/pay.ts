@@ -6,14 +6,14 @@ import * as ValidSchema from '@/valid-schema/class-valid';
 
 import { PayModel, AssetLogModel, PayMapper } from '@/models/mongo/asset';
 
-export let create: RequestHandler = (req, res) => {
-    responseHandler(async () => {
-        let user = req.myData.user;
-        let data = paramsValid(req.body, ValidSchema.PayCreate);
-        let payResult = await PayMapper.create(data, { user });
-        return payResult;
-    }, req, res);
-};
+// export let create: RequestHandler = (req, res) => {
+//     responseHandler(async () => {
+//         let user = req.myData.user;
+//         let data = paramsValid(req.body, ValidSchema.PayCreate);
+//         let payResult = await PayMapper.create(data, { user });
+//         return payResult;
+//     }, req, res);
+// };
 
 export let submit: RequestHandler = (req, res) => {
     responseHandler(async () => {

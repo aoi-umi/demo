@@ -257,7 +257,12 @@ export class GoodsMapper {
             type: data.payType,
             title: name,
             content: name + ' * ' + data.quantity,
-        }, { user: opt.user });
+        }, {
+            user: opt.user,
+            contactType: myEnum.payContactType.商品,
+            contactObj: { skuId: sku._id, quantity: data.quantity }
+        });
+        await sku.update({ saleQuantity: sku.saleQuantity + data.quantity });
         return {
             payInfo: payInfo
         };
