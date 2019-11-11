@@ -138,7 +138,8 @@ class GoodsDetailMain extends Base {
                     if (idx !== idx2) {
                         ele2.value.forEach((v, vIdx) => {
                             let match = this.data.sku.find(s =>
-                                s.status === myEnum.goodsSkuStatus.上架
+                                s.quantity > 0
+                                && s.status === myEnum.goodsSkuStatus.上架
                                 && s.spec[idx] === selectSpec[idx] && s.spec[idx2] === v.key);
                             if (!match)
                                 v.disabled = true;
