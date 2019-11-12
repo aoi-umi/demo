@@ -139,11 +139,11 @@ class ContentListItem extends Base {
                         <Col class={this.getStyleName('top-col')} nativeOn-click={() => {
                             this.toDetail(ele);
                         }}>
-                            <h3 class={this.getStyleName('list-title')} title={ele.title}>{ele.title}</h3>
-                            <div class="flex-stretch" on-click={() => {
+                            <h3 class={[...this.getStyleName('list-title'), 'flex-stretch']} title={ele.title}>{ele.title}</h3>
+                            {/* <div class="flex-stretch" on-click={() => {
                                 this.toDetail(ele);
                             }}>
-                            </div>
+                            </div> */}
                             {this.mgt && <MyTag value={ele.statusText} />}
                             {this.selectable && <Checkbox value={ele._checked} disabled={ele._disabled} on-on-change={(checked) => {
                                 this.$emit('selected-change', checked);

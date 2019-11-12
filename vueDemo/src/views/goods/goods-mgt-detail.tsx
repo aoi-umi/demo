@@ -31,6 +31,9 @@ export type SpuType = {
     statusText: string;
     putOnAt: string;
     expireAt: string;
+
+    price?: number;
+    saleQuantity?: number;
 };
 type SpecGroupType = { name: string, value: string[] };
 export type SkuType = {

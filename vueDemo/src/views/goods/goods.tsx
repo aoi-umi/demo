@@ -102,7 +102,7 @@ export default class Goods extends Base {
         return (
             <Col
                 class={this.getStyleName('item')}
-                xs={24} sm={6} lg={4}
+                xs={24} sm={12} md={6} lg={4}
                 nativeOn-click={() => {
                     this.toDetail(ele);
                 }}
@@ -110,9 +110,19 @@ export default class Goods extends Base {
                 <Card>
                     <MyImg class={this.getStyleName('cover')} src={ele.imgUrls[0]} />
                     <Divider />
-                    <span class={this.getStyleName('name')}>
-                        {ele.name}
-                    </span>
+                    <div class={this.getStyleName('info')}>
+                        <p title={ele.name} class={this.getStyleName('name')}>
+                            {ele.name}
+                        </p>
+                        <div class={this.getStyleName('sale-box')}>
+                            <span class={[...this.getStyleName('price'), 'flex-stretch']}>
+                                ¥{ele.price}
+                            </span>
+                            <span class='not-important'>
+                                已售{ele.saleQuantity}
+                            </span>
+                        </div>
+                    </div>
                 </Card>
             </Col>
         );
