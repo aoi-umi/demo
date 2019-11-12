@@ -135,43 +135,31 @@ class ContentListItem extends Base {
         return (
             <div>
                 <Card style={{ marginTop: '5px', cursor: this.mgt ? '' : 'pointer' }}>
-                    <Row>
-                        <Col class={this.getStyleName('top-col')} nativeOn-click={() => {
-                            this.toDetail(ele);
-                        }}>
-                            <h3 class={[...this.getStyleName('list-title'), 'flex-stretch']} title={ele.title}>{ele.title}</h3>
-                            {/* <div class="flex-stretch" on-click={() => {
-                                this.toDetail(ele);
-                            }}>
-                            </div> */}
-                            {this.mgt && <MyTag value={ele.statusText} />}
-                            {this.selectable && <Checkbox value={ele._checked} disabled={ele._disabled} on-on-change={(checked) => {
-                                this.$emit('selected-change', checked);
-                            }} />}
-                        </Col>
-                        <Col class={this.getStyleName('user-col')}>
-                            <UserAvatarView user={ele.user} />
-                            {ele.publishAt && <span class="not-important" style={{ marginLeft: '5px' }} on-click={() => {
-                                this.toDetail(ele);
-                            }}>发布于 <Time time={new Date(ele.publishAt)} /></span>}
-                            <div class="flex-stretch" on-click={() => {
-                                this.toDetail(ele);
-                            }}>
-                            </div>
-                        </Col>
-                    </Row>
-                    <Row class={this.getStyleName('content-row')} nativeOn-click={() => {
+                    <div on-click={() => {
                         this.toDetail(ele);
                     }}>
-                        <Col class={this.getStyleName('cover-col')}>
-                            {ele.coverUrl && <img class={[...this.getStyleName('cover'), "my-upload-item cover"]} v-lazy={ele.coverUrl} />}
-                            <p class={this.getStyleName('profile')}>{ele.profile || this.cfg.profile}</p>
-                        </Col>
-                        {this.mgt && <p class="not-important" on-click={() => {
-                            this.toDetail(ele);
-                        }}>创建于 <Time time={new Date(ele.createdAt)} /></p>}
-                    </Row>
-                    <Divider size="small" />
+                        <Row>
+                            <Col class={this.getStyleName('top-col')} >
+                                <h3 class={[...this.getStyleName('list-title'), 'flex-stretch']} title={ele.title}>{ele.title}</h3>
+                                {this.mgt && <MyTag value={ele.statusText} />}
+                                {this.selectable && <Checkbox value={ele._checked} disabled={ele._disabled} on-on-change={(checked) => {
+                                    this.$emit('selected-change', checked);
+                                }} />}
+                            </Col>
+                            <Col class={this.getStyleName('user-col')}>
+                                <UserAvatarView user={ele.user} />
+                                {ele.publishAt && <span class="not-important" style={{ marginLeft: '5px' }}>发布于 <Time time={new Date(ele.publishAt)} /></span>}
+                            </Col>
+                        </Row>
+                        <Row class={this.getStyleName('content-row')}>
+                            <Col class={this.getStyleName('cover-col')}>
+                                {ele.coverUrl && <img class={[...this.getStyleName('cover'), "my-upload-item cover"]} v-lazy={ele.coverUrl} />}
+                                <p class={this.getStyleName('profile')}>{ele.profile || this.cfg.profile}</p>
+                            </Col>
+                            {this.mgt && <p class="not-important">创建于 <Time time={new Date(ele.createdAt)} /></p>}
+                        </Row>
+                        <Divider size="small" />
+                    </div>
                     {this.$slots.default || (!this.mgt ?
                         <ContentOperateView data={ele} voteType={this.cfg.voteType} toDetail={() => {
                             this.toDetail(ele);

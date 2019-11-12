@@ -4,7 +4,7 @@ import { Type, Transform } from "class-transformer";
 
 import { myEnum } from "@/config";
 
-import { arrayTransform } from "./util";
+import { arrayTransform } from "../util";
 import {
     ContentQuery, ContentDetailQuery,
     ContentSave, ContentDel, ContentMgtAudit

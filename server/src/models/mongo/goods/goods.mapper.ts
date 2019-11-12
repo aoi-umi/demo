@@ -167,6 +167,10 @@ export class GoodsMapper {
         }
         if (and.length)
             match.$and = and;
+        let orderBy = data.orderBy;
+        if (['saleQuantity', 'price'].includes(orderBy)) {
+            orderBy = 'skuGroup.' + orderBy;
+        }
         let rs = await GoodsSpuModel.aggregatePaginate([
             { $match: match },
             {
@@ -191,7 +195,8 @@ export class GoodsMapper {
             },
             { $unwind: '$skuGroup' },
         ], {
-            ...BaseMapper.getListOptions(data)
+            ...BaseMapper.getListOptions(data),
+            orderBy,
         });
         return {
             rows: rs.rows.map(ele => {

@@ -108,10 +108,12 @@ export default class GoodsMgt extends Base {
                     }, {
                         title: '销量',
                         key: 'saleQuantity',
+                        sortable: 'custom' as any,
                         minWidth: 120,
                     }, {
                         title: '上架时间',
                         key: 'putOnAt',
+                        sortable: 'custom' as any,
                         minWidth: 120,
                         render: (h, params) => {
                             return (
