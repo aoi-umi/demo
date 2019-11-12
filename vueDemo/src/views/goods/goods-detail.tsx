@@ -10,6 +10,7 @@ import { MyTag, TagType } from '@/components/my-tag';
 import { MyLoad } from '@/components/my-load';
 import { MyImg } from '@/components/my-img';
 import { MyImgViewer, IMyImgViewer } from '@/components/my-img-viewer';
+import { MyNumber } from '@/components/my-number';
 
 import { Base } from '../base';
 import { DetailType, SkuType } from './goods-mgt-detail';
@@ -233,9 +234,11 @@ class GoodsDetailMain extends Base {
                     <Card class={this.getStyleName('buy-box')}>
                         <div class={this.getStyleName('buy-box-cont')}>
                             {this.sku &&
-                                <div>
-                                    <span>单价: {this.sku.price}</span>
-                                    <Input type="number" v-model={this.buyInfo.quantity} style={{ width: '60px', marginLeft: '10px' }} />/{this.sku.quantity}
+                                <div class={this.getStyleName('count-box')}>
+                                    <div>
+                                        单价 {this.sku.price} / 库存 {this.sku.quantity}
+                                    </div>
+                                    <MyNumber v-model={this.buyInfo.quantity} min={1} max={this.sku.quantity} />
                                 </div>
                             }
                             <div class={this.getStyleName('buy')}>

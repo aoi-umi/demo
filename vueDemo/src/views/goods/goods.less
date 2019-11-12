@@ -31,16 +31,23 @@
     display: flex;
     justify-content: flex-end;
     align-items: flex-end;
+    flex-direction: column;
   }
-  &buy {
-    margin-left: 10px;
+  &buy,
+  &count-box {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
+  }
+  &buy {
     button {
       margin-right: 0;
     }
   }
+  &count-box {
+    margin-bottom: 20px;
+  }
+
   &pay-box {
     margin-top: 20px;
     > * {
