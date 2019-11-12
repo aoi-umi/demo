@@ -175,7 +175,16 @@ export class GoodsMapper {
                     let: { spuId: '$_id' },
                     pipeline: [
                         { $match: { $expr: { $eq: ['$spuId', '$$spuId'] } } },
-                        { $group: { _id: null, saleQuantity: { $sum: '$saleQuantity' } } }
+                        { $sort: { price: -1 } },
+                        {
+                            $group: {
+                                _id: null,
+                                saleQuantity: {
+                                    $sum: '$saleQuantity'
+                                },
+                                price: { $first: '$price' }
+                            }
+                        }
                     ],
                     as: 'skuGroup'
                 }
@@ -187,7 +196,9 @@ export class GoodsMapper {
         return {
             rows: rs.rows.map(ele => {
                 let obj = new GoodsSpuModel(ele).toJSON();
-                obj.saleQuantity = ele.skuGroup.saleQuantity;
+                ['saleQuantity', 'price'].forEach(key => {
+                    obj[key] = ele.skuGroup[key];
+                });
                 this.resetSpu(obj, opt.resetOpt);
                 return obj;
             }),

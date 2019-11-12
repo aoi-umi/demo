@@ -55,8 +55,13 @@
 
   &item {
     cursor: pointer;
+    margin-bottom: 10px;
+    .ivu-card {
+      overflow: hidden;
+      border-radius: 6px;
+    }
     .ivu-card-body {
-      padding: 6px;
+      padding: 0px;
     }
     .ivu-divider {
       margin: 5px 0;
@@ -64,14 +69,23 @@
   }
   &cover {
     width: 100%;
-    height: 90px;
+    height: 180px;
     object-fit: cover;
-    img {
-      border-radius: 5px;
-    }
+  }
+  &info {
+    padding: 8px;
   }
   &name {
+    overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  &sale-box {
+    display: flex;
+  }
+  &price {
+    font-weight: bold;
+    color: rgb(255, 58, 58);
   }
 
   &mgt- {
