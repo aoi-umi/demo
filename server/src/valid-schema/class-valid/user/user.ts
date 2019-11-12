@@ -1,7 +1,7 @@
 import { IsArray, IsDefined, ArrayMinSize, MinLength } from "class-validator";
 import { Type, Transform } from "class-transformer";
-import { ListBase, DelBase, DetailQueryBase } from "./base";
-import { objectIdTransform } from "./util";
+import { ListBase, DelBase, DetailQueryBase } from "../base";
+import { objectIdTransform } from "../util";
 
 export class UserAccountExists {
     @IsDefined()

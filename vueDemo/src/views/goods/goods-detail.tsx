@@ -80,6 +80,7 @@ class GoodsDetailMain extends Base {
             return ele;
         });
         this.watchData(this.data);
+        this.selectSpec();
     }
 
     sku: SkuType = null;
@@ -126,20 +127,21 @@ class GoodsDetailMain extends Base {
         }
         this.buyInfo.name = this.sku ? this.data.spu.name + '-' + this.sku.name : '';
 
+        function canBuy(s) {
+            return s.quantity > 0 && s.status === myEnum.goodsSkuStatus.上架;
+        }
         //不可选项
         this.specTag.forEach((ele, idx) => {
             ele.value.forEach(v => {
-                v.disabled = false;
+                v.disabled = !this.data.sku.find(s => canBuy(s) && s.spec[idx] === v.key);
             });
-        });
-        this.specTag.forEach((ele, idx) => {
+
             if (selectSpec[idx]) {
                 this.specTag.forEach((ele2, idx2) => {
                     if (idx !== idx2) {
                         ele2.value.forEach((v, vIdx) => {
                             let match = this.data.sku.find(s =>
-                                s.quantity > 0
-                                && s.status === myEnum.goodsSkuStatus.上架
+                                canBuy(s)
                                 && s.spec[idx] === selectSpec[idx] && s.spec[idx2] === v.key);
                             if (!match)
                                 v.disabled = true;

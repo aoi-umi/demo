@@ -100,11 +100,14 @@ class UserPoptip extends Base {
         let notSelf = this.user._id !== this.storeUser.user._id;
         return (
             <div style={{ display: 'inline-block' }}>
-                <Poptip class="pointer" disabled={this.noTips} trigger="hover" style={{
-                    // zIndex: 10
-                }} placement={this.tipsPlacement} on-on-popper-show={() => {
-                    this.getUserDetail();
-                }}>
+                <Poptip class="pointer" disabled={this.noTips} trigger="hover"
+                    placement={this.tipsPlacement} on-on-popper-show={() => {
+                        this.getUserDetail();
+                    }}
+                    nativeOn-click={(e: MouseEvent) => {
+                        e.stopPropagation();
+                    }}
+                >
                     {this.$slots.default}
                     {this.self ?
                         <div slot="content">

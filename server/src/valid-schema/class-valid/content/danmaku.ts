@@ -4,7 +4,7 @@ import { Type, Transform } from "class-transformer";
 
 import { myEnum } from "@/config";
 
-import { arrayTransform, objectIdTransform } from "./util";
+import { arrayTransform, objectIdTransform } from "../util";
 
 export class DanmakuQuery {
     @IsDefined()
