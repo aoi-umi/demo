@@ -231,7 +231,7 @@ export default class App extends Base {
                         }
                     </div>
                 </Header>
-                <Layout class="no-bg">
+                <Layout class={["no-bg", this.isCollapsed ? "" : "side-menu-open"]}>
                     <Sider
                         class="side-menu"
                         ref="sider"
@@ -253,16 +253,14 @@ export default class App extends Base {
                                     this.isCollapsed = true;
                             }}
                         >
-                            {
-                                this.filterMenu(this.menuCfg).map(data => { return this.renderMenu(data); })
-                            }
+                            {this.filterMenu(this.menuCfg).map(data => { return this.renderMenu(data); })}
                         </Menu>
                     </Sider>
                     {!this.isSmall ? <Content class={["side-menu-blank"]} style={{
                         flex: `0 0 ${this.isCollapsed ? collapsedWidth : this.siderWidth}px`
                     }}></Content> :
                         <transition name="fade">
-                            <div class={style.cls.mask} v-show={!this.isCollapsed} style={{ zIndex: 10 }} on-click={() => {
+                            <div class={style.cls.mask} v-show={!this.isCollapsed} style={{ zIndex: 13 }} on-click={() => {
                                 this.isCollapsed = true;
                             }}></div>
                         </transition>
@@ -275,7 +273,7 @@ export default class App extends Base {
                             <router-view></router-view>
                         }
                     </Content>
-                    <BackTop />
+                    <BackTop bottom={100} />
                 </Layout>
             </Layout>
         );
