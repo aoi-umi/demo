@@ -367,6 +367,7 @@ class MyList<QueryArgs extends QueryArgsType> extends MyBase {
                             placement="top"
                             current={this.model.page.index}
                             page-size={this.model.page.size}
+                            size="small"
                             show-total show-elevator show-sizer={this.showSizer}
                             on-on-change={(page) => {
                                 this.model.page.index = page;

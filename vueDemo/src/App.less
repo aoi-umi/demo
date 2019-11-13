@@ -32,7 +32,7 @@ body {
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
   padding: 0;
   position: fixed;
-  z-index: 12;
+  z-index: 15;
   width: 100%;
   top: 0;
 }
@@ -124,7 +124,7 @@ body {
   top: @headerHeight;
   position: fixed;
   height: 100%;
-  z-index: 11;
+  z-index: 14;
 }
 
 .dialog-view {
@@ -203,4 +203,15 @@ img[lazy="loading"] {
 
 .pointer {
   cursor: pointer;
+}
+
+@media (min-width: 576px) {
+  .my-list-bottom-bar {
+    left: 56px !important;
+  }
+  .side-menu-open {
+    .my-list-bottom-bar {
+      left: 180px !important;
+    }
+  }
 }

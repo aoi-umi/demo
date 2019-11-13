@@ -102,7 +102,7 @@ export default class Goods extends Base {
         return (
             <Col
                 class={this.getStyleName('item')}
-                xs={24} sm={12} md={6} lg={4}
+                xs={12} sm={8} md={6} lg={5} xl={4}
                 nativeOn-click={() => {
                     this.toDetail(ele);
                 }}
