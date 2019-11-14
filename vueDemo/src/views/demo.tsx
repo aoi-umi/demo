@@ -1,22 +1,21 @@
 import { Component, Vue, Watch } from 'vue-property-decorator';
-import anime from 'animejs';
 import 'echarts/lib/chart/line';
 import * as echarts from 'echarts/lib/echarts';
 import * as  QRCode from 'qrcode';
+import { VideoJsPlayer } from 'video.js';
 
 import { testSocket, testApi } from '@/api';
-import { Input, Card, Button, ColorPicker, Row, Col, Checkbox } from '@/components/iview';
+import { Input, Card, Button, Checkbox } from '@/components/iview';
 import { MyList, IMyList } from '@/components/my-list';
 import { MyUpload, IMyUpload } from '@/components/my-upload';
 import { MyVideo, IMyVideo } from '@/components/my-video';
+import { MyEditor } from '@/components/my-editor';
 
 import { Base } from './base';
 import './demo.less';
-import { DanmakuPlayer } from '@/components/my-video/videojs-comp';
-import { VideoJsPlayer } from 'video.js';
 
 
-@Component
+@Component({})
 export default class App extends Base {
     protected stylePrefix = 'demo-';
     public value = '';
@@ -148,34 +147,30 @@ export default class App extends Base {
                         }],
                         danmaku: {
                             danmakuList,
-                            sendFn: async (data) => {
-                                let rs = await this.operateHandler('发送弹幕', async () => {
-                                    data.videoId = this.videoId;
-                                    await testApi.danmakuSubmit(data);
-                                }, { noSuccessHandler: true });
-                                return rs.success;
-                            }
+                            // sendFn: async (data) => {
+                            //     let rs = await this.operateHandler('发送弹幕', async () => {
+                            //         data.videoId = this.videoId;
+                            //         await testApi.danmakuSubmit(data);
+                            //     }, { noSuccessHandler: true });
+                            //     return rs.success;
+                            // }
                         }
                     }} />
-                    <div>
-                        <Button on-click={() => {
-                            this.$refs.videoCover.src = this.captureImage();
-                        }}>截取</Button>
-                        <img width="160" height="90" ref='videoCover' />
-                    </div>
+                </div>
+                <div style={{
+                    display: 'inline-block',
+                }}>
+                    <Button on-click={() => {
+                        this.$refs.videoCover.src = this.captureImage();
+                    }}>截取</Button>
+                    <img width="160" height="90" ref='videoCover' />
                 </div>
                 <div style={{
                     display: 'inline-block',
                     width: '600px',
                     verticalAlign: 'top',
                 }}>
-                    <quill-editor v-model={this.richText} options={{
-                        // theme: 'snow',
-                        // modules: {
-                        //     toolbar: ['bold', 'italic', 'underline', 'strike']
-                        // },
-                        placeholder: '输点啥。。。',
-                    }}></quill-editor>
+                    <MyEditor v-model={this.richText} placeholder='输点啥。。。' />
                     <Button on-click={() => {
                         console.log(this.richText);
                     }}>log</Button>

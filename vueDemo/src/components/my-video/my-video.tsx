@@ -1,6 +1,7 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
-
-import { VideoJsPlayer, VideoJsPlayerOptions } from 'video.js';
+import { VideoJsPlayer } from 'video.js';
+import Swatches from 'vue-swatches';
+import "vue-swatches/dist/vue-swatches.min.css";
 
 import { MyBase } from '../my-base';
 import { convClass } from '../utils';
@@ -8,7 +9,9 @@ import { convClass } from '../utils';
 import './my-video.less';
 import { DanmakuPlayer, DanmakuPlayerOptions } from './videojs-comp';
 
-@Component
+@Component({
+    Swatches
+})
 class MyVideo extends MyBase {
     stylePrefix = 'my-video-'
     @Prop()
@@ -16,23 +19,33 @@ class MyVideo extends MyBase {
 
     player: VideoJsPlayer;
     danmakuPlayer: DanmakuPlayer;
+    get getDp() {
+        return this.danmakuPlayer;
+    }
 
-    $refs: { video: HTMLVideoElement; };
+    $refs: { video: HTMLVideoElement; swatches: any };
 
-    mounted() {
+    protected mounted() {
         this.initPlayer();
     }
 
-    initPlayer() {
+    private initPlayer() {
         let opt = {
             ...this.getDefaultOpt(),
             ...this.options,
         };
+        if (!opt.danmaku)
+            opt.danmaku = {};
+        opt.danmaku = {
+            ...opt.danmaku,
+            elementAfterInput: this.$refs.swatches.$el
+        };
+
         this.danmakuPlayer = new DanmakuPlayer(this.$refs.video, opt);
         this.player = this.danmakuPlayer.player;
     }
 
-    beforeDestroy() {
+    protected beforeDestroy() {
         this.danmakuPlayer.dispose();
     }
 
@@ -45,7 +58,7 @@ class MyVideo extends MyBase {
             // playbackRates: [0.7, 1.0, 1.5, 2.0],
             aspectRatio: '16:9',
             nativeControlsForTouch: false,
-        } as VideoJsPlayerOptions;
+        } as DanmakuPlayerOptions;
     }
 
     capture() {
@@ -68,9 +81,26 @@ class MyVideo extends MyBase {
         this.player.currentTime(0);
     }
 
-    render() {
+    private color = '';
+
+    protected render() {
         return (
             <div class={this.getStyleName('root')}>
+                <div style={{ display: 'none' }}>
+                    <Swatches
+                        ref="swatches"
+                        colors="text-advanced"
+                        class={this.getStyleName('color-picker')}
+                        v-model={this.color}
+                        trigger-style={{
+                            width: '25px', height: '25px',
+                            border: '2px solid',
+                        }}
+                        on-input={(v) => {
+                            this.getDp.color = v;
+                        }}
+                    />
+                </div>
                 <video ref="video" class={this.getStyleName('video').concat(["video-js vjs-default-skin vjs-big-play-centered"])} crossOrigin="*"
                     x5-video-player-type="h5"
                     // x5-video-orientation="landscape"
