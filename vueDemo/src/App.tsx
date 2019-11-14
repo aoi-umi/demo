@@ -169,6 +169,16 @@ export default class App extends Base {
         text: routeConfig.payMgt.text,
         show: () => this.storeUser.user.hasAuth(routeConfig.payMgt.meta.authority)
     }, {
+        to: routeConfig.assetMgt.path,
+        icon: 'md-stats',
+        text: routeConfig.assetMgt.text,
+        show: () => this.storeUser.user.hasAuth(routeConfig.assetMgt.meta.authority)
+    }, {
+        to: routeConfig.goodsMgt.path,
+        icon: 'md-nutrition',
+        text: routeConfig.goodsMgt.text,
+        show: () => this.storeUser.user.hasAuth(routeConfig.goodsMgt.meta.authority)
+    }, {
         to: routeConfig.userMgt.path,
         icon: 'md-people',
         text: routeConfig.userMgt.text,
@@ -183,16 +193,6 @@ export default class App extends Base {
         icon: 'md-lock',
         text: routeConfig.authority.text,
         show: () => this.storeUser.user.hasAuth(routeConfig.authority.meta.authority)
-    }, {
-        to: routeConfig.assetMgt.path,
-        icon: 'md-stats',
-        text: routeConfig.assetMgt.text,
-        show: () => this.storeUser.user.hasAuth(routeConfig.assetMgt.meta.authority)
-    }, {
-        to: routeConfig.goodsMgt.path,
-        icon: 'md-nutrition',
-        text: routeConfig.goodsMgt.text,
-        show: () => this.storeUser.user.hasAuth(routeConfig.goodsMgt.meta.authority)
     },];
 
     private siderWidth = 180;
