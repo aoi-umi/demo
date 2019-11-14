@@ -16,7 +16,7 @@ import { UserPoptipView } from '../comps/user-poptip';
 import './comment.less';
 
 @Component
-class Comment extends Base {
+export class Comment extends Base {
     @Prop()
     ownerId: string;
 

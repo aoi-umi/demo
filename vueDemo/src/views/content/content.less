@@ -37,4 +37,18 @@
     min-width: 200px;
     white-space: pre-wrap;
   }
+
+  &op- {
+    &main {
+      display: flex;
+    }
+    &stretch {
+      > * {
+        flex: 1;
+      }
+    }
+    &item {
+      min-width: 60px;
+    }
+  }
 }

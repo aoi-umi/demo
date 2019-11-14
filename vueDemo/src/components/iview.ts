@@ -3,6 +3,7 @@ const iview = require("iview");
 
 import { convClass } from "./utils";
 
+export const Affix = convClass<iviewTypes.Affix>(iview.Affix);
 export const AutoComplete = convClass<iviewTypes.AutoComplete>(iview.AutoComplete);
 export const Avatar = convClass<iviewTypes.Avatar>(iview.Avatar);
 export const BackTop = convClass<iviewTypes.BackTop>(iview.BackTop);

@@ -4,7 +4,7 @@ import moment from 'dayjs';
 import { testApi } from '@/api';
 import { myEnum, dev } from '@/config';
 import { routerConfig } from '@/router';
-import { FormItem, Button, Divider } from '@/components/iview';
+import { FormItem, Button, Divider, Affix, Card } from '@/components/iview';
 import { MyEditor, IMyEditor } from '@/components/my-editor';
 
 import { ContentDetailType, ContentDataType, ContentMgtDetail, ContentMgtDetailView, ContentLogListView } from './content-mgt-base';
@@ -78,16 +78,22 @@ export default class ArticleMgtDetail extends ArticleMgtBase {
         return (
             <div>
                 <ArticleDetailMainView data={detail} />
-                {operate.length > 0 && <Divider size='small' />}
-                <div>
-                    {operate.map(ele => {
-                        return (
-                            <Button type={ele.type as any} on-click={ele.fn}>
-                                {ele.text}
-                            </Button>
-                        );
-                    })}
-                </div>
+                {operate.length > 0 &&
+                    <div>
+                        <Divider />
+                        <Affix offset-bottom={40}>
+                            <Card>
+                                {operate.map(ele => {
+                                    return (
+                                        <Button type={ele.type as any} on-click={ele.fn}>
+                                            {ele.text}
+                                        </Button>
+                                    );
+                                })}
+                            </Card>
+                        </Affix>
+                    </div>
+                }
                 {this.renderLog()}
                 {this.renderDelConfirm()}
                 {this.renderNotPassConfirm()}

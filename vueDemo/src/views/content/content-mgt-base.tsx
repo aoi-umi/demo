@@ -6,7 +6,7 @@ import { testApi } from '@/api';
 import { myEnum, dev } from '@/config';
 import { routerConfig } from '@/router';
 import { convClass } from '@/components/utils';
-import { Form, FormItem, Button, Modal, Input, Divider, Checkbox, DatePicker } from '@/components/iview';
+import { Form, FormItem, Button, Modal, Input, Divider, Checkbox, DatePicker, Affix, Card } from '@/components/iview';
 import { MyConfirm } from '@/components/my-confirm';
 import { MyList } from '@/components/my-list';
 import { MyUpload, IMyUpload, FileDataType } from '@/components/my-upload';
@@ -428,17 +428,16 @@ export class ContentMgtDetail extends Base {
                         <Input v-model={detail.remark} />
                     </FormItem>
                     {(!detail._id || detail.canUpdate) &&
-                        <div>
-                            <Divider size='small' />
-                            <FormItem>
+                        <Affix offset-bottom={40}>
+                            <Card>
                                 <Button on-click={() => {
                                     this.handleSave(false);
                                 }} loading={this.saving}>保存草稿</Button>
                                 <Button type="primary" on-click={() => {
                                     this.handleSave(true);
                                 }} loading={this.saving}>发布</Button>
-                            </FormItem>
-                        </div>
+                            </Card>
+                        </Affix>
                     }
                 </Form>
                 {this.renderLog()}

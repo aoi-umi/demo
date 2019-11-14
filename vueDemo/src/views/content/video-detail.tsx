@@ -4,7 +4,7 @@ import moment from 'dayjs';
 import { testApi, testSocket } from '@/api';
 import { myEnum, dev } from '@/config';
 import { convClass } from '@/components/utils';
-import { Divider, Spin } from '@/components/iview';
+import { Divider, Spin, Affix, Card } from '@/components/iview';
 import { MyLoad, IMyLoad } from '@/components/my-load';
 import { MyVideo, IMyVideo } from '@/components/my-video';
 import { FileType, FileDataType } from '@/components/my-upload';
@@ -12,14 +12,15 @@ import { FileType, FileDataType } from '@/components/my-upload';
 import { UserAvatarView } from '../comps/user-avatar';
 import { Base } from '../base';
 import { DetailType, DetailDataType } from './video-mgt-detail';
-import { CommentView } from './comment';
+import { CommentView, Comment } from './comment';
 
 import './video.less';
+import { ContentOperateView } from './content';
 
 @Component
 export default class VideoDetail extends Base {
     stylePrefix = 'video-';
-    $refs: { loadView: IMyLoad };
+    $refs: { loadView: IMyLoad, comment: Comment };
 
     render() {
         return (
@@ -36,7 +37,17 @@ export default class VideoDetail extends Base {
                         <div>
                             <VideoDetailMainView data={detail} />
                             <Divider size='small' />
-                            <CommentView ownerId={detail._id} ownUserId={detail.userId} type={myEnum.contentType.视频} />
+                            <Affix offset-bottom={40}>
+                                <Card>
+                                    <ContentOperateView data={detail} voteType={myEnum.voteType.视频} on-operate-click={(type) => {
+                                        if (type === myEnum.contentOperateType.评论) {
+                                            let el = this.$refs.comment.$el as HTMLElement;
+                                            window.scrollTo(0, el.offsetTop);
+                                        }
+                                    }} />
+                                </Card>
+                            </Affix>
+                            <CommentView ref='comment' ownerId={detail._id} ownUserId={detail.userId} type={myEnum.contentType.视频} />
                         </div>
                     );
                 }} />
