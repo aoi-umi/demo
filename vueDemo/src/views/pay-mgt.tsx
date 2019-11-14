@@ -189,6 +189,15 @@ export default class Pay extends Base {
             title: '单号',
             key: 'orderNo',
             minWidth: 120,
+            render: (h, params) => {
+                let detail = params.row;
+                return (this.storeUser.user.hasAuth(authority.payMgtQuery) ? <a on-click={() => {
+                    this.$router.push({
+                        path: routerConfig.assetMgtLog.path,
+                        query: { orderNo: detail.orderNo }
+                    });
+                }}>{detail.orderNo}</a> : <span>{detail.orderNo}</span>);
+            }
         }, {
             title: '标题',
             key: 'title',

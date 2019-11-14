@@ -96,6 +96,15 @@ export class AssetMgtLog extends Base {
                 }, {
                     title: '外部订单号',
                     key: 'outOrderNo',
+                    render: (h, params) => {
+                        let detail = params.row;
+                        return <a on-click={() => {
+                            this.$router.push({
+                                path: routerConfig.assetMgtNotify.path,
+                                query: { outOrderNo: detail.outOrderNo }
+                            });
+                        }}>{detail.outOrderNo}</a>;
+                    }
                 }, {
                     title: '金额',
                     key: 'money',
