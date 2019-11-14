@@ -1,9 +1,13 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
+import { quillEditor } from 'vue-quill-editor';
+
 import { MyInputBase } from '../my-input/my-input';
 import { convClass } from '../utils';
 
 
-@Component
+@Component({
+    quillEditor
+})
 class MyEditor extends MyInputBase {
 
     @Prop({
@@ -32,55 +36,55 @@ class MyEditor extends MyInputBase {
 
     $refs: { quillEditor: any };
 
-    private toolbarTips = [
-        { Choice: '.ql-bold', title: '加粗' },
-        { Choice: '.ql-italic', title: '倾斜' },
-        { Choice: '.ql-underline', title: '下划线' },
-        { Choice: '.ql-header', title: '段落格式' },
-        { Choice: '.ql-strike', title: '删除线' },
-        { Choice: '.ql-blockquote', title: '块引用' },
-        { Choice: '.ql-code-block', title: '插入代码段' },
-        { Choice: '.ql-size', title: '字体大小' },
-        { Choice: '.ql-header[value="1"]', title: 'h1' },
-        { Choice: '.ql-header[value="2"]', title: 'h2' },
-        { Choice: '.ql-list[value="ordered"]', title: '编号列表' },
-        { Choice: '.ql-list[value="bullet"]', title: '项目列表' },
-        { Choice: '.ql-script[value="sub"]', title: '下标' },
-        { Choice: '.ql-script[value="super"]', title: '上标' },
-        { Choice: '.ql-align', title: '对齐方式' },
-        { Choice: '.ql-color', title: '字体颜色' },
-        { Choice: '.ql-background', title: '背景颜色' },
-        { Choice: '.ql-font', title: '字体' },
-        { Choice: '.ql-image', title: '图像' },
-        { Choice: '.ql-video', title: '视频' },
-        { Choice: '.ql-link', title: '添加链接' },
-        { Choice: '.ql-formula', title: '插入公式' },
-        { Choice: '.ql-clean', title: '清除格式' },
-        { Choice: '.ql-indent[value="-1"]', title: '向左缩进' },
-        { Choice: '.ql-indent[value="+1"]', title: '向右缩进' },
-        { Choice: '.ql-direction', title: 'rtl' },
-        { Choice: '.ql-header .ql-picker-label', title: '标题大小' },
-        { Choice: '.ql-header .ql-picker-item[data-value="1"]', title: '标题一' },
-        { Choice: '.ql-header .ql-picker-item[data-value="2"]', title: '标题二' },
-        { Choice: '.ql-header .ql-picker-item[data-value="3"]', title: '标题三' },
-        { Choice: '.ql-header .ql-picker-item[data-value="4"]', title: '标题四' },
-        { Choice: '.ql-header .ql-picker-item[data-value="5"]', title: '标题五' },
-        { Choice: '.ql-header .ql-picker-item[data-value="6"]', title: '标题六' },
-        { Choice: '.ql-header .ql-picker-item:last-child', title: '标准' },
-        { Choice: '.ql-size .ql-picker-item[data-value="small"]', title: '小号' },
-        { Choice: '.ql-size .ql-picker-item[data-value="large"]', title: '大号' },
-        { Choice: '.ql-size .ql-picker-item[data-value="huge"]', title: '超大号' },
-        { Choice: '.ql-size .ql-picker-item:nth-child(2)', title: '标准' },
-        { Choice: '.ql-align .ql-picker-item:first-child', title: '居左对齐' },
-        { Choice: '.ql-align .ql-picker-item[data-value="center"]', title: '居中对齐' },
-        { Choice: '.ql-align .ql-picker-item[data-value="right"]', title: '居右对齐' },
-        { Choice: '.ql-align .ql-picker-item[data-value="justify"]', title: '两端对齐' }
+    private toolbarTips: { choice: string; title: string }[] = [
+        { choice: '.ql-bold', title: '加粗' },
+        { choice: '.ql-italic', title: '倾斜' },
+        { choice: '.ql-underline', title: '下划线' },
+        { choice: '.ql-header', title: '段落格式' },
+        { choice: '.ql-strike', title: '删除线' },
+        { choice: '.ql-blockquote', title: '块引用' },
+        { choice: '.ql-code-block', title: '插入代码段' },
+        { choice: '.ql-size', title: '字体大小' },
+        { choice: '.ql-header[value="1"]', title: 'h1' },
+        { choice: '.ql-header[value="2"]', title: 'h2' },
+        { choice: '.ql-list[value="ordered"]', title: '编号列表' },
+        { choice: '.ql-list[value="bullet"]', title: '项目列表' },
+        { choice: '.ql-script[value="sub"]', title: '下标' },
+        { choice: '.ql-script[value="super"]', title: '上标' },
+        { choice: '.ql-align', title: '对齐方式' },
+        { choice: '.ql-color', title: '字体颜色' },
+        { choice: '.ql-background', title: '背景颜色' },
+        { choice: '.ql-font', title: '字体' },
+        { choice: '.ql-image', title: '图像' },
+        { choice: '.ql-video', title: '视频' },
+        { choice: '.ql-link', title: '添加链接' },
+        { choice: '.ql-formula', title: '插入公式' },
+        { choice: '.ql-clean', title: '清除格式' },
+        { choice: '.ql-indent[value="-1"]', title: '向左缩进' },
+        { choice: '.ql-indent[value="+1"]', title: '向右缩进' },
+        { choice: '.ql-direction', title: 'rtl' },
+        { choice: '.ql-header .ql-picker-label', title: '标题大小' },
+        { choice: '.ql-header .ql-picker-item[data-value="1"]', title: '标题一' },
+        { choice: '.ql-header .ql-picker-item[data-value="2"]', title: '标题二' },
+        { choice: '.ql-header .ql-picker-item[data-value="3"]', title: '标题三' },
+        { choice: '.ql-header .ql-picker-item[data-value="4"]', title: '标题四' },
+        { choice: '.ql-header .ql-picker-item[data-value="5"]', title: '标题五' },
+        { choice: '.ql-header .ql-picker-item[data-value="6"]', title: '标题六' },
+        { choice: '.ql-header .ql-picker-item:last-child', title: '标准' },
+        { choice: '.ql-size .ql-picker-item[data-value="small"]', title: '小号' },
+        { choice: '.ql-size .ql-picker-item[data-value="large"]', title: '大号' },
+        { choice: '.ql-size .ql-picker-item[data-value="huge"]', title: '超大号' },
+        { choice: '.ql-size .ql-picker-item:nth-child(2)', title: '标准' },
+        { choice: '.ql-align .ql-picker-item:first-child', title: '居左对齐' },
+        { choice: '.ql-align .ql-picker-item[data-value="center"]', title: '居中对齐' },
+        { choice: '.ql-align .ql-picker-item[data-value="right"]', title: '居右对齐' },
+        { choice: '.ql-align .ql-picker-item[data-value="justify"]', title: '两端对齐' }
     ];
 
     protected mounted() {
         let el: HTMLElement = this.$refs.quillEditor.$el;
         for (let ele of this.toolbarTips) {
-            let elm = el.querySelector('.quill-editor ' + ele.Choice);
+            let elm = el.querySelector('.quill-editor ' + ele.choice);
             if (!elm)
                 continue;
             elm.setAttribute('title', ele.title);
@@ -115,7 +119,7 @@ class MyEditor extends MyInputBase {
     render() {
         let self = this;
         return (
-            <quill-editor style={{ background: '#fff' }} ref="quillEditor" v-model={this.currentValue} options={{
+            <quillEditor style={{ background: '#fff' }} ref="quillEditor" v-model={this.currentValue} options={{
                 placeholder: this.placeholder,
                 modules: {
                     toolbar: {
@@ -128,7 +132,7 @@ class MyEditor extends MyInputBase {
                     },
                 }
             }
-            }></quill-editor>
+            } />
         );
     }
 }

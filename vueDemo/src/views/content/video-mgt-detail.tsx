@@ -5,10 +5,8 @@ import { testApi } from '@/api';
 import { myEnum, dev } from '@/config';
 import { routerConfig } from '@/router';
 import { FormItem, Button, Divider, Input, Icon, Affix, Card } from '@/components/iview';
-import { MyVideo, IMyVideo } from '@/components/my-video';
 import { MyUpload, IMyUpload, FileDataType, FileType } from '@/components/my-upload';
 
-import { UserAvatarView } from '../comps/user-avatar';
 import { VideoMgtBase } from './video-mgt';
 import { ContentDetailType, ContentDataType, ContentMgtDetail, ContentMgtDetailView, ContentLogListView } from './content-mgt-base';
 
@@ -25,7 +23,7 @@ export type DetailType = ContentDetailType<DetailDataType>;
 @Component
 export default class VideoMgtDetail extends VideoMgtBase {
     stylePrefix = "video-mgt-";
-    $refs: { detailView: ContentMgtDetail, upload: IMyUpload, video: IMyVideo };
+    $refs: { detailView: ContentMgtDetail, upload: IMyUpload };
 
     private innerDetail: DetailType = this.getDetailData();
     protected getDetailData() {

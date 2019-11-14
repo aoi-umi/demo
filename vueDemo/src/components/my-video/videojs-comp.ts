@@ -12,6 +12,7 @@ type DanmakOptions = {
     hide?: boolean;
     danmakuList?: DanmakuDataType[],
     sendFn?: (data) => boolean | Promise<boolean>,
+    elementAfterInput?: HTMLElement | HTMLElement[];
 };
 type DanmakuDataType = {
     msg: string,
@@ -65,8 +66,8 @@ export class DanmakuPlayer {
         //修改control bar
         let controlBar = player.controlBar;
         let controlBarEl = controlBar.el();
-
-        let danmakuHide = this.options.danmaku.hide;
+        let danmakuOpt = this.options.danmaku;
+        let danmakuHide = danmakuOpt.hide;
         let danmakuBar = videojs.dom.createEl('div', {
             className: getClsName(clsPrefix, 'bar') + ' ' + (danmakuHide ? 'vjs-hidden' : ''),
         });
@@ -79,7 +80,11 @@ export class DanmakuPlayer {
             innerText: '发送',
             className: getClsName(clsPrefix, 'send') + ' vjs-control vjs-button',
         }) as any;
-        danmakuBar.append(input, sendBtn);
+        danmakuBar.append(input);
+        if (danmakuOpt.elementAfterInput) {
+            danmakuBar.append(...(danmakuOpt.elementAfterInput instanceof Array ? danmakuOpt.elementAfterInput : [danmakuOpt.elementAfterInput]));
+        }
+        danmakuBar.append(sendBtn);
         let statusBar2 = videojs.dom.createEl('div', {
             tabIndex: -1,
             className: getClsName(clsPrefix, 'status-bar'),
@@ -272,11 +277,8 @@ export class DanmakuPlayer {
         this.input.value = val;
     }
 
-    //todo 颜色
-    private get color() {
-        return '';
-    }
-
+    //颜色
+    color = '';
     danmakuPush(danmaku: DanmakuDataType | DanmakuDataType[]) {
         let list = danmaku instanceof Array ? danmaku : [danmaku];
         list.forEach(ele => {
