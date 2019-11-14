@@ -273,7 +273,7 @@ export default class App extends Base {
                             <router-view></router-view>
                         }
                     </Content>
-                    <BackTop bottom={100} />
+                    <BackTop bottom={100} right={10} />
                 </Layout>
             </Layout>
         );

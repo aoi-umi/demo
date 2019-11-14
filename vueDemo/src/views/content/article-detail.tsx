@@ -3,19 +3,20 @@ import moment from 'dayjs';
 
 import { testApi } from '@/api';
 import { myEnum, dev } from '@/config';
-import { Divider, Spin } from '@/components/iview';
+import { Divider, Affix, Card } from '@/components/iview';
 import { MyLoad, IMyLoad } from '@/components/my-load';
 import { convClass } from '@/components/utils';
 
 import { UserAvatarView } from '../comps/user-avatar';
 import { Base } from '../base';
 import { DetailType, DetailDataType } from './article-mgt-detail';
-import { CommentView } from './comment';
+import { CommentView, Comment } from './comment';
+import { ContentOperateView } from './content';
 
 @Component
 export default class ArticleDetail extends Base {
 
-    $refs: { loadView: IMyLoad };
+    $refs: { loadView: IMyLoad, comment: Comment };
 
     render() {
         return (
@@ -31,8 +32,18 @@ export default class ArticleDetail extends Base {
                     return (
                         <div>
                             <ArticleDetailMainView data={detail} />
+                            <Affix offset-bottom={40}>
+                                <Card>
+                                    <ContentOperateView data={detail} voteType={myEnum.voteType.文章} on-operate-click={(type) => {
+                                        if (type === myEnum.contentOperateType.评论) {
+                                            let el = this.$refs.comment.$el as HTMLElement;
+                                            window.scrollTo(0, el.offsetTop);
+                                        }
+                                    }} />
+                                </Card>
+                            </Affix>
                             <Divider size='small' />
-                            <CommentView ownerId={detail._id} ownUserId={detail.userId} type={myEnum.contentType.文章} />
+                            <CommentView ref='comment' ownerId={detail._id} ownUserId={detail.userId} type={myEnum.contentType.文章} />
                         </div>
                     );
                 }} />
@@ -70,9 +81,8 @@ class ArticleDetailMain extends Base {
                 <br />
                 {this.renderHeader(detail)}
                 <br />
-                <div class="ql-editor" domPropsInnerHTML={detail.content}>
-                </div>
-            </div>
+                <div class="ql-editor" domPropsInnerHTML={detail.content} />
+            </div >
         );
     }
 }

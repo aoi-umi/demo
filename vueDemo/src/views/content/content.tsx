@@ -15,6 +15,7 @@ import './content.less';
 
 @Component
 class ContentOperate extends Base {
+    stylePrefix = 'content-op-'
     @Prop({
         required: true
     })
@@ -24,6 +25,9 @@ class ContentOperate extends Base {
         required: true
     })
     voteType: number;
+
+    @Prop()
+    stretch?: boolean;
 
     @Prop()
     toDetail: () => void;
@@ -43,15 +47,20 @@ class ContentOperate extends Base {
     render() {
         let ele = this.data;
         return (
-            <div style={{ display: 'flex' }}>
+            <div class={[this.getStyleName('main'), this.stretch ? this.getStyleName('stretch') : '']}>
                 {[{
                     icon: 'md-eye',
+                    type: myEnum.contentOperateType.查看,
                     text: ele.readTimes,
                 }, {
                     icon: 'md-text',
-                    text: ele.commentCount
+                    type: myEnum.contentOperateType.评论,
+                    class: 'pointer',
+                    text: ele.commentCount,
                 }, {
                     icon: 'md-thumbs-up',
+                    type: myEnum.contentOperateType.赞,
+                    class: 'pointer',
                     text: ele.like,
                     color: ele.voteValue == myEnum.voteValue.喜欢 ? 'red' : '',
                     onClick: () => {
@@ -59,6 +68,8 @@ class ContentOperate extends Base {
                     }
                 }, {
                     icon: 'md-thumbs-down',
+                    type: myEnum.contentOperateType.踩,
+                    class: 'pointer',
                     text: ele.dislike,
                     color: ele.voteValue == myEnum.voteValue.不喜欢 ? 'red' : '',
                     onClick: () => {
@@ -66,9 +77,10 @@ class ContentOperate extends Base {
                     }
                 }].map(iconEle => {
                     return (
-                        <div class="center" style={{ flex: 1 }}
+                        <div class={["center", this.getStyleName('item'), iconEle.class || '']}
                             on-click={iconEle.onClick || (() => {
                                 this.toDetail && this.toDetail();
+                                this.$emit('operate-click', iconEle.type);
                             })} >
                             <Icon
                                 type={iconEle.icon}
@@ -161,7 +173,7 @@ class ContentListItem extends Base {
                         <Divider size="small" />
                     </div>
                     {this.$slots.default || (!this.mgt ?
-                        <ContentOperateView data={ele} voteType={this.cfg.voteType} toDetail={() => {
+                        <ContentOperateView data={ele} voteType={this.cfg.voteType} stretch toDetail={() => {
                             this.toDetail(ele);
                         }} /> :
                         <div />)}

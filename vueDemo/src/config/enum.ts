@@ -105,6 +105,12 @@ const enumDefineFront = {
         文章: 'article',
         视频: 'video',
     },
+    contentOperateType: {
+        查看: 0,
+        评论: 1,
+        赞: 2,
+        踩: 3
+    },
     userEditType: {
         修改: 'edit',
         封禁: 'disable',

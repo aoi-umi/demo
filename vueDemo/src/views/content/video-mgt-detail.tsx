@@ -4,7 +4,7 @@ import moment from 'dayjs';
 import { testApi } from '@/api';
 import { myEnum, dev } from '@/config';
 import { routerConfig } from '@/router';
-import { FormItem, Button, Divider, Input, Icon } from '@/components/iview';
+import { FormItem, Button, Divider, Input, Icon, Affix, Card } from '@/components/iview';
 import { MyVideo, IMyVideo } from '@/components/my-video';
 import { MyUpload, IMyUpload, FileDataType, FileType } from '@/components/my-upload';
 
@@ -104,16 +104,23 @@ export default class VideoMgtDetail extends VideoMgtBase {
             <div>
                 <VideoDetailMainView data={detail} />
 
-                {operate.length > 0 && <Divider size='small' />}
-                <div>
-                    {operate.map(ele => {
-                        return (
-                            <Button type={ele.type as any} on-click={ele.fn}>
-                                {ele.text}
-                            </Button>
-                        );
-                    })}
-                </div>
+                {operate.length > 0 &&
+                    <div>
+                        <Divider />
+                        <Affix offset-bottom={40}>
+                            <Card>
+                                {operate.map(ele => {
+                                    return (
+                                        <Button type={ele.type as any} on-click={ele.fn}>
+                                            {ele.text}
+                                        </Button>
+                                    );
+                                })}
+                            </Card>
+                        </Affix>
+                    </div>
+
+                }
                 {this.renderLog()}
                 {this.renderDelConfirm()}
                 {this.renderNotPassConfirm()}
