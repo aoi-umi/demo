@@ -13,6 +13,9 @@ export default {
     roleDel: 'roleDel',
     roleSave: 'roleSave',
 
+    settingQuery: 'settingQuery',
+    settingSave: 'settingSave',
+
     articleMgtDel: 'articleMgtDel',
     articleMgtAudit: 'articleMgtAudit',
     videoMgtDel: 'videoMgtDel',

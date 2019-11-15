@@ -37,10 +37,10 @@ var authority = {
     },
 
     videoMgtDel: {
-        code: 'videoMgtDel'
+        code: '视频管理删除'
     },
     videoMgtAudit: {
-        code: 'videoMgtAudit'
+        name: '视频管理审核'
     },
 
     commentMgtDel: {
@@ -56,6 +56,12 @@ var authority = {
     },
     payMgtOperate: {
         name: '支付管理操作'
+    },
+    settingQuery: {
+        name: '设置查询'
+    },
+    settingSave: {
+        name: '设置修改'
     },
 };
 

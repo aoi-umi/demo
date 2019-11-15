@@ -29,8 +29,8 @@ export type SpuType = {
     imgUrls: any[];
     status: number;
     statusText: string;
-    putOnAt: string;
-    expireAt: string;
+    putOnAt: Date;
+    expireAt: Date;
 
     price?: number;
     saleQuantity?: number;
@@ -65,8 +65,8 @@ export default class GoodsMgtDetail extends Base {
                 imgUrls: [],
                 status: myEnum.goodsStatus.上架,
                 statusText: '',
-                putOnAt: '',
-                expireAt: '',
+                putOnAt: null,
+                expireAt: null,
             },
             specGroup: [{
                 name: '款式',
@@ -86,6 +86,10 @@ export default class GoodsMgtDetail extends Base {
             detail = await testApi.goodsMgtDetailQuery({ _id: query._id });
             if (!this.preview) {
                 let { spu } = detail;
+                if (spu.putOnAt)
+                    spu.putOnAt = new Date(spu.putOnAt);
+                if (spu.expireAt)
+                    spu.expireAt = new Date(spu.expireAt);
                 spu.imgUrls = spu.imgUrls.map((ele, idx) => {
                     return { url: ele, fileType: FileDataType.图片, metadata: spu.imgs[idx] };
                 });

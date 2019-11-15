@@ -8,8 +8,9 @@ import { convert } from '@/helpers';
 import { convClass } from '@/components/utils';
 import { Modal, Form, FormItem, Button, RadioGroup, Radio, Input, DatePicker } from '@/components/iview';
 import { MyList, IMyList, Const as MyListConst } from '@/components/my-list';
-import { AuthorityTransferView, IAuthorityTransfer } from '../authority';
-import { IRoleTransfer, RoleTransferView } from '../role';
+
+import { AuthorityTransferView, IAuthorityTransfer } from '../system/authority';
+import { IRoleTransfer, RoleTransferView } from '../system/role';
 import { Base } from '../base';
 import { AuthorityTagView } from '../comps/authority-tag';
 import { RoleTagView } from '../comps/role-tag';

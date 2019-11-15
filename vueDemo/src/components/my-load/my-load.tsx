@@ -33,7 +33,7 @@ class MyLoad extends Vue {
         data: null,
     };
 
-    mounted() {
+    protected mounted() {
         if (!this.notLoadOnMounted)
             this.loadData();
     }

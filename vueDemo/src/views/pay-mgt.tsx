@@ -145,10 +145,10 @@ export default class Pay extends Base {
 
     query() {
         let list = this.$refs.list;
-        let query = this.$route.query;
+        let query: any = this.$route.query;
         list.setQueryByKey({
             ...query,
-            createdAt: [query.createdAtFrom || '', query.createdAtTo || ''],
+            createdAt: [query.createdAtFrom ? new Date(query.createdAtFrom) : '', query.createdAtTo ? new Date(query.createdAtTo) : ''],
         }, ['orderNo', 'outOrderNo', 'anyKey', 'createdAt']);
         let status = this.$route.query.status as string;
         let statusList = status ? status.split(',') : [];

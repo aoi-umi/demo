@@ -1,5 +1,6 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import * as iview from 'iview';
+
 import { testApi } from '@/api';
 import { myEnum, authority } from '@/config';
 import { convert } from '@/helpers';
@@ -10,9 +11,9 @@ import { MyConfirm } from '@/components/my-confirm';
 import { IMyTransfer, MyTransfer } from '@/components/my-transfer';
 import { TagType, MyTag } from '@/components/my-tag';
 
-import { AuthorityTagView, AuthorityDetail } from './comps/authority-tag';
+import { AuthorityTagView, AuthorityDetail } from '../comps/authority-tag';
 import { AuthorityTransferView, IAuthorityTransfer } from './authority';
-import { Base } from './base';
+import { Base } from '../base';
 
 export type DetailDataType = {
     _id?: string;

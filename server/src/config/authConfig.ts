@@ -83,6 +83,13 @@ export const authConfig = {
     payMgtOperate: {
         code: 'payMgtOperate'
     },
+
+    settingQuery: {
+        code: 'settingQuery'
+    },
+    settingSave: {
+        code: 'settingSave'
+    },
 };
 
 export default authConfig;

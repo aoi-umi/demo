@@ -49,7 +49,7 @@ export type ContentDataType = {
     like: number;
     dislike: number;
     setPublish: boolean;
-    setPublishAt: string;
+    setPublishAt: Date;
     publishAt: string;
     userId: string;
 
@@ -301,12 +301,14 @@ export class ContentMgtDetail extends Base {
 
     private coverList = [];
     private async loadDetail() {
-        let detail: ContentDetailType;
-        detail = await this.loadDetailData();
-        this.coverList = detail.detail.coverUrl ? [{ url: detail.detail.coverUrl, fileType: FileDataType.图片 }] : [];
-        this.innerDetail = detail;
+        let detailInfo = await this.loadDetailData();
+        let detail = detailInfo.detail;
+        this.coverList = detail.coverUrl ? [{ url: detail.coverUrl, fileType: FileDataType.图片 }] : [];
+        if (detail.setPublishAt)
+            detail.setPublishAt = new Date(detail.setPublishAt);
+        this.innerDetail = detailInfo;
         this.setRules();
-        return detail;
+        return detailInfo;
     }
 
     async uploadCover() {

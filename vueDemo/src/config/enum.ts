@@ -97,6 +97,12 @@ const enumDefine = {
     fileType: {
         图片: 'image',
         视频: 'video'
+    },
+    settingSignUpType: {
+        开放: 0,
+        限时开放: 1,
+        关闭: 2,
+        限时关闭: 3
     }
 };
 

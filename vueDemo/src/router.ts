@@ -108,7 +108,7 @@ export const routerConfig = {
         meta: {
             authority: [authority.login, authority.roleQuery],
         },
-        component: () => import('./views/role')
+        component: () => import('./views/system/role')
     },
     authority: {
         path: adminPath + '/authorityMgt',
@@ -116,7 +116,15 @@ export const routerConfig = {
         meta: {
             authority: [authority.login, authority.authorityQuery],
         },
-        component: () => import('./views/authority')
+        component: () => import('./views/system/authority')
+    },
+    setting: {
+        path: adminPath + '/setting',
+        text: '系统设置',
+        meta: {
+            authority: [authority.login, authority.settingQuery],
+        },
+        component: () => import('./views/system/setting')
     },
     assetMgt: {
         path: adminPath + '/assetMgt',
