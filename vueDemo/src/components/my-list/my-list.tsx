@@ -395,13 +395,14 @@ class MyList<QueryArgs extends QueryArgsType> extends MyBase {
                         </div>
                     }
                 </div>
-                {this.multiOperateBtnList.length > 0 && <Card class={this.bottomBarClass}>
-                    {this.multiOperateBtnList.map(ele => {
-                        return (
-                            <Button on-click={() => { ele.onClick && ele.onClick(this.selectedRows); }}>{ele.text}</Button>
-                        );
-                    })}
-                </Card>}
+                {this.multiOperateBtnList.length > 0 &&
+                    <Card class={this.bottomBarClass}>
+                        {this.multiOperateBtnList.map(ele => {
+                            return (
+                                <Button on-click={() => { ele.onClick && ele.onClick(this.selectedRows); }}>{ele.text}</Button>
+                            );
+                        })}
+                    </Card>}
             </div>
         );
     }

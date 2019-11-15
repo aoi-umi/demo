@@ -110,6 +110,9 @@ class VideoListItem extends Base {
                 selectable={this.selectable}
                 mgt={this.mgt}
                 contentType={myEnum.contentType.视频}
+                on-selected-change={(checked) => {
+                    this.$emit('selected-change', checked);
+                }}
             >
                 {this.$slots.default}
             </ContentListItemView>
