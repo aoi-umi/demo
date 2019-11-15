@@ -113,6 +113,9 @@ class ArticleListItem extends Base {
                 selectable={this.selectable}
                 mgt={this.mgt}
                 contentType={myEnum.contentType.文章}
+                on-selected-change={(checked) => {
+                    this.$emit('selected-change', checked);
+                }}
             >
                 {this.$slots.default}
             </ContentListItemView>
