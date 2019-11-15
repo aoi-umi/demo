@@ -28,6 +28,9 @@ const config = {
                 userSignUp: {
                     url: '/user/signUp',
                 },
+                userSignUpCheck: {
+                    url: '/user/signUpCheck',
+                },
                 userSignIn: {
                     url: '/user/signIn',
                 },
@@ -257,6 +260,14 @@ const config = {
                 },
                 goodsBuy: {
                     url: '/goods/buy',
+                },
+
+                settingDetailQuery: {
+                    url: '/setting/mgt/detailQuery',
+                    method: 'get',
+                },
+                settingSave: {
+                    url: '/setting/mgt/save',
                 },
 
                 //file

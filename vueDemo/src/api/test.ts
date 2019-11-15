@@ -7,6 +7,7 @@ import { ApiListQueryArgs, ApiMethod } from '.';
 
 type TestApiMethod = ApiMethod<ApiMethodConfigType, {
     userSignUp,
+    userSignUpCheck,
     userSignIn,
     userSignOut,
     userInfo,
@@ -88,6 +89,9 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
     imgGet,
     videoUpload,
     videoGet,
+
+    settingDetailQuery,
+    settingSave,
 }>;
 export type TestApiConfigType = ApiConfigModel<TestApiMethod>;
 
@@ -160,6 +164,9 @@ export class TestApi extends ApiModel<TestApiMethod> {
     //#region user 
     async userSignUp(data: { account: string, nickname: string, password: string }) {
         return this.requestByConfig(this.apiConfig.method.userSignUp, { data });
+    }
+    async userSignUpCheck() {
+        return this.requestByConfig(this.apiConfig.method.userSignUpCheck);
     }
     async userSignIn(data) {
         return this.requestByConfig(this.apiConfig.method.userSignIn, { data });
@@ -397,6 +404,16 @@ export class TestApi extends ApiModel<TestApiMethod> {
     }
     async goodsBuy(data) {
         return this.requestByConfig(this.apiConfig.method.goodsBuy, { data });
+    }
+    //#endregion
+
+    //#region setting 
+
+    async settingDetailQuery(data?) {
+        return this.requestByConfig(this.apiConfig.method.settingDetailQuery, { data });
+    }
+    async settingSave(data) {
+        return this.requestByConfig(this.apiConfig.method.settingSave, { data });
     }
     //#endregion
 }

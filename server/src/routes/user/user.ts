@@ -12,6 +12,7 @@ import { UserModel, UserMapper, UserLogMapper } from '@/models/mongo/user';
 import { FileMapper } from '@/models/mongo/file';
 import { LoginUser } from '@/models/login-user';
 import { FollowModel, FollowInstanceType, FollowMapper } from '@/models/mongo/follow';
+import { SettingMapper } from '@/models/mongo/setting';
 
 export let accountExists: RequestHandler = (req, res) => {
     responseHandler(async () => {
@@ -24,6 +25,9 @@ export let accountExists: RequestHandler = (req, res) => {
 export let signUp: RequestHandler = (req, res) => {
     responseHandler(async () => {
         let data = paramsValid(req.body, ValidSchema.UserSignUp);
+        let setting = await SettingMapper.detailQuery();
+        if (!setting.canSignUp)
+            throw common.error('暂不开放注册', config.error.NO_PERMISSIONS);
         let rs = await UserMapper.accountExists(data.account);
         if (rs)
             throw common.error('账号已存在');
@@ -34,6 +38,14 @@ export let signUp: RequestHandler = (req, res) => {
             _id: user._id,
             account: user.account
         };
+    }, req, res);
+};
+
+export let signUpCheck: RequestHandler = (req, res) => {
+    responseHandler(async () => {
+        let setting = await SettingMapper.detailQuery();
+        if (!setting.canSignUp)
+            throw common.error('暂不开放注册', config.error.NO_PERMISSIONS);
     }, req, res);
 };
 

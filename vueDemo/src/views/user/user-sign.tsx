@@ -10,6 +10,7 @@ import { Input, Form, FormItem, Button } from '@/components/iview';
 import { LoginUser } from '@/model/user';
 
 import { Base } from '../base';
+import { MyLoad } from '@/components/my-load';
 
 
 type SignInDataType = {
@@ -171,6 +172,17 @@ class SignUp extends Base {
     }
 
     render() {
+        return (
+            <MyLoad
+                loadFn={async () => {
+                    await testApi.userSignUpCheck();
+                }}
+                renderFn={() => { return this.renderFn(); }}
+            />
+        )
+    }
+
+    private renderFn() {
         let detail = this.innerDetail;
         return (
             <div class="dialog-view" on-keypress={this.handlePress}>

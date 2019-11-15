@@ -193,6 +193,11 @@ export default class App extends Base {
         icon: 'md-lock',
         text: routeConfig.authority.text,
         show: () => this.storeUser.user.hasAuth(routeConfig.authority.meta.authority)
+    }, {
+        to: routeConfig.setting.path,
+        icon: 'md-settings',
+        text: routeConfig.setting.text,
+        show: () => this.storeUser.user.hasAuth(routeConfig.setting.meta.authority)
     },];
 
     private siderWidth = 180;

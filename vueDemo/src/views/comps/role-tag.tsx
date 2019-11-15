@@ -4,7 +4,7 @@ import { myEnum } from '@/config';
 import { convClass } from '@/components/utils';
 import { MyTagBase } from '@/components/my-tag/my-tag';
 import { Tooltip } from '@/components/iview';
-import { DetailDataType } from '../role';
+import { DetailDataType } from '../system/role';
 import { AuthorityTagView } from './authority-tag';
 
 

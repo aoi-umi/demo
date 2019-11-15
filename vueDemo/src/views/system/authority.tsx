@@ -9,7 +9,7 @@ import { MyList, IMyList, Const as MyListConst } from '@/components/my-list';
 import { MyTransfer, IMyTransfer } from '@/components/my-transfer';
 import { MyConfirm } from '@/components/my-confirm';
 import { MyTag, TagType } from '@/components/my-tag';
-import { Base } from './base';
+import { Base } from '../base';
 
 type DetailDataType = {
     _id?: string;

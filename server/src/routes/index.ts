@@ -8,6 +8,7 @@ import { auth } from '@/config';
 import * as user from './user/user';
 router.post('/user/accountExists', UserAuthMid.normal(), user.accountExists);
 router.post('/user/signUp', UserAuthMid.normal(), user.signUp);
+router.post('/user/signUpCheck', UserAuthMid.normal(), user.signUpCheck);
 router.post('/user/signIn', UserAuthMid.normal(), user.signIn);
 router.post('/user/signOut', UserAuthMid.normal(), user.signOut);
 router.get('/user/info', UserAuthMid.normal([auth.login]), user.info);
@@ -141,4 +142,10 @@ router.post('/goods/mgt/del', UserAuthMid.normal([auth.login]), goods.mgtDel);
 router.get('/goods/detailQuery', UserAuthMid.normal(), goods.detailQuery);
 router.get('/goods/query', UserAuthMid.normal(), goods.query);
 router.post('/goods/buy', UserAuthMid.normal(), goods.buy);
+//#endregion
+
+//#region setting 
+import * as setting from './setting';
+router.get('/setting/mgt/detailQuery', UserAuthMid.normal([auth.settingQuery]), setting.detailQuery);
+router.post('/setting/mgt/save', UserAuthMid.normal([auth.settingSave]), setting.save);
 //#endregion
