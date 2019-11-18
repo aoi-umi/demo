@@ -20,12 +20,16 @@ import { AuthorityTagView } from '../comps/authority-tag';
 import { RoleTagView } from '../comps/role-tag';
 
 import { Base } from '../base';
-import { DetailDataType as UserDetailDataType } from './user-mgt';
 import Article, { ArticleListItemView, ArticleView } from '../content/article';
+import { VideoListItemView } from '../content/video';
+import { DetailDataType as UserDetailDataType } from './user-mgt';
 import { ChatList, ChatListView } from './user-chat';
+
+import './user.less';
 
 @Component
 export default class UserInfo extends Base {
+    stylePrefix = 'user-detail-';
     detail: UserDetailDataType = {};
     tab = '';
     mounted() {
@@ -44,7 +48,10 @@ export default class UserInfo extends Base {
             await this.$refs.loadView.loadData();
         if (loadRs.success) {
             if (myEnum.userTab.getAllValue().includes(query.tab)) {
-                this.tab = query.tab;
+                if (!this.storeUser.user.isLogin && [myEnum.userTab.私信].includes(query.tab)) {
+                    //需要登录的
+                } else
+                    this.tab = query.tab;
             }
             this.changeTab();
         }
@@ -59,6 +66,8 @@ export default class UserInfo extends Base {
             this.handleArticleSearch();
         } else if (this.tab === myEnum.userTab.私信 && !this.tabLoaded.chat) {
             this.handleChatSearch();
+        } else if (this.tab === myEnum.userTab.收藏 && !this.tabLoaded.favourite) {
+            this.handleFavouriteSearch();
         }
     }
 
@@ -79,7 +88,7 @@ export default class UserInfo extends Base {
     $refs: {
         formVaild: iview.Form, loadView: IMyLoad, upload: IMyUpload,
         followerList: FollowList, followingList: FollowList,
-        articleList: Article, chatList: ChatList,
+        articleList: Article, chatList: ChatList, favouriteList: any,
     };
     updateLoading = false;
     private getUpdateUser() {
@@ -218,6 +227,7 @@ export default class UserInfo extends Base {
         follower: false,
         article: false,
         chat: false,
+        favourite: false,
     };
 
     private handleFollowSearch(type) {
@@ -240,21 +250,25 @@ export default class UserInfo extends Base {
         this.tabLoaded.chat = true;
     }
 
+    private handleFavouriteSearch() {
+        this.$refs.favouriteList.query();
+        this.tabLoaded.favourite = true;
+    }
+
     renderInfo() {
         let detail = this.detail;
+        let user = this.storeUser.user;
         return (
-            <div style={{
-                // background: 'rgba(255,255,255,0.6)'
-            }}>
-                <div style={{ display: 'flex', alignItems: 'baseline' }}>
-                    <UserAvatarView user={detail} size="large" noTips showAccount style={{ marginLeft: '10px' }} />
+            <div>
+                <div class={this.getStyleName('main')}>
+                    <UserAvatarView user={detail} size="large" noTips showAccount class={this.getStyleName('avatar')} />
                     {detail.self && <a on-click={() => {
                         this.toggleUpdate(true);
-                    }} style={{ marginLeft: '5px' }}>修改</a>}
-                    <div style={{ flexGrow: 1 }}></div>
-                    {!detail.self && <FollowButtonView style={{ alignItems: 'flex-end' }} user={detail} />}
+                    }} class={this.getStyleName('edit')}>修改</a>}
+                    <div class="flex-stretch"></div>
+                    {!detail.self && <FollowButtonView class={this.getStyleName('follow')} user={detail} />}
                 </div>
-                <Tabs animated={false} v-model={this.tab} style={{ minHeight: '300px' }} on-on-click={(name: string) => {
+                <Tabs animated={false} v-model={this.tab} class={this.getStyleName('tab')} on-on-click={(name: string) => {
                     this.$router.push({
                         path: this.$route.path,
                         query: {
@@ -310,11 +324,16 @@ export default class UserInfo extends Base {
                     }}>
                         <FollowListView ref="followingList" userId={this.detail._id} followType={myEnum.followQueryType.关注} />
                     </TabPane>
-                    <TabPane name={myEnum.userTab.私信} label={() => {
+                    {user.isLogin && <TabPane name={myEnum.userTab.收藏} label={() => {
+                        return <div>收藏</div>;
+                    }}>
+                        <FavouriteListView ref="favouriteList" />
+                    </TabPane>}
+                    {user.isLogin && <TabPane name={myEnum.userTab.私信} label={() => {
                         return <div>私信</div>;
                     }}>
                         <ChatListView ref="chatList" />
-                    </TabPane>
+                    </TabPane>}
                 </Tabs>
             </div>
         );
@@ -394,6 +413,7 @@ export default class UserInfo extends Base {
  */
 @Component
 class FollowList extends Base {
+    stylePrefix = 'user-follow-';
     @Prop({
         required: true
     })
@@ -407,7 +427,7 @@ class FollowList extends Base {
     $refs: {
         list: IMyList<any>,
     };
-    followerAnyKey = '';
+    anyKey = '';
 
     query() {
         this.$refs.list.handleQuery({ resetPage: true });
@@ -415,7 +435,7 @@ class FollowList extends Base {
 
     private async followQuery() {
         let opt = {
-            anyKey: this.followerAnyKey,
+            anyKey: this.anyKey,
             userId: this.userId,
             type: this.followType,
         };
@@ -423,7 +443,7 @@ class FollowList extends Base {
         await this.$refs.list.query(opt);
     }
 
-    private renderFollow(rs: ResultType) {
+    private renderFn(rs: ResultType) {
         if (!rs.success || !rs.data.length) {
             let msg = !rs.success ? rs.msg : '空空的';
             return (
@@ -433,12 +453,11 @@ class FollowList extends Base {
         return rs.data.map(ele => {
             let user = this.followType == myEnum.followQueryType.粉丝 ? ele.followerUser : ele.followingUser;
             return (
-                <Card style={{ marginTop: '5px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline' }}>
+                <Card class={this.getStyleName('main')}>
+                    <div class={this.getStyleName('content')}>
                         <UserAvatarView user={user} />
-                        <span style={{ marginLeft: '5px' }}>{user.profile || dev.defaultProfile}</span>
-                        <div class="flex-stretch">
-                        </div>
+                        <span class={this.getStyleName('profile')}>{user.profile || dev.defaultProfile}</span>
+                        <div class="flex-stretch" />
                         <FollowButtonView user={user} />
                     </div>
                 </Card>
@@ -449,7 +468,7 @@ class FollowList extends Base {
     render() {
         return (
             <div>
-                <Input v-model={this.followerAnyKey} search on-on-search={() => {
+                <Input v-model={this.anyKey} search on-on-search={() => {
                     this.query();
                 }} />
                 <MyList
@@ -466,7 +485,7 @@ class FollowList extends Base {
                     }}
 
                     customRenderFn={(rs) => {
-                        return this.renderFollow(rs);
+                        return this.renderFn(rs);
                     }}
                 />
             </div>
@@ -475,3 +494,70 @@ class FollowList extends Base {
 }
 
 const FollowListView = convClass<FollowList>(FollowList);
+
+/**
+ * 收藏
+ */
+@Component
+
+class FavouriteList extends Base {
+    $refs: {
+        list: IMyList<any>,
+    };
+    anyKey = '';
+    query() {
+        this.$refs.list.handleQuery({ resetPage: true });
+    }
+
+    private async favouriteQuery() {
+        let opt = {
+            anyKey: this.anyKey,
+        };
+        await this.$refs.list.query(opt);
+    }
+
+    render() {
+        return (
+            <div>
+                <Input v-model={this.anyKey} search on-on-search={() => {
+                    this.query();
+                }} />
+                <MyList
+                    ref="list"
+                    type="custom"
+                    hideSearchBox
+                    on-query={(t) => {
+                        this.favouriteQuery();
+                    }}
+
+                    queryFn={async (data) => {
+                        let rs = await testApi.favouriteQuery(data);
+                        return rs;
+                    }}
+
+                    customRenderFn={(rs) => {
+                        return this.renderFn(rs);
+                    }}
+                />
+            </div>
+        );
+    }
+
+    private renderFn(rs: ResultType) {
+        if (!rs.success || !rs.data.length) {
+            let msg = !rs.success ? rs.msg : '空空的';
+            return (
+                <Card class="center" style={{ marginTop: '5px' }}>{msg}</Card>
+            );
+        }
+        return rs.data.map(ele => {
+            if (ele.contentType === myEnum.contentType.文章)
+                return <ArticleListItemView value={ele} />;
+            if (ele.contentType === myEnum.contentType.视频)
+                return <VideoListItemView value={ele} />;
+            return <Card>错误的类型</Card>;
+        });
+    }
+}
+
+const FavouriteListView = convClass<FavouriteList>(FavouriteList);

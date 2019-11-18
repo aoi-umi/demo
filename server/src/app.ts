@@ -19,11 +19,12 @@ debug('my-application');
 (async () => {
     await db.init(config.env.mongoose);
 })().then(async () => {
-    const main = require('./_main');
+    let helpers = await import('./helpers');
     process.on('unhandledRejection', function (e) {
-        main.logger.error('unhandledRejection');
-        main.logger.error(e);
+        helpers.logger.error('unhandledRejection');
+        helpers.logger.error(e);
     });
+    const main = await import('./_main');
     await main.init();
     const app = express();
     app.set('port', process.env.PORT || config.env.port);

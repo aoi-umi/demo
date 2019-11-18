@@ -6,13 +6,14 @@ import { Types, SchemaTypes } from 'mongoose';
 
 import { IVoteOwner } from '../vote';
 import { Base } from '../_base/base';
+import { IFavouriteOwner } from '../favourite';
 
 export type ContentBaseInstanceType = InstanceType<ContentBase>;
 export type ContentBaseDocType = DocType<ContentBaseInstanceType>;
 export type ContentBaseModelType = ModelType<ContentBase, typeof ContentBase>;
 
 @setSchema()
-export abstract class ContentBase extends Base implements IVoteOwner {
+export abstract class ContentBase extends Base implements IVoteOwner, IFavouriteOwner {
     @prop({
         type: SchemaTypes.ObjectId,
         required: true,
@@ -59,6 +60,11 @@ export abstract class ContentBase extends Base implements IVoteOwner {
         default: 0
     })
     dislike: number;
+
+    @prop({
+        default: 0
+    })
+    favourite: number;
 
     @prop({
         default: ''

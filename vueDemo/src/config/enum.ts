@@ -115,7 +115,8 @@ const enumDefineFront = {
         查看: 0,
         评论: 1,
         赞: 2,
-        踩: 3
+        踩: 3,
+        收藏: 4,
     },
     userEditType: {
         修改: 'edit',
@@ -130,6 +131,7 @@ const enumDefineFront = {
         关注: 'following',
         文章: 'article',
         私信: 'chat',
+        收藏: 'favourite',
     },
     chatSendStatus: {
         发送中: 0,

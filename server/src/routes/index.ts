@@ -87,6 +87,12 @@ import * as vote from './content/vote';
 router.post('/vote/submit', UserAuthMid.normal([auth.login]), vote.submit);
 //#endregion
 
+//#region favourite 
+import * as favourite from './content/favourite';
+router.post('/favourite/submit', UserAuthMid.normal([auth.login]), favourite.submit);
+router.get('/favourite/query', UserAuthMid.normal([auth.login]), favourite.query);
+//#endregion
+
 //#region follow 
 import * as follow from './user/follow';
 router.post('/follow/save', UserAuthMid.normal([auth.login]), follow.save);

@@ -16,6 +16,7 @@ import { FollowMapper } from '../follow';
 import { VoteMapper } from '../vote';
 import { UserMapper, UserModel, UserInstanceType } from '../user';
 import { ContentLogModel } from './content-log';
+import { FavouriteMapper } from '../favourite';
 
 export type ContentResetOption = {
     user?: LoginUser,
@@ -90,6 +91,9 @@ export class ContentMapper {
                 ...VoteMapper.lookupPipeline({
                     userId: resetOpt.user._id
                 }),
+                ...FavouriteMapper.lookupPipeline({
+                    userId: resetOpt.user._id
+                }),
                 ...FollowMapper.lookupPipeline({
                     userId: resetOpt.user._id,
                 })
@@ -146,7 +150,9 @@ export class ContentMapper {
         }
         delete detail.follow;
         detail.voteValue = detail.vote ? detail.vote.value : myEnum.voteValue.无;
+        detail.favouriteValue = detail.favouriteDetail ? detail.favouriteDetail.favourite : false;
         delete detail.vote;
+        delete detail.favouriteDetail;
         return detail;
     }
 

@@ -2,15 +2,16 @@ import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import * as iview from 'iview';
 import axios, { AxiosRequestConfig } from 'axios';
 import { VueCropper } from 'vue-cropper';
+
 import { Upload, Modal, Icon, Progress, Button } from '../iview';
 import { Utils, convClass } from '../utils';
 import { MyImg } from '../my-img';
 import { MyImgViewer, IMyImgViewer } from '../my-img-viewer';
 import { MyBase } from '../my-base';
+import { MyVideo, IMyVideo } from '../my-video';
 
 import * as style from '../style';
 import './my-upload.less';
-import { MyVideo, IMyVideo } from '../my-video';
 
 export const FileDataType = {
     未知: 0,

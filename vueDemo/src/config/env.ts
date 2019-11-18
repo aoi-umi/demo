@@ -186,8 +186,12 @@ const config = {
                 voteSubmit: {
                     url: '/vote/submit',
                 },
-                followSave: {
-                    url: '/follow/save',
+                favouriteSubmit: {
+                    url: '/favourite/submit',
+                },
+                favouriteQuery: {
+                    url: '/favourite/query',
+                    method: 'get',
                 },
                 followQuery: {
                     url: '/follow/query',

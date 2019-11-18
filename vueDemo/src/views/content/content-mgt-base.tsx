@@ -48,12 +48,14 @@ export type ContentDataType = {
     commentCount: number;
     like: number;
     dislike: number;
+    favourite: number;
     setPublish: boolean;
     setPublishAt: Date;
     publishAt: string;
     userId: string;
 
     voteValue: number;
+    favouriteValue: boolean;
     canUpdate: boolean;
     canDel: boolean;
     user: { _id: string; nickname: string; account: string };
