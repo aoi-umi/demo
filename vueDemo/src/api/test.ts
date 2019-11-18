@@ -60,6 +60,8 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
     commentDel,
 
     voteSubmit,
+    favouriteSubmit,
+    favouriteQuery,
     followSave,
     followQuery,
     chatSubmit,
@@ -326,6 +328,15 @@ export class TestApi extends ApiModel<TestApiMethod> {
     //#region vote 
     async voteSubmit(data) {
         return this.requestByConfig(this.apiConfig.method.voteSubmit, { data });
+    }
+    //#endregion
+
+    //#region favourite 
+    async favouriteSubmit(data) {
+        return this.requestByConfig(this.apiConfig.method.favouriteSubmit, { data });
+    }
+    async favouriteQuery(data) {
+        return this.requestByConfig(this.apiConfig.method.favouriteQuery, { data });
     }
     //#endregion
 

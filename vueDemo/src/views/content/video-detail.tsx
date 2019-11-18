@@ -39,7 +39,7 @@ export default class VideoDetail extends Base {
                             <Divider size='small' />
                             <Affix offset-bottom={40}>
                                 <Card>
-                                    <ContentOperateView data={detail} voteType={myEnum.voteType.视频} on-operate-click={(type) => {
+                                    <ContentOperateView data={detail} contentType={myEnum.contentType.视频} voteType={myEnum.voteType.视频} on-operate-click={(type) => {
                                         if (type === myEnum.contentOperateType.评论) {
                                             let el = this.$refs.comment.$el as HTMLElement;
                                             window.scrollTo(0, el.offsetTop);

@@ -26,6 +26,11 @@ class ContentOperate extends Base {
     })
     voteType: number;
 
+    @Prop({
+        required: true
+    })
+    contentType: number;
+
     @Prop()
     stretch?: boolean;
 
@@ -44,6 +49,18 @@ class ContentOperate extends Base {
         });
     }
 
+    private handleFavourite(detail, favourite) {
+        this.operateHandler('', async () => {
+            let rs = await testApi.favouriteSubmit({ ownerId: detail._id, favourite, type: this.voteType });
+            for (let key in rs) {
+                detail[key] = rs[key];
+            }
+            detail.favouriteValue = favourite;
+        }, {
+            noSuccessHandler: true
+        });
+    }
+
     render() {
         let ele = this.data;
         return (
@@ -57,6 +74,15 @@ class ContentOperate extends Base {
                     type: myEnum.contentOperateType.评论,
                     class: 'pointer',
                     text: ele.commentCount,
+                }, {
+                    icon: 'md-heart',
+                    type: myEnum.contentOperateType.收藏,
+                    class: 'pointer',
+                    text: ele.favourite,
+                    color: ele.favouriteValue ? 'red' : '',
+                    onClick: () => {
+                        this.handleFavourite(ele, !ele.favouriteValue);
+                    }
                 }, {
                     icon: 'md-thumbs-up',
                     type: myEnum.contentOperateType.赞,
@@ -173,7 +199,7 @@ class ContentListItem extends Base {
                         <Divider size="small" />
                     </div>
                     {this.$slots.default || (!this.mgt ?
-                        <ContentOperateView data={ele} voteType={this.cfg.voteType} stretch toDetail={() => {
+                        <ContentOperateView data={ele} contentType={this.contentType} voteType={this.cfg.voteType} stretch toDetail={() => {
                             this.toDetail(ele);
                         }} /> :
                         <div />)}
