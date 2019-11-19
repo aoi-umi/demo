@@ -180,14 +180,12 @@ export default class UserMgt extends Base {
         }, {
             title: '账号',
             key: 'account',
-            minWidth: 120,
             render: (h, params) => {
                 return <UserAvatarView style={{ margin: '5px' }} user={params.row} />;
             }
         }, {
             title: '角色',
             key: 'roleList',
-            minWidth: 120,
             render: (h, params) => {
                 let roleList = params.row.roleList;
                 return <RoleTagView value={roleList} />;
@@ -195,7 +193,6 @@ export default class UserMgt extends Base {
         }, {
             title: '权限',
             key: 'authorityList',
-            minWidth: 120,
             render: (h, params) => {
                 return <AuthorityTagView value={params.row.authorityList} />;
             }
@@ -203,14 +200,12 @@ export default class UserMgt extends Base {
             title: '创建时间',
             key: 'createdAt',
             sortable: 'custom' as any,
-            minWidth: 120,
             render: (h, params) => {
                 return <label>{moment(params.row.createdAt).format(dev.dateFormat)}</label>;
             }
         }, {
             title: '状态',
             key: 'statusText',
-            minWidth: 120,
         }, {
             title: '操作',
             key: 'action',
@@ -275,6 +270,9 @@ export default class UserMgt extends Base {
                     }}
                     hideQueryBtn={{ add: true, }}
 
+                    defaultColumn={{
+                        minWidth: 120
+                    }}
                     columns={this.getColumns()}
 
                     queryFn={async (data) => {

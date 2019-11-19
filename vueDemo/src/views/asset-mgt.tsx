@@ -81,6 +81,9 @@ export class AssetMgtLog extends Base {
 
                 customQueryNode={<MyTag v-model={this.statusList} />}
 
+                defaultColumn={{
+                    minWidth: 120
+                }}
                 columns={[{
                     title: '订单号',
                     key: 'orderNo',

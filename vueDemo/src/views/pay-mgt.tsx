@@ -176,7 +176,7 @@ export default class Pay extends Base {
             columns.push({
                 title: '用户',
                 key: 'user',
-                minWidth: 120,
+                minWidth: 160,
                 render: (h, params) => {
                     let detail = params.row;
                     return (
@@ -209,11 +209,9 @@ export default class Pay extends Base {
         }, {
             title: '金额',
             key: 'money',
-            minWidth: 80,
         }, {
             title: '支付类型',
             key: 'typeText',
-            minWidth: 80,
         }, {
             title: '外部单号',
             key: 'outOrderNo',
@@ -230,15 +228,12 @@ export default class Pay extends Base {
         }, {
             title: '状态',
             key: 'statusText',
-            minWidth: 80,
         }, {
             title: '退款状态',
             key: 'refundStatusText',
-            minWidth: 80,
         }, {
             title: '创建时间',
             key: 'createdAt',
-            minWidth: 80,
             render: (h, params) => {
                 let detail = params.row;
                 return (
@@ -328,6 +323,9 @@ export default class Pay extends Base {
                     }}
                     customQueryNode={<MyTag v-model={this.statusList} />}
 
+                    defaultColumn={{
+                        minWidth: 80
+                    }}
                     columns={this.getColumns()}
 
                     queryFn={async (data) => {
