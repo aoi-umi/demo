@@ -88,6 +88,11 @@ export default class GoodsMgt extends Base {
                             label: '名字',
                         },
                     }}
+
+                    defaultColumn={{
+                        minWidth: 120
+                    }}
+
                     columns={[{
                         key: '_selection',
                         type: 'selection',
@@ -96,25 +101,20 @@ export default class GoodsMgt extends Base {
                     }, {
                         title: '名字',
                         key: 'name',
-                        minWidth: 120,
                     }, {
                         title: '简介',
                         key: 'profile',
-                        minWidth: 120,
                     }, {
                         title: '状态',
                         key: 'statusText',
-                        minWidth: 120,
                     }, {
                         title: '销量',
                         key: 'saleQuantity',
                         sortable: 'custom' as any,
-                        minWidth: 120,
                     }, {
                         title: '上架时间',
                         key: 'putOnAt',
                         sortable: 'custom' as any,
-                        minWidth: 120,
                         render: (h, params) => {
                             return (
                                 <span>{moment(params.row.putOnAt).format(dev.dateFormat)}</span>

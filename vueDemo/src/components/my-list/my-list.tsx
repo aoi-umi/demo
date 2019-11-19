@@ -37,6 +37,28 @@ export type ResultType = {
 
 export type OnSortChangeOptions = { column: any, key: string, order: string };
 
+type ColType = {
+    type?: string;
+    title?: string,
+    key?: string,
+    width?: number;
+    minWidth?: number;
+    maxWidth?: number;
+    align?: string;
+    className?: string;
+    fixed?: string;
+    ellipsis?: boolean;
+    tooltip?: boolean;
+    render?: (h: any, params: { row: any; column: any }) => any;
+    renderHeader?: (h: any, params: { column: any }) => any;
+    indexMethod?: () => any;
+    sortable?: boolean | 'custom';
+    sortMethod?: () => any;
+    sortType?: 'asc' | 'desc';
+
+    //自定义字段
+    hide?: boolean;
+};
 @Component
 class MyList<QueryArgs extends QueryArgsType> extends MyBase {
     @Prop({
@@ -45,28 +67,11 @@ class MyList<QueryArgs extends QueryArgsType> extends MyBase {
     type: 'table' | 'custom';
 
     @Prop()
-    columns?: {
-        type?: string;
-        title?: string,
-        key?: string,
-        width?: number;
-        minWidth?: number;
-        maxWidth?: number;
-        align?: string;
-        className?: string;
-        fixed?: string;
-        ellipsis?: boolean;
-        tooltip?: boolean;
-        render?: (h: any, params: { row: any; column: any }) => any;
-        renderHeader?: (h: any, params: { column: any }) => any;
-        indexMethod?: () => any;
-        sortable?: boolean | 'custom';
-        sortMethod?: () => any;
-        sortType?: 'asc' | 'desc';
+    columns?: ColType[];
+    private cols?: ColType[];
 
-        //自定义字段
-        hide?: boolean;
-    }[];
+    @Prop()
+    defaultColumn?: ColType;
 
     @Prop()
     customRenderFn?: (result: ResultType) => any;
@@ -104,7 +109,7 @@ class MyList<QueryArgs extends QueryArgsType> extends MyBase {
     infiniteScroll?: boolean;
 
     @Prop()
-    customOperateView: any;
+    customOperateView?: any;
 
     @Prop()
     queryFn?: (data: any) => MyListResult | Promise<MyListResult>;
@@ -112,8 +117,18 @@ class MyList<QueryArgs extends QueryArgsType> extends MyBase {
     stylePrefix = clsPrefix;
 
     protected created() {
-        if (this.type == 'table' && !this.columns) {
-            throw new Error(`type 'table' require 'columns'!`);
+        if (this.type == 'table') {
+            if (!this.columns)
+                throw new Error(`type 'table' require 'columns'!`);
+            this.cols = this.columns;
+            if (this.defaultColumn) {
+                this.cols.forEach(ele => {
+                    for (let key in this.defaultColumn) {
+                        if (!(key in ele))
+                            ele[key] = this.defaultColumn[key];
+                    }
+                });
+            }
         } else if (this.type == 'custom' && !this.customRenderFn) {
             throw new Error(`type 'custom' require 'customRenderFn'!`);
         }
@@ -331,7 +346,7 @@ class MyList<QueryArgs extends QueryArgsType> extends MyBase {
                 <div class={this.getStyleName('content')}>
                     {this.$slots.default}
                     {this.type == 'table' ?
-                        <Table class={this.getStyleName('table')} columns={this.columns.filter(ele => {
+                        <Table class={this.getStyleName('table')} columns={this.cols.filter(ele => {
                             let sort = this.model.sort;
                             ele.sortType = '' as any;
                             if (sort.orderBy && sort.sortOrder) {

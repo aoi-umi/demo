@@ -1,6 +1,6 @@
 import { Component, Vue, Watch, Prop } from "vue-property-decorator";
 
-import * as router from '@/router';
+import { routerConfig } from '@/router';
 import {
     Menu, MenuItem,
     Icon, Content, Sider, Layout, Header, Button, Modal, BackTop, Submenu,
@@ -9,7 +9,6 @@ import * as style from '@/components/style';
 
 import { testApi, testSocket } from './api';
 import { dev, authority, env } from './config';
-const routeConfig = router.routerConfig;
 import "./App.less";
 import { SignInView } from './views/user/user-sign';
 import { Base } from './views/base';
@@ -21,13 +20,18 @@ export default class App extends Base {
     isCollapsed = true;
     theme = "light" as any;
     title = '';
-    activeName = this.getActiveNameByPath(location.pathname);
+    activeName = '';
     $refs: { sider: any, menu: iView.Menu };
 
     getActiveNameByPath(path: string) {
-        let split = path.split('/');
-        let slice = split[1] === 'admin' ? 3 : 2;
-        let name = split.slice(0, slice).join('/');
+        let name = '';
+        let matchLen = 0;
+        this.menuCfg.forEach(ele => {
+            if (path.startsWith(ele.to) && ele.to.length > matchLen) {
+                name = ele.to;
+                matchLen = ele.to.length;
+            }
+        });
         return name;
     }
 
@@ -35,6 +39,7 @@ export default class App extends Base {
         this.setTitle();
         this.getUserInfo();
         this.handleResize();
+        this.activeName = this.getActiveNameByPath(location.pathname);
     }
 
     private isSmall = false;
@@ -64,9 +69,9 @@ export default class App extends Base {
                 testSocket.login({ [dev.cacheKey.testUser]: token });
                 this.storeUser.setUser(user);
                 if (user) {
-                    if (location.pathname === routeConfig.userSignIn.path) {
+                    if (location.pathname === routerConfig.userSignIn.path) {
                         let { to, ...query } = this.$route.query;
-                        to = (to as string) || routeConfig.index.path;
+                        to = (to as string) || routerConfig.index.path;
                         let toQuery = query;
                         this.$router.push({ path: to, query: toQuery });
                     }
@@ -142,62 +147,62 @@ export default class App extends Base {
     }
 
     private menuCfg: MenuConfig[] = [{
-        to: routeConfig.bookmark.path,
+        to: routerConfig.bookmark.path,
         icon: 'md-home',
-        text: routeConfig.bookmark.text,
+        text: routerConfig.bookmark.text,
         show: false,
     }, {
-        to: routeConfig.video.path,
+        to: routerConfig.video.path,
         icon: 'logo-youtube',
-        text: routeConfig.video.text,
+        text: routerConfig.video.text,
     }, {
-        to: routeConfig.article.path,
+        to: routerConfig.article.path,
         icon: 'md-paper',
-        text: routeConfig.article.text,
+        text: routerConfig.article.text,
     }, {
-        to: routeConfig.goods.path,
+        to: routerConfig.goods.path,
         icon: 'md-cart',
-        text: routeConfig.goods.text,
+        text: routerConfig.goods.text,
     }, {
-        to: routeConfig.contentMgt.path,
+        to: routerConfig.contentMgt.path,
         icon: 'md-create',
-        text: routeConfig.contentMgt.text,
-        show: () => this.storeUser.user.hasAuth(routeConfig.contentMgt.meta.authority)
+        text: routerConfig.contentMgt.text,
+        show: () => this.storeUser.user.hasAuth(routerConfig.contentMgt.meta.authority)
     }, {
-        to: routeConfig.payMgt.path,
+        to: routerConfig.payMgt.path,
         icon: 'logo-usd',
-        text: routeConfig.payMgt.text,
-        show: () => this.storeUser.user.hasAuth(routeConfig.payMgt.meta.authority)
+        text: routerConfig.payMgt.text,
+        show: () => this.storeUser.user.hasAuth(routerConfig.payMgt.meta.authority)
     }, {
-        to: routeConfig.assetMgt.path,
+        to: routerConfig.assetMgt.path,
         icon: 'md-stats',
-        text: routeConfig.assetMgt.text,
-        show: () => this.storeUser.user.hasAuth(routeConfig.assetMgt.meta.authority)
+        text: routerConfig.assetMgt.text,
+        show: () => this.storeUser.user.hasAuth(routerConfig.assetMgt.meta.authority)
     }, {
-        to: routeConfig.goodsMgt.path,
+        to: routerConfig.goodsMgt.path,
         icon: 'md-nutrition',
-        text: routeConfig.goodsMgt.text,
-        show: () => this.storeUser.user.hasAuth(routeConfig.goodsMgt.meta.authority)
+        text: routerConfig.goodsMgt.text,
+        show: () => this.storeUser.user.hasAuth(routerConfig.goodsMgt.meta.authority)
     }, {
-        to: routeConfig.userMgt.path,
+        to: routerConfig.userMgt.path,
         icon: 'md-people',
-        text: routeConfig.userMgt.text,
-        show: () => this.storeUser.user.hasAuth(routeConfig.userMgt.meta.authority)
+        text: routerConfig.userMgt.text,
+        show: () => this.storeUser.user.hasAuth(routerConfig.userMgt.meta.authority)
     }, {
-        to: routeConfig.role.path,
+        to: routerConfig.role.path,
         icon: 'md-person',
-        text: routeConfig.role.text,
-        show: () => this.storeUser.user.hasAuth(routeConfig.role.meta.authority)
+        text: routerConfig.role.text,
+        show: () => this.storeUser.user.hasAuth(routerConfig.role.meta.authority)
     }, {
-        to: routeConfig.authority.path,
+        to: routerConfig.authority.path,
         icon: 'md-lock',
-        text: routeConfig.authority.text,
-        show: () => this.storeUser.user.hasAuth(routeConfig.authority.meta.authority)
+        text: routerConfig.authority.text,
+        show: () => this.storeUser.user.hasAuth(routerConfig.authority.meta.authority)
     }, {
-        to: routeConfig.setting.path,
+        to: routerConfig.setting.path,
         icon: 'md-settings',
-        text: routeConfig.setting.text,
-        show: () => this.storeUser.user.hasAuth(routeConfig.setting.meta.authority)
+        text: routerConfig.setting.text,
+        show: () => this.storeUser.user.hasAuth(routerConfig.setting.meta.authority)
     },];
 
     private siderWidth = 180;
@@ -230,7 +235,7 @@ export default class App extends Base {
                                     });
                                 }}>登录</Button>,
                                 <Button on-click={() => {
-                                    this.$router.push(routeConfig.userSignUp.path);
+                                    this.$router.push(routerConfig.userSignUp.path);
                                 }}>注册</Button>
                             ]
                         }
