@@ -81,7 +81,9 @@ class ArticleDetailMain extends Base {
                 <br />
                 {this.renderHeader(detail)}
                 <br />
-                <div class="ql-editor" domPropsInnerHTML={detail.content} />
+                <div class="ql-snow">
+                    <div class="ql-editor" domPropsInnerHTML={detail.content} />
+                </div>
             </div >
         );
     }
