@@ -5,12 +5,13 @@ import * as helpers from '@/helpers';
 import { dev, myEnum } from '@/config';
 import { routerConfig } from '@/router';
 import { testApi, testSocket } from '@/api';
+import { LocalStore } from '@/store';
 import { convClass } from '@/components/utils';
-import { Input, Form, FormItem, Button } from '@/components/iview';
+import { Input, Form, FormItem, Button, Checkbox } from '@/components/iview';
+import { MyLoad } from '@/components/my-load';
 import { LoginUser } from '@/model/user';
 
 import { Base } from '../base';
-import { MyLoad } from '@/components/my-load';
 
 
 type SignInDataType = {
@@ -47,11 +48,17 @@ class SignIn extends Base {
             let { account, password } = this.innerDetail;
             let req = { account, rand: helpers.randStr() };
             let token = LoginUser.createToken(account, password, req);
-            localStorage.setItem(dev.cacheKey.testUser, token);
+            LocalStore.setItem(dev.cacheKey.testUser, token);
             let rs = await testApi.userSignIn(req);
+
+            let remberSignIn: any = { account };
+            if (this.remberPwd)
+                remberSignIn.password = password;
+            else
+                this.innerDetail.password = '';
+            LocalStore.setItem(dev.cacheKey.remberSignIn, remberSignIn);
             testSocket.login({ [dev.cacheKey.testUser]: token });
             this.storeUser.setUser(rs);
-            this.innerDetail = this.getDetailData();
             this.$emit('success');
             if (this.to)
                 this.$router.push({ path: this.to, query: this.toQuery });
@@ -71,17 +78,32 @@ class SignIn extends Base {
 
     to = '';
     toQuery = null;
+    remberPwd = false;
     mounted() {
         if (location.pathname === routerConfig.userSignIn.path) {
             let { to, ...query } = this.$route.query;
             this.to = (to as string) || routerConfig.index.path;
             this.toQuery = query;
         }
+        let rs = LocalStore.getItem(dev.cacheKey.remberSignIn);
+        let detail = this.innerDetail;
+        if (rs) {
+            if (rs.account)
+                detail.account = rs.account;
+            if (rs.password) {
+                detail.password = rs.password;
+                this.remberPwd = true;
+            }
+        }
     }
     render() {
         let detail = this.innerDetail;
         return (
             <div class="dialog-view" on-keypress={this.handlePress}>
+                <div v-show={false}>
+                    <Input placeholder="应对自动填充" />
+                    <Input type="password" />
+                </div>
                 <h3>登录</h3>
                 <br />
                 <Form class="dialog-content" label-position="top" ref="formVaild" props={{ model: detail }} rules={this.rules}>
@@ -89,7 +111,10 @@ class SignIn extends Base {
                         <Input v-model={detail.account} />
                     </FormItem>
                     <FormItem label="密码" prop="password">
-                        <Input v-model={detail.password} type="password" />
+                        <Input v-model={detail.password} type="password" autocomplete="new-password" />
+                    </FormItem>
+                    <FormItem>
+                        <label><Checkbox v-model={this.remberPwd} />记住密码</label>
                     </FormItem>
                     <FormItem>
                         <Button type="primary" long on-click={this.handleSignIn} loading={this.loading}>登录</Button>

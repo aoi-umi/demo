@@ -1,6 +1,6 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { getModule } from 'vuex-module-decorators';
-import LoginUserStore from '@/store/loginUser';
+import LoginUserStore from '@/store/login-user';
 import { dev, error } from '@/config';
 import { routerConfig } from '@/router';
 import SettingStore from '@/store/setting';

@@ -4,6 +4,7 @@ import * as iviewTypes from 'iview';
 import { testApi, testSocket } from '@/api';
 import { dev, myEnum, authority } from '@/config';
 import { routerConfig } from '@/router';
+import { LocalStore } from '@/store';
 import { convClass } from '@/components/utils';
 import { Button, Avatar, Poptip, Spin } from '@/components/iview';
 import { MyImgViewer, IMyImgViewer } from '@/components/my-img-viewer';
@@ -63,7 +64,7 @@ class UserPoptip extends Base {
     }
 
     signOut() {
-        let token = localStorage.getItem(dev.cacheKey.testUser);
+        let token = LocalStore.getItem(dev.cacheKey.testUser);
         if (token) {
             testApi.userSignOut();
             testSocket.logout({ [dev.cacheKey.testUser]: token });
