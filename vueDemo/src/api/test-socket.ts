@@ -1,11 +1,12 @@
 import { myEnum, dev } from '@/config';
+import { LocalStore } from '@/store';
 import { Socket } from './model';
 
 export class TestSocket extends Socket {
     constructor(uri: string, opts?: SocketIOClient.ConnectOpts) {
         super(uri, opts);
         this.socket.on('connect', () => {
-            let token = localStorage.getItem(dev.cacheKey.testUser);
+            let token = LocalStore.getItem(dev.cacheKey.testUser);
             if (token)
                 this.login({ [dev.cacheKey.testUser]: token });
         });

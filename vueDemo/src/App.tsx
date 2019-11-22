@@ -6,6 +6,7 @@ import {
     Icon, Content, Sider, Layout, Header, Button, Modal, BackTop, Submenu,
 } from "@/components/iview";
 import * as style from '@/components/style';
+import { LocalStore } from '@/store';
 
 import { testApi, testSocket } from './api';
 import { dev, authority, env } from './config';
@@ -63,7 +64,7 @@ export default class App extends Base {
         document.title = this.title || env.title;
     }
     async getUserInfo() {
-        let token = localStorage.getItem(dev.cacheKey.testUser);
+        let token = LocalStore.getItem(dev.cacheKey.testUser);
         if (token) {
             await testApi.userInfo().then(user => {
                 testSocket.login({ [dev.cacheKey.testUser]: token });

@@ -1,3 +1,4 @@
+import { LocalStore } from '@/store';
 
 import { error } from '../helpers/utils';
 import { dev } from '../config';
@@ -132,7 +133,7 @@ export class TestApi extends ApiModel<TestApiMethod> {
 
     defaultHeaders() {
         let headers = {};
-        let token = localStorage.getItem(dev.cacheKey.testUser);
+        let token = LocalStore.getItem(dev.cacheKey.testUser);
         if (token)
             headers[dev.cacheKey.testUser] = token;
         return headers;

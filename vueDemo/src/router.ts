@@ -6,7 +6,7 @@ const ViewUI = iview as any;
 
 import { authority, error, dev } from './config';
 import store from './store';
-import LoginUserStore from './store/loginUser';
+import LoginUserStore from './store/login-user';
 
 Vue.use(Router);
 type MyRouteConfig = RouteConfig & { text?: string; };
