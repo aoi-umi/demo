@@ -13,7 +13,7 @@ export class LocalStore {
         return localStorage.setItem(key, JSON.stringify(val));
     }
 
-    static removeItem(key, val) {
+    static removeItem(key) {
         return localStorage.removeItem(key);
     }
 }

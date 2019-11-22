@@ -8,6 +8,7 @@ import { LocalStore } from '@/store';
 import { convClass } from '@/components/utils';
 import { Button, Avatar, Poptip, Spin } from '@/components/iview';
 import { MyImgViewer, IMyImgViewer } from '@/components/my-img-viewer';
+
 import { Base } from '../base';
 import { DetailDataType } from '../user/user-mgt';
 import { FollowButtonView } from './follow-button';
@@ -68,6 +69,7 @@ class UserPoptip extends Base {
         if (token) {
             testApi.userSignOut();
             testSocket.logout({ [dev.cacheKey.testUser]: token });
+            LocalStore.removeItem(dev.cacheKey.testUser);
         }
         for (let key in routerConfig) {
             let rtCfg = routerConfig[key];
