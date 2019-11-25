@@ -126,6 +126,9 @@ class MyVideo extends MyBase {
                         title: '内容',
                         key: 'msg',
                         minWidth: 80,
+                        render: (h, params) => {
+                            return <span class={this.getStyleName('danmaku-box-msg')} title={params.row.msg}>{params.row.msg}</span>;
+                        }
                     }, {
                         title: '发送时间',
                         key: 'createdAt',
@@ -134,7 +137,12 @@ class MyVideo extends MyBase {
                         render: (h, params) => {
                             return <span>{moment(params.row.createdAt).format(dev.dateFormat)}</span>;
                         }
-                    },]} data={this.danmakuList} width={300}></Table>
+                    },]}
+                        data={this.danmakuList} width={300}
+                        on-on-row-click={(ele) => {
+                            console.log(ele);
+                        }}
+                    />
                 </div>
             </div >
         );
