@@ -1,13 +1,16 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { VideoJsPlayer } from 'video.js';
 import Swatches from 'vue-swatches';
+import moment from 'dayjs';
 import "vue-swatches/dist/vue-swatches.min.css";
 
 import { MyBase } from '../my-base';
-import { convClass } from '../utils';
+import { convClass, Utils } from '../utils';
+import { Table } from '../iview';
 
 import './my-video.less';
-import { DanmakuPlayer, DanmakuPlayerOptions } from './videojs-comp';
+import { DanmakuPlayer, DanmakuPlayerOptions, DanmakuDataType } from './videojs-comp';
+import { dev } from '@/config';
 
 @Component({
     Swatches
@@ -29,6 +32,7 @@ class MyVideo extends MyBase {
         this.initPlayer();
     }
 
+    private danmakuList: DanmakuDataType[] = [];
     private initPlayer() {
         let opt = {
             ...this.getDefaultOpt(),
@@ -43,6 +47,7 @@ class MyVideo extends MyBase {
 
         this.danmakuPlayer = new DanmakuPlayer(this.$refs.video, opt);
         this.player = this.danmakuPlayer.player;
+        this.danmakuList = this.danmakuPlayer.danmakuDataList;
     }
 
     protected beforeDestroy() {
@@ -101,13 +106,37 @@ class MyVideo extends MyBase {
                         }}
                     />
                 </div>
-                <video ref="video" class={this.getStyleName('video').concat(["video-js vjs-default-skin vjs-big-play-centered"])} crossOrigin="*"
-                    x5-video-player-type="h5"
-                    // x5-video-orientation="landscape"
-                    x5-playsinline="" playsinline="" webkit-playsinline=""
-                >
-                </video>
-            </div>
+                <div class={this.getStyleName('video-box')}>
+                    <video ref="video" class={this.getStyleName('video').concat(["video-js vjs-default-skin vjs-big-play-centered"])} crossOrigin="*"
+                        x5-video-player-type="h5"
+                        // x5-video-orientation="landscape"
+                        x5-playsinline="" playsinline="" webkit-playsinline=""
+                    />
+                </div>
+                <div class={this.getStyleName('danmaku-box')}>
+                    <Table columns={[{
+                        title: '时间',
+                        key: 'pos',
+                        minWidth: 80,
+                        sortable: true,
+                        render: (h, params) => {
+                            return <span>{Utils.getDateDiff(0, params.row.pos)}</span>;
+                        }
+                    }, {
+                        title: '内容',
+                        key: 'msg',
+                        minWidth: 80,
+                    }, {
+                        title: '发送时间',
+                        key: 'createdAt',
+                        minWidth: 90,
+                        sortable: true,
+                        render: (h, params) => {
+                            return <span>{moment(params.row.createdAt).format(dev.dateFormat)}</span>;
+                        }
+                    },]} data={this.danmakuList} width={300}></Table>
+                </div>
+            </div >
         );
     }
 }

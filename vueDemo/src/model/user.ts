@@ -36,6 +36,10 @@ export class LoginUser {
         return false;
     }
 
+    equalsId(this: LoginUserType, id: string) {
+        return this._id && this._id === id;
+    }
+
     static createToken(account, pwd, data) {
         let token = account + helpers.md5(pwd) + JSON.stringify(data);
         token = helpers.md5(token);

@@ -14,11 +14,12 @@ type DanmakOptions = {
     sendFn?: (data) => boolean | Promise<boolean>,
     elementAfterInput?: HTMLElement | HTMLElement[];
 };
-type DanmakuDataType = {
+export type DanmakuDataType = {
     msg: string,
     color?: string;
     pos: number;
     isSelf?: boolean;
+    createdAt?: string;
 }
 type DanmakuDataTypeInner = DanmakuDataType & { add?: boolean };
 export type DanmakuPlayerOptions = videojs.PlayerOptions & {
@@ -279,10 +280,13 @@ export class DanmakuPlayer {
 
     //颜色
     color = '';
-    danmakuPush(danmaku: DanmakuDataType | DanmakuDataType[]) {
+    danmakuPush(danmaku: DanmakuDataType | DanmakuDataType[], top?: boolean) {
         let list = danmaku instanceof Array ? danmaku : [danmaku];
         list.forEach(ele => {
-            this.danmakuDataList.push(ele);
+            if (!top)
+                this.danmakuDataList.push(ele);
+            else
+                this.danmakuDataList.unshift(ele);
         });
     }
 
@@ -347,8 +351,11 @@ export class DanmakuPlayer {
             let dom = ele.dom;
             //创建dom
             if (!dom) {
+                let cls = ['danmaku'];
+                if (ele.isSelf)
+                    cls.push('danmaku-self');
                 ele.dom = dom = videojs.dom.createEl('div', {
-                    className: getClsName(clsPrefix, 'danmaku'),
+                    className: getClsName(clsPrefix, ...cls),
                     innerText: ele.msg,
                 }, {
                     style: `color: ${ele.color};left: ${width}px`

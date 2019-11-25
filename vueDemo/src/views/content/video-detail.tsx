@@ -89,12 +89,15 @@ class VideoDetailMain extends Base {
 
     async loadDanmaku() {
         let rs = await testApi.danmakuQuery({ videoId: this.videoId });
+        rs.rows.forEach(ele => {
+            ele.isSelf = this.storeUser.user.equalsId(ele.userId);
+        });
         this.$refs.video.danmakuPlayer.danmakuPush(rs.rows);
     }
 
     recvDanmaku(data) {
         if (data.videoId == this.videoId)
-            this.$refs.video.danmakuPlayer.danmakuPush(data);
+            this.$refs.video.danmakuPlayer.danmakuPush(data, true);
     }
 
     renderHeader(detail: DetailDataType) {

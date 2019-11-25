@@ -228,6 +228,11 @@ export const routerConfig = {
         text: '测试',
         component: () => import('./views/demo')
     },
+    waterfall: {
+        path: '/waterfall',
+        text: '测试',
+        component: () => import('./views/waterfall')
+    },
 
     error: {
         path: errPath,

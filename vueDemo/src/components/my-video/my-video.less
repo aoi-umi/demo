@@ -1,17 +1,20 @@
 .my-video- {
-  &root,
-  &video {
+  &root {
     width: inherit;
     height: inherit;
-  }
-  &root {
     display: flex;
     align-items: center;
   }
-  &video {
-    height: 100% !important;
+  &video-box {
+    flex-grow: 1;
   }
   &color-picker {
     margin-right: 5px;
+  }
+  &danmaku-box {
+    background: #fff;
+    height: inherit;
+    overflow: auto;
+    width: 300px;
   }
 }
