@@ -1,12 +1,18 @@
 .my-video- {
   &root {
-    width: inherit;
-    height: inherit;
+    width: 900px;
+    height: 500px;
     display: flex;
-    align-items: center;
+    align-items: stretch;
   }
   &video-box {
     flex-grow: 1;
+    display: flex;
+    align-items: center;
+    background: black;
+  }
+  &video {
+    height: 100% !important;
   }
   &color-picker {
     margin-right: 5px;
@@ -14,11 +20,23 @@
   &danmaku-box {
     background: #fff;
     height: inherit;
-    overflow: auto;
-    width: 300px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 360px;
+    .ivu-table-wrapper {
+      width: 100%;
+    }
   }
   &danmaku-box-msg {
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+  &danmaku-op-btn {
+    cursor: pointer;
+  }
+  &danmaku-op-content {
+    > * {
+      cursor: pointer;
+    }
   }
 }
