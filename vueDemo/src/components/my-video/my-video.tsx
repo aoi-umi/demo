@@ -6,7 +6,7 @@ import "vue-swatches/dist/vue-swatches.min.css";
 
 import { MyBase } from '../my-base';
 import { convClass, Utils } from '../utils';
-import { Table } from '../iview';
+import { Table, Icon, Poptip } from '../iview';
 
 import './my-video.less';
 import { DanmakuPlayer, DanmakuPlayerOptions, DanmakuDataType } from './videojs-comp';
@@ -16,7 +16,7 @@ import { dev } from '@/config';
     Swatches
 })
 class MyVideo extends MyBase {
-    stylePrefix = 'my-video-'
+    stylePrefix = 'my-video-';
     @Prop()
     options: DanmakuPlayerOptions;
 
@@ -105,6 +105,7 @@ class MyVideo extends MyBase {
                             this.getDp.color = v;
                         }}
                     />
+                    <video class={this.getStyleName('video').concat(["video-js vjs-default-skin vjs-big-play-centered"])} />
                 </div>
                 <div class={this.getStyleName('video-box')}>
                     <video ref="video" class={this.getStyleName('video').concat(["video-js vjs-default-skin vjs-big-play-centered"])} crossOrigin="*"
@@ -137,11 +138,28 @@ class MyVideo extends MyBase {
                         render: (h, params) => {
                             return <span>{moment(params.row.createdAt).format(dev.dateFormat)}</span>;
                         }
+                    }, {
+                        title: '操作',
+                        key: 'op',
+                        minWidth: 50,
+                        // fixed: 'right',
+                        render: (h, params) => {
+                            let ele = params.row;
+                            return (
+                                <Poptip trigger="hover" placement="left">
+                                    <Icon class={this.getStyleName('danmaku-op-btn')} type="md-more" />
+                                    <div slot="content" class={this.getStyleName('danmaku-op-content')}>
+                                        <div on-click={() => {
+                                            Utils.copy2Clipboard(ele.msg);
+                                            this.$Message.info('复制成功');
+                                        }}>复制</div>
+                                        <div v-show={false}>举报</div>
+                                    </div>
+                                </Poptip>
+                            );
+                        }
                     },]}
-                        data={this.danmakuList} width={300}
-                        on-on-row-click={(ele) => {
-                            console.log(ele);
-                        }}
+                        data={this.danmakuList}
                     />
                 </div>
             </div >

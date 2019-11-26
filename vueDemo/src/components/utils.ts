@@ -1,3 +1,5 @@
+import copy from 'copy-to-clipboard';
+
 export function convClass<typeofT, T = {}>(t) {
     return t as {
         new(props: Partial<typeofT & T> & VueComponentOptions): any
@@ -53,5 +55,9 @@ export class Utils {
         if (isMinus)
             diff = '-' + diff;
         return diff;
+    }
+
+    static copy2Clipboard(txt) {
+        copy(txt);
     }
 }

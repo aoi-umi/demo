@@ -122,28 +122,26 @@ class VideoDetailMain extends Base {
                 {this.renderHeader(detail)}
                 <br />
                 <div class={this.getStyleName('video-box')}>
-                    <div class={this.getStyleName('video')}>
-                        <MyVideo
-                            ref='video'
-                            options={{
-                                sources: this.videoList.map(ele => {
-                                    return {
-                                        src: ele.url,
-                                        type: ele.originFileType,
-                                    };
-                                }),
-                                poster: detail.coverUrl,
-                                danmaku: {
-                                    sendFn: async (data) => {
-                                        let rs = await this.operateHandler('发送弹幕', async () => {
-                                            data.videoId = this.videoId;
-                                            await testApi.danmakuSubmit(data);
-                                        }, { noSuccessHandler: true });
-                                        return rs.success;
-                                    }
+                    <MyVideo
+                        ref='video'
+                        options={{
+                            sources: this.videoList.map(ele => {
+                                return {
+                                    src: ele.url,
+                                    type: ele.originFileType,
+                                };
+                            }),
+                            poster: detail.coverUrl,
+                            danmaku: {
+                                sendFn: async (data) => {
+                                    let rs = await this.operateHandler('发送弹幕', async () => {
+                                        data.videoId = this.videoId;
+                                        await testApi.danmakuSubmit(data);
+                                    }, { noSuccessHandler: true });
+                                    return rs.success;
                                 }
-                            }} />
-                    </div>
+                            }
+                        }} />
                 </div>
             </div>
         );
