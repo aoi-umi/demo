@@ -13,10 +13,20 @@
 
 .waterfall- {
   &root {
+    position: relative;
+  }
+  &test0 {
     position: absolute;
-    top: 80px;
-    bottom: 0;
     left: 0;
     right: 0;
+    height: 500px;
+  }
+  &test1 {
+    position: relative;
+  }
+  &item {
+    position: absolute;
+    transition-duration: 0.5s;
+    transform: scale(0);
   }
 }
