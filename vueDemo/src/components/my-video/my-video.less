@@ -1,7 +1,9 @@
-.my-video- {
+@prefix: my-video-;
+@p: 56px;
+.@{prefix} {
   &root {
-    width: 900px;
-    height: 500px;
+    width: @p*16;
+    height: @p*9;
     display: flex;
     align-items: stretch;
   }
@@ -10,6 +12,7 @@
     display: flex;
     align-items: center;
     background: black;
+    position: relative;
   }
   &video {
     height: 100% !important;
@@ -17,14 +20,72 @@
   &color-picker {
     margin-right: 5px;
   }
+  &danmaku-box-side-bar,
+  &danmaku-box-toggle-btn {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  &danmaku-box-side-bar {
+    z-index: 1;
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    opacity: 0;
+    transition: opacity 1.5s;
+    &:hover {
+      opacity: 1;
+      transition-duration: 0s;
+    }
+  }
+  &danmaku-box-toggle-btn {
+    cursor: pointer;
+    height: 100px;
+    width: 20px;
+    align-items: center;
+    .ivu-icon {
+      transform: rotate(0);
+      // transform-origin: 40% 50%;
+      transition-duration: 0.5s;
+    }
+  }
+  &danmaku-box-toggle-btn-bg {
+    &,
+    &-shadow {
+      width: 0px;
+      height: 100px;
+      border-right: 20px solid rgba(255, 255, 255, 0.8);
+      border-top: 20px solid transparent;
+      border-bottom: 20px solid transparent;
+      position: absolute;
+      z-index: -1;
+      background-color: transparent;
+    }
+    &-shadow {
+      filter: drop-shadow(-3px 0px 3px rgba(0, 0, 0, 0.5));
+    }
+  }
   &danmaku-box {
     background: #fff;
     height: inherit;
     overflow-y: auto;
     overflow-x: hidden;
-    width: 360px;
+    width: 0;
+    transition-duration: 0.5s;
     .ivu-table-wrapper {
       width: 100%;
+    }
+  }
+
+  &danmaku-box-open {
+    .@{prefix}danmaku-box-toggle-btn .ivu-icon {
+      transform: rotate(180deg);
+      transition-duration: 0.5s;
+    }
+    .@{prefix}danmaku-box {
+      width: 360px;
+      transition-duration: 0.5s;
     }
   }
   &danmaku-box-msg {
