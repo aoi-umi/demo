@@ -87,10 +87,15 @@ class MyVideo extends MyBase {
     }
 
     private color = '';
+    private danmakuListOpen = true;
+
+    private danmakuBoxToggle() {
+        this.danmakuListOpen = !this.danmakuListOpen;
+    }
 
     protected render() {
         return (
-            <div class={this.getStyleName('root')}>
+            <div class={this.getStyleName('root', this.danmakuListOpen ? 'danmaku-box-open' : '')}>
                 <div style={{ display: 'none' }}>
                     <Swatches
                         ref="swatches"
@@ -113,6 +118,15 @@ class MyVideo extends MyBase {
                         // x5-video-orientation="landscape"
                         x5-playsinline="" playsinline="" webkit-playsinline=""
                     />
+                    <div class={this.getStyleName('danmaku-box-side-bar')}>
+                        <div class={this.getStyleName('danmaku-box-toggle-btn')} on-click={() => {
+                            this.danmakuBoxToggle();
+                        }}>
+                            <div class={this.getStyleName('danmaku-box-toggle-btn-bg-shadow')} />
+                            <div class={this.getStyleName('danmaku-box-toggle-btn-bg')} />
+                            <Icon type="ios-arrow-back" />
+                        </div>
+                    </div>
                 </div>
                 <div class={this.getStyleName('danmaku-box')}>
                     <Table columns={[{
