@@ -123,84 +123,85 @@ export default class App extends Base {
         }
         return (
             <div>
-                <div class={this.getStyleName('danmaku-main')} style={{
-                    width: '500px',
-                    display: 'inline-block',
-                }}>
-                    <Input v-model={this.videoIdText} search enter-button="确认"
-                        on-on-search={() => {
-                            this.videoId = this.videoIdText;
-                            let url = testApi.getVideoUrl(this.videoId) || 'http://vjs.zencdn.net/v/oceans.mp4';
-                            this.player.src({
+                <div class={this.getStyleName('box1')}>
+                    <div class={this.getStyleName('danmaku-main')}>
+                        <Input v-model={this.videoIdText} search enter-button="确认"
+                            on-on-search={() => {
+                                this.videoId = this.videoIdText;
+                                let url = testApi.getVideoUrl(this.videoId) || 'http://vjs.zencdn.net/v/oceans.mp4';
+                                this.player.src({
+                                    type: "video/mp4",
+                                    src: url
+                                });
+                                this.player.load();
+                                this.player.currentTime(0);
+                                this.player.play();
+                            }} />
+                        <MyVideo ref="video" options={{
+                            poster: '//localhost:8000/devMgt/img?_id=5da818d6433fe2209054c290',
+                            sources: [{
                                 type: "video/mp4",
-                                src: url
-                            });
-                            this.player.load();
-                            this.player.currentTime(0);
-                            this.player.play();
+                                src: testApi.getVideoUrl(this.videoId)
+                            }],
+                            danmaku: {
+                                danmakuList,
+                                // sendFn: async (data) => {
+                                //     let rs = await this.operateHandler('发送弹幕', async () => {
+                                //         data.videoId = this.videoId;
+                                //         await testApi.danmakuSubmit(data);
+                                //     }, { noSuccessHandler: true });
+                                //     return rs.success;
+                                // }
+                            }
                         }} />
-                    <MyVideo ref="video" options={{
-                        poster: '//localhost:8000/devMgt/img?_id=5da818d6433fe2209054c290',
-                        sources: [{
-                            type: "video/mp4",
-                            src: testApi.getVideoUrl(this.videoId)
-                        }],
-                        danmaku: {
-                            danmakuList,
-                            // sendFn: async (data) => {
-                            //     let rs = await this.operateHandler('发送弹幕', async () => {
-                            //         data.videoId = this.videoId;
-                            //         await testApi.danmakuSubmit(data);
-                            //     }, { noSuccessHandler: true });
-                            //     return rs.success;
-                            // }
-                        }
-                    }} />
+                    </div>
+                    <div style={{
+                        display: 'inline-block',
+                    }}>
+                        <Button on-click={() => {
+                            this.$refs.videoCover.src = this.captureImage();
+                        }}>截取</Button>
+                        <img width="160" height="90" ref='videoCover' />
+                    </div>
+                    <div style={{
+                        display: 'inline-block',
+                        width: '600px',
+                        verticalAlign: 'top',
+                    }}>
+                        <MyEditor v-model={this.richText} placeholder='输点啥。。。' />
+                        <Button on-click={() => {
+                            console.log(this.richText);
+                        }}>log</Button>
+                        <div ref="echart" style={{ height: '300px', width: '500px' }}></div>
+                        <Input v-model={this.chartAddData} search enter-button="添加" on-on-search={() => {
+                            let num = parseFloat(this.chartAddData);
+                            if (!isNaN(num)) {
+                                let opt = this.chart.getOption();
+                                let data: number[] = (opt.series[0] as any).data;
+                                data.shift();
+                                data.push(num);
+                                this.chart.setOption(opt);
+                                this.chartAddData = '';
+                            }
+                        }} />
+                    </div>
+                    <canvas ref="canvas"></canvas>
+                    <div>
+                        <MyUpload ref='upload' width={100} height={100}
+                            headers={testApi.defaultHeaders}
+                            uploadUrl={testApi.videoUploadUrl} maxSize={10240} successHandler={(res, file) => {
+                                testApi.uplodaHandler(res);
+                            }} />
+                        <Button on-click={() => {
+                            this.operateHandler('上传', async () => {
+                                let err = await this.$refs.upload.upload();
+                                if (err.length) {
+                                    throw new Error(err.join(','));
+                                }
+                            });
+                        }}>upload</Button>
+                    </div>
                 </div>
-                <div style={{
-                    display: 'inline-block',
-                }}>
-                    <Button on-click={() => {
-                        this.$refs.videoCover.src = this.captureImage();
-                    }}>截取</Button>
-                    <img width="160" height="90" ref='videoCover' />
-                </div>
-                <div style={{
-                    display: 'inline-block',
-                    width: '600px',
-                    verticalAlign: 'top',
-                }}>
-                    <MyEditor v-model={this.richText} placeholder='输点啥。。。' />
-                    <Button on-click={() => {
-                        console.log(this.richText);
-                    }}>log</Button>
-                    <div ref="echart" style={{ height: '300px', width: '500px' }}></div>
-                    <Input v-model={this.chartAddData} search enter-button="添加" on-on-search={() => {
-                        let num = parseFloat(this.chartAddData);
-                        if (!isNaN(num)) {
-                            let opt = this.chart.getOption();
-                            let data: number[] = (opt.series[0] as any).data;
-                            data.shift();
-                            data.push(num);
-                            this.chart.setOption(opt);
-                            this.chartAddData = '';
-                        }
-                    }} />
-                </div>
-                <canvas ref="canvas"></canvas>
-                <MyUpload ref='upload' width={100} height={100}
-                    headers={testApi.defaultHeaders}
-                    uploadUrl={testApi.videoUploadUrl} maxSize={10240} successHandler={(res, file) => {
-                        testApi.uplodaHandler(res);
-                    }} />
-                <Button on-click={() => {
-                    this.operateHandler('上传', async () => {
-                        let err = await this.$refs.upload.upload();
-                        if (err.length) {
-                            throw new Error(err.join(','));
-                        }
-                    });
-                }}>upload</Button>
 
                 <MyList ref="list" type="custom" infiniteScroll
                     customQueryNode={

@@ -60,4 +60,13 @@ export class Utils {
     static copy2Clipboard(txt) {
         copy(txt);
     }
+
+    static isScrollEnd(elm?: HTMLElement) {
+        if (!elm)
+            elm = document.documentElement;
+        let scrollTop = elm.scrollTop || elm.scrollTop;
+        let clientHeight = elm.clientHeight || elm.clientHeight;
+        let scrollHeight = elm.scrollHeight || elm.scrollHeight;
+        return (scrollTop + clientHeight == scrollHeight);
+    }
 }
