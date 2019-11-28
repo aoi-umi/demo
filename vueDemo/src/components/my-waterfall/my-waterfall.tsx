@@ -13,6 +13,8 @@ type MyWaterfallItemType = {
     success: boolean,
     height: number,
     bottom?: number,
+    left?: number,
+    colIdx?: number,
     style: any,
     img: HTMLImageElement
 };
@@ -121,6 +123,7 @@ class MyWaterfall extends MyBase {
         let itemWidth = Math.round(this.$refs.root.clientWidth / this.rowItemCount);
         let lastShowIdx = -1;
         let divHeight = 0;
+        let minBottom = 0;
         for (let i = 0; i < this.itemList.length; i++) {
             let item = this.itemList[i];
             let show = item.loaded && lastShowIdx < i;
@@ -133,17 +136,37 @@ class MyWaterfall extends MyBase {
                 width: width + 'px',
                 height: height + 'px',
             };
-            let lastCol = this.itemList[i - this.rowItemCount];
-            let top = lastCol ? (lastCol.bottom + this.space) : 0;
+            //第一行
+            let left = itemWidth * i, top = 0;
+            item.colIdx = i % this.rowItemCount;
+            if (i >= this.rowItemCount) {
+                let col = {};
+                for (let idx = 0; idx < i; idx++) {
+                    let ele = this.itemList[idx];
+                    col[ele.colIdx] = ele;
+                }
+                let minBottomCol: MyWaterfallItemType;
+                Object.values<MyWaterfallItemType>(col).forEach(ele => {
+                    if (!minBottomCol || minBottomCol.bottom > ele.bottom)
+                        minBottomCol = ele;
+                });
+                item.colIdx = minBottomCol.colIdx;
+                top = minBottomCol.bottom + this.space;
+                left = minBottomCol.left;
+            }
             item.bottom = top + item.height;
+            item.left = left;
             item.style.top = top + 'px';
-            item.style.left = ((i % this.rowItemCount) * itemWidth) + 'px';
+            item.style.left = left + 'px';
             item.style.transform = 'scale(1)';
             if (item.bottom > divHeight) {
                 divHeight = item.bottom;
             }
         }
         this.divHeight = divHeight;
+        //高度不足时触发加载
+        if (!this.finished)
+            this.handleScrollEnd();
     }
 
     private divHeight = 0;

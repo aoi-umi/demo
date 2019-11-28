@@ -39,7 +39,7 @@ export default class Waterfall extends Base {
 
     async getDataFn(refresh?: boolean) {
         return new Promise<any>((resolve) => {
-            let list = Array.from(new Array(22)).map((ele, idx) => {
+            let list = Array.from(new Array(10)).map((ele, idx) => {
                 let id = [1, 4, 5, 11][idx % 4];
                 return {
                     "src": `https://lfyfly.github.io/vue-waterfall-easy/demo/static/img/${id}.jpg`,
