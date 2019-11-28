@@ -18,6 +18,20 @@ class MyImgViewer extends MyBase {
     })
     maskClosable: boolean;
 
+    created() {
+        this.watchSrc();
+    }
+    private list: { src: string; scale: number }[] = [];
+    @Watch('src')
+    private watchSrc() {
+        this.list = (this.src instanceof Array ? this.src : [this.src]).map(src => {
+            return {
+                src,
+                scale: 1
+            };
+        });
+    }
+
     visible = false;
 
     show() {
@@ -30,7 +44,7 @@ class MyImgViewer extends MyBase {
     stylePrefix = 'my-img-viewer-';
 
     render() {
-        let list = this.src instanceof Array ? this.src : [this.src];
+        let list = this.list;
         let mutli = list.length > 1;
         return (
             <transition name="fade">
@@ -46,11 +60,22 @@ class MyImgViewer extends MyBase {
                         event.stopPropagation();
                     }}>
                         <Carousel easing="easing" arrow={mutli ? 'hover' : 'never'} dots={mutli ? 'inside' : 'none'}>
-                            {list.map(src => {
+                            {list.map(ele => {
+                                let transform = `scale(${ele.scale})`;
                                 return (
                                     <CarouselItem>
-                                        <div class={this.getStyleName('item')}>
-                                            <MyImg class={this.getStyleName('img')} src={src} />
+                                        <div class={this.getStyleName('item')} on-mousewheel={(event) => {
+                                            let scale = ele.scale;
+                                            let step = 0.1;
+                                            scale = scale + (event.wheelDeltaY > 0 ? 1 : -1 + step);
+                                            if (scale > 5) {
+                                                scale = 5;
+                                            } else if (scale < 0.5) {
+                                                scale = 0.5;
+                                            }
+                                            ele.scale = scale;
+                                        }}>
+                                            <MyImg class={this.getStyleName('img')} src={ele.src} style={{ transform }} />
                                         </div>
                                     </CarouselItem>
                                 );
