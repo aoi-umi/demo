@@ -6,6 +6,7 @@ import { MyWaterfall } from '@/components/my-waterfall';
 
 import { Base } from './base';
 import './demo.less';
+import { MyImgViewer, IMyImgViewer } from '@/components/my-img-viewer';
 
 type RenderItemType = {
     data: any,
@@ -20,7 +21,7 @@ type RenderItemType = {
     vueWaterfallEasy
 })
 export default class Waterfall extends Base {
-    $refs: { root: HTMLDivElement; };
+    $refs: { root: HTMLDivElement; imgViewer: IMyImgViewer };
     stylePrefix = 'waterfall-';
     imgsArr = [];
     group = 0;
@@ -64,10 +65,12 @@ export default class Waterfall extends Base {
     imgErrorFn(imgItem) {
         console.log('图片加载错误', imgItem)
     }
+    showUrl = '';
     render() {
         return (
             <div ref='root' class={this.getStyleName('root')}>
-                {this.type != '1' ?
+                <MyImgViewer ref="imgViewer" src={this.showUrl} />
+                {this.type == '1' ?
                     <div>
                         <Button on-click={() => {
                             this.getData(true);
@@ -90,6 +93,10 @@ export default class Waterfall extends Base {
                         }}
                         maskContentRenderFn={(item) => {
                             return <div>test{item.src}</div>;
+                        }}
+                        on-item-click={(e, item) => {
+                            this.showUrl = item.src;
+                            this.$refs.imgViewer.show();
                         }}
                     />
                 }

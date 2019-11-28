@@ -153,7 +153,9 @@ class MyWaterfall extends MyBase {
                 <div class={this.getStyleName('main')} style={{ height: this.divHeight + 'px' }}>
                     {this.itemList.map(ele => {
                         return (
-                            <div class={this.getStyleName('item')} style={ele.style}>
+                            <div class={this.getStyleName('item')} style={ele.style} on-click={(e) => {
+                                this.$emit('item-click', e, ele.data);
+                            }}>
                                 <img src={ele.data.src} />
                                 {this.maskContentRenderFn &&
                                     <div class={this.getStyleName('item-mask')}>
