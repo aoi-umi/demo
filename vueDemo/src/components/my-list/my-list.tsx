@@ -4,6 +4,7 @@ import {
     Table, Page, Row, Col,
     Input, Button, Divider, Card, Icon, Spin
 } from '../iview';
+import { Utils } from '../utils';
 import { MyBase } from '../my-base';
 import * as style from '../style';
 import { MyListModel, MyListResult } from './model';
@@ -139,18 +140,17 @@ class MyList<QueryArgs extends QueryArgsType> extends MyBase {
             this.result.msg = '暂无数据';
         }
 
-        window.addEventListener('scroll', () => {
-            if (this.infiniteScroll && this.isScrollEnd()) {
-                this.scrollEndHandler();
-            }
-        });
+        window.addEventListener('scroll', this.handleScrollEnd);
     }
 
-    private isScrollEnd() {
-        let scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-        let clientHeight = document.documentElement.clientHeight || document.body.clientHeight;
-        let scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
-        return (scrollTop + clientHeight == scrollHeight);
+    protected beforeDestroy() {
+        window.removeEventListener('scroll', this.handleScrollEnd);
+    }
+
+    private handleScrollEnd() {
+        if (this.infiniteScroll && Utils.isScrollEnd()) {
+            this.scrollEndHandler();
+        }
     }
 
     private scrollEndHandler() {

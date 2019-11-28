@@ -230,7 +230,7 @@ export const routerConfig = {
     },
     waterfall: {
         path: '/waterfall',
-        text: '测试',
+        text: '落地',
         component: () => import('./views/waterfall')
     },
 
