@@ -36,7 +36,7 @@ class MyWaterfall extends MyBase {
             let w = 128;
             if (width > 768)
                 w = 198;
-            return Math.floor(width / w);
+            return Math.max(Math.floor(width / w), 1);
         }
     })
     col: number | ((width: number) => number);
