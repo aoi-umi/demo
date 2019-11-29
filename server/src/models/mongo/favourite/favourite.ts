@@ -35,6 +35,9 @@ export class Favourite extends Base {
         required: true,
     })
     favourite: boolean;
+
+    @prop()
+    favourAt: Date;
 }
 
 let schema = getSchema(Favourite);

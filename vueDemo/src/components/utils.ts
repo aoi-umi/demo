@@ -62,11 +62,17 @@ export class Utils {
     }
 
     static isScrollEnd(elm?: HTMLElement) {
-        if (!elm)
-            elm = document.documentElement;
-        let scrollTop = elm.scrollTop || elm.scrollTop;
-        let clientHeight = elm.clientHeight || elm.clientHeight;
-        let scrollHeight = elm.scrollHeight || elm.scrollHeight;
-        return (scrollTop + clientHeight == scrollHeight);
+        let scrollTop, clientHeight, scrollHeight;
+        if (!elm) {
+            scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+            clientHeight = document.documentElement.clientHeight || document.body.clientHeight;
+            scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
+        } else {
+            scrollTop = elm.scrollTop;
+            clientHeight = elm.clientHeight;
+            scrollHeight = elm.scrollHeight;
+        }
+        // alert([scrollTop, clientHeight, scrollHeight].join(','));
+        return (scrollTop + clientHeight >= scrollHeight);
     }
 }

@@ -135,6 +135,7 @@ export class FavouriteMapper {
             },
             {
                 $project: {
+                    favourAt: 1,
                     items: {
                         $concatArrays: ['$article', '$video']
                     }
@@ -145,7 +146,7 @@ export class FavouriteMapper {
             },
             {
                 $replaceRoot: {
-                    newRoot: '$items'
+                    newRoot: { $mergeObjects: ['$items', { favourAt: '$favourAt' }] }
                 }
             },
             ...UserMapper.lookupPipeline(),
@@ -157,6 +158,7 @@ export class FavouriteMapper {
             },
         ], {
             ...BaseMapper.getListOptions(data),
+            orderBy: 'favourAt',
         });
         rs.rows = rs.rows.map(ele => {
             ContentMapper.resetDetail(ele, opt);

@@ -40,11 +40,16 @@ export default class Waterfall extends Base {
     async getDataFn(refresh?: boolean) {
         return new Promise<any>((resolve) => {
             let list = Array.from(new Array(10)).map((ele, idx) => {
-                let id = [1, 4, 5, 11][idx % 4];
+                let source = [
+                    'https://nodejs.org/static/images/logo.svg',
+                    'https://cn.vuejs.org/images/logo.png',
+                    'https://file.iviewui.com/logo-new.svg',
+                    'https://img-prod-cms-rt-microsoft-com.akamaized.net/cms/api/am/imageFileData/RE1Mu3b?ver=5c31',
+                    'https://www.tslang.cn/assets/images/ideicons/vscode.svg',
+                ];
+                let src = source[idx % source.length];
                 return {
-                    "src": `https://lfyfly.github.io/vue-waterfall-easy/demo/static/img/${id}.jpg`,
-                    "href": "https://www.baidu.com",
-                    "info": "一些图片描述文字"
+                    src,
                 };
             });
             this.imgsArr = refresh ? list : [...this.imgsArr, ...list];

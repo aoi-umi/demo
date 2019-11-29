@@ -33,6 +33,7 @@ export type DetailDataType = {
     follower?: number;
     following?: number;
     article?: number;
+    video?: number;
 
     self?: boolean;
 };

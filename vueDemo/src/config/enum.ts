@@ -129,6 +129,7 @@ const enumDefineFront = {
     userTab: {
         粉丝: 'follower',
         关注: 'following',
+        视频: 'video',
         文章: 'article',
         私信: 'chat',
         收藏: 'favourite',
