@@ -1,25 +1,12 @@
 import { Component, Vue, Watch } from 'vue-property-decorator';
-import vueWaterfallEasy from 'vue-waterfall-easy';
 
 import { Button } from '@/components/iview';
 import { MyWaterfall } from '@/components/my-waterfall';
+import { MyImgViewer, IMyImgViewer } from '@/components/my-img-viewer';
 
 import { Base } from './base';
 import './demo.less';
-import { MyImgViewer, IMyImgViewer } from '@/components/my-img-viewer';
-
-type RenderItemType = {
-    data: any,
-    loaded: boolean,
-    success: boolean,
-    height: number,
-    bottom?: number,
-    style: any,
-    img: HTMLImageElement
-};
-@Component({
-    vueWaterfallEasy
-})
+@Component
 export default class Waterfall extends Base {
     $refs: { root: HTMLDivElement; imgViewer: IMyImgViewer };
     stylePrefix = 'waterfall-';
@@ -76,22 +63,20 @@ export default class Waterfall extends Base {
             <div ref='root' class={this.getStyleName('root')}>
                 <MyImgViewer ref="imgViewer" src={this.showUrl} />
                 {this.type == '1' ?
-                    <div>
-                        <Button on-click={() => {
-                            this.getData(true);
-                        }} >刷新</Button>
-                        <Button on-click={() => {
-                            this.getData();
-                        }} >加载</Button>
-                        <div class={this.getStyleName('test0')}>
-                            <vueWaterfallEasy imgsArr={this.imgsArr} scrollReachBottom={() => {
-                                this.getData();
-                            }} imgError={(e) => {
-                                this.imgErrorFn(e);
-                            }} />
-                        </div>
-
-                    </div> :
+                    <MyWaterfall
+                        scrollElm='root'
+                        style={{ height: '300px' }}
+                        getDataFn={() => {
+                            return this.getDataFn();
+                        }}
+                        maskContentRenderFn={(item) => {
+                            return <div>test{item.src}</div>;
+                        }}
+                        on-item-click={(e, item) => {
+                            this.showUrl = item.src;
+                            this.$refs.imgViewer.show();
+                        }}
+                    /> :
                     <MyWaterfall
                         getDataFn={() => {
                             return this.getDataFn();

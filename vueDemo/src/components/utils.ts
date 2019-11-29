@@ -61,9 +61,9 @@ export class Utils {
         copy(txt);
     }
 
-    static isScrollEnd(elm?: HTMLElement) {
+    static isScrollEnd(elm?: HTMLElement | Window) {
         let scrollTop, clientHeight, scrollHeight;
-        if (!elm) {
+        if (!elm || elm instanceof Window) {
             scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
             clientHeight = document.documentElement.clientHeight || document.body.clientHeight;
             scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
