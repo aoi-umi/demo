@@ -100,6 +100,7 @@ class MyWaterfall extends MyBase {
     private handleResize() {
         this.watchCol();
         this.handleItemStyle();
+        this.handleScrollEnd();
     }
 
     private loading = false;
@@ -107,7 +108,7 @@ class MyWaterfall extends MyBase {
         return !!this.itemList.find(ele => !ele.loaded);
     }
     private handleScrollEnd() {
-        if (!this.finished && !this.loading && Utils.isScrollEnd(this.getScrollElm()) && !this.imgLoading) {
+        if (!this.finished && !this.loading && !this.imgLoading && Utils.isScrollEnd(this.getScrollElm())) {
             this.getData();
         }
     }
@@ -175,7 +176,7 @@ class MyWaterfall extends MyBase {
          */
         let padding = 5;
         let clientWidth = this.$refs.root.clientWidth + this.space;
-        let itemWidth = Math.round(clientWidth / this.actualCol) - this.space;
+        let itemWidth = Math.floor(clientWidth / this.actualCol) - this.space;
         let lastShowIdx = -1;
         let divHeight = 0;
         for (let i = 0; i < this.itemList.length; i++) {
@@ -239,8 +240,7 @@ class MyWaterfall extends MyBase {
         }
         this.divHeight = divHeight;
         //高度不足时触发加载
-        if (!this.finished)
-            this.handleScrollEnd();
+        this.handleScrollEnd();
     }
 
     private divHeight = 0;
@@ -264,8 +264,10 @@ class MyWaterfall extends MyBase {
                     })}
                 </div>
                 <div class={this.getStyleName('bottom-box')}>
-                    {(this.loading || this.imgLoading) && (this.$slots.loading || <span>加载中</span>)}
                     {this.finished && !this.imgLoading && (this.$slots.loaded || <span>加载完毕</span>)}
+                    <div style={{ visibility: (this.loading || this.imgLoading) ? '' : 'hidden' }}>
+                        {this.$slots.loading || <span>加载中</span>}
+                    </div>
                 </div>
             </div>
         );
