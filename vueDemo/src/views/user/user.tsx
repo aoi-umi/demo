@@ -21,7 +21,7 @@ import { RoleTagView } from '../comps/role-tag';
 
 import { Base } from '../base';
 import Article, { ArticleListItemView, ArticleView } from '../content/article';
-import { VideoListItemView } from '../content/video';
+import Video, { VideoListItemView, VideoView } from '../content/video';
 import { DetailDataType as UserDetailDataType } from './user-mgt';
 import { ChatList, ChatListView } from './user-chat';
 
@@ -32,6 +32,9 @@ export default class UserInfo extends Base {
     stylePrefix = 'user-detail-';
     detail: UserDetailDataType = {};
     tab = '';
+    created() {
+        this.initTab();
+    }
     mounted() {
         this.load();
     }
@@ -53,21 +56,7 @@ export default class UserInfo extends Base {
                 } else
                     this.tab = query.tab;
             }
-            this.changeTab();
-        }
-    }
-
-    private changeTab() {
-        if (this.tab === myEnum.userTab.粉丝 && !this.tabLoaded.follower) {
-            this.handleFollowSearch(myEnum.followQueryType.粉丝);
-        } else if (this.tab === myEnum.userTab.关注 && !this.tabLoaded.following) {
-            this.handleFollowSearch(myEnum.followQueryType.关注);
-        } else if (this.tab === myEnum.userTab.文章 && !this.tabLoaded.article) {
-            this.handleArticleSearch();
-        } else if (this.tab === myEnum.userTab.私信 && !this.tabLoaded.chat) {
-            this.handleChatSearch();
-        } else if (this.tab === myEnum.userTab.收藏 && !this.tabLoaded.favourite) {
-            this.handleFavouriteSearch();
+            this.handleSearch();
         }
     }
 
@@ -88,7 +77,7 @@ export default class UserInfo extends Base {
     $refs: {
         formVaild: iview.Form, loadView: IMyLoad, upload: IMyUpload,
         followerList: FollowList, followingList: FollowList,
-        articleList: Article, chatList: ChatList, favouriteList: any,
+        articleList: Article, videoList: Video, chatList: ChatList, favouriteList: FavouriteList,
     };
     updateLoading = false;
     private getUpdateUser() {
@@ -222,121 +211,33 @@ export default class UserInfo extends Base {
         }
     }
 
-    private tabLoaded = {
-        following: false,
-        follower: false,
-        article: false,
-        chat: false,
-        favourite: false,
-    };
+    private tabLoaded = {};
+    private initTab() {
+        myEnum.userTab.toArray().forEach(ele => {
+            this.tabLoaded[ele.value] = false;
+        });
+    }
 
-    private handleFollowSearch(type) {
-        if (type == myEnum.followQueryType.粉丝) {
+    private handleSearch(firstLoad?: boolean) {
+        if (!(this.tab in this.tabLoaded))
+            return;
+        let loaded = this.tabLoaded[this.tab];
+        if (loaded)
+            return;
+        if (this.tab === myEnum.userTab.粉丝) {
             this.$refs.followerList.query();
-            this.tabLoaded.follower = true;
-        } else {
+        } else if (this.tab === myEnum.userTab.关注) {
             this.$refs.followingList.query();
-            this.tabLoaded.following = true;
+        } else if (this.tab === myEnum.userTab.视频) {
+            this.$refs.videoList.query();
+        } else if (this.tab === myEnum.userTab.文章) {
+            this.$refs.articleList.query();
+        } else if (this.tab === myEnum.userTab.私信) {
+            this.$refs.chatList.query();
+        } else if (this.tab === myEnum.userTab.收藏) {
+            this.$refs.favouriteList.query();
         }
-    }
-
-    private handleArticleSearch() {
-        this.$refs.articleList.query();
-        this.tabLoaded.article = true;
-    }
-
-    private handleChatSearch() {
-        this.$refs.chatList.query();
-        this.tabLoaded.chat = true;
-    }
-
-    private handleFavouriteSearch() {
-        this.$refs.favouriteList.query();
-        this.tabLoaded.favourite = true;
-    }
-
-    renderInfo() {
-        let detail = this.detail;
-        let user = this.storeUser.user;
-        return (
-            <div>
-                <div class={this.getStyleName('main')}>
-                    <UserAvatarView user={detail} size="large" noTips showAccount class={this.getStyleName('avatar')} />
-                    {detail.self && <a on-click={() => {
-                        this.toggleUpdate(true);
-                    }} class={this.getStyleName('edit')}>修改</a>}
-                    <div class="flex-stretch"></div>
-                    {!detail.self && <FollowButtonView class={this.getStyleName('follow')} user={detail} />}
-                </div>
-                <Tabs animated={false} v-model={this.tab} class={this.getStyleName('tab')} on-on-click={(name: string) => {
-                    this.$router.push({
-                        path: this.$route.path,
-                        query: {
-                            ...this.$route.query,
-                            tab: name
-                        }
-                    });
-                }}>
-                    <TabPane label="概览">
-                        {detail.self ?
-                            <Form class="form-no-error" label-width={60}>
-                                <FormItem label="状态">
-                                    {detail.statusText}
-                                </FormItem>
-                                <FormItem label="简介">
-                                    {detail.profile || dev.defaultProfile}
-                                </FormItem>
-                                <FormItem label="角色">
-                                    <RoleTagView value={detail.roleList} hideCode />
-                                </FormItem>
-                                <FormItem label="权限">
-                                    <AuthorityTagView value={detail.authorityList} hideCode />
-                                </FormItem>
-                                <FormItem label="可用权限">
-                                    <AuthorityTagView value={Object.values(detail.auth)} hideCode />
-                                </FormItem>
-                                <FormItem label="注册时间">
-                                    {detail.createdAt && moment(detail.createdAt).format(dev.dateFormat)}
-                                </FormItem>
-                            </Form> :
-                            <Form class="form-no-error" label-width={60}>
-                                <FormItem label="简介">
-                                    {detail.profile || dev.defaultProfile}
-                                </FormItem>
-                                <FormItem label="注册时间">
-                                    {detail.createdAt && moment(detail.createdAt).format(dev.dateFormat)}
-                                </FormItem>
-                            </Form>
-                        }
-                    </TabPane>
-                    <TabPane name={myEnum.userTab.文章} label={() => {
-                        return <div>文章: {detail.article}</div>;
-                    }}>
-                        <ArticleView ref="articleList" notQueryOnRoute notQueryToRoute notQueryOnMounted />
-                    </TabPane>
-                    <TabPane name={myEnum.userTab.粉丝} label={() => {
-                        return <div>粉丝: {detail.follower}</div>;
-                    }}>
-                        <FollowListView ref="followerList" userId={this.detail._id} followType={myEnum.followQueryType.粉丝} />
-                    </TabPane>
-                    <TabPane name={myEnum.userTab.关注} label={() => {
-                        return <div>关注: {detail.following}</div>;
-                    }}>
-                        <FollowListView ref="followingList" userId={this.detail._id} followType={myEnum.followQueryType.关注} />
-                    </TabPane>
-                    {user.isLogin && <TabPane name={myEnum.userTab.收藏} label={() => {
-                        return <div>收藏</div>;
-                    }}>
-                        <FavouriteListView ref="favouriteList" />
-                    </TabPane>}
-                    {user.isLogin && <TabPane name={myEnum.userTab.私信} label={() => {
-                        return <div>私信</div>;
-                    }}>
-                        <ChatListView ref="chatList" />
-                    </TabPane>}
-                </Tabs>
-            </div>
-        );
+        this.tabLoaded[this.tab] = true;
     }
 
     render() {
@@ -404,6 +305,100 @@ export default class UserInfo extends Base {
                     </div>
                 </Modal>
             </div >
+        );
+    }
+
+    renderInfo() {
+        let detail = this.detail;
+        let user = this.storeUser.user;
+        return (
+            <div>
+                <div class={this.getStyleName('main')}>
+                    <UserAvatarView user={detail} size="large" noTips showAccount class={this.getStyleName('avatar')} />
+                    {detail.self && <a on-click={() => {
+                        this.toggleUpdate(true);
+                    }} class={this.getStyleName('edit')}>修改</a>}
+                    <div class="flex-stretch"></div>
+                    {!detail.self && <FollowButtonView class={this.getStyleName('follow')} user={detail} />}
+                </div>
+                <Tabs animated={false} v-model={this.tab} class={this.getStyleName('tab')} on-on-click={(name: string) => {
+                    this.$router.push({
+                        path: this.$route.path,
+                        query: {
+                            ...this.$route.query,
+                            tab: name
+                        }
+                    });
+                }}>
+                    <TabPane label="概览">
+                        {this.renderUserDetail()}
+                    </TabPane>
+                    <TabPane name={myEnum.userTab.视频} label={() => {
+                        return <div>视频: {detail.video}</div>;
+                    }}>
+                        <VideoView ref="videoList" notQueryOnRoute notQueryToRoute notQueryOnMounted />
+                    </TabPane>
+                    <TabPane name={myEnum.userTab.文章} label={() => {
+                        return <div>文章: {detail.article}</div>;
+                    }}>
+                        <ArticleView ref="articleList" notQueryOnRoute notQueryToRoute notQueryOnMounted />
+                    </TabPane>
+                    <TabPane name={myEnum.userTab.粉丝} label={() => {
+                        return <div>粉丝: {detail.follower}</div>;
+                    }}>
+                        <FollowListView ref="followerList" userId={this.detail._id} followType={myEnum.followQueryType.粉丝} />
+                    </TabPane>
+                    <TabPane name={myEnum.userTab.关注} label={() => {
+                        return <div>关注: {detail.following}</div>;
+                    }}>
+                        <FollowListView ref="followingList" userId={this.detail._id} followType={myEnum.followQueryType.关注} />
+                    </TabPane>
+                    {user.isLogin && <TabPane name={myEnum.userTab.收藏} label={() => {
+                        return <div>收藏</div>;
+                    }}>
+                        <FavouriteListView ref="favouriteList" />
+                    </TabPane>}
+                    {user.isLogin && <TabPane name={myEnum.userTab.私信} label={() => {
+                        return <div>私信</div>;
+                    }}>
+                        <ChatListView ref="chatList" />
+                    </TabPane>}
+                </Tabs>
+            </div>
+        );
+    }
+
+    renderUserDetail() {
+        let detail = this.detail;
+        return (detail.self ?
+            <Form class="form-no-error" label-width={60}>
+                <FormItem label="状态">
+                    {detail.statusText}
+                </FormItem>
+                <FormItem label="简介">
+                    {detail.profile || dev.defaultProfile}
+                </FormItem>
+                <FormItem label="角色">
+                    <RoleTagView value={detail.roleList} hideCode />
+                </FormItem>
+                <FormItem label="权限">
+                    <AuthorityTagView value={detail.authorityList} hideCode />
+                </FormItem>
+                <FormItem label="可用权限">
+                    <AuthorityTagView value={Object.values(detail.auth)} hideCode />
+                </FormItem>
+                <FormItem label="注册时间">
+                    {detail.createdAt && moment(detail.createdAt).format(dev.dateFormat)}
+                </FormItem>
+            </Form> :
+            <Form class="form-no-error" label-width={60}>
+                <FormItem label="简介">
+                    {detail.profile || dev.defaultProfile}
+                </FormItem>
+                <FormItem label="注册时间">
+                    {detail.createdAt && moment(detail.createdAt).format(dev.dateFormat)}
+                </FormItem>
+            </Form>
         );
     }
 }

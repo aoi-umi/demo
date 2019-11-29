@@ -7,31 +7,28 @@ import { Card, Input } from '@/components/iview';
 import { MyList, IMyList } from '@/components/my-list';
 
 import { Base } from '../base';
+import { ListBase } from '../comps/list-base';
 import { DetailDataType } from './article-mgt-detail';
 import { ContentListItemView } from './content';
 
 import './video.less';
 
 @Component
-export default class Video extends Base {
+export default class Video extends ListBase {
     $refs: { list: IMyList<any> };
 
     anyKey = '';
 
-    mounted() {
-        this.query();
-    }
-
-    @Watch('$route')
-    route(to, from) {
-        this.query();
-    }
-
     query() {
         let list = this.$refs.list;
-        let query: any = this.$route.query;
-        list.setQueryByKey(query, ['user', 'title']);
-        this.anyKey = query.anyKey;
+        let query
+        if (!this.notQueryOnRoute) {
+            query = this.$route.query;
+            list.setQueryByKey(query, ['user', 'title']);
+            this.anyKey = query.anyKey;
+        } else {
+            query = {};
+        }
         convert.Test.queryToListModel(query, list.model);
         this.$refs.list.query(query);
     }
@@ -70,15 +67,20 @@ export default class Video extends Base {
                         return rs;
                     }}
 
-                    on-query={(model) => {
-                        this.$router.push({
-                            path: this.$route.path,
-                            query: {
-                                ...model.query,
-                                anyKey: this.anyKey,
-                                ...convert.Test.listModelToQuery(model),
-                            }
-                        });
+                    on-query={(model, list: IMyList<any>) => {
+                        let q = {
+                            ...model.query,
+                            anyKey: this.anyKey,
+                            ...convert.Test.listModelToQuery(model),
+                        };
+                        if (!this.notQueryToRoute) {
+                            this.$router.push({
+                                path: this.$route.path,
+                                query: q
+                            });
+                        } else {
+                            list.query(q);
+                        }
                     }}
                 >
                 </MyList>
@@ -87,6 +89,7 @@ export default class Video extends Base {
     }
 }
 
+export const VideoView = convClass<Video>(Video);
 
 @Component
 class VideoListItem extends Base {

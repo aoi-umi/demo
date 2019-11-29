@@ -24,6 +24,8 @@ export let submit: RequestHandler = (req, res) => {
         let updateOwner: any = {};
         updateOwner.favourite = owner.favourite + (data.favourite ? 1 : -1);
         detail.favourite = data.favourite;
+        if (data.favourite)
+            detail.favourAt = new Date();
         await transaction(async (session) => {
             await owner.update(updateOwner, { session });
             await detail.save({ session });

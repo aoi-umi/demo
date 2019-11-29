@@ -16,7 +16,8 @@ type MyWaterfallItemType = {
     left?: number,
     colIdx?: number,
     style: any,
-    img: HTMLImageElement
+    img: HTMLImageElement,
+    timer?: any
 };
 
 type GetDataFnResult<T> = { data: T[], finished?: boolean };
@@ -26,14 +27,25 @@ class MyWaterfall extends MyBase {
     stylePrefix = 'my-waterfall-';
 
     @Prop({
-        default: 5
+        default: () => (width) => {
+            if (width < 576)
+                return 2;
+            if (width < 768)
+                return 3;
+            return 5;
+        }
     })
-    rowItemCount: number;
+    col: number | ((width: number) => number);
 
     @Prop({
-        default: 15
+        default: 10
     })
     space: number;
+
+    @Prop({
+        default: 20
+    })
+    timeout: number;
 
     @Prop({
         required: true
@@ -47,9 +59,18 @@ class MyWaterfall extends MyBase {
 
     currVal: any[] = [];
 
+    private actualCol = 1;
+    @Watch('col')
+    private watchCol() {
+        if (typeof this.col !== 'function')
+            this.actualCol = this.col;
+        else
+            this.actualCol = this.col(this.$refs.root.clientWidth);
+    }
     private itemList: MyWaterfallItemType[] = [];
 
     protected mounted() {
+        this.watchCol();
         window.addEventListener('resize', this.handleResize);
         window.addEventListener('scroll', this.handleScrollEnd);
     }
@@ -60,6 +81,7 @@ class MyWaterfall extends MyBase {
     }
 
     private handleResize() {
+        this.watchCol();
         this.handleItemStyle();
     }
 
@@ -94,7 +116,7 @@ class MyWaterfall extends MyBase {
                 return old;
             let img = new Image();
 
-            let obj = {
+            let obj: MyWaterfallItemType = {
                 data: ele,
                 loaded: false,
                 success: false,
@@ -105,13 +127,20 @@ class MyWaterfall extends MyBase {
             img.onload = img.onerror = (e) => {
                 this.imgLoaded(obj);
             };
+            if (this.timeout > 0) {
+                obj.timer = setTimeout(() => {
+                    this.imgLoaded(obj);
+                }, this.timeout * 1000);
+            }
             img.src = ele.src;
             return obj;
         });
     }
     private imgLoaded(obj: MyWaterfallItemType) {
         let idx = this.itemList.findIndex(item => item === obj);
-        if (idx === -1)
+        if (obj.timer)
+            clearTimeout(obj.timer);
+        if (idx === -1 || obj.loaded)
             return;
         let img = obj.img;
         obj.loaded = true;
@@ -120,33 +149,61 @@ class MyWaterfall extends MyBase {
     }
 
     private handleItemStyle() {
-        let itemWidth = Math.round(this.$refs.root.clientWidth / this.rowItemCount);
+        /*
+        |<----------clientWidth-------------->|<-space->|
+        |  col1                 |  col2       |
+        |<-itemWidth->|<-space->|<-itemWidth->|
+        |                       |             |
+        |-------------------------------------|        
+         */
+        let padding = 5;
+        let clientWidth = this.$refs.root.clientWidth + this.space;
+        let itemWidth = Math.round(clientWidth / this.actualCol) - this.space;
         let lastShowIdx = -1;
         let divHeight = 0;
-        let minBottom = 0;
         for (let i = 0; i < this.itemList.length; i++) {
             let item = this.itemList[i];
             let show = item.loaded && lastShowIdx < i;
             if (!show)
                 break;
             lastShowIdx = i;
-            let width = itemWidth - this.space;
-            let height = item.height = Math.round(item.img.height ? (width / item.img.width) * item.img.height : itemWidth);
+
+            /*                                
+            已知：x(itemWidth),padding,imgX,imgY
+            求y
+            imgY/imgX = y1/x1
+            => y = y1 + 2 * padding
+                = imgY/imgX * x1 + 2 * padding
+            |<-------x------->|
+            |      padding    |
+            |  |-----x1-----| |
+            y  y1           | |
+            |  |------------| |
+            |                 |
+            |-----------------|
+            */
+            let width = itemWidth;
+            let height = item.height = Math.round(item.img.height ?
+                (item.img.height / item.img.width) * (width - 2 * padding) + 2 * padding
+                : itemWidth);
             item.style = {
                 width: width + 'px',
                 height: height + 'px',
+                padding: padding + 'px',
             };
+
             //第一行
-            let left = itemWidth * i, top = 0;
-            item.colIdx = i % this.rowItemCount;
-            if (i >= this.rowItemCount) {
-                let col = {};
+            let left = (itemWidth + this.space) * i, top = 0;
+            item.colIdx = i % this.actualCol;
+            if (i >= this.actualCol) {
+                //记录每一列最后一个,获取bottom最小的,在该item下面添加当前元素
+                let colDict = {};
                 for (let idx = 0; idx < i; idx++) {
                     let ele = this.itemList[idx];
-                    col[ele.colIdx] = ele;
+                    colDict[ele.colIdx] = ele;
                 }
                 let minBottomCol: MyWaterfallItemType;
-                Object.values<MyWaterfallItemType>(col).forEach(ele => {
+                Object.values<MyWaterfallItemType>(colDict).forEach(ele => {
                     if (!minBottomCol || minBottomCol.bottom > ele.bottom)
                         minBottomCol = ele;
                 });
