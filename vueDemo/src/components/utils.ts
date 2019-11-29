@@ -63,7 +63,7 @@ export class Utils {
 
     static isScrollEnd(elm?: HTMLElement | Window) {
         let scrollTop, clientHeight, scrollHeight;
-        if (!elm || elm instanceof Window) {
+        if (!elm || elm instanceof Window || [document.body].includes(elm)) {
             scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
             clientHeight = document.documentElement.clientHeight || document.body.clientHeight;
             scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
@@ -72,7 +72,10 @@ export class Utils {
             clientHeight = elm.clientHeight;
             scrollHeight = elm.scrollHeight;
         }
-        // alert([scrollTop, clientHeight, scrollHeight].join(','));
+        // console.log('--------------');
+        // console.log([document.documentElement.scrollTop, document.documentElement.clientHeight, document.documentElement.scrollHeight].join(','));
+        // console.log([document.body.scrollTop, document.body.clientHeight, document.body.scrollHeight].join(','));
+        // console.log([scrollTop, clientHeight, scrollHeight].join(','));
         return (scrollTop + clientHeight >= scrollHeight);
     }
 }
