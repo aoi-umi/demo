@@ -22,6 +22,11 @@ type MyWaterfallItemType = {
 
 type GetDataFnResult<T> = { data: T[], finished?: boolean };
 
+const ScrollElm = {
+    window: 'window' as 'window',
+    root: 'root' as 'root'
+};
+type TypeOfValue<T> = T[keyof T];
 @Component
 class MyWaterfall extends MyBase {
     stylePrefix = 'my-waterfall-';
@@ -47,6 +52,15 @@ class MyWaterfall extends MyBase {
     })
     timeout: number;
 
+    /**
+     * 滚动的元素，默认为window
+     * 设为root时，给root一个高度
+     */
+    @Prop({
+        default: ScrollElm.window
+    })
+    scrollElm?: TypeOfValue<typeof ScrollElm>;
+
     @Prop({
         required: true
     })
@@ -69,15 +83,18 @@ class MyWaterfall extends MyBase {
     }
     private itemList: MyWaterfallItemType[] = [];
 
+    private getScrollElm() {
+        return this.scrollElm === ScrollElm.root ? this.$refs.root : window;
+    }
     protected mounted() {
         this.watchCol();
         window.addEventListener('resize', this.handleResize);
-        window.addEventListener('scroll', this.handleScrollEnd);
+        this.getScrollElm().addEventListener('scroll', this.handleScrollEnd);
     }
 
     protected beforeDestroy() {
         window.removeEventListener('resize', this.handleResize);
-        window.removeEventListener('scroll', this.handleScrollEnd);
+        this.getScrollElm().removeEventListener('scroll', this.handleScrollEnd);
     }
 
     private handleResize() {
@@ -90,7 +107,7 @@ class MyWaterfall extends MyBase {
         return !!this.itemList.find(ele => !ele.loaded);
     }
     private handleScrollEnd() {
-        if (!this.finished && !this.loading && Utils.isScrollEnd() && !this.imgLoading) {
+        if (!this.finished && !this.loading && Utils.isScrollEnd(this.getScrollElm()) && !this.imgLoading) {
             this.getData();
         }
     }
@@ -229,7 +246,7 @@ class MyWaterfall extends MyBase {
     private divHeight = 0;
     protected render() {
         return (
-            <div ref='root'>
+            <div ref='root' class={this.getStyleName('root')}>
                 <div class={this.getStyleName('main')} style={{ height: this.divHeight + 'px' }}>
                     {this.itemList.map(ele => {
                         return (
