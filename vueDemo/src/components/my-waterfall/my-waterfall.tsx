@@ -33,11 +33,10 @@ class MyWaterfall extends MyBase {
 
     @Prop({
         default: () => (width) => {
-            if (width < 576)
-                return 2;
-            if (width < 768)
-                return 3;
-            return 5;
+            let w = 128;
+            if (width > 768)
+                w = 198;
+            return Math.floor(width / w);
         }
     })
     col: number | ((width: number) => number);
@@ -108,6 +107,7 @@ class MyWaterfall extends MyBase {
         return !!this.itemList.find(ele => !ele.loaded);
     }
     private handleScrollEnd() {
+        // console.log(this.$refs.root.clientWidth, !this.finished, !this.loading, !this.imgLoading, Utils.isScrollEnd(this.getScrollElm()));
         if (!this.finished && !this.loading && !this.imgLoading && Utils.isScrollEnd(this.getScrollElm())) {
             this.getData();
         }
@@ -265,9 +265,11 @@ class MyWaterfall extends MyBase {
                 </div>
                 <div class={this.getStyleName('bottom-box')}>
                     {this.finished && !this.imgLoading && (this.$slots.loaded || <span>加载完毕</span>)}
-                    <div style={{ visibility: (this.loading || this.imgLoading) ? '' : 'hidden' }}>
-                        {this.$slots.loading || <span>加载中</span>}
-                    </div>
+                    {(this.loading || this.imgLoading) && (this.$slots.loading || <span>加载中</span>)}
+                    {!this.finished && !this.loading && !this.imgLoading
+                        && (<div class={this.getStyleName('more')} on-click={() => {
+                            this.getData();
+                        }}>{this.$slots.more || '更多'}</div>)}
                 </div>
             </div>
         );
