@@ -5,7 +5,7 @@ import { transaction } from '@/_system/dbMongo';
 import { responseHandler, paramsValid, } from '@/helpers';
 import { myEnum } from '@/config';
 import * as config from '@/config';
-import { cache } from '@/_main';
+import { cache } from '@/main';
 import * as ValidSchema from '@/valid-schema/class-valid';
 
 import { UserModel, UserMapper, UserLogMapper } from '@/models/mongo/user';

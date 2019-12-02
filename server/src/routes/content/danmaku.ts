@@ -5,7 +5,7 @@ import { myEnum } from '@/config';
 import * as config from '@/config';
 import { Auth } from '@/_system/auth';
 import * as ValidSchema from '@/valid-schema/class-valid';
-import { mySocket } from '@/_main';
+import { mySocket } from '@/main';
 
 import { DanmakuModel } from '@/models/mongo/danmaku';
 
