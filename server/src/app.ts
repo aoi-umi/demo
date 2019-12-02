@@ -24,7 +24,7 @@ debug('my-application');
         helpers.logger.error('unhandledRejection');
         helpers.logger.error(e);
     });
-    const main = await import('./_main');
+    const main = await import('./main');
     await main.init();
     const app = express();
     app.set('port', process.env.PORT || config.env.port);

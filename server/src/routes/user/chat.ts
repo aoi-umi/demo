@@ -2,7 +2,7 @@ import { RequestHandler } from "express";
 
 import { responseHandler, paramsValid } from "@/helpers";
 import { error } from "@/_system/common";
-import { mySocket } from "@/_main";
+import { mySocket } from "@/main";
 import * as ValidSchema from '@/valid-schema/class-valid';
 
 import { ChatModel, ChatMapper } from "@/models/mongo/chat";

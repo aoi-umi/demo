@@ -62,6 +62,13 @@ export let register = function (app: Express) {
         }
         next();
     });
+
+    app.get('/', function (req, res) {
+        res.json({
+            name: config.env.name,
+            version: config.env.version,
+        });
+    });
     app.use(config.env.urlPrefix, routes);
 }
 
