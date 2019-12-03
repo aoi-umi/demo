@@ -9,7 +9,7 @@ export type AuthorityDetail = {
     code?: string;
     status: number;
     name: string;
-}
+};
 @Component
 class AuthorityTag extends MyTagBase<AuthorityDetail> {
 
