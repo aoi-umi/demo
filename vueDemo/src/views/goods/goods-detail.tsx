@@ -13,6 +13,7 @@ import { MyImgViewer, IMyImgViewer } from '@/components/my-img-viewer';
 import { MyNumber } from '@/components/my-number';
 
 import { Base } from '../base';
+import { PayView } from '../comps/pay';
 import { DetailType, SkuType } from './goods-mgt-detail';
 
 import './goods.less';
@@ -154,20 +155,14 @@ class GoodsDetailMain extends Base {
     }
 
     private payShow = false;
-    private creatingBuy = false;
-    private buy() {
-        this.creatingBuy = true;
-        this.operateHandler('购买', async () => {
-            let { payInfo } = await testApi.goodsBuy({
-                quantity: this.buyInfo.quantity,
-                payType: this.buyInfo.payType,
-                totalPrice: this.totalPrice,
-                skuId: this.sku._id,
-            });
-            window.open(payInfo.url, '_blank');
-        }).finally(() => {
-            this.creatingBuy = false;
+    private async buy() {
+        let { payInfo } = await testApi.goodsBuy({
+            quantity: this.buyInfo.quantity,
+            payType: this.buyInfo.payType,
+            totalPrice: this.totalPrice,
+            skuId: this.sku._id,
         });
+        return payInfo;
     }
 
     showUrl = '';
@@ -176,21 +171,13 @@ class GoodsDetailMain extends Base {
         let multi = spu.imgUrls.length > 1;
         return (
             <div>
-                <Modal v-model={this.payShow} footer-hide>
-                    <div class={this.getStyleName('pay-box')}>
+                <Modal v-model={this.payShow} footer-hide >
+                    <PayView payFn={async () => {
+                        return this.buy();
+                    }}>
                         <p>{this.buyInfo.name}</p>
                         <p>支付金额: {this.totalPrice.toFixed(2)}</p>
-                        <RadioGroup v-model={this.buyInfo.payType}>
-                            {this.typeList.map(ele => {
-                                return <Radio label={ele.value}>{ele.key}</Radio>;
-                            })}
-                        </RadioGroup>
-                        <div class={this.getStyleName('pay-btn')}>
-                            <Button type="primary" loading={this.creatingBuy} on-click={() => {
-                                this.buy();
-                            }}>支付</Button>
-                        </div>
-                    </div>
+                    </PayView>
                 </Modal>
                 <h2>{spu.name}</h2>
                 <MyImgViewer ref="imgViewer" src={this.showUrl} />
