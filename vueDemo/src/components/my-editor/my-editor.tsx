@@ -7,12 +7,13 @@ import 'quill/dist/quill.bubble.css';
 import { MyInputBase } from '../my-input/my-input';
 import { convClass } from '../utils';
 
+import './style.less';
 
 @Component({
     quillEditor
 })
 class MyEditor extends MyInputBase {
-
+    stylePrefix = 'my-editor-';
     @Prop({
         default: () => {
             return [
@@ -122,7 +123,7 @@ class MyEditor extends MyInputBase {
     render() {
         let self = this;
         return (
-            <quillEditor style={{ background: '#fff' }} ref="quillEditor" v-model={this.currentValue} options={{
+            <quillEditor class={this.getStyleName('editor')} ref="quillEditor" v-model={this.currentValue} options={{
                 placeholder: this.placeholder,
                 modules: {
                     toolbar: {

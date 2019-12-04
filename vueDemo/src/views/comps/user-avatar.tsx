@@ -6,6 +6,8 @@ import { Avatar } from '@/components/iview';
 import { Base } from '../base';
 import { UserPoptipView } from './user-poptip';
 
+import './user-avatar.less';
+
 export type User = {
     _id?: string;
     nickname?: string;
@@ -16,6 +18,7 @@ export type User = {
 };
 @Component
 class UserAvatar extends Base {
+    stylePrefix = 'comp-user-avatar-';
     @Prop()
     user: User;
 
@@ -57,7 +60,7 @@ class UserAvatar extends Base {
 
     render() {
         return (
-            <div style={{ display: 'inline-block' }}>
+            <div class={this.getStyleName('root')}>
                 <UserPoptipView
                     user={this.user}
                     tipsPlacement={this.tipsPlacement}
@@ -65,11 +68,10 @@ class UserAvatar extends Base {
                     self={this.self}
                 >
                     <Avatar
-                        class="shadow"
+                        class={this.getStyleName('avatar').concat('shadow')}
                         icon="md-person"
                         size={this.size}
                         src={this.avatarUrl}
-                        style={{ marginRight: '10px' }}
                     />
                 </UserPoptipView>
                 <span class="not-important">{this.user.nickname}{this.showAccount && `(${this.user.account})`}{this.isAuthor && `(作者)`}</span>

@@ -2,10 +2,14 @@ import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 
 import { convClass } from '../utils';
 import { Spin, Button, Card } from '../iview';
+import { MyBase } from '../my-base';
+import { cls } from '../style';
 
+import './style.less';
 
 @Component
-class MyLoad extends Vue {
+class MyLoad extends MyBase {
+    stylePrefix = 'my-load-';
     @Prop()
     loadFn: () => Promise<any>;
 
@@ -54,12 +58,12 @@ class MyLoad extends Vue {
     protected render() {
         if (!this.result.success) {
             return (
-                <div style={{ position: 'relative', }}>
-                    <Card class="center" style={{ height: this.height ? this.height + 'px' : null, width: this.width ? this.width + 'px' : null }}>
+                <div class={this.getStyleName('root')}>
+                    <Card class={cls.center} style={{ height: this.height ? this.height + 'px' : null, width: this.width ? this.width + 'px' : null }}>
                         {this.loading ? <Spin size="large" fix /> :
-                            <div class="center" style={{ flexFlow: 'column' }}>
+                            <div class={this.getStyleName('content').concat(cls.center)}>
                                 {this.result.msg}
-                                <Button style={{ margin: '5px' }} on-click={this.loadData}>重试</Button>
+                                <Button class={this.getStyleName('retry-btn')} on-click={this.loadData}>重试</Button>
                             </div>
                         }
                     </Card>

@@ -1,6 +1,10 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
+
 import { Button, Row, Col } from '../iview';
 import { convClass } from '../utils';
+import { MyBase } from '../my-base';
+
+import './style.less';
 
 type BtnType = {
     text: string;
@@ -9,7 +13,8 @@ type BtnType = {
     onClick?: (ele: BtnType, idx: number) => any;
 };
 @Component
-class MyConfirm extends Vue {
+class MyConfirm extends MyBase {
+    stylePrefix = 'my-confirm-';
     @Prop()
     title?: string;
 
@@ -73,7 +78,7 @@ class MyConfirm extends Vue {
         return (
             <div>
                 <h2>{this.title || ''}</h2>
-                <div style={{ minHeight: '80px', marginTop: '10px' }}>
+                <div class={this.getStyleName('content-box')}>
                     {this.$slots.default}
                 </div>
                 {this.renderBtn()}

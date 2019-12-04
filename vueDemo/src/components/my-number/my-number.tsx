@@ -4,7 +4,7 @@ import { convClass } from '../utils';
 import { Icon, Button } from '../iview';
 import { MyBase } from '../my-base';
 
-import './my-number.less';
+import './style.less';
 
 @Component
 export class MyNumber extends MyBase {

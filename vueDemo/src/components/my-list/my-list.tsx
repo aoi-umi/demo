@@ -8,7 +8,8 @@ import { Utils } from '../utils';
 import { MyBase } from '../my-base';
 import * as style from '../style';
 import { MyListModel, MyListResult } from './model';
-import './my-list.less';
+
+import './style.less';
 
 type QueryArgsType = {
     [key: string]: {
@@ -294,8 +295,8 @@ class MyList<QueryArgs extends QueryArgsType> extends MyBase {
             <div>
                 {!this.hideSearchBox &&
                     <Card>
-                        <div style={{ justifyContent: 'flex-end', display: 'flex' }}>
-                            <div style={{ cursor: 'pointer' }} onClick={() => { this.showQuery = !this.showQuery; }}>
+                        <div class={this.getStyleName('toggle-box')}>
+                            <div class={style.cls.pointer} onClick={() => { this.showQuery = !this.showQuery; }}>
                                 {this.showQuery ? '隐藏' : '展开'}筛选
                                 <Icon type={this.showQuery ? 'ios-arrow-up' : 'ios-arrow-down'} />
                             </div>
@@ -306,7 +307,7 @@ class MyList<QueryArgs extends QueryArgsType> extends MyBase {
                                     let key = entry[0];
                                     let ele = entry[1];
                                     return (
-                                        <Col style={{ marginBottom: '5px' }} xs={24} sm={8} md={6}>
+                                        <Col class={this.getStyleName('query-args-item')} xs={24} sm={8} md={6}>
                                             {ele.label || key}
                                             {ele.comp ? ele.comp(this.model.query, ele) : <Input placeholder={ele.placeholder} v-model={this.model.query[key]} />}
                                         </Col>
