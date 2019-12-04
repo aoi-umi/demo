@@ -11,7 +11,7 @@ import { MyBase } from '../my-base';
 import { MyVideo, IMyVideo } from '../my-video';
 
 import * as style from '../style';
-import './my-upload.less';
+import './style.less';
 
 export const FileDataType = {
     未知: 0,
@@ -400,8 +400,8 @@ class MyUpload extends MyBase {
                 </Upload>
                 <transition name="fade">
                     <div class={[style.cls.mask]} v-show={this.cropperShow}>
-                        <div style={{ textAlign: 'center', width: '100%' }}>
-                            <div style={{ ...cropperSize, display: 'inline-block' }}>
+                        <div class={this.getStyleName('cropper-root')}>
+                            <div class={this.getStyleName('cropper-cont')} style={{ ...cropperSize }}>
                                 <VueCropper
                                     ref="cropper"
                                     props={this.cropper}

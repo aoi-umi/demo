@@ -1,9 +1,11 @@
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
+
 import { convClass } from '../utils';
 import { Option, Select, Input } from '../iview';
+import { MyBase } from '../my-base';
 
 @Component
-export class MyInputBase extends Vue {
+export class MyInputBase extends MyBase {
     @Prop()
     value?: string;
 

@@ -8,7 +8,7 @@ import { MyBase } from '../my-base';
 import { convClass, Utils } from '../utils';
 import { Table, Icon, Poptip } from '../iview';
 
-import './my-video.less';
+import './style.less';
 import { DanmakuPlayer, DanmakuPlayerOptions, DanmakuDataType } from './videojs-comp';
 import { dev } from '@/config';
 

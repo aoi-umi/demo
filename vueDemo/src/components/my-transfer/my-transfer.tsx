@@ -1,6 +1,10 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
+
 import { convClass } from '../utils';
 import { Button, Transfer } from '../iview';
+import { MyBase } from '../my-base';
+
+import './style.less';
 
 type DataType = {
     key: string;
@@ -9,7 +13,8 @@ type DataType = {
     disabled?: boolean;
 };
 @Component
-class MyTransfer extends Vue {
+class MyTransfer extends MyBase {
+    stylePrefix = 'my-transfer-';
     @Prop()
     selectedData: DataType[];
 
@@ -73,7 +78,7 @@ class MyTransfer extends Vue {
                     this.targetKeys = targetKeys;
                 }}
             >
-                <div style={{ float: 'right', margin: '5px' }}>
+                <div class={this.getStyleName('refresh')}>
                     <Button size="small" on-click={this.loadData} loading={this.loading}>刷新</Button>
                 </div>
             </Transfer>

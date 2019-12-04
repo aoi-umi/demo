@@ -13,6 +13,8 @@ import { Base } from '../base';
 import { DetailDataType } from '../user/user-mgt';
 import { FollowButtonView } from './follow-button';
 
+import './user-poptip.less';
+
 export type User = {
     _id?: string;
     nickname?: string;
@@ -23,6 +25,7 @@ export type User = {
 };
 @Component
 class UserPoptip extends Base {
+    stylePrefix = 'comp-user-poptip-';
     @Prop()
     user: User;
 
@@ -102,7 +105,7 @@ class UserPoptip extends Base {
         let loadFail = !!this.loadFailMsg;
         let notSelf = this.user._id !== this.storeUser.user._id;
         return (
-            <div style={{ display: 'inline-block' }}>
+            <div class={this.getStyleName('root')}>
                 <Poptip class="pointer" disabled={this.noTips} trigger="hover"
                     placement={this.tipsPlacement} on-on-popper-show={() => {
                         this.getUserDetail();
@@ -119,14 +122,14 @@ class UserPoptip extends Base {
                             }}>主页</p>
                             <p class="ivu-select-item" on-click={this.signOut}>退出</p>
                         </div> :
-                        <div slot="content" style={{ position: 'relative', margin: '2px' }}>
+                        <div slot="content" class={this.getStyleName('content')}>
                             {loadFail ?
-                                <div style={{ textAlign: 'center' }}>
+                                <div class="center">
                                     {this.loadFailMsg}
                                 </div> :
                                 <div>
                                     {this.loading && <Spin fix />}
-                                    <div style={{ textAlign: 'center' }}>
+                                    <div class={this.getStyleName('avatar-box').concat('center')}>
                                         <Avatar class="shadow" icon="md-person" src={this.userDetail.avatarUrl} size="large"
                                             nativeOn-click={() => {
                                                 if (this.avatarUrl) {
@@ -143,7 +146,7 @@ class UserPoptip extends Base {
                                 </div>
                             }
                             <br />
-                            <div style={{ textAlign: 'center' }}>
+                            <div class="center">
                                 {!!this.loadFailMsg &&
                                     <Button on-click={() => {
                                         this.getUserDetail();

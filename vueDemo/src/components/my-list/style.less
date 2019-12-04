@@ -1,5 +1,10 @@
 @prefix: my-list-;
 .@{prefix} {
+  &toggle-box {
+    justify-content: flex-end;
+    display: flex;
+  }
+
   &page {
     text-align: right;
     margin: 5px;
@@ -33,6 +38,9 @@
       max-height: 0;
       overflow: hidden;
     }
+  }
+  &query-arg-item {
+    margin-bottom: 5px;
   }
 
   &content {

@@ -1,8 +1,10 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
+
 import { convClass } from '../utils';
 import { Icon } from '../iview';
 import { MyBase } from '../my-base';
-import './my-img.less';
+
+import './style.less';
 
 @Component
 class MyImg extends MyBase {
@@ -39,12 +41,12 @@ class MyImg extends MyBase {
         return (
             <div class={rootCls}>
                 {!this.src ?
-                    <Icon type="md-image" size={40} style={{ lineHeight: '90px' }} /> :
+                    <Icon type="md-image" size={40} class={this.getStyleName('icon')} /> :
                     <img ref="img" class={this.getStyleName('image')} v-show={this.isLoadSuccess} on-error={this.handleError} src={this.src} alt={this.alt} />
                 }
                 {this.isFail &&
                     (this.failImg ? <img src={this.failImg} alt={this.alt} /> :
-                        <Icon type="md-alert" size={40} style={{ lineHeight: '90px' }} />)
+                        <Icon type="md-alert" size={40} class={this.getStyleName('icon')} />)
                 }
             </div>
         );
