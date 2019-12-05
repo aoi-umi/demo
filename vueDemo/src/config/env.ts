@@ -193,6 +193,9 @@ const config = {
                     url: '/favourite/query',
                     method: 'get',
                 },
+                followSave: {
+                    url: '/follow/save',
+                },
                 followQuery: {
                     url: '/follow/query',
                     method: 'get',

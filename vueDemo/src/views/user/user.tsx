@@ -452,7 +452,12 @@ class FollowList extends Base {
         return rs.data.map(ele => {
             let user = this.followType == myEnum.followQueryType.粉丝 ? ele.followerUser : ele.followingUser;
             return (
-                <Card class={this.getStyleName('main')}>
+                <Card class={[...this.getStyleName('main'), 'pointer']} nativeOn-click={() => {
+                    this.$router.push({
+                        path: routerConfig.userInfo.path,
+                        query: { _id: user._id }
+                    });
+                }}>
                     <div class={this.getStyleName('content')}>
                         <UserAvatarView user={user} />
                         <span class={this.getStyleName('profile')}>{user.profile || dev.defaultProfile}</span>

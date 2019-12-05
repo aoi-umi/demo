@@ -72,6 +72,8 @@ export class Base extends MyBase {
                     this.$Message.error(operate + '出错:' + e.message);
                 }
             }
+            if (!e.code)
+                console.error(e);
             return result;
         }
     }
