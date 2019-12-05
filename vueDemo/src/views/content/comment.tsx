@@ -17,6 +17,7 @@ import './comment.less';
 
 @Component
 export class Comment extends Base {
+    stylePrefix = 'comment-';
     @Prop()
     ownerId: string;
 
@@ -26,7 +27,6 @@ export class Comment extends Base {
     @Prop()
     type: number;
 
-    stylePrefix = 'comment-';
     $refs: { list: IMyList<any>, replyList: IMyList<any> };
     mounted() {
         this.query();
@@ -129,7 +129,7 @@ export class Comment extends Base {
     }
     renderSubmitBox() {
         return (
-            <div style={{ marginTop: '10px' }}>
+            <div class={this.getStyleName('send-box')}>
                 <MyEditor
                     class={this.getStyleName('send')}
                     toolbar={
@@ -159,29 +159,14 @@ export class Comment extends Base {
     }
 
     renderComment(ele, reply?: boolean) {
-        let tab = '42px';
-        let textStyle = {
-            marginBottom: '10px',
-        };
-        let contentStyle: any = {
-            marginLeft: tab,
-        };
-        if (ele.replyList && ele.replyList.length)
-            contentStyle.marginBottom = '10px';
-        let dividerStyle: any = {};
-        if (reply) {
-            dividerStyle = {
-                marginBottom: 0,
-            };
-        }
         return (
             <div class={this.getStyleName(!reply ? "main" : "reply")} key={ele._id}>
-                <div style={{ position: 'relative' }}>
+                <div class={this.getStyleName('content-root')}>
                     {ele.user && <UserAvatarView user={ele.user} isAuthor={ele.user._id === this.ownUserId} />}
-                    <span style={{ position: 'absolute', right: '5px' }}>
+                    <span class={this.getStyleName('floor')}>
                         #{ele.floor}
                     </span>
-                    <div style={contentStyle}>
+                    <div class={this.getStyleName('content')}>
                         {ele.quoteUser &&
                             <div><span>回复</span>
                                 <UserPoptipView user={ele.quoteUser}>
@@ -191,38 +176,44 @@ export class Comment extends Base {
                             </div>
                         }
                         {ele.isDel ?
-                            <p style={textStyle}>评论已删除</p> : <p domPropsInnerHTML={ele.comment} style={{ ...textStyle, overflowWrap: 'break-word' }} />
+                            <p class={this.getStyleName('text')}>评论已删除</p> :
+                            <p domPropsInnerHTML={ele.comment} class={this.getStyleName('text')} />
                         }
-                        <div class="pointer" style={{ display: 'flex', justifyContent: 'flex-start', marginRight: '5px' }}>
+                        <div class={this.getStyleName('bottom')}>
                             <span class="not-important" ><Time time={new Date(ele.createdAt)} /></span>
                             <div class='flex-stretch'></div>
-                            {ele.canDel && <Icon style={{ marginRight: '20px' }} type="md-trash" size={20} on-click={() => {
-                                this.handleDel(ele);
-                            }} />}
-                            <span style={{ marginRight: '20px' }}><Icon type="md-thumbs-up" size={20} color={ele.voteValue == myEnum.voteValue.喜欢 ? "red" : ''} on-click={() => {
-                                this.handleVote(ele, ele.voteValue == myEnum.voteValue.喜欢 ? myEnum.voteValue.无 : myEnum.voteValue.喜欢);
-                            }} />{ele.like}</span>
-                            <Icon type="md-quote" size={20} on-click={() => {
-                                this.resetReply(ele);
-                            }} />
+                            <div class={[...this.getStyleName('op-box'), "pointer"]}>
+                                {ele.canDel && <Icon type="md-trash" size={20} on-click={() => {
+                                    this.handleDel(ele);
+                                }} />}
+                                <span><Icon type="md-thumbs-up" size={20} color={ele.voteValue == myEnum.voteValue.喜欢 ? "red" : ''} on-click={() => {
+                                    this.handleVote(ele, ele.voteValue == myEnum.voteValue.喜欢 ? myEnum.voteValue.无 : myEnum.voteValue.喜欢);
+                                }} />{ele.like}</span>
+                                <Icon type="md-quote" size={20} on-click={() => {
+                                    this.resetReply(ele);
+                                }} />
+                            </div>
                         </div>
                     </div>
                     {this.reply.quote === ele && this.renderSubmitBox()}
                 </div>
                 {(ele.replyList && ele.replyList.length > 0)
-                    && ele.replyList.map(reply => this.renderComment(reply, true)).concat(
-                        <div class={this.getStyleName('reply').concat(['center'])} style={{ padding: '5px' }}>
-                            <a on-click={() => {
-                                this.replyShow = true;
-                                this.currComment = {
-                                    ...ele,
-                                    replyList: []
-                                };
-                                this.$refs.replyList.handleQuery({ resetPage: true });
-                            }}>更多</a>
-                        </div>)
+                    &&
+                    <div class={this.getStyleName('reply-list')}>
+                        {ele.replyList.map(reply => this.renderComment(reply, true)).concat(
+                            <div class={[...this.getStyleName('more-reply'), 'center']}>
+                                <a on-click={() => {
+                                    this.replyShow = true;
+                                    this.currComment = {
+                                        ...ele,
+                                        replyList: []
+                                    };
+                                    this.$refs.replyList.handleQuery({ resetPage: true });
+                                }}>更多</a>
+                            </div>)}
+                    </div>
                 }
-                <Divider style={dividerStyle} size='small' />
+                <Divider size='small' />
             </div>
         );
     }
@@ -231,7 +222,7 @@ export class Comment extends Base {
         if (!rs.success || !rs.data.length) {
             let msg = !rs.success ? rs.msg : '暂无评论';
             return (
-                <div class="center" style={{ marginTop: '5px', minHeight: '50px' }}>{msg}</div>
+                <div class={[...this.getStyleName('msg'), "center"]}>{msg}</div>
             );
         }
         return rs.data.map((ele) => {
@@ -271,7 +262,7 @@ export class Comment extends Base {
                         return rs;
                     }}
                 ></MyList>
-                <Modal v-model={this.replyShow} style={{ paddingTop: '30px' }} footer-hide>
+                <Modal v-model={this.replyShow} class={this.getStyleName('reply-modal')} footer-hide>
                     <h3>更多回复</h3>
                     {this.currComment && this.renderComment(this.currComment)}
                     <MyList

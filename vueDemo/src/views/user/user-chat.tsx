@@ -11,8 +11,11 @@ import { myEnum } from '@/config';
 import { MyList, IMyList, ResultType } from '@/components/my-list';
 import { routerConfig } from '@/router';
 
+import './user.less';
+
 @Component
 class ChatDetail extends Base {
+    stylePrefix = 'user-chat-detail-';
     detail: UserDetailDataType = {};
     created() {
         testSocket.bindChatRecv((data) => {
@@ -141,62 +144,44 @@ class ChatDetail extends Base {
                                 <div slot="title">
                                     <UserAvatarView user={this.detail} />
                                 </div>
-                                <Split v-model={this.split} mode="vertical" style={{ height: '400px', border: '1px solid #dcdee2' }}>
-                                    <div ref='chat' slot="top" style={{
-                                        textAlign: 'center',
-                                        height: '100%', width: '100%', paddingBottom: '7px', overflowY: 'auto',
-                                        padding: '5px'
-                                    }} on-scroll={(e) => {
+                                <Split v-model={this.split} mode="vertical" class={this.getStyleName('main')}>
+                                    <div ref='chat' slot="top" class={this.getStyleName('msg-box')} on-scroll={(e) => {
                                         if (e.target.scrollTop === 0)
                                             this.scrollLoad();
                                     }}>
                                         {this.loading ? <Icon type="ios-loading" size={18} class="loading-icon" /> :
-                                            this.noMore ? <p style={{ margin: '5px' }}>没有更多消息了</p> : <a on-click={() => {
+                                            this.noMore ? <p class={this.getStyleName('msg-no-more')}>没有更多消息了</p> : <a on-click={() => {
                                                 this.loadChat();
                                             }}>加载更多</a>
                                         }
                                         {this.chat.length === 0 ? <p>暂无消息</p> : this.chat.map(ele => {
                                             let self = ele.userId === this.selfUserId;
-                                            let flex = self ? 'flex-end' : 'flex-start';
                                             return (
                                                 <div
                                                     key={ele._id}
-                                                    style={{
-                                                        display: 'flex',
-                                                        flexFlow: 'column',
-                                                        alignItems: flex,
-                                                        margin: '5px',
-                                                        marginTop: '10px'
-                                                    }}>
-                                                    <div style={{
-                                                        display: 'flex',
-                                                        justifyContent: flex,
-                                                        alignItems: 'center',
-                                                    }}>
+                                                    class={this.getStyleName('msg-item', self && 'msg-item-self')}>
+                                                    <div class={this.getStyleName('msg-send-status-box')}>
                                                         {ele.sendStatus === myEnum.chatSendStatus.发送中 && <Icon type="ios-loading" size={18} class="loading-icon" />}
                                                         {ele.sendStatus === myEnum.chatSendStatus.发送失败 &&
                                                             <Icon class="pointer" type="ios-refresh-circle" size={18} on-click={() => {
                                                                 this.chatSubmit(ele);
                                                             }}></Icon>
                                                         }
-                                                        <div class="chat-content">
+                                                        <div class={this.getStyleName('msg-content')}>
                                                             {ele.content}
                                                         </div>
                                                     </div>
-                                                    <Time class="not-important" time={new Date(ele.createdAt)} style={{ fontSize: 'xx-small' }} />
+                                                    <Time class={[...this.getStyleName('msg-send-time'), "not-important"]} time={new Date(ele.createdAt)} />
                                                 </div>
                                             );
                                         })}
                                     </div>
-                                    <div slot="bottom" style={{
-                                        display: 'flex', height: '100%', width: '100%',
-                                        paddingTop: '7px'
-                                    }}>
+                                    <div slot="bottom" class={this.getStyleName('send-box')}>
                                         <textarea
                                             ref='input'
                                             autofocus
                                             v-model={this.chatContent}
-                                            style={{ resize: 'none', height: 'inherit', width: 'inherit', border: 0, padding: '5px 10px' }}
+                                            class={this.getStyleName('send-input')}
                                             on-keydown={(e: KeyboardEvent) => {
                                                 if (this.isPressEnter(e)) {
                                                     if (!e.altKey) {
@@ -209,8 +194,8 @@ class ChatDetail extends Base {
                                             }} />
                                     </div>
                                 </Split>
-                                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px', alignItems: 'flex-end' }} >
-                                    <span class='not-important' style={{ marginRight: '10px' }}>Alt + Enter换行</span>
+                                <div class={this.getStyleName('send-btn-box')} >
+                                    <span class={[...this.getStyleName('send-notice'), 'not-important']}>Alt + Enter换行</span>
                                     <Button type="primary" on-click={() => {
                                         this.chatSubmit();
                                     }}>发送</Button>
@@ -228,6 +213,7 @@ export default ChatDetailView;
 
 @Component
 export class ChatList extends Base {
+    stylePrefix = 'user-chat-list-';
     $refs: { list: IMyList };
 
     query() {
@@ -250,29 +236,22 @@ export class ChatList extends Base {
         if (!rs.success || !rs.data.length) {
             let msg = !rs.success ? rs.msg : '空空的';
             return (
-                <Card class="center" style={{ marginTop: '5px' }}>{msg}</Card>
+                <Card class={[...this.getStyleName('msg'), "center"]}>{msg}</Card>
             );
         }
         return rs.data.map(ele => {
             let user = ele.user;
             return (
-                <Card style={{ marginTop: '5px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline' }}>
+                <Card class={[...this.getStyleName('item'), 'pointer']} nativeOn-click={() => {
+                    this.toChat(user._id);
+                }}>
+                    <div class={this.getStyleName('item-first-row')}>
                         <UserAvatarView user={user} />
-                        <div class="flex-stretch pointer" on-click={() => {
-                            this.toChat(user._id);
-                        }}>
-                        </div>
+                        <div class="flex-stretch" />
                         <Time class="not-important" time={ele.createdAt} />
                     </div>
-                    <div class="pointer" style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'baseline' }} on-click={() => {
-                        this.toChat(user._id);
-                    }}>
-                        <span style={{
-                            marginLeft: '42px', textOverflow: 'ellipsis',
-                        }}>{ele.content}</span>
-                        <div class="flex-stretch">
-                        </div>
+                    <div class="pointer">
+                        <span class={this.getStyleName('item-msg')}>{ele.content}</span>
                     </div>
                 </Card>
             );

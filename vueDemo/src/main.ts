@@ -16,6 +16,8 @@ import router from './router';
 import store from './store';
 import { env } from './config';
 
+import './global.less';
+
 Vue.config.productionTip = false;
 document.title = env.title;
 new Vue({

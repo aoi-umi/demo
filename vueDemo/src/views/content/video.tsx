@@ -63,11 +63,11 @@ export default class Video extends ListBase {
                     }}
 
                     queryFn={async (data) => {
-                        let rs = await testApi.videoQuery(data);
+                        let rs = await testApi.videoQuery({ ...data, ...this.queryOpt });
                         return rs;
                     }}
 
-                    on-query={(model, list: IMyList<any>) => {
+                    on-query={(model, noClear, list: IMyList<any>) => {
                         let q = {
                             ...model.query,
                             anyKey: this.anyKey,

@@ -5,6 +5,19 @@ export function convClass<typeofT, T = {}>(t) {
         new(props: Partial<typeofT & T> & VueComponentOptions): any
     };
 }
+
+export function getCompOpts(target) {
+    let Ctor = typeof target === 'function'
+        ? target
+        : target.constructor;
+    let decorators = Ctor.__decorators__;
+    let options: any = {};
+    if (decorators) {
+        decorators.forEach(function (fn) { return fn(options); });
+    }
+    return options;
+}
+
 export class Utils {
     static base64ToFile = (dataUrl: string, filename: string) => {
         let arr = dataUrl.split(',');
@@ -19,7 +32,7 @@ export class Utils {
     }
 
     static getStyleName(stylePrefix: string, ...args: string[]) {
-        return args.map(ele => stylePrefix + ele);
+        return args.filter(ele => !!ele).map(ele => stylePrefix + ele);
     }
 
     static dateParse(date) {

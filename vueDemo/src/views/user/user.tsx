@@ -47,14 +47,18 @@ export default class UserInfo extends Base {
     async load() {
         let query = this.$route.query as { [key: string]: string };
         let loadRs = this.$refs.loadView.result;
-        if (!loadRs.success)
+        if (!loadRs.success || (this.detail._id !== query._id)) {
+            this.initTab();
             await this.$refs.loadView.loadData();
+        }
         if (loadRs.success) {
             if (myEnum.userTab.getAllValue().includes(query.tab)) {
                 if (!this.storeUser.user.isLogin && [myEnum.userTab.私信].includes(query.tab)) {
                     //需要登录的
                 } else
                     this.tab = query.tab;
+            } else {
+                this.tab = '';
             }
             this.handleSearch();
         }
@@ -336,12 +340,12 @@ export default class UserInfo extends Base {
                     <TabPane name={myEnum.userTab.视频} label={() => {
                         return <div>视频: {detail.video}</div>;
                     }}>
-                        <VideoView ref="videoList" notQueryOnRoute notQueryToRoute notQueryOnMounted />
+                        <VideoView ref="videoList" queryOpt={{ userId: detail._id }} notQueryOnRoute notQueryToRoute notQueryOnMounted />
                     </TabPane>
                     <TabPane name={myEnum.userTab.文章} label={() => {
                         return <div>文章: {detail.article}</div>;
                     }}>
-                        <ArticleView ref="articleList" notQueryOnRoute notQueryToRoute notQueryOnMounted />
+                        <ArticleView ref="articleList" queryOpt={{ userId: detail._id }} notQueryOnRoute notQueryToRoute notQueryOnMounted />
                     </TabPane>
                     <TabPane name={myEnum.userTab.粉丝} label={() => {
                         return <div>粉丝: {detail.follower}</div>;
@@ -353,12 +357,12 @@ export default class UserInfo extends Base {
                     }}>
                         <FollowListView ref="followingList" userId={this.detail._id} followType={myEnum.followQueryType.关注} />
                     </TabPane>
-                    {user.isLogin && <TabPane name={myEnum.userTab.收藏} label={() => {
+                    {detail.self && <TabPane name={myEnum.userTab.收藏} label={() => {
                         return <div>收藏</div>;
                     }}>
                         <FavouriteListView ref="favouriteList" />
                     </TabPane>}
-                    {user.isLogin && <TabPane name={myEnum.userTab.私信} label={() => {
+                    {detail.self && <TabPane name={myEnum.userTab.私信} label={() => {
                         return <div>私信</div>;
                     }}>
                         <ChatListView ref="chatList" />

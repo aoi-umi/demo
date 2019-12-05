@@ -271,7 +271,7 @@ export default class App extends Base {
                         flex: `0 0 ${this.isCollapsed ? collapsedWidth : this.siderWidth}px`
                     }}></Content> :
                         <transition name="fade">
-                            <div class={style.cls.mask} v-show={!this.isCollapsed} style={{ zIndex: 13 }} on-click={() => {
+                            <div class={[style.cls.mask, 'menu-mask']} v-show={!this.isCollapsed} on-click={() => {
                                 this.isCollapsed = true;
                             }}></div>
                         </transition>

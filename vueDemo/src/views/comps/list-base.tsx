@@ -3,10 +3,10 @@ import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { Base } from '../base';
 
 export interface IListBase {
-    queryOpt: any;
-    notQueryOnMounted: boolean;
-    notQueryOnRoute: boolean;
-    notQueryToRoute: boolean;
+    queryOpt?: any;
+    notQueryOnMounted?: boolean;
+    notQueryOnRoute?: boolean;
+    notQueryToRoute?: boolean;
     query: () => any;
 }
 
