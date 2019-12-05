@@ -40,11 +40,12 @@ class FollowBotton extends Base {
 
     render() {
         return (
-            <Button on-click={() => {
-                this.handleFollow();
+            <Button on-click={(e: MouseEvent) => {
+                this.handleFollow()
+                e.stopPropagation();
             }}>{this.innerUser.followEachOther ?
-                    '相互关注' :
-                    this.isFollow ? '已关注' : '关注'}
+                '相互关注' :
+                this.isFollow ? '已关注' : '关注'}
             </Button>
         );
     }
