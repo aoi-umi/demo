@@ -1,4 +1,4 @@
-import { Component, Vue, Watch } from 'vue-property-decorator';
+import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import 'echarts/lib/chart/line';
 import * as echarts from 'echarts/lib/echarts';
 import * as  QRCode from 'qrcode';
@@ -10,10 +10,10 @@ import { MyList, IMyList } from '@/components/my-list';
 import { MyUpload, IMyUpload } from '@/components/my-upload';
 import { MyVideo, IMyVideo } from '@/components/my-video';
 import { MyEditor } from '@/components/my-editor';
+import { convClass, getCompOpts } from '@/components/utils';
 
 import { Base } from './base';
 import './demo.less';
-
 
 @Component({})
 export default class App extends Base {
@@ -123,6 +123,8 @@ export default class App extends Base {
         }
         return (
             <div>
+                <TsxView />
+                <TsxView2 test="传参属性1" />
                 <div class={this.getStyleName('box1')}>
                     <div class={this.getStyleName('danmaku-main')}>
                         <Input v-model={this.videoIdText} search enter-button="确认"
@@ -243,3 +245,65 @@ export default class App extends Base {
         );
     }
 }
+
+
+
+class PropClass {
+    @Prop({
+        default: '组件1'
+    })
+    cname: string;
+
+    @Prop({
+        required: false,
+        default: '属性1',
+    })
+    test: string;
+}
+
+@Component({
+    mixins: [getCompOpts(PropClass)],
+})
+class Tsx extends Vue<PropClass> {
+    testFn() {
+        return this.cname;
+    }
+    protected render() {
+        return <div>{this.testFn()},{this.test},1111111111</div>;
+    }
+}
+const TsxView = convClass<PropClass>(Tsx);
+
+class PropClass2 extends PropClass {
+    @Prop({
+        default: '组件2'
+    })
+    cname: string;
+
+    @Prop({
+        required: true,
+        default: '属性1',
+    })
+    test: string;
+
+    @Prop({
+        default: '属性2',
+    })
+    test2: number;
+}
+
+@Component({
+    extends: Tsx,
+    mixins: [getCompOpts(PropClass2)],
+})
+class Tsx2 extends Vue<PropClass2 & Tsx> {
+    protected render() {
+        return (
+            <div>
+                <div>{this.testFn()},{this.test},222222</div>
+                <div>{this.testFn()},{this.test2},222222</div>
+            </div>
+        );
+    }
+}
+const TsxView2 = convClass<PropClass2>(Tsx2);

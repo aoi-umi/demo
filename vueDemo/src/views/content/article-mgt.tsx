@@ -43,9 +43,6 @@ export class ArticleMgtBase extends ContentMgtBase {
 @Component
 export default class ArticleMgt extends ArticleMgtBase implements IListBase {
     @Prop()
-    queryOpt: any;
-
-    @Prop()
     notQueryOnMounted: boolean;
 
     @Prop()
