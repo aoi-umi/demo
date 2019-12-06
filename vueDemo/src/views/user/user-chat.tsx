@@ -208,7 +208,7 @@ class ChatDetail extends Base {
     }
 }
 
-const ChatDetailView = convClass<ChatDetail>(ChatDetail);
+const ChatDetailView = convClass(ChatDetail);
 export default ChatDetailView;
 
 @Component
@@ -278,4 +278,4 @@ export class ChatList extends Base {
     }
 }
 
-export const ChatListView = convClass<ChatList>(ChatList);
+export const ChatListView = convClass(ChatList);

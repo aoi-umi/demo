@@ -4,7 +4,7 @@ import * as mathjs from 'mathjs';
 import { testApi } from '@/api';
 import errConfig, { getErrorCfgByCode } from '@/config/error';
 import { myEnum } from '@/config';
-import { convClass } from '@/components/utils';
+import { convClass, getCompOpts } from '@/components/utils';
 import { Carousel, CarouselItem, Row, Col, Divider, Input, Button, Card, Modal, RadioGroup, Radio } from '@/components/iview';
 import { MyTag, TagType } from '@/components/my-tag';
 import { MyLoad } from '@/components/my-load';
@@ -48,15 +48,19 @@ export default class GoodsDetail extends Base {
     }
 }
 
-@Component
-class GoodsDetailMain extends Base {
-    stylePrefix = 'goods-';
-    $refs: { imgViewer: IMyImgViewer };
-
+class GoodsDetailMainProp {
     @Prop({
         required: true
     })
     data: DetailType;
+}
+@Component({
+    extends: Base,
+    mixins: [getCompOpts(GoodsDetailMainProp)]
+})
+class GoodsDetailMain extends Vue<GoodsDetailMainProp & Base> {
+    stylePrefix = 'goods-';
+    $refs: { imgViewer: IMyImgViewer };
 
     specTag: { name: string, value: TagType[] }[] = [];
     @Watch('data')
@@ -242,4 +246,4 @@ class GoodsDetailMain extends Base {
     }
 }
 
-export const GoodsDetailMainView = convClass<GoodsDetailMain>(GoodsDetailMain);
+export const GoodsDetailMainView = convClass<GoodsDetailMainProp>(GoodsDetailMain);

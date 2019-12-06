@@ -4,25 +4,26 @@ import { myEnum, authority, dev } from '@/config';
 import { routerConfig } from '@/router';
 import { convert } from '@/helpers';
 import { Card, Button } from '@/components/iview';
-import { convClass } from '@/components/utils';
+import { convClass, getCompOpts } from '@/components/utils';
 import { MyList, IMyList } from '@/components/my-list';
 import { MyTag, TagType } from '@/components/my-tag';
 
-import { ListBase, IListBase } from '../comps/list-base';
+import { ListBase, IListBase, ListBaseProp } from '../comps/list-base';
 import { DetailDataType } from './article-mgt-detail';
 import { ArticleListItemView } from './article';
-import { ContentMgtBase, ContentDataType } from './content-mgt-base';
+import { ContentMgtBase, ContentDataType, IContentMgtBase } from './content-mgt-base';
 
-export class ArticleMgtBase extends ContentMgtBase {
+@Component
+export class ArticleMgtBase extends ContentMgtBase implements IContentMgtBase {
     contentMgtType = myEnum.contentMgtType.文章;
 
-    protected async auditFn(detail, pass) {
+    async auditFn(detail, pass) {
         let toStatus = pass ? myEnum.articleStatus.审核通过 : myEnum.articleStatus.审核不通过;
         let rs = await testApi.articleMgtAudit({ idList: [detail._id], status: toStatus, remark: this.notPassRemark });
         return rs;
     }
 
-    protected canAudit(detail: ContentDataType) {
+    canAudit(detail: ContentDataType) {
         return detail.status == myEnum.articleStatus.待审核 && this.storeUser.user.hasAuth(authority.articleMgtAudit);
     }
 
@@ -30,27 +31,22 @@ export class ArticleMgtBase extends ContentMgtBase {
         return preview ? routerConfig.articleMgtDetail.path : routerConfig.articleMgtEdit.path;
     }
 
-    protected async delFn() {
+    async delFn() {
         await testApi.articleMgtDel({ idList: this.delIds, remark: this.delRemark });
     }
 
-    protected isDel(detail) {
+    isDel(detail) {
         return detail.status === myEnum.articleStatus.已删除;
     }
 }
 
-
-@Component
-export default class ArticleMgt extends ArticleMgtBase implements IListBase {
-    @Prop()
-    notQueryOnMounted: boolean;
-
-    @Prop()
-    notQueryOnRoute: boolean;
-
-    @Prop()
-    notQueryToRoute: boolean;
-
+class ArticleMgtProp extends ListBaseProp {
+}
+@Component({
+    extends: ArticleMgtBase,
+    mixins: [getCompOpts(ArticleMgtProp)]
+})
+export default class ArticleMgt extends Vue<ArticleMgtProp & ArticleMgtBase> implements IListBase {
     $refs: { list: IMyList<any> };
 
     protected created() {
@@ -205,4 +201,4 @@ export default class ArticleMgt extends ArticleMgtBase implements IListBase {
     }
 }
 
-export const ArticleMgtView = convClass<ArticleMgt>(ArticleMgt);
+export const ArticleMgtView = convClass<ArticleMgtProp>(ArticleMgt);

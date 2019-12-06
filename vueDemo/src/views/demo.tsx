@@ -252,13 +252,13 @@ class PropClass {
     @Prop({
         default: '组件1'
     })
-    cname: string;
+    cname?: string;
 
     @Prop({
         required: false,
         default: '属性1',
     })
-    test: string;
+    test?: string;
 }
 
 @Component({
@@ -278,18 +278,18 @@ class PropClass2 extends PropClass {
     @Prop({
         default: '组件2'
     })
-    cname: string;
+    cname?: string;
 
     @Prop({
         required: true,
         default: '属性1',
     })
-    test: string;
+    test?: string;
 
     @Prop({
         default: '属性2',
     })
-    test2: number;
+    test2?: number;
 }
 
 @Component({

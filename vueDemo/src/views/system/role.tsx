@@ -4,7 +4,7 @@ import * as iview from 'iview';
 import { testApi } from '@/api';
 import { myEnum, authority } from '@/config';
 import { convert } from '@/helpers';
-import { convClass } from '@/components/utils';
+import { convClass, getCompOpts } from '@/components/utils';
 import { Modal, Input, Form, FormItem, Button, Checkbox, Switch } from '@/components/iview';
 import { MyList, IMyList, Const as MyListConst } from '@/components/my-list';
 import { MyConfirm } from '@/components/my-confirm';
@@ -23,11 +23,17 @@ export type DetailDataType = {
     statusText?: string;
     authorityList?: AuthorityDetail[];
     isDel?: boolean;
-}
-@Component
-class RoleDetail extends Base {
+};
+
+class RoleDetailProp {
     @Prop()
     detail: any;
+}
+@Component({
+    extends: Base,
+    mixins: [getCompOpts(RoleDetailProp)]
+})
+class RoleDetail extends Vue<RoleDetailProp & Base> {
 
     @Watch('detail')
     updateDetail(newVal) {
@@ -113,7 +119,7 @@ class RoleDetail extends Base {
     }
 }
 
-const RoleDetailView = convClass<RoleDetail>(RoleDetail);
+const RoleDetailView = convClass<RoleDetailProp>(RoleDetail);
 
 @Component
 export default class Role extends Base {
@@ -329,10 +335,14 @@ export default class Role extends Base {
     }
 }
 
-@Component
-class RoleTransfer extends Vue {
+class RoleTransferProp {
     @Prop()
     selectedData: DetailDataType[];
+}
+@Component({
+    mixins: [getCompOpts(RoleTransferProp)]
+})
+class RoleTransfer extends Vue<RoleTransferProp> {
 
     @Watch('selectedData')
     private updateSelectedData(newVal: DetailDataType[]) {
@@ -376,4 +386,4 @@ class RoleTransfer extends Vue {
 }
 
 export interface IRoleTransfer extends RoleTransfer { }
-export const RoleTransferView = convClass<RoleTransfer>(RoleTransfer);
+export const RoleTransferView = convClass<RoleTransferProp>(RoleTransfer);

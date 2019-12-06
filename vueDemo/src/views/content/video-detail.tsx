@@ -3,7 +3,7 @@ import moment from 'dayjs';
 
 import { testApi, testSocket } from '@/api';
 import { myEnum, dev } from '@/config';
-import { convClass } from '@/components/utils';
+import { convClass, getCompOpts } from '@/components/utils';
 import { Divider, Spin, Affix, Card } from '@/components/iview';
 import { MyLoad, IMyLoad } from '@/components/my-load';
 import { MyVideo, IMyVideo } from '@/components/my-video';
@@ -55,14 +55,18 @@ export default class VideoDetail extends Base {
     }
 }
 
-@Component
-class VideoDetailMain extends Base {
-    stylePrefix = 'video-';
-
+class VideoDetailMainProp {
     @Prop({
         required: true
     })
     data: DetailDataType;
+}
+@Component({
+    extends: Base,
+    mixins: [getCompOpts(VideoDetailMainProp)]
+})
+class VideoDetailMain extends Vue<VideoDetailMainProp & Base> {
+    stylePrefix = 'video-';
 
     $refs: { video: IMyVideo };
 
@@ -148,4 +152,4 @@ class VideoDetailMain extends Base {
     }
 }
 
-export const VideoDetailMainView = convClass<VideoDetailMain>(VideoDetailMain);
+export const VideoDetailMainView = convClass<VideoDetailMainProp>(VideoDetailMain);

@@ -5,7 +5,7 @@ import moment from 'dayjs';
 import { testApi } from '@/api';
 import { myEnum, authority, dev } from '@/config';
 import { convert } from '@/helpers';
-import { convClass } from '@/components/utils';
+import { convClass, getCompOpts } from '@/components/utils';
 import { Modal, Form, FormItem, Button, RadioGroup, Radio, Input, DatePicker } from '@/components/iview';
 import { MyList, IMyList, Const as MyListConst } from '@/components/my-list';
 
@@ -37,8 +37,8 @@ export type DetailDataType = {
 
     self?: boolean;
 };
-@Component
-class UserMgtDetail extends Base {
+
+class UserMgtDetailProp {
     @Prop({
         default: myEnum.userEditType.修改
     })
@@ -46,7 +46,12 @@ class UserMgtDetail extends Base {
 
     @Prop()
     detail: any;
-
+}
+@Component({
+    extends: Base,
+    mixins: [getCompOpts(UserMgtDetailProp)]
+})
+class UserMgtDetail extends Vue<UserMgtDetailProp & Base> {
     @Watch('detail')
     updateDetail(newVal) {
         let data = newVal;
@@ -141,7 +146,7 @@ class UserMgtDetail extends Base {
     }
 }
 
-const UserMgtDetailView = convClass<UserMgtDetail>(UserMgtDetail);
+const UserMgtDetailView = convClass<UserMgtDetailProp>(UserMgtDetail);
 
 @Component
 export default class UserMgt extends Base {

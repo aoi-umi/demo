@@ -5,7 +5,7 @@ import { testApi } from '@/api';
 import { myEnum, authority, dev } from '@/config';
 import { routerConfig } from '@/router';
 import { convert } from '@/helpers';
-import { convClass } from '@/components/utils';
+import { convClass, getCompOpts } from '@/components/utils';
 import { Modal, Input, Form, FormItem, Button, Checkbox, RadioGroup, Radio, InputNumber, DatePicker, Row, Col } from '@/components/iview';
 import { MyList, IMyList, Const as MyListConst } from '@/components/my-list';
 import { TagType, MyTag } from '@/components/my-tag';
@@ -22,10 +22,16 @@ type DetailDataType = {
     refundStatusText?: number;
     money?: number;
 };
-@Component
-class PayMgtDetail extends Base {
+
+class PayMgtDetailProp {
     @Prop()
     detail: any;
+}
+@Component({
+    extends: Base,
+    mixins: [getCompOpts(PayMgtDetailProp)]
+})
+class PayMgtDetail extends Vue<PayMgtDetailProp & Base> {
 
     @Watch('detail')
     updateDetail(newVal) {
@@ -121,7 +127,7 @@ class PayMgtDetail extends Base {
     }
 }
 
-const PayDetailView = convClass<PayMgtDetail>(PayMgtDetail);
+const PayDetailView = convClass<PayMgtDetailProp>(PayMgtDetail);
 
 @Component
 export default class Pay extends Base {

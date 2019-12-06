@@ -125,14 +125,14 @@ class SignIn extends Base {
     }
 }
 
-export const SignInView = convClass<SignIn>(SignIn);
+export const SignInView = convClass(SignIn);
 
 type SignUpDataType = {
     account: string;
     nickname: string;
     password: string;
     passwordRepeat: string;
-}
+};
 
 @Component
 class SignUp extends Base {
@@ -235,4 +235,4 @@ class SignUp extends Base {
     }
 }
 
-export const SignUpView = convClass<SignUp>(SignUp);
+export const SignUpView = convClass(SignUp);
