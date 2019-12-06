@@ -403,7 +403,7 @@ export class ContentMgtDetail extends Base {
                                 file.url = rs.url;
                                 return rs.fileId;
                             }}
-                            format={['jpg', 'png', 'bmp', 'gif']}
+                            format={['jpg', 'jpeg', 'png', 'bmp', 'gif']}
                             width={160} height={90}
                             v-model={this.coverList}
                         />

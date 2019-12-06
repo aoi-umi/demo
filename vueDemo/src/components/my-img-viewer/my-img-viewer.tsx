@@ -1,5 +1,6 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
-
+import Hammer from 'hammerjs';
+console.log(Hammer)
 import { convClass } from '../utils';
 import { Carousel, CarouselItem, Icon, Button } from '../iview';
 import { MyImg } from '../my-img';
@@ -10,10 +11,16 @@ import './style.less';
 
 @Component
 class MyImgViewer extends MyBase {
+    stylePrefix = 'my-img-viewer-';
     @Prop({
         default: ''
     })
     src: string | string[];
+
+    @Prop({
+        default: 0
+    })
+    idx?: number;
 
     @Prop({
         default: true
@@ -23,13 +30,12 @@ class MyImgViewer extends MyBase {
     created() {
         this.watchSrc();
     }
-    private list: { src: string; scale: number }[] = [];
+    private list: { src: string; }[] = [];
     @Watch('src')
     private watchSrc() {
         this.list = (this.src instanceof Array ? this.src : [this.src]).map(src => {
             return {
                 src,
-                scale: 1
             };
         });
     }
@@ -43,41 +49,38 @@ class MyImgViewer extends MyBase {
     hide() {
         this.visible = false;
     }
-    stylePrefix = 'my-img-viewer-';
 
     render() {
         let list = this.list;
         let mutli = list.length > 1;
         return (
             <transition name="fade">
-                {this.visible && <div class={style.cls.mask} on-click={() => {
-                    if (this.maskClosable)
-                        this.hide();
-                }} on-touchmove={(event) => {
-                    event.preventDefault();
-                }} on-mousewheel={(event) => {
-                    event.preventDefault();
-                }}>
-                    <div class={this.getStyleName('box')} on-click={(event) => {
-                        event.stopPropagation();
-                    }}>
-                        <Carousel easing="easing" arrow={mutli ? 'hover' : 'never'} dots={mutli ? 'inside' : 'none'}>
+                {this.visible && <div class={style.cls.mask}
+                    on-click={() => {
+                        if (this.maskClosable)
+                            this.hide();
+                    }} >
+                    <div class={this.getStyleName('stop-box')}
+                        on-touchmove={(event) => {
+                            event.preventDefault();
+                        }}
+                        on-mousewheel={(event) => {
+                            event.preventDefault();
+                        }} />
+                    <div class={this.getStyleName('box')}
+                        on-click={(event) => {
+                            event.stopPropagation();
+                        }}>
+                        <Carousel class={this.getStyleName('content')} value={this.idx}
+                            arrow={mutli ? 'hover' : 'never'}
+                            dots={mutli ? 'inside' : 'none'}>
                             {list.map(ele => {
-                                let transform = `scale(${ele.scale})`;
                                 return (
                                     <CarouselItem>
-                                        <div class={this.getStyleName('item')} on-mousewheel={(event) => {
-                                            let scale = ele.scale;
-                                            let step = 0.1;
-                                            scale = scale + (event.wheelDeltaY > 0 ? 1 : -1 + step);
-                                            if (scale > 5) {
-                                                scale = 5;
-                                            } else if (scale < 0.5) {
-                                                scale = 0.5;
-                                            }
-                                            ele.scale = scale;
-                                        }}>
-                                            <MyImg class={this.getStyleName('img')} src={ele.src} style={{ transform }} />
+                                        <div class={this.getStyleName('item')}>
+                                            <GestureView>
+                                                <MyImg class={this.getStyleName('img')} src={ele.src} />
+                                            </GestureView>
                                         </div>
                                     </CarouselItem>
                                 );
@@ -85,7 +88,7 @@ class MyImgViewer extends MyBase {
                         </Carousel>
                         <Button shape="circle" icon="md-close" type="error" class={this.getStyleName('close-btn')} on-click={this.hide} />
                     </div>
-                </div >}
+                </div>}
             </transition>
         );
     }
@@ -94,3 +97,85 @@ class MyImgViewer extends MyBase {
 const MyImgViewerView = convClass<MyImgViewer>(MyImgViewer);
 export default MyImgViewerView;
 export interface IMyImgViewer extends MyImgViewer { }
+
+@Component
+class Gesture extends MyBase {
+    stylePrefix = 'my-gesture-';
+    $refs: { root: HTMLDivElement };
+    private startX = 0;
+    private startY = 0;
+    x = 0;
+    y = 0;
+    scale = 1;
+
+    private reset() {
+        this.x = 0;
+        this.y = 0;
+        this.scale = 1;
+        this.updatePos();
+    }
+
+    private updatePos() {
+        this.startX = this.x;
+        this.startY = this.y;
+    }
+    mounted() {
+        const hammer = new Hammer(this.$refs.root);
+        hammer.get('pan').set({ direction: Hammer.DIRECTION_ALL });
+        hammer.on('panmove panend', (event) => {
+            this.x = this.startX + event.deltaX;
+            this.y = this.startY + event.deltaY;
+            if (event.type === 'panend') {
+                this.updatePos();
+            }
+        });
+        hammer.get('pinch').set({
+            enable: true
+        });
+        hammer.on('pinchin pinchout', (ev) => {
+            this.scaleHandler(ev.type == 'pinchout');
+        });
+        hammer.on('doubletap', () => {
+            this.reset();
+        });
+
+        this.$refs.root.addEventListener('mousedown', this.mousedownHandler);
+    }
+
+    beforeDestroy() {
+        this.$refs.root.removeEventListener('mousedown', this.mousedownHandler);
+    }
+    scaleHandler(scaleUp: boolean) {
+        let scale = this.scale;
+        let step = 0.05;
+        scale = scale + ((scaleUp ? 1 : -1) * step);
+        if (scale > 5) {
+            scale = 5;
+        } else if (scale < 0.5) {
+            scale = 0.5;
+        }
+        this.scale = scale;
+    }
+
+    mousedownHandler(event) {
+        event.preventDefault();
+    }
+
+    render() {
+        let transform = `scale(${this.scale}) translate(${this.x}px, ${this.y}px)`;
+        return (
+            <div ref='root' class={[...this.getStyleName('root'), 'center']}
+                on-mousewheel={(event) => {
+                    event.preventDefault();
+                    this.scaleHandler(event.wheelDeltaY > 0);
+                }}>
+                <div class={this.getStyleName('main')} style={{
+                    transform,
+                }}>
+                    {this.$slots.default}
+                </div>
+            </div>
+        )
+    }
+}
+const GestureView = convClass<Gesture>(Gesture);

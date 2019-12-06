@@ -1,6 +1,13 @@
 @prefix: my-img-viewer-;
 
 .@{prefix} {
+  &stop-box {
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    position: fixed;
+  }
   &box {
     display: inline-block;
     width: 800px;
@@ -14,7 +21,10 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: auto;
+    overflow: hide;
+    .vue-cropper {
+      background-image: none;
+    }
   }
 
   &close-btn {
@@ -27,6 +37,18 @@
   &img {
     max-height: 460px;
     max-width: 800px;
+    min-width: 40px;
+  }
+}
+
+.my-gesture- {
+  &root {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  &main {
+    transition-duration: 0.5s;
   }
 }
 

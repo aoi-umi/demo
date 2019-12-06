@@ -2,7 +2,7 @@ import copy from 'copy-to-clipboard';
 
 export function convClass<typeofT, T = {}>(t) {
     return t as {
-        new(props: Partial<typeofT & T> & VueComponentOptions): any
+        new(props: Partial<typeofT> & T & VueComponentOptions): any
     };
 }
 

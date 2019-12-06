@@ -165,7 +165,7 @@ class GoodsDetailMain extends Base {
         return payInfo;
     }
 
-    showUrl = '';
+    showIdx = 0;
     render() {
         let { spu } = this.data;
         let multi = spu.imgUrls.length > 1;
@@ -180,18 +180,18 @@ class GoodsDetailMain extends Base {
                     </PayView>
                 </Modal>
                 <h2>{spu.name}</h2>
-                <MyImgViewer ref="imgViewer" src={this.showUrl} />
+                <MyImgViewer ref="imgViewer" src={spu.imgUrls} idx={this.showIdx} />
                 <Row gutter={20}>
                     <Col xs={24} sm={8}>
                         <Carousel class={this.getStyleName('carousel')} loop
                             arrow={multi ? 'hover' : 'never'}
                             dots={multi ? 'inside' : 'none'}
                         >
-                            {spu.imgUrls.map(ele => {
+                            {spu.imgUrls.map((ele, idx) => {
                                 return (
                                     <CarouselItem class={this.getStyleName('carousel-item')}>
                                         <div class={this.getStyleName('carousel-img')} on-click={() => {
-                                            this.showUrl = ele;
+                                            this.showIdx = idx;
                                             this.$refs.imgViewer.show();
                                         }} >
                                             <MyImg src={ele} />
