@@ -1,15 +1,13 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 
-import { convClass } from '../utils';
+import { convClass, getCompOpts } from '../utils';
 import { Spin, Button, Card } from '../iview';
 import { MyBase } from '../my-base';
 import { cls } from '../style';
 
 import './style.less';
 
-@Component
-class MyLoad extends MyBase {
-    stylePrefix = 'my-load-';
+class MyLoadProp {
     @Prop()
     loadFn: () => Promise<any>;
 
@@ -29,6 +27,13 @@ class MyLoad extends MyBase {
 
     @Prop()
     errMsgFn?: (e) => string;
+}
+@Component({
+    extends: MyBase,
+    mixins: [getCompOpts(MyLoadProp)]
+})
+class MyLoad extends Vue<MyLoadProp & MyBase> {
+    stylePrefix = 'my-load-';
 
     loading = false;
     result = {
@@ -76,6 +81,6 @@ class MyLoad extends MyBase {
 }
 
 
-const MyLoadView = convClass<MyLoad>(MyLoad);
+const MyLoadView = convClass<MyLoadProp>(MyLoad);
 export default MyLoadView;
 export interface IMyLoad extends MyLoad { };

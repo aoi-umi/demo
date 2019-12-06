@@ -5,7 +5,7 @@ import { testApi, testSocket } from '@/api';
 import { dev, myEnum, authority } from '@/config';
 import { routerConfig } from '@/router';
 import { LocalStore } from '@/store';
-import { convClass } from '@/components/utils';
+import { convClass, getCompOpts } from '@/components/utils';
 import { Button, Avatar, Poptip, Spin } from '@/components/iview';
 import { MyImgViewer, IMyImgViewer } from '@/components/my-img-viewer';
 
@@ -23,9 +23,8 @@ export type User = {
     followStatus?: number;
     followEachOther?: boolean;
 };
-@Component
-class UserPoptip extends Base {
-    stylePrefix = 'comp-user-poptip-';
+
+class UserPoptipProp {
     @Prop()
     user: User;
 
@@ -48,6 +47,13 @@ class UserPoptip extends Base {
 
     @Prop()
     size: iviewTypes.Avatar['size'];
+}
+@Component({
+    extends: Base,
+    mixins: [getCompOpts(UserPoptipProp)]
+})
+class UserPoptip extends Vue<UserPoptipProp & Base> {
+    stylePrefix = 'comp-user-poptip-';
 
     private userDetail: DetailDataType = {};
     avatarUrl = '';
@@ -174,4 +180,4 @@ class UserPoptip extends Base {
     }
 }
 
-export const UserPoptipView = convClass<UserPoptip>(UserPoptip);
+export const UserPoptipView = convClass<UserPoptipProp>(UserPoptip);

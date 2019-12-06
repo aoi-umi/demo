@@ -6,6 +6,7 @@ import { routerConfig } from '@/router';
 import SettingStore from '@/store/setting';
 import { MyBase } from '@/components/my-base';
 
+@Component
 export class Base extends MyBase {
     protected get storeUser() {
         return getModule(LoginUserStore, this.$store);

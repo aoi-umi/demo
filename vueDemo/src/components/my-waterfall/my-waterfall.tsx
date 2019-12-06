@@ -1,6 +1,6 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 
-import { convClass, Utils } from '../utils';
+import { convClass, Utils, getCompOpts } from '../utils';
 import { MyBase } from '../my-base';
 import './my-waterfall.less';
 
@@ -27,10 +27,8 @@ const ScrollElm = {
     root: 'root' as 'root'
 };
 type TypeOfValue<T> = T[keyof T];
-@Component
-class MyWaterfall extends MyBase {
-    stylePrefix = 'my-waterfall-';
 
+class MyWaterfallProp {
     @Prop({
         default: () => (width) => {
             let w = 128;
@@ -39,17 +37,17 @@ class MyWaterfall extends MyBase {
             return Math.max(Math.floor(width / w), 1);
         }
     })
-    col: number | ((width: number) => number);
+    col?: number | ((width: number) => number);
 
     @Prop({
         default: 10
     })
-    space: number;
+    space?: number;
 
     @Prop({
         default: 20
     })
-    timeout: number;
+    timeout?: number;
 
     /**
      * 滚动的元素，默认为window
@@ -66,7 +64,14 @@ class MyWaterfall extends MyBase {
     getDataFn: <T = MyWaterfallDataType>() => GetDataFnResult<T> | Promise<GetDataFnResult<T>>;
 
     @Prop()
-    maskContentRenderFn: (item: any) => any;
+    maskContentRenderFn?: (item: any) => any;
+}
+@Component({
+    extends: MyBase,
+    mixins: [getCompOpts(MyWaterfallProp)]
+})
+class MyWaterfall extends Vue<MyWaterfallProp & MyBase> {
+    stylePrefix = 'my-waterfall-';
 
     $refs: { root: HTMLDivElement; };
 
@@ -276,5 +281,5 @@ class MyWaterfall extends MyBase {
     }
 }
 
-const MyWaterfallView = convClass<MyWaterfall>(MyWaterfall);
+const MyWaterfallView = convClass<MyWaterfallProp>(MyWaterfall);
 export default MyWaterfallView;

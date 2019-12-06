@@ -1,6 +1,7 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 
 import { Base } from '../base';
+import { getCompOpts } from '@/components/utils';
 
 export interface IListBase {
     queryOpt?: any;
@@ -10,20 +11,24 @@ export interface IListBase {
     query: () => any;
 }
 
-@Component
-export class ListBase extends Base implements IListBase {
+export class ListBaseProp {
     @Prop()
-    queryOpt: any;
+    queryOpt?: any;
 
     @Prop()
-    notQueryOnMounted: boolean;
+    notQueryOnMounted?: boolean;
 
     @Prop()
-    notQueryOnRoute: boolean;
+    notQueryOnRoute?: boolean;
 
     @Prop()
-    notQueryToRoute: boolean;
-
+    notQueryToRoute?: boolean;
+}
+@Component({
+    extends: Base,
+    mixins: [getCompOpts(ListBaseProp)]
+})
+export class ListBase extends Vue<ListBaseProp & Base> implements IListBase {
     mounted() {
         if (!this.notQueryOnMounted)
             this.query();

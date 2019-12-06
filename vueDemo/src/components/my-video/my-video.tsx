@@ -5,20 +5,24 @@ import moment from 'dayjs';
 import "vue-swatches/dist/vue-swatches.min.css";
 
 import { MyBase } from '../my-base';
-import { convClass, Utils } from '../utils';
+import { convClass, Utils, getCompOpts } from '../utils';
 import { Table, Icon, Poptip } from '../iview';
 
 import './style.less';
 import { DanmakuPlayer, DanmakuPlayerOptions, DanmakuDataType } from './videojs-comp';
 import { dev } from '@/config';
 
+class MyVideoProp {
+    @Prop()
+    options?: DanmakuPlayerOptions;
+}
 @Component({
+    extends: MyBase,
+    mixins: [getCompOpts(MyVideoProp)],
     Swatches
 })
-class MyVideo extends MyBase {
+class MyVideo extends Vue<MyVideoProp & MyBase> {
     stylePrefix = 'my-video-';
-    @Prop()
-    options: DanmakuPlayerOptions;
 
     player: VideoJsPlayer;
     danmakuPlayer: DanmakuPlayer;
@@ -181,6 +185,6 @@ class MyVideo extends MyBase {
     }
 }
 
-const MyVideoView = convClass<MyVideo>(MyVideo);
+const MyVideoView = convClass<MyVideoProp>(MyVideo);
 export default MyVideoView;
 export interface IMyVideo extends MyVideo { }

@@ -1,7 +1,7 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import Hammer from 'hammerjs';
-console.log(Hammer)
-import { convClass } from '../utils';
+
+import { convClass, getCompOpts } from '../utils';
 import { Carousel, CarouselItem, Icon, Button } from '../iview';
 import { MyImg } from '../my-img';
 import { MyBase } from '../my-base';
@@ -9,9 +9,7 @@ import * as style from '../style';
 
 import './style.less';
 
-@Component
-class MyImgViewer extends MyBase {
-    stylePrefix = 'my-img-viewer-';
+class MyImgViewerProp {
     @Prop({
         default: ''
     })
@@ -25,7 +23,14 @@ class MyImgViewer extends MyBase {
     @Prop({
         default: true
     })
-    maskClosable: boolean;
+    maskClosable?: boolean;
+}
+@Component({
+    extends: MyBase,
+    mixins: [getCompOpts(MyImgViewerProp)]
+})
+class MyImgViewer extends Vue<MyImgViewerProp & MyBase>{
+    stylePrefix = 'my-img-viewer-';
 
     created() {
         this.watchSrc();
@@ -94,12 +99,14 @@ class MyImgViewer extends MyBase {
     }
 }
 
-const MyImgViewerView = convClass<MyImgViewer>(MyImgViewer);
+const MyImgViewerView = convClass<MyImgViewerProp>(MyImgViewer);
 export default MyImgViewerView;
 export interface IMyImgViewer extends MyImgViewer { }
 
-@Component
-class Gesture extends MyBase {
+@Component({
+    extends: MyBase
+})
+class Gesture extends Vue<MyBase> {
     stylePrefix = 'my-gesture-';
     $refs: { root: HTMLDivElement };
     private startX = 0;
@@ -178,4 +185,4 @@ class Gesture extends MyBase {
         )
     }
 }
-const GestureView = convClass<Gesture>(Gesture);
+const GestureView = convClass(Gesture);

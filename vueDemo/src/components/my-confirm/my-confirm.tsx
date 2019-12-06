@@ -1,7 +1,7 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 
 import { Button, Row, Col } from '../iview';
-import { convClass } from '../utils';
+import { convClass, getCompOpts } from '../utils';
 import { MyBase } from '../my-base';
 
 import './style.less';
@@ -12,9 +12,8 @@ type BtnType = {
     loading?: boolean;
     onClick?: (ele: BtnType, idx: number) => any;
 };
-@Component
-class MyConfirm extends MyBase {
-    stylePrefix = 'my-confirm-';
+
+class MyConfirmProp {
     @Prop()
     title?: string;
 
@@ -29,6 +28,13 @@ class MyConfirm extends MyBase {
 
     @Prop()
     cancel?: (ele: BtnType) => void;
+}
+@Component({
+    extends: MyBase,
+    mixins: [getCompOpts(MyConfirmProp)]
+})
+class MyConfirm extends Vue<MyConfirmProp & MyBase> {
+    stylePrefix = 'my-confirm-';
 
     private get innerBtnList() {
         return this.btnList || [{
@@ -87,5 +93,5 @@ class MyConfirm extends MyBase {
     }
 }
 
-const MyConfirmView = convClass<MyConfirm>(MyConfirm);
+const MyConfirmView = convClass<MyConfirmProp>(MyConfirm);
 export default MyConfirmView;

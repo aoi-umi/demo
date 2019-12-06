@@ -1,13 +1,12 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 
-import { convClass } from '../utils';
+import { convClass, getCompOpts } from '../utils';
 import { Icon } from '../iview';
 import { MyBase } from '../my-base';
 
 import './style.less';
 
-@Component
-class MyImg extends MyBase {
+class MyImgProp {
     @Prop()
     src?: string;
 
@@ -17,9 +16,14 @@ class MyImg extends MyBase {
     @Prop()
     failImg?: string;
 
-    @Prop()
-    vLazy?: string;
-
+    // @Prop()
+    // vLazy?: string;
+}
+@Component({
+    extends: MyBase,
+    mixins: [getCompOpts(MyImgProp)],
+})
+class MyImg extends Vue<MyImgProp & MyBase> {
     @Watch('src')
     private watchSrc(newVal) {
         this.isLoadSuccess = !!newVal;
@@ -53,5 +57,5 @@ class MyImg extends MyBase {
     }
 }
 
-const MyImgView = convClass<MyImg>(MyImg);
+const MyImgView = convClass<MyImgProp>(MyImg);
 export default MyImgView;

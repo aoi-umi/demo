@@ -1,17 +1,20 @@
 import { Vue, Prop, Watch, Component } from 'vue-property-decorator';
-import { convClass } from '../utils';
+import { convClass, getCompOpts } from '../utils';
 import { Tag, Tooltip } from '../iview';
 import { TagType } from './model';
 export type RenderTagType = string | TagType;
 
-@Component
-export class MyTagBase<T = RenderTagType> extends Vue {
+export class MyTagBaseProp<T = RenderTagType> {
     @Prop()
-    value: T | (T[]);
+    value?: T | (T[]);
 
     @Prop()
     singleCheck?: boolean;
-
+}
+@Component({
+    mixins: [getCompOpts(MyTagBaseProp)]
+})
+export class MyTagBase<T = RenderTagType> extends Vue<MyTagBaseProp<T>> {
     @Watch('value')
     protected watchValue(newValue) {
         let newList = [];
@@ -83,6 +86,6 @@ export class MyTagBase<T = RenderTagType> extends Vue {
     }
 }
 
-const MyTagView = convClass<MyTagBase>(MyTagBase);
+const MyTagView = convClass<MyTagBaseProp>(MyTagBase);
 export default MyTagView;
 export interface IMyTag extends MyTagBase { };
