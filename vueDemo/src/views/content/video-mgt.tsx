@@ -4,25 +4,26 @@ import { myEnum, authority, dev } from '@/config';
 import { routerConfig } from '@/router';
 import { convert } from '@/helpers';
 import { Card, Button } from '@/components/iview';
-import { convClass } from '@/components/utils';
+import { convClass, getCompOpts } from '@/components/utils';
 import { MyList, IMyList } from '@/components/my-list';
 import { MyTag, TagType } from '@/components/my-tag';
 
-import { ListBase, IListBase } from '../comps/list-base';
+import { ListBase, IListBase, ListBaseProp } from '../comps/list-base';
 import { DetailDataType } from './article-mgt-detail';
 import { VideoListItemView } from './video';
-import { ContentMgtBase, ContentDataType } from './content-mgt-base';
+import { ContentMgtBase, ContentDataType, IContentMgtBase } from './content-mgt-base';
 
-export class VideoMgtBase extends ContentMgtBase {
+@Component
+export class VideoMgtBase extends ContentMgtBase implements IContentMgtBase {
     contentMgtType = myEnum.contentMgtType.视频;
 
-    protected async auditFn(detail, pass) {
+    async auditFn(detail, pass) {
         let toStatus = pass ? myEnum.videoStatus.审核通过 : myEnum.videoStatus.审核不通过;
         let rs = await testApi.videoMgtAudit({ idList: [detail._id], status: toStatus, remark: this.notPassRemark });
         return rs;
     }
 
-    protected canAudit(detail: ContentDataType) {
+    canAudit(detail: ContentDataType) {
         return detail.status == myEnum.videoStatus.待审核 && this.storeUser.user.hasAuth(authority.videoMgtAudit);
     }
 
@@ -30,30 +31,21 @@ export class VideoMgtBase extends ContentMgtBase {
         return preview ? routerConfig.videoMgtDetail.path : routerConfig.videoMgtEdit.path;
     }
 
-    protected async delFn() {
+    async delFn() {
         await testApi.videoMgtDel({ idList: this.delIds, remark: this.delRemark });
     }
 
-    protected isDel(detail) {
+    isDel(detail) {
         return detail.status === myEnum.videoStatus.已删除;
     }
 }
 
-
-@Component
-export default class VideoMgt extends VideoMgtBase implements IListBase {
-    @Prop()
-    queryOpt: any;
-
-    @Prop()
-    notQueryOnMounted: boolean;
-
-    @Prop()
-    notQueryOnRoute: boolean;
-
-    @Prop()
-    notQueryToRoute: boolean;
-
+class VideoMgtProp extends ListBaseProp { }
+@Component({
+    extends: VideoMgtBase,
+    mixins: [getCompOpts(VideoMgtProp)]
+})
+export default class VideoMgt extends Vue<VideoMgtProp & VideoMgtBase> implements IListBase {
     $refs: { list: IMyList<any> };
 
     protected created() {
@@ -208,4 +200,4 @@ export default class VideoMgt extends VideoMgtBase implements IListBase {
     }
 }
 
-export const VideoMgtView = convClass<VideoMgt>(VideoMgt);
+export const VideoMgtView = convClass<VideoMgtProp>(VideoMgt);

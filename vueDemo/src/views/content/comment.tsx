@@ -3,7 +3,7 @@ import moment from 'dayjs';
 
 import { testApi } from '@/api';
 import { convert } from '@/helpers';
-import { convClass } from '@/components/utils';
+import { convClass, getCompOpts } from '@/components/utils';
 import { MyList, IMyList, ResultType } from '@/components/my-list';
 import { MyEditor } from '@/components/my-editor';
 import { Divider, Button, Avatar, Modal, Icon, Time } from '@/components/iview';
@@ -15,9 +15,7 @@ import { UserPoptipView } from '../comps/user-poptip';
 
 import './comment.less';
 
-@Component
-export class Comment extends Base {
-    stylePrefix = 'comment-';
+class CommentProp {
     @Prop()
     ownerId: string;
 
@@ -26,6 +24,14 @@ export class Comment extends Base {
 
     @Prop()
     type: number;
+}
+
+@Component({
+    extends: Base,
+    mixins: [getCompOpts(CommentProp)]
+})
+export class Comment extends Vue<CommentProp & Base> {
+    stylePrefix = 'comment-';
 
     $refs: { list: IMyList<any>, replyList: IMyList<any> };
     mounted() {
@@ -311,4 +317,4 @@ export class Comment extends Base {
     }
 }
 
-export const CommentView = convClass<Comment>(Comment);
+export const CommentView = convClass<CommentProp>(Comment);

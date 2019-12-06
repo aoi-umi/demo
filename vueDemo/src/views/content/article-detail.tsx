@@ -5,7 +5,7 @@ import { testApi } from '@/api';
 import { myEnum, dev } from '@/config';
 import { Divider, Affix, Card } from '@/components/iview';
 import { MyLoad, IMyLoad } from '@/components/my-load';
-import { convClass } from '@/components/utils';
+import { convClass, getCompOpts } from '@/components/utils';
 
 import { UserAvatarView } from '../comps/user-avatar';
 import { Base } from '../base';
@@ -51,14 +51,18 @@ export default class ArticleDetail extends Base {
     }
 }
 
-@Component
-class ArticleDetailMain extends Base {
-    stylePrefix = 'article-';
-
+class ArticleDetailMainProp {
     @Prop({
         required: true
     })
     data: DetailDataType;
+}
+@Component({
+    extends: Base,
+    mixins: [getCompOpts(ArticleDetailMainProp)]
+})
+class ArticleDetailMain extends Vue<ArticleDetailMainProp & Base> {
+    stylePrefix = 'article-';
 
     renderHeader(detail: DetailDataType) {
         return (
@@ -89,4 +93,4 @@ class ArticleDetailMain extends Base {
     }
 }
 
-export const ArticleDetailMainView = convClass<ArticleDetailMain>(ArticleDetailMain);
+export const ArticleDetailMainView = convClass<ArticleDetailMainProp>(ArticleDetailMain);

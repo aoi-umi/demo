@@ -2,19 +2,22 @@ import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { testApi } from '@/api';
 import { myEnum, authority, dev } from '@/config';
 import { convert } from '@/helpers';
-import { convClass } from '@/components/utils';
+import { convClass, getCompOpts } from '@/components/utils';
 import { Card, Input } from '@/components/iview';
 import { MyList, IMyList } from '@/components/my-list';
 
 import { Base } from '../base';
-import { ListBase } from '../comps/list-base';
+import { ListBase, ListBaseProp } from '../comps/list-base';
 import { DetailDataType } from './article-mgt-detail';
 import { ContentListItemView } from './content';
 
 import './video.less';
 
-@Component
-export default class Video extends ListBase {
+class VideoProp extends ListBaseProp { }
+@Component({
+    extends: ListBase
+})
+export default class Video extends Vue<VideoProp & ListBase> {
     $refs: { list: IMyList<any> };
 
     anyKey = '';
@@ -89,10 +92,9 @@ export default class Video extends ListBase {
     }
 }
 
-export const VideoView = convClass<Video>(Video);
+export const VideoView = convClass<VideoProp>(Video);
 
-@Component
-class VideoListItem extends Base {
+class VideoListItemProp {
     @Prop({
         required: true
     })
@@ -105,6 +107,13 @@ class VideoListItem extends Base {
 
     @Prop()
     mgt?: boolean;
+}
+@Component({
+    extends: Base,
+    mixins: [getCompOpts(VideoListItemProp)]
+})
+class VideoListItem extends Vue<VideoListItemProp & Base> {
+
 
     render() {
         return (
@@ -123,4 +132,4 @@ class VideoListItem extends Base {
     }
 }
 
-export const VideoListItemView = convClass<VideoListItem>(VideoListItem);
+export const VideoListItemView = convClass<VideoListItemProp>(VideoListItem);

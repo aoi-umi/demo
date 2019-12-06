@@ -2,8 +2,8 @@ import copy from 'copy-to-clipboard';
 
 export function convClass<prop, partial extends boolean = false>(t) {
     return t as {
-        // new(props: (partial extends false ? prop : Partial<prop>) & VueComponentOptions): any
-        new(props: Partial<prop> & VueComponentOptions): any
+        new(props: (partial extends false ? prop : Partial<prop>) & VueComponentOptions): any
+        // new(props: Partial<prop> & VueComponentOptions): any
     };
 }
 

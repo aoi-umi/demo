@@ -4,7 +4,7 @@ import { myEnum, dev } from '@/config';
 import { testApi } from '@/api';
 import { routerConfig } from '@/router';
 import { Icon, Card, Row, Col, Checkbox, Time, Divider } from '@/components/iview';
-import { convClass } from '@/components/utils';
+import { convClass, getCompOpts } from '@/components/utils';
 import { MyTag } from '@/components/my-tag';
 
 import { Base } from '../base';
@@ -13,9 +13,7 @@ import { ContentDataType } from './content-mgt-base';
 
 import './content.less';
 
-@Component
-class ContentOperate extends Base {
-    stylePrefix = 'content-op-'
+class ContentOperateProp {
     @Prop({
         required: true
     })
@@ -35,7 +33,14 @@ class ContentOperate extends Base {
     stretch?: boolean;
 
     @Prop()
-    toDetail: () => void;
+    toDetail?: () => void;
+}
+@Component({
+    extends: Base,
+    mixins: [getCompOpts(ContentOperateProp)]
+})
+class ContentOperate extends Vue<ContentOperateProp & Base> {
+    stylePrefix = 'content-op-'
 
     private handleVote(detail, value) {
         this.operateHandler('', async () => {
@@ -121,11 +126,9 @@ class ContentOperate extends Base {
     }
 }
 
-export const ContentOperateView = convClass<ContentOperate>(ContentOperate);
+export const ContentOperateView = convClass<ContentOperateProp>(ContentOperate);
 
-@Component
-class ContentListItem extends Base {
-    stylePrefix = "content-";
+class ContentListItemProp {
     @Prop({
         required: true
     })
@@ -143,6 +146,14 @@ class ContentListItem extends Base {
         required: true
     })
     contentType: number;
+}
+
+@Component({
+    extends: Base,
+    mixins: [getCompOpts(ContentListItemProp)]
+})
+class ContentListItem extends Vue<ContentListItemProp & Base> {
+    stylePrefix = "content-";
 
     private cfgs = {
         [myEnum.contentType.文章]: {
@@ -209,4 +220,4 @@ class ContentListItem extends Base {
     }
 }
 
-export const ContentListItemView = convClass<ContentListItem>(ContentListItem);
+export const ContentListItemView = convClass<ContentListItemProp>(ContentListItem);

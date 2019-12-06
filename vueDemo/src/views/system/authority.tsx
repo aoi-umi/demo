@@ -3,7 +3,7 @@ import * as iview from 'iview';
 import { testApi } from '@/api';
 import { myEnum, authority } from '@/config';
 import { convert } from '@/helpers';
-import { convClass } from '@/components/utils';
+import { convClass, getCompOpts } from '@/components/utils';
 import { Modal, Input, Form, FormItem, Button, Checkbox, Switch, Transfer } from '@/components/iview';
 import { MyList, IMyList, Const as MyListConst } from '@/components/my-list';
 import { MyTransfer, IMyTransfer } from '@/components/my-transfer';
@@ -19,11 +19,16 @@ type DetailDataType = {
     statusText?: string;
     isDel?: boolean;
 };
-@Component
-class AuthorityDetail extends Base {
+
+class AuthorityDetailProp {
     @Prop()
     detail: any;
-
+}
+@Component({
+    extends: Base,
+    mixins: [getCompOpts(AuthorityDetailProp)]
+})
+class AuthorityDetail extends Vue<AuthorityDetailProp & Base> {
     @Watch('detail')
     updateDetail(newVal) {
         let data = newVal || this.getDetailData();
@@ -101,7 +106,7 @@ class AuthorityDetail extends Base {
     }
 }
 
-const AuthorityDetailView = convClass<AuthorityDetail>(AuthorityDetail);
+const AuthorityDetailView = convClass<AuthorityDetailProp>(AuthorityDetail);
 
 @Component
 export default class Authority extends Base {
@@ -299,10 +304,14 @@ export default class Authority extends Base {
     }
 }
 
-@Component
-class AuthorityTransfer extends Vue {
+class AuthorityTransferProp {
     @Prop()
     selectedData: DetailDataType[];
+}
+@Component({
+    mixins: [getCompOpts(AuthorityTransferProp)]
+})
+class AuthorityTransfer extends Vue<AuthorityTransferProp> {
 
     @Watch('selectedData')
     private updateSelectedData(newVal: DetailDataType[]) {
@@ -346,4 +355,4 @@ class AuthorityTransfer extends Vue {
 }
 
 export interface IAuthorityTransfer extends AuthorityTransfer { }
-export const AuthorityTransferView = convClass<AuthorityTransfer>(AuthorityTransfer);
+export const AuthorityTransferView = convClass<AuthorityTransferProp>(AuthorityTransfer);

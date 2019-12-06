@@ -6,7 +6,7 @@ import * as helpers from '@/helpers';
 import { dev, myEnum } from '@/config';
 import { routerConfig } from '@/router';
 import { testApi, testSocket } from '@/api';
-import { convClass } from '@/components/utils';
+import { convClass, getCompOpts } from '@/components/utils';
 import { Modal, Input, Form, FormItem, Button, Card, TabPane, Tabs, Time } from '@/components/iview';
 import { MyUpload, IMyUpload, FileDataType } from '@/components/my-upload';
 import { MyList, IMyList, ResultType } from '@/components/my-list';
@@ -410,9 +410,7 @@ export default class UserInfo extends Base {
 /**
  * 粉丝/关注
  */
-@Component
-class FollowList extends Base {
-    stylePrefix = 'user-follow-';
+class FollowListProp {
     @Prop({
         required: true
     })
@@ -422,6 +420,13 @@ class FollowList extends Base {
         required: true
     })
     followType: number;
+}
+@Component({
+    extends: Base,
+    mixins: [getCompOpts(FollowListProp)]
+})
+class FollowList extends Vue<FollowListProp & Base> {
+    stylePrefix = 'user-follow-';
 
     $refs: {
         list: IMyList<any>,
@@ -497,7 +502,7 @@ class FollowList extends Base {
     }
 }
 
-const FollowListView = convClass<FollowList>(FollowList);
+const FollowListView = convClass<FollowListProp>(FollowList);
 
 /**
  * 收藏
@@ -564,4 +569,4 @@ class FavouriteList extends Base {
     }
 }
 
-const FavouriteListView = convClass<FavouriteList>(FavouriteList);
+const FavouriteListView = convClass(FavouriteList);

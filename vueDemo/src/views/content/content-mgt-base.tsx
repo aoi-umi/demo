@@ -5,7 +5,7 @@ import { testApi } from '@/api';
 
 import { myEnum, dev } from '@/config';
 import { routerConfig } from '@/router';
-import { convClass } from '@/components/utils';
+import { convClass, getCompOpts } from '@/components/utils';
 import { Form, FormItem, Button, Modal, Input, Divider, Checkbox, DatePicker, Affix, Card } from '@/components/iview';
 import { MyConfirm } from '@/components/my-confirm';
 import { MyList } from '@/components/my-list';
@@ -64,8 +64,18 @@ export type ContentDataType = {
     _checked?: boolean;
 };
 
-export abstract class ContentMgtBase extends Base {
-    abstract contentMgtType: string;
+export interface IContentMgtBase {
+    contentMgtType: string;
+    auditFn(detail: ContentDataType, pass: boolean): Promise<{ status, statusText }>;
+    canAudit(detail: ContentDataType): boolean;
+    toDetailUrl(preview: boolean): string;
+    isDel(detail: ContentDataType): boolean;
+    delFn(): Promise<any>;
+}
+@Component({
+    extends: Base
+})
+export class ContentMgtBase extends Vue<IContentMgtBase & Base> {
     delShow = false;
     delIds = [];
     delRemark = '';
@@ -88,7 +98,6 @@ export abstract class ContentMgtBase extends Base {
         this.toList();
     }
 
-    protected abstract auditFn(detail: ContentDataType, pass: boolean): Promise<{ status, statusText }>;
 
     protected async audit(detail: ContentDataType, pass: boolean) {
         await this.operateHandler('审核', async () => {
@@ -100,8 +109,6 @@ export abstract class ContentMgtBase extends Base {
         });
     }
 
-    protected abstract canAudit(detail: ContentDataType): boolean;
-
     protected toList() {
         this.$router.push({
             path: routerConfig.contentMgt.path,
@@ -110,8 +117,6 @@ export abstract class ContentMgtBase extends Base {
             }
         });
     }
-
-    abstract toDetailUrl(preview: boolean): string;
 
     protected toDetail(_id?, opt?: {
         preview?: boolean,
@@ -125,8 +130,6 @@ export abstract class ContentMgtBase extends Base {
             query: { _id: _id || '', repost: opt.repost ? 'true' : '' }
         });
     }
-
-    protected abstract isDel(detail: ContentDataType): boolean;
 
     protected getOperate(detail: ContentDataType, opt?: { noPreview?: boolean; isDetail?: boolean; }) {
         opt = { ...opt };
@@ -221,7 +224,6 @@ export abstract class ContentMgtBase extends Base {
     protected delSuccessHandler() {
         this.toList();
     }
-    protected abstract delFn(): Promise<any>;
     async delClick() {
         await this.operateHandler('删除', async () => {
             await this.delFn();
@@ -233,18 +235,17 @@ export abstract class ContentMgtBase extends Base {
     }
 }
 
-@Component
-export class ContentMgtDetail extends Base {
+class ContentMgtDetailProp {
     @Prop({
         required: true
     })
     loadDetailData: () => Promise<ContentDetailType>;
 
     @Prop()
-    getRules: () => any;
+    getRules?: () => any;
 
     @Prop()
-    beforeValidFn: (detail) => Promise<any>;
+    beforeValidFn?: (detail) => Promise<any>;
 
     @Prop({
         required: true
@@ -257,12 +258,18 @@ export class ContentMgtDetail extends Base {
     saveSuccessFn: (rs) => void;
 
     @Prop()
-    preview: boolean;
+    preview?: boolean;
 
     @Prop({
         required: true
     })
     renderPreviewFn: (detail) => any;
+}
+@Component({
+    extends: Base,
+    mixins: [getCompOpts(ContentMgtDetailProp)]
+})
+export class ContentMgtDetail extends Vue<ContentMgtDetailProp & Base> {
 
     $refs: { formVaild: iview.Form, cover: IMyUpload, loadView: IMyLoad };
 
@@ -450,16 +457,19 @@ export class ContentMgtDetail extends Base {
     }
 }
 
-export const ContentMgtDetailView = convClass<ContentMgtDetail>(ContentMgtDetail);
+export const ContentMgtDetailView = convClass<ContentMgtDetailProp>(ContentMgtDetail);
 
-
-@Component
-export class ContentLogList extends Base {
+class ContentLogListProp {
     @Prop({
         default: () => []
     })
     log: any[];
-
+}
+@Component({
+    extends: Base,
+    mixins: [getCompOpts(ContentLogListProp)]
+})
+export class ContentLogList extends Vue<ContentLogListProp & Base> {
     render() {
         let log = this.log;
         return (
@@ -501,4 +511,4 @@ export class ContentLogList extends Base {
     }
 }
 
-export const ContentLogListView = convClass<ContentLogList>(ContentLogList);
+export const ContentLogListView = convClass<ContentLogListProp>(ContentLogList);

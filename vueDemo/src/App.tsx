@@ -208,7 +208,7 @@ export default class App extends Base {
 
     private siderWidth = 180;
     render() {
-        let collapsedWidth = this.isSmall ? 0 : 56;
+        let collapsedWidth = this.isSmall ? 0 : 58;
         return (
             <Layout class="layout no-bg">
                 <Modal v-model={this.storeSetting.setting.signInShow} footer-hide>

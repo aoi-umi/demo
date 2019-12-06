@@ -3,17 +3,18 @@ import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { testApi } from '@/api';
 import { myEnum, authority, dev } from '@/config';
 import { convert } from '@/helpers';
-import { convClass } from '@/components/utils';
+import { convClass, getCompOpts } from '@/components/utils';
 import { Card, Input, } from '@/components/iview';
 import { MyList, IMyList } from '@/components/my-list';
 
-import { ListBase } from '../comps/list-base';
+import { ListBase, ListBaseProp } from '../comps/list-base';
 import { Base } from '../base';
 import { DetailDataType } from './article-mgt-detail';
 import { ContentListItemView } from './content';
 
 import './article.less';
 
+class ArticleProp extends ListBaseProp { }
 @Component
 export default class Article extends ListBase {
     $refs: { list: IMyList<any> };
@@ -89,10 +90,9 @@ export default class Article extends ListBase {
     }
 }
 
-export const ArticleView = convClass<Article>(Article);
+export const ArticleView = convClass<ArticleProp>(Article);
 
-@Component
-class ArticleListItem extends Base {
+class ArticleListItemProp {
     @Prop({
         required: true
     })
@@ -106,6 +106,13 @@ class ArticleListItem extends Base {
     @Prop()
     mgt?: boolean;
 
+}
+
+@Component({
+    extends: Base,
+    mixins: [getCompOpts(ArticleListItemProp)]
+})
+class ArticleListItem extends Vue<ArticleListItemProp & Base> {
     render() {
         return (
             <ContentListItemView
@@ -123,4 +130,4 @@ class ArticleListItem extends Base {
     }
 }
 
-export const ArticleListItemView = convClass<ArticleListItem>(ArticleListItem);
+export const ArticleListItemView = convClass<ArticleListItemProp>(ArticleListItem);

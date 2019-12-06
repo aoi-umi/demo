@@ -7,7 +7,7 @@ import {
 
 type SettingType = {
     signInShow: boolean;
-}
+};
 
 @Module({ name: 'setting' })
 export default class SettingStore extends VuexModule {

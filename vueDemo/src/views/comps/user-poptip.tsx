@@ -43,10 +43,10 @@ class UserPoptipProp {
     @Prop({
         default: 'right-start'
     })
-    tipsPlacement: iviewTypes.Poptip['placement'];
+    tipsPlacement?: iviewTypes.Poptip['placement'];
 
     @Prop()
-    size: iviewTypes.Avatar['size'];
+    size?: iviewTypes.Avatar['size'];
 }
 @Component({
     extends: Base,
