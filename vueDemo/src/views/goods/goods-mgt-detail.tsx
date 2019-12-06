@@ -221,7 +221,7 @@ export default class GoodsMgtDetail extends Base {
                                 file.metadata = rs.fileId;
                                 return rs.fileId;
                             }}
-                            format={['jpg', 'png']}
+                            format={['jpg', 'jpeg', 'png']}
                             width={160} height={90}
                             v-model={spu.imgUrls}
                             maxCount={4}
