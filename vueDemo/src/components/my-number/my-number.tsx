@@ -1,14 +1,12 @@
 import { Vue, Prop, Watch, Component } from 'vue-property-decorator';
 
-import { convClass } from '../utils';
+import { convClass, getCompOpts } from '../utils';
 import { Icon, Button } from '../iview';
 import { MyBase } from '../my-base';
 
 import './style.less';
 
-@Component
-export class MyNumber extends MyBase {
-    stylePrefix = "my-number-";
+class MyNumberProp {
     @Prop({
         default: 0
     })
@@ -24,6 +22,13 @@ export class MyNumber extends MyBase {
 
     @Prop()
     max?: number;
+}
+@Component({
+    extends: MyBase,
+    mixins: [getCompOpts(MyNumberProp)]
+})
+export class MyNumber extends Vue<MyNumberProp & MyBase> {
+    stylePrefix = "my-number-";
 
     @Watch('value')
     protected watchValue(newValue) {
@@ -65,5 +70,5 @@ export class MyNumber extends MyBase {
     }
 }
 
-const MyNumberView = convClass<MyNumber>(MyNumber);
+const MyNumberView = convClass<MyNumberProp>(MyNumber);
 export default MyNumberView;

@@ -1,24 +1,27 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 
 import { myEnum } from '@/config';
-import { convClass } from '@/components/utils';
+import { convClass, getCompOpts } from '@/components/utils';
 import { MyTagBase } from '@/components/my-tag/my-tag';
 import { Tooltip } from '@/components/iview';
 import { DetailDataType } from '../system/role';
 import { AuthorityTagView } from './authority-tag';
 
 
-@Component
-class RoleTag extends MyTagBase {
+class RoleTagProp {
     @Prop({
         default: []
     })
     value: DetailDataType[];
-    tagList: DetailDataType[] = this.value;
 
     @Prop()
     hideCode?: boolean;
-
+}
+@Component({
+    extends: MyTagBase,
+    mixins: [getCompOpts(RoleTagProp)]
+})
+class RoleTag extends Vue<RoleTagProp & MyTagBase<DetailDataType>> {
     render() {
         return (
             <div>
@@ -51,5 +54,5 @@ class RoleTag extends MyTagBase {
 }
 
 
-export const RoleTagView = convClass<RoleTag>(RoleTag);
+export const RoleTagView = convClass<RoleTagProp>(RoleTag);
 export interface IRoleTagView extends RoleTag { };

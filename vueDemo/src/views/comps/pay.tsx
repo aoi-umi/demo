@@ -2,7 +2,7 @@ import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import * as  QRCode from 'qrcode';
 
 import { myEnum } from '@/config';
-import { convClass } from '@/components/utils';
+import { convClass, getCompOpts } from '@/components/utils';
 import { RadioGroup, Radio, Button, Modal, Spin } from '@/components/iview';
 
 import { Base } from '../base';
@@ -14,18 +14,23 @@ const ShowType = {
     二维码: 'qecode'
 };
 
-@Component
-class Pay extends Base {
-    stylePrefix = 'comp-pay-';
+class PayProp {
     @Prop({
         default: myEnum.assetSourceType.支付宝
     })
-    payType: number;
+    payType?: number;
 
     @Prop({
         required: true
     })
     payFn: () => Promise<{ url: string }>;
+}
+@Component({
+    extends: Base,
+    mixins: [getCompOpts(PayProp)]
+})
+class Pay extends Vue<PayProp & Base> {
+    stylePrefix = 'comp-pay-';
 
     $refs: { qrCanvas: HTMLDivElement; }
 
@@ -104,4 +109,4 @@ class Pay extends Base {
 
 }
 
-export const PayView = convClass<Pay>(Pay);
+export const PayView = convClass<PayProp>(Pay);

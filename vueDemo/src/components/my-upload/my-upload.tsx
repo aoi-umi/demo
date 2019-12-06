@@ -4,7 +4,7 @@ import axios, { AxiosRequestConfig } from 'axios';
 import { VueCropper } from 'vue-cropper';
 
 import { Upload, Modal, Icon, Progress, Button } from '../iview';
-import { Utils, convClass } from '../utils';
+import { Utils, convClass, getCompOpts } from '../utils';
 import { MyImg } from '../my-img';
 import { MyImgViewer, IMyImgViewer } from '../my-img-viewer';
 import { MyBase } from '../my-base';
@@ -52,10 +52,7 @@ type SetFileType = {
     file: File,
     originFileType?: string;
 };
-@Component({
-    VueCropper
-})
-class MyUpload extends MyBase {
+class MyUploadProp {
     @Prop()
     uploadUrl: string;
 
@@ -95,13 +92,31 @@ class MyUpload extends MyBase {
     @Prop({
         default: () => []
     })
-    value: FileType[];
-    fileList: FileType[] = [];
+    value?: FileType[];
 
     @Prop({
         default: FileDataType.图片
     })
-    uploadIconType: number;
+    uploadIconType?: number;
+
+    @Prop()
+    successHandler?: (res: any, file: FileType) => any;
+
+    @Prop()
+    cropperOptions?: CropperOption;
+
+    @Prop()
+    showVideoCrop?: boolean;
+}
+@Component({
+    extends: MyBase,
+    mixins: [getCompOpts(MyUploadProp)],
+    VueCropper
+})
+class MyUpload extends Vue<MyUploadProp & MyBase> {
+    stylePrefix = 'my-upload-';
+
+    fileList: FileType[] = [];
 
     @Watch('value')
     private watchValue(newVal: any[]) {
@@ -113,17 +128,6 @@ class MyUpload extends MyBase {
             this.fileList = [];
         }
     }
-
-    @Prop()
-    successHandler: (res: any, file: FileType) => any;
-
-    @Prop()
-    cropperOptions?: CropperOption;
-
-    @Prop()
-    showVideoCrop?: boolean;
-
-    stylePrefix = 'my-upload-';
 
     $refs: { upload: iview.Upload & { fileList: FileType[] }, cropper: any, imgViewer: IMyImgViewer };
 
@@ -430,6 +434,6 @@ class MyUpload extends MyBase {
     }
 }
 
-const MyUploadView = convClass<MyUpload>(MyUpload);
+const MyUploadView = convClass<MyUploadProp>(MyUpload);
 export default MyUploadView;
 export interface IMyUpload extends MyUpload { }

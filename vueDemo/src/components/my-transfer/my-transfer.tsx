@@ -1,6 +1,6 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 
-import { convClass } from '../utils';
+import { convClass, getCompOpts } from '../utils';
 import { Button, Transfer } from '../iview';
 import { MyBase } from '../my-base';
 
@@ -12,14 +12,20 @@ type DataType = {
     data: any;
     disabled?: boolean;
 };
-@Component
-class MyTransfer extends MyBase {
-    stylePrefix = 'my-transfer-';
+
+class MyTransferProp {
     @Prop()
     selectedData: DataType[];
 
     @Prop()
     getDataFn: () => DataType[] | Promise<DataType[]>;
+}
+@Component({
+    extends: MyBase,
+    mixins: [getCompOpts(MyTransferProp)]
+})
+class MyTransfer extends Vue<MyTransferProp & MyBase> {
+    stylePrefix = 'my-transfer-';
 
     @Watch('selectedData')
     private updateSelectedData(newVal: DataType[]) {
@@ -88,5 +94,5 @@ class MyTransfer extends MyBase {
 
 
 export interface IMyTransfer extends MyTransfer { }
-const MyTransferView = convClass<MyTransfer>(MyTransfer);
+const MyTransferView = convClass<MyTransferProp>(MyTransfer);
 export default MyTransferView;

@@ -1,6 +1,6 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 
-import { convClass } from '@/components/utils';
+import { convClass, getCompOpts } from '@/components/utils';
 import { Spin, Button, Card } from '@/components/iview';
 import { myEnum } from '@/config';
 import { testApi } from '@/api';
@@ -8,13 +8,17 @@ import { Base } from "../base";
 import { User } from './user-avatar';
 
 
-@Component
-class FollowBotton extends Base {
+class FollowBottonProp {
     @Prop({
         required: true
     })
     user: User;
-
+}
+@Component({
+    extends: Base,
+    mixins: [getCompOpts(FollowBottonProp)]
+})
+class FollowBotton extends Vue<FollowBottonProp & Base> {
     private innerUser = this.user;
 
     get isFollow() {
@@ -52,5 +56,5 @@ class FollowBotton extends Base {
 }
 
 
-export const FollowButtonView = convClass<FollowBotton>(FollowBotton);
+export const FollowButtonView = convClass<FollowBottonProp>(FollowBotton);
 export interface IFollowBottonView extends FollowBotton { };

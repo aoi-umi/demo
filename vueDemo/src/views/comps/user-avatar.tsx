@@ -1,7 +1,7 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import * as iviewTypes from 'iview';
 
-import { convClass } from '@/components/utils';
+import { convClass, getCompOpts } from '@/components/utils';
 import { Avatar } from '@/components/iview';
 import { Base } from '../base';
 import { UserPoptipView } from './user-poptip';
@@ -16,9 +16,8 @@ export type User = {
     followStatus?: number;
     followEachOther?: boolean;
 };
-@Component
-class UserAvatar extends Base {
-    stylePrefix = 'comp-user-avatar-';
+
+class UserAvatarProp {
     @Prop()
     user: User;
 
@@ -26,7 +25,7 @@ class UserAvatar extends Base {
     showAccount?: boolean;
 
     @Prop()
-    size: iviewTypes.Avatar['size'];
+    size?: iviewTypes.Avatar['size'];
 
     @Prop()
     noTips?: boolean;
@@ -40,7 +39,14 @@ class UserAvatar extends Base {
     @Prop({
         default: 'right-start'
     })
-    tipsPlacement: iviewTypes.Poptip['placement'];
+    tipsPlacement?: iviewTypes.Poptip['placement'];
+}
+@Component({
+    extends: Base,
+    mixins: [getCompOpts(UserAvatarProp)]
+})
+class UserAvatar extends Vue<UserAvatarProp & Base> {
+    stylePrefix = 'comp-user-avatar-';
 
     avatarUrl = '';
 
@@ -56,7 +62,6 @@ class UserAvatar extends Base {
     watchUser(newVal, oldVal) {
         this.init(newVal);
     }
-
 
     render() {
         return (
@@ -80,4 +85,4 @@ class UserAvatar extends Base {
     }
 }
 
-export const UserAvatarView = convClass<UserAvatar>(UserAvatar);
+export const UserAvatarView = convClass<UserAvatarProp>(UserAvatar);

@@ -4,16 +4,12 @@ import 'quill/dist/quill.core.css';
 import 'quill/dist/quill.snow.css';
 import 'quill/dist/quill.bubble.css';
 
-import { MyInputBase } from '../my-input/my-input';
-import { convClass } from '../utils';
+import { MyInputBase, MyInputBaseProp } from '../my-input/my-input';
+import { convClass, getCompOpts } from '../utils';
 
 import './style.less';
 
-@Component({
-    quillEditor
-})
-class MyEditor extends MyInputBase {
-    stylePrefix = 'my-editor-';
+class MyEditorProp extends MyInputBaseProp {
     @Prop({
         default: () => {
             return [
@@ -37,6 +33,14 @@ class MyEditor extends MyInputBase {
         }
     })
     toolbar?: any[][];
+}
+@Component({
+    extends: MyInputBase,
+    mixins: [getCompOpts(MyEditorProp)],
+    quillEditor,
+})
+class MyEditor extends Vue<MyEditorProp & MyInputBase> {
+    stylePrefix = 'my-editor-';
 
     $refs: { quillEditor: any };
 
@@ -142,5 +146,5 @@ class MyEditor extends MyInputBase {
 }
 
 export interface IMyEditor extends MyEditor { }
-const MyEditorView = convClass<MyEditor>(MyEditor);
+const MyEditorView = convClass<MyEditorProp>(MyEditor);
 export default MyEditorView;

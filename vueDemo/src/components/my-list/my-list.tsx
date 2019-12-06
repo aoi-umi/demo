@@ -4,7 +4,7 @@ import {
     Table, Page, Row, Col,
     Input, Button, Divider, Card, Icon, Spin
 } from '../iview';
-import { Utils } from '../utils';
+import { Utils, getCompOpts, convClass } from '../utils';
 import { MyBase } from '../my-base';
 import * as style from '../style';
 import { MyListModel, MyListResult } from './model';
@@ -61,16 +61,20 @@ type ColType = {
     //自定义字段
     hide?: boolean;
 };
-@Component
-class MyList<QueryArgs extends QueryArgsType> extends MyBase {
+
+class MyListProp<QueryArgs = any> {
+    @Prop({
+        default: () => new MyListModel<{ [k in keyof QueryArgs]: any }>()
+    })
+    value?: MyListModel<{ [k in keyof QueryArgs]: any }>;
+
     @Prop({
         default: 'table'
     })
-    type: 'table' | 'custom';
+    type?: 'table' | 'custom';
 
     @Prop()
     columns?: ColType[];
-    private cols?: ColType[];
 
     @Prop()
     defaultColumn?: ColType;
@@ -116,8 +120,18 @@ class MyList<QueryArgs extends QueryArgsType> extends MyBase {
     @Prop()
     queryFn?: (data: any) => MyListResult | Promise<MyListResult>;
 
+    //批量操作
+    @Prop({ default: () => [] })
+    multiOperateBtnList?: { text: string; onClick: (selection: any[]) => void }[];
+}
+@Component({
+    extends: MyBase,
+    mixins: [getCompOpts(MyListProp)],
+})
+class MyList<QueryArgs extends QueryArgsType> extends Vue<MyListProp<QueryArgs> & MyBase> {
     stylePrefix = clsPrefix;
 
+    private cols?: ColType[];
     protected created() {
         if (this.type == 'table') {
             if (!this.columns)
@@ -225,16 +239,8 @@ class MyList<QueryArgs extends QueryArgsType> extends MyBase {
         this.selectedRows = selection;
     }
 
-    //批量操作
-    @Prop({ default: () => [] })
-    multiOperateBtnList: { text: string; onClick: (selection: any[]) => void }[];
-
     private showQuery = true;
     private loading = false;
-    @Prop({
-        default: () => new MyListModel<{ [k in keyof QueryArgs]: any }>()
-    })
-    value: MyListModel<{ [k in keyof QueryArgs]: any }>;
     model = this.value;
 
     @Watch('value')
@@ -425,7 +431,5 @@ class MyList<QueryArgs extends QueryArgsType> extends MyBase {
 }
 
 export interface IMyList<T extends QueryArgsType = any> extends MyList<T> { }
-const MyListView = MyList as {
-    new <T extends QueryArgsType>(props: Partial<MyList<T>> & VueComponentOptions): any;
-};
+const MyListView = convClass<MyListProp>(MyList);
 export default MyListView;
