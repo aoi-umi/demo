@@ -64,11 +64,13 @@ class UserMgtDetail extends Vue<UserMgtDetailProp & Base> {
             data.disabledTo = new Date(data.disabledTo);
         this.innerDetail = data;
         this.disableType = data.disabled ? myEnum.userDisableType.封禁至 : myEnum.userDisableType.解封;
+        this.password = '';
     }
 
     private rules = {};
     $refs: { formVaild: iview.Form; roleTransfer: IRoleTransfer, authTransfer: IAuthorityTransfer };
     private disableType = myEnum.userDisableType.解封;
+    private password = '';
 
     private saving = false;
     private async save() {
@@ -85,6 +87,7 @@ class UserMgtDetail extends Vue<UserMgtDetailProp & Base> {
                     delAuthList,
                     addRoleList,
                     delRoleList,
+                    password: this.password,
                 });
             } else {
                 rs = await testApi.userMgtDisable({
@@ -105,12 +108,15 @@ class UserMgtDetail extends Vue<UserMgtDetailProp & Base> {
             <div>
                 <h3>{myEnum.userEditType.getKey(this.type)}</h3>
                 <br />
-                <Form label-width={50} ref="formVaild" props={{ model: detail }} rules={this.rules} nativeOn-submit={(e) => {
+                <Form label-width={60} ref="formVaild" props={{ model: detail }} rules={this.rules} nativeOn-submit={(e) => {
                     e.preventDefault();
                 }} >
                     <FormItem label="账号">{detail.account}({detail.nickname})</FormItem>
                     {this.type == myEnum.userEditType.修改 ?
                         <div>
+                            <FormItem label="重置密码">
+                                <Input v-model={this.password} />
+                            </FormItem>
                             <FormItem label="角色">
                                 <RoleTransferView ref="roleTransfer" selectedData={detail.roleList} />
                             </FormItem>
