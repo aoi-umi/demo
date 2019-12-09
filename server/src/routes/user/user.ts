@@ -207,6 +207,11 @@ export let mgtSave: RequestHandler = (req, res) => {
         update.authorityList = detail.authorityList;
         update.roleList = detail.roleList;
 
+        if (data.password) {
+            update.password = common.md5(data.password);
+            remark += `[修改了密码, 原密码: ${detail.password}]`;
+        }
+
         let log = UserLogMapper.create(detail, user, { remark });
         await transaction(async (session) => {
             await detail.update(update, { session });
