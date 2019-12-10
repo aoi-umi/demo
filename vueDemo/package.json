@@ -7,7 +7,7 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "format": "eslint --fix  ./src/**/*.{ts,tsx}",
-    "report": "npm run build --report"
+    "report": "set report=true && npm run build"
   },
   "dependencies": {
     "animejs": "3.0.1",

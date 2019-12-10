@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import iView from 'iview';
-import 'iview/dist/styles/iview.css';
 import VueLazyload from 'vue-lazyload';
 //仅用于引入类型
 import { } from 'echarts';
