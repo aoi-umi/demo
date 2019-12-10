@@ -340,7 +340,10 @@ class MyUpload extends Vue<MyUploadProp & MyBase> {
                     let isVideo = item.fileType === FileDataType.视频;
                     let itemRefName = 'itemRef' + idx;
                     return (
-                        <div class={[...this.getStyleName('item'), this.shape == 'circle' ? style.cls.circle : '']} style={{ width, height }}>
+                        <div class={[...this.getStyleName('item'), this.shape == 'circle' ? style.cls.circle : '']} style={{ width, height }}
+                            v-dragging={{ item, list: this.fileList, group: 'upload-item' }}
+                            key={idx}
+                        >
                             {isImg && <MyImg ref={itemRefName} class={this.getStyleName('item-cont')} src={item.url || item.data} />}
                             {isVideo && <MyVideo ref={itemRefName} class={this.getStyleName('item-cont')} options={{
                                 sources: [{

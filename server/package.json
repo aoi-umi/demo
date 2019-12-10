@@ -12,11 +12,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "3rd-party-pay": "0.0.7",
+    "3rd-party-pay": "0.0.9",
     "ajv": "^6.5.4",
     "ajv-errors": "^1.0.1",
     "amqplib-delay": "0.0.1",
-    "axios": "^0.18.0",
+    "axios": "^0.18.1",
     "body-parser": "^1.18.3",
     "body-parser-xml": "^1.1.0",
     "class-transformer": "^0.2.3",

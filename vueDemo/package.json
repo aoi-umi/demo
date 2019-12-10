@@ -6,11 +6,13 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "format": "eslint --fix  ./src/**/*.{ts,tsx}"
+    "format": "eslint --fix  ./src/**/*.{ts,tsx}",
+    "report": "npm run build --report"
   },
   "dependencies": {
     "animejs": "3.0.1",
-    "axios": "0.18.0",
+    "awe-dnd": "^0.3.4",
+    "axios": "^0.19.0",
     "copy-to-clipboard": "^3.2.0",
     "core-js": "2.6.5",
     "dayjs": "1.8.16",
@@ -51,6 +53,7 @@
     "less-loader": "^5.0.0",
     "typescript": "^3.4.3",
     "typescript-eslint-parser": "^22.0.0",
-    "vue-template-compiler": "^2.5.21"
+    "vue-template-compiler": "^2.5.21",
+    "webpack-bundle-analyzer": "^3.6.0"
   }
 }
