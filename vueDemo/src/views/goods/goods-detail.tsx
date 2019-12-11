@@ -1,10 +1,10 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
-import * as mathjs from 'mathjs';
 
 import { testApi } from '@/api';
 import errConfig, { getErrorCfgByCode } from '@/config/error';
 import { myEnum } from '@/config';
 import { convClass, getCompOpts } from '@/components/utils';
+import { mathjs } from '@/helpers';
 import { Carousel, CarouselItem, Row, Col, Divider, Input, Button, Card, Modal, RadioGroup, Radio } from '@/components/iview';
 import { MyTag, TagType } from '@/components/my-tag';
 import { MyLoad } from '@/components/my-load';

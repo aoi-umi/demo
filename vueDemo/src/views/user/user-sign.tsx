@@ -7,12 +7,13 @@ import { routerConfig } from '@/router';
 import { testApi, testSocket } from '@/api';
 import { LocalStore } from '@/store';
 import { convClass } from '@/components/utils';
-import { Input, Form, FormItem, Button, Checkbox } from '@/components/iview';
+import { Input, Form, FormItem, Button, Checkbox, Spin, Icon } from '@/components/iview';
 import { MyLoad } from '@/components/my-load';
 import { LoginUser } from '@/model/user';
 
 import { Base } from '../base';
 
+import './user.less';
 
 type SignInDataType = {
     account?: string;
@@ -136,7 +137,7 @@ type SignUpDataType = {
 
 @Component
 class SignUp extends Base {
-
+    stylePrefix = 'user-sign-up-';
     private innerDetail: SignUpDataType = this.getDetailData();
     private getDetailData() {
         return {
@@ -149,7 +150,15 @@ class SignUp extends Base {
 
     private rules = {
         account: [
-            { required: true, trigger: 'blur' }
+            { required: true, trigger: 'blur' },
+            {
+                asyncValidator: async (rule, value) => {
+                    let rs = await testApi.userAccountExists(value);
+                    if (rs)
+                        throw new Error('账号已存在');
+                },
+                trigger: ['changed', 'blur']
+            }
         ],
         nickname: [
             { required: true, trigger: 'blur' }
@@ -174,6 +183,7 @@ class SignUp extends Base {
     $refs: { formVaild: iview.Form };
 
     private loading = false;
+    private accExistsLoading = false;
 
     private async handleSignUp() {
         await this.operateHandler('注册', async () => {
