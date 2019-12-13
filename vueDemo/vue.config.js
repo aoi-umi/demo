@@ -1,10 +1,22 @@
+const path = require('path');
+
+const { MyPugin } = require('./dynamic-import-cdn-pugin');
 let env = process.env;
 
-let plugins = [];
+let cdnOpt = {
+    'video.js': {
+        moduleName: 'VideoJs',
+        url: 'https://unpkg.com/video.js@7.6.6/dist/video.cjs.js'
+    }
+};
+let plugins = [
+    new MyPugin(cdnOpt),
+];
 if (env.report) {
     let { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
     plugins.push(new BundleAnalyzerPlugin());
 }
+
 let link = [
     "https://unpkg.com/iview@3.5.4/dist/styles/iview.css"
 ];
@@ -27,12 +39,16 @@ module.exports = {
     },
     configureWebpack: {
         plugins,
-        externals: {
+        externals: [{
             'vue': 'Vue',
             'vue-router': 'VueRouter',
             'vuex': 'Vuex',
             'axios': 'axios',
             iview: 'iview',
+        },
+        ],
+        module: {
+            rules: []
         },
     },
 };
