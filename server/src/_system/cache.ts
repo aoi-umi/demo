@@ -5,7 +5,7 @@ import * as config from '@/config';
 import * as common from './common';
 
 function writeCacheErr(err) {
-    console.error(moment().format('yyyy-MM-dd HH:mm:ss'), 'Cache Error [' + err + ']');
+    console.error(moment().format('YYYY-MM-DD HH:mm:ss'), 'Cache Error [' + err + ']');
 }
 
 let connectErrorTimes = 0;
