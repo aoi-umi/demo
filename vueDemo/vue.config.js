@@ -5,8 +5,12 @@ let env = process.env;
 
 let cdnOpt = {
     'video.js': {
-        moduleName: 'VideoJs',
-        url: 'https://unpkg.com/video.js@7.6.6/dist/video.cjs.js'
+        moduleName: 'videojs',
+        url: 'https://unpkg.com/video.js@7.6.6/dist/video.min.js'
+    },
+    quill: {
+        moduleName: 'Quill',
+        url: 'https://unpkg.com/quill@1.3.7/dist/quill.min.js'
     }
 };
 let plugins = [
