@@ -4,7 +4,8 @@
   "description": "",
   "main": "dest/index.js",
   "scripts": {
-    "build": "rm -rf ./depoly && tsc -p tsconfig-deploy.json",
+    "build": "rm -rf ./dest && tsc",
+    "deploy": "rm -rf ./depoly && tsc -p tsconfig-deploy.json",
     "build-dev": "tsc",
     "doc": "apidoc -i src/ -o _test/docs",
     "test": "echo \"Error: no test specified\" && exit 1"
