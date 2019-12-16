@@ -1,9 +1,8 @@
 const { Template, ExternalsPlugin } = require('webpack');
 const Chunk = require('webpack/lib/Chunk');
-const Entrypoint = require('webpack/lib/Entrypoint');
 
-const PluginName = 'DynamicImportCdnFactoryPlugin';
-exports.DynamicImportCdnFactoryPlugin = class DynamicImportCdnFactoryPlugin {
+const PluginName = 'DynamicImportCdnPlugin';
+exports.DynamicImportCdnPlugin = class DynamicImportCdnPlugin {
     constructor(cdn) {
         this.cdn = cdn;
         this.globalCdn = {};
@@ -27,6 +26,8 @@ exports.DynamicImportCdnFactoryPlugin = class DynamicImportCdnFactoryPlugin {
             if (hasCdnJs) {
                 self.jsHandler(compilation);
             }
+
+            self.cssHandler(compilation);
 
             compilation.plugin('html-webpack-plugin-before-html-generation', function (htmlPluginData) {
                 let js = [];
@@ -143,5 +144,13 @@ exports.DynamicImportCdnFactoryPlugin = class DynamicImportCdnFactoryPlugin {
                 cdnFn(chunk);
             }
         });
+    }
+
+    cssHandler(compilation) {
+        // let mainTemplate = compilation.mainTemplate;
+        // mainTemplate.hooks.requireEnsure.tap(PluginName, (source, chunk, hash) => {
+        //     // console.log(source);
+        //     return source;
+        // });
     }
 }
