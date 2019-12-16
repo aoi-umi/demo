@@ -1,20 +1,42 @@
-const path = require('path');
 
-const { MyPugin } = require('./dynamic-import-cdn-pugin');
+const { DynamicImportCdnFactoryPlugin } = require('./dynamic-import-cdn-pugin');
 let env = process.env;
 
 let cdnOpt = {
-    'video.js': {
-        moduleName: 'videojs',
-        url: 'https://unpkg.com/video.js@7.6.6/dist/video.min.js'
-    },
-    quill: {
-        moduleName: 'Quill',
-        url: 'https://unpkg.com/quill@1.3.7/dist/quill.min.js'
+    js: {
+        vue: {
+            moduleName: 'Vue',
+            url: 'https://unpkg.com/vue@2.6.10/dist/vue.min.js'
+        },
+        'vue-router': {
+            moduleName: 'VueRouter',
+            url: 'https://unpkg.com/vue-router@3.0.2/dist/vue-router.min.js',
+        },
+        vuex: {
+            moduleName: 'Vuex',
+            url: 'https://unpkg.com/vuex@3.1.0/dist/vuex.min.js'
+        },
+        axios: {
+            moduleName: 'axios',
+            url: 'https://unpkg.com/axios@0.19.0/dist/axios.min.js'
+        },
+        iview: {
+            moduleName: 'iview',
+            url: 'https://unpkg.com/iview@3.5.4/dist/iview.min.js',
+        },
+
+        'video.js': {
+            moduleName: 'videojs',
+            url: 'https://unpkg.com/video.js@7.6.6/dist/video.min.js'
+        },
+        quill: {
+            moduleName: 'Quill',
+            url: 'https://unpkg.com/quill@1.3.7/dist/quill.min.js'
+        }
     }
 };
 let plugins = [
-    new MyPugin(cdnOpt),
+    new DynamicImportCdnFactoryPlugin(cdnOpt),
 ];
 if (env.report) {
     let { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
@@ -24,13 +46,6 @@ if (env.report) {
 let link = [
     "https://unpkg.com/iview@3.5.4/dist/styles/iview.css"
 ];
-let script = [
-    "https://unpkg.com/vue@2.6.10/dist/vue.js",
-    "https://unpkg.com/vue-router@3.0.2/dist/vue-router.min.js",
-    "https://unpkg.com/vuex@3.1.0/dist/vuex.min.js",
-    "https://unpkg.com/axios@0.19.0/dist/axios.min.js",
-    "https://unpkg.com/iview@3.5.4/dist/iview.js",
-];
 module.exports = {
     productionSourceMap: false,
     pages: {
@@ -38,19 +53,11 @@ module.exports = {
             // entry for the page
             entry: 'src/main.ts',
             link,
-            script,
         }
     },
     configureWebpack: {
         plugins,
-        externals: [{
-            'vue': 'Vue',
-            'vue-router': 'VueRouter',
-            'vuex': 'Vuex',
-            'axios': 'axios',
-            iview: 'iview',
-        },
-        ],
+        externals: [],
         module: {
             rules: []
         },
