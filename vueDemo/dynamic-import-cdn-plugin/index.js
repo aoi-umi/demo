@@ -2,7 +2,7 @@ const { Template, ExternalsPlugin } = require('webpack');
 const Chunk = require('webpack/lib/Chunk');
 const Entrypoint = require('webpack/lib/Entrypoint');
 
-const PuginName = 'DynamicImportCdnFactoryPlugin';
+const PluginName = 'DynamicImportCdnFactoryPlugin';
 exports.DynamicImportCdnFactoryPlugin = class DynamicImportCdnFactoryPlugin {
     constructor(cdn) {
         this.cdn = cdn;
@@ -23,7 +23,7 @@ exports.DynamicImportCdnFactoryPlugin = class DynamicImportCdnFactoryPlugin {
             ).apply(compiler);
         }
         let globalCdn = this.globalCdn;
-        compiler.hooks.compilation.tap(PuginName, function (compilation, options) {
+        compiler.hooks.compilation.tap(PluginName, function (compilation, options) {
             if (hasCdnJs) {
                 self.jsHandler(compilation);
             }
@@ -45,7 +45,7 @@ exports.DynamicImportCdnFactoryPlugin = class DynamicImportCdnFactoryPlugin {
         let globalCdn = this.globalCdn;
         let cdnJs = this.cdn.js;
 
-        mainTemplate.hooks.localVars.tap(PuginName, function (source, chunk, hash) {
+        mainTemplate.hooks.localVars.tap(PluginName, function (source, chunk, hash) {
             let str = 'function jsonpScriptSrc(chunkId) {';
             let idx = source.indexOf(str);
             if (idx === -1) {
@@ -68,7 +68,7 @@ exports.DynamicImportCdnFactoryPlugin = class DynamicImportCdnFactoryPlugin {
             return Template.asString(buf);
         });
         if (mainTemplate.hooks.jsonpScript) {
-            mainTemplate.hooks.jsonpScript.tap(PuginName, function (source, chunk, hash) {
+            mainTemplate.hooks.jsonpScript.tap(PluginName, function (source, chunk, hash) {
                 let buf = [];
                 let idx = source.indexOf('var chunk = installedChunks[chunkId];');
                 buf.push(source.substr(0, idx));
@@ -135,7 +135,7 @@ exports.DynamicImportCdnFactoryPlugin = class DynamicImportCdnFactoryPlugin {
             });
         }
 
-        compilation.hooks.afterOptimizeChunks.tap(PuginName, function (chunks, chunkGroups) {
+        compilation.hooks.afterOptimizeChunks.tap(PluginName, function (chunks, chunkGroups) {
             for (const chunk of chunks) {
                 if (!chunk.isOnlyInitial()) {
                     return;

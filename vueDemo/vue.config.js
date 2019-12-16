@@ -1,5 +1,5 @@
 
-const { DynamicImportCdnFactoryPlugin } = require('./dynamic-import-cdn-pugin');
+const { DynamicImportCdnFactoryPlugin } = require('./dynamic-import-cdn-plugin');
 let env = process.env;
 
 let cdnOpt = {
