@@ -1,7 +1,7 @@
 
-const { DynamicImportCdnFactoryPlugin } = require('./dynamic-import-cdn-plugin');
+const { DynamicImportCdnPlugin } = require('./dynamic-import-cdn-plugin');
 let env = process.env;
-
+let isProd = env.NODE_ENV === 'production';
 let cdnOpt = {
     js: {
         vue: {
@@ -36,7 +36,7 @@ let cdnOpt = {
     }
 };
 let plugins = [
-    new DynamicImportCdnFactoryPlugin(cdnOpt),
+    new DynamicImportCdnPlugin(cdnOpt),
 ];
 if (env.report) {
     let { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
@@ -62,4 +62,9 @@ module.exports = {
             rules: []
         },
     },
+    css: {
+        extract: !isProd ? false : {
+            ignoreOrder: true
+        },
+    }
 };
