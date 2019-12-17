@@ -75,7 +75,7 @@ exports.DynamicImportCdnPlugin = class DynamicImportCdnPlugin {
         }
 
         compiler.hooks.compilation.tap(PluginName, function (compilation, options) {
-            const jsCdnFn = (chunk) => {
+            const cdnJsFn = (chunk) => {
                 if (!chunk.isOnlyInitial()) {
                     return;
                 }
@@ -99,6 +99,7 @@ exports.DynamicImportCdnPlugin = class DynamicImportCdnPlugin {
                 }
             }
 
+            const cdnJsVar = 'cdnJs';
             const jsHandler = (compilation) => {
                 let mainTemplate = compilation.mainTemplate;
 
@@ -111,12 +112,12 @@ exports.DynamicImportCdnPlugin = class DynamicImportCdnPlugin {
                     let buf = [];
                     buf.push(
                         source.substr(0, idx),
-                        `var cdn = ${JSON.stringify(cdnJs, null, '\t')};`,
+                        `var ${cdnJsVar} = ${JSON.stringify(cdnJs, null, '\t')};`,
                         str,
                         Template.indent([
-                            `if(cdn[chunkId]) {`,
+                            `if(${cdnJsVar}[chunkId]) {`,
                             Template.indent([
-                                `return cdn[chunkId].url;`,
+                                `return ${cdnJsVar}[chunkId].url;`,
                             ]),
                             `}`,]),
 
@@ -130,10 +131,10 @@ exports.DynamicImportCdnPlugin = class DynamicImportCdnPlugin {
                         let idx = source.indexOf('var chunk = installedChunks[chunkId];');
                         buf.push(source.substr(0, idx));
                         buf.push(
-                            'if(cdn[chunkId]) {',
+                            `if(${cdnJsVar}[chunkId]) {`,
                             Template.indent([
                                 Template.indent([
-                                    `webpackJsonp.push([[chunkId], window[cdn[chunkId].moduleName]]);`,
+                                    `webpackJsonp.push([[chunkId], window[${cdnJsVar}[chunkId].moduleName]]);`,
                                 ]),
                             ]),
                             '}'
@@ -145,13 +146,13 @@ exports.DynamicImportCdnPlugin = class DynamicImportCdnPlugin {
 
                 compilation.hooks.afterOptimizeChunks.tap(PluginName, (chunks, chunkGroups) => {
                     for (const chunk of chunks) {
-                        jsCdnFn(chunk);
+                        cdnJsFn(chunk);
                     }
                 });
             }
 
             let chunkCssMap = {};
-            const cssCdnFn = (chunk) => {
+            const cdnCssFn = (chunk) => {
                 if (!chunk.isOnlyInitial()) {
                     return;
                 }
@@ -159,50 +160,124 @@ exports.DynamicImportCdnPlugin = class DynamicImportCdnPlugin {
                 if (entry) {
                     setGlobalCdn('css', chunk);
                 }
-                let dependencies = getDependencies(chunk.getModules());
-                for (let d of dependencies) {
+                const CssExtractType = "css/mini-extract";
+                //find css map
+                for (let c of chunk.getAllAsyncChunks()) {
                     for (let key in cdnCss) {
-                        if (globalCdn.css[key] || (chunkCssMap[chunk.id] && chunkCssMap[chunk.id].includes(key)))
+                        if (globalCdn.css[key] || (chunkCssMap[c.id] && chunkCssMap[c.id].includes(cdnCss[key])))
                             continue;
-                        let cdnCssDep = findCdnDep(key, d.module);
-                        if (cdnCssDep) {
-                            let cssDep = cdnCssDep.module.dependencies.find(e => e.module && e.module.type === "css/mini-extract");
-                            if (cssDep) {
-                                cssDep.content = '';
-                                cssDep.module.content = '';
-                                if (!chunkCssMap[chunk.id]) {
-                                    chunkCssMap[chunk.id] = [];
+                        for (const module of c.modulesIterable) {
+                            if (module.type === CssExtractType && module.issuer.rawRequest === key) {
+                                if (!chunkCssMap[c.id]) {
+                                    chunkCssMap[c.id] = [];
                                 }
-                                chunkCssMap[chunk.id].push(key);
+                                chunkCssMap[c.id].push(cdnCss[key]);
+                                break;
                             }
                         }
                     }
+                }
 
+                //clear content
+                let clearMap = {};
+                let dependencies = getDependencies(chunk.getModules());
+                for (let key in cdnCss) {
+                    if (globalCdn.css[key] || clearMap[key])
+                        continue;
+                    for (let d of dependencies) {
+                        let cdnCssDep = findCdnDep(key, d.module);
+                        if (!cdnCssDep)
+                            continue;
+                        let cssDep = cdnCssDep.module.dependencies.find(e => e.module && e.module.type === CssExtractType);
+                        if (cssDep) {
+                            cssDep.content = '';
+                            cssDep.module.content = '';
+                            clearMap[key] = true;
+                            break;
+                        }
+                    }
                 }
             }
 
+            const insCdnCssChunksVar = 'installedCdnCssChunks';
             const cssHandler = (compilation) => {
                 let mainTemplate = compilation.mainTemplate;
+                mainTemplate.hooks.localVars.tap(PluginName, function (source, chunk, hash) {
+                    return Template.asString([source, '', '// object to store loaded cdn CSS chunks', `var ${insCdnCssChunksVar} = {};`]);
+                });
 
                 compilation.hooks.afterOptimizeChunkIds.tap(PluginName, () => {
                     let chunks = compilation.chunks;
                     for (const chunk of chunks) {
-                        cssCdnFn(chunk);
+                        cdnCssFn(chunk);
                     }
                 });
 
                 mainTemplate.hooks.requireEnsure.tap(PluginName, (source, chunk, hash) => {
-                    let idx = source.indexOf('var cssChunks =');
-                    if (idx === -1) {
-                        return source;
-                    }
-                    console.log(chunkCssMap);
-                    return source;
+                    let buf = [source];
+                    const cdnCssVar = 'cdnCss';
+                    buf.push(
+                        '',
+                        `var ${cdnCssVar} = ${JSON.stringify(chunkCssMap, null, '\t')};`,
+                        `if(${insCdnCssChunksVar}[chunkId]) promises.push(${insCdnCssChunksVar}[chunkId]);`,
+                        `else if(${insCdnCssChunksVar}[chunkId] !== 0 && ${cdnCssVar}[chunkId]) {`,
+                        Template.indent([
+                            `promises.push(${insCdnCssChunksVar}[chunkId] = Promise.all(${cdnCssVar}[chunkId].map(function(href) {`,
+                            Template.indent([
+                                `var fullhref = href;`,
+                                `return new Promise(function(resolve, reject) {`,
+                                Template.indent([
+                                    'var existingLinkTags = document.getElementsByTagName("link");',
+                                    'for(var i = 0; i < existingLinkTags.length; i++) {',
+                                    Template.indent([
+                                        'var tag = existingLinkTags[i];',
+                                        'var dataHref = tag.getAttribute("data-href") || tag.getAttribute("href");',
+                                        'if(tag.rel === "stylesheet" && (dataHref === href || dataHref === fullhref)) return resolve();'
+                                    ]),
+                                    '}',
+                                    'var existingStyleTags = document.getElementsByTagName("style");',
+                                    'for(var i = 0; i < existingStyleTags.length; i++) {',
+                                    Template.indent([
+                                        'var tag = existingStyleTags[i];', 'var dataHref = tag.getAttribute("data-href");',
+                                        'if(dataHref === href || dataHref === fullhref) return resolve();'
+                                    ]),
+                                    '}',
+                                    'var linkTag = document.createElement("link");', 'linkTag.rel = "stylesheet";',
+                                    'linkTag.type = "text/css";',
+                                    'linkTag.onload = resolve;',
+                                    'linkTag.onerror = function(event) {',
+                                    Template.indent([
+                                        'var request = event && event.target && event.target.src || fullhref;',
+                                        'var err = new Error("Loading CSS chunk " + chunkId + " failed.\\n(" + request + ")");',
+                                        'err.code = "CDN_CSS_CHUNK_LOAD_FAILED";',
+                                        'err.request = request;',
+                                        `delete ${insCdnCssChunksVar}[chunkId]`,
+                                        'linkTag.parentNode.removeChild(linkTag)',
+                                        'reject(err);'
+                                    ]),
+                                    '};',
+                                    'linkTag.href = fullhref;',
+                                    // crossOriginLoading ?
+                                    //     Template.asString([`if (linkTag.href.indexOf(window.location.origin + '/') !== 0) {`,
+                                    //         Template.indent(`linkTag.crossOrigin = ${JSON.stringify(crossOriginLoading)};`), '}'
+                                    //     ]) : '',
+                                    'var head = document.getElementsByTagName("head")[0];',
+                                    'head.appendChild(linkTag);'
+                                ]),
+                                `});`,
+                            ]),
+                            `})).then(function() {`,
+                            Template.indent([`${insCdnCssChunksVar}[chunkId] = 0;`]),
+                            '}));'
+                        ]),
+                        '}',
+                    );
+                    return Template.asString(buf);
                 });
             }
-            if (hasCdnJs) {
+            if (hasCdnJs)
                 jsHandler(compilation);
-            }
+
 
             if (hasCdnCss)
                 cssHandler(compilation);
