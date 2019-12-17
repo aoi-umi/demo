@@ -36,9 +36,10 @@ class MyVideo extends Vue<MyVideoProp & MyBase> {
         this.initPlayer();
     }
 
+    private opt: DanmakuPlayerOptions = {};
     private danmakuList: DanmakuDataType[] = [];
     private initPlayer() {
-        let opt = {
+        let opt = this.opt = {
             ...this.getDefaultOpt(),
             ...this.options,
         };
@@ -97,6 +98,10 @@ class MyVideo extends Vue<MyVideoProp & MyBase> {
         this.danmakuListOpen = !this.danmakuListOpen;
     }
 
+    private get danmakuHide() {
+        return this.opt.danmaku && this.opt.danmaku.hide;
+    }
+
     protected render() {
         return (
             <div class={this.getStyleName('root', this.danmakuListOpen ? 'danmaku-box-open' : '')}>
@@ -122,7 +127,7 @@ class MyVideo extends Vue<MyVideoProp & MyBase> {
                         // x5-video-orientation="landscape"
                         x5-playsinline="" playsinline="" webkit-playsinline=""
                     />
-                    <div class={this.getStyleName('danmaku-box-side-bar')}>
+                    <div v-show={!this.danmakuHide} class={this.getStyleName('danmaku-box-side-bar')}>
                         <div class={this.getStyleName('danmaku-box-toggle-btn')} on-click={() => {
                             this.danmakuBoxToggle();
                         }}>
@@ -132,7 +137,7 @@ class MyVideo extends Vue<MyVideoProp & MyBase> {
                         </div>
                     </div>
                 </div>
-                <div class={this.getStyleName('danmaku-box')}>
+                <div v-show={!this.danmakuHide} class={this.getStyleName('danmaku-box')}>
                     <Table columns={[{
                         title: '时间',
                         key: 'pos',

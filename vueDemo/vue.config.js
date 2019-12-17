@@ -3,6 +3,10 @@ const { DynamicImportCdnPlugin } = require('./dynamic-import-cdn-plugin');
 let env = process.env;
 let isProd = env.NODE_ENV === 'production';
 let cdnOpt = {
+    css: {
+        'video.js/dist/video-js.min.css': 'https://unpkg.com/video.js@7.6.6/dist/video-js.min.css',
+        'iview/dist/styles/iview.css': 'https://unpkg.com/iview@3.5.4/dist/styles/iview.css',
+    },
     js: {
         vue: {
             moduleName: 'Vue',
@@ -43,16 +47,12 @@ if (env.report) {
     plugins.push(new BundleAnalyzerPlugin());
 }
 
-let link = [
-    "https://unpkg.com/iview@3.5.4/dist/styles/iview.css"
-];
 module.exports = {
     productionSourceMap: false,
     pages: {
         index: {
             // entry for the page
             entry: 'src/main.ts',
-            link,
         }
     },
     configureWebpack: {
@@ -63,7 +63,7 @@ module.exports = {
         },
     },
     css: {
-        extract: !isProd ? false : {
+        extract: false && !isProd ? false : {
             ignoreOrder: true
         },
     }
