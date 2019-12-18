@@ -2,10 +2,22 @@
 const { DynamicImportCdnPlugin } = require('./dynamic-import-cdn-plugin');
 let env = process.env;
 let isProd = env.NODE_ENV === 'production';
+function getCssCdn(host, cfg) {
+    let rs = {};
+    for (let key in cfg) {
+        rs[key] = host + cfg[key];
+    }
+    return rs;
+}
 let cdnOpt = {
     css: {
-        'video.js/dist/video-js.min.css': 'https://unpkg.com/video.js@7.6.6/dist/video-js.min.css',
         'iview/dist/styles/iview.css': 'https://unpkg.com/iview@3.5.4/dist/styles/iview.css',
+        'video.js/dist/video-js.min.css': 'https://unpkg.com/video.js@7.6.6/dist/video-js.min.css',
+        ...getCssCdn('https://unpkg.com/quill@1.3.7/dist/', {
+            'quill/dist/quill.core.css': 'quill.core.css',
+            'quill/dist/quill.snow.css': 'quill.snow.css',
+            'quill/dist/quill.bubble.css': 'quill.bubble.css',
+        }),
     },
     js: {
         vue: {
@@ -63,7 +75,7 @@ module.exports = {
         },
     },
     css: {
-        extract: false && !isProd ? false : {
+        extract: !isProd ? false : {
             ignoreOrder: true
         },
     }
