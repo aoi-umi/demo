@@ -14,29 +14,3 @@ export default new Vuex.Store({
 });
 
 export * from './local-store';
-
-
-declare module "vue/types/vue" {
-    interface Vue {
-        storeUser: LoginUserStore;
-        storeSetting: SettingStore;
-    }
-}
-
-import { getModule } from 'vuex-module-decorators';
-Vue.use({
-    install: function (Vue) {
-        Object.defineProperties(Vue.prototype, {
-            storeUser: {
-                get() {
-                    return getModule(LoginUserStore, this.$store)
-                }
-            },
-            storeSetting: {
-                get() {
-                    return getModule(SettingStore, this.$store)
-                }
-            },
-        });
-    }
-});
