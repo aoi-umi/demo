@@ -23,6 +23,7 @@ exports.DynamicImportCdnPlugin = class DynamicImportCdnPlugin {
                 externals[key] = cdnJs[key].moduleName;
             }
         }
+        const CssExtractType = "css/mini-extract";
 
         if (Object.keys(externals).length) {
             new ExternalsPlugin(
@@ -49,37 +50,66 @@ exports.DynamicImportCdnPlugin = class DynamicImportCdnPlugin {
             return false;
         }
 
-        const setGlobalCdn = (type, chunk) => {
-            let global = globalCdn[type];
-            let cdnOpt = self.cdn[type];
-            for (let key in cdnOpt) {
-                if (!global[key] && findCdnDep(key, chunk.entryModule))
-                    global[key] = type === 'js' ? cdnOpt[key].url : cdnOpt[key];
-            }
-        }
-
-        const getDependencies = (modules) => {
-            let filterFn = m => typeof m.source === "function" && m.blocks.length > 0;
-            let dependencies = [];
-            modules.filter(filterFn).forEach(module => {
-                module.blocks.forEach(block => {
-                    block.dependencies.forEach(d => {
-                        let chunkGroup = d.block.chunkGroup;
-                        if (!chunkGroup)
-                            return;
-                        dependencies.push(d);
-                    });
-                });
-            });
-            return dependencies;
-        }
+        let cssClearMap = {};
 
         compiler.hooks.compilation.tap(PluginName, function (compilation, options) {
+            //i don't know how to exclude it now, so, clear the content
+            const clearCss = (key, cdnCssDep) => {
+                let cssDep = cdnCssDep.module.dependencies.find(e => e.module && e.module.type === CssExtractType);
+                if (cssDep) {
+                    cssDep.content =
+                        cssDep.module.content = `/* cdn  ${cdnCss[key]} */`;
+                    cdnCssDep.module.assets = {};
+                    let m = compilation.modules.find(ele => ele.rawRequest === key);
+                    m.buildInfo.assets = null;
+                    cssClearMap[key] = true;
+                    // console.log(`clear css: ${key}`);
+                }
+                return cssDep;
+            };
+
+            const setGlobalCdn = (type, chunk) => {
+                let global = globalCdn[type];
+                let cdnOpt = self.cdn[type];
+                for (let key in cdnOpt) {
+                    while (true) {
+                        if (global[key])
+                            break;
+                        let dep = findCdnDep(key, chunk.entryModule);
+                        if (!dep)
+                            break;
+                        if (type === 'css') {
+                            global[key] = cdnOpt[key];
+                            clearCss(key, dep);
+                        } else {
+                            global[key] = cdnOpt[key].url
+                        }
+                        break;
+                    }
+                }
+            }
+
+            const getDependencies = (modules) => {
+                let filterFn = m => typeof m.source === "function" && m.blocks.length > 0;
+                let dependencies = [];
+                modules.filter(filterFn).forEach(module => {
+                    module.blocks.forEach(block => {
+                        block.dependencies.forEach(d => {
+                            let chunkGroup = d.block.chunkGroup;
+                            if (!chunkGroup)
+                                return;
+                            dependencies.push(d);
+                        });
+                    });
+                });
+                return dependencies;
+            }
+
             const cdnJsFn = (chunk) => {
                 if (!chunk.isOnlyInitial()) {
                     return;
                 }
-                let entry = !!chunk.name;
+                let entry = chunk.hasRuntime();
                 if (entry) {
                     setGlobalCdn('js', chunk);
                 }
@@ -156,11 +186,10 @@ exports.DynamicImportCdnPlugin = class DynamicImportCdnPlugin {
                 if (!chunk.isOnlyInitial()) {
                     return;
                 }
-                let entry = !!chunk.name;
+                let entry = chunk.hasRuntime();
                 if (entry) {
                     setGlobalCdn('css', chunk);
                 }
-                const CssExtractType = "css/mini-extract";
                 //find css map
                 for (let c of chunk.getAllAsyncChunks()) {
                     for (let key in cdnCss) {
@@ -179,22 +208,16 @@ exports.DynamicImportCdnPlugin = class DynamicImportCdnPlugin {
                 }
 
                 //clear content
-                let clearMap = {};
                 let dependencies = getDependencies(chunk.getModules());
                 for (let key in cdnCss) {
-                    if (globalCdn.css[key] || clearMap[key])
+                    if (cssClearMap[key])
                         continue;
                     for (let d of dependencies) {
                         let cdnCssDep = findCdnDep(key, d.module);
                         if (!cdnCssDep)
                             continue;
-                        let cssDep = cdnCssDep.module.dependencies.find(e => e.module && e.module.type === CssExtractType);
-                        if (cssDep) {
-                            cssDep.content = '';
-                            cssDep.module.content = '';
-                            clearMap[key] = true;
+                        if (clearCss(key, cdnCssDep))
                             break;
-                        }
                     }
                 }
             }
