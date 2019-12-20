@@ -1,5 +1,5 @@
 
-const { DynamicImportCdnPlugin } = require('./dynamic-import-cdn-plugin');
+const { DynamicImportCdnPlugin } = require('webpack-dynamic-import-cdn-plugin');
 let env = process.env;
 let isProd = env.NODE_ENV === 'production';
 function getCdn(host, cfg) {
