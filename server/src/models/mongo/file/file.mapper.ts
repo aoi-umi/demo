@@ -5,9 +5,16 @@ import { myEnum } from '@/config';
 import { FileModel } from './file';
 
 export class FileMapper {
-    static getUrl(_id, fileType: string, host?: string) {
+    static getUrl(_id, fileType: string, opt?: {
+        host?: string;
+        isRaw?: boolean;
+    }) {
         if (!_id)
             return '';
+        opt = {
+            ...opt
+        };
+        let host = opt.host;
         if (host) {
             host = '//' + host;
         }
@@ -15,15 +22,25 @@ export class FileMapper {
             [myEnum.fileType.图片]: config.env.imgPrefix,
             [myEnum.fileType.视频]: config.env.videoPrefix,
         }[fileType];
-        return url ? host + url + '?_id=' + _id : '';
+        let params: any = {
+            _id
+        };
+        if (opt.isRaw)
+            params.isRaw = true;
+        return !url ? '' :
+            host + url + '?' +
+            Object.entries(params)
+                .filter(o => o[1])
+                .map(o => `${o[0]}=${o[1]}`)
+                .join('&');
     }
 
     static getImgUrl(_id, host?: string) {
-        return this.getUrl(_id, myEnum.fileType.图片, host);
+        return this.getUrl(_id, myEnum.fileType.图片, { host });
     }
 
     static getVideoUrl(_id, host?: string) {
-        return this.getUrl(_id, myEnum.fileType.视频, host);
+        return this.getUrl(_id, myEnum.fileType.视频, { host });
     }
 
     static async findWithRaw(cond) {
