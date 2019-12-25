@@ -192,7 +192,7 @@ export default class GoodsMgtDetail extends Base {
                     <FormItem label="状态" prop="spu.status">
                         <RadioGroup v-model={spu.status}>
                             {myEnum.goodsStatus.toArray().filter(s => s.value !== myEnum.goodsStatus.已删除).map(s => {
-                                return <Radio label={s.value}>{s.key}</Radio>
+                                return <Radio label={s.value}>{s.key}</Radio>;
                             })}
                         </RadioGroup>
                     </FormItem>
@@ -319,7 +319,7 @@ export default class GoodsMgtDetail extends Base {
                     </Row>
                     {gIdx < specGroup.length - 1 && <Divider size="small" />}
                 </div>
-            )
+            );
         });
     }
 

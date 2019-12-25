@@ -72,7 +72,7 @@ class Pay extends Vue<PayProp & Base> {
         this.qrErr = '';
         this.qrDrawing = true;
         await QRCode.toCanvas(this.$refs.qrCanvas, str, { width: 200 }).catch(e => {
-            this.qrErr = e.message
+            this.qrErr = e.message;
         }).finally(() => {
             this.qrDrawing = false;
         });

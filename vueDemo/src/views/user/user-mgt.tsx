@@ -128,7 +128,7 @@ class UserMgtDetail extends Vue<UserMgtDetailProp & Base> {
                             <FormItem label="封禁">
                                 <RadioGroup v-model={this.disableType}>
                                     {myEnum.userDisableType.toArray().map(s => {
-                                        return <Radio label={s.value}>{s.key}</Radio>
+                                        return <Radio label={s.value}>{s.key}</Radio>;
                                     })}
                                 </RadioGroup>
                             </FormItem>

@@ -182,7 +182,7 @@ class MyVideo extends Vue<MyVideoProp & MyBase> {
                             );
                         }
                     },]}
-                        data={this.danmakuList}
+                    data={this.danmakuList}
                     />
                 </div>
             </div >
