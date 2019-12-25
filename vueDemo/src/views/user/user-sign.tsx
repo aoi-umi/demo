@@ -214,7 +214,7 @@ class SignUp extends Base {
                 }}
                 renderFn={() => { return this.renderFn(); }}
             />
-        )
+        );
     }
 
     private renderFn() {

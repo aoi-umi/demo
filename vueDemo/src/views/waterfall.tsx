@@ -20,7 +20,7 @@ export default class Waterfall extends Base {
     }
 
     created() {
-        this.getData()
+        this.getData();
         this.watchRoute();
     }
 
@@ -56,10 +56,7 @@ export default class Waterfall extends Base {
         this.getDataFn(refresh);
         this.group++;
     }
-
-    imgErrorFn(imgItem) {
-        console.log('图片加载错误', imgItem)
-    }
+    
     showUrl = '';
     render() {
         return (

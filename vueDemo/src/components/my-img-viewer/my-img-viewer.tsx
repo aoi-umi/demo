@@ -182,7 +182,7 @@ class Gesture extends Vue<MyBase> {
                     {this.$slots.default}
                 </div>
             </div>
-        )
+        );
     }
 }
 const GestureView = convClass(Gesture);
