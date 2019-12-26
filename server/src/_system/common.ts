@@ -86,7 +86,7 @@ export let promiseAll = function (list: Array<Q.Promise<any>>) {
         });
     }).catch(d.reject);
     return d.promise;
-}
+};
 
 export let promisify = function (fun, caller?) {
     return function (...args): Q.Promise<any> {
@@ -176,7 +176,7 @@ export function enumerable(value: boolean) {
             descriptor = Object.getOwnPropertyDescriptor(target, propertyKey) || {};
             if (descriptor.enumerable != value) {
                 descriptor.enumerable = value;
-                Object.defineProperty(target, propertyKey, descriptor)
+                Object.defineProperty(target, propertyKey, descriptor);
             }
         }
     };
@@ -195,7 +195,7 @@ export function distinct<T = any>(list: T[], fn?: (list: T[], val: T) => boolean
     let rtn = [];
     for (let val of list) {
         if (fn ? fn(rtn, val) : !rtn.includes(val))
-            rtn.push(val)
+            rtn.push(val);
     }
     return rtn;
 }
@@ -311,7 +311,7 @@ export let requestServiceByConfig = function (option: RequestServiceByConfigOpti
         let defaultMethodArgs = {
             isUseDefault: true,
             method: 'POST',
-        }
+        };
         let methodConfig = service.method[option.methodName];
         methodConfig = extend(defaultMethodArgs, methodConfig);
 
@@ -372,15 +372,15 @@ export let requestService = function (option: AxiosRequestConfig) {
         let data = response.data;
         let encoding = response.headers['content-encoding'];
         switch (encoding) {
-            case 'gzip':
-                let buffer = await promisify(zlib.unzip)(data);
-                data = buffer.toString();
-                if (data && typeof data == 'string')
-                    data = JSON.parse(data);
-                break;
-            default:
-                if (encoding)
-                    throw error(`Not Accept Encoding:${encoding}`);
+        case 'gzip':
+            let buffer = await promisify(zlib.unzip)(data);
+            data = buffer.toString();
+            if (data && typeof data == 'string')
+                data = JSON.parse(data);
+            break;
+        default:
+            if (encoding)
+                throw error(`Not Accept Encoding:${encoding}`);
         }
 
         if (Buffer.isBuffer(data)) {
@@ -554,7 +554,7 @@ export let isObjectEmpty = function (obj) {
         }
     }
     return empty;
-}
+};
 //#endregion
 
 //删除require

@@ -7,6 +7,7 @@ declare global {
     namespace Express {
         interface Request {
             myData: MyData;
+            myOption: any;
             _parsedUrl: {
                 pathname: string;
             },

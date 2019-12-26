@@ -70,7 +70,7 @@ export class FollowMapper {
         let userIdKey = '';
         let asName = '';
         if (data.type == myEnum.followQueryType.关注) {
-            cond.userId = userId
+            cond.userId = userId;
             userIdKey = 'followUserId';
             asName = 'followingUser';
         } else {

@@ -71,7 +71,7 @@ export class UserAuthMid {
             } catch (e) {
                 next(e);
             }
-        }
+        };
         return fn;
     }
 }

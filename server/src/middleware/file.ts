@@ -11,6 +11,6 @@ export class FileMid {
             } else {
                 next();
             }
-        })
+        });
     }
 }

@@ -1,38 +1,32 @@
-import { RequestHandler } from 'express';
 
-import { responseHandler, paramsValid } from '@/helpers';
+import { paramsValid } from '@/helpers';
 import * as ValidSchema from '@/valid-schema/class-valid';
 import { ThirdPartyPayMapper } from '@/3rd-party';
+import { MyRequestHandler } from '@/middleware';
 
 import { NotifyMapper } from '@/models/mongo/notify';
 import { AssetLogMapper } from '@/models/mongo/asset';
 
-export const notifyQuery: RequestHandler = (req, res) => {
-    responseHandler(async () => {
-        let data = paramsValid(req.query, ValidSchema.AssetNotifyQuery);
-        let { rows, total } = await NotifyMapper.query(data);
-        return {
-            rows,
-            total
-        };
-    }, req, res);
+export const notifyQuery: MyRequestHandler = async (opt, req, res) => {
+    let data = paramsValid(req.query, ValidSchema.AssetNotifyQuery);
+    let { rows, total } = await NotifyMapper.query(data);
+    return {
+        rows,
+        total
+    };
 };
 
-export const notifyRetry: RequestHandler = (req, res) => {
-    responseHandler(async () => {
-        let data = paramsValid(req.body, ValidSchema.AssetNotifyRetry);
-        await ThirdPartyPayMapper.notifyHandler({ notifyId: data._id });
-    }, req, res);
-}
+export const notifyRetry: MyRequestHandler = async (opt, req, res) => {
+    let data = paramsValid(req.body, ValidSchema.AssetNotifyRetry);
+    await ThirdPartyPayMapper.notifyHandler({ notifyId: data._id });
+};
 
-export const logQuery: RequestHandler = (req, res) => {
-    responseHandler(async () => {
-        let data = paramsValid(req.query, ValidSchema.AssetLogQuery);
+export const logQuery: MyRequestHandler = async (opt, req, res) => {
+    let data = paramsValid(req.query, ValidSchema.AssetLogQuery);
 
-        let { rows, total } = await AssetLogMapper.query(data);
-        return {
-            rows,
-            total
-        };
-    }, req, res);
+    let { rows, total } = await AssetLogMapper.query(data);
+    return {
+        rows,
+        total
+    };
 };

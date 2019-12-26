@@ -16,7 +16,7 @@ export class SocketUser {
             socketList: list,
             socketData: null as Socket,
             idx: -1
-        }
+        };
         if (list) {
             let matchIdx = list.findIndex(ele => ele === socket);
             if (matchIdx > -1) {

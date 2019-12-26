@@ -4,8 +4,9 @@ import {
 } from 'mongoose-ts-ua';
 import { Types, SchemaTypes } from 'mongoose';
 
-import { Base } from '../_base';
 import { myEnum } from '@/config';
+
+import { Base } from '../_base';
 
 export type SettingInstanceType = InstanceType<Setting>;
 export type SettingModelType = ModelType<Setting, typeof Setting>;
@@ -39,15 +40,15 @@ export class Setting extends Base {
         let inTime = (!this.signUpFrom || this.signUpFrom && this.signUpFrom.getTime() <= now)
             && (!this.signUpTo || this.signUpTo && this.signUpTo.getTime() >= now);
         switch (this.signUpType) {
-            case myEnum.settingSignUpType.开放:
-            default:
-                return true;
-            case myEnum.settingSignUpType.限时开放:
-                return inTime;
-            case myEnum.settingSignUpType.关闭:
-                return false;
-            case myEnum.settingSignUpType.限时关闭:
-                return !inTime;
+        case myEnum.settingSignUpType.开放:
+        default:
+            return true;
+        case myEnum.settingSignUpType.限时开放:
+            return inTime;
+        case myEnum.settingSignUpType.关闭:
+            return false;
+        case myEnum.settingSignUpType.限时关闭:
+            return !inTime;
         }
     }
     

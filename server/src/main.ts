@@ -59,7 +59,7 @@ export let register = function (app: Express) {
             ip: req.realIp,
             imgHost: req.headers.host,
             videoHost: req.headers.host,
-        }
+        };
         next();
     });
 
@@ -70,10 +70,10 @@ export let register = function (app: Express) {
         });
     });
     app.use(config.env.urlPrefix, routes);
-}
+};
 
 export let errorHandler = function (err, req: Request, res: Response, next) {
-    helpers.responseHandler(() => {
+    helpers.myRequestHandler(() => {
         throw err;
     }, req, res);
 };
