@@ -33,7 +33,7 @@ export class MyTagModel {
                     add: false,
                     key: newTag.key,
                     tag: newTag.tag,
-                    selected: true,
+                    checked: true,
                     checkable: true,
                     data: newTag.data,
                     isDel: newTag.isDel

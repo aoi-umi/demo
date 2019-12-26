@@ -1,4 +1,4 @@
-import { Request, Response, Express } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import * as Q from 'q';
 import * as moment from 'dayjs';
 import { MongooseDocument, Error } from 'mongoose';
@@ -26,16 +26,16 @@ configure({
     }
 });
 
-type ResponseHandlerOptType = {
+type MyRequestHandlerOpt = {
     json?: boolean;
     noSend?: boolean;
     sendAsFile?: boolean;
     originRes?: boolean;
 }
-export let responseHandler = function (fn: (opt?: ResponseHandlerOptType) => any, req: Request, res: Response, next?) {
-    let opt: ResponseHandlerOptType = {
+export let myRequestHandler = function (fn: (opt?: MyRequestHandlerOpt) => any, req: Request, res: Response, next?) {
+    let opt: MyRequestHandlerOpt = {
         json: true,
-    }
+    };
     //let log = helpers.expressCreateLog(req, res);
     return Q.fcall(() => {
         return fn(opt);
@@ -61,7 +61,7 @@ export let responseHandler = function (fn: (opt?: ResponseHandlerOptType) => any
                 result = {
                     result: true,
                     data: result,
-                }
+                };
             }
             res.json(result);
             //log.response = result;
@@ -75,7 +75,7 @@ export let responseHandler = function (fn: (opt?: ResponseHandlerOptType) => any
         // if (log.response)
         //     new LogModel(log).save();
     });
-}
+};
 
 /**
  * 数据校验
@@ -128,7 +128,7 @@ export let mongooseValid = function (dict: { [key: string]: MongooseDocument }) 
     if (invalid) {
         throw common.error({ remark: list.join('#') }, config.error.ARGS_ERROR);
     }
-}
+};
 
 /**
  * mongo 日期范围匹配
@@ -140,7 +140,7 @@ export let dbDateMatch = function (dateFrom, dateTo) {
         sqlDate = {};
         function convertDate(d) {
             if (typeof d == 'string' && d.includes('T')) {
-                d = new Date(d)
+                d = new Date(d);
             }
             return moment(d, 'YYYY-MM-DD').toDate();
         }
@@ -160,7 +160,7 @@ export let dbDateMatch = function (dateFrom, dateTo) {
         mongoDate,
         sqlDate,
     };
-}
+};
 
 export let tryFn = function (fn) {
     try {
