@@ -19,7 +19,7 @@ export function request(options: AxiosRequestConfig) {
     }
     opt = extend(opt, options);
 
-    if (opt.method && opt.method.toLowerCase() == 'get')
+    if (opt.method?.toLowerCase() == 'get')
         opt.params = opt.data;
 
     return axios.request(opt);

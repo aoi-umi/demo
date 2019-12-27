@@ -115,7 +115,7 @@ export let mongooseValid = function (dict: { [key: string]: MongooseDocument }) 
     for (let key in dict) {
         let ele = dict[key];
         let err: any = ele.validateSync();
-        if (err && err.errors) {
+        if (err?.errors) {
             invalid = true;
             let subList = [];
             for (let errorKey in err.errors) {

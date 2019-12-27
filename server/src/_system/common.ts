@@ -511,7 +511,7 @@ export let getListDiff = function <T1, T2>(option: {
         compare = opt.compare, delReturnValue = opt.delReturnValue, addReturnValue = opt.addReturnValue;
     let delList = [];
     let addList = [];
-    if (newList && newList.length) {
+    if (newList?.length) {
         list.forEach(function (item) {
             let match = newList.find(function (item2) {
                 return compare(item, item2);

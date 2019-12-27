@@ -172,20 +172,20 @@ export let mgtSave: MyRequestHandler = async (opt, req, res) => {
     let update: any = {};
 
     let remark = '';
-    if (data.delAuthList && data.delAuthList.length) {
+    if (data.delAuthList?.length) {
         detail.authorityList = detail.authorityList.filter(ele => !data.delAuthList.includes(ele));
         remark += `[删除了权限:${data.delAuthList.join(',')}]`;
     }
-    if (data.delRoleList && data.delRoleList.length) {
+    if (data.delRoleList?.length) {
         detail.roleList = detail.roleList.filter(ele => !data.delRoleList.includes(ele));
         remark += `[删除了角色:${data.delRoleList.join(',')}]`;
     }
 
-    if (data.addAuthList && data.addAuthList.length) {
+    if (data.addAuthList?.length) {
         detail.authorityList = [...detail.authorityList, ...data.addAuthList];
         remark += `[增加了权限:${data.addAuthList.join(',')}]`;
     }
-    if (data.addRoleList && data.addRoleList.length) {
+    if (data.addRoleList?.length) {
         detail.roleList = [...detail.roleList, ...data.addRoleList];
         remark += `[增加了角色:${data.addRoleList.join(',')}]`;
     }

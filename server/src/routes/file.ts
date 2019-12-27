@@ -45,7 +45,7 @@ const download: MyRequestHandler = async (opt, req: Request, res: Response) => {
         rawFile = await FileModel.rawFindOne({ _id: data._id });
     } else {
         let fileList = await FileMapper.findWithRaw({ _id: data._id, fileType: option.fileType });
-        rawFile = fileList[0] && fileList[0].rawFile;
+        rawFile = fileList[0]?.rawFile;
     }
     opt.noSend = true;
     if (!rawFile) {

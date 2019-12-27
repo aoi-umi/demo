@@ -185,7 +185,7 @@ export class CommentMapper {
     static resetDetail(detail, opt: CommentResetOption) {
         let { userList, user, voteList } = opt;
         if (user) {
-            if (voteList && voteList.length) {
+            if (voteList?.length) {
                 let vote = voteList.find(ele => ele.ownerId.equals(detail._id) && ele.userId.equals(user._id));
                 detail.voteValue = vote ? vote.value : myEnum.voteValue.无;
             }
@@ -198,7 +198,7 @@ export class CommentMapper {
             };
             detail.canDel = rs.canDel;
         }
-        if (userList && userList.length) {
+        if (userList?.length) {
             detail.quoteUser = userList.find(u => u._id.equals(detail.quoteUserId));
             detail.user = userList.find(u => u._id.equals(detail.userId));
         }

@@ -51,10 +51,10 @@ export let save: MyRequestHandler = async (opt, req, res) => {
             update[key] = data[key];
         });
 
-        if (data.delAuthList && data.delAuthList.length) {
+        if (data.delAuthList?.length) {
             detail.authorityList = detail.authorityList.filter(ele => !data.delAuthList.includes(ele));
         }
-        if (data.addAuthList && data.addAuthList.length) {
+        if (data.addAuthList?.length) {
             detail.authorityList = [...detail.authorityList, ...data.addAuthList];
         }
         update.authorityList = detail.authorityList;

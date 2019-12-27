@@ -52,10 +52,10 @@ export let save: MyRequestHandler = async (opt, req, res) => {
         ['name', 'url'].forEach(key => {
             update[key] = data[key];
         });
-        if (data.delTagList && data.delTagList.length) {
+        if (data.delTagList?.length) {
             detail.tagList = detail.tagList.filter(ele => !data.delTagList.includes(ele));
         }
-        if (data.addTagList && data.addTagList.length) {
+        if (data.addTagList?.length) {
             detail.tagList = [...detail.tagList, ...data.addTagList];
         }
         update.tagList = detail.tagList;

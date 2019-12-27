@@ -229,7 +229,7 @@ export class UserMapper {
     static async detail(_id, opt: UserResetOption) {
         let userRs = await UserMapper.query({ _id }, opt);
         let userDetail = userRs.rows[0];
-        if (userDetail && userDetail.roleList.find(r => r.code == config.dev.rootRole)) {
+        if (userDetail?.roleList.find(r => r.code == config.dev.rootRole)) {
             let authList = await AuthorityModel.find({ status: myEnum.authorityStatus.启用 });
             authList.forEach(ele => {
                 userDetail.auth[ele.code] = ele;
@@ -243,7 +243,7 @@ export class UserMapper {
         if (!user)
             throw common.error('账号不存在');
         let disRs = user.checkDisabled();
-        if (loginUser && loginUser.loginData) {
+        if (loginUser?.loginData) {
             let { checkToken } = UserMapper.createToken(loginUser.loginData, user);
             if (checkToken !== loginUser.key) {
                 throw common.error('账号的密码已变更, 请重新登录');
@@ -276,7 +276,7 @@ export class UserMapper {
             }
         }
 
-        let lastLoginAt = (opt.oldData && opt.oldData.lastLoginAt) || new Date();
+        let lastLoginAt = (opt.oldData?.lastLoginAt) || new Date();
         let rtn = {
             _id: user._id, account: user.account, nickname: user.nickname, avatar: user.avatar,
             key: token, authority: userAuth,
