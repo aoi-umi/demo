@@ -7,11 +7,12 @@ import { routerConfig } from '@/router';
 import { testApi, testSocket } from '@/api';
 import { LocalStore } from '@/store';
 import { convClass } from '@/components/utils';
-import { Input, Form, FormItem, Button, Checkbox, Spin, Icon } from '@/components/iview';
+import { Input, Form, FormItem, Button, Checkbox, Spin, Icon, AutoComplete, Option } from '@/components/iview';
 import { MyLoad } from '@/components/my-load';
 import { LoginUser } from '@/model/user';
 
 import { Base } from '../base';
+import { LocalStoreUser } from './model';
 
 import './user.less';
 
@@ -22,7 +23,7 @@ type SignInDataType = {
 
 @Component
 class SignIn extends Base {
-
+    stylePrefix = 'user-sign-in-';
     private innerDetail: SignInDataType = this.getDetailData();
     private getDetailData() {
         return {
@@ -52,12 +53,15 @@ class SignIn extends Base {
             LocalStore.setItem(dev.cacheKey.testUser, token);
             let rs = await testApi.userSignIn(req);
 
-            let remberSignIn: any = { account };
+            let list = LocalStoreUser.getList();
+            if (!list)
+                list = [];
+            let remberSignIn: LocalStoreUser = { account };
             if (this.remberPwd)
                 remberSignIn.password = password;
             else
                 this.innerDetail.password = '';
-            LocalStore.setItem(dev.cacheKey.remberSignIn, remberSignIn);
+            LocalStoreUser.updateAccount(remberSignIn, list);
             testSocket.login({ [dev.cacheKey.testUser]: token });
             this.storeUser.setUser(rs);
             this.$emit('success');
@@ -80,15 +84,17 @@ class SignIn extends Base {
     to = '';
     toQuery = null;
     remberPwd = false;
+    signInUsers = [];
     mounted() {
         if (location.pathname === routerConfig.userSignIn.path) {
             let { to, ...query } = this.$route.query;
             this.to = (to as string) || routerConfig.index.path;
             this.toQuery = query;
         }
-        let rs = LocalStore.getItem(dev.cacheKey.remberSignIn);
+        let list = this.signInUsers = LocalStoreUser.getList();
         let detail = this.innerDetail;
-        if (rs) {
+        if (list && list.length) {
+            let rs = list[0];
             if (rs.account)
                 detail.account = rs.account;
             if (rs.password) {
@@ -109,7 +115,29 @@ class SignIn extends Base {
                 <br />
                 <Form class="dialog-content" label-position="top" ref="formVaild" props={{ model: detail }} rules={this.rules}>
                     <FormItem label="账号" prop="account">
-                        <Input v-model={detail.account} />
+                        <AutoComplete v-model={detail.account} on-on-select={(value) => {
+                            let match = this.signInUsers.find(ele => ele.account === value);
+                            detail.password = match?.password || '';
+                        }}>
+                            {this.signInUsers.filter(ele => !detail.account || ele.account.includes(detail.account)).map(ele => {
+                                let opt = (
+                                    <Option key={ele.account} value={ele.account}>
+                                        <span>{ele.account}</span>
+                                    </Option>
+                                );
+                                opt.componentOptions.tag = 'Option';
+                                let icon = <Icon type="md-close" class={this.getStyleName('account-item-del')} nativeOn-click={() => {
+                                    LocalStoreUser.delAccount(ele.account, this.signInUsers);
+                                }} />;
+                                icon.componentOptions.tag = '';
+                                return (
+                                    <div class={this.getStyleName('account-item')}>
+                                        {opt}
+                                        {icon}
+                                    </div>
+                                );
+                            })}
+                        </AutoComplete>
                     </FormItem>
                     <FormItem label="密码" prop="password">
                         <Input v-model={detail.password} type="password" autocomplete="new-password" />
