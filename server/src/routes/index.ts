@@ -68,6 +68,6 @@ router.post('/setting/mgt/save', UserAuthMid.normal([auth.settingSave]), MyReque
 
 //#region wx 
 import * as wx from './wx';
-router.get('/wx/getCode', UserAuthMid.normal([auth.settingQuery]), MyRequestHandlerMid.convert(wx.getCode));
-router.post('/wx/getUserInfo', UserAuthMid.normal([auth.settingSave]), MyRequestHandlerMid.convert(wx.getUserInfo));
+router.get('/wx/getCode', MyRequestHandlerMid.convert(wx.getCode));
+router.get('/wx/getUserInfo', MyRequestHandlerMid.convert(wx.getUserInfo));
 //#endregion

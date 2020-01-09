@@ -28,8 +28,14 @@ export class UserMapper {
         return { dataStr, checkToken };
     }
 
-    static async accountExists(account: string) {
-        let rs = await UserModel.findOne({ account });
+    static async accountExists(val: string, type?: string) {
+        let opt: any = {};
+        if (type === myEnum.userFindAccountType.微信openId) {
+            opt.wxOpenId = val;
+        } else {
+            opt.account = val;
+        }
+        let rs = await UserModel.findOne(opt);
         return rs;
     }
 

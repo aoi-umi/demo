@@ -3,15 +3,14 @@ import { env } from "@/config";
 import * as common from "@/_system/common";
 
 export const getCode: MyRequestHandler = async (opt, req, res) => {
-    let redirectUri = 'http://144.202.99.178';
     let url = 'https://open.weixin.qq.com/connect/oauth2/authorize?'
         + [
-            `redirect_uri=${redirectUri}`,
+            `redirect_uri=${env.host}/wx/auth?getUserInfo=1`,
             `appid=${env.wxOffiaCcount.appId}`,
             `response_type=code&scope=snsapi_userinfo&state=1&connect_redirect=1#wechat_redirect`
         ].join('&');
     return url;
-}
+};
 
 type WxErrorType = {
     errcode: string;
@@ -43,7 +42,7 @@ const getToken = async (data: { code }) => {
 };
 
 export const getUserInfo: MyRequestHandler = async (opt, req, res) => {
-    let data = req.body;
+    let data = req.query;
     let tokenRs = await getToken(data);
     let url = `https://api.weixin.qq.com/sns/userinfo?access_token=${tokenRs.access_token}&openid=${tokenRs.openid}`;
     let rs = await common.requestService({ url, method: 'get' });

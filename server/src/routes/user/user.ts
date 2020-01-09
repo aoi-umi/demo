@@ -16,8 +16,12 @@ import { SettingMapper } from '@/models/mongo/setting';
 
 export let accountExists: MyRequestHandler = async (opt, req, res) => {
     let data = paramsValid(req.body, ValidSchema.UserAccountExists);
-    let rs = await UserMapper.accountExists(data.account);
-    return rs && { _id: rs._id };
+    let rs = await UserMapper.accountExists(data.val, data.type);
+    return rs && {
+        _id: rs._id,
+        nickname: rs.nickname,
+        avatarUrl: FileMapper.getImgUrl(rs.avatar, req.myData.imgHost)
+    };
 };
 
 export let signUp: MyRequestHandler = async (opt, req, res) => {
@@ -64,7 +68,7 @@ export let signOut: MyRequestHandler = async (opt, req, res) => {
     if (user) {
         await cache.del(user.key);
     }
-  
+
 };
 
 function returnUser(user: LoginUser) {
@@ -74,7 +78,7 @@ function returnUser(user: LoginUser) {
 export let info: MyRequestHandler = async (opt, req, res) => {
     let user = req.myData.user;
     return returnUser(user);
-  
+
 };
 
 export let detail: MyRequestHandler = async (opt, req, res) => {
@@ -84,7 +88,7 @@ export let detail: MyRequestHandler = async (opt, req, res) => {
     UserMapper.resetDetail(detail, { imgHost: req.myData.imgHost });
     await UserMapper.resetStat(dbUser, detail);
     return detail;
-  
+
 };
 
 export let detailQuery: MyRequestHandler = async (opt, req, res) => {
@@ -113,7 +117,7 @@ export let detailQuery: MyRequestHandler = async (opt, req, res) => {
         }
     }
     return obj;
-  
+
 };
 
 export let update: MyRequestHandler = async (opt, req, res) => {
@@ -145,7 +149,7 @@ export let update: MyRequestHandler = async (opt, req, res) => {
         await cache.set(userInfoKey, user, config.dev.cacheTime.user);
     }
     return updateCache;
-  
+
 };
 
 export let mgtQuery: MyRequestHandler = async (opt, req, res) => {
@@ -160,7 +164,7 @@ export let mgtQuery: MyRequestHandler = async (opt, req, res) => {
         rows,
         total
     };
-  
+
 };
 
 export let mgtSave: MyRequestHandler = async (opt, req, res) => {
@@ -205,7 +209,7 @@ export let mgtSave: MyRequestHandler = async (opt, req, res) => {
     return {
         _id: detail._id,
     };
-  
+
 };
 
 export let mgtDisable: MyRequestHandler = async (opt, req, res) => {
@@ -240,5 +244,5 @@ export let mgtDisable: MyRequestHandler = async (opt, req, res) => {
     return {
         _id: detail._id,
     };
-  
+
 };

@@ -223,6 +223,12 @@ export const routerConfig = {
         component: () => import('./views/pay-mgt')
     },
 
+    wxAuth: {
+        path: '/wx/auth',
+        text: '微信授权',
+        component: () => import('./views/wx-auth')
+    },
+
     test: {
         path: '/test',
         text: '测试',

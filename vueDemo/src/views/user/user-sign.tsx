@@ -181,7 +181,7 @@ class SignUp extends Base {
             { required: true, trigger: 'blur' },
             {
                 asyncValidator: async (rule, value) => {
-                    let rs = await testApi.userAccountExists(value);
+                    let rs = await testApi.userAccountExists({ val: value });
                     if (rs)
                         throw new Error('账号已存在');
                 },

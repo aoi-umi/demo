@@ -19,6 +19,7 @@ export default {
     port: processEnv.Port || 8000,
     version: '0.0.1',
     cachePrefix: name,
+    host: 'http://144.202.99.178',
     redis: {
         uri: processEnv.RedisUri || 'redis://localhost',
     },

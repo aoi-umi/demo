@@ -95,6 +95,9 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
 
     settingDetailQuery,
     settingSave,
+
+    wxGetCode,
+    wxGetUserInfo,
 }>;
 export type TestApiConfigType = ApiConfigModel<TestApiMethod>;
 
@@ -191,8 +194,8 @@ export class TestApi extends ApiModel<TestApiMethod> {
     async userUpdate(data) {
         return this.requestByConfig(this.apiConfig.method.userUpdate, { data });
     }
-    async userAccountExists(account: string) {
-        return this.requestByConfig(this.apiConfig.method.userAccountExists, { data: { account } });
+    async userAccountExists(data) {
+        return this.requestByConfig(this.apiConfig.method.userAccountExists, { data });
     }
 
     async userMgtQuery(data?) {
@@ -426,6 +429,16 @@ export class TestApi extends ApiModel<TestApiMethod> {
     }
     async settingSave(data) {
         return this.requestByConfig(this.apiConfig.method.settingSave, { data });
+    }
+    //#endregion
+
+    //#region wx 
+
+    async wxGetCode() {
+        return this.requestByConfig(this.apiConfig.method.wxGetCode);
+    }
+    async wxGetUserInfo(data) {
+        return this.requestByConfig(this.apiConfig.method.wxGetUserInfo, { data });
     }
     //#endregion
 }

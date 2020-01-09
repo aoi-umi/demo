@@ -20,6 +20,9 @@ const enumDefine = {
         待审核: 1,
         正常: 2
     },
+    userFindAccountType: {
+        微信openId: 'wxOpenId'
+    },
     articleStatus: contentStatus,
     videoStatus: contentStatus,
     contentType: {

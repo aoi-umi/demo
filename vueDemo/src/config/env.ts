@@ -289,7 +289,16 @@ const config = {
                 },
                 videoGet: {
                     url: '/video'
-                }
+                },
+
+                wxGetCode: {
+                    url: '/wx/getCode',
+                    method: 'get'
+                },
+                wxGetUserInfo: {
+                    url: '/wx/getUserInfo',
+                    method: 'get'
+                },
             },
         } as TestApiConfigType
     }
