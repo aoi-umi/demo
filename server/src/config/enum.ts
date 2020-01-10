@@ -20,8 +20,8 @@ export const enumDefine = {
         待审核: 1,
         正常: 2
     },
-    userFindAccountType: {
-        微信openId: 'wxOpenId'
+    userBy: {
+        微信授权: 'wxCode'
     },
     articleStatus: contentStatus,
     videoStatus: contentStatus,

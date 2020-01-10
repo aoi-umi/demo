@@ -14,26 +14,15 @@ const uplaod: MyRequestHandler = async (opt, req: Request, res: Response) => {
     let file = req.file;
     let user = req.myData.user;
 
-    let fs = new FileModel({
-        filename: file.originalname,
-        userId: user._id,
-        nickname: user.nickname,
-        account: user.nickname,
-        fileType: option.fileType
-    });
-    let fileType = file.mimetype.split('/')[0];
-    if (
-        (option.fileType === myEnum.fileType.视频 && fileType !== 'video')
-        || option.fileType === myEnum.fileType.图片 && fileType !== 'image'
-    )
-        throw common.error('错误的文件类型');
-    await fs.upload({
-        buffer: file.buffer,
+    let rs = await FileMapper.upload({
+        user,
+        fileType: option.fileType,
         contentType: file.mimetype,
+        buffer: file.buffer,
+        filename: file.originalname,
+        imgHost: req.myData.imgHost
     });
-    let obj = fs.toOutObject();
-    obj.url = FileMapper.getUrl(fs._id, option.fileType, { host: req.myData.imgHost });
-    return obj;
+    return rs;
 };
 
 const download: MyRequestHandler = async (opt, req: Request, res: Response) => {

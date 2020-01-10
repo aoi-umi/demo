@@ -12,64 +12,6 @@ import { UserModel, UserMapper, UserLogMapper } from '@/models/mongo/user';
 import { FileMapper } from '@/models/mongo/file';
 import { LoginUser } from '@/models/login-user';
 import { FollowModel, FollowInstanceType, FollowMapper } from '@/models/mongo/follow';
-import { SettingMapper } from '@/models/mongo/setting';
-
-export let accountExists: MyRequestHandler = async (opt, req, res) => {
-    let data = paramsValid(req.body, ValidSchema.UserAccountExists);
-    let rs = await UserMapper.accountExists(data.val, data.type);
-    return rs && {
-        _id: rs._id,
-        nickname: rs.nickname,
-        avatarUrl: FileMapper.getImgUrl(rs.avatar, req.myData.imgHost)
-    };
-};
-
-export let signUp: MyRequestHandler = async (opt, req, res) => {
-    let data = paramsValid(req.body, ValidSchema.UserSignUp);
-    let setting = await SettingMapper.detailQuery();
-    if (!setting.canSignUp)
-        throw common.error('暂不开放注册', config.error.NO_PERMISSIONS);
-    let rs = await UserMapper.accountExists(data.account);
-    if (rs)
-        throw common.error('账号已存在');
-    data.password = common.md5(data.password);
-    let user = await UserModel.create(data);
-
-    return {
-        _id: user._id,
-        account: user.account
-    };
-};
-
-export let signUpCheck: MyRequestHandler = async (opt, req, res) => {
-    let setting = await SettingMapper.detailQuery();
-    if (!setting.canSignUp)
-        throw common.error('暂不开放注册', config.error.NO_PERMISSIONS);
-};
-
-export let signIn: MyRequestHandler = async (opt, req, res) => {
-    let data = paramsValid(req.body, ValidSchema.UserSignIn);
-    let token = req.myData.user.key;
-    let { user, disableResult } = await UserMapper.accountCheck(data.account);
-
-    let returnUser = await UserMapper.login(data, {
-        resetOpt: { imgHost: req.myData.imgHost },
-        token,
-        user,
-        disabled: disableResult.disabled
-    });
-    let userInfoKey = config.dev.cacheKey.user + token;
-    await cache.set(userInfoKey, returnUser, config.dev.cacheTime.user);
-    return returnUser;
-};
-
-export let signOut: MyRequestHandler = async (opt, req, res) => {
-    let user = req.myData.user;
-    if (user) {
-        await cache.del(user.key);
-    }
-
-};
 
 function returnUser(user: LoginUser) {
     delete user.loginData;
@@ -131,7 +73,7 @@ export let update: MyRequestHandler = async (opt, req, res) => {
         let { checkToken } = UserMapper.createToken(restData, dbUser);
         if (token !== checkToken)
             throw common.error('', config.error.TOKEN_WRONG);
-        update.password = common.md5(restData.newPassword);
+        update.password = UserMapper.encryptPwd(restData.newPassword);
     }
     let log = UserLogMapper.create(dbUser, user, { update });
     await transaction(async (session) => {
@@ -145,8 +87,10 @@ export let update: MyRequestHandler = async (opt, req, res) => {
         for (let key in updateCache) {
             user[key] = updateCache[key];
         }
-        let userInfoKey = config.dev.cacheKey.user + user.key;
-        await cache.set(userInfoKey, user, config.dev.cacheTime.user);
+        await cache.setByCfg({
+            ...config.dev.cache.user,
+            key: user.key,
+        }, user);
     }
     return updateCache;
 
@@ -197,7 +141,7 @@ export let mgtSave: MyRequestHandler = async (opt, req, res) => {
     update.roleList = detail.roleList;
 
     if (data.password) {
-        update.password = common.md5(data.password);
+        update.password = UserMapper.encryptPwd(data.password);
         remark += `[修改了密码, 原密码: ${detail.password}]`;
     }
 

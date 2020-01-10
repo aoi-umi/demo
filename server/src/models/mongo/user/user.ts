@@ -114,7 +114,7 @@ export class User extends Base {
     })
     video: number;
 
-    
+    //授权
     @prop({
         default: ''
     })

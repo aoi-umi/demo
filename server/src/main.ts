@@ -17,7 +17,7 @@ import { PayMapper } from './models/mongo/asset';
 
 export const auth = new Auth();
 export const mq = new MQ();
-export const cache = new Cache(config.env.redis.uri, config.env.cachePrefix ? config.env.cachePrefix + ':' : '');
+export const cache = new Cache(config.env.redis.uri, config.env.cachePrefix || '');
 export async function init() {
 
     await mq.connect(config.env.mq.mqUri);

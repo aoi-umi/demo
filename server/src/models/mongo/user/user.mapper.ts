@@ -28,9 +28,13 @@ export class UserMapper {
         return { dataStr, checkToken };
     }
 
-    static async accountExists(val: string, type?: string) {
+    static encryptPwd(pwd: string) {
+        return common.md5(pwd);
+    }
+
+    static async accountExists(val: string, by?: string) {
         let opt: any = {};
-        if (type === myEnum.userFindAccountType.微信openId) {
+        if (by === myEnum.userBy.微信授权) {
             opt.wxOpenId = val;
         } else {
             opt.account = val;
@@ -267,11 +271,14 @@ export class UserMapper {
         user: UserInstanceType,
         token,
         oldData?: any,
+        noPwd?: boolean,
     }) {
         let { token, disabled, user } = opt;
         let { checkToken } = UserMapper.createToken(data, user);
-        if (token !== checkToken)
-            throw common.error('', config.error.TOKEN_WRONG);
+        if (!opt.noPwd) {
+            if (token !== checkToken)
+                throw common.error('', config.error.TOKEN_WRONG);
+        }
         let userAuth = {
             [config.auth.login.code]: 1
         };
@@ -285,7 +292,7 @@ export class UserMapper {
         let lastLoginAt = (opt.oldData?.lastLoginAt) || new Date();
         let rtn = {
             _id: user._id, account: user.account, nickname: user.nickname, avatar: user.avatar,
-            key: token, authority: userAuth,
+            key: checkToken, authority: userAuth,
             loginData: data,
             cacheAt: new Date(),
             lastLoginAt

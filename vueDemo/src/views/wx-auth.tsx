@@ -1,12 +1,14 @@
 import { Component, Vue, Watch } from 'vue-property-decorator';
 
-import { testApi } from '@/api';
+import { testApi, testSocket } from '@/api';
 import { Spin, Avatar, Button, Card } from '@/components/iview';
 import { MyLoad } from '@/components/my-load';
-import { myEnum } from '@/config';
+import { myEnum, dev } from '@/config';
 
 import { Base } from './base';
 import './wx-auth.less';
+import { SignUpView } from './user/user-sign';
+import { LocalStore } from '@/store';
 
 type WxUserInfo = {
     openid: string;
@@ -26,35 +28,60 @@ export default class WxAuth extends Base {
 
     }
 
+    wxUserInfo: WxUserInfo;
     loading = false;
+    val = '';
     async auth() {
-
         let query: any = this.$route.query;
-        let userInfo: WxUserInfo;
+        this.val = query.code;
         try {
+            this.wxUserInfo = null;
             this.loading = true;
             //dev
-            if (userInfo) { }
+            if (this.wxUserInfo) { }
             else if (!query.getUserInfo) {
                 let rs = await testApi.wxGetCode();
                 window.location.href = rs;
             } else {
-                userInfo = await testApi.wxGetUserInfo({ code: query.code });
+                this.wxUserInfo = await testApi.wxGetUserInfo({ code: this.val });
             }
         } finally {
             this.loading = false;
         }
-        if (userInfo)
-            this.checkAccount(userInfo.openid);
-        return userInfo;
+        if (this.wxUserInfo)
+            this.checkAccount(this.val);
+        return this.wxUserInfo;
     }
 
     accountChecking = false;
-    account = {};
-    async checkAccount(openId) {
-        this.accountChecking = true;
-        this.account = await testApi.userAccountExists({ val: openId, type: myEnum.userFindAccountType.微信openId });
-        this.accountChecking = false;
+    accountMsg = '';
+    account: { _id?: string };
+    by = myEnum.userBy.微信授权;
+    async checkAccount(val) {
+        try {
+            this.accountMsg = '';
+            this.accountChecking = true;
+            this.account = await testApi.userAccountExists({ val, by: this.by });
+        } catch (e) {
+            this.accountMsg = e.message;
+        } finally {
+            this.accountChecking = false;
+        }
+    }
+
+    signInLoading = false;
+    async signInByCode() {
+        await this.operateHandler('登录', async () => {
+            this.signInLoading = true;
+            let req = { by: this.by, val: this.val };
+            let rs = await testApi.userSignInByAuth(req);
+            let token = rs.key;
+            LocalStore.setItem(dev.cacheKey.testUser, token);
+            testSocket.login({ [dev.cacheKey.testUser]: token });
+            this.storeUser.setUser(rs);
+        }).finally(() => {
+            this.signInLoading = false;
+        });
     }
 
     render() {
@@ -70,11 +97,8 @@ export default class WxAuth extends Base {
                                 <Avatar src={userInfo.headimgurl} size="large" />
                                 <span>{userInfo.nickname}</span>
                                 <div class={this.getStyleName('op')}>
-                                    {this.accountChecking ?
-                                        <Spin /> :
-                                        (!this.account ?
-                                            this.storeUser.user.isLogin ? <Button>绑定</Button> : <Button>注册</Button>
-                                            : <Button>登录</Button>)
+                                    {this.accountChecking ? <Spin /> :
+                                        this.accountMsg ? this.accountMsg : this.renderOperate()
                                     }
                                 </div>
                             </div>
@@ -83,5 +107,17 @@ export default class WxAuth extends Base {
                 }}
             />
         );
+    }
+
+    private renderOperate() {
+        return (
+            this.storeUser.user.isLogin ?
+                <span>已登录</span> :
+                this.account ?
+                    <Button loading={this.signInLoading} on-click={() => { this.signInByCode(); }}>登录</Button> :
+                    <SignUpView account={this.wxUserInfo.nickname} by={myEnum.userBy.微信授权} byVal={this.val} />
+
+        );
+
     }
 }

@@ -39,7 +39,7 @@ export class SocketUser {
     }
 
     async addUser(data, socket: Socket) {
-        let user = await UserAuthMid.getUser(data[config.dev.cacheKey.user]);
+        let user = await UserAuthMid.getUser(data[config.dev.cache.user.prefix]);
         if (user.isLogin) {
             let key = user._id.toString();
             socket.myData.userId = key;

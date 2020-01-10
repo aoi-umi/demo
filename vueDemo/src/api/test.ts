@@ -10,6 +10,7 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
     userSignUp,
     userSignUpCheck,
     userSignIn,
+    userSignInByAuth,
     userSignOut,
     userInfo,
     userAccountExists,
@@ -176,6 +177,9 @@ export class TestApi extends ApiModel<TestApiMethod> {
     }
     async userSignIn(data) {
         return this.requestByConfig(this.apiConfig.method.userSignIn, { data });
+    }
+    async userSignInByAuth(data) {
+        return this.requestByConfig(this.apiConfig.method.userSignInByAuth, { data });
     }
     async userSignOut() {
         return this.requestByConfig(this.apiConfig.method.userSignOut);

@@ -9,9 +9,10 @@ export class UserAccountExists {
     @MinLength(1)
     val: string;
 
-    @IsIn(myEnum.userFindAccountType.getAllValue())
-    type?: string;
+    @IsIn(myEnum.userBy.getAllValue())
+    by?: string;
 }
+
 
 export class UserSignUp {
     @IsDefined()
@@ -22,6 +23,11 @@ export class UserSignUp {
 
     @IsDefined()
     password: string;
+
+    @IsIn(myEnum.userBy.getAllValue())
+    by?: string;
+
+    byVal?: string;
 }
 
 export class UserSignIn {
@@ -30,6 +36,15 @@ export class UserSignIn {
 
     @IsDefined()
     rand: string;
+}
+
+export class UserSignInByAuth {
+    @IsIn(myEnum.userBy.getAllValue())
+    @IsDefined()
+    by: string;
+
+    @IsDefined()
+    val: string;
 }
 
 export class UserUpdate {

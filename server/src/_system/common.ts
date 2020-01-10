@@ -277,13 +277,14 @@ export let extend = function (...args) {
     return res;
 };
 
+type RequestServiceOption = AxiosRequestConfig & { raw?: boolean };
 export type RequestServiceByConfigOption = {
     serviceName?: string;
     methodName?: string;
     beforeRequest?: Function;
     afterResponse?: Function;
     outLog?: any;
-} & AxiosRequestConfig;
+} & RequestServiceOption;
 export let requestServiceByConfig = function (option: RequestServiceByConfigOption) {
     let method = '';
     let url = '';
@@ -359,8 +360,8 @@ export let requestServiceByConfig = function (option: RequestServiceByConfigOpti
     });
 };
 
-export let requestService = function (option: AxiosRequestConfig) {
-    let opt: AxiosRequestConfig = {
+export let requestService = function (option: RequestServiceOption) {
+    let opt: RequestServiceOption = {
         method: 'POST',
     };
     opt = extend(opt, option);
@@ -372,19 +373,18 @@ export let requestService = function (option: AxiosRequestConfig) {
         let data = response.data;
         let encoding = response.headers['content-encoding'];
         switch (encoding) {
-        case 'gzip':
-            let buffer = await promisify(zlib.unzip)(data);
-            data = buffer.toString();
-            if (data && typeof data == 'string')
-                data = JSON.parse(data);
-            break;
-        default:
-            if (encoding)
-                throw error(`Not Accept Encoding:${encoding}`);
+            case 'gzip':
+                data = await promisify(zlib.unzip)(data);
+                break;
+            default:
+                if (encoding)
+                    throw error(`Not Accept Encoding:${encoding}`);
         }
 
-        if (Buffer.isBuffer(data)) {
+        if (!opt.raw && Buffer.isBuffer(data)) {
             data = data.toString();
+            if (data && typeof data == 'string')
+                data = JSON.parse(data);
         }
         return { response, data };
     });

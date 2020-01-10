@@ -1,16 +1,21 @@
 import { MQ, defaultDelayTime } from "amqplib-delay";
 
 export default {
-    //#region 缓存 
-    cacheKey: {
-        user: 'userCacheKey',
-        captcha: 'captchaKey'
-    },
-
+    //#region 缓存
     /**缓存时间 秒 */
-    cacheTime: {
-        user: 3600 * 24 * 7,
-        captcha: 60 * 10
+    cache: {
+        user: {
+            prefix: 'userCacheKey',
+            time: 3600 * 24 * 7,
+        },
+        captcha: {
+            prefix: 'captchaKey',
+            time: 60 * 10,
+        },
+        wxAuthCode: {
+            prefix: 'wxAuthCode',
+            time: 3600 * 24,
+        }
     },
     //自动重新登录时间 秒
     autoLoginTime: 3600 * 2,

@@ -7,12 +7,15 @@ let router = express.Router();
 export default router;
 
 //#region user 
+import * as userSign from './user-sign';
+router.post('/user/signUp', UserAuthMid.normal(), MyRequestHandlerMid.convert(userSign.signUp));
+router.post('/user/signUpCheck', UserAuthMid.normal(), MyRequestHandlerMid.convert(userSign.signUpCheck));
+router.post('/user/signIn', UserAuthMid.normal(), MyRequestHandlerMid.convert(userSign.signIn));
+router.post('/user/signInByAuth', UserAuthMid.normal(), MyRequestHandlerMid.convert(userSign.signInByAuth));
+router.post('/user/signOut', UserAuthMid.normal(), MyRequestHandlerMid.convert(userSign.signOut));
+router.post('/user/accountExists', UserAuthMid.normal(), MyRequestHandlerMid.convert(userSign.accountExists));
+
 import * as user from './user';
-router.post('/user/accountExists', UserAuthMid.normal(), MyRequestHandlerMid.convert(user.accountExists));
-router.post('/user/signUp', UserAuthMid.normal(), MyRequestHandlerMid.convert(user.signUp));
-router.post('/user/signUpCheck', UserAuthMid.normal(), MyRequestHandlerMid.convert(user.signUpCheck));
-router.post('/user/signIn', UserAuthMid.normal(), MyRequestHandlerMid.convert(user.signIn));
-router.post('/user/signOut', UserAuthMid.normal(), MyRequestHandlerMid.convert(user.signOut));
 router.get('/user/info', UserAuthMid.normal([auth.login]), MyRequestHandlerMid.convert(user.info));
 router.get('/user/detail', UserAuthMid.normal([auth.login]), MyRequestHandlerMid.convert(user.detail));
 router.get('/user/detailQuery', UserAuthMid.normal(), MyRequestHandlerMid.convert(user.detailQuery));

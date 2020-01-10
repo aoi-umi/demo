@@ -34,6 +34,9 @@ const config = {
                 userSignIn: {
                     url: '/user/signIn',
                 },
+                userSignInByAuth: {
+                    url: '/user/signInByAuth',
+                },
                 userSignOut: {
                     url: '/user/signOut',
                 },
