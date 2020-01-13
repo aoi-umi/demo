@@ -110,7 +110,7 @@ let signInFn = async (data: ValidSchema.UserSignIn, opt: { noPwd?: boolean, req:
         disabled: disableResult.disabled,
         noPwd: opt.noPwd
     });
-    let userInfoCfg = { ...config.dev.cache.user, key: token };
+    let userInfoCfg = { ...config.dev.cache.user, key: returnUser.key };
     await cache.setByCfg(userInfoCfg, returnUser);
     return returnUser;
 };

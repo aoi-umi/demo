@@ -9,6 +9,7 @@ import { Base } from './base';
 import './wx-auth.less';
 import { SignUpView } from './user/user-sign';
 import { LocalStore } from '@/store';
+import { routerConfig } from '@/router';
 
 type WxUserInfo = {
     openid: string;
@@ -25,7 +26,12 @@ type WxUserInfo = {
 export default class WxAuth extends Base {
     stylePrefix = "wx-auth-";
     mounted() {
+        this.auth();
+    }
 
+    @Watch('$route')
+    private watchRouter() {
+        this.auth();
     }
 
     wxUserInfo: WxUserInfo;
@@ -45,6 +51,8 @@ export default class WxAuth extends Base {
             } else {
                 this.wxUserInfo = await testApi.wxGetUserInfo({ code: this.val });
             }
+        } catch (e) {
+            this.errMsg = e.message;
         } finally {
             this.loading = false;
         }
@@ -54,16 +62,16 @@ export default class WxAuth extends Base {
     }
 
     accountChecking = false;
-    accountMsg = '';
+    errMsg = '';
     account: { _id?: string };
     by = myEnum.userBy.微信授权;
     async checkAccount(val) {
         try {
-            this.accountMsg = '';
+            this.errMsg = '';
             this.accountChecking = true;
             this.account = await testApi.userAccountExists({ val, by: this.by });
         } catch (e) {
-            this.accountMsg = e.message;
+            this.errMsg = e.message;
         } finally {
             this.accountChecking = false;
         }
@@ -86,23 +94,26 @@ export default class WxAuth extends Base {
 
     render() {
         return (
-            <MyLoad
-                loadFn={this.auth}
-                renderFn={(userInfo: WxUserInfo) => {
-                    return (
-                        <Card class={this.getStyleName('user-info-card')}>
-                            <div>
-                                {this.storeUser.user.isLogin ?
+            <Card class={this.getStyleName('user-info-card')}>
+                {this.loading ? <Spin fix /> :
+                    <div>
+                        {
+                            this.errMsg ?
+                                <div class={this.getStyleName('err')}>
+                                    {this.errMsg}
+                                    <Button on-click={() => {
+                                        this.$router.push(routerConfig.wxAuth.path);
+                                    }}>重试</Button>
+                                </div> :
+                                this.storeUser.user.isLogin ?
                                     <div class={this.getStyleName('logined')}>
                                         <span>已登录</span>
                                     </div> :
-                                    !userInfo ? <div /> : this.renderUserInfo()
-                                }
-                            </div>
-                        </Card>
-                    );
-                }}
-            />
+                                    !this.wxUserInfo ? <div /> : this.renderUserInfo()
+                        }
+                    </div>
+                }
+            </Card>
         );
     }
 
@@ -115,11 +126,9 @@ export default class WxAuth extends Base {
                 <div class={this.getStyleName('op')}>
                     {this.accountChecking ?
                         <Spin /> :
-                        this.accountMsg ?
-                            this.accountMsg :
-                            this.account ?
-                                <Button loading={this.signInLoading} on-click={() => { this.signInByCode(); }}>登录</Button> :
-                                <SignUpView account={this.wxUserInfo.nickname} by={myEnum.userBy.微信授权} byVal={this.val} />
+                        this.account ?
+                            <Button loading={this.signInLoading} on-click={() => { this.signInByCode(); }}>登录</Button> :
+                            <SignUpView account={this.wxUserInfo.nickname} by={myEnum.userBy.微信授权} byVal={this.val} />
                     }
                 </div>
             </div>

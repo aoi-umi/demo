@@ -175,6 +175,7 @@ class SignIn extends Vue<Base & SignInProp> {
                         }].map(ele => {
                             return <img class={this.getStyleName('3rd-party-login-item')} src={ele.src} on-click={() => {
                                 this.$router.push(ele.to);
+                                this.$emit('3rd-party-login-click');
                             }} />;
                         })}
                     </div>

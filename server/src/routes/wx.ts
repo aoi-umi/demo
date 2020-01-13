@@ -1,5 +1,7 @@
 import { MyRequestHandler } from "@/middleware";
 import { wxInst } from "@/3rd-party";
+import { paramsValid } from "@/helpers";
+import * as ValidSchema from '@/valid-schema/class-valid';
 
 export const getCode: MyRequestHandler = async (opt, req, res) => {
     let rs = wxInst.getCodeUrl();
@@ -7,7 +9,7 @@ export const getCode: MyRequestHandler = async (opt, req, res) => {
 };
 
 export const getUserInfo: MyRequestHandler = async (opt, req, res) => {
-    let data = req.query;
+    let data = paramsValid(req.query, ValidSchema.WxGetUserInfo);
     let rs = await wxInst.getUserInfo(data);
     delete rs.openid;
     return rs;

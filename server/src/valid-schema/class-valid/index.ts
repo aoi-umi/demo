@@ -18,3 +18,5 @@ export * from './bookmark';
 export * from './file';
 export * from './pay';
 export * from './goods';
+
+export * from './wx';
