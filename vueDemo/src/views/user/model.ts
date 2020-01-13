@@ -5,7 +5,7 @@ export class LocalStoreUser {
     account: string;
     password?: string;
     static getList() {
-        return LocalStore.getItem(dev.cacheKey.signInUsers) as LocalStoreUser[];
+        return LocalStore.getItem(dev.cacheKey.signInUsers) || [] as LocalStoreUser[];
     }
 
     static updateAccount(detail: LocalStoreUser, list?: LocalStoreUser[]) {

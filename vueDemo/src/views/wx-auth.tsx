@@ -93,14 +93,18 @@ export default class WxAuth extends Base {
                         return <div />;
                     return (
                         <Card class={this.getStyleName('user-info-card')}>
-                            <div class={this.getStyleName('user-info')}>
-                                <Avatar src={userInfo.headimgurl} size="large" />
-                                <span>{userInfo.nickname}</span>
-                                <div class={this.getStyleName('op')}>
-                                    {this.accountChecking ? <Spin /> :
-                                        this.accountMsg ? this.accountMsg : this.renderOperate()
-                                    }
-                                </div>
+                            <div>
+                                {this.storeUser.user.isLogin ? <span>已登录</span> :
+                                    <div class={this.getStyleName('user-info')}>
+                                        <Avatar src={userInfo.headimgurl} size="large" />
+                                        <span>{userInfo.nickname}</span>
+                                        <div class={this.getStyleName('op')}>
+                                            {this.accountChecking ? <Spin /> :
+                                                this.accountMsg ? this.accountMsg : this.renderOperate()
+                                            }
+                                        </div>
+                                    </div>
+                                }
                             </div>
                         </Card>
                     );
@@ -111,11 +115,9 @@ export default class WxAuth extends Base {
 
     private renderOperate() {
         return (
-            this.storeUser.user.isLogin ?
-                <span>已登录</span> :
-                this.account ?
-                    <Button loading={this.signInLoading} on-click={() => { this.signInByCode(); }}>登录</Button> :
-                    <SignUpView account={this.wxUserInfo.nickname} by={myEnum.userBy.微信授权} byVal={this.val} />
+            this.account ?
+                <Button loading={this.signInLoading} on-click={() => { this.signInByCode(); }}>登录</Button> :
+                <SignUpView account={this.wxUserInfo.nickname} by={myEnum.userBy.微信授权} byVal={this.val} />
 
         );
 

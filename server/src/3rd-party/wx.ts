@@ -88,7 +88,7 @@ export class Wx extends WxBase {
         //{"errcode":40001,"errmsg":"invalid credential, access_token is invalid or not latest, hints: [ req_id: KhpFn2Dae-jhOqva ]"}
         //{"openid":"o3EBEt4xoZ35nQrec3eiEgJ-16vg","nickname":"nickname","sex":1,"language":"zh_CN","city":"","province":"","country":"CG","headimgurl":"","privilege":[]}
         let succ = rs.data as WxUserInfoType;
-        cache.setByCfg(cfg, succ);
+        await cache.setByCfg(cfg, succ);
         return succ;
     }
 }
