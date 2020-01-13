@@ -168,6 +168,16 @@ class SignIn extends Vue<Base & SignInProp> {
                     <FormItem>
                         <Button type="primary" long on-click={this.handleSignIn} loading={this.loading}>登录</Button>
                     </FormItem>
+                    <div class={this.getStyleName('3rd-party-login')}>
+                        {[{
+                            src: '/logo/weixin.svg',
+                            to: routerConfig.wxAuth.path
+                        }].map(ele => {
+                            return <img class={this.getStyleName('3rd-party-login-item')} src={ele.src} on-click={() => {
+                                this.$router.push(ele.to);
+                            }} />;
+                        })}
+                    </div>
                 </Form>
             </div >
         );

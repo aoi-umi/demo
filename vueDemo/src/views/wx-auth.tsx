@@ -37,9 +37,9 @@ export default class WxAuth extends Base {
         try {
             this.wxUserInfo = null;
             this.loading = true;
-            //dev
-            if (this.wxUserInfo) { }
-            else if (!query.getUserInfo) {
+            if (this.storeUser.user.isLogin) {
+
+            } else if (!query.getUserInfo) {
                 let rs = await testApi.wxGetCode();
                 window.location.href = rs;
             } else {
@@ -89,21 +89,14 @@ export default class WxAuth extends Base {
             <MyLoad
                 loadFn={this.auth}
                 renderFn={(userInfo: WxUserInfo) => {
-                    if (!userInfo)
-                        return <div />;
                     return (
                         <Card class={this.getStyleName('user-info-card')}>
                             <div>
-                                {this.storeUser.user.isLogin ? <span>已登录</span> :
-                                    <div class={this.getStyleName('user-info')}>
-                                        <Avatar src={userInfo.headimgurl} size="large" />
-                                        <span>{userInfo.nickname}</span>
-                                        <div class={this.getStyleName('op')}>
-                                            {this.accountChecking ? <Spin /> :
-                                                this.accountMsg ? this.accountMsg : this.renderOperate()
-                                            }
-                                        </div>
-                                    </div>
+                                {this.storeUser.user.isLogin ?
+                                    <div class={this.getStyleName('logined')}>
+                                        <span>已登录</span>
+                                    </div> :
+                                    !userInfo ? <div /> : this.renderUserInfo()
                                 }
                             </div>
                         </Card>
@@ -113,11 +106,23 @@ export default class WxAuth extends Base {
         );
     }
 
-    private renderOperate() {
+    private renderUserInfo() {
+        let userInfo = this.wxUserInfo;
         return (
-            this.account ?
-                <Button loading={this.signInLoading} on-click={() => { this.signInByCode(); }}>登录</Button> :
-                <SignUpView account={this.wxUserInfo.nickname} by={myEnum.userBy.微信授权} byVal={this.val} />
+            <div class={this.getStyleName('user-info')}>
+                <Avatar src={userInfo.headimgurl} size="large" />
+                <span>{userInfo.nickname}</span>
+                <div class={this.getStyleName('op')}>
+                    {this.accountChecking ?
+                        <Spin /> :
+                        this.accountMsg ?
+                            this.accountMsg :
+                            this.account ?
+                                <Button loading={this.signInLoading} on-click={() => { this.signInByCode(); }}>登录</Button> :
+                                <SignUpView account={this.wxUserInfo.nickname} by={myEnum.userBy.微信授权} byVal={this.val} />
+                    }
+                </div>
+            </div>
 
         );
 
