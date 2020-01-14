@@ -289,7 +289,7 @@ export default class App extends Base {
                     }
                     <Content class="main-content">
                         {
-                            this.getingUserInfo ? <Spin /> :
+                            this.getingUserInfo ? <Spin fix /> :
                                 this.$route.meta.keepAlive ?
                                     <keep-alive>
                                         <router-view></router-view>

@@ -45,17 +45,30 @@ export default class WxAuth extends Base {
         try {
             this.wxUserInfo = null;
             this.loading = true;
+            this.msg = '';
+            this.errorMsg = '';
             if (query.getUserInfo) {
                 this.wxUserInfo = await testApi.wxGetUserInfo({ code: this.val });
             } else {
-                if ((type === myEnum.wxAuthType.绑定 && this.storeUser.user.isLogin)
-                    || type === myEnum.wxAuthType.登录 && !this.storeUser.user.isLogin) {
-                    let rs = await testApi.wxGetCode();
+                let to = false;
+                if (type === myEnum.wxAuthType.绑定) {
+                    if (this.storeUser.user.isLogin)
+                        to = true;
+                    else
+                        this.msg = '未登录';
+                } else if (type === myEnum.wxAuthType.登录) {
+                    if (!this.storeUser.user.isLogin)
+                        to = true;
+                    else
+                        this.msg = '已登录';
+                }
+                if (to) {
+                    let rs = await testApi.wxGetCode({ type });
                     window.location.href = rs;
                 }
             }
         } catch (e) {
-            this.msg = e.message;
+            this.errorMsg = e.message;
         } finally {
             this.loading = false;
         }
@@ -65,16 +78,17 @@ export default class WxAuth extends Base {
     }
 
     accountChecking = false;
+    errorMsg = '';
     msg = '';
     account: { _id?: string };
     by = myEnum.userBy.微信授权;
     async checkAccount(val) {
         try {
-            this.msg = '';
+            this.errorMsg = '';
             this.accountChecking = true;
             this.account = await testApi.userAccountExists({ val, by: this.by });
         } catch (e) {
-            this.msg = e.message;
+            this.errorMsg = e.message;
         } finally {
             this.accountChecking = false;
         }
@@ -99,12 +113,13 @@ export default class WxAuth extends Base {
     async userBind() {
         try {
             this.msg = '';
+            this.errorMsg = '';
             this.bindLoading = true;
             let data = { by: this.by, val: this.val };
             await testApi.userBind(data);
             this.msg = '绑定成功';
         } catch (e) {
-            this.msg = e.message;
+            this.errorMsg = e.message;
         } finally {
             this.bindLoading = false;
         }
@@ -116,9 +131,9 @@ export default class WxAuth extends Base {
                 {this.loading ? <Spin fix /> :
                     <div>
                         {
-                            this.msg ?
+                            this.errorMsg || this.msg ?
                                 <div class={this.getStyleName('err')}>
-                                    {this.msg}
+                                    {this.errorMsg || this.msg}
                                     <Button on-click={() => {
                                         this.$router.push(routerConfig.wxAuth.path);
                                     }}>重试</Button>
@@ -126,7 +141,7 @@ export default class WxAuth extends Base {
                                 this.storeUser.user.isLogin ?
                                     <div class={this.getStyleName('logined')}>
                                         <span>已登录</span>
-                                        {this.type === myEnum.wxAuthType.绑定 &&
+                                        {!this.loading && this.type === myEnum.wxAuthType.绑定 &&
                                             <Button loading={this.bindLoading} on-click={() => { this.userBind(); }}>绑定</Button>
                                         }
                                     </div> :
@@ -146,7 +161,7 @@ export default class WxAuth extends Base {
                 <span>{userInfo.nickname}</span>
                 <div class={this.getStyleName('op')}>
                     {this.accountChecking ?
-                        <Spin /> :
+                        <Spin fix /> :
                         this.account ?
                             <Button loading={this.signInLoading} on-click={() => { this.signInByCode(); }}>登录</Button> :
                             <SignUpView account={this.wxUserInfo.nickname} by={myEnum.userBy.微信授权} byVal={this.val} />

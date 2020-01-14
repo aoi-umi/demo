@@ -446,8 +446,8 @@ export class TestApi extends ApiModel<TestApiMethod> {
 
     //#region wx 
 
-    async wxGetCode() {
-        return this.requestByConfig(this.apiConfig.method.wxGetCode);
+    async wxGetCode(data) {
+        return this.requestByConfig(this.apiConfig.method.wxGetCode, { data });
     }
     async wxGetUserInfo(data) {
         return this.requestByConfig(this.apiConfig.method.wxGetUserInfo, { data });

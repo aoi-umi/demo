@@ -171,10 +171,11 @@ class SignIn extends Vue<Base & SignInProp> {
                     <div class={this.getStyleName('3rd-party-login')}>
                         {[{
                             src: '/logo/weixin.svg',
-                            to: routerConfig.wxAuth.path
+                            to: routerConfig.wxAuth.path,
+                            query: { type: myEnum.wxAuthType.登录 }
                         }].map(ele => {
                             return <img class={this.getStyleName('3rd-party-login-item')} src={ele.src} on-click={() => {
-                                this.$router.push(ele.to);
+                                this.$router.push({ path: ele.to, query: ele.query });
                                 this.$emit('3rd-party-login-click');
                             }} />;
                         })}
