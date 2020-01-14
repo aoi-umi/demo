@@ -49,14 +49,24 @@
         cursor: pointer;
       }
     }
-    &3rd-party-login {
-      display: flex;
-      justify-content: center;
-    }
-    &3rd-party-login-item {
-      border-radius: 50%;
-      margin: 0 10px;
-      cursor: pointer;
+  }
+}
+
+.third-party-login- {
+  &root {
+    display: flex;
+    justify-content: center;
+  }
+  &bind {
+    justify-content: flex-start;
+  }
+
+  &item {
+    border-radius: 50%;
+    margin: 0 10px;
+    cursor: pointer;
+    &.disabled {
+      filter: grayscale(100%);
     }
   }
 }

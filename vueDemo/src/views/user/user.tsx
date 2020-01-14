@@ -24,6 +24,7 @@ import Article, { ArticleListItemView, ArticleView } from '../content/article';
 import Video, { VideoListItemView, VideoView } from '../content/video';
 import { DetailDataType as UserDetailDataType } from './user-mgt';
 import { ChatList, ChatListView } from './user-chat';
+import { ThirdPartyLoginView } from './user-sign';
 
 import './user.less';
 
@@ -82,7 +83,6 @@ export default class UserInfo extends Base {
         formVaild: iview.Form, loadView: IMyLoad, upload: IMyUpload,
         followerList: FollowList, followingList: FollowList,
         articleList: Article, videoList: Video, chatList: ChatList, favouriteList: FavouriteList,
-        userUnbind: UserUnbind
     };
     updateLoading = false;
     private getUpdateUser() {
@@ -390,14 +390,7 @@ export default class UserInfo extends Base {
                         {detail.createdAt && moment(detail.createdAt).format(dev.dateFormat)}
                     </FormItem>
                     <FormItem label="绑定">
-                        <span>微信 {detail.bind[myEnum.userBind.微信] ? <Button on-click={() => {
-                            this.$refs.userUnbind.show(myEnum.userBind.微信);
-                        }}>解绑</Button> : <Button on-click={() => {
-                            this.$router.push({
-                                path: routerConfig.wxAuth.path,
-                                query: { type: myEnum.wxAuthType.绑定 }
-                            });
-                        }}>绑定</Button>}</span>
+                        <ThirdPartyLoginView bind user={detail} />
                     </FormItem>
                 </Form>
             </div> :
@@ -419,7 +412,7 @@ class UserUnbindProp {
     extends: Base,
     mixins: [getCompOpts(UserUnbindProp)]
 })
-class UserUnbind extends Vue<UserUnbindProp & Base> {
+export class UserUnbind extends Vue<UserUnbindProp & Base> {
     $refs: { unbind: iview.Form, };
     isShow = false;
     saving = false;
@@ -496,7 +489,7 @@ class UserUnbind extends Vue<UserUnbindProp & Base> {
 }
 
 
-const UserUnbindView = convClass<UserUnbindProp>(UserUnbind);
+export const UserUnbindView = convClass<UserUnbindProp>(UserUnbind);
 
 /**
  * 粉丝/关注

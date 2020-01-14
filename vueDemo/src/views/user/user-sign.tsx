@@ -12,6 +12,8 @@ import { MyLoad } from '@/components/my-load';
 import { LoginUser } from '@/model/user';
 
 import { Base } from '../base';
+import { DetailDataType as UserDetailDataType } from './user-mgt';
+import { UserUnbind, UserUnbindView } from './user';
 import { LocalStoreUser } from './model';
 
 import './user.less';
@@ -168,18 +170,9 @@ class SignIn extends Vue<Base & SignInProp> {
                     <FormItem>
                         <Button type="primary" long on-click={this.handleSignIn} loading={this.loading}>登录</Button>
                     </FormItem>
-                    <div class={this.getStyleName('3rd-party-login')}>
-                        {[{
-                            src: '/logo/weixin.svg',
-                            to: routerConfig.wxAuth.path,
-                            query: { type: myEnum.wxAuthType.登录 }
-                        }].map(ele => {
-                            return <img class={this.getStyleName('3rd-party-login-item')} src={ele.src} on-click={() => {
-                                this.$router.push({ path: ele.to, query: ele.query });
-                                this.$emit('3rd-party-login-click');
-                            }} />;
-                        })}
-                    </div>
+                    <ThirdPartyLoginView on-item-click={() => {
+                        this.$emit('3rd-party-login-click');
+                    }} />
                 </Form>
             </div >
         );
@@ -187,6 +180,58 @@ class SignIn extends Vue<Base & SignInProp> {
 }
 
 export const SignInView = convClass<SignInProp>(SignIn);
+
+class ThirdPartyLoginProp {
+    @Prop()
+    bind?: boolean;
+
+    @Prop()
+    user?: UserDetailDataType
+}
+@Component({
+    extends: Base,
+    mixins: [getCompOpts(ThirdPartyLoginProp)]
+})
+class ThirdPartyLogin extends Vue<ThirdPartyLoginProp & Base> {
+    stylePrefix = 'third-party-login-';
+
+    $refs: { userUnbind: UserUnbind }
+    render() {
+        return (
+            <div class={this.getStyleName('root', this.bind && 'bind')}>
+                {this.bind && <UserUnbindView ref="userUnbind" on-success={(type) => {
+                    this.user.bind[type] = false;
+                }} />}
+                {[{
+                    bind: myEnum.userBind.微信,
+                    src: '/logo/weixin.svg',
+                    to: routerConfig.wxAuth.path,
+                    query: { type: myEnum.wxAuthType.登录 }
+                },].map(ele => {
+                    let noBind = this.bind && !this.user.bind[ele.bind];
+                    return <img class={this.getStyleName('item').concat([noBind ? 'disabled' : ''])} src={ele.src} on-click={() => {
+                        if (!this.bind) {
+                            this.$router.push({ path: ele.to, query: ele.query });
+                        } else {
+                            if (noBind) {
+                                this.$router.push({
+                                    path: routerConfig.wxAuth.path,
+                                    query: { type: myEnum.wxAuthType.绑定 }
+                                });
+                            } else {
+                                this.$refs.userUnbind.show(myEnum.userBind.微信);
+                            }
+
+                        }
+                        this.$emit('item-click', ele);
+                    }} />;
+                })}
+            </div>
+        );
+    }
+}
+
+export const ThirdPartyLoginView = convClass<ThirdPartyLoginProp>(ThirdPartyLogin);
 
 type SignUpDataType = {
     account: string;

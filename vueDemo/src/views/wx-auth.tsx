@@ -4,12 +4,12 @@ import { testApi, testSocket } from '@/api';
 import { Spin, Avatar, Button, Card } from '@/components/iview';
 import { MyLoad } from '@/components/my-load';
 import { myEnum, dev } from '@/config';
-
-import { Base } from './base';
-import './wx-auth.less';
-import { SignUpView } from './user/user-sign';
 import { LocalStore } from '@/store';
 import { routerConfig } from '@/router';
+
+import { Base } from './base';
+import { SignUpView } from './user/user-sign';
+import './wx-auth.less';
 
 type WxUserInfo = {
     openid: string;
@@ -135,7 +135,10 @@ export default class WxAuth extends Base {
                                 <div class={this.getStyleName('err')}>
                                     {this.errorMsg || this.msg}
                                     <Button on-click={() => {
-                                        this.$router.push(routerConfig.wxAuth.path);
+                                        this.$router.push({
+                                            path: routerConfig.wxAuth.path,
+                                            query: { type: this.type }
+                                        });
                                     }}>重试</Button>
                                 </div> :
                                 this.storeUser.user.isLogin ?
