@@ -82,6 +82,7 @@ export default class UserInfo extends Base {
         formVaild: iview.Form, loadView: IMyLoad, upload: IMyUpload,
         followerList: FollowList, followingList: FollowList,
         articleList: Article, videoList: Video, chatList: ChatList, favouriteList: FavouriteList,
+        userUnbind: UserUnbind
     };
     updateLoading = false;
     private getUpdateUser() {
@@ -177,13 +178,8 @@ export default class UserInfo extends Base {
                 req = {
                     ...req,
                     newPassword: this.updateDetail.newPwd,
-                    round: helpers.randStr(),
                 };
-                let token = LoginUser.createToken(user.account, this.updateDetail.pwd, req);
-                req = {
-                    ...req,
-                    token
-                };
+                req = LoginUser.createReqWithToken(user.account, this.updateDetail.pwd, req);
             }
             if (Object.keys(req).length) {
                 let rs = await testApi.userUpdate(req);
@@ -259,7 +255,7 @@ export default class UserInfo extends Base {
                     <div class="dialog-view" on-keypress={this.handlePress}>
                         <h3>修改</h3>
                         <br />
-                        <Form class="dialog-content" ref="formVaild" props={{ model: this.updateDetail }} rules={this.rules}>
+                        <Form class="dialog-content" ref="formVaild" label-position="top" props={{ model: this.updateDetail }} rules={this.rules}>
                             <FormItem prop="avatar">
                                 <MyUpload
                                     class="center"
@@ -282,24 +278,19 @@ export default class UserInfo extends Base {
                                     shape="circle"
                                 />
                             </FormItem>
-                            <FormItem prop="nickname">
-                                <span>昵称</span>
+                            <FormItem label="昵称" prop="nickname">
                                 <Input v-model={this.updateDetail.nickname} />
                             </FormItem>
-                            <FormItem prop="pwd">
-                                <span>密码</span>
+                            <FormItem label="密码" prop="pwd">
                                 <Input v-model={this.updateDetail.pwd} type="password" placeholder="不修改密码时不用填" />
                             </FormItem>
-                            <FormItem prop="newPwd">
-                                <span>新密码</span>
+                            <FormItem label="新密码" prop="newPwd">
                                 <Input v-model={this.updateDetail.newPwd} type="password" />
                             </FormItem>
-                            <FormItem prop="newPwdRepeat">
-                                <span>确认密码</span>
+                            <FormItem label="确认密码" prop="newPwdRepeat">
                                 <Input v-model={this.updateDetail.newPwdRepeat} type="password" />
                             </FormItem>
-                            <FormItem prop="profile">
-                                <span>简介</span>
+                            <FormItem label="简介" prop="profile">
                                 <Input v-model={this.updateDetail.profile} placeholder={dev.defaultProfile} type="textarea" />
                             </FormItem>
                             <FormItem>
@@ -375,26 +366,41 @@ export default class UserInfo extends Base {
     renderUserDetail() {
         let detail = this.detail;
         return (detail.self ?
-            <Form class="form-no-error" label-width={60}>
-                <FormItem label="状态">
-                    {detail.statusText}
-                </FormItem>
-                <FormItem label="简介">
-                    {detail.profile || dev.defaultProfile}
-                </FormItem>
-                <FormItem label="角色">
-                    <RoleTagView value={detail.roleList} hideCode />
-                </FormItem>
-                <FormItem label="权限">
-                    <AuthorityTagView value={detail.authorityList} hideCode />
-                </FormItem>
-                <FormItem label="可用权限">
-                    <AuthorityTagView value={Object.values(detail.auth)} hideCode />
-                </FormItem>
-                <FormItem label="注册时间">
-                    {detail.createdAt && moment(detail.createdAt).format(dev.dateFormat)}
-                </FormItem>
-            </Form> :
+            <div>
+                <UserUnbindView ref="userUnbind" on-success={(type) => {
+                    detail.bind[type] = false;
+                }} />
+                <Form class="form-no-error" label-width={60}>
+                    <FormItem label="状态">
+                        {detail.statusText}
+                    </FormItem>
+                    <FormItem label="简介">
+                        {detail.profile || dev.defaultProfile}
+                    </FormItem>
+                    <FormItem label="角色">
+                        <RoleTagView value={detail.roleList} hideCode />
+                    </FormItem>
+                    <FormItem label="权限">
+                        <AuthorityTagView value={detail.authorityList} hideCode />
+                    </FormItem>
+                    <FormItem label="可用权限">
+                        <AuthorityTagView value={Object.values(detail.auth)} hideCode />
+                    </FormItem>
+                    <FormItem label="注册时间">
+                        {detail.createdAt && moment(detail.createdAt).format(dev.dateFormat)}
+                    </FormItem>
+                    <FormItem label="绑定">
+                        <span>微信 {detail.bind[myEnum.userBind.微信] ? <Button on-click={() => {
+                            this.$refs.userUnbind.show(myEnum.userBind.微信);
+                        }}>解绑</Button> : <Button on-click={() => {
+                            this.$router.push({
+                                path: routerConfig.wxAuth.path,
+                                query: { type: myEnum.wxAuthType.绑定 }
+                            });
+                        }}>绑定</Button>}</span>
+                    </FormItem>
+                </Form>
+            </div> :
             <Form class="form-no-error" label-width={60}>
                 <FormItem label="简介">
                     {detail.profile || dev.defaultProfile}
@@ -406,6 +412,91 @@ export default class UserInfo extends Base {
         );
     }
 }
+
+class UserUnbindProp {
+}
+@Component({
+    extends: Base,
+    mixins: [getCompOpts(UserUnbindProp)]
+})
+class UserUnbind extends Vue<UserUnbindProp & Base> {
+    $refs: { unbind: iview.Form, };
+    isShow = false;
+    saving = false;
+    form = {
+        pwd: ''
+    };
+
+    type: string;
+
+    show(type) {
+        this.resetForm();
+        this.type = type;
+        this.isShow = true;
+    }
+
+    resetForm() {
+        this.form.pwd = '';
+    }
+
+    rules = {
+        pwd: [{
+            required: true,
+            trigger: 'blur'
+        }],
+    };
+
+    handlePress(e) {
+        if (this.isPressEnter(e)) {
+            this.unbind();
+        }
+    }
+
+    unbind() {
+        this.operateHandler('解绑', async () => {
+            this.saving = true;
+            let user = this.storeUser.user;
+
+            let data = {
+                type: this.type
+            };
+            data = LoginUser.createReqWithToken(user.account, this.form.pwd, data);
+            await testApi.userUnbind(data);
+            this.$emit('success', data.type);
+        }, {
+            validate: this.$refs.unbind.validate
+        }).then(rs => {
+            if (rs.success) {
+                this.isShow = false;
+                this.resetForm();
+            }
+        }).finally(() => {
+            this.saving = false;
+        });
+    }
+
+    render() {
+        return (
+            <Modal v-model={this.isShow} title="确认解绑?" footer-hide>
+                <div on-keypress={this.handlePress}>
+                    <Form class="dialog-content" ref="unbind" props={{ model: this.form }} rules={this.rules} nativeOn-submit={(e) => {
+                        e.preventDefault();
+                    }}>
+                        <FormItem label="请输入密码" prop="pwd">
+                            <Input type="password" v-model={this.form.pwd} />
+                        </FormItem>
+                        <FormItem>
+                            <Button type="primary" long on-click={this.unbind} loading={this.saving}>修改</Button>
+                        </FormItem>
+                    </Form>
+                </div>
+            </Modal>
+        );
+    }
+}
+
+
+const UserUnbindView = convClass<UserUnbindProp>(UserUnbind);
 
 /**
  * 粉丝/关注

@@ -34,6 +34,7 @@ export type DetailDataType = {
     following?: number;
     article?: number;
     video?: number;
+    bind?: { wx: boolean };
 
     self?: boolean;
 };

@@ -32,10 +32,10 @@ export class Wx extends WxBase {
         this.appSecret = opt.appSecret;
     }
 
-    getCodeUrl() {
+    getCodeUrl(type) {
         let url = 'https://open.weixin.qq.com/connect/oauth2/authorize?'
             + [
-                `redirect_uri=${env.host}/wx/auth?getUserInfo=1`,
+                `redirect_uri=${env.host}/wx/auth?type=${type}&getUserInfo=1`,
                 `appid=${this.appId}`,
                 `response_type=code&scope=snsapi_userinfo&state=1&connect_redirect=1#wechat_redirect`
             ].join('&');

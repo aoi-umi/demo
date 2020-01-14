@@ -10,8 +10,10 @@ import { NotifyMapper, NotifyInstanceType, NotifyModel } from "@/models/mongo/no
 import { PayRefund } from "@/valid-schema/class-valid";
 import { RefundModel } from "@/models/mongo/asset/refund";
 import { transaction } from "@/_system/dbMongo";
+import { UserMapper } from "@/models/mongo/user";
 import { alipayInst } from "./alipay";
 import { wxpayInst } from "./wxpay";
+import { wxInst } from "./wx";
 
 export type NotifyType = {
     notifyId: any,
@@ -130,5 +132,41 @@ export class ThirdPartyPayMapper {
             logger.error(e);
             throw e;
         }
+    }
+}
+
+export class ThirdPartyAuthMapper {
+    static async userByHandler(data: { by: string, val: string }, opt?: { checkExists?: boolean }) {
+        opt = {
+            ...opt,
+        };
+        let rs: { val: string, avatarUrl?: string; saveKey?: string; raw?: any }
+        if (data.by) {
+            if (data.by === myEnum.userBy.微信授权) {
+                let userRs = await wxInst.getUserInfo({ code: data.val }, { noReq: true });
+                rs = {
+                    val: userRs.openid,
+                    avatarUrl: userRs.headimgurl,
+                    raw: userRs
+                };
+            }
+            let map = {
+                [myEnum.userBy.微信授权]: {
+                    msg: '微信号',
+                    saveKey: 'wxOpenId'
+                }
+            }[data.by];
+            if (opt.checkExists) {
+                let exists = await UserMapper.accountExists(rs.val, data.by);
+                if (exists)
+                    throw common.error(`${map.msg}已绑定`);
+            }
+            rs.saveKey = map.saveKey;
+        } else {
+            rs = {
+                val: data.val
+            };
+        }
+        return rs;
     }
 }

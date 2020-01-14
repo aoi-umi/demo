@@ -8,29 +8,15 @@ import * as config from '@/config';
 import { myEnum } from '@/config';
 import { cache } from '@/main';
 import * as ValidSchema from '@/valid-schema/class-valid';
-import { wxInst } from '@/3rd-party';
+import { ThirdPartyAuthMapper } from '@/3rd-party';
 
 import { UserModel, UserMapper, UserLogMapper } from '@/models/mongo/user';
 import { SettingMapper } from '@/models/mongo/setting';
 import { FileMapper } from '@/models/mongo/file';
 
-const UserByHandler = async (data: { by: string, val: string }) => {
-    if (data.by === myEnum.userBy.微信授权) {
-        let rs = await wxInst.getUserInfo({ code: data.val }, { noReq: true });
-        return {
-            val: rs.openid,
-            avatarUrl: rs.headimgurl,
-            raw: rs
-        };
-    }
-    return {
-        val: data.val
-    };
-};
-
 export let accountExists: MyRequestHandler = async (opt, req, res) => {
     let data = paramsValid(req.body, ValidSchema.UserAccountExists);
-    let userByRs = await UserByHandler({ by: data.by, val: data.val });
+    let userByRs = await ThirdPartyAuthMapper.userByHandler({ by: data.by, val: data.val });
     let rs = await UserMapper.accountExists(userByRs.val, data.by);
     return rs && {
         _id: rs._id,
@@ -48,20 +34,11 @@ export let signUp: MyRequestHandler = async (opt, req, res) => {
     if (rs)
         throw common.error('账号已存在');
 
-    let userByRs = await UserByHandler({ by: data.by, val: data.byVal });
+    let userByRs = await ThirdPartyAuthMapper.userByHandler({ by: data.by, val: data.byVal }, { checkExists: true });
 
     let user = new UserModel(data);
     if (data.by) {
-        let rs = await UserMapper.accountExists(userByRs.val, data.by);
-        let map = {
-            [myEnum.userBy.微信授权]: {
-                msg: '微信号',
-                saveKey: 'wxOpenId'
-            }
-        }[data.by];
-        if (rs)
-            throw common.error(`${map.msg}已绑定`);
-        user[map.saveKey] = userByRs.val;
+        user[userByRs.saveKey] = userByRs.val;
         if (userByRs.avatarUrl) {
             try {
                 let rs = await common.requestService({
@@ -122,7 +99,7 @@ export let signIn: MyRequestHandler = async (opt, req, res) => {
 
 export let signInByAuth: MyRequestHandler = async (opt, req, res) => {
     let data = paramsValid(req.body, ValidSchema.UserSignInByAuth);
-    let userByRs = await UserByHandler({ by: data.by, val: data.val });
+    let userByRs = await ThirdPartyAuthMapper.userByHandler({ by: data.by, val: data.val });
     let existsRs = await UserMapper.accountExists(userByRs.val, data.by);
     if (!existsRs)
         throw common.error('账号未绑定');

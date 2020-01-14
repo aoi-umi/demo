@@ -17,6 +17,8 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
     userDetail,
     userDetailQuery,
     userUpdate,
+    userUnbind,
+    userBind,
 
     userMgtQuery,
     userMgtSave,
@@ -197,6 +199,12 @@ export class TestApi extends ApiModel<TestApiMethod> {
     }
     async userUpdate(data) {
         return this.requestByConfig(this.apiConfig.method.userUpdate, { data });
+    }
+    async userUnbind(data) {
+        return this.requestByConfig(this.apiConfig.method.userUnbind, { data });
+    }
+    async userBind(data) {
+        return this.requestByConfig(this.apiConfig.method.userBind, { data });
     }
     async userAccountExists(data) {
         return this.requestByConfig(this.apiConfig.method.userAccountExists, { data });

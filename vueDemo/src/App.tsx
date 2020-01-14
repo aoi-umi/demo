@@ -3,7 +3,7 @@ import { Component, Vue, Watch, Prop } from "vue-property-decorator";
 import { routerConfig } from '@/router';
 import {
     Menu, MenuItem,
-    Icon, Content, Sider, Layout, Header, Button, Modal, BackTop, Submenu,
+    Icon, Content, Sider, Layout, Header, Button, Modal, BackTop, Submenu, Spin,
 } from "@/components/iview";
 import * as style from '@/components/style';
 import { LocalStore } from '@/store';
@@ -64,7 +64,9 @@ export default class App extends Base {
         this.title = this.$route.meta.title || '';
         document.title = this.title || env.title;
     }
+    getingUserInfo = false;
     async getUserInfo() {
+        this.getingUserInfo = true;
         let token = LocalStore.getItem(dev.cacheKey.testUser);
         if (token) {
             await testApi.userInfo().then(user => {
@@ -82,6 +84,7 @@ export default class App extends Base {
                 console.error(e);
             });
         }
+        this.getingUserInfo = false;
     }
 
     collapsedSider() {
@@ -285,11 +288,13 @@ export default class App extends Base {
                         </transition>
                     }
                     <Content class="main-content">
-                        {this.$route.meta.keepAlive ?
-                            <keep-alive>
-                                <router-view></router-view>
-                            </keep-alive> :
-                            <router-view></router-view>
+                        {
+                            this.getingUserInfo ? <Spin /> :
+                                this.$route.meta.keepAlive ?
+                                    <keep-alive>
+                                        <router-view></router-view>
+                                    </keep-alive> :
+                                    <router-view></router-view>
                         }
                     </Content>
                     <BackTop bottom={100} right={10} />

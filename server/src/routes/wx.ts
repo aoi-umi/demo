@@ -4,7 +4,8 @@ import { paramsValid } from "@/helpers";
 import * as ValidSchema from '@/valid-schema/class-valid';
 
 export const getCode: MyRequestHandler = async (opt, req, res) => {
-    let rs = wxInst.getCodeUrl();
+    let data = req.query;
+    let rs = wxInst.getCodeUrl(data.type);
     return rs;
 };
 

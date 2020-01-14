@@ -119,6 +119,13 @@ export class User extends Base {
         default: ''
     })
     wxOpenId: string;
+
+    @prop()
+    get bind() {
+        return {
+            [myEnum.userBind.微信]: !!this.wxOpenId
+        };
+    }
 }
 
 export const UserModel = getModelForClass<User, typeof User>(User);

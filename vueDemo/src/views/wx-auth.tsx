@@ -37,22 +37,25 @@ export default class WxAuth extends Base {
     wxUserInfo: WxUserInfo;
     loading = false;
     val = '';
+    type = '';
     async auth() {
         let query: any = this.$route.query;
         this.val = query.code;
+        let type = this.type = query.type;
         try {
             this.wxUserInfo = null;
             this.loading = true;
-            if (this.storeUser.user.isLogin) {
-
-            } else if (!query.getUserInfo) {
-                let rs = await testApi.wxGetCode();
-                window.location.href = rs;
-            } else {
+            if (query.getUserInfo) {
                 this.wxUserInfo = await testApi.wxGetUserInfo({ code: this.val });
+            } else {
+                if ((type === myEnum.wxAuthType.绑定 && this.storeUser.user.isLogin)
+                    || type === myEnum.wxAuthType.登录 && !this.storeUser.user.isLogin) {
+                    let rs = await testApi.wxGetCode();
+                    window.location.href = rs;
+                }
             }
         } catch (e) {
-            this.errMsg = e.message;
+            this.msg = e.message;
         } finally {
             this.loading = false;
         }
@@ -62,24 +65,24 @@ export default class WxAuth extends Base {
     }
 
     accountChecking = false;
-    errMsg = '';
+    msg = '';
     account: { _id?: string };
     by = myEnum.userBy.微信授权;
     async checkAccount(val) {
         try {
-            this.errMsg = '';
+            this.msg = '';
             this.accountChecking = true;
             this.account = await testApi.userAccountExists({ val, by: this.by });
         } catch (e) {
-            this.errMsg = e.message;
+            this.msg = e.message;
         } finally {
             this.accountChecking = false;
         }
     }
 
     signInLoading = false;
-    async signInByCode() {
-        await this.operateHandler('登录', async () => {
+    signInByCode() {
+        this.operateHandler('登录', async () => {
             this.signInLoading = true;
             let req = { by: this.by, val: this.val };
             let rs = await testApi.userSignInByAuth(req);
@@ -92,15 +95,30 @@ export default class WxAuth extends Base {
         });
     }
 
+    bindLoading = false;
+    async userBind() {
+        try {
+            this.msg = '';
+            this.bindLoading = true;
+            let data = { by: this.by, val: this.val };
+            await testApi.userBind(data);
+            this.msg = '绑定成功';
+        } catch (e) {
+            this.msg = e.message;
+        } finally {
+            this.bindLoading = false;
+        }
+    }
+
     render() {
         return (
             <Card class={this.getStyleName('user-info-card')}>
                 {this.loading ? <Spin fix /> :
                     <div>
                         {
-                            this.errMsg ?
+                            this.msg ?
                                 <div class={this.getStyleName('err')}>
-                                    {this.errMsg}
+                                    {this.msg}
                                     <Button on-click={() => {
                                         this.$router.push(routerConfig.wxAuth.path);
                                     }}>重试</Button>
@@ -108,6 +126,9 @@ export default class WxAuth extends Base {
                                 this.storeUser.user.isLogin ?
                                     <div class={this.getStyleName('logined')}>
                                         <span>已登录</span>
+                                        {this.type === myEnum.wxAuthType.绑定 &&
+                                            <Button loading={this.bindLoading} on-click={() => { this.userBind(); }}>绑定</Button>
+                                        }
                                     </div> :
                                     !this.wxUserInfo ? <div /> : this.renderUserInfo()
                         }

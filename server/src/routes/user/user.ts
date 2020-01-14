@@ -8,10 +8,11 @@ import * as config from '@/config';
 import { cache } from '@/main';
 import * as ValidSchema from '@/valid-schema/class-valid';
 
-import { UserModel, UserMapper, UserLogMapper } from '@/models/mongo/user';
+import { UserModel, UserMapper, UserLogMapper, UserDocType } from '@/models/mongo/user';
 import { FileMapper } from '@/models/mongo/file';
 import { LoginUser } from '@/models/login-user';
 import { FollowModel, FollowInstanceType, FollowMapper } from '@/models/mongo/follow';
+import { ThirdPartyAuthMapper } from '@/3rd-party';
 
 function returnUser(user: LoginUser) {
     delete user.loginData;
@@ -65,15 +66,12 @@ export let detailQuery: MyRequestHandler = async (opt, req, res) => {
 export let update: MyRequestHandler = async (opt, req, res) => {
     let data = paramsValid(req.body, ValidSchema.UserUpdate);
     let user = req.myData.user;
-    let { token, ...restData } = data;
-    let updateCache: any = common.getDataInKey(restData, ['avatar', 'nickname', 'profile']);
+    let updateCache: any = common.getDataInKey(data, ['avatar', 'nickname', 'profile']);
     let update = { ...updateCache };
     let dbUser = await UserModel.findById(user._id);
-    if (restData.newPassword) {
-        let { checkToken } = UserMapper.createToken(restData, dbUser);
-        if (token !== checkToken)
-            throw common.error('', config.error.TOKEN_WRONG);
-        update.password = UserMapper.encryptPwd(restData.newPassword);
+    if (data.newPassword) {
+        UserMapper.checkToken(data, dbUser);
+        update.password = UserMapper.encryptPwd(data.newPassword);
     }
     let log = UserLogMapper.create(dbUser, user, { update });
     await transaction(async (session) => {
@@ -94,6 +92,28 @@ export let update: MyRequestHandler = async (opt, req, res) => {
     }
     return updateCache;
 
+};
+
+export let unbind: MyRequestHandler = async (opt, req, res) => {
+    let data = paramsValid(req.body, ValidSchema.UserUnbind);
+    let user = req.myData.user;
+    let dbUser = await UserModel.findById(user._id);
+    UserMapper.checkToken(data, dbUser);
+    let update: UserDocType = {};
+    if (data.type === myEnum.userBind.微信) {
+        update.wxOpenId = '';
+    }
+    await dbUser.update(update);
+};
+
+export let bind: MyRequestHandler = async (opt, req, res) => {
+    let data = paramsValid(req.body, ValidSchema.UserBind);
+    let userByRs = await ThirdPartyAuthMapper.userByHandler({ by: data.by, val: data.val }, { checkExists: true });
+    let user = req.myData.user;
+    let dbUser = await UserModel.findById(user._id);
+    let update: UserDocType = {};
+    update[userByRs.saveKey] = userByRs.val;
+    await dbUser.update(update);
 };
 
 export let mgtQuery: MyRequestHandler = async (opt, req, res) => {

@@ -55,6 +55,12 @@ const config = {
                 userUpdate: {
                     url: '/user/update',
                 },
+                userUnbind: {
+                    url: '/user/unbind',
+                },
+                userBind: {
+                    url: '/user/bind',
+                },
                 userAccountExists: {
                     url: '/user/accountExists',
                 },

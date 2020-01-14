@@ -23,6 +23,9 @@ const enumDefine = {
     userBy: {
         微信授权: 'wxCode'
     },
+    userBind: {
+        微信: 'wx'
+    },
     articleStatus: contentStatus,
     videoStatus: contentStatus,
     contentType: {
@@ -147,6 +150,10 @@ const enumDefineFront = {
         规格数量: 1,
         规格值: 2,
     },
+    wxAuthType: {
+        登录: 'login',
+        绑定: 'bind'
+    }
 };
 export const enumDef = {
     ...enumDefine,

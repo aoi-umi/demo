@@ -45,4 +45,14 @@ export class LoginUser {
         token = helpers.md5(token);
         return token;
     }
+
+    static createReqWithToken(account, pwd, data) {
+        data = {
+            ...data,
+            rand: helpers.randStr(),
+        };
+        let token = LoginUser.createToken(account, pwd, data);
+        data.token = token;
+        return data;
+    }
 }

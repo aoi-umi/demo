@@ -54,6 +54,26 @@ export class UserUpdate {
 
     token: string;
 }
+export class UserUnbind {
+    @IsIn(myEnum.userBind.getAllValue())
+    @IsDefined()
+    type: string;
+
+    @IsDefined()
+    rand: string;
+
+    @IsDefined()
+    token: string;
+}
+
+export class UserBind {
+    @IsIn(myEnum.userBy.getAllValue())
+    @IsDefined()
+    by: string;
+
+    @IsDefined()
+    val: string;
+}
 
 export class UserDetailQuery extends DetailQueryBase {
 }

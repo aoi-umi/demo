@@ -28,6 +28,13 @@ export class UserMapper {
         return { dataStr, checkToken };
     }
 
+    static checkToken(data: { token: string }, user: UserInstanceType) {
+        let { token, ...restData } = data;
+        let { checkToken } = UserMapper.createToken(restData, user);
+        if (token !== checkToken)
+            throw common.error('', config.error.TOKEN_WRONG);
+    }
+
     static encryptPwd(pwd: string) {
         return common.md5(pwd);
     }
@@ -183,6 +190,7 @@ export class UserMapper {
         rs.rows = rs.rows.map((ele) => {
             let model = new UserModel(ele);
             let obj = model.toJSON();
+            delete obj.wxOpenId;
             //可用权限
             let auth = {};
             let authorityList = ele.newAuthorityList;

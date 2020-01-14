@@ -23,6 +23,9 @@ export const enumDefine = {
     userBy: {
         微信授权: 'wxCode'
     },
+    userBind: {
+        微信: 'wx'
+    },
     articleStatus: contentStatus,
     videoStatus: contentStatus,
     danmakuType: {
