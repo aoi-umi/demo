@@ -123,6 +123,7 @@ const enumDefineFront = {
         赞: 2,
         踩: 3,
         收藏: 4,
+        分享: 5,
     },
     userEditType: {
         修改: 'edit',

@@ -4,7 +4,7 @@ import { myEnum, dev } from '@/config';
 import { testApi } from '@/api';
 import { routerConfig } from '@/router';
 import { Icon, Card, Row, Col, Checkbox, Time, Divider } from '@/components/iview';
-import { convClass, getCompOpts } from '@/components/utils';
+import { convClass, getCompOpts, Utils } from '@/components/utils';
 import { MyTag } from '@/components/my-tag';
 
 import { Base } from '../base';
@@ -34,6 +34,9 @@ class ContentOperateProp {
 
     @Prop()
     toDetail?: () => void;
+
+    @Prop()
+    getShareUrl: () => void;
 }
 @Component({
     extends: Base,
@@ -105,6 +108,15 @@ class ContentOperate extends Vue<ContentOperateProp & Base> {
                     color: ele.voteValue == myEnum.voteValue.不喜欢 ? 'red' : '',
                     onClick: () => {
                         this.handleVote(ele, ele.voteValue == myEnum.voteValue.不喜欢 ? myEnum.voteValue.无 : myEnum.voteValue.不喜欢);
+                    }
+                }, {
+                    icon: 'md-share',
+                    type: myEnum.contentOperateType.分享,
+                    class: 'pointer',
+                    onClick: () => {
+                        let url = this.getShareUrl();
+                        Utils.copy2Clipboard(url);
+                        this.$Message.info('已复制到粘贴板');
                     }
                 }].map(iconEle => {
                     return (
@@ -179,6 +191,10 @@ class ContentListItem extends Vue<ContentListItemProp & Base> {
         });
     }
 
+    private getDetailUrl(ele: ContentDataType) {
+        return `${location.host}${this.cfg.detailUrl}?_id=${ele._id}`;
+    }
+
     render() {
         let ele = this.value;
         return (
@@ -212,6 +228,8 @@ class ContentListItem extends Vue<ContentListItemProp & Base> {
                     {this.$slots.default || (!this.mgt ?
                         <ContentOperateView data={ele} contentType={this.contentType} voteType={this.cfg.voteType} stretch toDetail={() => {
                             this.toDetail(ele);
+                        }} getShareUrl={() => {
+                            return this.getDetailUrl(ele);
                         }} /> :
                         <div />)}
                 </Card>
