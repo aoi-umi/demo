@@ -1,5 +1,4 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
-import * as  QRCode from 'qrcode';
 
 import { myEnum } from '@/config';
 import { convClass, getCompOpts } from '@/components/utils';
@@ -8,10 +7,11 @@ import { RadioGroup, Radio, Button, Modal, Spin } from '@/components/iview';
 import { Base } from '../base';
 
 import './pay.less';
+import { MyQrcode, IMyQrcode } from '@/components/my-qrcode';
 
 const ShowType = {
     网页: 'web',
-    二维码: 'qecode'
+    二维码: 'qrcode'
 };
 
 class PayProp {
@@ -32,7 +32,7 @@ class PayProp {
 class Pay extends Vue<PayProp & Base> {
     stylePrefix = 'comp-pay-';
 
-    $refs: { qrCanvas: HTMLDivElement; }
+    $refs: { qrcode: IMyQrcode; }
 
     private typeList: { key: string; value: any, checked?: boolean }[] = [];
     protected created() {
@@ -63,20 +63,9 @@ class Pay extends Vue<PayProp & Base> {
     private showType = ShowType.网页;
     private showPayContent(url) {
         if (this.showType === ShowType.二维码)
-            this.qrcode(url);
+            this.$refs.qrcode.drawQrcode(url);
     }
 
-    private qrErr = '';
-    private qrDrawing = false;
-    private async qrcode(str: string) {
-        this.qrErr = '';
-        this.qrDrawing = true;
-        await QRCode.toCanvas(this.$refs.qrCanvas, str, { width: 200 }).catch(e => {
-            this.qrErr = e.message;
-        }).finally(() => {
-            this.qrDrawing = false;
-        });
-    }
     private payBoxShow = false;
     protected render() {
         return (
@@ -84,13 +73,7 @@ class Pay extends Vue<PayProp & Base> {
                 {this.$slots.default}
                 <Modal v-model={this.payBoxShow} footer-hide mask-closable={false}>
                     <div class={this.getStyleName('pay-content')}>
-                        {
-                            this.showType === ShowType.二维码 &&
-                            <div>
-                                {this.qrDrawing && <Spin size="large" fix />}
-                                {this.qrErr || <canvas ref="qrCanvas" class={this.getStyleName('qr-box')} />}
-                            </div>
-                        }
+                        <MyQrcode ref="qrcode" v-show={this.showType === ShowType.二维码} />
                     </div>
                 </Modal>
                 <RadioGroup v-model={this.payType}>

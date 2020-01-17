@@ -67,6 +67,8 @@ export default {
     },
     //公众平台
     wxOffiaCcount: {
+        // appId: 'wxa72874334956e5c9',
+        // appSecret: '1cd084d2b490f012ac01abcae879f748',
         appId: 'wx4f6293a9fba42e66',
         appSecret: 'c76edd3e2a23d34c6003451ea69c46cd',
     }

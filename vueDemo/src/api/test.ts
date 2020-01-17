@@ -101,6 +101,7 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
 
     wxGetCode,
     wxGetUserInfo,
+    wxCodeSend,
 }>;
 export type TestApiConfigType = ApiConfigModel<TestApiMethod>;
 
@@ -451,6 +452,9 @@ export class TestApi extends ApiModel<TestApiMethod> {
     }
     async wxGetUserInfo(data) {
         return this.requestByConfig(this.apiConfig.method.wxGetUserInfo, { data });
+    }
+    async wxCodeSend(data) {
+        return this.requestByConfig(this.apiConfig.method.wxCodeSend, { data });
     }
     //#endregion
 }

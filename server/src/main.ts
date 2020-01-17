@@ -99,6 +99,10 @@ export let initSocket = function (server: Server) {
             socketUser.danmakuDisConn(msg.videoId, socket);
         });
 
+        socket.on(myEnum.socket.授权, (msg) => {
+            mySocket.authObj[msg.token] = socket;
+        });
+
         socket.on('disconnect', function () {
             socketUser.delUserBySocket(socket);
         });

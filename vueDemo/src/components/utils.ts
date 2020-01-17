@@ -92,4 +92,8 @@ export class Utils {
         // console.log([scrollTop, clientHeight, scrollHeight].join(','));
         return (scrollTop + clientHeight >= scrollHeight);
     }
+
+    static isWxClient() {
+        return /MicroMessenger/i.test(navigator.userAgent);
+    };
 }

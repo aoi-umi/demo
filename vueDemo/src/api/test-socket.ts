@@ -2,6 +2,7 @@ import { myEnum, dev } from '@/config';
 import { LocalStore } from '@/store';
 import { Socket } from './model';
 
+//todo 连接后创建id关联
 export class TestSocket extends Socket {
     constructor(uri: string, opts?: SocketIOClient.ConnectOpts) {
         super(uri, opts);
@@ -39,5 +40,15 @@ export class TestSocket extends Socket {
 
     danmakuDisconnect(data) {
         this.socket.emit(myEnum.socket.弹幕池断开, data);
+    }
+
+    auth(data) {
+        this.socket.emit(myEnum.socket.授权, data);
+    }
+
+    bindAuthRecv(fn: (data) => void) {
+        this.socket.on(myEnum.socket.授权接收, (msg) => {
+            fn(msg);
+        });
     }
 }

@@ -105,6 +105,8 @@ export const enumDefine = {
         登录: 'login',
         登出: 'logout',
         私信接收: 'chatRecv',
+        授权: '3rdPartyAuth',
+        授权接收: '3rdPartyAuthRecv',
     },
     fileType: {
         图片: 'image',

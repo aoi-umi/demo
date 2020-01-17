@@ -99,6 +99,8 @@ const enumDefine = {
         登录: 'login',
         登出: 'logout',
         私信接收: 'chatRecv',
+        授权: '3rdPartyAuth',
+        授权接收: '3rdPartyAuthRecv',
     },
     fileType: {
         图片: 'image',
@@ -153,7 +155,8 @@ const enumDefineFront = {
     },
     wxAuthType: {
         登录: 'login',
-        绑定: 'bind'
+        绑定: 'bind',
+        扫码: 'scan',
     }
 };
 export const enumDef = {

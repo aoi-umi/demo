@@ -1,11 +1,13 @@
 import { Component, Vue, Watch } from 'vue-property-decorator';
 
 import { testApi, testSocket } from '@/api';
-import { Spin, Avatar, Button, Card } from '@/components/iview';
-import { MyLoad } from '@/components/my-load';
-import { myEnum, dev } from '@/config';
+import { myEnum, dev, env } from '@/config';
 import { LocalStore } from '@/store';
 import { routerConfig } from '@/router';
+import * as helpers from '@/helpers';
+import { Spin, Avatar, Button, Card } from '@/components/iview';
+import { Utils } from '@/components/utils';
+import { MyQrcode, IMyQrcode } from '@/components/my-qrcode';
 
 import { Base } from './base';
 import { SignUpView } from './user/user-sign';
@@ -25,8 +27,13 @@ type WxUserInfo = {
 @Component
 export default class WxAuth extends Base {
     stylePrefix = "wx-auth-";
+    $refs: { qrcode: IMyQrcode };
     mounted() {
         this.auth();
+        testSocket.bindAuthRecv((data) => {
+            this.val = data.code;
+            this.signInByCode();
+        });
     }
 
     @Watch('$route')
@@ -35,7 +42,7 @@ export default class WxAuth extends Base {
     }
 
     wxUserInfo: WxUserInfo;
-    loading = false;
+    loading = true;
     val = '';
     type = '';
     async auth() {
@@ -43,6 +50,7 @@ export default class WxAuth extends Base {
         this.val = query.code;
         let type = this.type = query.type;
         try {
+            this.account = null;
             this.wxUserInfo = null;
             this.loading = true;
             this.msg = '';
@@ -63,8 +71,20 @@ export default class WxAuth extends Base {
                         this.msg = '已登录';
                 }
                 if (to) {
-                    let rs = await testApi.wxGetCode({ type });
-                    window.location.href = rs;
+                    let isWx = Utils.isWxClient();
+                    let data: any = {};
+                    if (!isWx) {
+                        type = myEnum.wxAuthType.扫码;
+                        data.token = helpers.randStr();
+                        testSocket.auth({ token: data.token });
+                    }
+                    data.type = type;
+                    let rs = this.getCodeUrl(data);
+                    if (isWx) {
+                        window.location.href = rs;
+                    } else {
+                        this.$refs.qrcode.drawQrcode(rs);
+                    }
                 }
             }
         } catch (e) {
@@ -73,14 +93,25 @@ export default class WxAuth extends Base {
             this.loading = false;
         }
         if (this.wxUserInfo)
-            this.checkAccount(this.val);
+            await this.checkAccount(this.val);
         return this.wxUserInfo;
+    }
+
+    getCodeUrl(data: { type: string, token?: string }) {
+        let uri = encodeURIComponent(`${env.host}/wx/auth?type=${data.type}&getUserInfo=1&token=${data.token || ''}`);
+        let url = 'https://open.weixin.qq.com/connect/oauth2/authorize?'
+            + [
+                `redirect_uri=${uri}`,
+                `appid=${env.wxOffiaCcount.appId}`,
+                `response_type=code&scope=snsapi_userinfo&state=1&connect_redirect=1#wechat_redirect`
+            ].join('&');
+        return url;
     }
 
     accountChecking = false;
     errorMsg = '';
     msg = '';
-    account: { _id?: string };
+    account: { _id?: string } = {};
     by = myEnum.userBy.微信授权;
     async checkAccount(val) {
         try {
@@ -109,6 +140,26 @@ export default class WxAuth extends Base {
         });
     }
 
+    authSending = false;
+    authMsg = '';
+    authSend() {
+        this.operateHandler('授权', async () => {
+            this.authSending = false;
+            this.authMsg = '';
+            let query = this.$route.query;
+            let rs = await testApi.wxCodeSend({
+                code: query.code,
+                token: query.token
+            });
+            this.authMsg = rs ? '授权成功' : '授权失败';
+        }, { noDefaultHandler: true }).then(rs => {
+            if (!rs.success)
+                this.authMsg = '授权出错';
+        }).finally(() => {
+            this.authSending = false;
+        });
+    }
+
     bindLoading = false;
     async userBind() {
         try {
@@ -129,29 +180,40 @@ export default class WxAuth extends Base {
         return (
             <Card class={this.getStyleName('user-info-card')}>
                 {this.loading ? <Spin fix /> :
-                    <div>
-                        {
-                            this.errorMsg || this.msg ?
-                                <div class={this.getStyleName('err')}>
-                                    {this.errorMsg || this.msg}
-                                    <Button on-click={() => {
-                                        this.$router.push({
-                                            path: routerConfig.wxAuth.path,
-                                            query: { type: this.type }
-                                        });
-                                    }}>重试</Button>
-                                </div> :
-                                this.storeUser.user.isLogin ?
-                                    <div class={this.getStyleName('logined')}>
-                                        <span>已登录</span>
-                                        {!this.loading && this.type === myEnum.wxAuthType.绑定 &&
-                                            <Button loading={this.bindLoading} on-click={() => { this.userBind(); }}>绑定</Button>
-                                        }
+                    this.type === myEnum.wxAuthType.扫码 ?
+                        <div>
+                            {!this.account ? '无关联账号,请先绑定或注册' :
+                                <div>
+                                    {this.authMsg || <Button loading={this.authSending} on-click={() => {
+                                        this.authSend();
+                                    }}>授权登录</Button>}
+                                </div>
+                            }
+                        </div> :
+                        <div>
+                            {
+                                this.errorMsg || this.msg ?
+                                    <div class={this.getStyleName('err')}>
+                                        {this.errorMsg || this.msg}
+                                        <Button on-click={() => {
+                                            this.$router.push({
+                                                path: routerConfig.wxAuth.path,
+                                                query: { type: this.type }
+                                            });
+                                        }}>重试</Button>
                                     </div> :
-                                    !this.wxUserInfo ? <div /> : this.renderUserInfo()
-                        }
-                    </div>
+                                    this.storeUser.user.isLogin ?
+                                        <div class={this.getStyleName('logined')}>
+                                            <span>已登录</span>
+                                            {!this.loading && this.type === myEnum.wxAuthType.绑定 &&
+                                                <Button loading={this.bindLoading} on-click={() => { this.userBind(); }}>绑定</Button>
+                                            }
+                                        </div> :
+                                        !this.wxUserInfo ? <div /> : this.renderUserInfo()
+                            }
+                        </div>
                 }
+                <MyQrcode ref="qrcode" v-show={!this.storeUser.user.isLogin && !Utils.isWxClient() && this.type === myEnum.wxAuthType.登录} />
             </Card>
         );
     }
