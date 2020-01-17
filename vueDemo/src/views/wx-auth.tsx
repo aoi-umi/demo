@@ -195,12 +195,12 @@ export default class WxAuth extends Base {
                                 this.errorMsg || this.msg ?
                                     <div class={this.getStyleName('err')}>
                                         {this.errorMsg || this.msg}
-                                        <Button on-click={() => {
+                                        {this.errorMsg && <Button on-click={() => {
                                             this.$router.push({
                                                 path: routerConfig.wxAuth.path,
                                                 query: { type: this.type }
                                             });
-                                        }}>重试</Button>
+                                        }}>重试</Button>}
                                     </div> :
                                     this.storeUser.user.isLogin ?
                                         <div class={this.getStyleName('logined')}>
