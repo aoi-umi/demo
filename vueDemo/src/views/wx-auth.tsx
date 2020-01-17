@@ -50,9 +50,9 @@ export default class WxAuth extends Base {
         this.val = query.code;
         let type = this.type = query.type;
         try {
+            this.loading = true;
             this.account = null;
             this.wxUserInfo = null;
-            this.loading = true;
             this.msg = '';
             this.errorMsg = '';
             if (query.getUserInfo) {
