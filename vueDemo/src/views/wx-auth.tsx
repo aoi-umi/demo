@@ -177,30 +177,31 @@ export default class WxAuth extends Base {
     }
 
     render() {
+        let isScan = this.type === myEnum.wxAuthType.扫码;
         return (
             <Card class={this.getStyleName('user-info-card')}>
                 {this.loading ? <Spin fix /> :
-                    this.type === myEnum.wxAuthType.扫码 ?
-                        <div>
-                            {!this.account ? '无关联账号,请先绑定或注册' :
-                                <div>
-                                    {this.authMsg || <Button loading={this.authSending} on-click={() => {
-                                        this.authSend();
-                                    }}>授权登录</Button>}
-                                </div>
-                            }
+                    this.errorMsg || this.msg ?
+                        <div class={this.getStyleName('err')}>
+                            {this.errorMsg || this.msg}
+                            {this.errorMsg && !isScan && <Button on-click={() => {
+                                this.$router.push({
+                                    path: routerConfig.wxAuth.path,
+                                    query: { type: this.type }
+                                });
+                            }}>重试</Button>}
                         </div> :
                         <div>
                             {
-                                this.errorMsg || this.msg ?
-                                    <div class={this.getStyleName('err')}>
-                                        {this.errorMsg || this.msg}
-                                        {this.errorMsg && <Button on-click={() => {
-                                            this.$router.push({
-                                                path: routerConfig.wxAuth.path,
-                                                query: { type: this.type }
-                                            });
-                                        }}>重试</Button>}
+                                isScan ?
+                                    <div>
+                                        {!this.account ? '无关联账号,请先绑定或注册' :
+                                            <div>
+                                                {this.authMsg || <Button loading={this.authSending} on-click={() => {
+                                                    this.authSend();
+                                                }}>授权登录</Button>}
+                                            </div>
+                                        }
                                     </div> :
                                     this.storeUser.user.isLogin ?
                                         <div class={this.getStyleName('logined')}>
