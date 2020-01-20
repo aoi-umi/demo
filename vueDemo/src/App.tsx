@@ -70,7 +70,6 @@ export default class App extends Base {
         let token = LocalStore.getItem(dev.cacheKey.testUser);
         if (token) {
             await testApi.userInfo().then(user => {
-                testSocket.login({ [dev.cacheKey.testUser]: token });
                 this.storeUser.setUser(user);
                 if (user) {
                     if (location.pathname === routerConfig.userSignIn.path) {
@@ -81,10 +80,17 @@ export default class App extends Base {
                     }
                 }
             }).catch(e => {
+                token = '';
                 console.error(e);
             });
         }
         this.getingUserInfo = false;
+
+        testSocket.socket.on('connect', () => {
+            if (token) {
+                testSocket.login({ [dev.cacheKey.testUser]: token });
+            }
+        });
     }
 
     collapsedSider() {

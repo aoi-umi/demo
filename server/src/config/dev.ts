@@ -15,7 +15,11 @@ export default {
         wxAuthCode: {
             prefix: 'wxAuthCode',
             time: 3600 * 24,
-        }
+        },
+        wxAuth: {
+            prefix: 'wxAuth',
+            time: 60 * 10,
+        },
     },
     //自动重新登录时间 秒
     autoLoginTime: 3600 * 2,

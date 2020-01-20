@@ -83,6 +83,9 @@ export let initSocket = function (server: Server) {
     const io = SocketIO(server, { path: config.env.urlPrefix + '/socket.io' });
     mySocket = new MySocket(io, (socket, mySocket) => {
         let { socketUser } = mySocket;
+
+        let sessionId = mySocket.connect(socket, socket.request._query);
+
         socket.myData = {};
         socket.on(myEnum.socket.登录, (msg) => {
             socketUser.addUser(msg, socket);
@@ -100,11 +103,14 @@ export let initSocket = function (server: Server) {
         });
 
         socket.on(myEnum.socket.授权, (msg) => {
-            mySocket.authObj[msg.token] = socket;
+            cache.setByCfg({
+                ...config.dev.cache.wxAuth,
+                key: msg.token
+            }, sessionId);
         });
 
         socket.on('disconnect', function () {
-            socketUser.delUserBySocket(socket);
+            mySocket.disconnect(socket);
         });
     });
 };

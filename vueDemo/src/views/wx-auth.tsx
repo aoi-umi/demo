@@ -76,7 +76,7 @@ export default class WxAuth extends Base {
                     if (!isWx) {
                         type = myEnum.wxAuthType.扫码;
                         data.token = helpers.randStr();
-                        testSocket.auth({ token: data.token });
+                        testSocket.auth(data);
                     }
                     data.type = type;
                     let rs = this.getCodeUrl(data);
