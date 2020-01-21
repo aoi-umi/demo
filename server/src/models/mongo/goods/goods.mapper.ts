@@ -282,7 +282,7 @@ export class GoodsMapper {
         let { spu } = await GoodsMapper.detailQuery({ _id: sku.spuId }, { normal: true });
 
         let name = spu.name + sku.name;
-        let payInfo = await PayMapper.create({
+        let payRs = await PayMapper.create({
             money: totalPrice,
             type: data.payType,
             title: name,
@@ -293,8 +293,6 @@ export class GoodsMapper {
             contactObj: { skuId: sku._id, quantity: data.quantity }
         });
         await sku.update({ saleQuantity: sku.saleQuantity + data.quantity });
-        return {
-            payInfo: payInfo
-        };
+        return payRs;
     }
 }

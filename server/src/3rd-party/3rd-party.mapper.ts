@@ -3,14 +3,15 @@ import * as wxpay from "3rd-party-pay/dest/lib/wxpay";
 import { myEnum } from "@/config";
 import { logger } from "@/helpers";
 import * as common from "@/_system/common";
-
-import { AssetLogModel, PayInstanceType, AssetLogInstanceType, PayModel, PayMapper } from "@/models/mongo/asset";
-import { NotifyMapper, NotifyInstanceType, NotifyModel } from "@/models/mongo/notify";
-
-import { PayRefund } from "@/valid-schema/class-valid";
-import { RefundModel } from "@/models/mongo/asset/refund";
 import { transaction } from "@/_system/dbMongo";
+import { PayRefund } from "@/valid-schema/class-valid";
+import { mySocket } from "@/main";
+
+import { NotifyMapper, NotifyInstanceType, NotifyModel } from "@/models/mongo/notify";
+import { AssetLogModel, PayInstanceType, AssetLogInstanceType, PayModel, PayMapper } from "@/models/mongo/asset";
+import { RefundModel } from "@/models/mongo/asset/refund";
 import { UserMapper } from "@/models/mongo/user";
+
 import { alipayInst } from "./alipay";
 import { wxpayInst } from "./wxpay";
 import { wxInst } from "./wx";
@@ -125,6 +126,8 @@ export class ThirdPartyPayMapper {
                 await assetLog.update({ status: myEnum.assetLogStatus.已完成 });
             }
             await PayModel.updateOne({ assetLogId: assetLog._id, status: { $in: [myEnum.payStatus.待处理, myEnum.payStatus.未支付] } }, { status: myEnum.payStatus.已支付 });
+
+            mySocket.payCallBack(notify.orderNo);
         } catch (e) {
             if (assetLog)
                 await assetLog.update({ remark: e.message, $push: { remarkList: { msg: e.message, notifyId: notify._id } } });

@@ -22,7 +22,6 @@ export class MySocket {
         this.io = optIO;
         this.socketUser = new SocketUser();
         this.io.on('connection', (socket: Socket) => {
-
             onConnect && onConnect(socket, this);
         });
     }
@@ -42,6 +41,16 @@ export class MySocket {
             return true;
         }
         return false;
+    }
+
+    async payCallBack(orderNo: string) {
+        let sessionId = await cache.getByCfg({
+            ...config.dev.cache.pay,
+            key: orderNo
+        });
+        if (sessionId) {
+            this.allSocket[sessionId] && this.allSocket[sessionId].emit(myEnum.socket.支付回调, { orderNo });
+        }
     }
 
     connect(socket: Socket, data) {

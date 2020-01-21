@@ -159,13 +159,13 @@ class GoodsDetailMain extends Vue<GoodsDetailMainProp & Base> {
     }
 
     private async buy() {
-        let { payInfo } = await testApi.goodsBuy({
+        let rs = await testApi.goodsBuy({
             quantity: this.buyInfo.quantity,
             payType: this.buyInfo.payType,
             totalPrice: this.totalPrice,
             skuId: this.sku._id,
         });
-        return payInfo;
+        return rs;
     }
 
     showIdx = 0;

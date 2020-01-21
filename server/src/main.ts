@@ -109,6 +109,13 @@ export let initSocket = function (server: Server) {
             }, sessionId);
         });
 
+        socket.on(myEnum.socket.支付, (msg) => {
+            cache.setByCfg({
+                ...config.dev.cache.pay,
+                key: msg.orderNo
+            }, sessionId);
+        });
+
         socket.on('disconnect', function () {
             mySocket.disconnect(socket);
         });

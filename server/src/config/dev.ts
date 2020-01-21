@@ -20,6 +20,11 @@ export default {
             prefix: 'wxAuth',
             time: 60 * 10,
         },
+        //关联支付通知
+        pay: {
+            prefix: 'pay',
+            time: 60 * 16,
+        },
     },
     //自动重新登录时间 秒
     autoLoginTime: 3600 * 2,

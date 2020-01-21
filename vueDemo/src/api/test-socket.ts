@@ -19,6 +19,13 @@ export class TestSocket extends Socket {
         }
         opts.query['sessionId'] = id;
         super(uri, opts);
+
+        this.socket.on('connect', () => {
+            let token = LocalStore.getItem(dev.cacheKey.testUser);
+            if (token) {
+                this.login({ [dev.cacheKey.testUser]: token });
+            }
+        });
     }
 
     bindDanmakuRecv(fn: (data) => void) {
@@ -58,5 +65,15 @@ export class TestSocket extends Socket {
         this.socket.on(myEnum.socket.授权接收, (msg) => {
             fn(msg);
         });
+    }
+
+    bindPayCallback(fn: (data) => void) {
+        this.socket.on(myEnum.socket.支付回调, (msg) => {
+            fn(msg);
+        });
+    }
+
+    pay(data) {
+        this.socket.emit(myEnum.socket.支付, data);
     }
 }

@@ -107,6 +107,8 @@ export const enumDefine = {
         私信接收: 'chatRecv',
         授权: '3rdPartyAuth',
         授权接收: '3rdPartyAuthRecv',
+        支付: 'pay',
+        支付回调: 'payCallback',
     },
     fileType: {
         图片: 'image',

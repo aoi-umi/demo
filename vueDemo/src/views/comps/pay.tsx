@@ -8,6 +8,8 @@ import { Base } from '../base';
 
 import './pay.less';
 import { MyQrcode, IMyQrcode } from '@/components/my-qrcode';
+import { testSocket } from '@/api';
+import { routerConfig } from '@/router';
 
 const ShowType = {
     网页: 'web',
@@ -23,7 +25,7 @@ class PayProp {
     @Prop({
         required: true
     })
-    payFn: () => Promise<{ url: string }>;
+    payFn: () => Promise<{ orderNo: string, url: string }>;
 }
 @Component({
     extends: Base,
@@ -41,10 +43,16 @@ export class Pay extends Vue<PayProp & Base> {
             ele['checked'] = false;
             return ele;
         });
+        testSocket.bindPayCallback((data) => {
+            if (data.orderNo === this.orderNo) {
+                this.$router.push(routerConfig.payMgt.path);
+            }
+        });
     }
 
     private creatingPay = false;
     private paying = false;
+    private orderNo = '';
     private pay() {
         this.creatingPay = true;
         this.operateHandler('调起支付', async () => {
@@ -56,6 +64,8 @@ export class Pay extends Vue<PayProp & Base> {
             } else {
                 window.open(rs.url, '_blank');
             }
+            this.orderNo = rs.orderNo;
+            testSocket.pay({ orderNo: rs.orderNo });
         }, {
             noSuccessHandler: true,
         }).finally(() => {
@@ -72,6 +82,7 @@ export class Pay extends Vue<PayProp & Base> {
     private payBoxShow = false;
     toggle(val?: boolean) {
         this.isShow = val !== void 0 ? val : !this.isShow;
+        this.orderNo = '';
     }
     protected render() {
         return (
