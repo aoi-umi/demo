@@ -86,11 +86,18 @@ export default class App extends Base {
         }
         this.getingUserInfo = false;
 
-        testSocket.socket.on('connect', () => {
+        function socketLogin() {
             if (token) {
                 testSocket.login({ [dev.cacheKey.testUser]: token });
             }
-        });
+        }
+        if (testSocket.socket.connected) {
+            socketLogin();
+        } else {
+            testSocket.socket.on('connect', () => {
+                socketLogin();
+            });
+        }
     }
 
     collapsedSider() {

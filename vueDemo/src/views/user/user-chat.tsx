@@ -18,6 +18,7 @@ class ChatDetail extends Base {
     stylePrefix = 'user-chat-detail-';
     detail: UserDetailDataType = {};
     created() {
+        this.selfUserId = this.storeUser.user._id;
         testSocket.bindChatRecv((data) => {
             if (data.userId === this.detail._id) {
                 this.chat.push(data);
@@ -71,7 +72,7 @@ class ChatDetail extends Base {
     private chatContent = '';
     private noMore = false;
     private lastId = null;
-    private selfUserId = this.storeUser.user._id;
+    private selfUserId = '';
     chat = [];
     @Watch('chat')
     private watchChat() {
