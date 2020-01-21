@@ -45,8 +45,21 @@ export class Pay extends Vue<PayProp & Base> {
         });
         testSocket.bindPayCallback((data) => {
             if (data.orderNo === this.orderNo) {
-                this.$router.push(routerConfig.payMgt.path);
+                this.toggle(false);
             }
+            this.$Notice.info({
+                title: '支付成功',
+                render: () => {
+                    return (
+                        <span>
+                            订单{data.orderNo}支付成功
+                            <a on-click={() => {
+                                this.$router.push(routerConfig.payMgt.path);
+                            }}>查看</a>
+                        </span>
+                    );
+                }
+            });
         });
     }
 
