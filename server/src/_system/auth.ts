@@ -55,14 +55,14 @@ export class Auth {
                 opt.notExistsAuthority = item;
             }
         }
-        if (opt && opt.throwError) {
+        if (opt?.throwError) {
             throw common.error('', Auth.getErrorCode(opt.notExistsAuthority));
         }
         return false;
     }
 
     static getErrorCode(authData) {
-        if (authData && config.auth[authData] && config.auth[authData].errCode)
+        if (authData && config.auth[authData]?.errCode)
             return config.auth[authData].errCode;
         return config.error.NO_PERMISSIONS;
     }

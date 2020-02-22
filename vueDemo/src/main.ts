@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import iView from 'iview';
 import VueLazyload from 'vue-lazyload';
-//仅用于引入类型
-import { } from 'echarts';
+
+import 'iview/dist/styles/iview.css';
 
 Vue.use(iView);
 Vue.use(VueLazyload, {

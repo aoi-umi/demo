@@ -23,6 +23,7 @@ class File extends GridFSFile {
         return {
             filename: this.filename,
             fileId: this._id.toString(),
+            rawFileId: this.fileId.toString(),
             url: '',
         };
     }

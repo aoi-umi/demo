@@ -17,7 +17,7 @@ import { PayMapper } from './models/mongo/asset';
 
 export const auth = new Auth();
 export const mq = new MQ();
-export const cache = new Cache(config.env.redis.uri, config.env.cachePrefix ? config.env.cachePrefix + ':' : '');
+export const cache = new Cache(config.env.redis.uri, config.env.cachePrefix || '');
 export async function init() {
 
     await mq.connect(config.env.mq.mqUri);
@@ -59,7 +59,7 @@ export let register = function (app: Express) {
             ip: req.realIp,
             imgHost: req.headers.host,
             videoHost: req.headers.host,
-        }
+        };
         next();
     });
 
@@ -70,10 +70,10 @@ export let register = function (app: Express) {
         });
     });
     app.use(config.env.urlPrefix, routes);
-}
+};
 
 export let errorHandler = function (err, req: Request, res: Response, next) {
-    helpers.responseHandler(() => {
+    helpers.myRequestHandler(() => {
         throw err;
     }, req, res);
 };
@@ -83,6 +83,9 @@ export let initSocket = function (server: Server) {
     const io = SocketIO(server, { path: config.env.urlPrefix + '/socket.io' });
     mySocket = new MySocket(io, (socket, mySocket) => {
         let { socketUser } = mySocket;
+
+        let sessionId = mySocket.connect(socket, socket.request._query);
+
         socket.myData = {};
         socket.on(myEnum.socket.登录, (msg) => {
             socketUser.addUser(msg, socket);
@@ -99,8 +102,22 @@ export let initSocket = function (server: Server) {
             socketUser.danmakuDisConn(msg.videoId, socket);
         });
 
+        socket.on(myEnum.socket.授权, (msg) => {
+            cache.setByCfg({
+                ...config.dev.cache.wxAuth,
+                key: msg.token
+            }, sessionId);
+        });
+
+        socket.on(myEnum.socket.支付, (msg) => {
+            cache.setByCfg({
+                ...config.dev.cache.pay,
+                key: msg.orderNo
+            }, sessionId);
+        });
+
         socket.on('disconnect', function () {
-            socketUser.delUserBySocket(socket);
+            mySocket.disconnect(socket);
         });
     });
 };

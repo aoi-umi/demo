@@ -128,7 +128,7 @@ export class Base extends Model<Base> {
             rows,
             total: getAll ? rows.length : (groupRs.total as number || 0),
             groupRs: groupRs as { [key in keyof U]: number } & { _id: any, total: number },
-        }
+        };
     }
 
     @setStatic

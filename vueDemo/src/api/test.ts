@@ -10,12 +10,15 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
     userSignUp,
     userSignUpCheck,
     userSignIn,
+    userSignInByAuth,
     userSignOut,
     userInfo,
     userAccountExists,
     userDetail,
     userDetailQuery,
     userUpdate,
+    userUnbind,
+    userBind,
 
     userMgtQuery,
     userMgtSave,
@@ -95,6 +98,10 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
 
     settingDetailQuery,
     settingSave,
+
+    wxGetCode,
+    wxGetUserInfo,
+    wxCodeSend,
 }>;
 export type TestApiConfigType = ApiConfigModel<TestApiMethod>;
 
@@ -174,6 +181,9 @@ export class TestApi extends ApiModel<TestApiMethod> {
     async userSignIn(data) {
         return this.requestByConfig(this.apiConfig.method.userSignIn, { data });
     }
+    async userSignInByAuth(data) {
+        return this.requestByConfig(this.apiConfig.method.userSignInByAuth, { data });
+    }
     async userSignOut() {
         return this.requestByConfig(this.apiConfig.method.userSignOut);
     }
@@ -191,8 +201,14 @@ export class TestApi extends ApiModel<TestApiMethod> {
     async userUpdate(data) {
         return this.requestByConfig(this.apiConfig.method.userUpdate, { data });
     }
-    async userAccountExists(account: string) {
-        return this.requestByConfig(this.apiConfig.method.userAccountExists, { data: { account } });
+    async userUnbind(data) {
+        return this.requestByConfig(this.apiConfig.method.userUnbind, { data });
+    }
+    async userBind(data) {
+        return this.requestByConfig(this.apiConfig.method.userBind, { data });
+    }
+    async userAccountExists(data) {
+        return this.requestByConfig(this.apiConfig.method.userAccountExists, { data });
     }
 
     async userMgtQuery(data?) {
@@ -426,6 +442,19 @@ export class TestApi extends ApiModel<TestApiMethod> {
     }
     async settingSave(data) {
         return this.requestByConfig(this.apiConfig.method.settingSave, { data });
+    }
+    //#endregion
+
+    //#region wx 
+
+    async wxGetCode(data) {
+        return this.requestByConfig(this.apiConfig.method.wxGetCode, { data });
+    }
+    async wxGetUserInfo(data) {
+        return this.requestByConfig(this.apiConfig.method.wxGetUserInfo, { data });
+    }
+    async wxCodeSend(data) {
+        return this.requestByConfig(this.apiConfig.method.wxCodeSend, { data });
     }
     //#endregion
 }

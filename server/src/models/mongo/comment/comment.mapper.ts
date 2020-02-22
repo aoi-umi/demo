@@ -60,7 +60,7 @@ export class CommentMapper {
                 ownerId: data.ownerId,
                 type: data.type,
                 topId: { $exists: 0 }
-            }
+            };
         }
 
         // let owner = await CommentMapper.findOwner({
@@ -170,11 +170,11 @@ export class CommentMapper {
         let match: any = { _id: opt.ownerId };
         if (opt.type == myEnum.contentType.文章) {
             if (!opt.mgt)
-                match.status = myEnum.articleStatus.审核通过
+                match.status = myEnum.articleStatus.审核通过;
             owner = await ArticleMapper.findOne(match);
         } else if (opt.type == myEnum.contentType.视频) {
             if (!opt.mgt)
-                match.status = myEnum.videoStatus.审核通过
+                match.status = myEnum.videoStatus.审核通过;
             owner = await VideoMapper.findOne(match);
         }
         if (!owner)
@@ -185,7 +185,7 @@ export class CommentMapper {
     static resetDetail(detail, opt: CommentResetOption) {
         let { userList, user, voteList } = opt;
         if (user) {
-            if (voteList && voteList.length) {
+            if (voteList?.length) {
                 let vote = voteList.find(ele => ele.ownerId.equals(detail._id) && ele.userId.equals(user._id));
                 detail.voteValue = vote ? vote.value : myEnum.voteValue.无;
             }
@@ -198,7 +198,7 @@ export class CommentMapper {
             };
             detail.canDel = rs.canDel;
         }
-        if (userList && userList.length) {
+        if (userList?.length) {
             detail.quoteUser = userList.find(u => u._id.equals(detail.quoteUserId));
             detail.user = userList.find(u => u._id.equals(detail.userId));
         }

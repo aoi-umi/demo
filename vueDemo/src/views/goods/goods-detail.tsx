@@ -13,7 +13,7 @@ import { MyImgViewer, IMyImgViewer } from '@/components/my-img-viewer';
 import { MyNumber } from '@/components/my-number';
 
 import { Base } from '../base';
-import { PayView } from '../comps/pay';
+import { PayView, Pay } from '../comps/pay';
 import { DetailType, SkuType } from './goods-mgt-detail';
 
 import './goods.less';
@@ -60,7 +60,7 @@ class GoodsDetailMainProp {
 })
 class GoodsDetailMain extends Vue<GoodsDetailMainProp & Base> {
     stylePrefix = 'goods-';
-    $refs: { imgViewer: IMyImgViewer };
+    $refs: { imgViewer: IMyImgViewer, pay: Pay };
 
     specTag: { name: string, value: TagType[] }[] = [];
     @Watch('data')
@@ -158,15 +158,14 @@ class GoodsDetailMain extends Vue<GoodsDetailMainProp & Base> {
         });
     }
 
-    private payShow = false;
     private async buy() {
-        let { payInfo } = await testApi.goodsBuy({
+        let rs = await testApi.goodsBuy({
             quantity: this.buyInfo.quantity,
             payType: this.buyInfo.payType,
             totalPrice: this.totalPrice,
             skuId: this.sku._id,
         });
-        return payInfo;
+        return rs;
     }
 
     showIdx = 0;
@@ -175,14 +174,12 @@ class GoodsDetailMain extends Vue<GoodsDetailMainProp & Base> {
         let multi = spu.imgUrls.length > 1;
         return (
             <div>
-                <Modal v-model={this.payShow} footer-hide >
-                    <PayView payFn={async () => {
-                        return this.buy();
-                    }}>
-                        <p>{this.buyInfo.name}</p>
-                        <p>支付金额: {this.totalPrice.toFixed(2)}</p>
-                    </PayView>
-                </Modal>
+                <PayView ref="pay" payFn={async () => {
+                    return this.buy();
+                }}>
+                    <p>{this.buyInfo.name}</p>
+                    <p>支付金额: {this.totalPrice.toFixed(2)}</p>
+                </PayView>
                 <h2>{spu.name}</h2>
                 <MyImgViewer ref="imgViewer" src={spu.imgUrls} idx={this.showIdx} />
                 <Row gutter={20}>
@@ -235,7 +232,7 @@ class GoodsDetailMain extends Vue<GoodsDetailMainProp & Base> {
                             <div class={this.getStyleName('buy')}>
                                 <span>总价:{this.totalPrice.toFixed(2)}</span>
                                 <Button disabled={!this.sku} on-click={() => {
-                                    this.payShow = true;
+                                    this.$refs.pay.toggle(true);
                                 }}>立即购买</Button>
                             </div>
                         </div>

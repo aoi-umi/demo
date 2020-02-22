@@ -113,6 +113,19 @@ export class User extends Base {
         default: 0
     })
     video: number;
+
+    //授权
+    @prop({
+        default: ''
+    })
+    wxOpenId: string;
+
+    @prop()
+    get bind() {
+        return {
+            [myEnum.userBind.微信]: !!this.wxOpenId
+        };
+    }
 }
 
 export const UserModel = getModelForClass<User, typeof User>(User);

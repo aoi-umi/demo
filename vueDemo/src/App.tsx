@@ -3,7 +3,7 @@ import { Component, Vue, Watch, Prop } from "vue-property-decorator";
 import { routerConfig } from '@/router';
 import {
     Menu, MenuItem,
-    Icon, Content, Sider, Layout, Header, Button, Modal, BackTop, Submenu,
+    Icon, Content, Sider, Layout, Header, Button, Modal, BackTop, Submenu, Spin,
 } from "@/components/iview";
 import * as style from '@/components/style';
 import { LocalStore } from '@/store';
@@ -40,6 +40,7 @@ export default class App extends Base {
         this.setTitle();
         this.getUserInfo();
         this.handleResize();
+        this.setMenuCfg();
         this.activeName = this.getActiveNameByPath(location.pathname);
     }
 
@@ -63,11 +64,12 @@ export default class App extends Base {
         this.title = this.$route.meta.title || '';
         document.title = this.title || env.title;
     }
+    getingUserInfo = false;
     async getUserInfo() {
+        this.getingUserInfo = true;
         let token = LocalStore.getItem(dev.cacheKey.testUser);
         if (token) {
             await testApi.userInfo().then(user => {
-                testSocket.login({ [dev.cacheKey.testUser]: token });
                 this.storeUser.setUser(user);
                 if (user) {
                     if (location.pathname === routerConfig.userSignIn.path) {
@@ -78,8 +80,14 @@ export default class App extends Base {
                     }
                 }
             }).catch(e => {
+                token = '';
                 console.error(e);
             });
+        }
+        this.getingUserInfo = false;
+
+        if (token && testSocket.socket.connected) {
+            testSocket.login({ [dev.cacheKey.testUser]: token });
         }
     }
 
@@ -147,64 +155,67 @@ export default class App extends Base {
         this.activeName = this.getActiveNameByPath(location.pathname);
     }
 
-    private menuCfg: MenuConfig[] = [{
-        to: routerConfig.bookmark.path,
-        icon: 'md-home',
-        text: routerConfig.bookmark.text,
-        show: false,
-    }, {
-        to: routerConfig.video.path,
-        icon: 'logo-youtube',
-        text: routerConfig.video.text,
-    }, {
-        to: routerConfig.article.path,
-        icon: 'md-paper',
-        text: routerConfig.article.text,
-    }, {
-        to: routerConfig.goods.path,
-        icon: 'md-cart',
-        text: routerConfig.goods.text,
-    }, {
-        to: routerConfig.contentMgt.path,
-        icon: 'md-create',
-        text: routerConfig.contentMgt.text,
-        show: () => this.storeUser.user.hasAuth(routerConfig.contentMgt.meta.authority)
-    }, {
-        to: routerConfig.payMgt.path,
-        icon: 'logo-usd',
-        text: routerConfig.payMgt.text,
-        show: () => this.storeUser.user.hasAuth(routerConfig.payMgt.meta.authority)
-    }, {
-        to: routerConfig.assetMgt.path,
-        icon: 'md-stats',
-        text: routerConfig.assetMgt.text,
-        show: () => this.storeUser.user.hasAuth(routerConfig.assetMgt.meta.authority)
-    }, {
-        to: routerConfig.goodsMgt.path,
-        icon: 'md-nutrition',
-        text: routerConfig.goodsMgt.text,
-        show: () => this.storeUser.user.hasAuth(routerConfig.goodsMgt.meta.authority)
-    }, {
-        to: routerConfig.userMgt.path,
-        icon: 'md-people',
-        text: routerConfig.userMgt.text,
-        show: () => this.storeUser.user.hasAuth(routerConfig.userMgt.meta.authority)
-    }, {
-        to: routerConfig.role.path,
-        icon: 'md-person',
-        text: routerConfig.role.text,
-        show: () => this.storeUser.user.hasAuth(routerConfig.role.meta.authority)
-    }, {
-        to: routerConfig.authority.path,
-        icon: 'md-lock',
-        text: routerConfig.authority.text,
-        show: () => this.storeUser.user.hasAuth(routerConfig.authority.meta.authority)
-    }, {
-        to: routerConfig.setting.path,
-        icon: 'md-settings',
-        text: routerConfig.setting.text,
-        show: () => this.storeUser.user.hasAuth(routerConfig.setting.meta.authority)
-    },];
+    private menuCfg: MenuConfig[] = [];
+    private setMenuCfg() {
+        this.menuCfg = [{
+            to: routerConfig.bookmark.path,
+            icon: 'md-home',
+            text: routerConfig.bookmark.text,
+            show: false,
+        }, {
+            to: routerConfig.video.path,
+            icon: 'logo-youtube',
+            text: routerConfig.video.text,
+        }, {
+            to: routerConfig.article.path,
+            icon: 'md-paper',
+            text: routerConfig.article.text,
+        }, {
+            to: routerConfig.goods.path,
+            icon: 'md-cart',
+            text: routerConfig.goods.text,
+        }, {
+            to: routerConfig.contentMgt.path,
+            icon: 'md-create',
+            text: routerConfig.contentMgt.text,
+            show: () => this.storeUser.user.hasAuth(routerConfig.contentMgt.meta.authority)
+        }, {
+            to: routerConfig.payMgt.path,
+            icon: 'logo-usd',
+            text: routerConfig.payMgt.text,
+            show: () => this.storeUser.user.hasAuth(routerConfig.payMgt.meta.authority)
+        }, {
+            to: routerConfig.assetMgt.path,
+            icon: 'md-stats',
+            text: routerConfig.assetMgt.text,
+            show: () => this.storeUser.user.hasAuth(routerConfig.assetMgt.meta.authority)
+        }, {
+            to: routerConfig.goodsMgt.path,
+            icon: 'md-nutrition',
+            text: routerConfig.goodsMgt.text,
+            show: () => this.storeUser.user.hasAuth(routerConfig.goodsMgt.meta.authority)
+        }, {
+            to: routerConfig.userMgt.path,
+            icon: 'md-people',
+            text: routerConfig.userMgt.text,
+            show: () => this.storeUser.user.hasAuth(routerConfig.userMgt.meta.authority)
+        }, {
+            to: routerConfig.role.path,
+            icon: 'md-person',
+            text: routerConfig.role.text,
+            show: () => this.storeUser.user.hasAuth(routerConfig.role.meta.authority)
+        }, {
+            to: routerConfig.authority.path,
+            icon: 'md-lock',
+            text: routerConfig.authority.text,
+            show: () => this.storeUser.user.hasAuth(routerConfig.authority.meta.authority)
+        }, {
+            to: routerConfig.setting.path,
+            icon: 'md-settings',
+            text: routerConfig.setting.text,
+            show: () => this.storeUser.user.hasAuth(routerConfig.setting.meta.authority)
+        },];
+    }
 
     private siderWidth = 180;
     render() {
@@ -213,6 +224,10 @@ export default class App extends Base {
             <Layout class="layout no-bg">
                 <Modal v-model={this.storeSetting.setting.signInShow} footer-hide>
                     <SignInView on-success={() => {
+                        this.storeSetting.setSetting({
+                            signInShow: false
+                        });
+                    }} on-3rd-party-login-click={() => {
                         this.storeSetting.setSetting({
                             signInShow: false
                         });
@@ -277,11 +292,13 @@ export default class App extends Base {
                         </transition>
                     }
                     <Content class="main-content">
-                        {this.$route.meta.keepAlive ?
-                            <keep-alive>
-                                <router-view></router-view>
-                            </keep-alive> :
-                            <router-view></router-view>
+                        {
+                            this.getingUserInfo ? <Spin fix /> :
+                                this.$route.meta.keepAlive ?
+                                    <keep-alive>
+                                        <router-view></router-view>
+                                    </keep-alive> :
+                                    <router-view></router-view>
                         }
                     </Content>
                     <BackTop bottom={100} right={10} />

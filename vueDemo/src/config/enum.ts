@@ -20,6 +20,12 @@ const enumDefine = {
         待审核: 1,
         正常: 2
     },
+    userBy: {
+        微信授权: 'wxCode'
+    },
+    userBind: {
+        微信: 'wx'
+    },
     articleStatus: contentStatus,
     videoStatus: contentStatus,
     contentType: {
@@ -97,6 +103,10 @@ const enumDefine = {
         登录: 'login',
         登出: 'logout',
         私信接收: 'chatRecv',
+        授权: '3rdPartyAuth',
+        授权接收: '3rdPartyAuthRecv',
+        支付: 'pay',
+        支付回调: 'payCallback',
     },
     fileType: {
         图片: 'image',
@@ -121,6 +131,7 @@ const enumDefineFront = {
         赞: 2,
         踩: 3,
         收藏: 4,
+        分享: 5,
     },
     userEditType: {
         修改: 'edit',
@@ -148,6 +159,11 @@ const enumDefineFront = {
         规格数量: 1,
         规格值: 2,
     },
+    wxAuthType: {
+        登录: 'login',
+        绑定: 'bind',
+        扫码: 'scan',
+    }
 };
 export const enumDef = {
     ...enumDefine,

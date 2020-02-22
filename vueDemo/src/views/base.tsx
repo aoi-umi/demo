@@ -1,10 +1,22 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
+import { getModule } from 'vuex-module-decorators';
+
+import SettingStore from '@/store/setting';
+import LoginUserStore from '@/store/login-user';
 import { dev, error } from '@/config';
 import { routerConfig } from '@/router';
 import { MyBase } from '@/components/my-base';
 
 @Component
 export class Base extends MyBase {
+    get storeUser() {
+        return getModule(LoginUserStore, this.$store);
+    }
+
+    get storeSetting() {
+        return getModule(SettingStore, this.$store);
+    }
+
     async operateHandler(operate: string, fn: () => any, opt?: {
         beforeValid?: () => any;
         onSuccessClose?: () => any;

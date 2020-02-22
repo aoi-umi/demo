@@ -20,6 +20,12 @@ export const enumDefine = {
         待审核: 1,
         正常: 2
     },
+    userBy: {
+        微信授权: 'wxCode'
+    },
+    userBind: {
+        微信: 'wx'
+    },
     articleStatus: contentStatus,
     videoStatus: contentStatus,
     danmakuType: {
@@ -103,6 +109,10 @@ export const enumDefine = {
         登录: 'login',
         登出: 'logout',
         私信接收: 'chatRecv',
+        授权: '3rdPartyAuth',
+        授权接收: '3rdPartyAuthRecv',
+        支付: 'pay',
+        支付回调: 'payCallback',
     },
     fileType: {
         图片: 'image',

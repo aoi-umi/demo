@@ -28,8 +28,25 @@ export class UserMapper {
         return { dataStr, checkToken };
     }
 
-    static async accountExists(account: string) {
-        let rs = await UserModel.findOne({ account });
+    static checkToken(data: { token: string }, user: UserInstanceType) {
+        let { token, ...restData } = data;
+        let { checkToken } = UserMapper.createToken(restData, user);
+        if (token !== checkToken)
+            throw common.error('', config.error.TOKEN_WRONG);
+    }
+
+    static encryptPwd(pwd: string) {
+        return common.md5(pwd);
+    }
+
+    static async accountExists(val: string, by?: string) {
+        let opt: any = {};
+        if (by === myEnum.userBy.微信授权) {
+            opt.wxOpenId = val;
+        } else {
+            opt.account = val;
+        }
+        let rs = await UserModel.findOne(opt);
         return rs;
     }
 
@@ -173,6 +190,7 @@ export class UserMapper {
         rs.rows = rs.rows.map((ele) => {
             let model = new UserModel(ele);
             let obj = model.toJSON();
+            delete obj.wxOpenId;
             //可用权限
             let auth = {};
             let authorityList = ele.newAuthorityList;
@@ -229,7 +247,7 @@ export class UserMapper {
     static async detail(_id, opt: UserResetOption) {
         let userRs = await UserMapper.query({ _id }, opt);
         let userDetail = userRs.rows[0];
-        if (userDetail && userDetail.roleList.find(r => r.code == config.dev.rootRole)) {
+        if (userDetail?.roleList.find(r => r.code == config.dev.rootRole)) {
             let authList = await AuthorityModel.find({ status: myEnum.authorityStatus.启用 });
             authList.forEach(ele => {
                 userDetail.auth[ele.code] = ele;
@@ -243,7 +261,7 @@ export class UserMapper {
         if (!user)
             throw common.error('账号不存在');
         let disRs = user.checkDisabled();
-        if (loginUser && loginUser.loginData) {
+        if (loginUser?.loginData) {
             let { checkToken } = UserMapper.createToken(loginUser.loginData, user);
             if (checkToken !== loginUser.key) {
                 throw common.error('账号的密码已变更, 请重新登录');
@@ -261,11 +279,14 @@ export class UserMapper {
         user: UserInstanceType,
         token,
         oldData?: any,
+        noPwd?: boolean,
     }) {
         let { token, disabled, user } = opt;
         let { checkToken } = UserMapper.createToken(data, user);
-        if (token !== checkToken)
-            throw common.error('', config.error.TOKEN_WRONG);
+        if (!opt.noPwd) {
+            if (token !== checkToken)
+                throw common.error('', config.error.TOKEN_WRONG);
+        }
         let userAuth = {
             [config.auth.login.code]: 1
         };
@@ -276,10 +297,10 @@ export class UserMapper {
             }
         }
 
-        let lastLoginAt = (opt.oldData && opt.oldData.lastLoginAt) || new Date();
+        let lastLoginAt = (opt.oldData?.lastLoginAt) || new Date();
         let rtn = {
             _id: user._id, account: user.account, nickname: user.nickname, avatar: user.avatar,
-            key: token, authority: userAuth,
+            key: checkToken, authority: userAuth,
             loginData: data,
             cacheAt: new Date(),
             lastLoginAt

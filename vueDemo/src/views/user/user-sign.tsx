@@ -6,23 +6,42 @@ import { dev, myEnum } from '@/config';
 import { routerConfig } from '@/router';
 import { testApi, testSocket } from '@/api';
 import { LocalStore } from '@/store';
-import { convClass } from '@/components/utils';
-import { Input, Form, FormItem, Button, Checkbox, Spin, Icon } from '@/components/iview';
+import { convClass, getCompOpts } from '@/components/utils';
+import { Input, Form, FormItem, Button, Checkbox, Spin, Icon, AutoComplete, Option } from '@/components/iview';
 import { MyLoad } from '@/components/my-load';
 import { LoginUser } from '@/model/user';
 
 import { Base } from '../base';
+import { DetailDataType as UserDetailDataType } from './user-mgt';
+import { UserUnbind, UserUnbindView } from './user';
+import { LocalStoreUser } from './model';
 
 import './user.less';
+
+class SignProp {
+    @Prop()
+    account?: string;
+
+    @Prop()
+    by?: string;
+
+    @Prop()
+    byVal?: string;
+}
 
 type SignInDataType = {
     account?: string;
     password?: string;
 };
 
-@Component
-class SignIn extends Base {
-
+class SignInProp extends SignProp {
+}
+@Component({
+    extends: Base,
+    mixins: [getCompOpts(SignInProp)]
+})
+class SignIn extends Vue<Base & SignInProp> {
+    stylePrefix = 'user-sign-in-';
     private innerDetail: SignInDataType = this.getDetailData();
     private getDetailData() {
         return {
@@ -43,6 +62,10 @@ class SignIn extends Base {
     $refs: { formVaild: iview.Form };
     private loading = false;
 
+    protected created() {
+        if (this.account)
+            this.innerDetail.account = this.account;
+    }
     private async handleSignIn() {
         await this.operateHandler('登录', async () => {
             this.loading = true;
@@ -52,12 +75,15 @@ class SignIn extends Base {
             LocalStore.setItem(dev.cacheKey.testUser, token);
             let rs = await testApi.userSignIn(req);
 
-            let remberSignIn: any = { account };
+            let list = LocalStoreUser.getList();
+            if (!list)
+                list = [];
+            let remberSignIn: LocalStoreUser = { account };
             if (this.remberPwd)
                 remberSignIn.password = password;
             else
                 this.innerDetail.password = '';
-            LocalStore.setItem(dev.cacheKey.remberSignIn, remberSignIn);
+            LocalStoreUser.updateAccount(remberSignIn, list);
             testSocket.login({ [dev.cacheKey.testUser]: token });
             this.storeUser.setUser(rs);
             this.$emit('success');
@@ -80,15 +106,17 @@ class SignIn extends Base {
     to = '';
     toQuery = null;
     remberPwd = false;
+    signInUsers = [];
     mounted() {
         if (location.pathname === routerConfig.userSignIn.path) {
             let { to, ...query } = this.$route.query;
             this.to = (to as string) || routerConfig.index.path;
             this.toQuery = query;
         }
-        let rs = LocalStore.getItem(dev.cacheKey.remberSignIn);
+        let list = this.signInUsers = LocalStoreUser.getList();
         let detail = this.innerDetail;
-        if (rs) {
+        if (list && list.length) {
+            let rs = list[0];
             if (rs.account)
                 detail.account = rs.account;
             if (rs.password) {
@@ -109,10 +137,32 @@ class SignIn extends Base {
                 <br />
                 <Form class="dialog-content" label-position="top" ref="formVaild" props={{ model: detail }} rules={this.rules}>
                     <FormItem label="账号" prop="account">
-                        <Input v-model={detail.account} />
+                        <AutoComplete v-model={detail.account} clearable on-on-select={(value) => {
+                            let match = this.signInUsers.find(ele => ele.account === value);
+                            detail.password = match?.password || '';
+                        }}>
+                            {this.signInUsers.filter(ele => !detail.account || ele.account.includes(detail.account)).map(ele => {
+                                let opt = (
+                                    <Option key={ele.account} value={ele.account}>
+                                        <span>{ele.account}</span>
+                                    </Option>
+                                );
+                                opt.componentOptions.tag = 'Option';
+                                let icon = <Icon type="md-close" class={this.getStyleName('account-item-del')} nativeOn-click={() => {
+                                    LocalStoreUser.delAccount(ele.account, this.signInUsers);
+                                }} />;
+                                icon.componentOptions.tag = '';
+                                return (
+                                    <div class={this.getStyleName('account-item')}>
+                                        {opt}
+                                        {icon}
+                                    </div>
+                                );
+                            })}
+                        </AutoComplete>
                     </FormItem>
                     <FormItem label="密码" prop="password">
-                        <Input v-model={detail.password} type="password" autocomplete="new-password" />
+                        <Input v-model={detail.password} type="password" clearable autocomplete="new-password" />
                     </FormItem>
                     <FormItem>
                         <label><Checkbox v-model={this.remberPwd} />记住密码</label>
@@ -120,13 +170,68 @@ class SignIn extends Base {
                     <FormItem>
                         <Button type="primary" long on-click={this.handleSignIn} loading={this.loading}>登录</Button>
                     </FormItem>
+                    <ThirdPartyLoginView on-item-click={() => {
+                        this.$emit('3rd-party-login-click');
+                    }} />
                 </Form>
             </div >
         );
     }
 }
 
-export const SignInView = convClass(SignIn);
+export const SignInView = convClass<SignInProp>(SignIn);
+
+class ThirdPartyLoginProp {
+    @Prop()
+    bind?: boolean;
+
+    @Prop()
+    user?: UserDetailDataType
+}
+@Component({
+    extends: Base,
+    mixins: [getCompOpts(ThirdPartyLoginProp)]
+})
+class ThirdPartyLogin extends Vue<ThirdPartyLoginProp & Base> {
+    stylePrefix = 'third-party-login-';
+
+    $refs: { userUnbind: UserUnbind }
+    render() {
+        return (
+            <div class={this.getStyleName('root', this.bind && 'bind')}>
+                {this.bind && <UserUnbindView ref="userUnbind" on-success={(type) => {
+                    this.user.bind[type] = false;
+                }} />}
+                {[{
+                    bind: myEnum.userBind.微信,
+                    src: '/logo/weixin.svg',
+                    to: routerConfig.wxAuth.path,
+                    query: { type: myEnum.wxAuthType.登录 }
+                },].map(ele => {
+                    let noBind = this.bind && !this.user.bind[ele.bind];
+                    return <img class={this.getStyleName('item').concat([noBind ? 'disabled' : ''])} src={ele.src} on-click={() => {
+                        if (!this.bind) {
+                            this.$router.push({ path: ele.to, query: ele.query });
+                        } else {
+                            if (noBind) {
+                                this.$router.push({
+                                    path: routerConfig.wxAuth.path,
+                                    query: { type: myEnum.wxAuthType.绑定 }
+                                });
+                            } else {
+                                this.$refs.userUnbind.show(myEnum.userBind.微信);
+                            }
+
+                        }
+                        this.$emit('item-click', ele);
+                    }} />;
+                })}
+            </div>
+        );
+    }
+}
+
+export const ThirdPartyLoginView = convClass<ThirdPartyLoginProp>(ThirdPartyLogin);
 
 type SignUpDataType = {
     account: string;
@@ -135,8 +240,15 @@ type SignUpDataType = {
     passwordRepeat: string;
 };
 
-@Component
-class SignUp extends Base {
+class SignUpProp extends SignProp {
+    @Prop()
+    nickname?: string;
+}
+@Component({
+    extends: Base,
+    mixins: [getCompOpts(SignUpProp)]
+})
+class SignUp extends Vue<SignUpProp & Base> {
     stylePrefix = 'user-sign-up-';
     private innerDetail: SignUpDataType = this.getDetailData();
     private getDetailData() {
@@ -153,7 +265,7 @@ class SignUp extends Base {
             { required: true, trigger: 'blur' },
             {
                 asyncValidator: async (rule, value) => {
-                    let rs = await testApi.userAccountExists(value);
+                    let rs = await testApi.userAccountExists({ val: value });
                     if (rs)
                         throw new Error('账号已存在');
                 },
@@ -182,13 +294,27 @@ class SignUp extends Base {
 
     $refs: { formVaild: iview.Form };
 
+    protected created() {
+        if (this.account)
+            this.innerDetail.account =
+                this.innerDetail.nickname =
+                this.account;
+    }
     private loading = false;
-    private accExistsLoading = false;
 
     private async handleSignUp() {
         await this.operateHandler('注册', async () => {
             this.loading = true;
-            let rs = await testApi.userSignUp(this.innerDetail);
+            let data: any = {
+                ...this.innerDetail,
+            };
+            if (this.by)
+                data.by = this.by;
+            if ([myEnum.userBy.微信授权].includes(this.by)) {
+                data.byVal = this.byVal;
+            }
+
+            let rs = await testApi.userSignUp(data);
             this.innerDetail = this.getDetailData();
             this.$emit('success');
             this.$router.push(routerConfig.userSignIn.path);
@@ -214,7 +340,7 @@ class SignUp extends Base {
                 }}
                 renderFn={() => { return this.renderFn(); }}
             />
-        )
+        );
     }
 
     private renderFn() {
@@ -245,4 +371,4 @@ class SignUp extends Base {
     }
 }
 
-export const SignUpView = convClass(SignUp);
+export const SignUpView = convClass<SignUpProp>(SignUp);

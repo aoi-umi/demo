@@ -1,6 +1,5 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
-import 'echarts/lib/chart/line';
-import * as echarts from 'echarts/lib/echarts';
+import * as echarts from 'echarts';
 import * as  QRCode from 'qrcode';
 import { VideoJsPlayer } from 'video.js';
 

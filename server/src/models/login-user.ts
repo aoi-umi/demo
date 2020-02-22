@@ -25,6 +25,6 @@ export class LoginUser {
     }
 
     equalsId(id) {
-        return this._id && this._id.equals(id);
+        return this._id?.equals(id);
     }
 }

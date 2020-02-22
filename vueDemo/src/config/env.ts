@@ -1,28 +1,32 @@
 import { TestApiConfigType } from "../api";
 
 const host = 'umi-aoi.xyz';
-const env = location.hostname.includes(host) ? 'prod' : 'dev';
+const ip = '144.202.99.178';
+const env = [host, ip].find(ele => location.hostname.includes(ele)) ? 'prod' : 'dev';
 const envConfig = {
     prod: {
-        host: `//api.${host}`
+        host: 'http://' + ip,
+        apiHost: `//api.${host}`
     },
     dev: {
-        host: `//${location.hostname}:8000`
+        host: 'http://192.168.100.119:8080',
+        apiHost: `//${location.hostname}:8000`
     }
 };
 let currEnvCfg = envConfig[env];
 const config = {
     title: '开发',
+    host: currEnvCfg.host,
     socket: {
         test: {
-            host: `${currEnvCfg.host}`,
+            host: `${currEnvCfg.apiHost}`,
             path: '/devMgt/socket.io'
         }
     },
     api: {
         test: {
             defaultArgs: {
-                host: `${currEnvCfg.host}/devMgt`,
+                host: `${currEnvCfg.apiHost}/devMgt`,
             },
             method: {
                 userSignUp: {
@@ -33,6 +37,9 @@ const config = {
                 },
                 userSignIn: {
                     url: '/user/signIn',
+                },
+                userSignInByAuth: {
+                    url: '/user/signInByAuth',
                 },
                 userSignOut: {
                     url: '/user/signOut',
@@ -51,6 +58,12 @@ const config = {
                 },
                 userUpdate: {
                     url: '/user/update',
+                },
+                userUnbind: {
+                    url: '/user/unbind',
+                },
+                userBind: {
+                    url: '/user/bind',
                 },
                 userAccountExists: {
                     url: '/user/accountExists',
@@ -289,9 +302,24 @@ const config = {
                 },
                 videoGet: {
                     url: '/video'
-                }
+                },
+
+                wxGetCode: {
+                    url: '/wx/getCode',
+                    method: 'get'
+                },
+                wxGetUserInfo: {
+                    url: '/wx/getUserInfo',
+                    method: 'get'
+                },
+                wxCodeSend: {
+                    url: '/wx/codeSend',
+                },
             },
         } as TestApiConfigType
+    },
+    wxOffiaCcount: {
+        appId: 'wx4f6293a9fba42e66',
     }
 };
 export default config;

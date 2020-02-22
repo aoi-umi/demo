@@ -20,7 +20,7 @@ yarn-error.log*
 *.sln
 *.sw?
 
-
+out
 dist
 dest
 package-lock.json

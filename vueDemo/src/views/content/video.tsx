@@ -24,7 +24,7 @@ export default class Video extends Vue<VideoProp & ListBase> {
 
     query() {
         let list = this.$refs.list;
-        let query
+        let query;
         if (!this.notQueryOnRoute) {
             query = this.$route.query;
             list.setQueryByKey(query, ['user', 'title']);

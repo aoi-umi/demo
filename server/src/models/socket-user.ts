@@ -16,7 +16,7 @@ export class SocketUser {
             socketList: list,
             socketData: null as Socket,
             idx: -1
-        }
+        };
         if (list) {
             let matchIdx = list.findIndex(ele => ele === socket);
             if (matchIdx > -1) {
@@ -39,7 +39,7 @@ export class SocketUser {
     }
 
     async addUser(data, socket: Socket) {
-        let user = await UserAuthMid.getUser(data[config.dev.cacheKey.user]);
+        let user = await UserAuthMid.getUser(data[config.dev.cache.user.prefix]);
         if (user.isLogin) {
             let key = user._id.toString();
             socket.myData.userId = key;

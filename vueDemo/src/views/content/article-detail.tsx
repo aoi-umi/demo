@@ -40,6 +40,8 @@ export default class ArticleDetail extends Base {
                                             let el = this.$refs.comment.$el as HTMLElement;
                                             window.scrollTo(0, el.offsetTop);
                                         }
+                                    }} getShareUrl={() => {
+                                        return location.href;
                                     }} />
                                 </Card>
                             </Affix>

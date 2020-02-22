@@ -23,8 +23,11 @@ export class UserAuthMid {
             key: token || ''
         });
         if (token) {
-            let userCacheKey = config.dev.cacheKey.user + token;
-            let userData = await cache.get(userCacheKey);
+            let userCacheCfg = {
+                ...config.dev.cache.user,
+                key: token,
+            };
+            let userData = await cache.getByCfg(userCacheCfg);
             if (userData) {
                 user = plainToClass(LoginUser, userData);
                 user.isLogin = true;
@@ -43,10 +46,10 @@ export class UserAuthMid {
                             user: dbUser,
                             oldData: user,
                         });
-                        await cache.set(userCacheKey, cacheUser, config.dev.cacheTime.user);
+                        await cache.setByCfg(userCacheCfg, cacheUser);
                     } catch (e) {
                         logger.error(e);
-                        cache.del(userCacheKey);
+                        cache.delByCfg(userCacheCfg);
                     }
                 }
             }
@@ -57,7 +60,7 @@ export class UserAuthMid {
     static normal(authData?: AuthType) {
         let fn: RequestHandler = async (req, res, next) => {
             try {
-                let token = req.header(config.dev.cacheKey.user);
+                let token = req.header(config.dev.cache.user.prefix);
                 let user = await UserAuthMid.getUser(token, {
                     autoLogin: true,
                     resetOpt: { imgHost: req.myData.imgHost }
@@ -71,7 +74,7 @@ export class UserAuthMid {
             } catch (e) {
                 next(e);
             }
-        }
+        };
         return fn;
     }
 }

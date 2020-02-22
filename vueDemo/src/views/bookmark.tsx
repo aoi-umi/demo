@@ -46,6 +46,7 @@ class BookmarkDetail extends Vue<BookmarkDetailProp & Base> {
 
     private initDetail(data) {
         this.innerDetail = data;
+        this.tag = '';
         this.tagModel.initTag(this.innerDetail.tagList);
     }
 
@@ -61,7 +62,7 @@ class BookmarkDetail extends Vue<BookmarkDetailProp & Base> {
     $refs: { formVaild: iview.Form };
 
     addTag() {
-        let tag = this.tag && this.tag.trim();
+        let tag = this.tag?.trim();
         if (tag) {
             this.tagModel.addTag(tag);
             this.tag = '';

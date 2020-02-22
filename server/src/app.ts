@@ -16,6 +16,19 @@ import * as db from '@/_system/dbMongo';
 
 bodyParserXml(bodyParser);
 debug('my-application');
+
+
+const app = express();
+app.set('port', process.env.PORT || config.env.port);
+
+app.use(logger('dev'));
+app.use(bodyParser['xml']({ xmlParseOptions: { explicitArray: false } }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+// app.use(express.static(path.join(__dirname, 'public')));
+//app.use(express.static(config.fileDir));
+app.use(cors());
 (async () => {
     await db.init(config.env.mongoose);
 })().then(async () => {
@@ -26,17 +39,6 @@ debug('my-application');
     });
     const main = await import('./main');
     await main.init();
-    const app = express();
-    app.set('port', process.env.PORT || config.env.port);
-
-    app.use(logger('dev'));
-    app.use(bodyParser['xml']({ xmlParseOptions: { explicitArray: false } }));
-    app.use(express.json());
-    app.use(express.urlencoded({ extended: false }));
-    app.use(cookieParser());
-    // app.use(express.static(path.join(__dirname, 'public')));
-    //app.use(express.static(config.fileDir));
-    app.use(cors());
 
     main.register(app);
 
@@ -55,7 +57,9 @@ debug('my-application');
         let address = server.address() as AddressInfo;
         console.log([
             '#################',
+            '#',
             `# ${config.env.name} run at ${address.address}:${address.port},version:${config.env.version}`,
+            '#',
             '#################',
         ].join('\r\n'));
     });

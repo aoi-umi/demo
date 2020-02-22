@@ -192,6 +192,10 @@ export class PayMapper {
             await assetLog.save({ session });
         });
         SendQueue.payAutoCancel({ _id: pay._id });
-        return payInfo;
+        return {
+            payId: pay._id,
+            orderNo: pay.orderNo,
+            ...payInfo
+        };
     }
 }

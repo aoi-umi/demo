@@ -86,7 +86,7 @@ export let promiseAll = function (list: Array<Q.Promise<any>>) {
         });
     }).catch(d.reject);
     return d.promise;
-}
+};
 
 export let promisify = function (fun, caller?) {
     return function (...args): Q.Promise<any> {
@@ -176,7 +176,7 @@ export function enumerable(value: boolean) {
             descriptor = Object.getOwnPropertyDescriptor(target, propertyKey) || {};
             if (descriptor.enumerable != value) {
                 descriptor.enumerable = value;
-                Object.defineProperty(target, propertyKey, descriptor)
+                Object.defineProperty(target, propertyKey, descriptor);
             }
         }
     };
@@ -195,7 +195,7 @@ export function distinct<T = any>(list: T[], fn?: (list: T[], val: T) => boolean
     let rtn = [];
     for (let val of list) {
         if (fn ? fn(rtn, val) : !rtn.includes(val))
-            rtn.push(val)
+            rtn.push(val);
     }
     return rtn;
 }
@@ -277,13 +277,14 @@ export let extend = function (...args) {
     return res;
 };
 
+type RequestServiceOption = AxiosRequestConfig & { raw?: boolean };
 export type RequestServiceByConfigOption = {
     serviceName?: string;
     methodName?: string;
     beforeRequest?: Function;
     afterResponse?: Function;
     outLog?: any;
-} & AxiosRequestConfig;
+} & RequestServiceOption;
 export let requestServiceByConfig = function (option: RequestServiceByConfigOption) {
     let method = '';
     let url = '';
@@ -311,7 +312,7 @@ export let requestServiceByConfig = function (option: RequestServiceByConfigOpti
         let defaultMethodArgs = {
             isUseDefault: true,
             method: 'POST',
-        }
+        };
         let methodConfig = service.method[option.methodName];
         methodConfig = extend(defaultMethodArgs, methodConfig);
 
@@ -359,8 +360,8 @@ export let requestServiceByConfig = function (option: RequestServiceByConfigOpti
     });
 };
 
-export let requestService = function (option: AxiosRequestConfig) {
-    let opt: AxiosRequestConfig = {
+export let requestService = function (option: RequestServiceOption) {
+    let opt: RequestServiceOption = {
         method: 'POST',
     };
     opt = extend(opt, option);
@@ -373,18 +374,17 @@ export let requestService = function (option: AxiosRequestConfig) {
         let encoding = response.headers['content-encoding'];
         switch (encoding) {
             case 'gzip':
-                let buffer = await promisify(zlib.unzip)(data);
-                data = buffer.toString();
-                if (data && typeof data == 'string')
-                    data = JSON.parse(data);
+                data = await promisify(zlib.unzip)(data);
                 break;
             default:
                 if (encoding)
                     throw error(`Not Accept Encoding:${encoding}`);
         }
 
-        if (Buffer.isBuffer(data)) {
+        if (!opt.raw && Buffer.isBuffer(data)) {
             data = data.toString();
+            if (data && typeof data == 'string')
+                data = JSON.parse(data);
         }
         return { response, data };
     });
@@ -511,7 +511,7 @@ export let getListDiff = function <T1, T2>(option: {
         compare = opt.compare, delReturnValue = opt.delReturnValue, addReturnValue = opt.addReturnValue;
     let delList = [];
     let addList = [];
-    if (newList && newList.length) {
+    if (newList?.length) {
         list.forEach(function (item) {
             let match = newList.find(function (item2) {
                 return compare(item, item2);
@@ -554,7 +554,7 @@ export let isObjectEmpty = function (obj) {
         }
     }
     return empty;
-}
+};
 //#endregion
 
 //删除require

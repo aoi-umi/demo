@@ -1,13 +1,18 @@
-import { IsArray, IsDefined, ArrayMinSize, MinLength } from "class-validator";
+import { IsArray, IsDefined, ArrayMinSize, MinLength, IsIn } from "class-validator";
 import { Type, Transform } from "class-transformer";
 import { ListBase, DelBase, DetailQueryBase } from "../base";
 import { objectIdTransform } from "../util";
+import { myEnum } from "@/config";
 
 export class UserAccountExists {
     @IsDefined()
     @MinLength(1)
-    account: string;
+    val: string;
+
+    @IsIn(myEnum.userBy.getAllValue())
+    by?: string;
 }
+
 
 export class UserSignUp {
     @IsDefined()
@@ -18,6 +23,11 @@ export class UserSignUp {
 
     @IsDefined()
     password: string;
+
+    @IsIn(myEnum.userBy.getAllValue())
+    by?: string;
+
+    byVal?: string;
 }
 
 export class UserSignIn {
@@ -28,12 +38,41 @@ export class UserSignIn {
     rand: string;
 }
 
+export class UserSignInByAuth {
+    @IsIn(myEnum.userBy.getAllValue())
+    @IsDefined()
+    by: string;
+
+    @IsDefined()
+    val: string;
+}
+
 export class UserUpdate {
     newPassword: string;
 
     rand: string;
 
     token: string;
+}
+export class UserUnbind {
+    @IsIn(myEnum.userBind.getAllValue())
+    @IsDefined()
+    type: string;
+
+    @IsDefined()
+    rand: string;
+
+    @IsDefined()
+    token: string;
+}
+
+export class UserBind {
+    @IsIn(myEnum.userBy.getAllValue())
+    @IsDefined()
+    by: string;
+
+    @IsDefined()
+    val: string;
 }
 
 export class UserDetailQuery extends DetailQueryBase {

@@ -4,7 +4,9 @@ export default {
     dateFormat: 'YYYY-MM-DD HH:mm:ss',
     cacheKey: {
         testUser: 'userCacheKey',
-        remberSignIn: 'remberSignIn'
+        remberSignIn: 'remberSignIn',
+        signInUsers: 'signInUsers',
+        sessionId: 'sessionId',
     },
     defaultProfile: defaultProfile,
     defaultArticleProfile: defaultProfile,

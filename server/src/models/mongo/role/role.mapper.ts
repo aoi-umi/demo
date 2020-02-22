@@ -47,7 +47,7 @@ export class RoleMapper {
                     { 'newAuthorityList.code': anykey },
                     { 'newAuthorityList.name': anykey },
                 ]
-            }]
+            }];
         }
         if (data.authority) {
             let authority = new RegExp(escapeRegExp(data.authority), 'i');

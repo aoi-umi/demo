@@ -35,12 +35,12 @@ const _getMessage = ValidationTypes.getMessage;
 ValidationTypes.getMessage = function (this: typeof ValidationTypes, type: string, isEach: boolean) {
     let eachPrefix = isEach ? "里的每一项" : "";
     switch (type) {
-        case this.CONTAINS:
-            return `${eachPrefix}必须包含 $constraint1 字符串`;
-        case this.IS_INT:
-            return `${eachPrefix}必须是整数`;
-        case this.IS_DEFINED:
-            return `${eachPrefix}不能为空`;
+    case this.CONTAINS:
+        return `${eachPrefix}必须包含 $constraint1 字符串`;
+    case this.IS_INT:
+        return `${eachPrefix}必须是整数`;
+    case this.IS_DEFINED:
+        return `${eachPrefix}不能为空`;
     }
     return _getMessage.apply(ValidationTypes, arguments);
-}
+};

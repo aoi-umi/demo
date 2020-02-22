@@ -25,7 +25,7 @@ export class Pay extends Base {
     @prop()
     get orderNo() {
         //临时
-        return this._id.toString()
+        return this._id.toString();
     };
 
     @prop({
