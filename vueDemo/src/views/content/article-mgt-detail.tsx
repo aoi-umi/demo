@@ -15,6 +15,7 @@ import './article.less';
 
 export type DetailDataType = ContentDataType & {
     content: string;
+    contentType: number;
 };
 export type DetailType = ContentDetailType<DetailDataType>;
 
@@ -27,6 +28,7 @@ export default class ArticleMgtDetail extends ArticleMgtBase {
     protected getDetailData() {
         let data = this.getDefaultDetail<DetailDataType>();
         data.detail.content = '';
+        data.detail.contentType = myEnum.articleContentType.默认;
         data.detail.status = myEnum.articleStatus.草稿;
         data.detail.statusText = myEnum.articleStatus.getKey(data.detail.status);
         return data;
@@ -60,6 +62,7 @@ export default class ArticleMgtDetail extends ArticleMgtBase {
         let { user, ...restDetail } = detail;
         let rs = await testApi.articleMgtSave({
             ...restDetail,
+            contentType: this.$refs.editor.currType,
             submit
         });
         return rs;
@@ -140,6 +143,7 @@ export default class ArticleMgtDetail extends ArticleMgtBase {
                 <FormItem label="内容" prop="content">
                     <MyEditor ref="editor" class={this.getStyleName('detail-content')}
                         v-model={detail.content}
+                        type={detail.contentType}
                         placeholder='输点啥。。。'
                         on-img-change={(file) => {
                             this.fileChangeHandler(file);

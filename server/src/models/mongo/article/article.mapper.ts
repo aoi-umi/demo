@@ -127,7 +127,7 @@ export class ArticleMapper {
     static async mgtSave(data: ValidSchema.ArticleSave, opt: { user: LoginUser }) {
         let status = data.submit ? myEnum.articleStatus.待审核 : myEnum.articleStatus.草稿;
         let saveKey: (keyof ArticleDocType)[] = [
-            'cover', 'title', 'profile', 'content', 'remark',
+            'cover', 'title', 'profile', 'content', 'contentType', 'remark',
             'setPublish', 'setPublishAt'
         ];
         let rs = await ContentMapper.mgtSave(data, {

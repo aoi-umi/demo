@@ -26,6 +26,10 @@ const enumDefine = {
         文章: 0,
         视频: 1,
     },
+    articleContentType: {
+        默认: 0,
+        Markdown: 1,
+    },
     commentStatus: {
         正常: 0,
         已删除: -1

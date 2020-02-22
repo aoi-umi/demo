@@ -1,5 +1,6 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import moment from 'dayjs';
+import marked from 'marked';
 
 import { testApi } from '@/api';
 import { myEnum, dev } from '@/config';
@@ -63,6 +64,14 @@ class ArticleDetailMainProp {
 })
 class ArticleDetailMain extends Vue<ArticleDetailMainProp & Base> {
     stylePrefix = 'article-';
+    content = '';
+    created() {
+        let detail = this.data;
+        this.content = detail.content;
+        if (detail.contentType === myEnum.articleContentType.Markdown) {
+            this.content = marked(detail.content);
+        }
+    }
 
     renderHeader(detail: DetailDataType) {
         return (
@@ -86,7 +95,7 @@ class ArticleDetailMain extends Vue<ArticleDetailMainProp & Base> {
                 {this.renderHeader(detail)}
                 <br />
                 <div class="ql-snow">
-                    <div class="ql-editor" domPropsInnerHTML={detail.content} />
+                    <div class="ql-editor" domPropsInnerHTML={this.content} />
                 </div>
             </div >
         );

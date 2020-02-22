@@ -16,6 +16,10 @@ export class ArticleSave extends ContentSave {
     @IsDefined()
     @MinLength(1)
     content: string;
+    
+    @IsDefined()
+    @IsIn(myEnum.articleContentType.getAllValue())
+    contentType: number;
 }
 
 export class ArticleDel extends ContentDel {

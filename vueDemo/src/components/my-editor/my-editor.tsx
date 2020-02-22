@@ -4,10 +4,18 @@ import 'quill/dist/quill.core.css';
 import 'quill/dist/quill.snow.css';
 import 'quill/dist/quill.bubble.css';
 
-import { MyInputBase, MyInputBaseProp } from '../my-input/my-input';
+import marked from 'marked';
+
+import { Input, RadioGroup, Radio, Row, Col } from '../iview';
 import { convClass, getCompOpts } from '../utils';
+import { MyInputBase, MyInputBaseProp } from '../my-input/my-input';
 
 import './style.less';
+
+const ContentType = {
+    default: 0,
+    markdown: 1,
+};
 
 class MyEditorProp extends MyInputBaseProp {
     @Prop({
@@ -33,6 +41,11 @@ class MyEditorProp extends MyInputBaseProp {
         }
     })
     toolbar?: any[][];
+
+    @Prop({
+        default: ContentType.default
+    })
+    type?: number
 }
 @Component({
     extends: MyInputBase,
@@ -89,6 +102,43 @@ class MyEditor extends Vue<MyEditorProp & MyInputBase> {
         { choice: '.ql-align .ql-picker-item[data-value="justify"]', title: '两端对齐' }
     ];
 
+    private contentTypeList: any[];
+    currType = this.type;
+    private defaultValue = '';
+    private markdownValue = '';
+    private markdownPreview = '';
+    @Watch('defaultValue')
+    private watchDefault() {
+        this.setCurrVal(this.defaultValue);
+    }
+    @Watch('markdownValue')
+    private watchMarkdown() {
+        this.markdownPreview = marked(this.markdownValue);
+        this.setCurrVal(this.markdownValue);
+    }
+    private setCurrVal(val) {
+        this.currentValue = val;
+    }
+
+    private typeMap = {
+        [ContentType.default]: 'defaultValue',
+        [ContentType.markdown]: 'markdownValue',
+    };
+    
+    @Watch('currType')
+    private watchType(newType, oldType) {
+        this.$data[this.typeMap[newType]] = this.$data[this.typeMap[oldType]];
+    }
+
+    created() {
+        this.$data[this.typeMap[this.currType]] = this.value;
+        this.contentTypeList = Object.entries(ContentType).map((v) => {
+            return {
+                key: v[0],
+                value: v[1],
+            };
+        });
+    }
     protected mounted() {
         let el: HTMLElement = this.$refs.quillEditor.$el;
         for (let ele of this.toolbarTips) {
@@ -127,20 +177,44 @@ class MyEditor extends Vue<MyEditorProp & MyInputBase> {
     render() {
         let self = this;
         return (
-            <quillEditor class={this.getStyleName('editor')} ref="quillEditor" v-model={this.currentValue} options={{
-                placeholder: this.placeholder,
-                modules: {
-                    toolbar: {
-                        container: this.toolbar,
-                        handlers: {
-                            image: function () {
-                                self.handleImg(this);
-                            }
+            <div>
+                <div>
+                    <span>类型 </span>
+                    <RadioGroup v-model={this.currType}>
+                        {this.contentTypeList.map(ele => {
+                            return <Radio label={ele.value}>{ele.key}</Radio>
+                        })}
+                    </RadioGroup>
+                </div>
+                <quillEditor v-show={this.currType === ContentType.default}
+                    class={this.getStyleName('editor')} ref="quillEditor"
+                    v-model={this.defaultValue} options={{
+                        placeholder: this.placeholder,
+                        modules: {
+                            toolbar: {
+                                container: this.toolbar,
+                                handlers: {
+                                    image: function () {
+                                        self.handleImg(this);
+                                    }
+                                }
+                            },
                         }
-                    },
-                }
-            }
-            } />
+                    }
+                    } />
+                <Row gutter={5}>
+                    <Col xs={12}>
+                        <Input
+                            v-show={this.currType === ContentType.markdown} type="textarea"
+                            class={this.getStyleName('editor')} v-model={this.markdownValue}
+                        />
+                    </Col>
+                    <Col xs={12}>
+                        <div class={this.getStyleName('preview')} domPropsInnerHTML={this.markdownPreview}>
+                        </div>
+                    </Col>
+                </Row>
+            </div>
         );
     }
 }

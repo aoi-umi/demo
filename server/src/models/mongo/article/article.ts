@@ -23,6 +23,12 @@ export class Article extends ContentBase {
     content: string;
 
     @prop({
+        enum: myEnum.articleContentType.getAllValue(),
+        default: myEnum.articleContentType.默认,
+    })
+    contentType: number;
+
+    @prop({
         enum: myEnum.articleStatus.getAllValue(),
         required: true
     })
