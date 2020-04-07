@@ -24,15 +24,15 @@ class Download {
     static async run(url, analyzerType) {
         let dir = 'out';
         dir = path.join(dir, url.replace(/http(s)?:\/\//, '').replace(/\//g, '_'));
-        mkdir(dir);
         // let exec = /^http(s)?:\/\/[^\/]+/.exec(url);
         let html = await this.load(url);
         let analyzer = this.getAnalyzer(analyzerType, url);
         let list = await analyzer(html);
-
+        
         if (!list.length)
-            console.log('无下载内容');
+        console.log('无下载内容');
         else {
+            mkdir(dir);
             await this.save(dir, list);
         }
     }
