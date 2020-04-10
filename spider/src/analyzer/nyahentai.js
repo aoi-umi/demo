@@ -21,7 +21,10 @@ async function nyahentai(html) {
             }
         }
     });
-    return list;
+    let title = $('#info h1').text();
+    if (title)
+        title = title.trim();
+    return { list, title };
 }
 
 exports.default = nyahentai;

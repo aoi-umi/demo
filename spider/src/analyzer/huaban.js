@@ -40,5 +40,5 @@ exports.default = async function (html, save) {
                 };
             });
     }
-    return list;
+    return { list };
 };

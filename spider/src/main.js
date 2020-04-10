@@ -23,17 +23,20 @@ class Download {
 
     static async run(url, analyzerType) {
         let dir = 'out';
-        dir = path.join(dir, url.replace(/http(s)?:\/\//, '').replace(/\//g, '_'));
+        let dirName = url.replace(/http(s)?:\/\//, '').replace(/\//g, '_');
         // let exec = /^http(s)?:\/\/[^\/]+/.exec(url);
         let html = await this.load(url);
         let analyzer = this.getAnalyzer(analyzerType, url);
-        let list = await analyzer(html);
-        
-        if (!list.length)
-        console.log('无下载内容');
+        let rs = await analyzer(html);
+
+        if (!rs.list.length)
+            console.log('无下载内容');
         else {
+            if (rs.title)
+                dirName = rs.title;
+            dir = path.join(dir, dirName);
             mkdir(dir);
-            await this.save(dir, list);
+            await this.save(dir, rs.list);
         }
     }
 
@@ -78,7 +81,7 @@ class Download {
         if (!analyzerType) {
             if (/huaban.com/.test(url))
                 analyzerType = analyzerEnum.花瓣;
-            else if (/nyahentai.pro/.test(url))
+            else if (/nyahentai.pro|nyahentai[\d]*.com/.test(url))
                 analyzerType = analyzerEnum.nyahentai;
 
         }
