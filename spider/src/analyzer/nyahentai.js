@@ -8,7 +8,15 @@ async function nyahentai(html) {
         let src = dom.attr('data-src');
         let reg = /(\d+)t\.([\w]+)$/;
         if (src) {
-            src = src.replace('t.nyahentai.net', 'i.nyahentai.net');
+            [{
+                search: 'mt.404cdn.com',
+                replace: 'mi.404cdn.com',
+            }, {
+                search: 't.nyahentai.net',
+                replace: 'i.nyahentai.net',
+            }].forEach(ele => {
+                src = src.replace(ele.search, ele.replace);
+            });
             let exec = reg.exec(src);
             if (exec) {
                 list.push([{
