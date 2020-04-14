@@ -48,7 +48,10 @@ export default class UserInfo extends Base {
     async load() {
         let query = this.$route.query as { [key: string]: string };
         let loadRs = this.$refs.loadView.result;
-        if (!loadRs.success || (query._id && this.detail._id !== query._id)) {
+        if (!loadRs.success
+            || (query._id && this.detail._id !== query._id)
+            || (!query._id && !this.storeUser.user.equalsId(this.detail._id))
+        ) {
             this.initTab();
             await this.$refs.loadView.loadData();
         }

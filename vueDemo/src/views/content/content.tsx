@@ -197,6 +197,7 @@ class ContentListItem extends Vue<ContentListItemProp & Base> {
 
     render() {
         let ele = this.value;
+        let min = false;//this.contentType === myEnum.contentType.视频;
         return (
             <div>
                 <Card style={{ marginTop: '5px', cursor: this.mgt ? '' : 'pointer' }}>
@@ -219,7 +220,7 @@ class ContentListItem extends Vue<ContentListItemProp & Base> {
                         <Row class={this.getStyleName('content-row')}>
                             <Col class={this.getStyleName('cover-col')}>
                                 {ele.coverUrl && <img class={[...this.getStyleName('cover'), "my-upload-item cover"]} v-lazy={ele.coverUrl} />}
-                                <p class={this.getStyleName('profile')}>{ele.profile || this.cfg.profile}</p>
+                                {!min && <p class={this.getStyleName('profile')}>{ele.profile || this.cfg.profile}</p>}
                             </Col>
                             {this.mgt && <p class="not-important">创建于 <Time time={new Date(ele.createdAt)} /></p>}
                         </Row>

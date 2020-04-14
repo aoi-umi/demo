@@ -27,9 +27,6 @@ export const routerConfig = {
     userInfo: {
         path: '/user/info',
         text: '个人主页',
-        meta: {
-            // authority: [authority.login],
-        },
         component: () => import('./views/user/user')
     },
     userChat: {
