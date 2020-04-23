@@ -11,13 +11,16 @@ const analyzerEnum = {
 };
 function mkdir(dir) {
     if (!fs.existsSync(dir)) {
+        console.log('创建文件夹', dir);
         fs.mkdirSync(dir, { recursive: true });
     }
 }
 class Download {
     static async load(url) {
+        console.log('load url start');
         let rs = await axios.get(url);
         let html = rs.data;
+        console.log('load url end');
         return html;
     }
 
@@ -34,6 +37,9 @@ class Download {
         else {
             if (rs.title)
                 dirName = rs.title;
+
+            //替换特殊符号
+            dirName = dirName.replace(/[\\\/\<\>\?\*\|"\:]/g, '');
             dir = path.join(dir, dirName);
             mkdir(dir);
             await this.save(dir, rs.list);

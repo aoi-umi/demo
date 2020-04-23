@@ -79,7 +79,7 @@ class UserAvatar extends Vue<UserAvatarProp & Base> {
                         src={this.avatarUrl}
                     />
                 </UserPoptipView>
-                <span class="not-important">{this.user.nickname}{this.showAccount && `(${this.user.account})`}{this.isAuthor && `(作者)`}</span>
+                <span class="not-important">{this.user.nickname}{this.showAccount && `(${this.user.account})`}{this.isAuthor && `(发布者)`}</span>
             </div>
         );
     }
