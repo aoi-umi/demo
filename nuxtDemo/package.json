@@ -1,0 +1,24 @@
+{
+  "name": "nuxtDemo",
+  "version": "1.0.0",
+  "description": "My funkadelic Nuxt.js project",
+  "author": "author",
+  "private": true,
+  "scripts": {
+    "dev": "nuxt-ts",
+    "build": "nuxt-ts build",
+    "generate": "nuxt-ts generate",
+    "start": "nuxt-ts start"
+  },
+  "dependencies": {
+    "@nuxt/typescript-runtime": "^0.4.6",
+    "cross-env": "^5.2.0",
+    "koa": "^2.6.2",
+    "nuxt": "^2.12.2"
+  },
+  "devDependencies": {
+    "@nuxt/typescript-build": "^0.6.0",
+    "@types/koa": "^2.11.3",
+    "nodemon": "^1.18.9"
+  }
+}
