@@ -16,6 +16,7 @@
     "noEmit": true,
     "experimentalDecorators": true,
     "baseUrl": "./src",
+    "jsx": "preserve",
     "paths": {
       "~/*": [
         "./*"
