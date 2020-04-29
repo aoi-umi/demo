@@ -17,6 +17,7 @@
     "experimentalDecorators": true,
     "baseUrl": "./src",
     "jsx": "preserve",
+    "skipLibCheck": true,//类库类型冲突
     "paths": {
       "~/*": [
         "./*"

@@ -14,8 +14,18 @@ const config: Configuration = {
       { hid: 'description', name: 'description', content: process.env.npm_package_description || '' }
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
-    ]
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      { rel: 'stylesheet', href: 'https://unpkg.com/element-ui@2.13.1/lib/theme-chalk/index.css' },
+    ],
+    script: [{
+      type: 'text/javascript',
+      charset: 'utf-8',
+      src: 'https://unpkg.com/vue@2.6.11/dist/vue.js'
+    }, {
+      type: 'text/javascript',
+      charset: 'utf-8',
+      src: 'https://unpkg.com/element-ui@2.13.1/lib/index.js'
+    }]
   },
   /*
   ** Customize the progress-bar color
@@ -29,13 +39,15 @@ const config: Configuration = {
   /*
   ** Plugins to load before mounting the App
   */
-  plugins: [
-  ],
+  plugins: [{
+    src: '~plugins/ElementUI',
+    ssr: true,
+  }],
   /*
   ** Nuxt.js dev-modules
   */
   buildModules: [
-    '@nuxt/typescript-build',
+    '@nuxt/typescript-build'
   ],
   /*
   ** Nuxt.js modules
@@ -68,10 +80,10 @@ const config: Configuration = {
     ** You can extend webpack config here
     */
     extend(config, ctx) {
-    }
+    },
   },
   server: {
     port: 3010
-  }
+  },
 };
 export default config;
