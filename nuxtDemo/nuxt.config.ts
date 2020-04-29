@@ -41,7 +41,25 @@ const config: Configuration = {
   ** Nuxt.js modules
   */
   modules: [
+    '@nuxtjs/axios',
   ],
+  axios: {
+    proxy: true,// 可以自动识别服务器的IP，避免提示跨域名
+    withCredentials: true,     // 允许携带cookie
+    timeout: 10000,
+    prefix: '/api',
+  },
+  // env: {
+  //   baseUrl: 'http://127.0.0.1:9999/',
+  // },
+  // // 代理服务器
+  // proxyTable: {
+  //   "/api": {
+  //     target: "http://127.0.0.1:9999/",  // 前后端分离线上地址，必须写死不能动态配置。打包时要注意
+  //     changeOrigin: true,// 如果接口跨域，需要进行这个参数配置
+  //     pathRewrite: { "^/api": "/api" }
+  //   }
+  // },
   /*
   ** Build configuration
   */
@@ -51,6 +69,9 @@ const config: Configuration = {
     */
     extend(config, ctx) {
     }
+  },
+  server: {
+    port: 3010
   }
 };
 export default config;

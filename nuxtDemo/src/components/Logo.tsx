@@ -17,6 +17,10 @@ class CompProp {
   mixins: [getCompOpts(CompProp)]
 })
 class Logo extends Vue<CompProp> {
+  mounted() {
+    this.$axios.post('/test/post');
+    this.$axios.get('/test/get');
+  }
   render() {
     return (
       <div>

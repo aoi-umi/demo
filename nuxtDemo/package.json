@@ -1,27 +1,31 @@
 {
-  "name": "nuxtDemo",
+  "name": "nuxt-demo",
   "version": "1.0.0",
   "description": "My funkadelic Nuxt.js project",
   "author": "author",
   "private": true,
   "scripts": {
-    "dev": "nuxt-ts",
+    "dev": "cross-env nodemon src/server/index.ts",
+    "start": "cross-env NODE_ENV=production ts-node src/server/index.ts",
     "build": "nuxt-ts build",
-    "generate": "nuxt-ts generate",
-    "start": "nuxt-ts start"
+    "generate": "nuxt-ts generate"
   },
   "dependencies": {
     "@nuxt/typescript-runtime": "^0.4.6",
+    "@nuxtjs/axios": "^5.10.2",
     "cross-env": "^5.2.0",
     "koa": "^2.6.2",
+    "koa-router": "^8.0.8",
     "nuxt": "^2.12.2"
   },
   "devDependencies": {
     "@nuxt/typescript-build": "^0.6.0",
     "@types/koa": "^2.11.3",
+    "@types/koa-router": "^7.4.0",
     "less": "^3.11.1",
     "less-loader": "^6.0.0",
     "nodemon": "^1.18.9",
+    "tsconfig-paths": "^3.9.0",
     "vue-property-decorator": "^8.4.2"
   }
 }
