@@ -111,7 +111,7 @@ class UserMgtDetail extends Vue<UserMgtDetailProp & Base> {
                 <br />
                 <Form label-width={60} ref="formVaild" props={{ model: detail }} rules={this.rules} nativeOn-submit={(e) => {
                     e.preventDefault();
-                }} >
+                }}>
                     <FormItem label="账号">{detail.account}({detail.nickname})</FormItem>
                     {this.type == myEnum.userEditType.修改 ?
                         <div>

@@ -1,9 +1,14 @@
 import { TestApiConfigType } from "../api";
 
-const host = 'umi-aoi.xyz';
+const host = 'sellfishboy.top';
 const ip = '144.202.99.178';
 const env = [host, ip].find(ele => location.hostname.includes(ele)) ? 'prod' : 'dev';
-const envConfig = {
+const envConfig: {
+    [env: string]: {
+        host: string;
+        apiHost: string;
+    }
+} = {
     prod: {
         host: 'http://' + ip,
         apiHost: `//api.${host}`
@@ -16,7 +21,7 @@ const envConfig = {
 let currEnvCfg = envConfig[env];
 const config = {
     title: '开发',
-    host: currEnvCfg.host,
+    ipHost: currEnvCfg.host,
     socket: {
         test: {
             host: `${currEnvCfg.apiHost}`,

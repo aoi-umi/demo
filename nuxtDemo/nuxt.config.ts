@@ -17,15 +17,22 @@ const config: Configuration = {
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
       { rel: 'stylesheet', href: 'https://unpkg.com/element-ui@2.13.1/lib/theme-chalk/index.css' },
     ],
-    script: [{
-      type: 'text/javascript',
-      charset: 'utf-8',
-      src: 'https://unpkg.com/vue@2.6.11/dist/vue.js'
-    }, {
-      type: 'text/javascript',
-      charset: 'utf-8',
-      src: 'https://unpkg.com/element-ui@2.13.1/lib/index.js'
-    }]
+    script: [
+      // {
+      //   type: 'text/javascript',
+      //   charset: 'utf-8',
+      //   async: true,
+      //   defer: true,
+      //   src: 'https://unpkg.com/vue@2.6.11/dist/vue.js'
+      // },
+      // {
+      //   type: 'text/javascript',
+      //   charset: 'utf-8',
+      //   async: true,
+      //   defer: true,
+      //   src: 'https://unpkg.com/element-ui@2.9.1/lib/index.js'
+      // }
+    ]
   },
   /*
   ** Customize the progress-bar color
@@ -40,8 +47,8 @@ const config: Configuration = {
   ** Plugins to load before mounting the App
   */
   plugins: [{
-    src: '~plugins/ElementUI',
-    ssr: true,
+    src: '~/plugins/ElementUI',
+    // mode: 'server',
   }],
   /*
   ** Nuxt.js dev-modules
@@ -81,7 +88,8 @@ const config: Configuration = {
     */
     extend(config, ctx) {
     },
-  },
+    // vendor: ['element-ui']
+  } as any,
   server: {
     port: 3010
   },

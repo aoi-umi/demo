@@ -15,7 +15,7 @@
     "@nuxt/typescript-runtime": "^0.4.6",
     "@nuxtjs/axios": "^5.10.2",
     "cross-env": "^5.2.0",
-    "element-ui": "^2.13.1",
+    "element-ui": "^2.9.1",
     "koa": "^2.6.2",
     "koa-router": "^8.0.8",
     "nuxt": "^2.12.2"

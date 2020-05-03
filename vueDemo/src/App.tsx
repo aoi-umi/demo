@@ -1,6 +1,6 @@
 import { Component, Vue, Watch, Prop } from "vue-property-decorator";
 
-import { routerConfig } from '@/router';
+import { routerConfig, MyRouteConfig } from '@/router';
 import {
     Menu, MenuItem,
     Icon, Content, Sider, Layout, Header, Button, Modal, BackTop, Submenu, Spin,
@@ -9,7 +9,7 @@ import * as style from '@/components/style';
 import { LocalStore } from '@/store';
 
 import { testApi, testSocket } from './api';
-import { dev, authority, env } from './config';
+import { dev, env } from './config';
 import "./App.less";
 import { SignInView } from './views/user/user-sign';
 import { Base } from './views/base';
@@ -158,63 +158,59 @@ export default class App extends Base {
     private menuCfg: MenuConfig[] = [];
     private setMenuCfg() {
         this.menuCfg = [{
-            to: routerConfig.bookmark.path,
+            routerConfig: routerConfig.bookmark,
             icon: 'md-home',
-            text: routerConfig.bookmark.text,
             show: false,
         }, {
-            to: routerConfig.video.path,
+            routerConfig: routerConfig.video,
             icon: 'logo-youtube',
-            text: routerConfig.video.text,
         }, {
-            to: routerConfig.article.path,
+            routerConfig: routerConfig.article,
             icon: 'md-paper',
-            text: routerConfig.article.text,
         }, {
-            to: routerConfig.goods.path,
+            routerConfig: routerConfig.goods,
             icon: 'md-cart',
-            text: routerConfig.goods.text,
         }, {
-            to: routerConfig.contentMgt.path,
+            routerConfig: routerConfig.contentMgt,
             icon: 'md-create',
-            text: routerConfig.contentMgt.text,
-            show: () => this.storeUser.user.hasAuth(routerConfig.contentMgt.meta.authority)
         }, {
-            to: routerConfig.payMgt.path,
+            routerConfig: routerConfig.payMgt,
             icon: 'logo-usd',
-            text: routerConfig.payMgt.text,
-            show: () => this.storeUser.user.hasAuth(routerConfig.payMgt.meta.authority)
         }, {
-            to: routerConfig.assetMgt.path,
+            routerConfig: routerConfig.assetMgt,
             icon: 'md-stats',
             text: routerConfig.assetMgt.text,
-            show: () => this.storeUser.user.hasAuth(routerConfig.assetMgt.meta.authority)
         }, {
-            to: routerConfig.goodsMgt.path,
+            routerConfig: routerConfig.goodsMgt,
             icon: 'md-nutrition',
-            text: routerConfig.goodsMgt.text,
-            show: () => this.storeUser.user.hasAuth(routerConfig.goodsMgt.meta.authority)
         }, {
-            to: routerConfig.userMgt.path,
+            routerConfig: routerConfig.userMgt,
             icon: 'md-people',
-            text: routerConfig.userMgt.text,
-            show: () => this.storeUser.user.hasAuth(routerConfig.userMgt.meta.authority)
         }, {
-            to: routerConfig.role.path,
+            routerConfig: routerConfig.role,
             icon: 'md-person',
-            text: routerConfig.role.text,
-            show: () => this.storeUser.user.hasAuth(routerConfig.role.meta.authority)
         }, {
-            to: routerConfig.authority.path,
+            routerConfig: routerConfig.authority,
             icon: 'md-lock',
-            text: routerConfig.authority.text,
-            show: () => this.storeUser.user.hasAuth(routerConfig.authority.meta.authority)
         }, {
-            to: routerConfig.setting.path,
+            routerConfig: routerConfig.apps,
+            icon: 'md-apps',
+        }, {
+            routerConfig: routerConfig.setting,
             icon: 'md-settings',
-            text: routerConfig.setting.text,
-            show: () => this.storeUser.user.hasAuth(routerConfig.setting.meta.authority)
-        },];
+        }].map(ele => {
+            let { routerConfig, ...rest } = ele;
+            let obj = {} as any;
+            let routeCfg = routerConfig as MyRouteConfig;
+            if (routeCfg) {
+                obj.to = routeCfg.path;
+                obj.text = routeCfg.text;
+                if (routeCfg.meta.authority)
+                    obj.show = () => this.storeUser.user.hasAuth(routeCfg.meta.authority)
+            }
+            obj = { ...obj, ...rest };
+            return obj;
+        });
     }
 
     private siderWidth = 180;
