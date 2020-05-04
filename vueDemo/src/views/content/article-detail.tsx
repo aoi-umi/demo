@@ -1,6 +1,8 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import moment from 'dayjs';
 import marked from 'marked';
+import hljs from 'highlight.js';
+import 'highlight.js/styles/github.css';
 
 import { testApi } from '@/api';
 import { myEnum, dev } from '@/config';
@@ -14,6 +16,20 @@ import { DetailType, DetailDataType } from './article-mgt-detail';
 import { CommentView, Comment } from './comment';
 import { ContentOperateView } from './content';
 
+marked.setOptions({
+    renderer: new marked.Renderer(),
+    highlight: function (code) {
+        return hljs.highlightAuto(code).value;
+    },
+    pedantic: false,
+    gfm: true,
+    // tables: true,
+    breaks: false,
+    sanitize: false,
+    smartLists: true,
+    smartypants: false,
+    xhtml: false
+});
 @Component
 export default class ArticleDetail extends Base {
 

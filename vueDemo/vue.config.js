@@ -18,6 +18,7 @@ let cdnOpt = {
             'quill/dist/quill.snow.css': 'quill.snow.css',
             'quill/dist/quill.bubble.css': 'quill.bubble.css',
         }),
+        'highlight.js/styles/github.css': 'https://unpkg.com/highlight.js/styles/github.css'
     },
     js: {
         vue: {

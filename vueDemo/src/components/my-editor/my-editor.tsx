@@ -124,7 +124,7 @@ class MyEditor extends Vue<MyEditorProp & MyInputBase> {
         [ContentType.default]: 'defaultValue',
         [ContentType.markdown]: 'markdownValue',
     };
-    
+
     @Watch('currType')
     private watchType(newType, oldType) {
         this.$data[this.typeMap[newType]] = this.$data[this.typeMap[oldType]];
@@ -202,12 +202,12 @@ class MyEditor extends Vue<MyEditorProp & MyInputBase> {
                         }
                     }
                     } />
-                <Row gutter={5}>
+                <Row gutter={10}>
                     <Col xs={12}>
-                        <Input
-                            v-show={this.currType === ContentType.markdown} type="textarea"
-                            class={this.getStyleName('editor')} v-model={this.markdownValue}
-                        />
+                        <div contenteditable='true' v-show={this.currType === ContentType.markdown} type="textarea"
+                            class={[...this.getStyleName('editor'), 'ivu-input']}>
+                            {this.markdownValue}
+                        </div>
                     </Col>
                     <Col xs={12}>
                         <div class={this.getStyleName('preview')} domPropsInnerHTML={this.markdownPreview}>

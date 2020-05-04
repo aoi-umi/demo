@@ -27,10 +27,11 @@ export default {
         uri: processEnv.MongoUri || "mongodb://localhost",
         options: {
             useNewUrlParser: true,
-            autoReconnect: true,
+            // autoReconnect: true,
             useFindAndModify: false,
             dbName: 'devMgt',
             useCreateIndex: true,
+            useUnifiedTopology: true
         }
     } as MongoOpt,
     mq: {
