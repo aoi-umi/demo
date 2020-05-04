@@ -204,9 +204,12 @@ class MyEditor extends Vue<MyEditorProp & MyInputBase> {
                     } />
                 <Row gutter={10}>
                     <Col xs={12}>
-                        <div contenteditable='true' v-show={this.currType === ContentType.markdown} type="textarea"
-                            class={[...this.getStyleName('editor'), 'ivu-input']}>
-                            {this.markdownValue}
+                        <div class={this.getStyleName('wrap')}>
+                            <pre class={this.getStyleName('pre')}>{this.markdownValue}</pre>
+                            <Input
+                                v-show={this.currType === ContentType.markdown} type="textarea"
+                                class={this.getStyleName('md-editor')} v-model={this.markdownValue}
+                            />
                         </div>
                     </Col>
                     <Col xs={12}>
