@@ -60,7 +60,7 @@ export class UserAuthMid {
     static normal(authData?: AuthType) {
         return async (c, next) => {
             let ctx = c as Context;
-            let token = ctx.header(config.dev.cache.user.prefix);
+            let token = ctx.request.get(config.dev.cache.user.prefix);
             let user = await UserAuthMid.getUser(token, {
                 autoLogin: true,
                 resetOpt: { imgHost: ctx.myData.imgHost }

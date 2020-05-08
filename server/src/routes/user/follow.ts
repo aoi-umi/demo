@@ -10,9 +10,9 @@ import { MyRequestHandler } from '@/middleware';
 import { FollowMapper } from '@/models/mongo/follow';
 import { UserModel, UserMapper } from '@/models/mongo/user';
 
-export let save: MyRequestHandler = async (opt, req, res) => {
-    let user = req.myData.user;
-    let data = paramsValid(req.body, ValidSchema.FollowSave);
+export let save: MyRequestHandler = async (opt) => {
+    let user = opt.reqData.user;
+    let data = paramsValid(opt.reqData, ValidSchema.FollowSave);
     if (user.equalsId(data.userId)) {
         throw error('不能关注自己');
     }
@@ -41,10 +41,10 @@ export let save: MyRequestHandler = async (opt, req, res) => {
     };
 };
 
-export let query: MyRequestHandler = async (opt, req, res) => {
-    let user = req.myData.user;
-    let data = paramsValid(req.query, ValidSchema.FollowQuery);
-    let { rows, total } = await FollowMapper.query(data, { user, imgHost: req.myData.imgHost });
+export let query: MyRequestHandler = async (opt) => {
+    let user = opt.reqData.user;
+    let data = paramsValid(opt.reqData, ValidSchema.FollowQuery);
+    let { rows, total } = await FollowMapper.query(data, { user, imgHost: opt.reqData.imgHost });
     return {
         rows,
         total,

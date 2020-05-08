@@ -17,11 +17,9 @@ interface MyData {
 declare module 'koa' {
     interface DefaultContext {
         myData: MyData;
-        myOption: any;
         _parsedUrl: {
             pathname: string;
         },
-        realIp: string;
     }
 }
 

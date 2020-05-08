@@ -10,6 +10,7 @@ import * as common from '../_system/common';
 import * as config from '../config';
 import * as ValidSchema from '../valid-schema/class-valid';
 import { valid } from './class-valid';
+import { MyRequestHandlerOpt } from '@/middleware';
 
 export const logger = getLogger();
 
@@ -26,20 +27,14 @@ configure({
     }
 });
 
-type MyRequestHandlerOpt = {
-    json?: boolean;
-    noSend?: boolean;
-    sendAsFile?: boolean;
-    originRes?: boolean;
-}
-export let myRequestHandler = function (fn: (opt?: MyRequestHandlerOpt) => any, ctx: Context, next?) {
+
+export let myRequestHandler = async function (fn: (opt?: MyRequestHandlerOpt) => any, ctx: Context) {
     let opt: MyRequestHandlerOpt = {
         json: true,
     };
     //let log = helpers.expressCreateLog(req, res);
-    return Q.fcall(() => {
-        return fn(opt);
-    }).then(result => {
+    try {
+        let result = await fn(opt);
         //fn中自行处理
         if (opt.noSend)
             return result;
@@ -63,18 +58,20 @@ export let myRequestHandler = function (fn: (opt?: MyRequestHandlerOpt) => any, 
                     data: result,
                 };
             }
-            ctx.json(result);
+            ctx.body = result;
             //log.response = result;
         }
-    }).catch(err => {
+    } catch (err) {
         let msg = err.msg || err.message;
+        if (err.status)
+            ctx.status = err.status;
         let response = { result: false, code: err.code, msg, remark: err.remark };
         logger.error(err);
-        ctx.json(response);
-    }).finally(() => {
+        ctx.body = response;
+    } finally {
         // if (log.response)
         //     new LogModel(log).save();
-    });
+    };
 };
 
 /**

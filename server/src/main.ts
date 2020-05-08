@@ -1,5 +1,4 @@
 import * as Koa from 'koa';
-import { Context } from 'koa';
 import * as Router from '@koa/router';
 import { ConfirmChannel } from 'amqplib';
 import * as SocketIO from 'socket.io';
@@ -13,6 +12,7 @@ import { Auth } from '@/_system/auth';
 import { Cache } from '@/_system/cache';
 import routes from '@/routes';
 import { ThirdPartyPayMapper } from '@/3rd-party';
+import * as helpers from '@/helpers';
 
 import { PayMapper } from './models/mongo/asset';
 
@@ -54,24 +54,18 @@ export async function init() {
 
 export let register = function (app: Koa) {
     app.use(async (ctx, next) => {
-        let req = ctx.req;
-        ctx.realIp = ctx.header('X-Real-IP') || ctx.ip;
-        ctx.myData = {
-            startTime: new Date().getTime(),
-            ip: ctx.realIp,
-            imgHost: req.headers.host,
-            videoHost: req.headers.host,
-        };
-        try {
-            let rs = await next();
-            if (!rs)
-                ctx.body = rs;
-        } catch (e) {
-            ctx.body = {
-                code: -1,
-                msg: e.message
+        await helpers.myRequestHandler(async (opt) => {
+            opt.noSend = true;
+            let ip = ctx.request.get('X-Real-IP') || ctx.ip;
+            ctx.myData = {
+                startTime: new Date().getTime(),
+                ip,
+                imgHost: ctx.headers.host,
+                videoHost: ctx.headers.host,
             };
-        }
+            await next();
+            return ctx.body;
+        }, ctx);
     });
 
     let router = new Router();

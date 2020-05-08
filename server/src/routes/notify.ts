@@ -5,7 +5,7 @@ import { NotifyMapper } from '@/models/mongo/notify';
 import { SendQueue } from '@/task';
 
 export let alipayNotify: RequestHandler = async (ctx, next) => {
-    let data = ctx.body;
+    let data = ctx.request.body;
     let rs = await alipayInst.payNotifyHandler({ ...data }, async (notify) => {
         let notifyType = myEnum.notifyType.支付宝;
         let notifyObj = await NotifyMapper.create({ type: notifyType, value: notify, raw: data });
@@ -13,11 +13,11 @@ export let alipayNotify: RequestHandler = async (ctx, next) => {
 
         SendQueue.payNotify({ notifyId: notifyObj.notify._id });
     });
-    ctx.send(rs);
+    ctx.body = rs;
 };
 
 export let wxpayNotify: RequestHandler = async (ctx) => {
-    let data = ctx.body;
+    let data = ctx.request.body;
     let rs = await wxpayInst.payNotifyHandler({ ...data.xml }, async (notify) => {
         let notifyType = myEnum.notifyType.微信;
         let notifyObj = await NotifyMapper.create({ type: notifyType, value: notify, raw: data });
@@ -25,5 +25,5 @@ export let wxpayNotify: RequestHandler = async (ctx) => {
 
         SendQueue.payNotify({ notifyId: notifyObj.notify._id });
     });
-    ctx.send(rs);
+    ctx.body = rs;
 };

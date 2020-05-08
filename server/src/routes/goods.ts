@@ -10,18 +10,18 @@ import { GoodsMapper } from '@/models/mongo/goods';
 import { error } from '@/_system/common';
 import { Auth } from '@/_system/auth';
 
-export const mgtSave: MyRequestHandler = async (opt, req, res) => {
-    let data = paramsValid(req.body, ValidSchema.GoodsMgtSave);
-    let user = req.myData.user;
+export const mgtSave: MyRequestHandler = async (opt) => {
+    let data = paramsValid(opt.reqData, ValidSchema.GoodsMgtSave);
+    let user = opt.reqData.user;
     let rs = await GoodsMapper.mgtSave(data, { user });
     return {
         _id: rs.spu._id
     };
 };
 
-export const mgtDetailQuery: MyRequestHandler = async (opt, req, res) => {
-    let data = paramsValid(req.query, ValidSchema.GoodsMgtDetailQuery);
-    let myData = req.myData;
+export const mgtDetailQuery: MyRequestHandler = async (opt) => {
+    let data = paramsValid(opt.reqData, ValidSchema.GoodsMgtDetailQuery);
+    let myData = opt.reqData;
     let user = myData.user;
     let rs = await GoodsMapper.detailQuery(data);
     if (!user.equalsId(rs.spu.userId)) {
@@ -36,9 +36,9 @@ export const mgtDetailQuery: MyRequestHandler = async (opt, req, res) => {
     return ret;
 };
 
-export const mgtQuery: MyRequestHandler = async (opt, req, res) => {
-    let data = paramsValid(req.query, ValidSchema.GoodsMgtQuery);
-    let myData = req.myData;
+export const mgtQuery: MyRequestHandler = async (opt) => {
+    let data = paramsValid(opt.reqData, ValidSchema.GoodsMgtQuery);
+    let myData = opt.reqData;
     let user = myData.user;
     let { rows, total } = await GoodsMapper.query(data, {
         user,
@@ -54,9 +54,9 @@ export const mgtQuery: MyRequestHandler = async (opt, req, res) => {
     };
 };
 
-export let mgtDel: MyRequestHandler = async (opt, req, res) => {
-    let user = req.myData.user;
-    let data = paramsValid(req.body, ValidSchema.GoodsMgtDel);
+export let mgtDel: MyRequestHandler = async (opt) => {
+    let user = opt.reqData.user;
+    let data = paramsValid(opt.reqData, ValidSchema.GoodsMgtDel);
     await GoodsMapper.updateStatus({
         cond: {
             idList: data.idList,
@@ -67,9 +67,9 @@ export let mgtDel: MyRequestHandler = async (opt, req, res) => {
     });
 };
 
-export const detailQuery: MyRequestHandler = async (opt, req, res) => {
-    let data = paramsValid(req.query, ValidSchema.GoodsDetailQuery);
-    let myData = req.myData;
+export const detailQuery: MyRequestHandler = async (opt) => {
+    let data = paramsValid(opt.reqData, ValidSchema.GoodsDetailQuery);
+    let myData = opt.reqData;
     let user = myData.user;
     let rs = await GoodsMapper.detailQuery(data, { normal: true });
 
@@ -81,9 +81,9 @@ export const detailQuery: MyRequestHandler = async (opt, req, res) => {
     return ret;
 };
 
-export const query: MyRequestHandler = async (opt, req, res) => {
-    let data = paramsValid(req.query, ValidSchema.GoodsQuery);
-    let myData = req.myData;
+export const query: MyRequestHandler = async (opt) => {
+    let data = paramsValid(opt.reqData, ValidSchema.GoodsQuery);
+    let myData = opt.reqData;
     let user = myData.user;
     let { rows, total } = await GoodsMapper.query(data, {
         user,
@@ -99,9 +99,9 @@ export const query: MyRequestHandler = async (opt, req, res) => {
     };
 };
 
-export const buy: MyRequestHandler = async (opt, req, res) => {
-    let data = paramsValid(req.body, ValidSchema.GoodsBuy);
-    let myData = req.myData;
+export const buy: MyRequestHandler = async (opt) => {
+    let data = paramsValid(opt.reqData, ValidSchema.GoodsBuy);
+    let myData = opt.reqData;
     let user = myData.user;
     let rs = await GoodsMapper.buy(data, { user });
     return rs;

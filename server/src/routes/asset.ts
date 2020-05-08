@@ -7,8 +7,8 @@ import { MyRequestHandler } from '@/middleware';
 import { NotifyMapper } from '@/models/mongo/notify';
 import { AssetLogMapper } from '@/models/mongo/asset';
 
-export const notifyQuery: MyRequestHandler = async (opt, req, res) => {
-    let data = paramsValid(req.query, ValidSchema.AssetNotifyQuery);
+export const notifyQuery: MyRequestHandler = async (opt) => {
+    let data = paramsValid(opt.reqData, ValidSchema.AssetNotifyQuery);
     let { rows, total } = await NotifyMapper.query(data);
     return {
         rows,
@@ -16,13 +16,13 @@ export const notifyQuery: MyRequestHandler = async (opt, req, res) => {
     };
 };
 
-export const notifyRetry: MyRequestHandler = async (opt, req, res) => {
-    let data = paramsValid(req.body, ValidSchema.AssetNotifyRetry);
+export const notifyRetry: MyRequestHandler = async (opt) => {
+    let data = paramsValid(opt.reqData, ValidSchema.AssetNotifyRetry);
     await ThirdPartyPayMapper.notifyHandler({ notifyId: data._id });
 };
 
-export const logQuery: MyRequestHandler = async (opt, req, res) => {
-    let data = paramsValid(req.query, ValidSchema.AssetLogQuery);
+export const logQuery: MyRequestHandler = async (opt) => {
+    let data = paramsValid(opt.reqData, ValidSchema.AssetLogQuery);
 
     let { rows, total } = await AssetLogMapper.query(data);
     return {

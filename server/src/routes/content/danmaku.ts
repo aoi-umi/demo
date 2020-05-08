@@ -10,9 +10,9 @@ import { MyRequestHandler } from '@/middleware';
 
 import { DanmakuModel } from '@/models/mongo/danmaku';
 
-export let submit: MyRequestHandler = async (opt, req, res) => {
-    let user = req.myData.user;
-    let data = paramsValid(req.body, ValidSchema.DanmakuSubmit);
+export let submit: MyRequestHandler = async (opt) => {
+    let user = opt.reqData.user;
+    let data = paramsValid(opt.reqData, ValidSchema.DanmakuSubmit);
     let detail = new DanmakuModel({
         ...data,
         userId: user._id,
@@ -22,9 +22,9 @@ export let submit: MyRequestHandler = async (opt, req, res) => {
     mySocket.socketUser.danmakuBoardcast(detail.videoId, detail);
 };
 
-export let query: MyRequestHandler = async (opt, req, res) => {
-    let user = req.myData.user;
-    let data = paramsValid(req.query, ValidSchema.DanmakuQuery);
+export let query: MyRequestHandler = async (opt) => {
+    let user = opt.reqData.user;
+    let data = paramsValid(opt.reqData, ValidSchema.DanmakuQuery);
     let rows = await DanmakuModel.find({ videoId: data.videoId });
     return {
         rows

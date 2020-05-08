@@ -8,8 +8,8 @@ import { MyRequestHandler } from '@/middleware';
 
 import { RoleModel, RoleInstanceType, RoleMapper } from '@/models/mongo/role';
 
-export let query: MyRequestHandler = async (opt, req, res) => {
-    let data = paramsValid(req.query, ValidSchema.RoleQuery);
+export let query: MyRequestHandler = async (opt) => {
+    let data = paramsValid(opt.reqData, ValidSchema.RoleQuery);
     let { rows, total } = await RoleMapper.query({ ...data, includeDelAuth: true });
     return {
         rows,
@@ -17,13 +17,13 @@ export let query: MyRequestHandler = async (opt, req, res) => {
     };
 };
 
-export let codeExists: MyRequestHandler = async (opt, req, res) => {
-    let data = paramsValid(req.body, ValidSchema.RoleCodeExists);
+export let codeExists: MyRequestHandler = async (opt) => {
+    let data = paramsValid(opt.reqData, ValidSchema.RoleCodeExists);
     let rs = await RoleMapper.codeExists(data.code, data._id);
     return rs && { _id: rs._id };
 };
 
-export let save: MyRequestHandler = async (opt, req, res) => {
+export let save: MyRequestHandler = async (opt) => {
     let data: {
         _id?: string;
         name?: string;
@@ -31,7 +31,7 @@ export let save: MyRequestHandler = async (opt, req, res) => {
         status?: string;
         delAuthList?: string[];
         addAuthList?: string[];
-    } = req.body;
+    } = opt.reqData;
     let detail: RoleInstanceType;
     let rs = await RoleMapper.codeExists(data.code, data._id);
     if (rs)
@@ -65,11 +65,11 @@ export let save: MyRequestHandler = async (opt, req, res) => {
     };
 };
 
-export let update: MyRequestHandler = async (opt, req, res) => {
+export let update: MyRequestHandler = async (opt) => {
     let data: {
         _id: string;
         status?: string;
-    } & Object = req.body;
+    } & Object = opt.reqData;
     let model = await RoleModel.findById(data._id);
     if (!model)
         throw error('not exists');
@@ -85,8 +85,8 @@ export let update: MyRequestHandler = async (opt, req, res) => {
     };
 };
 
-export let del: MyRequestHandler = async (opt, req, res) => {
-    let data = paramsValid(req.body, ValidSchema.RoleDel);
+export let del: MyRequestHandler = async (opt) => {
+    let data = paramsValid(opt.reqData, ValidSchema.RoleDel);
     let rs = await RoleModel.deleteMany({ _id: { $in: data.idList } });
     if (!rs.n)
         throw error('', config.error.NO_MATCH_DATA);

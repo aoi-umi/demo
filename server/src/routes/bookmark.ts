@@ -8,8 +8,8 @@ import { MyRequestHandler } from '@/middleware/my-request-handler';
 import { BookmarkModel, BookmarkInstanceType } from '@/models/mongo/bookmark';
 import { BaseMapper } from '@/models/mongo/_base';
 
-export let query: MyRequestHandler = async (opt, req, res) => {
-    let data = paramsValid(req.query, ValidSchema.BookmarkQuery);
+export let query: MyRequestHandler = async (opt) => {
+    let data = paramsValid(opt.reqData, ValidSchema.BookmarkQuery);
     let query: any = {};
     if (data.anyKey) {
         let anykey = new RegExp(escapeRegExp(data.anyKey), 'i');
@@ -35,8 +35,8 @@ export let query: MyRequestHandler = async (opt, req, res) => {
     };
 };
 
-export let save: MyRequestHandler = async (opt, req, res) => {
-    let data = paramsValid(req.body, ValidSchema.BookmarkSave);
+export let save: MyRequestHandler = async (opt) => {
+    let data = paramsValid(opt.reqData, ValidSchema.BookmarkSave);
     let detail: BookmarkInstanceType;
     if (!data._id) {
         delete data._id;
@@ -66,8 +66,8 @@ export let save: MyRequestHandler = async (opt, req, res) => {
     };
 };
 
-export let del: MyRequestHandler = async (opt, req, res) => {
-    let data = paramsValid(req.body, ValidSchema.BookmarkDel);
+export let del: MyRequestHandler = async (opt) => {
+    let data = paramsValid(opt.reqData, ValidSchema.BookmarkDel);
     let rs = await BookmarkModel.deleteMany({ _id: { $in: data.idList } });
     if (!rs.n)
         throw error('', config.error.NO_MATCH_DATA);

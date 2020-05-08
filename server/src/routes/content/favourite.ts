@@ -10,9 +10,9 @@ import { MyRequestHandler } from '@/middleware';
 
 import { FavouriteMapper } from '@/models/mongo/favourite';
 
-export let submit: MyRequestHandler = async (opt, req, res) => {
-    let user = req.myData.user;
-    let data = paramsValid(req.body, ValidSchema.FavouriteSubmit);
+export let submit: MyRequestHandler = async (opt) => {
+    let user = opt.reqData.user;
+    let data = paramsValid(opt.reqData, ValidSchema.FavouriteSubmit);
     let owner = await FavouriteMapper.findOwner({ ownerId: data.ownerId, type: data.type });
     let detail = await FavouriteMapper.create({ ownerId: data.ownerId, userId: user._id, type: data.type });
     //没变化，返回最新的数据
@@ -34,10 +34,10 @@ export let submit: MyRequestHandler = async (opt, req, res) => {
     return updateOwner;
 };
 
-export let query: MyRequestHandler = async (opt, req, res) => {
-    let myData = req.myData;
+export let query: MyRequestHandler = async (opt) => {
+    let myData = opt.reqData;
     let user = myData.user;
-    let data = paramsValid(req.query, ValidSchema.FavouriteQuery);
+    let data = paramsValid(opt.reqData, ValidSchema.FavouriteQuery);
     let { rows, total } = await FavouriteMapper.query(data, { user, imgHost: myData.imgHost });
     return {
         rows,

@@ -9,14 +9,14 @@ import { MyRequestHandler } from '@/middleware';
 import { SettingMapper } from '@/models/mongo/setting';
 
 
-export let detailQuery: MyRequestHandler = async (opt, req, res) => {
+export let detailQuery: MyRequestHandler = async (opt) => {
     let rs = await SettingMapper.detailQuery();
     return rs;
 };
 
-export let save: MyRequestHandler = async (opt, req, res) => {
-    let user = req.myData.user;
-    let data = req.body;
+export let save: MyRequestHandler = async (opt) => {
+    let user = opt.reqData.user;
+    let data = opt.reqData;
     let detail = await SettingMapper.detailQuery();
     ['signUpType', 'signUpFrom', 'signUpTo'].forEach(key => {
         detail[key] = data[key];
