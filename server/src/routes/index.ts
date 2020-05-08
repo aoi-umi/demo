@@ -9,10 +9,10 @@ let router = new Router({
 export default router;
 
 import user from './user';
-router.use(user);
+router.use(user.routes());
 
 import content from './content';
-router.use(content);
+router.use(content.routes());
 
 //#region bookmark 
 import * as bookmark from './bookmark';

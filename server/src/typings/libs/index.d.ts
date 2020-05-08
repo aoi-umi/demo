@@ -27,3 +27,9 @@ declare module 'koa' {
 
 import { MySocket } from '../../_system/socket';
 type SocketOnConnect = (socket: Socket, mySocket: MySocket) => void;
+
+
+import { Context } from 'koa';
+import { Middleware } from '@koa/router';
+
+export type RequestHandler = Middleware<any, Context>;

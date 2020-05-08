@@ -1,4 +1,4 @@
-import { Middleware } from "@koa/router";
+import { Context } from "koa";
 import { plainToClass } from "class-transformer";
 
 import * as config from '@/config';
@@ -57,8 +57,9 @@ export class UserAuthMid {
         return user;
     }
 
-    static async normal(authData?: AuthType) {
-        let fn: Middleware = async (ctx, next) => {
+    static normal(authData?: AuthType) {
+        return async (c, next) => {
+            let ctx = c as Context;
             let token = ctx.header(config.dev.cache.user.prefix);
             let user = await UserAuthMid.getUser(token, {
                 autoLogin: true,
@@ -71,6 +72,5 @@ export class UserAuthMid {
                 auth.checkAccessable(user, authData);
             await next();
         };
-        return fn;
     }
 }

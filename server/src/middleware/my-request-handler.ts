@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction, RequestHandler } from 'express';
+import { Context, Next } from 'koa';
 import { myRequestHandler } from '@/helpers';
 
 type MyRequestHandlerOpt = {
@@ -9,16 +9,16 @@ type MyRequestHandlerOpt = {
 }
 
 export interface MyRequestHandler {
-    (opt: MyRequestHandlerOpt, req: Request, res: Response, next?: NextFunction): any;
+    (opt: MyRequestHandlerOpt, ctx: Context, next?: Next): any;
 }
 
 export class MyRequestHandlerMid {
     static convert(fn: MyRequestHandler) {
-        let rh: RequestHandler = (req, res, next) => {
-            myRequestHandler(async (opt) => {
-                let rs = await fn(opt, req, res, next);
+        let rh = async (ctx, next) => {
+            await myRequestHandler(async (opt) => {
+                let rs = await fn(opt, ctx, next);
                 return rs;
-            }, req, res, next);
+            }, ctx, next);
         };
         return rh;
     }

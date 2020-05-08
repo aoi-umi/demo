@@ -13,6 +13,7 @@ import { ThirdPartyAuthMapper } from '@/3rd-party';
 import { UserModel, UserMapper, UserLogMapper } from '@/models/mongo/user';
 import { SettingMapper } from '@/models/mongo/setting';
 import { FileMapper } from '@/models/mongo/file';
+import { Context } from 'koa';
 
 export let accountExists: MyRequestHandler = async (opt, req, res) => {
     let data = paramsValid(req.body, ValidSchema.UserAccountExists);
@@ -75,7 +76,7 @@ export let signUpCheck: MyRequestHandler = async (opt, req, res) => {
         throw common.error('暂不开放注册', config.error.NO_PERMISSIONS);
 };
 
-let signInFn = async (data: ValidSchema.UserSignIn, opt: { noPwd?: boolean, req: Request }) => {
+let signInFn = async (data: ValidSchema.UserSignIn, opt: { noPwd?: boolean, req: Context }) => {
     let { req } = opt;
     let token = req.myData.user.key;
     let { user, disableResult } = await UserMapper.accountCheck(data.account);

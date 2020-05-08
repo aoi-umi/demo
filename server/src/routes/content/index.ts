@@ -1,9 +1,9 @@
-import * as express from 'express';
+import * as Router from '@koa/router';
 
 import { UserAuthMid, MyRequestHandlerMid } from '@/middleware';
 import { auth } from '@/config';
 
-let router = express.Router();
+let router = new Router();
 export default router;
 
 

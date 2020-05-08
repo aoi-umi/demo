@@ -9,10 +9,10 @@ import { FileMapper, FileModel } from "@/models/mongo/file";
 import { logger } from "@/helpers";
 import { MyRequestHandler } from "@/middleware";
 
-const uplaod: MyRequestHandler = async (opt, req: Request, res: Response) => {
-    let option = <{ fileType: string }>req.myOption;
-    let file = req.file;
-    let user = req.myData.user;
+const uplaod: MyRequestHandler = async (opt, ctx) => {
+    let option = <{ fileType: string }>ctx.myOption;
+    let file = ctx.file;
+    let user = ctx.myData.user;
 
     let rs = await FileMapper.upload({
         user,
@@ -20,15 +20,15 @@ const uplaod: MyRequestHandler = async (opt, req: Request, res: Response) => {
         contentType: file.mimetype,
         buffer: file.buffer,
         filename: file.originalname,
-        imgHost: req.myData.imgHost
+        imgHost: ctx.myData.imgHost
     });
     return rs;
 };
 
-const download: MyRequestHandler = async (opt, req: Request, res: Response) => {
-    let option = <{ fileType: string }>req.myOption;
+const download: MyRequestHandler = async (opt, ctx) => {
+    let option = <{ fileType: string }>ctx.myOption;
 
-    let data = paramsValid(req.query, ValidSchema.FileGet);
+    let data = paramsValid(ctx.query, ValidSchema.FileGet);
     let rawFile: GridFSInstance<any>;
     if (data.isRaw) {
         rawFile = await FileModel.rawFindOne({ _id: data._id });
@@ -38,11 +38,11 @@ const download: MyRequestHandler = async (opt, req: Request, res: Response) => {
     }
     opt.noSend = true;
     if (!rawFile) {
-        res.status(404).end();
+        ctx.status = 404;
         return;
     }
     //分片下载
-    let range = req.headers.range as string;
+    let range = ctx.headers.range as string;
     let downloadOpt: any = {
         returnStream: true,
     };
@@ -54,7 +54,7 @@ const download: MyRequestHandler = async (opt, req: Request, res: Response) => {
         let end = pos[1] ? parseInt(pos[1], 10) : total - 1;
         let chunksize = (end - start) + 1;
 
-        res.writeHead(206, {
+        ctx.writeHead(206, {
             'Content-Range': `bytes ${start}-${end}/${total}`,
             'Accept-Ranges': 'bytes',
             'Content-Length': chunksize,
@@ -67,25 +67,24 @@ const download: MyRequestHandler = async (opt, req: Request, res: Response) => {
         };
         let rs = await new FileModel({ fileId: rawFile._id }).download(downloadOpt);
         rs.stream
-            .pipe(res, { end: true })
+            .pipe(ctx.res, { end: true })
             .on('error', function (err) {
                 logger.log('file stream error:', err.message);
-                res.sendStatus(500);
+                ctx.sendStatus(500);
             });
     } else {
-        let ifModifiedSince = req.headers['if-modified-since'] as string;
+        let ifModifiedSince = ctx.headers['if-modified-since'] as string;
         downloadOpt.ifModifiedSince = ifModifiedSince;
         let rs = await new FileModel({ fileId: rawFile._id }).download(downloadOpt);
         if (rs.noModified) {
-            res.status(304);
-            res.end();
+            ctx.status = 304;
             return;
         }
-        res.set('Content-Type', rs.raw.contentType);
-        res.set('Content-Length', rs.raw.length.toString());
-        res.set('Content-Disposition', 'inline');
-        res.set('Last-Modified', (rs.raw.uploadDate || new Date()).toUTCString());
-        rs.stream.pipe(res);
+        ctx.set('Content-Type', rs.raw.contentType);
+        ctx.set('Content-Length', rs.raw.length.toString());
+        ctx.set('Content-Disposition', 'inline');
+        ctx.set('Last-Modified', (rs.raw.uploadDate || new Date()).toUTCString());
+        rs.stream.pipe(ctx.res);
     }
 };
 

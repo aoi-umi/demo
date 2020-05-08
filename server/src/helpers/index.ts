@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Context, Next } from 'koa';
 import * as Q from 'q';
 import * as moment from 'dayjs';
 import { MongooseDocument, Error } from 'mongoose';
@@ -32,7 +32,7 @@ type MyRequestHandlerOpt = {
     sendAsFile?: boolean;
     originRes?: boolean;
 }
-export let myRequestHandler = function (fn: (opt?: MyRequestHandlerOpt) => any, req: Request, res: Response, next?) {
+export let myRequestHandler = function (fn: (opt?: MyRequestHandlerOpt) => any, ctx: Context, next?) {
     let opt: MyRequestHandlerOpt = {
         json: true,
     };
@@ -46,15 +46,15 @@ export let myRequestHandler = function (fn: (opt?: MyRequestHandlerOpt) => any, 
         //result = {fileBuff, filename}
         if (opt.sendAsFile) {
             let filename = result.filename || '未命名';
-            let userAgent = (req.headers['user-agent'] || '').toLowerCase();
-            res.setHeader('Content-Type', "application/octet-stream");
+            let userAgent = (ctx.headers['user-agent'] || '').toLowerCase();
+            ctx.setHeader('Content-Type', "application/octet-stream");
             let encodeName = encodeURIComponent(filename);
             let disposition = 'attachment; filename=' + encodeName;
             if (userAgent.indexOf('firefox') >= 0) {
                 disposition = `attachment; filename*="utf8''${encodeName}"`;
             }
-            res.setHeader('Content-Disposition', disposition);
-            res.end(result.fileBuff);
+            ctx.setHeader('Content-Disposition', disposition);
+            ctx.end(result.fileBuff);
         }
         else {
             if (!opt.originRes) {
@@ -63,14 +63,14 @@ export let myRequestHandler = function (fn: (opt?: MyRequestHandlerOpt) => any, 
                     data: result,
                 };
             }
-            res.json(result);
+            ctx.json(result);
             //log.response = result;
         }
     }).catch(err => {
         let msg = err.msg || err.message;
         let response = { result: false, code: err.code, msg, remark: err.remark };
         logger.error(err);
-        res.json(response);
+        ctx.json(response);
     }).finally(() => {
         // if (log.response)
         //     new LogModel(log).save();
