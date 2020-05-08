@@ -1,8 +1,12 @@
-import * as express from 'express';
-let router = express.Router();
-export default router;
+import * as Koa from 'koa';
+import * as Router from '@koa/router';
 import { UserAuthMid, FileMid, MyRequestHandlerMid } from '@/middleware';
-import { auth } from '@/config';
+import { auth, env } from '@/config';
+
+let router = new Router({
+    prefix: env.urlPrefix
+});
+export default router;
 
 import user from './user';
 router.use(user);

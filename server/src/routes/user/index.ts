@@ -1,13 +1,18 @@
-import * as express from 'express';
+import * as Router from '@koa/router';
 
 import { UserAuthMid, MyRequestHandlerMid } from '@/middleware';
 import { auth } from '@/config';
 
-let router = express.Router();
+let router = new Router();
 export default router;
 
 //#region user 
 import * as userSign from './user-sign';
+let x = () => {
+    let fn: Router.Middleware = async (ctx, next) => {};
+    return fn;
+}
+router.post('/user/signUp', x());
 router.post('/user/signUp', UserAuthMid.normal(), MyRequestHandlerMid.convert(userSign.signUp));
 router.post('/user/signUpCheck', UserAuthMid.normal(), MyRequestHandlerMid.convert(userSign.signUpCheck));
 router.post('/user/signIn', UserAuthMid.normal(), MyRequestHandlerMid.convert(userSign.signIn));

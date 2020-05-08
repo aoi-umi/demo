@@ -1,4 +1,6 @@
-import { Request, Response, Express } from 'express';
+import * as Koa from 'koa';
+import { Context } from 'koa';
+import * as Router from '@koa/router';
 import { ConfirmChannel } from 'amqplib';
 import * as SocketIO from 'socket.io';
 import { Server } from 'http';
@@ -6,7 +8,6 @@ import { MQ } from 'amqplib-delay';
 
 import * as config from '@/config';
 import { myEnum } from '@/config';
-import * as helpers from '@/helpers';
 import { MySocket } from '@/_system/socket';
 import { Auth } from '@/_system/auth';
 import { Cache } from '@/_system/cache';
@@ -51,31 +52,44 @@ export async function init() {
     });
 }
 
-export let register = function (app: Express) {
-    app.use((req, res, next) => {
-        req.realIp = req.header('X-Real-IP') || req.ip;
-        req.myData = {
+export let register = function (app: Koa) {
+    app.use(async (ctx, next) => {
+        let req = ctx.req;
+        ctx.realIp = ctx.header('X-Real-IP') || ctx.ip;
+        ctx.myData = {
             startTime: new Date().getTime(),
-            ip: req.realIp,
+            ip: ctx.realIp,
             imgHost: req.headers.host,
             videoHost: req.headers.host,
         };
-        next();
+        try {
+            let rs = await next();
+            if (!rs)
+                ctx.body = rs;
+        } catch (e) {
+            ctx.body = {
+                code: -1,
+                msg: e.message
+            };
+        }
     });
 
-    app.get('/', function (req, res) {
-        res.json({
+    let router = new Router();
+    router.get('/', async (ctx) => {
+        return {
             name: config.env.name,
             version: config.env.version,
-        });
+        };
     });
-    app.use(config.env.urlPrefix, routes);
-};
+    app.use(router.routes()).use(router.allowedMethods());
+    app.use(routes.routes()).use(routes.allowedMethods());
 
-export let errorHandler = function (err, req: Request, res: Response, next) {
-    helpers.myRequestHandler(() => {
+    app.use(async (ctx, next) => {
+        let err = new Error('Not Found');
+        err['status'] = 404;
+        ctx.status = 404;
         throw err;
-    }, req, res);
+    });
 };
 
 export var mySocket: MySocket = null;
