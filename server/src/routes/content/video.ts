@@ -10,7 +10,7 @@ import { MyRequestHandler } from '@/middleware';
 import { VideoMapper, VideoModel } from '@/models/mongo/video';
 
 export let mgtQuery: MyRequestHandler = async (opt) => {
-    let myData = opt.reqData;
+    let myData = opt.myData;
     let user = myData.user;
     let data = paramsValid(opt.reqData, ValidSchema.VideoQuery);
 
@@ -29,7 +29,7 @@ export let mgtQuery: MyRequestHandler = async (opt) => {
 };
 
 export let mgtDetailQuery: MyRequestHandler = async (opt) => {
-    let myData = opt.reqData;
+    let myData = opt.myData;
     let user = myData.user;
     let data = paramsValid(opt.reqData, ValidSchema.VideoDetailQuery);
     let rs = await VideoMapper.detailQuery({ _id: data._id }, {
@@ -83,7 +83,7 @@ export let mgtAudit: MyRequestHandler = async (opt) => {
 
 
 export let query: MyRequestHandler = async (opt) => {
-    let myData = opt.reqData;
+    let myData = opt.myData;
     let user = myData.user;
     let data = paramsValid(opt.reqData, ValidSchema.VideoQuery);
 
@@ -101,7 +101,7 @@ export let query: MyRequestHandler = async (opt) => {
 };
 
 export let detailQuery: MyRequestHandler = async (opt) => {
-    let myData = opt.reqData;
+    let myData = opt.myData;
     let user = myData.user;
     let data = paramsValid(opt.reqData, ValidSchema.VideoDetailQuery);
     let rs = await VideoMapper.detailQuery({ _id: data._id }, {

@@ -21,7 +21,7 @@ export const mgtSave: MyRequestHandler = async (opt) => {
 
 export const mgtDetailQuery: MyRequestHandler = async (opt) => {
     let data = paramsValid(opt.reqData, ValidSchema.GoodsMgtDetailQuery);
-    let myData = opt.reqData;
+    let myData = opt.myData;
     let user = myData.user;
     let rs = await GoodsMapper.detailQuery(data);
     if (!user.equalsId(rs.spu.userId)) {
@@ -38,7 +38,7 @@ export const mgtDetailQuery: MyRequestHandler = async (opt) => {
 
 export const mgtQuery: MyRequestHandler = async (opt) => {
     let data = paramsValid(opt.reqData, ValidSchema.GoodsMgtQuery);
-    let myData = opt.reqData;
+    let myData = opt.myData;
     let user = myData.user;
     let { rows, total } = await GoodsMapper.query(data, {
         user,
@@ -69,7 +69,7 @@ export let mgtDel: MyRequestHandler = async (opt) => {
 
 export const detailQuery: MyRequestHandler = async (opt) => {
     let data = paramsValid(opt.reqData, ValidSchema.GoodsDetailQuery);
-    let myData = opt.reqData;
+    let myData = opt.myData;
     let user = myData.user;
     let rs = await GoodsMapper.detailQuery(data, { normal: true });
 
@@ -83,7 +83,7 @@ export const detailQuery: MyRequestHandler = async (opt) => {
 
 export const query: MyRequestHandler = async (opt) => {
     let data = paramsValid(opt.reqData, ValidSchema.GoodsQuery);
-    let myData = opt.reqData;
+    let myData = opt.myData;
     let user = myData.user;
     let { rows, total } = await GoodsMapper.query(data, {
         user,
@@ -101,7 +101,7 @@ export const query: MyRequestHandler = async (opt) => {
 
 export const buy: MyRequestHandler = async (opt) => {
     let data = paramsValid(opt.reqData, ValidSchema.GoodsBuy);
-    let myData = opt.reqData;
+    let myData = opt.myData;
     let user = myData.user;
     let rs = await GoodsMapper.buy(data, { user });
     return rs;

@@ -35,7 +35,7 @@ export let submit: MyRequestHandler = async (opt) => {
 };
 
 export let query: MyRequestHandler = async (opt) => {
-    let myData = opt.reqData;
+    let myData = opt.myData;
     let user = myData.user;
     let data = paramsValid(opt.reqData, ValidSchema.FavouriteQuery);
     let { rows, total } = await FavouriteMapper.query(data, { user, imgHost: myData.imgHost });
