@@ -3,6 +3,7 @@ import * as debug from 'debug';
 import * as Koa from 'koa';
 import * as logger from 'koa-morgan';
 import * as bodyParser from 'koa-bodyparser';
+import * as xmlParser from 'koa-xml-body';
 import * as cors from '@koa/cors';
 import { AddressInfo } from 'net';
 import 'reflect-metadata';
@@ -18,6 +19,11 @@ debug('my-application');
 const app = new Koa();
 
 app.use(logger('dev'));
+app.use(xmlParser({
+    xmlOptions: {
+        explicitArray: false
+    }
+}));
 app.use(bodyParser());
 // app.use(express.static(path.join(__dirname, 'public')));
 //app.use(express.static(config.fileDir));
