@@ -45,7 +45,7 @@ export let mgtDetailQuery: MyRequestHandler = async (opt) => {
 };
 
 export let mgtSave: MyRequestHandler = async (opt) => {
-    let user = opt.reqData.user;
+    let user = opt.myData.user;
     let data = paramsValid(opt.reqData, ValidSchema.VideoSave);
     let detail = await VideoMapper.mgtSave(data, { user });
     return {
@@ -54,7 +54,7 @@ export let mgtSave: MyRequestHandler = async (opt) => {
 };
 
 export let mgtDel: MyRequestHandler = async (opt) => {
-    let user = opt.reqData.user;
+    let user = opt.myData.user;
     let data = paramsValid(opt.reqData, ValidSchema.VideoDel);
     await VideoMapper.updateStatus({
         cond: {
@@ -68,7 +68,7 @@ export let mgtDel: MyRequestHandler = async (opt) => {
 };
 
 export let mgtAudit: MyRequestHandler = async (opt) => {
-    let user = opt.reqData.user;
+    let user = opt.myData.user;
     let data = paramsValid(opt.reqData, ValidSchema.VideoMgtAudit);
     let rs = await VideoMapper.updateStatus({
         cond: {

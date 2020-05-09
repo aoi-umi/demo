@@ -15,7 +15,7 @@ export let detailQuery: MyRequestHandler = async (opt) => {
 };
 
 export let save: MyRequestHandler = async (opt) => {
-    let user = opt.reqData.user;
+    let user = opt.myData.user;
     let data = opt.reqData;
     let detail = await SettingMapper.detailQuery();
     ['signUpType', 'signUpFrom', 'signUpTo'].forEach(key => {

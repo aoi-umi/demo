@@ -11,7 +11,7 @@ import { FollowMapper } from '@/models/mongo/follow';
 import { UserModel, UserMapper } from '@/models/mongo/user';
 
 export let save: MyRequestHandler = async (opt) => {
-    let user = opt.reqData.user;
+    let user = opt.myData.user;
     let data = paramsValid(opt.reqData, ValidSchema.FollowSave);
     if (user.equalsId(data.userId)) {
         throw error('不能关注自己');
@@ -42,9 +42,9 @@ export let save: MyRequestHandler = async (opt) => {
 };
 
 export let query: MyRequestHandler = async (opt) => {
-    let user = opt.reqData.user;
+    let user = opt.myData.user;
     let data = paramsValid(opt.reqData, ValidSchema.FollowQuery);
-    let { rows, total } = await FollowMapper.query(data, { user, imgHost: opt.reqData.imgHost });
+    let { rows, total } = await FollowMapper.query(data, { user, imgHost: opt.myData.imgHost });
     return {
         rows,
         total,

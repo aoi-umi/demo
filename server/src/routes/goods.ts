@@ -12,7 +12,7 @@ import { Auth } from '@/_system/auth';
 
 export const mgtSave: MyRequestHandler = async (opt) => {
     let data = paramsValid(opt.reqData, ValidSchema.GoodsMgtSave);
-    let user = opt.reqData.user;
+    let user = opt.myData.user;
     let rs = await GoodsMapper.mgtSave(data, { user });
     return {
         _id: rs.spu._id
@@ -55,7 +55,7 @@ export const mgtQuery: MyRequestHandler = async (opt) => {
 };
 
 export let mgtDel: MyRequestHandler = async (opt) => {
-    let user = opt.reqData.user;
+    let user = opt.myData.user;
     let data = paramsValid(opt.reqData, ValidSchema.GoodsMgtDel);
     await GoodsMapper.updateStatus({
         cond: {

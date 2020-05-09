@@ -6,20 +6,20 @@ import { Server } from 'http';
 import { MQ } from 'amqplib-delay';
 
 import * as config from '@/config';
-import { myEnum } from '@/config';
 import { MySocket } from '@/_system/socket';
 import { Auth } from '@/_system/auth';
 import { Cache } from '@/_system/cache';
 import routes from '@/routes';
 import { ThirdPartyPayMapper } from '@/3rd-party';
 import * as helpers from '@/helpers';
+import { initSocket } from '@/routes/socket';
 
 import { PayMapper } from './models/mongo/asset';
 
 export const auth = new Auth();
 export const mq = new MQ();
 export const cache = new Cache(config.env.redis.uri, config.env.cachePrefix || '');
-export async function init() {
+export async function init(app: Koa) {
 
     await mq.connect(config.env.mq.mqUri);
 
@@ -50,9 +50,10 @@ export async function init() {
             }),
         ] as any);
     });
+    register(app);
 }
 
-export let register = function (app: Koa) {
+let register = function (app: Koa) {
     app.use(async (ctx, next) => {
         await helpers.myRequestHandler(async (opt) => {
             opt.noSend = true;
@@ -87,46 +88,7 @@ export let register = function (app: Koa) {
 };
 
 export var mySocket: MySocket = null;
-export let initSocket = function (server: Server) {
-    const io = SocketIO(server, { path: config.env.urlPrefix + '/socket.io' });
-    mySocket = new MySocket(io, (socket, mySocket) => {
-        let { socketUser } = mySocket;
-
-        let sessionId = mySocket.connect(socket, socket.request._query);
-
-        socket.myData = {};
-        socket.on(myEnum.socket.登录, (msg) => {
-            socketUser.addUser(msg, socket);
-        });
-        socket.on(myEnum.socket.登出, (msg) => {
-            socketUser.delUserBySocket(socket);
-        });
-
-        socket.on(myEnum.socket.弹幕池连接, (msg) => {
-            socketUser.danmakuConn(msg.videoId, socket);
-        });
-
-        socket.on(myEnum.socket.弹幕池断开, (msg) => {
-            socketUser.danmakuDisConn(msg.videoId, socket);
-        });
-
-        socket.on(myEnum.socket.授权, (msg) => {
-            cache.setByCfg({
-                ...config.dev.cache.wxAuth,
-                key: msg.token
-            }, sessionId);
-        });
-
-        socket.on(myEnum.socket.支付, (msg) => {
-            cache.setByCfg({
-                ...config.dev.cache.pay,
-                key: msg.orderNo
-            }, sessionId);
-        });
-
-        socket.on('disconnect', function () {
-            mySocket.disconnect(socket);
-        });
-    });
+export let initServer = function (server: Server) {
+    mySocket = initSocket(server, cache);
 };
 

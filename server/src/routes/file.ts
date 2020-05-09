@@ -97,7 +97,7 @@ export const imgUpload: MyRequestHandler = (opt, ctx) => {
 
 export const imgGet: MyRequestHandler = (opt, ctx) => {
     opt.reqOption = { fileType: myEnum.fileType.图片, file: ctx.file };
-    return download(opt);
+    return download(opt, ctx);
 };
 
 export const videoUpload: MyRequestHandler = (opt, ctx) => {
@@ -107,5 +107,5 @@ export const videoUpload: MyRequestHandler = (opt, ctx) => {
 
 export const vedioGet: MyRequestHandler = (opt, ctx) => {
     opt.reqOption = { fileType: myEnum.fileType.视频, file: ctx.file };
-    return download(opt);
+    return download(opt, ctx);
 };

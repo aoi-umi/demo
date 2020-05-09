@@ -19,30 +19,30 @@ function returnUser(user: LoginUser) {
     return user.key ? user : null;
 }
 export let info: MyRequestHandler = async (opt) => {
-    let user = opt.reqData.user;
+    let user = opt.myData.user;
     return returnUser(user);
 
 };
 
 export let detail: MyRequestHandler = async (opt) => {
-    let user = opt.reqData.user;
-    let detail = await UserMapper.detail(user._id, { imgHost: opt.reqData.imgHost });
+    let user = opt.myData.user;
+    let detail = await UserMapper.detail(user._id, { imgHost: opt.myData.imgHost });
     let dbUser = await UserModel.findById(user._id);
-    UserMapper.resetDetail(detail, { imgHost: opt.reqData.imgHost });
+    UserMapper.resetDetail(detail, { imgHost: opt.myData.imgHost });
     await UserMapper.resetStat(dbUser, detail);
     return detail;
 
 };
 
 export let detailQuery: MyRequestHandler = async (opt) => {
-    let user = opt.reqData.user;
+    let user = opt.myData.user;
     let data = paramsValid(opt.reqData, ValidSchema.UserDetailQuery);
 
     let detail = await UserModel.findById(data._id, { password: 0, roleList: 0, authorityList: 0 });
     if (!detail)
         throw common.error('', config.error.USER_NOT_FOUND);
     let obj = detail.toJSON({ virtuals: false });
-    UserMapper.resetDetail(obj, { imgHost: opt.reqData.imgHost });
+    UserMapper.resetDetail(obj, { imgHost: opt.myData.imgHost });
     await UserMapper.resetStat(detail, obj);
     let follow: FollowInstanceType;
     obj.followEachOther = false;
@@ -65,7 +65,7 @@ export let detailQuery: MyRequestHandler = async (opt) => {
 
 export let update: MyRequestHandler = async (opt) => {
     let data = paramsValid(opt.reqData, ValidSchema.UserUpdate);
-    let user = opt.reqData.user;
+    let user = opt.myData.user;
     let updateCache: any = common.getDataInKey(data, ['avatar', 'nickname', 'profile']);
     let update = { ...updateCache };
     let dbUser = await UserModel.findById(user._id);
@@ -79,7 +79,7 @@ export let update: MyRequestHandler = async (opt) => {
         await log.save({ session });
     });
     if (updateCache.avatar)
-        updateCache.avatarUrl = FileMapper.getImgUrl(updateCache.avatar, opt.reqData.imgHost);
+        updateCache.avatarUrl = FileMapper.getImgUrl(updateCache.avatar, opt.myData.imgHost);
 
     if (!common.isObjectEmpty(updateCache)) {
         for (let key in updateCache) {
@@ -96,7 +96,7 @@ export let update: MyRequestHandler = async (opt) => {
 
 export let unbind: MyRequestHandler = async (opt) => {
     let data = paramsValid(opt.reqData, ValidSchema.UserUnbind);
-    let user = opt.reqData.user;
+    let user = opt.myData.user;
     let dbUser = await UserModel.findById(user._id);
     UserMapper.checkToken(data, dbUser);
     let update: UserDocType = {};
@@ -109,7 +109,7 @@ export let unbind: MyRequestHandler = async (opt) => {
 export let bind: MyRequestHandler = async (opt) => {
     let data = paramsValid(opt.reqData, ValidSchema.UserBind);
     let userByRs = await ThirdPartyAuthMapper.userByHandler({ by: data.by, val: data.val }, { checkExists: true });
-    let user = opt.reqData.user;
+    let user = opt.myData.user;
     let dbUser = await UserModel.findById(user._id);
     let update: UserDocType = {};
     update[userByRs.saveKey] = userByRs.val;
@@ -120,9 +120,9 @@ export let mgtQuery: MyRequestHandler = async (opt) => {
     let data = paramsValid(opt.reqData, ValidSchema.UserMgtQuery);
     let { rows, total } = await UserMapper.query({
         ...data, includeDelAuth: true
-    }, { imgHost: opt.reqData.imgHost });
+    }, { imgHost: opt.myData.imgHost });
     rows.forEach(detail => {
-        UserMapper.resetDetail(detail, { imgHost: opt.reqData.imgHost });
+        UserMapper.resetDetail(detail, { imgHost: opt.myData.imgHost });
     });
     return {
         rows,
@@ -132,7 +132,7 @@ export let mgtQuery: MyRequestHandler = async (opt) => {
 };
 
 export let mgtSave: MyRequestHandler = async (opt) => {
-    let user = opt.reqData.user;
+    let user = opt.myData.user;
     let data = paramsValid(opt.reqData, ValidSchema.UserMgtSave);
     let detail = await UserModel.findById(data._id);
     if (!detail.canEdit)
@@ -177,7 +177,7 @@ export let mgtSave: MyRequestHandler = async (opt) => {
 };
 
 export let mgtDisable: MyRequestHandler = async (opt) => {
-    let user = opt.reqData.user;
+    let user = opt.myData.user;
     let data = paramsValid(opt.reqData, ValidSchema.UserMgtDisable);
     let detail = await UserModel.findById(data._id);
     if (!detail.canEdit)

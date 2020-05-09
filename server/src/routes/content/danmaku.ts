@@ -11,7 +11,7 @@ import { MyRequestHandler } from '@/middleware';
 import { DanmakuModel } from '@/models/mongo/danmaku';
 
 export let submit: MyRequestHandler = async (opt) => {
-    let user = opt.reqData.user;
+    let user = opt.myData.user;
     let data = paramsValid(opt.reqData, ValidSchema.DanmakuSubmit);
     let detail = new DanmakuModel({
         ...data,
@@ -23,7 +23,7 @@ export let submit: MyRequestHandler = async (opt) => {
 };
 
 export let query: MyRequestHandler = async (opt) => {
-    let user = opt.reqData.user;
+    let user = opt.myData.user;
     let data = paramsValid(opt.reqData, ValidSchema.DanmakuQuery);
     let rows = await DanmakuModel.find({ videoId: data.videoId });
     return {

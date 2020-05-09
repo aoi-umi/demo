@@ -12,7 +12,7 @@ import { CommentMapper, CommentModel } from '@/models/mongo/comment';
 import { UserMapper } from '@/models/mongo/user';
 
 export let submit: MyRequestHandler = async (opt) => {
-    let user = opt.reqData.user;
+    let user = opt.myData.user;
     let data = paramsValid(opt.reqData, ValidSchema.CommentSubmit);
     let owner = await CommentMapper.findOwner({ ownerId: data.ownerId, type: data.type });
     let comment = await CommentMapper.create(data, data.type, user);
@@ -33,10 +33,10 @@ export let submit: MyRequestHandler = async (opt) => {
     };
     let obj = CommentMapper.resetDetail(ret, {
         user,
-        imgHost: opt.reqData.imgHost,
+        imgHost: opt.myData.imgHost,
     });
     if (comment.quoteUserId) {
-        let list = await UserMapper.queryById(comment.quoteUserId, { imgHost: opt.reqData.imgHost });
+        let list = await UserMapper.queryById(comment.quoteUserId, { imgHost: opt.myData.imgHost });
         obj.quoteUser = list[0];
     } else {
         obj.replyList = [];
@@ -45,13 +45,13 @@ export let submit: MyRequestHandler = async (opt) => {
 };
 
 export let query: MyRequestHandler = async (opt) => {
-    let user = opt.reqData.user;
+    let user = opt.myData.user;
     let data = paramsValid(opt.reqData, ValidSchema.CommentQuery);
     let { total, rows } = await CommentMapper.query({
         ...data,
     }, {
         resetOpt: {
-            imgHost: opt.reqData.imgHost,
+            imgHost: opt.myData.imgHost,
             user: user.isLogin ? user : null
         },
     });
@@ -63,7 +63,7 @@ export let query: MyRequestHandler = async (opt) => {
 };
 
 export let del: MyRequestHandler = async (opt) => {
-    let user = opt.reqData.user;
+    let user = opt.myData.user;
     let data = paramsValid(opt.reqData, ValidSchema.CommentDel);
     /**
      * 可删除

@@ -13,15 +13,15 @@ import { ArticleModel, ArticleMapper } from '@/models/mongo/article';
  * @apiGroup article
  * @apiParamClass (src/valid-schema/class-valid/article.ts) {AritcleQuery}
  */
-export let mgtQuery: MyRequestHandler = async (opt, req) => {
-    let user = opt.reqData.user;
+export let mgtQuery: MyRequestHandler = async (opt, ctx) => {
+    let user = opt.myData.user;
     let data = paramsValid(opt.reqData, ValidSchema.ArticleQuery);
 
     let { rows, total } = await ArticleMapper.query(data, {
         userId: user._id,
         audit: Auth.contains(user, config.auth.articleMgtAudit),
         resetOpt: {
-            imgHost: opt.reqData.imgHost,
+            imgHost: opt.myData.imgHost,
             user,
         }
     });
@@ -31,14 +31,14 @@ export let mgtQuery: MyRequestHandler = async (opt, req) => {
     };
 };
 
-export let mgtDetailQuery: MyRequestHandler = async (opt, req) => {
-    let user = opt.reqData.user;
+export let mgtDetailQuery: MyRequestHandler = async (opt, ctx) => {
+    let user = opt.myData.user;
     let data = paramsValid(opt.reqData, ValidSchema.ArticleDetailQuery);
     let rs = await ArticleMapper.detailQuery({ _id: data._id }, {
         userId: user._id,
         audit: Auth.contains(user, config.auth.articleMgtAudit),
         resetOpt: {
-            imgHost: opt.reqData.imgHost,
+            imgHost: opt.myData.imgHost,
             user,
         }
     });
@@ -50,8 +50,8 @@ export let mgtDetailQuery: MyRequestHandler = async (opt, req) => {
  * @apiGroup article
  * @apiParamClass (src/valid-schema/class-valid/article.ts) {AritcleSave}
  */
-export let mgtSave: MyRequestHandler = async (opt, req) => {
-    let user = opt.reqData.user;
+export let mgtSave: MyRequestHandler = async (opt, ctx) => {
+    let user = opt.myData.user;
     let data = paramsValid(opt.reqData, ValidSchema.ArticleSave);
     let detail = await ArticleMapper.mgtSave(data, { user });
     return {
@@ -59,8 +59,8 @@ export let mgtSave: MyRequestHandler = async (opt, req) => {
     };
 };
 
-export let mgtDel: MyRequestHandler = async (opt, req) => {
-    let user = opt.reqData.user;
+export let mgtDel: MyRequestHandler = async (opt, ctx) => {
+    let user = opt.myData.user;
     let data = paramsValid(opt.reqData, ValidSchema.ArticleDel);
     await ArticleMapper.updateStatus({
         cond: {
@@ -73,8 +73,8 @@ export let mgtDel: MyRequestHandler = async (opt, req) => {
     });
 };
 
-export let mgtAudit: MyRequestHandler = async (opt, req) => {
-    let user = opt.reqData.user;
+export let mgtAudit: MyRequestHandler = async (opt, ctx) => {
+    let user = opt.myData.user;
     let data = paramsValid(opt.reqData, ValidSchema.ArticleMgtAudit);
     let rs = await ArticleMapper.updateStatus({
         cond: {
@@ -88,14 +88,14 @@ export let mgtAudit: MyRequestHandler = async (opt, req) => {
 };
 
 
-export let query: MyRequestHandler = async (opt, req) => {
-    let user = opt.reqData.user;
+export let query: MyRequestHandler = async (opt, ctx) => {
+    let user = opt.myData.user;
     let data = paramsValid(opt.reqData, ValidSchema.ArticleQuery);
 
     let { rows, total } = await ArticleMapper.query(data, {
         normal: true,
         resetOpt: {
-            imgHost: opt.reqData.imgHost,
+            imgHost: opt.myData.imgHost,
             user: user.isLogin ? user : null,
         }
     });
@@ -105,13 +105,13 @@ export let query: MyRequestHandler = async (opt, req) => {
     };
 };
 
-export let detailQuery: MyRequestHandler = async (opt, req) => {
-    let user = opt.reqData.user;
+export let detailQuery: MyRequestHandler = async (opt, ctx) => {
+    let user = opt.myData.user;
     let data = paramsValid(opt.reqData, ValidSchema.ArticleDetailQuery);
     let rs = await ArticleMapper.detailQuery({ _id: data._id }, {
         normal: true,
         resetOpt: {
-            imgHost: opt.reqData.imgHost,
+            imgHost: opt.myData.imgHost,
             user: user.isLogin ? user : null,
         }
     });

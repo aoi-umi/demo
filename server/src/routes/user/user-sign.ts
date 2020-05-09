@@ -21,7 +21,7 @@ export let accountExists: MyRequestHandler = async (opt) => {
     return rs && {
         _id: rs._id,
         nickname: rs.nickname,
-        avatarUrl: FileMapper.getImgUrl(rs.avatar, opt.reqData.imgHost)
+        avatarUrl: FileMapper.getImgUrl(rs.avatar, opt.myData.imgHost)
     };
 };
 
@@ -50,7 +50,7 @@ export let signUp: MyRequestHandler = async (opt) => {
                     contentType: rs.response.headers['content-type'],
                     buffer: rs.data,
                     filename: userByRs.avatarUrl,
-                    imgHost: opt.reqData.imgHost,
+                    imgHost: opt.myData.imgHost,
                     user
                 });
                 user.avatar = uploadRs.fileId;
@@ -112,7 +112,7 @@ export let signInByAuth: MyRequestHandler = async (opt) => {
 };
 
 export let signOut: MyRequestHandler = async (opt) => {
-    let user = opt.reqData.user;
+    let user = opt.myData.user;
     if (user) {
         await cache.delByCfg({
             ...config.dev.cache.user,

@@ -31,9 +31,7 @@ app.use(cors());
         helpers.logger.error(e);
     });
     const main = await import('./main');
-    await main.init();
-
-    main.register(app);
+    await main.init(app);
 
     let port = process.env.PORT || config.env.port;
     const server = app.listen(port);
@@ -45,5 +43,5 @@ app.use(cors());
         '#',
         '#################',
     ].join('\r\n'));
-    main.initSocket(server);
+    main.initServer(server);
 });

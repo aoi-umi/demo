@@ -11,7 +11,7 @@ import { MyRequestHandler } from '@/middleware';
 import { FavouriteMapper } from '@/models/mongo/favourite';
 
 export let submit: MyRequestHandler = async (opt) => {
-    let user = opt.reqData.user;
+    let user = opt.myData.user;
     let data = paramsValid(opt.reqData, ValidSchema.FavouriteSubmit);
     let owner = await FavouriteMapper.findOwner({ ownerId: data.ownerId, type: data.type });
     let detail = await FavouriteMapper.create({ ownerId: data.ownerId, userId: user._id, type: data.type });

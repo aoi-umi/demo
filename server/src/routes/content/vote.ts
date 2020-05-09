@@ -11,7 +11,7 @@ import { MyRequestHandler } from '@/middleware';
 import { VoteModel, VoteMapper } from '@/models/mongo/vote';
 
 export let submit: MyRequestHandler = async (opt) => {
-    let user = opt.reqData.user;
+    let user = opt.myData.user;
     let data = paramsValid(opt.reqData, ValidSchema.VoteSubmit);
     let owner = await VoteMapper.findOwner({ ownerId: data.ownerId, type: data.type });
     let detail = await VoteMapper.create({ ownerId: data.ownerId, userId: user._id, type: data.type });
