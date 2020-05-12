@@ -1,11 +1,10 @@
 import 'module-alias/register';
 import * as debug from 'debug';
-import * as express from 'express';
-import * as logger from 'morgan';
-import * as cookieParser from 'cookie-parser';
-import * as bodyParser from 'body-parser';
-import * as bodyParserXml from 'body-parser-xml';
-import * as cors from 'cors';
+import * as Koa from 'koa';
+import * as logger from 'koa-morgan';
+import * as bodyParser from 'koa-bodyparser';
+import * as xmlParser from 'koa-xml-body';
+import * as cors from '@koa/cors';
 import { AddressInfo } from 'net';
 import 'reflect-metadata';
 
@@ -14,18 +13,18 @@ import './moduleAlias';
 import * as config from '@/config';
 import * as db from '@/_system/dbMongo';
 
-bodyParserXml(bodyParser);
 debug('my-application');
 
 
-const app = express();
-app.set('port', process.env.PORT || config.env.port);
+const app = new Koa();
 
 app.use(logger('dev'));
-app.use(bodyParser['xml']({ xmlParseOptions: { explicitArray: false } }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
+app.use(xmlParser({
+    xmlOptions: {
+        explicitArray: false
+    }
+}));
+app.use(bodyParser());
 // app.use(express.static(path.join(__dirname, 'public')));
 //app.use(express.static(config.fileDir));
 app.use(cors());
@@ -38,30 +37,17 @@ app.use(cors());
         helpers.logger.error(e);
     });
     const main = await import('./main');
-    await main.init();
+    await main.init(app);
 
-    main.register(app);
-
-    /// catch 404 and forwarding to error handler
-    app.use(function (req, res, next) {
-        let err = new Error('Not Found');
-        err['status'] = 404;
-        res.status(404);
-        next(err);
-    });
-
-    /// error handlers
-    app.use(main.errorHandler);
-
-    const server = app.listen(app.get('port'), '0.0.0.0', function () {
-        let address = server.address() as AddressInfo;
-        console.log([
-            '#################',
-            '#',
-            `# ${config.env.name} run at ${address.address}:${address.port},version:${config.env.version}`,
-            '#',
-            '#################',
-        ].join('\r\n'));
-    });
-    main.initSocket(server);
+    let port = process.env.PORT || config.env.port;
+    const server = app.listen(port);
+    let address = server.address() as AddressInfo;
+    console.log([
+        '#################',
+        '#',
+        `# ${config.env.name} run at ${address.address}:${address.port},version:${config.env.version}`,
+        '#',
+        '#################',
+    ].join('\r\n'));
+    main.initServer(server);
 });

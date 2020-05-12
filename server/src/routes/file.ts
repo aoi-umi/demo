@@ -1,5 +1,6 @@
 import { RequestHandler, Request, Response } from "express";
 import { GridFSInstance } from "mongoose-ts-ua";
+import * as multer from '@koa/multer';
 
 import * as common from "@/_system/common";
 import { paramsValid } from "@/helpers";
@@ -9,26 +10,26 @@ import { FileMapper, FileModel } from "@/models/mongo/file";
 import { logger } from "@/helpers";
 import { MyRequestHandler } from "@/middleware";
 
-const uplaod: MyRequestHandler = async (opt, req: Request, res: Response) => {
-    let option = <{ fileType: string }>req.myOption;
-    let file = req.file;
-    let user = req.myData.user;
+const uplaod: MyRequestHandler = async (opt) => {
+    let option = <{ fileType: string, file: multer.File }>opt.reqOption;
+    let { myData } = opt;
+    let { file } = option;
 
     let rs = await FileMapper.upload({
-        user,
+        user: myData.user,
         fileType: option.fileType,
         contentType: file.mimetype,
         buffer: file.buffer,
         filename: file.originalname,
-        imgHost: req.myData.imgHost
+        imgHost: myData.imgHost
     });
     return rs;
 };
 
-const download: MyRequestHandler = async (opt, req: Request, res: Response) => {
-    let option = <{ fileType: string }>req.myOption;
+const download: MyRequestHandler = async (opt, ctx) => {
+    let option = <{ fileType: string }>opt.reqOption;
 
-    let data = paramsValid(req.query, ValidSchema.FileGet);
+    let data = paramsValid(opt.reqData, ValidSchema.FileGet);
     let rawFile: GridFSInstance<any>;
     if (data.isRaw) {
         rawFile = await FileModel.rawFindOne({ _id: data._id });
@@ -38,11 +39,11 @@ const download: MyRequestHandler = async (opt, req: Request, res: Response) => {
     }
     opt.noSend = true;
     if (!rawFile) {
-        res.status(404).end();
+        ctx.status = 404;
         return;
     }
     //分片下载
-    let range = req.headers.range as string;
+    let range = ctx.headers.range as string;
     let downloadOpt: any = {
         returnStream: true,
     };
@@ -54,7 +55,7 @@ const download: MyRequestHandler = async (opt, req: Request, res: Response) => {
         let end = pos[1] ? parseInt(pos[1], 10) : total - 1;
         let chunksize = (end - start) + 1;
 
-        res.writeHead(206, {
+        ctx.writeHead(206, {
             'Content-Range': `bytes ${start}-${end}/${total}`,
             'Accept-Ranges': 'bytes',
             'Content-Length': chunksize,
@@ -67,44 +68,44 @@ const download: MyRequestHandler = async (opt, req: Request, res: Response) => {
         };
         let rs = await new FileModel({ fileId: rawFile._id }).download(downloadOpt);
         rs.stream
-            .pipe(res, { end: true })
+            .pipe(ctx.res, { end: true })
             .on('error', function (err) {
                 logger.log('file stream error:', err.message);
-                res.sendStatus(500);
+                ctx.sendStatus(500);
             });
     } else {
-        let ifModifiedSince = req.headers['if-modified-since'] as string;
+        let ifModifiedSince = ctx.request.get('if-modified-since');
         downloadOpt.ifModifiedSince = ifModifiedSince;
         let rs = await new FileModel({ fileId: rawFile._id }).download(downloadOpt);
         if (rs.noModified) {
-            res.status(304);
-            res.end();
+            ctx.status = 304;
             return;
         }
-        res.set('Content-Type', rs.raw.contentType);
-        res.set('Content-Length', rs.raw.length.toString());
-        res.set('Content-Disposition', 'inline');
-        res.set('Last-Modified', (rs.raw.uploadDate || new Date()).toUTCString());
-        rs.stream.pipe(res);
+        ctx.set('Content-Type', rs.raw.contentType);
+        ctx.set('Content-Length', rs.raw.length.toString());
+        ctx.set('Content-Disposition', 'inline');
+        ctx.set('Last-Modified', (rs.raw.uploadDate || new Date()).toUTCString());
+        // rs.stream.pipe(ctx.res);
+        ctx.body = rs.stream;
     }
 };
 
-export const imgUpload: MyRequestHandler = (opt, req, res) => {
-    req.myOption = { fileType: myEnum.fileType.图片 };
-    return uplaod(opt, req, res);
+export const imgUpload: MyRequestHandler = (opt, ctx) => {
+    opt.reqOption = { fileType: myEnum.fileType.图片, file: ctx.file };
+    return uplaod(opt);
 };
 
-export const imgGet: MyRequestHandler = (opt, req, res) => {
-    req.myOption = { fileType: myEnum.fileType.图片 };
-    return download(opt, req, res);
+export const imgGet: MyRequestHandler = (opt, ctx) => {
+    opt.reqOption = { fileType: myEnum.fileType.图片, file: ctx.file };
+    return download(opt, ctx);
 };
 
-export const videoUpload: MyRequestHandler = (opt, req, res) => {
-    req.myOption = { fileType: myEnum.fileType.视频 };
-    return uplaod(opt, req, res);
+export const videoUpload: MyRequestHandler = (opt, ctx) => {
+    opt.reqOption = { fileType: myEnum.fileType.视频, file: ctx.file };
+    return uplaod(opt);
 };
 
-export const vedioGet: MyRequestHandler = (opt, req, res) => {
-    req.myOption = { fileType: myEnum.fileType.视频 };
-    return download(opt, req, res);
+export const vedioGet: MyRequestHandler = (opt, ctx) => {
+    opt.reqOption = { fileType: myEnum.fileType.视频, file: ctx.file };
+    return download(opt, ctx);
 };

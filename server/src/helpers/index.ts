@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Context, Next } from 'koa';
 import * as Q from 'q';
 import * as moment from 'dayjs';
 import { MongooseDocument, Error } from 'mongoose';
@@ -10,6 +10,7 @@ import * as common from '../_system/common';
 import * as config from '../config';
 import * as ValidSchema from '../valid-schema/class-valid';
 import { valid } from './class-valid';
+import { MyRequestHandlerOpt } from '@/middleware';
 
 export const logger = getLogger();
 
@@ -26,35 +27,29 @@ configure({
     }
 });
 
-type MyRequestHandlerOpt = {
-    json?: boolean;
-    noSend?: boolean;
-    sendAsFile?: boolean;
-    originRes?: boolean;
-}
-export let myRequestHandler = function (fn: (opt?: MyRequestHandlerOpt) => any, req: Request, res: Response, next?) {
+
+export let myRequestHandler = async function (fn: (opt?: MyRequestHandlerOpt) => any, ctx: Context) {
     let opt: MyRequestHandlerOpt = {
         json: true,
     };
     //let log = helpers.expressCreateLog(req, res);
-    return Q.fcall(() => {
-        return fn(opt);
-    }).then(result => {
+    try {
+        let result = await fn(opt);
         //fn中自行处理
         if (opt.noSend)
             return result;
         //result = {fileBuff, filename}
         if (opt.sendAsFile) {
             let filename = result.filename || '未命名';
-            let userAgent = (req.headers['user-agent'] || '').toLowerCase();
-            res.setHeader('Content-Type', "application/octet-stream");
+            let userAgent = (ctx.headers['user-agent'] || '').toLowerCase();
+            ctx.setHeader('Content-Type', "application/octet-stream");
             let encodeName = encodeURIComponent(filename);
             let disposition = 'attachment; filename=' + encodeName;
             if (userAgent.indexOf('firefox') >= 0) {
                 disposition = `attachment; filename*="utf8''${encodeName}"`;
             }
-            res.setHeader('Content-Disposition', disposition);
-            res.end(result.fileBuff);
+            ctx.setHeader('Content-Disposition', disposition);
+            ctx.end(result.fileBuff);
         }
         else {
             if (!opt.originRes) {
@@ -63,18 +58,20 @@ export let myRequestHandler = function (fn: (opt?: MyRequestHandlerOpt) => any, 
                     data: result,
                 };
             }
-            res.json(result);
+            ctx.body = result;
             //log.response = result;
         }
-    }).catch(err => {
+    } catch (err) {
         let msg = err.msg || err.message;
+        if (err.status)
+            ctx.status = err.status;
         let response = { result: false, code: err.code, msg, remark: err.remark };
         logger.error(err);
-        res.json(response);
-    }).finally(() => {
+        ctx.body = response;
+    } finally {
         // if (log.response)
         //     new LogModel(log).save();
-    });
+    };
 };
 
 /**

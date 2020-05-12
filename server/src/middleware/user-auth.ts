@@ -1,4 +1,4 @@
-import { RequestHandler } from "express";
+import { Context } from "koa";
 import { plainToClass } from "class-transformer";
 
 import * as config from '@/config';
@@ -58,23 +58,19 @@ export class UserAuthMid {
     }
 
     static normal(authData?: AuthType) {
-        let fn: RequestHandler = async (req, res, next) => {
-            try {
-                let token = req.header(config.dev.cache.user.prefix);
-                let user = await UserAuthMid.getUser(token, {
-                    autoLogin: true,
-                    resetOpt: { imgHost: req.myData.imgHost }
-                });
-                req.myData.user = user;
+        return async (c, next) => {
+            let ctx = c as Context;
+            let token = ctx.request.get(config.dev.cache.user.prefix);
+            let user = await UserAuthMid.getUser(token, {
+                autoLogin: true,
+                resetOpt: { imgHost: ctx.myData.imgHost }
+            });
+            ctx.myData.user = user;
 
-                //url权限认证
-                if (authData)
-                    auth.checkAccessable(user, authData);
-                next();
-            } catch (e) {
-                next(e);
-            }
+            //url权限认证
+            if (authData)
+                auth.checkAccessable(user, authData);
+            await next();
         };
-        return fn;
     }
 }

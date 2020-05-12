@@ -11,12 +11,12 @@ import { MyRequestHandler } from '@/middleware';
 import { CommentMapper, CommentModel } from '@/models/mongo/comment';
 import { UserMapper } from '@/models/mongo/user';
 
-export let submit: MyRequestHandler = async (opt, req, res) => {
-    let user = req.myData.user;
-    let data = paramsValid(req.body, ValidSchema.CommentSubmit);
+export let submit: MyRequestHandler = async (opt) => {
+    let user = opt.myData.user;
+    let data = paramsValid(opt.reqData, ValidSchema.CommentSubmit);
     let owner = await CommentMapper.findOwner({ ownerId: data.ownerId, type: data.type });
     let comment = await CommentMapper.create(data, data.type, user);
-    comment.ip = req.realIp;
+    comment.ip = opt.myData.ip;
     await transaction(async (session) => {
         await comment.save({ session });
         await owner.update({ commentCount: owner.commentCount + 1 });
@@ -33,10 +33,10 @@ export let submit: MyRequestHandler = async (opt, req, res) => {
     };
     let obj = CommentMapper.resetDetail(ret, {
         user,
-        imgHost: req.myData.imgHost,
+        imgHost: opt.myData.imgHost,
     });
     if (comment.quoteUserId) {
-        let list = await UserMapper.queryById(comment.quoteUserId, { imgHost: req.myData.imgHost });
+        let list = await UserMapper.queryById(comment.quoteUserId, { imgHost: opt.myData.imgHost });
         obj.quoteUser = list[0];
     } else {
         obj.replyList = [];
@@ -44,14 +44,14 @@ export let submit: MyRequestHandler = async (opt, req, res) => {
     return obj;
 };
 
-export let query: MyRequestHandler = async (opt, req, res) => {
-    let user = req.myData.user;
-    let data = paramsValid(req.query, ValidSchema.CommentQuery);
+export let query: MyRequestHandler = async (opt) => {
+    let user = opt.myData.user;
+    let data = paramsValid(opt.reqData, ValidSchema.CommentQuery);
     let { total, rows } = await CommentMapper.query({
         ...data,
     }, {
         resetOpt: {
-            imgHost: req.myData.imgHost,
+            imgHost: opt.myData.imgHost,
             user: user.isLogin ? user : null
         },
     });
@@ -62,9 +62,9 @@ export let query: MyRequestHandler = async (opt, req, res) => {
     };
 };
 
-export let del: MyRequestHandler = async (opt, req, res) => {
-    let user = req.myData.user;
-    let data = paramsValid(req.body, ValidSchema.CommentDel);
+export let del: MyRequestHandler = async (opt) => {
+    let user = opt.myData.user;
+    let data = paramsValid(opt.reqData, ValidSchema.CommentDel);
     /**
      * 可删除
      * 1.本人

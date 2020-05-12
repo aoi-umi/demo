@@ -8,8 +8,8 @@ import { MyRequestHandler } from '@/middleware';
 
 import { AuthorityModel, AuthorityInstanceType, AuthorityMapper } from '@/models/mongo/authority';
 
-export let query: MyRequestHandler = async (opt, req, res) => {
-    let data = paramsValid(req.query, ValidSchema.AuthorityQuery);
+export let query: MyRequestHandler = async (opt) => {
+    let data = paramsValid(opt.reqData, ValidSchema.AuthorityQuery);
     let { rows, total } = await AuthorityMapper.query(data);
 
     return {
@@ -18,19 +18,19 @@ export let query: MyRequestHandler = async (opt, req, res) => {
     };
 };
 
-export let codeExists: MyRequestHandler = async (opt, req, res) => {
-    let data = paramsValid(req.body, ValidSchema.AuthorityCodeExists);
+export let codeExists: MyRequestHandler = async (opt) => {
+    let data = paramsValid(opt.reqData, ValidSchema.AuthorityCodeExists);
     let rs = await AuthorityMapper.codeExists(data.code, data._id);
     return rs && { _id: rs._id };
 };
 
-export let save: MyRequestHandler = async (opt, req, res) => {
+export let save: MyRequestHandler = async (opt) => {
     let data: {
         _id?: string;
         name?: string;
         code?: string;
         status?: string;
-    } = req.body;
+    } = opt.reqData;
     let model: AuthorityInstanceType;
     let rs = await AuthorityMapper.codeExists(data.code, data._id);
     if (rs)
@@ -55,11 +55,11 @@ export let save: MyRequestHandler = async (opt, req, res) => {
     };
 };
 
-export let update: MyRequestHandler = async (opt, req, res) => {
+export let update: MyRequestHandler = async (opt) => {
     let data: {
         _id: string;
         status?: string;
-    } & Object = req.body;
+    } & Object = opt.reqData;
     let model = await AuthorityModel.findById(data._id);
     if (!model)
         throw error('not exists');
@@ -75,8 +75,8 @@ export let update: MyRequestHandler = async (opt, req, res) => {
     };
 };
 
-export let del: MyRequestHandler = async (opt, req, res) => {
-    let data = paramsValid(req.body, ValidSchema.AuthorityDel);
+export let del: MyRequestHandler = async (opt) => {
+    let data = paramsValid(opt.reqData, ValidSchema.AuthorityDel);
     let rs = await AuthorityModel.deleteMany({ _id: { $in: data.idList } });
     if (!rs.n)
         throw error('', config.error.NO_MATCH_DATA);

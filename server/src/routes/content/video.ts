@@ -9,10 +9,10 @@ import { MyRequestHandler } from '@/middleware';
 
 import { VideoMapper, VideoModel } from '@/models/mongo/video';
 
-export let mgtQuery: MyRequestHandler = async (opt, req, res) => {
-    let myData = req.myData;
+export let mgtQuery: MyRequestHandler = async (opt) => {
+    let myData = opt.myData;
     let user = myData.user;
-    let data = paramsValid(req.query, ValidSchema.VideoQuery);
+    let data = paramsValid(opt.reqData, ValidSchema.VideoQuery);
 
     let { rows, total } = await VideoMapper.query(data, {
         userId: user._id,
@@ -28,10 +28,10 @@ export let mgtQuery: MyRequestHandler = async (opt, req, res) => {
     };
 };
 
-export let mgtDetailQuery: MyRequestHandler = async (opt, req, res) => {
-    let myData = req.myData;
+export let mgtDetailQuery: MyRequestHandler = async (opt) => {
+    let myData = opt.myData;
     let user = myData.user;
-    let data = paramsValid(req.query, ValidSchema.VideoDetailQuery);
+    let data = paramsValid(opt.reqData, ValidSchema.VideoDetailQuery);
     let rs = await VideoMapper.detailQuery({ _id: data._id }, {
         userId: user._id,
         audit: Auth.contains(user, config.auth.videoMgtAudit),
@@ -44,18 +44,18 @@ export let mgtDetailQuery: MyRequestHandler = async (opt, req, res) => {
     return rs;
 };
 
-export let mgtSave: MyRequestHandler = async (opt, req, res) => {
-    let user = req.myData.user;
-    let data = paramsValid(req.body, ValidSchema.VideoSave);
+export let mgtSave: MyRequestHandler = async (opt) => {
+    let user = opt.myData.user;
+    let data = paramsValid(opt.reqData, ValidSchema.VideoSave);
     let detail = await VideoMapper.mgtSave(data, { user });
     return {
         _id: detail._id
     };
 };
 
-export let mgtDel: MyRequestHandler = async (opt, req, res) => {
-    let user = req.myData.user;
-    let data = paramsValid(req.body, ValidSchema.VideoDel);
+export let mgtDel: MyRequestHandler = async (opt) => {
+    let user = opt.myData.user;
+    let data = paramsValid(opt.reqData, ValidSchema.VideoDel);
     await VideoMapper.updateStatus({
         cond: {
             idList: data.idList,
@@ -67,9 +67,9 @@ export let mgtDel: MyRequestHandler = async (opt, req, res) => {
     });
 };
 
-export let mgtAudit: MyRequestHandler = async (opt, req, res) => {
-    let user = req.myData.user;
-    let data = paramsValid(req.body, ValidSchema.VideoMgtAudit);
+export let mgtAudit: MyRequestHandler = async (opt) => {
+    let user = opt.myData.user;
+    let data = paramsValid(opt.reqData, ValidSchema.VideoMgtAudit);
     let rs = await VideoMapper.updateStatus({
         cond: {
             idList: data.idList,
@@ -82,10 +82,10 @@ export let mgtAudit: MyRequestHandler = async (opt, req, res) => {
 };
 
 
-export let query: MyRequestHandler = async (opt, req, res) => {
-    let myData = req.myData;
+export let query: MyRequestHandler = async (opt) => {
+    let myData = opt.myData;
     let user = myData.user;
-    let data = paramsValid(req.query, ValidSchema.VideoQuery);
+    let data = paramsValid(opt.reqData, ValidSchema.VideoQuery);
 
     let { rows, total } = await VideoMapper.query(data, {
         normal: true,
@@ -100,10 +100,10 @@ export let query: MyRequestHandler = async (opt, req, res) => {
     };
 };
 
-export let detailQuery: MyRequestHandler = async (opt, req, res) => {
-    let myData = req.myData;
+export let detailQuery: MyRequestHandler = async (opt) => {
+    let myData = opt.myData;
     let user = myData.user;
-    let data = paramsValid(req.query, ValidSchema.VideoDetailQuery);
+    let data = paramsValid(opt.reqData, ValidSchema.VideoDetailQuery);
     let rs = await VideoMapper.detailQuery({ _id: data._id }, {
         normal: true,
         resetOpt: {

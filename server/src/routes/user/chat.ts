@@ -10,9 +10,9 @@ import { ChatModel, ChatMapper } from "@/models/mongo/chat";
 import { BaseMapper } from "@/models/mongo/_base";
 import { UserMapper } from "@/models/mongo/user";
 
-export let submit: MyRequestHandler = async (opt, req, res) => {
-    let user = req.myData.user;
-    let data = paramsValid(req.body, ValidSchema.ChatSubmit);
+export let submit: MyRequestHandler = async (opt) => {
+    let user = opt.myData.user;
+    let data = paramsValid(opt.reqData, ValidSchema.ChatSubmit);
     if (user.equalsId(data.destUserId))
         throw error('不能私信自己');
     let chat = new ChatModel({
@@ -23,19 +23,19 @@ export let submit: MyRequestHandler = async (opt, req, res) => {
     mySocket.socketUser.sendChat(chat.toObject());
 };
 
-export let query: MyRequestHandler = async (opt, req, res) => {
-    let user = req.myData.user;
-    let data = paramsValid(req.query, ValidSchema.ChatQuery);
-    let rs = await ChatMapper.query(data, { userId: user._id, imgHost: req.myData.imgHost });
+export let query: MyRequestHandler = async (opt) => {
+    let user = opt.myData.user;
+    let data = paramsValid(opt.reqData, ValidSchema.ChatQuery);
+    let rs = await ChatMapper.query(data, { userId: user._id, imgHost: opt.myData.imgHost });
     return {
         rows: rs.rows,
         total: rs.total,
     };
 };
 
-export let list: MyRequestHandler = async (opt, req, res) => {
-    let user = req.myData.user;
-    let data = paramsValid(req.query, ValidSchema.ChatList);
+export let list: MyRequestHandler = async (opt) => {
+    let user = opt.myData.user;
+    let data = paramsValid(opt.reqData, ValidSchema.ChatList);
     let userId = user._id;
     let rs = await ChatModel.aggregatePaginate([
         {
@@ -62,7 +62,7 @@ export let list: MyRequestHandler = async (opt, req, res) => {
     });
     let rows = rs.rows.map(ele => {
         let obj = ele.data;
-        UserMapper.resetDetail(ele.user, { imgHost: req.myData.imgHost });
+        UserMapper.resetDetail(ele.user, { imgHost: opt.myData.imgHost });
         obj.user = ele.user;
         return obj;
     });

@@ -13,15 +13,15 @@ import { ArticleModel, ArticleMapper } from '@/models/mongo/article';
  * @apiGroup article
  * @apiParamClass (src/valid-schema/class-valid/article.ts) {AritcleQuery}
  */
-export let mgtQuery: MyRequestHandler = async (opt, req, res) => {
-    let user = req.myData.user;
-    let data = paramsValid(req.query, ValidSchema.ArticleQuery);
+export let mgtQuery: MyRequestHandler = async (opt, ctx) => {
+    let user = opt.myData.user;
+    let data = paramsValid(opt.reqData, ValidSchema.ArticleQuery);
 
     let { rows, total } = await ArticleMapper.query(data, {
         userId: user._id,
         audit: Auth.contains(user, config.auth.articleMgtAudit),
         resetOpt: {
-            imgHost: req.myData.imgHost,
+            imgHost: opt.myData.imgHost,
             user,
         }
     });
@@ -31,14 +31,14 @@ export let mgtQuery: MyRequestHandler = async (opt, req, res) => {
     };
 };
 
-export let mgtDetailQuery: MyRequestHandler = async (opt, req, res) => {
-    let user = req.myData.user;
-    let data = paramsValid(req.query, ValidSchema.ArticleDetailQuery);
+export let mgtDetailQuery: MyRequestHandler = async (opt, ctx) => {
+    let user = opt.myData.user;
+    let data = paramsValid(opt.reqData, ValidSchema.ArticleDetailQuery);
     let rs = await ArticleMapper.detailQuery({ _id: data._id }, {
         userId: user._id,
         audit: Auth.contains(user, config.auth.articleMgtAudit),
         resetOpt: {
-            imgHost: req.myData.imgHost,
+            imgHost: opt.myData.imgHost,
             user,
         }
     });
@@ -50,18 +50,18 @@ export let mgtDetailQuery: MyRequestHandler = async (opt, req, res) => {
  * @apiGroup article
  * @apiParamClass (src/valid-schema/class-valid/article.ts) {AritcleSave}
  */
-export let mgtSave: MyRequestHandler = async (opt, req, res) => {
-    let user = req.myData.user;
-    let data = paramsValid(req.body, ValidSchema.ArticleSave);
+export let mgtSave: MyRequestHandler = async (opt, ctx) => {
+    let user = opt.myData.user;
+    let data = paramsValid(opt.reqData, ValidSchema.ArticleSave);
     let detail = await ArticleMapper.mgtSave(data, { user });
     return {
         _id: detail._id
     };
 };
 
-export let mgtDel: MyRequestHandler = async (opt, req, res) => {
-    let user = req.myData.user;
-    let data = paramsValid(req.body, ValidSchema.ArticleDel);
+export let mgtDel: MyRequestHandler = async (opt, ctx) => {
+    let user = opt.myData.user;
+    let data = paramsValid(opt.reqData, ValidSchema.ArticleDel);
     await ArticleMapper.updateStatus({
         cond: {
             idList: data.idList,
@@ -73,9 +73,9 @@ export let mgtDel: MyRequestHandler = async (opt, req, res) => {
     });
 };
 
-export let mgtAudit: MyRequestHandler = async (opt, req, res) => {
-    let user = req.myData.user;
-    let data = paramsValid(req.body, ValidSchema.ArticleMgtAudit);
+export let mgtAudit: MyRequestHandler = async (opt, ctx) => {
+    let user = opt.myData.user;
+    let data = paramsValid(opt.reqData, ValidSchema.ArticleMgtAudit);
     let rs = await ArticleMapper.updateStatus({
         cond: {
             idList: data.idList,
@@ -88,14 +88,14 @@ export let mgtAudit: MyRequestHandler = async (opt, req, res) => {
 };
 
 
-export let query: MyRequestHandler = async (opt, req, res) => {
-    let user = req.myData.user;
-    let data = paramsValid(req.query, ValidSchema.ArticleQuery);
+export let query: MyRequestHandler = async (opt, ctx) => {
+    let user = opt.myData.user;
+    let data = paramsValid(opt.reqData, ValidSchema.ArticleQuery);
 
     let { rows, total } = await ArticleMapper.query(data, {
         normal: true,
         resetOpt: {
-            imgHost: req.myData.imgHost,
+            imgHost: opt.myData.imgHost,
             user: user.isLogin ? user : null,
         }
     });
@@ -105,13 +105,13 @@ export let query: MyRequestHandler = async (opt, req, res) => {
     };
 };
 
-export let detailQuery: MyRequestHandler = async (opt, req, res) => {
-    let user = req.myData.user;
-    let data = paramsValid(req.query, ValidSchema.ArticleDetailQuery);
+export let detailQuery: MyRequestHandler = async (opt, ctx) => {
+    let user = opt.myData.user;
+    let data = paramsValid(opt.reqData, ValidSchema.ArticleDetailQuery);
     let rs = await ArticleMapper.detailQuery({ _id: data._id }, {
         normal: true,
         resetOpt: {
-            imgHost: req.myData.imgHost,
+            imgHost: opt.myData.imgHost,
             user: user.isLogin ? user : null,
         }
     });

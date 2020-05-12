@@ -1,16 +1,9 @@
-import * as multer from "multer";
+import * as Koa from "koa";
+import { RouterContext } from "@koa/router";
+import * as multer from "@koa/multer";
 
 export class FileMid {
-    static single(req, res, next) {
-        multer().single('file')(req, res, function (err) {
-            if (err) {
-                res.json({
-                    result: false,
-                    msg: '缺少参数'
-                });
-            } else {
-                next();
-            }
-        });
+    static async single(ctx: Koa.Context & RouterContext, next) {
+        await multer().single('file')(ctx, next);
     }
 }

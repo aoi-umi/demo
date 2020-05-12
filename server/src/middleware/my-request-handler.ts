@@ -1,7 +1,12 @@
-import { Request, Response, NextFunction, RequestHandler } from 'express';
+import { Context, Next } from 'koa';
+import { RouterContext } from '@koa/router';
 import { myRequestHandler } from '@/helpers';
+import { MyData } from '@/typings/libs';
 
-type MyRequestHandlerOpt = {
+export type MyRequestHandlerOpt = {
+    reqData?: any;
+    reqOption?: any;
+    myData?: MyData;
     json?: boolean;
     noSend?: boolean;
     sendAsFile?: boolean;
@@ -9,16 +14,19 @@ type MyRequestHandlerOpt = {
 }
 
 export interface MyRequestHandler {
-    (opt: MyRequestHandlerOpt, req: Request, res: Response, next?: NextFunction): any;
+    (opt: MyRequestHandlerOpt, ctx?: Context, next?: Next): any;
 }
 
 export class MyRequestHandlerMid {
     static convert(fn: MyRequestHandler) {
-        let rh: RequestHandler = (req, res, next) => {
-            myRequestHandler(async (opt) => {
-                let rs = await fn(opt, req, res, next);
+        let rh = async (ctx: Context & RouterContext, next) => {
+            let rs = await myRequestHandler(async (opt) => {
+                opt.reqData = ctx.method === 'GET' ? ctx.request.query : ctx.request.body;
+                opt.myData = ctx.myData;
+                let rs = await fn(opt, ctx, next);
                 return rs;
-            }, req, res, next);
+            }, ctx);
+            return rs;
         };
         return rh;
     }
