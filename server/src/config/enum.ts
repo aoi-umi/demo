@@ -101,6 +101,11 @@ export const enumDefine = {
         下架: 0,
         上架: 1,
     },
+    statUserType: {
+        ip: 'ip',
+        uv: 'uv',
+        pv: 'pv',
+    },
 
     socket: {
         弹幕接收: 'danmakuRecv',

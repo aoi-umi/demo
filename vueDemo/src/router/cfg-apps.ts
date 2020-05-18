@@ -12,4 +12,9 @@ export default {
         text: '小编bot',
         component: () => import('../views/apps/xiaobian-bot')
     },
+    stat: {
+        path: '/stat',
+        text: '统计',
+        component: () => import('../views/stat/user')
+    },
 };

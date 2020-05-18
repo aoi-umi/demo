@@ -30,6 +30,7 @@ export default {
     autoLoginTime: 3600 * 2,
     //#endregion
     rootRole: 'root',
+    dayFormat: 'YYYY-MM-DD',
     dateFormat: 'YYYY-MM-DD HH:mm:ss',
 
     mq: {

@@ -1,12 +1,19 @@
-import * as Koa from 'koa';
 import * as Router from '@koa/router';
-import { UserAuthMid, FileMid, MyRequestHandlerMid } from '@/middleware';
+import { UserAuthMid, FileMid, MyRequestHandlerMid, UserStatMid } from '@/middleware';
 import { auth, env } from '@/config';
 
 let router = new Router({
     prefix: env.urlPrefix
 });
 export default router;
+
+
+router.get('/server/info', UserStatMid.stat, MyRequestHandlerMid.convert(() => {
+    return {
+        name: env.name,
+        version: env.version,
+    };
+}));
 
 import user from './user';
 router.use(user.routes());
@@ -75,4 +82,10 @@ import * as wx from './wx';
 router.get('/wx/getCode', MyRequestHandlerMid.convert(wx.getCode));
 router.get('/wx/getUserInfo', MyRequestHandlerMid.convert(wx.getUserInfo));
 router.post('/wx/codeSend', MyRequestHandlerMid.convert(wx.codeSend));
+//#endregion
+
+//#region stat 
+import * as stat from './stat';
+router.post('/stat/pv/save', MyRequestHandlerMid.convert(stat.pvSave));
+router.get('/stat/query', MyRequestHandlerMid.convert(stat.query));
 //#endregion

@@ -1,7 +1,6 @@
 import * as Koa from 'koa';
 import * as Router from '@koa/router';
 import { ConfirmChannel } from 'amqplib';
-import * as SocketIO from 'socket.io';
 import { Server } from 'http';
 import { MQ } from 'amqplib-delay';
 
@@ -54,6 +53,8 @@ export async function init(app: Koa) {
 }
 
 let register = function (app: Koa) {
+    app.keys = ['some secret hurr'];
+
     app.use(async (ctx, next) => {
         await helpers.myRequestHandler(async (opt) => {
             opt.noSend = true;
@@ -69,14 +70,14 @@ let register = function (app: Koa) {
         }, ctx);
     });
 
-    let router = new Router();
-    router.get('/', async (ctx) => {
-        return {
+    let route = new Router();
+    route.get('/', async (ctx) => {
+        ctx.body = {
             name: config.env.name,
             version: config.env.version,
         };
     });
-    app.use(router.routes()).use(router.allowedMethods());
+    app.use(route.routes()).use(route.allowedMethods());
     app.use(routes.routes()).use(routes.allowedMethods());
 
     app.use(async (ctx, next) => {

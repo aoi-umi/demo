@@ -7,6 +7,7 @@ import { ApiModel, ApiConfigModel, ApiMethodConfigType } from './model';
 import { ApiListQueryArgs, ApiMethod } from '.';
 
 type TestApiMethod = ApiMethod<ApiMethodConfigType, {
+    serverInfo,
     userSignUp,
     userSignUpCheck,
     userSignIn,
@@ -102,6 +103,9 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
     wxGetCode,
     wxGetUserInfo,
     wxCodeSend,
+
+    statPVSave,
+    statQuery,
 }>;
 export type TestApiConfigType = ApiConfigModel<TestApiMethod>;
 
@@ -124,13 +128,14 @@ export class TestApi extends ApiModel<TestApiMethod> {
                     ...this.defaultHeaders(),
                     ...req.headers,
                 };
+                req.withCredentials = true;
                 return req;
             },
             afterResponse: (res: Result) => {
                 if (!res.result)
                     throw error(res.msg, res.code);
                 return res.data;
-            }
+            },
         });
         this.imgUploadUrl = this.getRequestConfig(this.apiConfig.method.imgUpload).url;
         this.imgUrl = this.getRequestConfig(this.apiConfig.method.imgGet).url;
@@ -170,6 +175,10 @@ export class TestApi extends ApiModel<TestApiMethod> {
         return id ? this.videoUrl + '?_id=' + id : '';
     }
     //#endregion  
+
+    async serverInfo() {
+        return this.requestByConfig(this.apiConfig.method.serverInfo);
+    }
 
     //#region user 
     async userSignUp(data: { account: string, nickname: string, password: string }) {
@@ -457,6 +466,16 @@ export class TestApi extends ApiModel<TestApiMethod> {
         return this.requestByConfig(this.apiConfig.method.wxCodeSend, { data });
     }
     //#endregion
+
+    //#region stat 
+    async statPVSave(data) {
+        return this.requestByConfig(this.apiConfig.method.statPVSave, { data });
+    }
+    async statQuery() {
+        return this.requestByConfig(this.apiConfig.method.statQuery);
+    }
+    //#endregion
+
 }
 
 type FileUploadRes = { fileId: string; url: string };

@@ -21,7 +21,6 @@ function returnUser(user: LoginUser) {
 export let info: MyRequestHandler = async (opt) => {
     let user = opt.myData.user;
     return returnUser(user);
-
 };
 
 export let detail: MyRequestHandler = async (opt) => {

@@ -10,10 +10,10 @@ import { LocalStore } from '@/store';
 
 import { testApi, testSocket } from './api';
 import { dev, env } from './config';
-import "./App.less";
 import { SignInView } from './views/user/user-sign';
 import { Base } from './views/base';
 import { UserAvatarView } from './views/comps/user-avatar';
+import "./App.less";
 
 @Component
 export default class App extends Base {
@@ -23,6 +23,14 @@ export default class App extends Base {
     title = '';
     activeName = '';
     $refs: { sider: any, menu: iView.Menu };
+
+    @Watch('$route')
+    private watchRoute(old, newVal) {
+        this.log();
+    }
+    async log() {
+        testApi.statPVSave({ path: this.$route.path });
+    }
 
     getActiveNameByPath(path: string) {
         let name = '';
@@ -42,6 +50,8 @@ export default class App extends Base {
         this.handleResize();
         this.setMenuCfg();
         this.activeName = this.getActiveNameByPath(location.pathname);
+        testApi.serverInfo();
+        this.log();
     }
 
     private isSmall = false;
@@ -134,7 +144,7 @@ export default class App extends Base {
     getMenu(data: MenuConfig) {
         let name = this.getMenuName(data);
         return (
-            <MenuItem class="menu-item" name={name} to={data.to}>
+            <MenuItem key={data.to} class="menu-item" name={name} to={data.to}>
                 <Icon type={data.icon} />
                 <span class="menu-text">{data.text}</span>
             </MenuItem>
@@ -198,6 +208,9 @@ export default class App extends Base {
         }, {
             routerConfig: routerConfig.setting,
             icon: 'md-settings',
+        }, {
+            routerConfig: routerConfig.stat,
+            icon: 'md-pie',
         }].map(ele => {
             let { routerConfig, ...rest } = ele;
             let obj = {} as any;

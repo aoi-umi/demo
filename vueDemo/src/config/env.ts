@@ -34,6 +34,10 @@ const config = {
                 host: `${currEnvCfg.apiHost}/devMgt`,
             },
             method: {
+                serverInfo: {
+                    url: '/server/info',
+                    method: 'get'
+                },
                 userSignUp: {
                     url: '/user/signUp',
                 },
@@ -320,6 +324,13 @@ const config = {
                 wxCodeSend: {
                     url: '/wx/codeSend',
                 },
+                statPVSave: {
+                    url: '/stat/pv/save'
+                },
+                statQuery: {
+                    url: '/stat/query',
+                    method: 'get'
+                }
             },
         } as TestApiConfigType
     },
