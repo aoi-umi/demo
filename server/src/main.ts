@@ -58,7 +58,7 @@ let register = function (app: Koa) {
     app.use(async (ctx, next) => {
         await helpers.myRequestHandler(async (opt) => {
             opt.noSend = true;
-            let ip = ctx.request.get('X-Real-IP') || ctx.ip;
+            let ip = ctx.request.get('x-forwarded-for') || ctx.request.get('X-Real-IP') || ctx.ip;
             ctx.myData = {
                 startTime: new Date().getTime(),
                 ip,
