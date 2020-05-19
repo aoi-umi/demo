@@ -24,11 +24,7 @@ export default class App extends Base {
     activeName = '';
     $refs: { sider: any, menu: iView.Menu };
 
-    @Watch('$route')
-    private watchRoute(old, newVal) {
-        this.log();
-    }
-    async log() {
+    async logPV() {
         testApi.statPVSave({ path: this.$route.path });
     }
 
@@ -51,7 +47,7 @@ export default class App extends Base {
         this.setMenuCfg();
         this.activeName = this.getActiveNameByPath(location.pathname);
         testApi.serverInfo();
-        this.log();
+        this.logPV();
     }
 
     private isSmall = false;
@@ -66,7 +62,7 @@ export default class App extends Base {
     private handleResize() {
         this.isSmall = document.body.clientWidth < 576;
     }
-    get menuitemClasses() {
+    get menuClasses() {
         return ["menu", this.isCollapsed ? "collapsed-menu" : ""];
     }
 
@@ -163,6 +159,9 @@ export default class App extends Base {
     route(to, from) {
         this.setTitle();
         this.activeName = this.getActiveNameByPath(location.pathname);
+        this.logPV();
+        if (!this.isCollapsed)
+            this.isCollapsed = true;
     }
 
     private menuCfg: MenuConfig[] = [];
@@ -281,7 +280,7 @@ export default class App extends Base {
                             active-name={this.activeName}
                             theme={"dark"}
                             width="auto"
-                            class={this.menuitemClasses}
+                            class={this.menuClasses}
                             open-names={this.openNames}
                             on-on-select={() => {
                                 if (this.isSmall)
