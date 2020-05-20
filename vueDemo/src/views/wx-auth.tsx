@@ -225,7 +225,7 @@ export default class WxAuth extends Base {
                 }
                 <div class={this.getStyleName("qrcode-box")} v-show={!Utils.isWxClient() && (this.qrcodeLoginShow || this.qrcodeBindShow)}>
                     <div>使用微信扫一扫</div>
-                    <MyQrcode ref="qrcode" v-show={!this.qrcodeLoginShow} />
+                    <MyQrcode ref="qrcode" v-show={this.qrcodeLoginShow} />
                     <MyQrcode ref="qrcodeBind" v-show={this.qrcodeBindShow} />
                 </div>
             </Card>
