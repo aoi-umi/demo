@@ -27,9 +27,10 @@ type WxUserInfo = {
 @Component
 export default class WxAuth extends Base {
     stylePrefix = "wx-auth-";
-    $refs: { qrcode: IMyQrcode };
+    $refs: { qrcode: IMyQrcode, qrcodeBind: IMyQrcode };
     mounted() {
         this.auth();
+        this.$refs.qrcodeBind.drawQrcode(location.href);
         testSocket.bindAuthRecv((data) => {
             this.val = data.code;
             this.signInByCode();
@@ -45,6 +46,14 @@ export default class WxAuth extends Base {
     loading = true;
     val = '';
     type = '';
+    get qrcodeLoginShow() {
+        return !this.storeUser.user.isLogin && this.type === myEnum.wxAuthType.登录;
+    }
+
+    get qrcodeBindShow() {
+        return this.storeUser.user.isLogin && this.type === myEnum.wxAuthType.绑定;
+    }
+
     async auth() {
         let query: any = this.$route.query;
         this.val = query.code;
@@ -206,7 +215,7 @@ export default class WxAuth extends Base {
                                     this.storeUser.user.isLogin ?
                                         <div class={this.getStyleName('logined')}>
                                             <span>已登录</span>
-                                            {!this.loading && this.type === myEnum.wxAuthType.绑定 &&
+                                            {!this.loading && this.type === myEnum.wxAuthType.绑定 && Utils.isWxClient() &&
                                                 <Button loading={this.bindLoading} on-click={() => { this.userBind(); }}>绑定</Button>
                                             }
                                         </div> :
@@ -214,7 +223,11 @@ export default class WxAuth extends Base {
                             }
                         </div>
                 }
-                <MyQrcode ref="qrcode" v-show={!this.storeUser.user.isLogin && !Utils.isWxClient() && this.type === myEnum.wxAuthType.登录} />
+                <div class={this.getStyleName("qrcode-box")} v-show={!Utils.isWxClient() && (this.qrcodeLoginShow || this.qrcodeBindShow)}>
+                    <div>使用微信扫一扫</div>
+                    <MyQrcode ref="qrcode" v-show={!this.qrcodeLoginShow} />
+                    <MyQrcode ref="qrcodeBind" v-show={this.qrcodeBindShow} />
+                </div>
             </Card>
         );
     }

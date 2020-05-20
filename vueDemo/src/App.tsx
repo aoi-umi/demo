@@ -77,6 +77,7 @@ export default class App extends Base {
         if (token) {
             await testApi.userInfo().then(user => {
                 this.storeUser.setUser(user);
+                testSocket.login({ [dev.cacheKey.testUser]: token });
                 if (user) {
                     if (location.pathname === routerConfig.userSignIn.path) {
                         let { to, ...query } = this.$route.query;
