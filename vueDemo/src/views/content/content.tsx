@@ -3,7 +3,7 @@ import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { myEnum, dev } from '@/config';
 import { testApi } from '@/api';
 import { routerConfig } from '@/router';
-import { Icon, Card, Row, Col, Checkbox, Time, Divider } from '@/components/iview';
+import { Icon, Card, Row, Col, Checkbox, Time, Divider, Dropdown, DropdownMenu, DropdownItem } from '@/components/iview';
 import { convClass, getCompOpts, Utils } from '@/components/utils';
 import { MyTag } from '@/components/my-tag';
 
@@ -70,69 +70,106 @@ class ContentOperate extends Vue<ContentOperateProp & Base> {
     }
 
     render() {
-        let ele = this.data;
         return (
             <div class={[this.getStyleName('main'), this.stretch ? this.getStyleName('stretch') : '']}>
-                {[{
-                    icon: 'md-eye',
-                    type: myEnum.contentOperateType.查看,
-                    text: ele.readTimes,
-                }, {
-                    icon: 'md-text',
-                    type: myEnum.contentOperateType.评论,
-                    class: 'pointer',
-                    text: ele.commentCount,
-                }, {
-                    icon: 'md-heart',
-                    type: myEnum.contentOperateType.收藏,
-                    class: 'pointer',
-                    text: ele.favourite,
-                    color: ele.favouriteValue ? 'red' : '',
-                    onClick: () => {
-                        this.handleFavourite(ele, !ele.favouriteValue);
-                    }
-                }, {
-                    icon: 'md-thumbs-up',
-                    type: myEnum.contentOperateType.赞,
-                    class: 'pointer',
-                    text: ele.like,
-                    color: ele.voteValue == myEnum.voteValue.喜欢 ? 'red' : '',
-                    onClick: () => {
-                        this.handleVote(ele, ele.voteValue == myEnum.voteValue.喜欢 ? myEnum.voteValue.无 : myEnum.voteValue.喜欢);
-                    }
-                }, {
-                    icon: 'md-thumbs-down',
-                    type: myEnum.contentOperateType.踩,
-                    class: 'pointer',
-                    text: ele.dislike,
-                    color: ele.voteValue == myEnum.voteValue.不喜欢 ? 'red' : '',
-                    onClick: () => {
-                        this.handleVote(ele, ele.voteValue == myEnum.voteValue.不喜欢 ? myEnum.voteValue.无 : myEnum.voteValue.不喜欢);
-                    }
-                }, {
-                    icon: 'md-share',
-                    type: myEnum.contentOperateType.分享,
-                    class: 'pointer',
-                    onClick: () => {
-                        let url = this.getShareUrl();
-                        Utils.copy2Clipboard(url);
-                        this.$Message.info('已复制到粘贴板');
-                    }
-                }].map(iconEle => {
-                    return (
-                        <div class={["center", this.getStyleName('item'), iconEle.class || '']}
-                            on-click={iconEle.onClick || (() => {
-                                this.toDetail && this.toDetail();
-                                this.$emit('operate-click', iconEle.type);
-                            })} >
-                            <Icon
-                                type={iconEle.icon}
-                                size={24}
-                                color={iconEle.color} />
-                            <b style={{ marginLeft: '4px' }}>{iconEle.text}</b>
-                        </div>
-                    );
-                })}
+                {this.renderBtns()}
+            </div>
+        );
+    }
+
+    renderBtns() {
+        let ele = this.data;
+        let minOperation = [{
+            icon: 'md-eye',
+            type: myEnum.contentOperateType.查看,
+            text: ele.readTimes,
+        }, {
+            icon: 'md-text',
+            type: myEnum.contentOperateType.评论,
+            text: ele.commentCount,
+        }, {
+            icon: 'md-heart',
+            type: myEnum.contentOperateType.收藏,
+            text: ele.favourite,
+            color: ele.favouriteValue ? 'red' : '',
+            onClick: () => {
+                this.handleFavourite(ele, !ele.favouriteValue);
+            }
+        }, {
+            icon: 'md-thumbs-up',
+            type: myEnum.contentOperateType.赞,
+            text: ele.like,
+            color: ele.voteValue == myEnum.voteValue.喜欢 ? 'red' : '',
+            onClick: () => {
+                this.handleVote(ele, ele.voteValue == myEnum.voteValue.喜欢 ? myEnum.voteValue.无 : myEnum.voteValue.喜欢);
+            }
+        },];
+
+        let otherOperation = [{
+            icon: 'md-thumbs-down',
+            type: myEnum.contentOperateType.踩,
+            class: 'pointer',
+            text: ele.dislike,
+            color: ele.voteValue == myEnum.voteValue.不喜欢 ? 'red' : '',
+            onClick: () => {
+                this.handleVote(ele, ele.voteValue == myEnum.voteValue.不喜欢 ? myEnum.voteValue.无 : myEnum.voteValue.不喜欢);
+            }
+        }, {
+            icon: 'md-share',
+            type: myEnum.contentOperateType.分享,
+            class: 'pointer',
+            onClick: () => {
+                let url = this.getShareUrl();
+                Utils.copy2Clipboard(url);
+                this.$Message.info('已复制到粘贴板');
+            }
+        }];
+        if (this.isSmall) {
+            return [
+                ...minOperation.map(iconEle => {
+                    return this.renderBtn(iconEle);
+                }),
+                <div class={["center", this.getStyleName('item')]}>
+                    <Dropdown>
+                        <Icon type="md-more" size={24} />
+                        <DropdownMenu slot="list">
+                            {otherOperation.map(iconEle => {
+                                return (
+                                    <DropdownItem>
+                                        {this.renderBtn(iconEle)}
+                                    </DropdownItem>
+                                );
+                            })}
+                        </DropdownMenu>
+                    </Dropdown>
+                </div>
+            ];
+        } else {
+            return [...minOperation, ...otherOperation].map(iconEle => {
+                return this.renderBtn(iconEle);
+            });
+        }
+    }
+
+    renderBtn(iconEle: {
+        icon: string;
+        type: number;
+        text?: string | number;
+        class?: string;
+        onClick?: () => void;
+        color?: string;
+    }) {
+        return (
+            <div class={["center", this.getStyleName('item'), iconEle.class || '']}
+                on-click={iconEle.onClick || (() => {
+                    this.toDetail && this.toDetail();
+                    this.$emit('operate-click', iconEle.type);
+                })} >
+                <Icon
+                    type={iconEle.icon}
+                    size={24}
+                    color={iconEle.color} />
+                <b style={{ marginLeft: '4px' }}>{iconEle.text}</b>
             </div>
         );
     }

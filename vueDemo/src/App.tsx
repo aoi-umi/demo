@@ -43,25 +43,12 @@ export default class App extends Base {
     protected created() {
         this.setTitle();
         this.getUserInfo();
-        this.handleResize();
         this.setMenuCfg();
         this.activeName = this.getActiveNameByPath(location.pathname);
         testApi.serverInfo();
         this.logPV();
     }
 
-    private isSmall = false;
-    protected mounted() {
-        window.addEventListener('resize', this.handleResize);
-    }
-
-    protected beforeDestroy() {
-        window.removeEventListener('resize', this.handleResize);
-    }
-
-    private handleResize() {
-        this.isSmall = document.body.clientWidth < 576;
-    }
     get menuClasses() {
         return ["menu", this.isCollapsed ? "collapsed-menu" : ""];
     }

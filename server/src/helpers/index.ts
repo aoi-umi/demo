@@ -63,8 +63,8 @@ export let myRequestHandler = async function (fn: (opt?: MyRequestHandlerOpt) =>
         }
     } catch (err) {
         let msg = err.msg || err.message;
-        if (err.status)
-            ctx.status = err.status;
+        // if (err.status)
+        //     ctx.status = err.status;
         let response = { result: false, code: err.code, msg, remark: err.remark };
         logger.error(err);
         ctx.body = response;

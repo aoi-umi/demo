@@ -17,6 +17,22 @@ export class Base extends MyBase {
         return getModule(SettingStore, this.$store);
     }
 
+    protected isSmall = false;
+    protected created() {
+        this.handleResize();
+    }
+    protected mounted() {
+        window.addEventListener('resize', this.handleResize);
+    }
+
+    protected beforeDestroy() {
+        window.removeEventListener('resize', this.handleResize);
+    }
+
+    private handleResize() {
+        this.isSmall = document.body.clientWidth < 576;
+    }
+
     async operateHandler(operate: string, fn: () => any, opt?: {
         beforeValid?: () => any;
         onSuccessClose?: () => any;

@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig } from 'axios';
 import { AnimeInstance } from 'animejs';
 import * as md from 'node-forge/lib/md.all';
 
-export function request(options: AxiosRequestConfig) {
+export async function request(options: AxiosRequestConfig) {
     if (!options.url)
         throw new Error('url can not empty!');
     let opt: AxiosRequestConfig = {
@@ -22,7 +22,8 @@ export function request(options: AxiosRequestConfig) {
     if (opt.method?.toLowerCase() == 'get')
         opt.params = opt.data;
 
-    return axios.request(opt);
+    let rs = await axios.request(opt);
+    return rs;
 }
 
 export function extend(...args) {
