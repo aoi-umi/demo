@@ -3,7 +3,7 @@ import { Component, Vue, Watch, Prop } from "vue-property-decorator";
 import { routerConfig, MyRouteConfig } from '@/router';
 import {
     Menu, MenuItem,
-    Icon, Content, Sider, Layout, Header, Button, Modal, BackTop, Submenu, Spin,
+    Icon, Content, Sider, Layout, Header, Button, Modal, BackTop, Submenu, Spin, Tooltip,
 } from "@/components/iview";
 import * as style from '@/components/style';
 import { LocalStore } from '@/store';
@@ -126,6 +126,17 @@ export default class App extends Base {
     }
 
     getMenu(data: MenuConfig) {
+        if (this.isCollapsed) {
+            return (
+                <Tooltip class="menu-tooltip" content={data.text} placement="right" transfer>
+                    {this.getMenuItem(data)}
+                </Tooltip>
+            );
+        }
+        return this.getMenuItem(data);
+    }
+
+    private getMenuItem(data: MenuConfig) {
         let name = this.getMenuName(data);
         return (
             <MenuItem key={data.to} class="menu-item" name={name} to={data.to}>
