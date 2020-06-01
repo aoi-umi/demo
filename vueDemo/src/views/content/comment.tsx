@@ -151,6 +151,7 @@ export class Comment extends Vue<CommentProp & Base> {
                     }
                     placeholder='请输入评论'
                     v-model={this.reply.content}
+                    defaultOnly
                 />
                 <div class={this.getStyleName('send-op-box')}>
                     <Button on-click={() => {
@@ -237,6 +238,7 @@ export class Comment extends Vue<CommentProp & Base> {
     }
 
     render() {
+        let send = this.reply.floor === 0;
         return (
             <div>
                 <div class={this.getStyleName('send-op-box')}>
@@ -244,10 +246,10 @@ export class Comment extends Vue<CommentProp & Base> {
                         this.query();
                     }} loading={this.refreshLoading}>刷新评论</Button>
                     <Button type="primary" on-click={() => {
-                        this.resetReply({ floor: 0 });
-                    }}>发送评论</Button>
+                        this.resetReply({ floor: send ? -1 : 0 });
+                    }}>{send ? '取消发送' : '发送评论'}</Button>
                 </div>
-                {this.reply.floor === 0 && this.renderSubmitBox()}
+                {send && this.renderSubmitBox()}
                 <MyList
                     ref="list"
                     hideSearchBox

@@ -45,7 +45,10 @@ class MyEditorProp extends MyInputBaseProp {
     @Prop({
         default: ContentType.default
     })
-    type?: number
+    type?: number;
+
+    @Prop()
+    defaultOnly?: boolean;
 }
 @Component({
     extends: MyInputBase,
@@ -178,7 +181,7 @@ class MyEditor extends Vue<MyEditorProp & MyInputBase> {
         let self = this;
         return (
             <div>
-                <div>
+                {!this.defaultOnly && <div>
                     <span>类型 </span>
                     <RadioGroup v-model={this.currType}>
                         {this.contentTypeList.map(ele => {
@@ -186,6 +189,7 @@ class MyEditor extends Vue<MyEditorProp & MyInputBase> {
                         })}
                     </RadioGroup>
                 </div>
+                }
                 <quillEditor v-show={this.currType === ContentType.default}
                     class={this.getStyleName('editor')} ref="quillEditor"
                     v-model={this.defaultValue} options={{
@@ -202,12 +206,11 @@ class MyEditor extends Vue<MyEditorProp & MyInputBase> {
                         }
                     }
                     } />
-                <Row gutter={10}>
+                <Row gutter={10} v-show={this.currType === ContentType.markdown}>
                     <Col xs={12}>
                         <div class={this.getStyleName('wrap')}>
                             <pre class={this.getStyleName('pre')}>{this.markdownValue}</pre>
-                            <Input
-                                v-show={this.currType === ContentType.markdown} type="textarea"
+                            <Input type="textarea"
                                 class={this.getStyleName('md-editor')} v-model={this.markdownValue}
                             />
                         </div>

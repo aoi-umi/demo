@@ -41,7 +41,7 @@ export default class App extends Base {
     }
 
     protected created() {
-        this.setTitle();
+        this.setRouteTitle();
         this.getUserInfo();
         this.setMenuCfg();
         this.activeName = this.getActiveNameByPath(location.pathname);
@@ -53,7 +53,7 @@ export default class App extends Base {
         return ["menu", this.isCollapsed ? "collapsed-menu" : ""];
     }
 
-    setTitle() {
+    setRouteTitle() {
         this.title = this.$route.meta.title || '';
         document.title = this.title || env.title;
     }
@@ -156,7 +156,7 @@ export default class App extends Base {
 
     @Watch('$route')
     route(to, from) {
-        this.setTitle();
+        this.setRouteTitle();
         this.activeName = this.getActiveNameByPath(location.pathname);
         this.logPV();
         if (!this.isCollapsed)

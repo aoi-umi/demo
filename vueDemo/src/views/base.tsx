@@ -107,4 +107,8 @@ export class Base extends MyBase {
             query,
         });
     }
+
+    protected setTitle(title: string) {
+        document.title = title;
+    }
 }
