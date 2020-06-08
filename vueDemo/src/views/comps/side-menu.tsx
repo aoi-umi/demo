@@ -2,12 +2,13 @@ import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 
 import {
     Menu, MenuItem,
-    Icon, Content, Sider, Layout, Header, Button, Modal, BackTop, Submenu, Spin, Tooltip,
+    Icon, Content, Sider, Layout, Submenu, Tooltip,
 } from "@/components/iview";
 import { convClass, getCompOpts } from '@/components/utils';
 import * as style from '@/components/style';
 
 import { Base } from '../base';
+import './side-menu.less';
 
 export type MenuConfig = {
     name?: string;
@@ -25,6 +26,9 @@ class SideMenuProp {
     @Prop({ default: '' })
     activeName?: string;
 
+    // @Prop({ default: 'left' })
+    // placement?: 'left' | 'right';
+
     @Prop({ default: 180 })
     width?: number;
 
@@ -36,6 +40,7 @@ class SideMenuProp {
     mixins: [getCompOpts(SideMenuProp)]
 })
 export class SideMenu extends Vue<SideMenuProp & Base> {
+    stylePrefix = "comp-side-menu-";
     $refs: { sider: any, menu: iView.Menu };
     isCollapsed = true;
     private openNames = [];
@@ -50,10 +55,6 @@ export class SideMenu extends Vue<SideMenuProp & Base> {
     route(to, from) {
         if (!this.isCollapsed)
             this.isCollapsed = true;
-    }
-
-    get menuClasses() {
-        return ["menu", this.isCollapsed ? "collapsed-menu" : ""];
     }
 
     get siderWidth() {
@@ -101,10 +102,10 @@ export class SideMenu extends Vue<SideMenuProp & Base> {
 
         let name = this.getMenuName(data);
         return (
-            <Submenu class="menu-sub-menu" name={name}>
+            <Submenu class={this.getStyleName("sub-menu")} name={name}>
                 <template slot="title">
                     <Icon type={data.icon} />
-                    <span class="menu-text">{data.text}</span>
+                    <span class={this.getStyleName("text")}>{data.text}</span>
                 </template>
                 {this.filterMenu(data.children).map(ele => this.getMenu(ele))}
             </Submenu>
@@ -114,7 +115,7 @@ export class SideMenu extends Vue<SideMenuProp & Base> {
     getMenu(data: MenuConfig) {
         if (this.isCollapsed) {
             return (
-                <Tooltip class="menu-tooltip" content={data.text} placement="right" transfer>
+                <Tooltip class={this.getStyleName("tooltip")} content={data.text} placement="right" transfer>
                     {this.getMenuItem(data)}
                 </Tooltip>
             );
@@ -125,9 +126,9 @@ export class SideMenu extends Vue<SideMenuProp & Base> {
     private getMenuItem(data: MenuConfig) {
         let name = this.getMenuName(data);
         return (
-            <MenuItem key={data.to} class="menu-item" name={name} to={data.to}>
+            <MenuItem key={data.to} class={this.getStyleName("item")} name={name} to={data.to}>
                 <Icon type={data.icon} />
-                <span class="menu-text">{data.text}</span>
+                <span class={this.getStyleName("text")}>{data.text}</span>
             </MenuItem>
         );
     }
@@ -135,9 +136,9 @@ export class SideMenu extends Vue<SideMenuProp & Base> {
     render() {
         let collapsedWidth = this.isSmall ? 0 : this.collapsedWidth;
         return (
-            <Layout class={["no-bg", this.isCollapsed ? "" : "side-menu-open"]}>
+            <Layout class={[...this.getStyleName("root"), "no-bg", this.isCollapsed ? "" : "open"]}>
                 <Sider
-                    class="side-menu"
+                    class={this.getStyleName('sider')}
                     ref="sider"
                     hide-trigger
                     collapsible
@@ -150,7 +151,7 @@ export class SideMenu extends Vue<SideMenuProp & Base> {
                         active-name={this.activeName}
                         theme={"dark"}
                         width="auto"
-                        class={this.menuClasses}
+                        class={this.getStyleName("menu")}
                         open-names={this.openNames}
                         on-on-select={() => {
                             if (this.isSmall)
@@ -160,11 +161,11 @@ export class SideMenu extends Vue<SideMenuProp & Base> {
                         {this.filterMenu(this.menuCfg).map(data => { return this.renderMenu(data); })}
                     </Menu>
                 </Sider>
-                {!this.isSmall ? <Content class={["side-menu-blank"]} style={{
+                {!this.isSmall ? <Content class={this.getStyleName('blank')} style={{
                     flex: `0 0 ${this.isCollapsed ? collapsedWidth : this.siderWidth}px`
                 }}></Content> :
                     <transition name="fade">
-                        <div class={[style.cls.mask, 'menu-mask']} v-show={!this.isCollapsed} on-click={() => {
+                        <div class={[style.cls.mask, ...this.getStyleName("mask")]} v-show={!this.isCollapsed} on-click={() => {
                             this.isCollapsed = true;
                         }}></div>
                     </transition>

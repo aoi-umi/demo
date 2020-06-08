@@ -5,7 +5,6 @@ import {
     Menu, MenuItem,
     Icon, Content, Sider, Layout, Header, Button, Modal, BackTop, Submenu, Spin, Tooltip,
 } from "@/components/iview";
-import * as style from '@/components/style';
 import { LocalStore } from '@/store';
 
 import { testApi, testSocket } from './api';

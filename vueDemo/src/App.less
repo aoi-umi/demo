@@ -1,9 +1,11 @@
 @headerHeight: 64px;
+
 .layout {
   position: relative;
   border-radius: 4px;
   overflow: hidden;
 }
+
 .layout-header-bar {
   background: #fff;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
@@ -13,14 +15,17 @@
   width: 100%;
   top: 0;
 }
+
 .layout-header-right {
   float: right;
   position: relative;
   margin-right: 20px;
-  > * {
+
+  >* {
     margin-right: 10px;
   }
 }
+
 .layout-logo-left {
   width: 90%;
   height: 30px;
@@ -28,51 +33,14 @@
   border-radius: 3px;
   margin: 15px auto;
 }
+
 .menu-icon {
   transition: all 0.3s;
   margin: 0 20px;
 }
+
 .rotate-icon {
   transform: rotate(-90deg);
-}
-
-.menu {
-  span {
-    display: inline-block;
-    overflow: hidden;
-    width: 69px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    vertical-align: bottom;
-    transition: width 0.2s ease 0.2s;
-  }
-  i {
-    vertical-align: middle;
-    font-size: 22px;
-  }
-}
-.collapsed-menu {
-  span {
-    width: 0px;
-    transition: width 0.2s ease;
-  }
-  i {
-    vertical-align: middle;
-  }
-}
-
-.menu-item,
-.menu-sub-menu > .ivu-menu-submenu-title {
-  padding: 14px !important;
-}
-
-.side-menu-blank {
-  flex: 0 0 78px;
-  position: relative;
-  transition: all 0.2s ease-in-out;
-}
-.menu-mask {
-  z-index: 13;
 }
 
 .main-content {
@@ -82,16 +50,18 @@
   min-height: 560px;
   height: 100%;
 }
+
 @media (max-width: 576px) {
   .main-content {
     padding: 10px;
   }
 }
 
-.side-menu {
-  overflow-y: auto;
-  top: @headerHeight;
-  bottom: 0px;
-  position: fixed;
-  z-index: 14;
+.comp-side-menu- {
+  &sider {
+    top: @headerHeight;
+    bottom: 0px;
+    position: fixed;
+    z-index: 14;
+  }
 }
