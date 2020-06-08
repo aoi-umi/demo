@@ -13,44 +13,34 @@ import { dev, env } from './config';
 import { SignInView } from './views/user/user-sign';
 import { Base } from './views/base';
 import { UserAvatarView } from './views/comps/user-avatar';
+import { SideMenuView, SideMenu, MenuConfig } from './views/comps/side-menu';
 import "./App.less";
 
 @Component
 export default class App extends Base {
-    drawerOpen = false;
-    isCollapsed = true;
     theme = "light" as any;
     title = '';
     activeName = '';
-    $refs: { sider: any, menu: iView.Menu };
+    $refs: { sideMenu: SideMenu };
 
     async logPV() {
         testApi.statPVSave({ path: this.$route.path });
     }
 
     getActiveNameByPath(path: string) {
-        let name = '';
-        let matchLen = 0;
-        this.menuCfg.forEach(ele => {
-            if (path.startsWith(ele.to) && ele.to.length > matchLen) {
-                name = ele.to;
-                matchLen = ele.to.length;
-            }
-        });
-        return name;
+        return this.$refs.sideMenu.getActiveNameByPath(path);
     }
 
     protected created() {
         this.setRouteTitle();
         this.getUserInfo();
         this.setMenuCfg();
-        this.activeName = this.getActiveNameByPath(location.pathname);
         testApi.serverInfo();
         this.logPV();
     }
 
-    get menuClasses() {
-        return ["menu", this.isCollapsed ? "collapsed-menu" : ""];
+    protected mounted() {
+        this.activeName = this.getActiveNameByPath(location.pathname);
     }
 
     setRouteTitle() {
@@ -85,73 +75,8 @@ export default class App extends Base {
         }
     }
 
-    collapsedSider() {
-        this.$refs.sider.toggleCollapse();
-    }
-
-    getMenuName(data: MenuConfig) {
-        let name = data.name;
-        if (!name)
-            name = this.getActiveNameByPath(data.to);
-        return name;
-    }
-
-    filterMenu(list: MenuConfig[]) {
-        return list.filter((ele: MenuConfig) => {
-            let show = ele.show;
-            if (!ele.hasOwnProperty('show')) {
-                show = true;
-            } else if (typeof ele.show === 'function') {
-                show = ele.show();
-            }
-            return show;
-        });
-    }
-
-    renderMenu(data: MenuConfig) {
-        if (!data.children) {
-            return this.getMenu(data);
-        }
-
-        let name = this.getMenuName(data);
-        return (
-            <Submenu class="menu-sub-menu" name={name}>
-                <template slot="title">
-                    <Icon type={data.icon} />
-                    <span class="menu-text">{data.text}</span>
-                </template>
-                {this.filterMenu(data.children).map(ele => this.getMenu(ele))}
-            </Submenu>
-        );
-    }
-
-    getMenu(data: MenuConfig) {
-        if (this.isCollapsed) {
-            return (
-                <Tooltip class="menu-tooltip" content={data.text} placement="right" transfer>
-                    {this.getMenuItem(data)}
-                </Tooltip>
-            );
-        }
-        return this.getMenuItem(data);
-    }
-
-    private getMenuItem(data: MenuConfig) {
-        let name = this.getMenuName(data);
-        return (
-            <MenuItem key={data.to} class="menu-item" name={name} to={data.to}>
-                <Icon type={data.icon} />
-                <span class="menu-text">{data.text}</span>
-            </MenuItem>
-        );
-    }
-
-    private openNames = [];
-    @Watch('openNames')
-    private watchOpenNames() {
-        this.$nextTick(() => {
-            this.$refs.menu.updateOpened();
-        });
+    toggleSider() {
+        this.$refs.sideMenu.toggleSider();
     }
 
     @Watch('$route')
@@ -159,8 +84,6 @@ export default class App extends Base {
         this.setRouteTitle();
         this.activeName = this.getActiveNameByPath(location.pathname);
         this.logPV();
-        if (!this.isCollapsed)
-            this.isCollapsed = true;
     }
 
     private menuCfg: MenuConfig[] = [];
@@ -224,9 +147,7 @@ export default class App extends Base {
         });
     }
 
-    private siderWidth = 180;
     render() {
-        let collapsedWidth = this.isSmall ? 0 : 58;
         return (
             <Layout class="layout no-bg">
                 <Modal v-model={this.storeSetting.setting.signInShow} footer-hide>
@@ -242,7 +163,7 @@ export default class App extends Base {
                 </Modal>
                 <Header class="layout-header-bar">
                     <Icon
-                        on-click={this.collapsedSider}
+                        on-click={this.toggleSider}
                         class="menu-icon"
                         type="md-menu"
                         size="24"
@@ -264,40 +185,7 @@ export default class App extends Base {
                         }
                     </div>
                 </Header>
-                <Layout class={["no-bg", this.isCollapsed ? "" : "side-menu-open"]}>
-                    <Sider
-                        class="side-menu"
-                        ref="sider"
-                        hide-trigger
-                        collapsible
-                        collapsed-width={collapsedWidth}
-                        width={this.siderWidth}
-                        v-model={this.isCollapsed}
-                    >
-                        <Menu
-                            ref='menu'
-                            active-name={this.activeName}
-                            theme={"dark"}
-                            width="auto"
-                            class={this.menuClasses}
-                            open-names={this.openNames}
-                            on-on-select={() => {
-                                if (this.isSmall)
-                                    this.isCollapsed = true;
-                            }}
-                        >
-                            {this.filterMenu(this.menuCfg).map(data => { return this.renderMenu(data); })}
-                        </Menu>
-                    </Sider>
-                    {!this.isSmall ? <Content class={["side-menu-blank"]} style={{
-                        flex: `0 0 ${this.isCollapsed ? collapsedWidth : this.siderWidth}px`
-                    }}></Content> :
-                        <transition name="fade">
-                            <div class={[style.cls.mask, 'menu-mask']} v-show={!this.isCollapsed} on-click={() => {
-                                this.isCollapsed = true;
-                            }}></div>
-                        </transition>
-                    }
+                <SideMenuView ref="sideMenu" menuCfg={this.menuCfg} activeName={this.activeName}>
                     <Content class="main-content">
                         {
                             this.getingUserInfo ? <Spin fix /> :
@@ -309,17 +197,8 @@ export default class App extends Base {
                         }
                     </Content>
                     <BackTop bottom={100} right={10} />
-                </Layout>
+                </SideMenuView>
             </Layout>
         );
     }
 }
-
-type MenuConfig = {
-    name?: string;
-    to: string;
-    text: string;
-    icon?: string;
-    show?: boolean | (() => boolean);
-    children?: MenuConfig[];
-};
