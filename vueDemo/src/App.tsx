@@ -101,49 +101,64 @@ export default class App extends Base {
             routerConfig: routerConfig.goods,
             icon: 'md-cart',
         }, {
-            routerConfig: routerConfig.contentMgt,
-            icon: 'md-create',
-        }, {
-            routerConfig: routerConfig.payMgt,
-            icon: 'logo-usd',
-        }, {
-            routerConfig: routerConfig.assetMgt,
-            icon: 'md-stats',
-            text: routerConfig.assetMgt.text,
-        }, {
-            routerConfig: routerConfig.goodsMgt,
-            icon: 'md-nutrition',
-        }, {
-            routerConfig: routerConfig.userMgt,
-            icon: 'md-people',
-        }, {
-            routerConfig: routerConfig.role,
-            icon: 'md-person',
-        }, {
-            routerConfig: routerConfig.authority,
-            icon: 'md-lock',
-        }, {
             routerConfig: routerConfig.apps,
             icon: 'md-apps',
         }, {
-            routerConfig: routerConfig.setting,
-            icon: 'md-settings',
+            text: '我的',
+            icon: 'md-person',
+            name: 'my',
+            children: [{
+                routerConfig: routerConfig.contentMgt,
+                icon: 'md-create',
+            }, {
+                routerConfig: routerConfig.payMgt,
+                icon: 'logo-usd',
+            }, {
+                routerConfig: routerConfig.goodsMgt,
+                icon: 'md-nutrition',
+            },]
+        }, {
+            text: '管理',
+            icon: 'md-cog',
+            name: 'mgt',
+            children: [{
+                routerConfig: routerConfig.userMgt,
+                icon: 'md-people',
+            }, {
+                routerConfig: routerConfig.role,
+                icon: 'md-person',
+            }, {
+                routerConfig: routerConfig.authority,
+                icon: 'md-lock',
+            }, {
+                routerConfig: routerConfig.assetMgt,
+                icon: 'md-stats',
+                text: routerConfig.assetMgt.text,
+            }, {
+                routerConfig: routerConfig.setting,
+                icon: 'md-settings',
+            },]
         }, {
             routerConfig: routerConfig.stat,
             icon: 'md-pie',
-        }].map(ele => {
-            let { routerConfig, ...rest } = ele;
-            let obj = {} as any;
-            let routeCfg = routerConfig as MyRouteConfig;
-            if (routeCfg) {
-                obj.to = routeCfg.path;
-                obj.text = routeCfg.text;
-                if (routeCfg.meta.authority)
-                    obj.show = () => this.storeUser.user.hasAuth(routeCfg.meta.authority)
-            }
-            obj = { ...obj, ...rest };
-            return obj;
-        });
+        },].map(ele => this.convMenu(ele));
+    }
+
+    private convMenu(ele) {
+        let { routerConfig, children, ...rest } = ele;
+        let obj = {} as any;
+        let routeCfg = routerConfig as MyRouteConfig;
+        if (routeCfg) {
+            obj.to = routeCfg.path;
+            obj.text = routeCfg.text;
+            if (routeCfg.meta.authority)
+                obj.show = () => this.storeUser.user.hasAuth(routeCfg.meta.authority)
+        }
+        obj = { ...obj, ...rest };
+        if (children && children.length) {
+            obj.children = children.map(child => this.convMenu(child));
+        }
+        return obj;
     }
 
     render() {

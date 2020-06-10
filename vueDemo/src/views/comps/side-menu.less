@@ -45,7 +45,18 @@
   }
 
   &tooltip {
-    display: block;
+    display: flex;
+    justify-content: stretch;
+
+    .ivu-tooltip-rel {
+      display: flex;
+      justify-content: stretch;
+      flex-grow: 1;
+
+      >* {
+        flex-grow: 1;
+      }
+    }
   }
 
   &item,
@@ -53,8 +64,13 @@
     padding: 14px !important;
   }
 
-  &item {
+  &item,
+  &sub-menu-title {
     display: flex;
+  }
+
+  &sub-menu-title>i {
+    margin-right: 6px;
   }
 }
 
