@@ -43,14 +43,6 @@ export default {
         },
         component: () => import('../views/system/setting')
     },
-    assetMgt: {
-        path: adminPath + '/assetMgt',
-        text: '资金',
-        meta: {
-            authority: [authority.login, authority.payMgtQuery],
-        },
-        component: () => import('../views/asset-mgt')
-    },
     assetMgtLog: {
         path: adminPath + '/assetMgt/log',
         text: '资金记录',

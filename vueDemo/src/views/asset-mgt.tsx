@@ -11,27 +11,6 @@ import { MyList, IMyList, Const as MyListConst } from '@/components/my-list';
 import { TagType, MyTag } from '@/components/my-tag';
 import { Base } from './base';
 
-
-@Component
-export default class AssetMgt extends Base {
-    render() {
-        return (
-            <Row gutter={5}>
-                <Col xs={8}>
-                    <Card class="pointer" nativeOn-click={() => {
-                        this.$router.push(routerConfig.assetMgtLog.path);
-                    }}>资金记录</Card>
-                </Col>
-                <Col xs={8}>
-                    <Card class="pointer" nativeOn-click={() => {
-                        this.$router.push(routerConfig.assetMgtNotify.path);
-                    }}>回调通知</Card>
-                </Col>
-            </Row>
-        );
-    }
-}
-
 @Component
 export class AssetMgtLog extends Base {
     $refs: { list: IMyList<any> };

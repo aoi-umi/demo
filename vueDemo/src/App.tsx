@@ -131,9 +131,15 @@ export default class App extends Base {
                 routerConfig: routerConfig.authority,
                 icon: 'md-lock',
             }, {
-                routerConfig: routerConfig.assetMgt,
+                text: '资金',
                 icon: 'md-stats',
-                text: routerConfig.assetMgt.text,
+                children: [{
+                    routerConfig: routerConfig.assetMgtLog,
+                    icon: 'logo-usd',
+                }, {
+                    routerConfig: routerConfig.assetMgtNotify,
+                    icon: 'md-copy',
+                },]
             }, {
                 routerConfig: routerConfig.setting,
                 icon: 'md-settings',
