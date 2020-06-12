@@ -6,6 +6,7 @@ import { Types, SchemaTypes } from 'mongoose';
 
 import { myEnum } from '@/config';
 import { ContentBase } from '../content/content-base';
+import { IPagination } from '../_plugins/pagination';
 
 export type VideoInstanceType = InstanceType<Video>;
 export type VideoModelType = ModelType<Video, typeof Video>;
@@ -45,5 +46,5 @@ export class Video extends ContentBase {
     }
 }
 
-export const VideoModel = getModelForClass<Video, typeof Video>(Video);
+export const VideoModel = getModelForClass<Video, typeof Video & IPagination<Video>>(Video);
 

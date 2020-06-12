@@ -34,14 +34,14 @@ export class NotifyMapper {
             orderNo: '',
         };
         switch (data.type) {
-        case myEnum.notifyType.微信:
-            obj.outOrderNo = data.value.out_trade_no;
-            obj.orderNo = data.value.transaction_id;
-            break;
-        case myEnum.notifyType.支付宝:
-            obj.outOrderNo = data.value.out_trade_no;
-            obj.orderNo = data.value.trade_no;
-            break;
+            case myEnum.notifyType.微信:
+                obj.outOrderNo = data.value.out_trade_no;
+                obj.orderNo = data.value.transaction_id;
+                break;
+            case myEnum.notifyType.支付宝:
+                obj.outOrderNo = data.value.out_trade_no;
+                obj.orderNo = data.value.trade_no;
+                break;
         }
         return obj;
     }
@@ -52,7 +52,9 @@ export class NotifyMapper {
             match.orderNo = new RegExp(escapeRegExp(data.orderNo), 'i');
         if (data.outOrderNo)
             match.outOrderNo = new RegExp(escapeRegExp(data.outOrderNo), 'i');
-        let rs = await NotifyModel.aggregatePaginate([
+        let rs = await NotifyModel.aggregatePaginate<{
+            assetLog?: any
+        }>([
             { $match: match },
             {
                 $lookup: {

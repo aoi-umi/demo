@@ -218,6 +218,10 @@ const config = {
                     url: '/favourite/query',
                     method: 'get',
                 },
+                myImgQuery: {
+                    url: '/my/img/query',
+                    method: 'get',
+                },
                 followSave: {
                     url: '/follow/save',
                 },

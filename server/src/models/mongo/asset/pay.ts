@@ -1,6 +1,6 @@
 import {
     getModelForClass, ModelType, DocType, InstanceType,
-    setSchema, prop, arrayProp, getSchema
+    setSchema, prop, arrayProp, getSchema, setPlugin
 } from 'mongoose-ts-ua';
 import { Types, SchemaTypes } from 'mongoose';
 import * as Int32 from 'mongoose-int32';
@@ -14,6 +14,7 @@ export type PayInstanceType = InstanceType<Pay>;
 export type PayModelType = ModelType<Pay, typeof Pay>;
 export type PayDocType = DocType<PayInstanceType>;
 
+import { pagination, IPagination } from '../_plugins/pagination';
 @setSchema({
     schemaOptions: {
         toJSON: {
@@ -21,6 +22,7 @@ export type PayDocType = DocType<PayInstanceType>;
         }
     }
 })
+@setPlugin(pagination)
 export class Pay extends Base {
     @prop()
     get orderNo() {
@@ -137,5 +139,5 @@ export class Pay extends Base {
     }
 }
 
-export const PayModel = getModelForClass<Pay, typeof Pay>(Pay);
+export const PayModel = getModelForClass<Pay, typeof Pay & IPagination<Pay>>(Pay);
 

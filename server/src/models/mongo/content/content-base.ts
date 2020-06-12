@@ -1,18 +1,20 @@
 import {
     getModelForClass, ModelType, DocType, InstanceType,
-    setSchema, prop, arrayProp
+    setSchema, prop, arrayProp, setPlugin
 } from 'mongoose-ts-ua';
 import { Types, SchemaTypes } from 'mongoose';
 
 import { IVoteOwner } from '../vote';
 import { Base } from '../_base/base';
 import { IFavouriteOwner } from '../favourite';
+import { pagination, IPagination } from '../_plugins/pagination';
 
 export type ContentBaseInstanceType = InstanceType<ContentBase>;
 export type ContentBaseDocType = DocType<ContentBaseInstanceType>;
-export type ContentBaseModelType = ModelType<ContentBase, typeof ContentBase>;
+export type ContentBaseModelType = ModelType<ContentBase, typeof ContentBase & IPagination<ContentBase>>;
 
 @setSchema()
+@setPlugin(pagination)
 export abstract class ContentBase extends Base implements IVoteOwner, IFavouriteOwner {
     @prop({
         type: SchemaTypes.ObjectId,

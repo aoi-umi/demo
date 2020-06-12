@@ -3,14 +3,6 @@ import { authority } from '../config';
 let adminPath = '/admin';
 
 export default {
-    admin: {
-        path: adminPath,
-        text: '管理',
-        meta: {
-            authority: [authority.login],
-        },
-    },
-
     userMgt: {
         path: adminPath + '/userMgt',
         text: '用户',

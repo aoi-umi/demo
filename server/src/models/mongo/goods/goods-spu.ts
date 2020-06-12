@@ -1,12 +1,13 @@
 import {
     getModelForClass, ModelType, DocType, InstanceType,
-    setSchema, prop, arrayProp, getSchema, setMethod
+    setSchema, prop, arrayProp, getSchema, setMethod, setPlugin
 } from 'mongoose-ts-ua';
 import { Types, SchemaTypes } from 'mongoose';
 
 import { myEnum } from '@/config';
 
 import { Base } from '../_base';
+import { pagination, IPagination } from '../_plugins/pagination';
 export type GoodsSpuInstanceType = InstanceType<GoodsSpu>;
 export type GoodsSpuModelType = ModelType<GoodsSpu, typeof GoodsSpu>;
 export type GoodsSpuDocType = DocType<GoodsSpuInstanceType>;
@@ -16,6 +17,7 @@ export type GoodsSpuDocType = DocType<GoodsSpuInstanceType>;
         toJSON: { virtuals: true }
     }
 })
+@setPlugin(pagination)
 export class GoodsSpu extends Base {
     @prop({
         required: true,
@@ -83,4 +85,4 @@ export class GoodsSpu extends Base {
     }
 }
 
-export const GoodsSpuModel = getModelForClass<GoodsSpu, typeof GoodsSpu>(GoodsSpu);
+export const GoodsSpuModel = getModelForClass<GoodsSpu, typeof GoodsSpu & IPagination<GoodsSpu>>(GoodsSpu);

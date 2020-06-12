@@ -171,7 +171,9 @@ export class GoodsMapper {
         if (['saleQuantity', 'price'].includes(orderBy)) {
             orderBy = 'skuGroup.' + orderBy;
         }
-        let rs = await GoodsSpuModel.aggregatePaginate([
+        let rs = await GoodsSpuModel.aggregatePaginate<{
+            skuGroup: any
+        }>([
             { $match: match },
             {
                 $lookup: {

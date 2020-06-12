@@ -183,11 +183,14 @@ export class UserMapper {
                 $match: query2,
             },
         ];
-        let rs = await UserModel.aggregatePaginate(pipeline, {
+        let rs = await UserModel.aggregatePaginate<{
+            newAuthorityList: any[],
+            newRoleList: any[],
+        }>(pipeline, {
             noTotal,
             ...BaseMapper.getListOptions(data),
         });
-        rs.rows = rs.rows.map((ele) => {
+        let rows = rs.rows.map((ele) => {
             let model = new UserModel(ele);
             let obj = model.toJSON();
             delete obj.wxOpenId;
@@ -230,7 +233,10 @@ export class UserMapper {
             UserMapper.resetDetail(obj, opt);
             return obj;
         });
-        return rs;
+        return {
+            ...rs,
+            rows,
+        };
     }
 
     static setDelAuthOrRole(list, codeList) {

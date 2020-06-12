@@ -1,12 +1,13 @@
 import {
     getModelForClass, ModelType, DocType, InstanceType,
-    setSchema, prop, arrayProp, getSchema
+    setSchema, prop, arrayProp, getSchema, setPlugin
 } from 'mongoose-ts-ua';
 import { Types, SchemaTypes } from 'mongoose';
 
 import { myEnum } from '@/config';
 
 import { Base } from '../_base';
+import { pagination, IPagination } from '../_plugins/pagination';
 
 export type NotifyInstanceType = InstanceType<Notify>;
 export type NotifyModelType = ModelType<Notify, typeof Notify>;
@@ -16,6 +17,7 @@ export type NotifyDocType = DocType<NotifyInstanceType>;
         toJSON: { virtuals: true }
     }
 })
+@setPlugin(pagination)
 export class Notify extends Base {
     @prop({
         enum: myEnum.notifyType.getAllValue(),
@@ -48,5 +50,5 @@ export class Notify extends Base {
     raw: any;
 }
 
-export const NotifyModel = getModelForClass<Notify, typeof Notify>(Notify);
+export const NotifyModel = getModelForClass<Notify, typeof Notify & IPagination<Notify>>(Notify);
 

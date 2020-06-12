@@ -145,6 +145,15 @@ const cfg = {
         component: () => import('../views/pay-mgt')
     },
 
+    imgMgt: {
+        path: '/imgMgt',
+        text: '图片',
+        component: () => import('../views/img-mgt'),
+        meta: {
+            authority: [authority.login],
+        },
+    },
+
     wxAuth: {
         path: '/wx/auth',
         text: '微信授权',

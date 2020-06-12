@@ -1,4 +1,3 @@
-import { RequestHandler } from 'express';
 
 import * as config from '@/config';
 import { myEnum } from '@/config';

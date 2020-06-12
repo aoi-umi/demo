@@ -1,4 +1,3 @@
-import { RequestHandler } from 'express';
 
 import { paramsValid } from '@/helpers';
 import { error, escapeRegExp } from '@/_system/common';

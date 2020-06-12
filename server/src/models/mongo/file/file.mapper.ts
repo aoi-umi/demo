@@ -3,9 +3,16 @@ import { Types } from 'mongoose';
 import * as common from '@/_system/common';
 import * as config from '@/config';
 import { myEnum } from '@/config';
-import { FileModel } from './file';
+import * as ValidSchema from '@/valid-schema/class-valid';
 import { LoginUser } from '@/models/login-user';
 
+import { FileModel } from './file';
+import { BaseMapper } from '../_base';
+
+const Prefix = {
+    [myEnum.fileType.图片]: config.env.imgPrefix,
+    [myEnum.fileType.视频]: config.env.videoPrefix,
+};
 export class FileMapper {
     static getUrl(_id, fileType: string, opt?: {
         host?: string;
@@ -20,10 +27,7 @@ export class FileMapper {
         if (host) {
             host = '//' + host;
         }
-        let url = {
-            [myEnum.fileType.图片]: config.env.imgPrefix,
-            [myEnum.fileType.视频]: config.env.videoPrefix,
-        }[fileType];
+        let url = Prefix[fileType];
         let params: any = {
             _id
         };
@@ -94,5 +98,24 @@ export class FileMapper {
         let obj = fs.toOutObject();
         obj.url = FileMapper.getUrl(fs._id, opt.fileType, { host: opt.imgHost });
         return obj;
+    }
+
+    static async query(data: ValidSchema.ListBase, opt: { user: LoginUser, host?: string }) {
+        let { user } = opt;
+        let rs = await FileModel.findAndCountAll({
+            ...BaseMapper.getListOptions(data),
+            conditions: {
+                userId: user._id
+            }
+        });
+        let rows = rs.rows.map(ele => {
+            let obj = ele._doc as typeof ele._doc & { url?: string };
+            obj.url = this.getImgUrl(ele._id, opt.host);
+            return obj;
+        });
+        return {
+            ...rs,
+            rows
+        };
     }
 }

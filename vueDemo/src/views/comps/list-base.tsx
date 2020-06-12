@@ -1,7 +1,8 @@
 import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 
-import { Base } from '../base';
 import { getCompOpts } from '@/components/utils';
+
+import { Base } from '../base';
 
 export interface IListBase {
     queryOpt?: any;

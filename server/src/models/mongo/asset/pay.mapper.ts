@@ -55,7 +55,10 @@ export class PayMapper {
         if (data.outOrderNo)
             match2['assetLog.outOrderNo'] = new RegExp(escapeRegExp(data.outOrderNo), 'i');
 
-        let rs = await PayModel.aggregatePaginate([
+        let rs = await PayModel.aggregatePaginate<{
+            user: any,
+            assetLog: any,
+        }>([
             { $match: match },
             ...UserMapper.lookupPipeline(),
             ...AssetLogMapper.lookupPipeline(),

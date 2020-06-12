@@ -116,6 +116,9 @@ export default class App extends Base {
             }, {
                 routerConfig: routerConfig.goodsMgt,
                 icon: 'md-nutrition',
+            }, {
+                routerConfig: routerConfig.imgMgt,
+                icon: 'md-image',
             },]
         }, {
             text: '管理',

@@ -21,6 +21,9 @@ router.use(user.routes());
 import content from './content';
 router.use(content.routes());
 
+import my from './my';
+router.use(my.routes());
+
 //#region bookmark 
 import * as bookmark from './bookmark';
 router.get('/bookmark/query', UserAuthMid.normal(), MyRequestHandlerMid.convert(bookmark.query));

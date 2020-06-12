@@ -60,7 +60,7 @@ export let list: MyRequestHandler = async (opt) => {
             })
         ]
     });
-    let rows = rs.rows.map(ele => {
+    let rows = rs.rows.map((ele: any) => {
         let obj = ele.data;
         UserMapper.resetDetail(ele.user, { imgHost: opt.myData.imgHost });
         obj.user = ele.user;

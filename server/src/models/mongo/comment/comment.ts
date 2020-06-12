@@ -1,6 +1,6 @@
 import {
     getModelForClass, ModelType, DocType, InstanceType,
-    setSchema, prop, arrayProp
+    setSchema, prop, arrayProp, setPlugin
 } from 'mongoose-ts-ua';
 import { Types, SchemaTypes } from 'mongoose';
 
@@ -8,11 +8,13 @@ import { myEnum } from '@/config';
 
 import { Base } from '../_base';
 import { IVoteOwner } from '../vote';
+import { pagination, IPagination } from '../_plugins/pagination';
 
 export type CommentInstanceType = InstanceType<Comment>;
 export type CommentModelType = ModelType<Comment, typeof Comment>;
 export type CommentDocType = DocType<CommentInstanceType>;
 @setSchema()
+@setPlugin(pagination)
 export class Comment extends Base implements IVoteOwner {
     /**
      * 所属文章等id
@@ -84,5 +86,5 @@ export class Comment extends Base implements IVoteOwner {
     }
 }
 
-export const CommentModel = getModelForClass<Comment, typeof Comment>(Comment);
+export const CommentModel = getModelForClass<Comment, typeof Comment & IPagination<Comment>>(Comment);
 

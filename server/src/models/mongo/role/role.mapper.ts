@@ -93,7 +93,9 @@ export class RoleMapper {
                 $match: query2,
             },
         ];
-        let rs = await RoleModel.aggregatePaginate(pipeline, {
+        let rs = await RoleModel.aggregatePaginate<{
+            newAuthorityList: any
+        }>(pipeline, {
             noTotal,
             ...BaseMapper.getListOptions(data),
         });

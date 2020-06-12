@@ -1,12 +1,13 @@
 import {
     getModelForClass, ModelType, DocType, InstanceType,
-    setSchema, prop, arrayProp, setMethod
+    setSchema, prop, arrayProp, setMethod, setPlugin
 } from 'mongoose-ts-ua';
 import { Types, SchemaTypes } from 'mongoose';
 
 import { myEnum } from '@/config';
 
 import { Base } from '../_base';
+import { pagination, IPagination } from '../_plugins/pagination';
 
 export type ContentLogInstanceType = InstanceType<ContentLog>;
 export type ContentLogModelType = ModelType<ContentLog, typeof ContentLog>;
@@ -18,6 +19,7 @@ export type ContentLogDocType = DocType<ContentLogInstanceType>;
         }
     }
 })
+@setPlugin(pagination)
 export class ContentLog extends Base {
     @prop({
         type: SchemaTypes.ObjectId,
@@ -73,7 +75,7 @@ export class ContentLog extends Base {
     remark: string;
 }
 
-export const ContentLogModel = getModelForClass<ContentLog, typeof ContentLog>(ContentLog);
+export const ContentLogModel = getModelForClass<ContentLog, typeof ContentLog & IPagination<ContentLog>>(ContentLog);
 
 
 

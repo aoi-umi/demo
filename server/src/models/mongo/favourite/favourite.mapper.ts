@@ -97,7 +97,9 @@ export class FavouriteMapper {
         }
         if (and.length)
             match2.$and = and;
-        let rs = await FavouriteModel.aggregatePaginate([
+        let rs = await FavouriteModel.aggregatePaginate<{
+            favouriteValue: boolean
+        }>([
             {
                 $match: {
                     userId: opt.user._id,

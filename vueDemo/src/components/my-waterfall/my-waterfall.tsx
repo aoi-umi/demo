@@ -123,13 +123,18 @@ class MyWaterfall extends Vue<MyWaterfallProp & MyBase> {
     }
 
     private finished = false;
+    private errMsg = '';
     async getData(refresh?: boolean) {
         this.loading = true;
-        let { data, finished } = await this.getDataFn();
+        this.errMsg = '';
+        try {
+            let { data, finished } = await this.getDataFn();
+            this.finished = finished;
+            this.currVal = refresh ? data : [...this.currVal, ...data];
+        } catch (e) {
+            this.errMsg = `出错了: ${e.message || '未知错误'}`;
+        }
         this.loading = false;
-        this.finished = finished;
-
-        this.currVal = refresh ? data : [...this.currVal, ...data];
     }
     @Watch('currVal')
     private watchCurrVal() {
@@ -259,22 +264,27 @@ class MyWaterfall extends Vue<MyWaterfallProp & MyBase> {
                                 this.$emit('item-click', e, ele.data);
                             }}>
                                 <img src={ele.data.src} />
-                                {this.maskContentRenderFn &&
-                                    <div class={this.getStyleName('item-mask')}>
-                                        {this.maskContentRenderFn(ele.data)}
-                                    </div>
-                                }
+                                <div class={this.getStyleName('item-mask')}>
+                                    {this.maskContentRenderFn && this.maskContentRenderFn(ele.data) || ele.data.src}
+                                </div>
                             </div>
                         );
                     })}
                 </div>
                 <div class={this.getStyleName('bottom-box')}>
-                    {this.finished && !this.imgLoading && (this.$slots.loaded || <span>加载完毕</span>)}
-                    {(this.loading || this.imgLoading) && (this.$slots.loading || <span>加载中</span>)}
-                    {!this.finished && !this.loading && !this.imgLoading
-                        && (<div class={this.getStyleName('more')} on-click={() => {
+                    {this.errMsg ?
+                        <span>{this.errMsg}<a on-click={() => {
                             this.getData();
-                        }}>{this.$slots.more || '更多'}</div>)}
+                        }}>重试</a></span> :
+                        <div>
+                            {this.finished && !this.imgLoading && (this.$slots.loaded || <span>加载完毕</span>)}
+                            {(this.loading || this.imgLoading) && (this.$slots.loading || <span>加载中</span>)}
+                            {!this.finished && !this.loading && !this.imgLoading
+                                && (<div class={this.getStyleName('more')} on-click={() => {
+                                    this.getData();
+                                }}>{this.$slots.more || '更多'}</div>)}
+                        </div>
+                    }
                 </div>
             </div>
         );

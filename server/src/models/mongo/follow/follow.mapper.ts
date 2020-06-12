@@ -125,7 +125,10 @@ export class FollowMapper {
                 { $unwind: { path: '$follow', preserveNullAndEmptyArrays: true } },
             ];
         }
-        let rs = await FollowModel.aggregatePaginate(pipeline, {
+        let rs = await FollowModel.aggregatePaginate<{
+            user: any,
+            follow: any,
+        }>(pipeline, {
             ...BaseMapper.getListOptions(data),
         });
         rs.rows = rs.rows.map(detail => {

@@ -5,6 +5,7 @@ import {
 
 import { myEnum } from '@/config';
 import { ContentBase } from '../content/content-base';
+import { IPagination } from '../_plugins/pagination';
 
 export type ArticleInstanceType = InstanceType<Article>;
 export type ArticleModelType = ModelType<Article, typeof Article>;
@@ -50,5 +51,5 @@ export class Article extends ContentBase {
     }
 }
 
-export const ArticleModel = getModelForClass<Article, typeof Article>(Article);
+export const ArticleModel = getModelForClass<Article, typeof Article & IPagination<Article>>(Article);
 

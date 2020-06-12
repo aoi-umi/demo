@@ -1,12 +1,13 @@
 import {
     getModelForClass, ModelType, DocType, InstanceType,
-    setSchema, prop, arrayProp, setMethod
+    setSchema, prop, arrayProp, setMethod, setPlugin
 } from 'mongoose-ts-ua';
 import * as moment from 'dayjs';
 
 import { myEnum, dev } from '@/config';
 
 import { Base } from '../_base';
+import { pagination, IPagination } from '../_plugins/pagination';
 
 export type UserInstanceType = InstanceType<User>;
 export type UserModelType = ModelType<User, typeof User>;
@@ -18,6 +19,7 @@ export type UserDocType = DocType<UserInstanceType>;
         }
     }
 })
+@setPlugin(pagination)
 export class User extends Base {
     @prop({
         required: true,
@@ -128,5 +130,5 @@ export class User extends Base {
     }
 }
 
-export const UserModel = getModelForClass<User, typeof User>(User);
+export const UserModel = getModelForClass<User, typeof User & IPagination<User>>(User);
 

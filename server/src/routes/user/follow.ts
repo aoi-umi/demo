@@ -1,4 +1,3 @@
-import { RequestHandler } from 'express';
 
 import { transaction } from '@/_system/dbMongo';
 import { error } from '@/_system/common';

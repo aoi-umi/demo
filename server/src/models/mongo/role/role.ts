@@ -1,11 +1,12 @@
 import {
     getModelForClass, ModelType, DocType, InstanceType,
-    setSchema, prop, arrayProp
+    setSchema, prop, arrayProp, setPlugin
 } from 'mongoose-ts-ua';
 
 import { myEnum } from '@/config/enum';
 
 import { Base } from '../_base';
+import { pagination, IPagination } from '../_plugins/pagination';
 
 export type RoleInstanceType = InstanceType<Role>;
 export type RoleModelType = ModelType<Role, typeof Role>;
@@ -17,6 +18,7 @@ export type RoleDocType = DocType<RoleInstanceType>;
         }
     }
 })
+@setPlugin(pagination)
 export class Role extends Base {
     @prop({
         required: true,
@@ -50,5 +52,5 @@ export class Role extends Base {
     authorityList: string[];
 }
 
-export const RoleModel = getModelForClass<Role, typeof Role>(Role);
+export const RoleModel = getModelForClass<Role, typeof Role & IPagination<Role>>(Role);
 

@@ -1,8 +1,11 @@
 import { Types, SchemaTypes } from 'mongoose';
-import { GridFSFile, GridFSModel, setSchema, prop, setMethod, getGridFSModel } from 'mongoose-ts-ua';
+import { GridFSFile, GridFSModel, setSchema, prop, setMethod, getGridFSModel, setPlugin, InstanceType } from 'mongoose-ts-ua';
 
+import { pagination, IPagination } from '../_plugins/pagination';
 
+type FileInstanceType = InstanceType<File>;
 @setSchema()
+@setPlugin(pagination)
 class File extends GridFSFile {
     @prop()
     nickname: string;
@@ -29,6 +32,6 @@ class File extends GridFSFile {
     }
 }
 
-export const FileModel = getGridFSModel<File, typeof File>({
+export const FileModel = getGridFSModel<File, typeof File & IPagination<File>>({
     schema: File,
 });

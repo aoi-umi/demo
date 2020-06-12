@@ -127,7 +127,9 @@ export class ContentMapper {
             log: null as any[]
         };
         if (!opt.normal) {
-            let logRs = await ContentLogModel.aggregatePaginate([
+            let logRs = await ContentLogModel.aggregatePaginate<{
+                user: any
+            }>([
                 { $match: { contentId: detail._id } },
                 ...UserMapper.lookupPipeline(),
                 { $sort: { _id: -1 } }

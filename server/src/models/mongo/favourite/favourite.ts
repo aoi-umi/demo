@@ -1,17 +1,19 @@
 import {
     getModelForClass, ModelType, DocType, InstanceType,
-    setSchema, prop, arrayProp, getSchema
+    setSchema, prop, arrayProp, getSchema, setPlugin
 } from 'mongoose-ts-ua';
 import { Types, SchemaTypes } from 'mongoose';
 
 import { myEnum } from '@/config/enum';
 
 import { Base } from '../_base';
+import { pagination, IPagination } from '../_plugins/pagination';
 
 export type FavouriteInstanceType = InstanceType<Favourite>;
 export type FavouriteModelType = ModelType<Favourite, typeof Favourite>;
 export type FavouriteDocType = DocType<FavouriteInstanceType>;
 @setSchema()
+@setPlugin(pagination)
 export class Favourite extends Base {
     @prop({
         required: true,
@@ -43,7 +45,7 @@ export class Favourite extends Base {
 let schema = getSchema(Favourite);
 schema.index({ ownerId: 1, userId: 1 }, { unique: true });
 
-export const FavouriteModel = getModelForClass<Favourite, typeof Favourite>(Favourite);
+export const FavouriteModel = getModelForClass<Favourite, typeof Favourite & IPagination<Favourite>>(Favourite);
 
 export interface IFavouriteOwner {
     favourite: number;

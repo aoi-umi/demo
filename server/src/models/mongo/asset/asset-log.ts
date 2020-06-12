@@ -1,6 +1,6 @@
 import {
     getModelForClass, ModelType, DocType, InstanceType,
-    setSchema, prop, arrayProp, getSchema, SubDocType
+    setSchema, prop, arrayProp, getSchema, SubDocType, setPlugin
 } from 'mongoose-ts-ua';
 import { Types, SchemaTypes } from 'mongoose';
 import * as Int32 from 'mongoose-int32';
@@ -9,6 +9,7 @@ import * as mathjs from 'mathjs';
 import { myEnum } from '@/config';
 
 import { Base } from '../_base';
+import { pagination, IPagination } from '../_plugins/pagination';
 
 export type AssetLogInstanceType = InstanceType<AssetLog>;
 export type AssetLogModelType = ModelType<AssetLog, typeof AssetLog>;
@@ -39,6 +40,7 @@ class AssetLogRemark {
         }
     }
 })
+@setPlugin(pagination)
 export class AssetLog extends Base {
 
     @prop({
@@ -117,5 +119,5 @@ export class AssetLog extends Base {
     remarkList: SubDocType<AssetLogRemark>[];
 }
 
-export const AssetLogModel = getModelForClass<AssetLog, typeof AssetLog>(AssetLog);
+export const AssetLogModel = getModelForClass<AssetLog, typeof AssetLog & IPagination<AssetLog>>(AssetLog);
 

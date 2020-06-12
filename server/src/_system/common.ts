@@ -8,7 +8,6 @@ import * as net from 'net';
 import * as crypto from 'crypto';
 import * as Q from 'q';
 import * as zlib from 'zlib';
-import { Request } from 'express';
 import * as config from '@/config';
 
 
@@ -397,15 +396,6 @@ export let getErrorConfigByCode = function (code) {
         if (config.error[key].code == code)
             return config.error[key];
     }
-};
-
-export let getClientIp = function (req: Request) {
-    // let ip = req.headers['x-forwarded-for']
-    // || req.connection.remoteAddress
-    // || req.socket.remoteAddress
-    // || req.connection.socket.remoteAddress;
-    let ip = req.ip;
-    return ip;
 };
 
 export let IPv4ToIPv6 = function (ip, convert?: boolean) {
