@@ -306,7 +306,7 @@ class MyWaterfall extends Vue<MyWaterfallProp & MyBase> {
                                 }
                                 this.$emit('item-click', e, item);
                             }}>
-                                <img src={ele.data.src} style="visibility:hidden" />
+                                <img src={ele.data.src} />
                                 {this.selectable && <Checkbox v-model={ele.selected} class={this.getStyleName('select-box')} nativeOn-click={(event: MouseEvent) => {
                                     event.stopPropagation();
                                 }} />}
