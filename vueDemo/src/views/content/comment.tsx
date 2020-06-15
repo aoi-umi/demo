@@ -243,7 +243,7 @@ export class Comment extends Vue<CommentProp & Base> {
             <div>
                 <div class={this.getStyleName('send-op-box')}>
                     <Button on-click={() => {
-                        this.query();
+                        this.query(convert.Test.listModelToQuery(this.$refs.list.model));
                     }} loading={this.refreshLoading}>刷新评论</Button>
                     <Button type="primary" on-click={() => {
                         this.resetReply({ floor: send ? -1 : 0 });
