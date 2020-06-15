@@ -1,14 +1,14 @@
 import { Component, Vue, Watch } from 'vue-property-decorator';
 
-import { Button } from '@/components/iview';
-import { MyWaterfall } from '@/components/my-waterfall';
-import { MyImgViewer, IMyImgViewer } from '@/components/my-img-viewer';
+import { Button, Divider, Modal } from '@/components/iview';
+import { MyWaterfall, IMyWaterfallView } from '@/components/my-waterfall';
+import { MyConfirm } from '@/components/my-confirm';
 
 import { Base } from './base';
 import { testApi } from '@/api';
 @Component
-export default class Waterfall extends Base {
-    $refs: { root: HTMLDivElement; imgViewer: IMyImgViewer };
+export default class ImgMgt extends Base {
+    $refs: { root: HTMLDivElement; waterFall: IMyWaterfallView };
     stylePrefix = 'img-mgt';
     imgsArr = [];
 
@@ -27,24 +27,58 @@ export default class Waterfall extends Base {
         };
     }
 
-    showUrl = '';
+    delConfirmShow = false;
+    selectable = false;
+    private cancel() {
+        this.selectable = false;
+        this.delConfirmShow = false;
+    }
+    private get deletable() {
+        return this.$refs.waterFall && this.$refs.waterFall.itemList.filter(ele => ele.selected).length > 0;
+    }
+    private async del() {
+        let waterFall = this.$refs.waterFall;
+        let selectedList = waterFall.itemList.filter(ele => ele.selected);
+        let idList = selectedList.map(ele => ele.data.data._id);
+        await testApi.myImgDel({ idList });
+        waterFall.removeItem(selectedList.map(ele => ele.index));
+        this.cancel();
+    }
     render() {
         return (
-            <div ref='root' class={this.getStyleName('root')}>
-                <MyImgViewer ref="imgViewer" src={this.showUrl} />
-
+            <div>
+                <Button type="error" disabled={this.selectable && !this.deletable} on-click={() => {
+                    if (!this.selectable) {
+                        this.selectable = true;
+                    } else {
+                        this.delConfirmShow = true;
+                    }
+                }}>删除</Button>
+                {this.selectable && <Button on-click={() => {
+                    this.cancel();
+                }}>取消</Button>}
+                <Divider />
                 <MyWaterfall
+                    ref="waterFall"
+                    selectable={this.selectable}
                     getDataFn={() => {
                         return this.getData();
                     }}
                     maskContentRenderFn={(item) => {
                         return <div>{item.data.filename}</div>;
                     }}
-                    on-item-click={(e, item) => {
-                        this.showUrl = item.src;
-                        this.$refs.imgViewer.show();
-                    }}
                 />
+                <Modal v-model={this.delConfirmShow} footer-hide>
+                    <MyConfirm title="确认删除"
+                        loading
+                        cancel={() => {
+                            this.cancel();
+                        }}
+                        ok={() => {
+                            return this.del();
+                        }}>
+                    </MyConfirm>
+                </Modal>
             </div>
         );
     }

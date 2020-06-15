@@ -103,7 +103,8 @@ export class FileMapper {
     static async query(data: ValidSchema.ListBase & { fileType?: string }, opt: { user: LoginUser, host?: string }) {
         let { user } = opt;
         let cond: any = {
-            userId: user._id
+            userId: user._id,
+            isUserDel: { $ne: true }
         };
         if (data.fileType)
             cond.fileType = data.fileType;

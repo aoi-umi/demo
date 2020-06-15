@@ -222,6 +222,9 @@ const config = {
                     url: '/my/img/query',
                     method: 'get',
                 },
+                myImgDel: {
+                    url: '/my/img/del',
+                },
                 followSave: {
                     url: '/follow/save',
                 },

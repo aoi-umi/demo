@@ -3,12 +3,16 @@ import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import { convClass, Utils, getCompOpts } from '../utils';
 import { MyBase } from '../my-base';
 import './my-waterfall.less';
+import { Checkbox } from '../iview';
+import { MyImgViewer, IMyImgViewer } from '../my-img-viewer';
 
 export type MyWaterfallDataType = {
     src: string;
+    data: any;
 };
 type MyWaterfallItemType = {
     data: MyWaterfallDataType,
+    selected?: boolean,
     loaded: boolean,
     success: boolean,
     height: number,
@@ -17,7 +21,8 @@ type MyWaterfallItemType = {
     colIdx?: number,
     style: any,
     img: HTMLImageElement,
-    timer?: any
+    timer?: any,
+    index: number,
 };
 
 type GetDataFnResult<T> = { data: T[], finished?: boolean };
@@ -65,6 +70,12 @@ class MyWaterfallProp {
 
     @Prop()
     maskContentRenderFn?: (item: any) => any;
+
+    @Prop()
+    selectable?: boolean;
+
+    @Prop()
+    noDefaultClickEvent?: boolean;
 }
 @Component({
     extends: MyBase,
@@ -73,10 +84,12 @@ class MyWaterfallProp {
 class MyWaterfall extends Vue<MyWaterfallProp & MyBase> {
     stylePrefix = 'my-waterfall-';
 
-    $refs: { root: HTMLDivElement; };
+    $refs: { root: HTMLDivElement; imgViewer: IMyImgViewer };
 
     currVal: any[] = [];
+    selectedVal: any[] = [];
 
+    currUrl = '';
     private actualCol = 1;
     @Watch('col')
     private watchCol() {
@@ -85,7 +98,16 @@ class MyWaterfall extends Vue<MyWaterfallProp & MyBase> {
         else
             this.actualCol = this.col(this.$refs.root.clientWidth);
     }
-    private itemList: MyWaterfallItemType[] = [];
+    @Watch('selectable')
+    private watchSelectable(newVal) {
+        if (!newVal) {
+            this.itemList.forEach(ele => {
+                ele.selected = false;
+            });
+        }
+    }
+
+    itemList: MyWaterfallItemType[] = [];
 
     private getScrollElm() {
         return this.scrollElm === ScrollElm.root ? this.$refs.root : window;
@@ -140,17 +162,21 @@ class MyWaterfall extends Vue<MyWaterfallProp & MyBase> {
     private watchCurrVal() {
         this.itemList = this.currVal.map((ele, idx) => {
             let old = this.itemList.find(e => e.data === ele);
-            if (old)
+            if (old) {
+                old.index = idx;
                 return old;
+            }
             let img = new Image();
 
             let obj: MyWaterfallItemType = {
+                index: idx,
                 data: ele,
                 loaded: false,
                 success: false,
                 height: 0,
                 style: {} as any,
-                img
+                img,
+                selected: false,
             };
             img.onload = img.onerror = (e) => {
                 this.imgLoaded(obj);
@@ -253,17 +279,37 @@ class MyWaterfall extends Vue<MyWaterfallProp & MyBase> {
         this.handleScrollEnd();
     }
 
+    removeItem(idxList: number[]) {
+        for (let i = this.currVal.length - 1; i > 0; i--) {
+            if (idxList.includes(i)) {
+                this.currVal.splice(i, 1);
+            }
+        }
+        this.$nextTick(() => {
+            this.handleItemStyle();
+        });
+    }
+
     private divHeight = 0;
     protected render() {
         return (
             <div ref='root' class={this.getStyleName('root')}>
+                <MyImgViewer ref="imgViewer" src={this.currUrl} />
                 <div class={this.getStyleName('main')} style={{ height: this.divHeight + 'px' }}>
-                    {this.itemList.map(ele => {
+                    {this.itemList.map((ele, idx) => {
                         return (
                             <div class={this.getStyleName('item')} style={ele.style} on-click={(e) => {
-                                this.$emit('item-click', e, ele.data);
+                                let item = ele.data;
+                                this.currUrl = item.src;
+                                if (!this.noDefaultClickEvent) {
+                                    this.$refs.imgViewer.show();
+                                }
+                                this.$emit('item-click', e, item);
                             }}>
-                                <img src={ele.data.src} />
+                                <img src={ele.data.src} style="visibility:hidden" />
+                                {this.selectable && <Checkbox v-model={ele.selected} class={this.getStyleName('select-box')} nativeOn-click={(event: MouseEvent) => {
+                                    event.stopPropagation();
+                                }} />}
                                 <div class={this.getStyleName('item-mask')}>
                                     {this.maskContentRenderFn && this.maskContentRenderFn(ele.data) || ele.data.src}
                                 </div>
@@ -293,3 +339,4 @@ class MyWaterfall extends Vue<MyWaterfallProp & MyBase> {
 
 const MyWaterfallView = convClass<MyWaterfallProp>(MyWaterfall);
 export default MyWaterfallView;
+export interface IMyWaterfallView extends MyWaterfall { };

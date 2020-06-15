@@ -19,6 +19,9 @@ class File extends GridFSFile {
     userId: Types.ObjectId;
 
     @prop()
+    isUserDel: boolean;
+
+    @prop()
     fileType: string;
 
     @setMethod

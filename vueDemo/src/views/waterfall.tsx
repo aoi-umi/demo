@@ -2,13 +2,12 @@ import { Component, Vue, Watch } from 'vue-property-decorator';
 
 import { Button } from '@/components/iview';
 import { MyWaterfall } from '@/components/my-waterfall';
-import { MyImgViewer, IMyImgViewer } from '@/components/my-img-viewer';
 
 import { Base } from './base';
 import './demo.less';
 @Component
 export default class Waterfall extends Base {
-    $refs: { root: HTMLDivElement; imgViewer: IMyImgViewer };
+    $refs: { root: HTMLDivElement; };
     stylePrefix = 'waterfall-';
     imgsArr = [];
     group = 0;
@@ -56,12 +55,10 @@ export default class Waterfall extends Base {
         this.getDataFn(refresh);
         this.group++;
     }
-    
-    showUrl = '';
+
     render() {
         return (
             <div ref='root' class={this.getStyleName('root')}>
-                <MyImgViewer ref="imgViewer" src={this.showUrl} />
                 {this.type == '1' ?
                     <MyWaterfall
                         scrollElm='root'
@@ -72,10 +69,6 @@ export default class Waterfall extends Base {
                         maskContentRenderFn={(item) => {
                             return <div>test{item.src}</div>;
                         }}
-                        on-item-click={(e, item) => {
-                            this.showUrl = item.src;
-                            this.$refs.imgViewer.show();
-                        }}
                     /> :
                     <MyWaterfall
                         getDataFn={() => {
@@ -83,10 +76,6 @@ export default class Waterfall extends Base {
                         }}
                         maskContentRenderFn={(item) => {
                             return <div>test{item.src}</div>;
-                        }}
-                        on-item-click={(e, item) => {
-                            this.showUrl = item.src;
-                            this.$refs.imgViewer.show();
                         }}
                     />
                 }

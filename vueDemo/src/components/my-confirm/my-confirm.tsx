@@ -18,7 +18,7 @@ class MyConfirmProp {
     title?: string;
 
     @Prop({ default: false })
-    loading: boolean;
+    loading?: boolean;
 
     @Prop()
     btnList?: BtnType[];

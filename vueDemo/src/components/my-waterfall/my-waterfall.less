@@ -1,11 +1,14 @@
 @prefix: my-waterfall-;
+
 .@{prefix} {
   &root {
     overflow-y: auto;
   }
+
   &main {
     position: relative;
   }
+
   &item {
     cursor: pointer;
     position: absolute;
@@ -15,15 +18,18 @@
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
     border-radius: 5px;
     background: rgba(216, 216, 216, 0.555);
-    > img {
+
+    >img {
       width: 100%;
     }
+
     &:hover {
       .@{prefix}item-mask {
         transform: translateY(0);
       }
     }
   }
+
   &item-mask {
     background: rgba(0, 0, 0, 0.5);
     position: absolute;
@@ -34,13 +40,20 @@
     transform: translateY(100%);
     transition-duration: 0.5s;
   }
+
   &bottom-box {
     margin: 10px 0;
     display: flex;
     flex-direction: column;
     align-items: center;
   }
+
   &more {
     cursor: pointer;
+  }
+
+  &select-box {
+    position: absolute;
+    left: 5px;
   }
 }

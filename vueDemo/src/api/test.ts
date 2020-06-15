@@ -68,6 +68,7 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
     favouriteSubmit,
     favouriteQuery,
     myImgQuery,
+    myImgDel,
     followSave,
     followQuery,
     chatSubmit,
@@ -370,6 +371,9 @@ export class TestApi extends ApiModel<TestApiMethod> {
     //#region my 
     async myImgQuery(data) {
         return this.requestByConfig(this.apiConfig.method.myImgQuery, { data });
+    }
+    async myImgDel(data) {
+        return this.requestByConfig(this.apiConfig.method.myImgDel, { data });
     }
     //#endregion
 
