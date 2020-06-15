@@ -100,13 +100,16 @@ export class FileMapper {
         return obj;
     }
 
-    static async query(data: ValidSchema.ListBase, opt: { user: LoginUser, host?: string }) {
+    static async query(data: ValidSchema.ListBase & { fileType?: string }, opt: { user: LoginUser, host?: string }) {
         let { user } = opt;
+        let cond: any = {
+            userId: user._id
+        };
+        if (data.fileType)
+            cond.fileType = data.fileType;
         let rs = await FileModel.findAndCountAll({
             ...BaseMapper.getListOptions(data),
-            conditions: {
-                userId: user._id
-            }
+            conditions: cond
         });
         let rows = rs.rows.map(ele => {
             let obj = ele._doc as typeof ele._doc & { url?: string };
