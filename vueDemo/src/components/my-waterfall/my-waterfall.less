@@ -16,11 +16,15 @@
     transform: scale(0);
     overflow: hidden;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
     background: rgba(216, 216, 216, 0.555);
 
     >img {
       width: 100%;
+    }
+
+    &,
+    >img {
+      border-radius: 5px;
     }
 
     &:hover {
@@ -37,8 +41,15 @@
     left: 0;
     right: 0;
     padding: 2px 5px;
-    transform: translateY(100%);
+    transform: translateY(110%);
     transition-duration: 0.5s;
+  }
+
+  &click-box {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
   }
 
   &bottom-box {
@@ -54,6 +65,7 @@
 
   &select-box {
     position: absolute;
-    left: 5px;
+    left: 8px;
+    top: 5px;
   }
 }

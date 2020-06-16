@@ -210,7 +210,7 @@ class MyWaterfall extends Vue<MyWaterfallProp & MyBase> {
         |                       |             |
         |-------------------------------------|        
          */
-        let padding = 5;
+        let padding = 3;
         let clientWidth = this.$refs.root.clientWidth + this.space;
         let itemWidth = Math.floor(clientWidth / this.actualCol) - this.space;
         let lastShowIdx = -1;
@@ -298,18 +298,17 @@ class MyWaterfall extends Vue<MyWaterfallProp & MyBase> {
                 <div class={this.getStyleName('main')} style={{ height: this.divHeight + 'px' }}>
                     {this.itemList.map((ele, idx) => {
                         return (
-                            <div class={this.getStyleName('item')} style={ele.style} on-click={(e) => {
-                                let item = ele.data;
-                                this.currUrl = item.src;
-                                if (!this.noDefaultClickEvent) {
-                                    this.$refs.imgViewer.show();
-                                }
-                                this.$emit('item-click', e, item);
-                            }}>
+                            <div class={this.getStyleName('item')} style={ele.style} >
                                 <img src={ele.data.src} />
-                                {this.selectable && <Checkbox v-model={ele.selected} class={this.getStyleName('select-box')} nativeOn-click={(event: MouseEvent) => {
-                                    event.stopPropagation();
-                                }} />}
+                                <div class={this.getStyleName('click-box')} on-click={(e) => {
+                                    let item = ele.data;
+                                    this.currUrl = item.src;
+                                    if (!this.noDefaultClickEvent) {
+                                        this.$refs.imgViewer.show();
+                                    }
+                                    this.$emit('item-click', e, item);
+                                }} />
+                                {this.selectable && <Checkbox v-model={ele.selected} class={this.getStyleName('select-box')} />}
                                 <div class={this.getStyleName('item-mask')}>
                                     {this.maskContentRenderFn && this.maskContentRenderFn(ele.data) || ele.data.src}
                                 </div>
