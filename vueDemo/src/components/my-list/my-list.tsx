@@ -123,6 +123,11 @@ class MyListProp<QueryArgs = any> {
     //批量操作
     @Prop({ default: () => [] })
     multiOperateBtnList?: { text: string; onClick: (selection: any[]) => void }[];
+
+    @Prop({
+        default: 'bottom'
+    })
+    pagePosition?: 'top' | 'bottom' | 'both';
 }
 @Component({
     extends: MyBase,
@@ -292,6 +297,32 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue<MyListProp<QueryArgs> 
 
     $refs: { page: iView.Page & { currentPage: number } };
 
+    private renderPage(position: string) {
+        if (!this.infiniteScroll && !this.hidePage && this.result.total !== 0 && (['both', position].includes(this.pagePosition))) {
+            return (
+                <Page
+                    ref="page"
+                    class={this.getStyleName('page')} total={this.result.total}
+                    placement="top"
+                    current={this.model.page.index}
+                    page-size={this.model.page.size}
+                    size="small"
+                    show-total show-elevator show-sizer={this.showSizer}
+                    on-on-change={(page) => {
+                        this.model.page.index = page;
+                        this.handleQuery();
+                    }}
+                    on-on-page-size-change={(size) => {
+                        let oldIdx = this.model.page.index;
+                        this.model.page.index = 1;
+                        this.model.page.size = size;
+                        if (oldIdx == 1) {
+                            this.handleQuery();
+                        }
+                    }} />);
+        }
+
+    }
     protected render() {
         let hideQueryBtn = this.hideQueryBtn || {};
         if (this.$refs.page && this.$refs.page.currentPage !== this.model.page.index) {
@@ -352,6 +383,7 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue<MyListProp<QueryArgs> 
                 }
                 <div class={this.getStyleName('content')}>
                     {this.$slots.default}
+                    {this.renderPage('top')}
                     {this.type == 'table' ?
                         <Table class={this.getStyleName('table')} columns={this.cols.filter(ele => {
                             let sort = this.model.sort;
@@ -363,47 +395,26 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue<MyListProp<QueryArgs> 
                             }
                             return !ele.hide;
                         })}
-                        data={this.result.data} no-data-text={this.result.msg}
-                        on-on-selection-change={this.setSelectedRows}
-                        on-on-sort-change={(opt: OnSortChangeOptions) => {
-                            let sortMap = {
-                                asc: 1,
-                                desc: -1
-                            };
-                            let orderBy, sortOrder = sortMap[opt.order];
-                            if (sortOrder)
-                                orderBy = opt.key;
-                            this.model.setSort({
-                                orderBy,
-                                sortOrder,
-                            });
-                            this.handleQuery({ resetPage: true });
-                        }}>
+                            data={this.result.data} no-data-text={this.result.msg}
+                            on-on-selection-change={this.setSelectedRows}
+                            on-on-sort-change={(opt: OnSortChangeOptions) => {
+                                let sortMap = {
+                                    asc: 1,
+                                    desc: -1
+                                };
+                                let orderBy, sortOrder = sortMap[opt.order];
+                                if (sortOrder)
+                                    orderBy = opt.key;
+                                this.model.setSort({
+                                    orderBy,
+                                    sortOrder,
+                                });
+                                this.handleQuery({ resetPage: true });
+                            }}>
                         </Table> :
                         this.customRenderFn(this.result)
                     }
-                    {!this.infiniteScroll && !this.hidePage && this.result.total !== 0 &&
-                        <Page
-                            ref="page"
-                            class={this.getStyleName('page')} total={this.result.total}
-                            placement="top"
-                            current={this.model.page.index}
-                            page-size={this.model.page.size}
-                            size="small"
-                            show-total show-elevator show-sizer={this.showSizer}
-                            on-on-change={(page) => {
-                                this.model.page.index = page;
-                                this.handleQuery();
-                            }}
-                            on-on-page-size-change={(size) => {
-                                let oldIdx = this.model.page.index;
-                                this.model.page.index = 1;
-                                this.model.page.size = size;
-                                if (oldIdx == 1) {
-                                    this.handleQuery();
-                                }
-                            }} />
-                    }
+                    {this.renderPage('bottom')}
                     {!this.infiniteScroll ?
                         this.loading && <Spin size="large" fix /> :
                         <div class={this.getStyleName('bottom-loading').concat(style.cls.center)}>

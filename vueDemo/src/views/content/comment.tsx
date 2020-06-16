@@ -254,6 +254,7 @@ export class Comment extends Vue<CommentProp & Base> {
                     ref="list"
                     hideSearchBox
                     type="custom"
+                    pagePosition="both"
 
                     customRenderFn={this.renderResult}
 
