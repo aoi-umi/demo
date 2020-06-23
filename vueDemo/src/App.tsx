@@ -2,8 +2,7 @@ import { Component, Vue, Watch, Prop } from "vue-property-decorator";
 
 import { routerConfig, MyRouteConfig } from '@/router';
 import {
-    Menu, MenuItem,
-    Icon, Content, Sider, Layout, Header, Button, Modal, BackTop, Submenu, Spin, Tooltip,
+    Icon, Content, Layout, Header, Button, Modal, BackTop, Spin,
 } from "@/components/iview";
 import { LocalStore } from '@/store';
 
@@ -135,6 +134,7 @@ export default class App extends Base {
                 icon: 'md-lock',
             }, {
                 text: '资金',
+                name: 'asset',
                 icon: 'md-stats',
                 children: [{
                     routerConfig: routerConfig.assetMgtLog,

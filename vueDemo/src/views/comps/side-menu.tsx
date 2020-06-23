@@ -9,6 +9,7 @@ import * as style from '@/components/style';
 
 import { Base } from '../base';
 import './side-menu.less';
+import cfg from '@/router/cfg';
 
 export type MenuConfig = {
     name?: string;
@@ -70,37 +71,48 @@ export class SideMenu extends Vue<SideMenuProp & Base> {
     getMenuName(data: MenuConfig) {
         let name = data.name;
         if (!name && data.to)
-            name = this.getActiveNameByPath(data.to);
+            name = this.getActiveNameByPath(data.to, false);
         return name;
     }
 
-    getActiveNameByPath(path: string) {
-        return this.findCfg(this.menuCfg, path);
+    getActiveNameByPath(path: string, setOpenNames = true) {
+        let { name, openNames } = this.findCfg(this.menuCfg, path);
+        if (setOpenNames) {
+            this.openNames = Array.from(new Set([...this.openNames, ...openNames]));
+        }
+        return name;
     }
 
     private findCfg(data: MenuConfig[], path: string, matchLen = 0) {
         let name = '';
+        let openNames = [];
         for (let ele of data) {
+            let list = [];
+            let pathName = ele.name || ele.to;
             if (path.startsWith(ele.to) && ele.to.length > matchLen) {
                 name = ele.to;
-                matchLen = ele.to.length;
+                matchLen = name.length;
+                openNames = list;
             }
+            if (pathName)
+                list.push(pathName);
             if (ele.children) {
-                let childName = this.findCfg(ele.children, path, matchLen);
+                let { name: childName, openNames: childOpenNames } = this.findCfg(ele.children, path, matchLen);
                 let childLen = childName.length;
                 if (childLen > matchLen) {
                     name = childName;
-                    matchLen = childLen
+                    matchLen = childLen;
+                    openNames = list;
                 }
+                list.push(...childOpenNames);
             }
         }
-        return name;
+        return { name, openNames };
     }
 
     filterMenu(list: MenuConfig[]) {
         return list.filter((ele: MenuConfig) => {
             let show = this.isMenuItemShow(ele);
-
             return show;
         });
     }
@@ -123,7 +135,7 @@ export class SideMenu extends Vue<SideMenuProp & Base> {
     renderMenu() {
         return this.filterMenu(this.menuCfg).map(data => { return this.renderMenuItem(data); });
     }
-
+    private defaultIcon = "md-apps";
     renderMenuItem(data: MenuConfig, child = false) {
         if (!data.children || !data.children.length) {
             return this.getMenu(data);
@@ -135,7 +147,7 @@ export class SideMenu extends Vue<SideMenuProp & Base> {
                 <template slot="title">
                     <Tooltip disabled={!this.isCollapsed} class={this.getStyleName("tooltip")} content={data.text} placement="right" transfer>
                         <div class={this.getStyleName('sub-menu-title')}>
-                            <Icon type={data.icon} />
+                            <Icon type={data.icon || this.defaultIcon} />
                             <span class={this.getStyleName("text")}>{data.text}</span>
                         </div>
                     </Tooltip >
@@ -159,7 +171,7 @@ export class SideMenu extends Vue<SideMenuProp & Base> {
             console.log(data);
         return (
             <MenuItem key={data.to} class={this.getStyleName("item")} name={name} to={data.to}>
-                <Icon type={data.icon} />
+                <Icon type={data.icon || this.defaultIcon} />
                 <span class={this.getStyleName("text")}>{data.text}</span>
             </MenuItem>
         );
