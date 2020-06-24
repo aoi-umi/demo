@@ -1,18 +1,20 @@
 module.exports = {
     // "extends": "eslint:recommended",
-    parser: 'typescript-eslint-parser',
+    parser: "typescript-eslint-parser",
     plugins: [
-        'typescript'
+        "typescript",
+        // 'plugin:prettier/recommended'
     ],
     parserOptions: {
-        "ecmaVersion": 7,
-        sourceType: 'module'
+        ecmaVersion: 7,
+        sourceType: "module",
     },
-    "rules": {
+    rules: {
         // "consistent-return": 2,
-        "indent": [1, 4],
+        indent: [1, 4],
         // "no-else-return": 1,
-        "semi": [1, "always"],
-        "space-unary-ops": 2
-    }
+        semi: [1, "always"],
+        "space-unary-ops": 2,
+        "react/no-array-index-key": 0,
+    },
 };

@@ -185,7 +185,7 @@ class MyEditor extends Vue<MyEditorProp & MyInputBase> {
                     <span>类型 </span>
                     <RadioGroup v-model={this.currType}>
                         {this.contentTypeList.map(ele => {
-                            return <Radio label={ele.value}>{ele.key}</Radio>
+                            return <Radio label={ele.value}>{ele.key}</Radio>;
                         })}
                     </RadioGroup>
                 </div>

@@ -161,7 +161,7 @@ export default class App extends Base {
             obj.to = routeCfg.path;
             obj.text = routeCfg.text;
             if (routeCfg.meta.authority)
-                obj.show = () => this.storeUser.user.hasAuth(routeCfg.meta.authority)
+                obj.show = () => this.storeUser.user.hasAuth(routeCfg.meta.authority);
         }
         obj = { ...obj, ...rest };
         if (children && children.length) {
