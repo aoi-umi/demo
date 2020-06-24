@@ -93,6 +93,7 @@ class ContentOperate extends Vue<ContentOperateProp & Base> {
         }, {
             icon: 'md-heart',
             type: myEnum.contentOperateType.收藏,
+            class: 'pointer',
             text: ele.favourite,
             color: ele.favouriteValue ? 'red' : '',
             onClick: () => {
@@ -101,6 +102,7 @@ class ContentOperate extends Vue<ContentOperateProp & Base> {
         }, {
             icon: 'md-thumbs-up',
             type: myEnum.contentOperateType.赞,
+            class: 'pointer',
             text: ele.like,
             color: ele.voteValue == myEnum.voteValue.喜欢 ? 'red' : '',
             onClick: () => {
@@ -190,7 +192,7 @@ class ContentOperate extends Vue<ContentOperateProp & Base> {
         color?: string;
     }) {
         return (
-            <div class={[!this.mgt && "center", this.getStyleName('item'), iconEle.class || '']}
+            <div class={[this.getStyleName('item'), ...(!this.mgt ? [iconEle.class, "center"] : [])]}
                 on-click={this.mgt ? () => { } : (iconEle.onClick || (() => {
                     this.toDetail && this.toDetail();
                     this.$emit('operate-click', iconEle.type);
