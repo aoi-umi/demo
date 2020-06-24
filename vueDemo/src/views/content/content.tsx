@@ -33,10 +33,13 @@ class ContentOperateProp {
     stretch?: boolean;
 
     @Prop()
+    mgt?: boolean;
+
+    @Prop()
     toDetail?: () => void;
 
     @Prop()
-    getShareUrl: () => void;
+    getShareUrl?: () => void;
 }
 @Component({
     extends: Base,
@@ -71,15 +74,15 @@ class ContentOperate extends Vue<ContentOperateProp & Base> {
 
     render() {
         return (
-            <div class={[this.getStyleName('main'), this.stretch ? this.getStyleName('stretch') : '']}>
-                {this.renderBtns()}
+            <div class={[this.getStyleName('main'), this.stretch && this.getStyleName('stretch'), this.mgt && "not-important"]}>
+                {!this.mgt ? this.renderBtns() : this.renderMgtBtns()}
             </div>
         );
     }
 
-    renderBtns() {
+    getOperationCfg() {
         let ele = this.data;
-        let minOperation = [{
+        return [{
             icon: 'md-eye',
             type: myEnum.contentOperateType.查看,
             text: ele.readTimes,
@@ -103,9 +106,7 @@ class ContentOperate extends Vue<ContentOperateProp & Base> {
             onClick: () => {
                 this.handleVote(ele, ele.voteValue == myEnum.voteValue.喜欢 ? myEnum.voteValue.无 : myEnum.voteValue.喜欢);
             }
-        },];
-
-        let otherOperation = [{
+        }, {
             icon: 'md-thumbs-down',
             type: myEnum.contentOperateType.踩,
             class: 'pointer',
@@ -124,6 +125,22 @@ class ContentOperate extends Vue<ContentOperateProp & Base> {
                 this.$Message.info('已复制到粘贴板');
             }
         }];
+    }
+
+    renderBtns() {
+        let list = this.getOperationCfg();
+        let minOperation = list.filter(cfg => [
+            myEnum.contentOperateType.查看,
+            myEnum.contentOperateType.评论,
+            myEnum.contentOperateType.收藏,
+            myEnum.contentOperateType.赞,
+        ].includes(cfg.type));
+
+        let otherOperation = list.filter(cfg => [
+            myEnum.contentOperateType.踩,
+            myEnum.contentOperateType.分享,
+        ].includes(cfg.type));
+
         if (this.isSmall) {
             return [
                 ...minOperation.map(iconEle => {
@@ -145,10 +162,23 @@ class ContentOperate extends Vue<ContentOperateProp & Base> {
                 </div>
             ];
         } else {
-            return [...minOperation, ...otherOperation].map(iconEle => {
+            return list.map(iconEle => {
                 return this.renderBtn(iconEle);
             });
         }
+    }
+
+    renderMgtBtns() {
+        let list = this.getOperationCfg().filter(cfg => [
+            myEnum.contentOperateType.查看,
+            myEnum.contentOperateType.评论,
+            myEnum.contentOperateType.收藏,
+            myEnum.contentOperateType.赞,
+            myEnum.contentOperateType.踩,
+        ].includes(cfg.type));
+        return list.map(iconEle => {
+            return this.renderBtn(iconEle);
+        });
     }
 
     renderBtn(iconEle: {
@@ -160,14 +190,14 @@ class ContentOperate extends Vue<ContentOperateProp & Base> {
         color?: string;
     }) {
         return (
-            <div class={["center", this.getStyleName('item'), iconEle.class || '']}
-                on-click={iconEle.onClick || (() => {
+            <div class={[!this.mgt && "center", this.getStyleName('item'), iconEle.class || '']}
+                on-click={this.mgt ? () => { } : (iconEle.onClick || (() => {
                     this.toDetail && this.toDetail();
                     this.$emit('operate-click', iconEle.type);
-                })} >
+                }))} >
                 <Icon
                     type={iconEle.icon}
-                    size={24}
+                    size={!this.mgt ? 24 : 20}
                     color={iconEle.color} />
                 <b style={{ marginLeft: '4px' }}>{iconEle.text}</b>
             </div>
@@ -260,16 +290,19 @@ class ContentListItem extends Vue<ContentListItemProp & Base> {
                                 {!min && <p class={this.getStyleName('profile')}>{ele.profile || this.cfg.profile}</p>}
                             </Col>
                             {this.mgt && <p class="not-important">创建于 <Time time={new Date(ele.createdAt)} /></p>}
+                            {this.mgt && <ContentOperateView data={ele} contentType={this.contentType} voteType={this.cfg.voteType} mgt />}
                         </Row>
                         <Divider size="small" />
                     </div>
-                    {this.$slots.default || (!this.mgt ?
-                        <ContentOperateView data={ele} contentType={this.contentType} voteType={this.cfg.voteType} stretch toDetail={() => {
-                            this.toDetail(ele);
-                        }} getShareUrl={() => {
-                            return this.getDetailUrl(ele);
-                        }} /> :
-                        <div />)}
+                    <div style="display:flex;">
+                        {this.$slots.default || (!this.mgt ?
+                            <ContentOperateView data={ele} contentType={this.contentType} voteType={this.cfg.voteType} stretch toDetail={() => {
+                                this.toDetail(ele);
+                            }} getShareUrl={() => {
+                                return this.getDetailUrl(ele);
+                            }} /> :
+                            <div />)}
+                    </div>
                 </Card>
             </div>
         );

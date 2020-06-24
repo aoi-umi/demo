@@ -12,6 +12,7 @@ import { ListBase, IListBase, ListBaseProp } from '../comps/list-base';
 import { DetailDataType } from './article-mgt-detail';
 import { ArticleListItemView } from './article';
 import { ContentMgtBase, ContentDataType, IContentMgtBase } from './content-mgt-base';
+import './article.less';
 
 @Component
 export class ArticleMgtBase extends ContentMgtBase implements IContentMgtBase {
@@ -47,6 +48,7 @@ class ArticleMgtProp extends ListBaseProp {
     mixins: [getCompOpts(ArticleMgtProp)]
 })
 export default class ArticleMgt extends Vue<ArticleMgtProp & ArticleMgtBase> implements IListBase {
+    stylePrefix = 'article-mgt-';
     $refs: { list: IMyList<any> };
 
     protected created() {
@@ -146,7 +148,7 @@ export default class ArticleMgt extends Vue<ArticleMgtProp & ArticleMgtBase> imp
                                         ele._checked = val;
                                         this.$refs.list.selectedRows = rs.data.filter(ele => ele._checked);
                                     }}>
-                                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                    <div class={this.getStyleName('item-op-box')}>
                                         {
                                             this.getOperate(ele).map(ele => {
                                                 return (

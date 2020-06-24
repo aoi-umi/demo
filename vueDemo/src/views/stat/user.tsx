@@ -75,6 +75,8 @@ export default class StatUser extends Base {
                 },
                 series: pvSeries
             });
+        }, {
+            noSuccessHandler: true
         });
     }
 
