@@ -9,6 +9,7 @@ const analyzerEnum = {
     花瓣: 'huaban',
     nyahentai: 'nyahentai'
 };
+exports.analyzerEnum = analyzerEnum;
 function mkdir(dir) {
     if (!fs.existsSync(dir)) {
         console.log('创建文件夹', dir);
@@ -17,6 +18,7 @@ function mkdir(dir) {
 }
 class Download {
     static async load(url) {
+        console.log(`url: ${url}`);
         console.log('load url start');
         let rs = await axios.get(url);
         let html = rs.data;
