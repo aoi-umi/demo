@@ -1,14 +1,14 @@
-import { Model, InstanceType } from "mongoose-ts-ua";
-import { Types } from "mongoose";
+import { Model, InstanceType } from 'mongoose-ts-ua';
+import { Types } from 'mongoose';
 
-import { myEnum } from "@/config";
-import * as config from "@/config";
-import { error } from "@/_system/common";
+import { myEnum } from '@/config';
+import * as config from '@/config';
+import { error } from '@/_system/common';
 
-import { ArticleMapper, ArticleModel } from "../article";
-import { VideoModel } from "../video";
-import { CommentModel } from "../comment";
-import { IVoteOwner, VoteModel } from "./vote";
+import { ArticleMapper, ArticleModel } from '../article';
+import { VideoModel } from '../video';
+import { CommentModel } from '../comment';
+import { IVoteOwner, VoteModel } from './vote';
 
 export class VoteMapper {
     static async create(opt: {

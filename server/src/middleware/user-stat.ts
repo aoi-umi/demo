@@ -1,12 +1,12 @@
-import * as Koa from "koa";
+import * as Koa from 'koa';
 import * as moment from 'dayjs';
-import { RouterContext } from "@koa/router";
+import { RouterContext } from '@koa/router';
 
 import * as common from '@/_system/common';
-import { logger } from "@/helpers";
+import { logger } from '@/helpers';
 
-import { StatUserMapper } from "@/models/mongo/statistics";
-import { myEnum } from "@/config";
+import { StatUserMapper } from '@/models/mongo/statistics';
+import { myEnum } from '@/config';
 
 export class UserStatMid {
     static async stat(ctx: Koa.Context & RouterContext, next) {

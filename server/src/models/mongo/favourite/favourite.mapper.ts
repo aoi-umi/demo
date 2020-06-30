@@ -1,18 +1,18 @@
-import { Model, InstanceType } from "mongoose-ts-ua";
-import { Types } from "mongoose";
+import { Model, InstanceType } from 'mongoose-ts-ua';
+import { Types } from 'mongoose';
 
-import { myEnum } from "@/config";
-import * as config from "@/config";
-import { error } from "@/_system/common";
+import { myEnum } from '@/config';
+import * as config from '@/config';
+import { error } from '@/_system/common';
 import * as ValidSchema from '@/valid-schema/class-valid';
 
-import { ArticleModel } from "../article";
-import { VideoModel } from "../video";
-import { ContentBaseInstanceType, ContentResetOption, ContentMapper } from "../content";
-import { FavouriteModel } from "./favourite";
-import { BaseMapper } from "../_base";
-import { UserMapper } from "../user";
-import { VoteMapper } from "../vote";
+import { ArticleModel } from '../article';
+import { VideoModel } from '../video';
+import { ContentBaseInstanceType, ContentResetOption, ContentMapper } from '../content';
+import { FavouriteModel } from './favourite';
+import { BaseMapper } from '../_base';
+import { UserMapper } from '../user';
+import { VoteMapper } from '../vote';
 
 export class FavouriteMapper {
     static async create(opt: {
@@ -131,8 +131,8 @@ export class FavouriteMapper {
             },
             {
                 $addFields: {
-                    "article.contentType": myEnum.contentType.文章,
-                    "video.contentType": myEnum.contentType.视频,
+                    'article.contentType': myEnum.contentType.文章,
+                    'video.contentType': myEnum.contentType.视频,
                 }
             },
             {

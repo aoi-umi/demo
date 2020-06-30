@@ -1,4 +1,4 @@
-import { ClassType } from "class-transformer/ClassTransformer";
+import { ClassType } from 'class-transformer/ClassTransformer';
 import { Types } from 'mongoose';
 
 export function arrayTransform(value: any, cls: ClassType<any>) {

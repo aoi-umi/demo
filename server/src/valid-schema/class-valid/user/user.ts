@@ -1,8 +1,8 @@
-import { IsArray, IsDefined, ArrayMinSize, MinLength, IsIn } from "class-validator";
-import { Type, Transform } from "class-transformer";
-import { ListBase, DelBase, DetailQueryBase } from "../base";
-import { objectIdTransform } from "../util";
-import { myEnum } from "@/config";
+import { IsArray, IsDefined, ArrayMinSize, MinLength, IsIn } from 'class-validator';
+import { Type, Transform } from 'class-transformer';
+import { ListBase, DelBase, DetailQueryBase } from '../base';
+import { objectIdTransform } from '../util';
+import { myEnum } from '@/config';
 
 export class UserAccountExists {
     @IsDefined()

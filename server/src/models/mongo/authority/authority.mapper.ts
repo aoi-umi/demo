@@ -4,7 +4,7 @@ import * as ValidSchema from '@/valid-schema/class-valid';
 import { escapeRegExp } from '@/_system/common';
 
 import { BaseMapper } from '../_base';
-import { AuthorityModel } from ".";
+import { AuthorityModel } from '.';
 
 export class AuthorityMapper {
     static async codeExists(code: string, _id?: any) {

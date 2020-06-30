@@ -55,7 +55,7 @@ export let signUp: MyRequestHandler = async (opt) => {
                 });
                 user.avatar = uploadRs.fileId;
             } catch (e) {
-                logger.error([`获取头像`, userByRs.avatarUrl, `失败`, `${e.message}`].join('\r\n'));
+                logger.error(['获取头像', userByRs.avatarUrl, '失败', `${e.message}`].join('\r\n'));
             }
         }
     }

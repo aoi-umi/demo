@@ -1,10 +1,10 @@
-import { Transform, Type } from "class-transformer";
-import { IsDefined, MinLength, MaxLength, IsIn } from "class-validator";
+import { Transform, Type } from 'class-transformer';
+import { IsDefined, MinLength, MaxLength, IsIn } from 'class-validator';
 import { Types } from 'mongoose';
 
-import { myEnum } from "@/config";
-import { ListBase, DelBase } from "../base";
-import { objectIdTransform } from "../util";
+import { myEnum } from '@/config';
+import { ListBase, DelBase } from '../base';
+import { objectIdTransform } from '../util';
 
 export class CommentSubmit {
     @IsDefined()

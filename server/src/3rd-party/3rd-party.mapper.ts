@@ -1,20 +1,20 @@
-import * as wxpay from "3rd-party-pay/dest/lib/wxpay";
+import * as wxpay from '3rd-party-pay/dest/lib/wxpay';
 
-import { myEnum } from "@/config";
-import { logger } from "@/helpers";
-import * as common from "@/_system/common";
-import { transaction } from "@/_system/dbMongo";
-import { PayRefund } from "@/valid-schema/class-valid";
-import { mySocket } from "@/main";
+import { myEnum } from '@/config';
+import { logger } from '@/helpers';
+import * as common from '@/_system/common';
+import { transaction } from '@/_system/dbMongo';
+import { PayRefund } from '@/valid-schema/class-valid';
+import { mySocket } from '@/main';
 
-import { NotifyMapper, NotifyInstanceType, NotifyModel } from "@/models/mongo/notify";
-import { AssetLogModel, PayInstanceType, AssetLogInstanceType, PayModel, PayMapper } from "@/models/mongo/asset";
-import { RefundModel } from "@/models/mongo/asset/refund";
-import { UserMapper } from "@/models/mongo/user";
+import { NotifyMapper, NotifyInstanceType, NotifyModel } from '@/models/mongo/notify';
+import { AssetLogModel, PayInstanceType, AssetLogInstanceType, PayModel, PayMapper } from '@/models/mongo/asset';
+import { RefundModel } from '@/models/mongo/asset/refund';
+import { UserMapper } from '@/models/mongo/user';
 
-import { alipayInst } from "./alipay";
-import { wxpayInst } from "./wxpay";
-import { wxInst } from "./wx";
+import { alipayInst } from './alipay';
+import { wxpayInst } from './wxpay';
+import { wxInst } from './wx';
 
 export type NotifyType = {
     notifyId: any,
@@ -143,7 +143,7 @@ export class ThirdPartyAuthMapper {
         opt = {
             ...opt,
         };
-        let rs: { val: string, avatarUrl?: string; saveKey?: string; raw?: any }
+        let rs: { val: string, avatarUrl?: string; saveKey?: string; raw?: any };
         if (data.by) {
             if (data.by === myEnum.userBy.微信授权) {
                 let userRs = await wxInst.getUserInfo({ code: data.val }, { noReq: true });

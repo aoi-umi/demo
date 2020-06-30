@@ -1,9 +1,9 @@
-import { Transform, Type } from "class-transformer";
-import { IsDefined, MinLength, MaxLength, IsIn, IsBoolean } from "class-validator";
+import { Transform, Type } from 'class-transformer';
+import { IsDefined, MinLength, MaxLength, IsIn, IsBoolean } from 'class-validator';
 import { Types } from 'mongoose';
-import { myEnum } from "@/config";
-import { objectIdTransform } from "../util";
-import { ListBase } from "../base";
+import { myEnum } from '@/config';
+import { objectIdTransform } from '../util';
+import { ListBase } from '../base';
 
 export class FavouriteSubmit {
     @IsDefined()

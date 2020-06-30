@@ -1,6 +1,6 @@
-import { LoginUser } from "../../login-user";
-import { ContentLog, ContentLogModel } from "./content-log";
-import { ContentBaseInstanceType } from "./content-base";
+import { LoginUser } from '../../login-user';
+import { ContentLog, ContentLogModel } from './content-log';
+import { ContentBaseInstanceType } from './content-base';
 
 export class ContentLogMapper {
     static create(content: ContentBaseInstanceType, user: LoginUser, opt: {

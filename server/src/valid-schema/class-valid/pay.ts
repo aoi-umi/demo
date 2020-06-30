@@ -1,10 +1,10 @@
-import { IsDefined, IsIn, IsNumber, IsDecimal, IsDate, Min, IsPositive } from "class-validator";
-import { Type, Transform } from "class-transformer";
+import { IsDefined, IsIn, IsNumber, IsDecimal, IsDate, Min, IsPositive } from 'class-validator';
+import { Type, Transform } from 'class-transformer';
 import { Types } from 'mongoose';
 
-import { myEnum } from "@/config";
-import { ListBase, DetailQueryBase } from "./base";
-import { objectIdTransform } from "./util";
+import { myEnum } from '@/config';
+import { ListBase, DetailQueryBase } from './base';
+import { objectIdTransform } from './util';
 
 export class PayCreate {
     // @IsDecimal({

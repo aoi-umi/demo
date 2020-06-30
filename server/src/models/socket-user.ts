@@ -1,6 +1,6 @@
-import { UserAuthMid } from "@/middleware";
-import { myEnum } from "@/config";
-import * as config from "@/config";
+import { UserAuthMid } from '@/middleware';
+import { myEnum } from '@/config';
+import * as config from '@/config';
 
 export class SocketUser {
     user: {

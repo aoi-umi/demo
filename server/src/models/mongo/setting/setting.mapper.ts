@@ -1,4 +1,4 @@
-import { SettingModel } from "./setting";
+import { SettingModel } from './setting';
 
 export class SettingMapper {
     static async detailQuery() {

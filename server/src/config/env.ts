@@ -24,7 +24,7 @@ export default {
         uri: processEnv.RedisUri || 'redis://localhost',
     },
     mongoose: {
-        uri: processEnv.MongoUri || "mongodb://localhost",
+        uri: processEnv.MongoUri || 'mongodb://localhost',
         options: {
             useNewUrlParser: true,
             // autoReconnect: true,

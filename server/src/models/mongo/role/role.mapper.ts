@@ -7,7 +7,7 @@ import * as ValidSchema from '@/valid-schema/class-valid';
 import { AuthorityModel } from '../authority';
 import { UserMapper } from '../user';
 import { BaseMapper } from '../_base';
-import { RoleModel } from ".";
+import { RoleModel } from '.';
 
 export class RoleMapper {
     static async codeExists(code: string, _id?: any) {

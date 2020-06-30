@@ -1,10 +1,10 @@
-import { Model, InstanceType } from "mongoose-ts-ua";
-import { Types } from "mongoose";
+import { Model, InstanceType } from 'mongoose-ts-ua';
+import { Types } from 'mongoose';
 
 import * as ValidSchema from '@/valid-schema/class-valid';
 
-import { UserMapper, UserResetOption } from "../user";
-import { ChatModel } from "./chat";
+import { UserMapper, UserResetOption } from '../user';
+import { ChatModel } from './chat';
 
 export class ChatMapper {
     static async query(data: ValidSchema.ChatQuery, opt: { userId: any } & UserResetOption) {

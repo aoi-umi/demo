@@ -1,7 +1,7 @@
-import { Type, Transform } from "class-transformer";
+import { Type, Transform } from 'class-transformer';
 import { Types } from 'mongoose';
 
-import { objectIdTransform } from "@/valid-schema/class-valid/util";
+import { objectIdTransform } from '@/valid-schema/class-valid/util';
 
 export class LoginUser {
     isLogin: boolean;

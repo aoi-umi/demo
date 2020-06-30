@@ -1,14 +1,14 @@
-import { RequestHandler, Request, Response } from "express";
-import { GridFSInstance } from "mongoose-ts-ua";
+import { RequestHandler, Request, Response } from 'express';
+import { GridFSInstance } from 'mongoose-ts-ua';
 import * as multer from '@koa/multer';
 
-import * as common from "@/_system/common";
-import { paramsValid } from "@/helpers";
-import { myEnum } from "@/config";
+import * as common from '@/_system/common';
+import { paramsValid } from '@/helpers';
+import { myEnum } from '@/config';
 import * as ValidSchema from '@/valid-schema/class-valid';
-import { FileMapper, FileModel } from "@/models/mongo/file";
-import { logger } from "@/helpers";
-import { MyRequestHandler } from "@/middleware";
+import { FileMapper, FileModel } from '@/models/mongo/file';
+import { logger } from '@/helpers';
+import { MyRequestHandler } from '@/middleware';
 
 const uplaod: MyRequestHandler = async (opt) => {
     let option = <{ fileType: string, file: multer.File }>opt.reqOption;
@@ -48,7 +48,7 @@ const download: MyRequestHandler = async (opt, ctx) => {
         returnStream: true,
     };
     if (range) {
-        let pos = range.replace(/bytes=/, "").split("-");
+        let pos = range.replace(/bytes=/, '').split('-');
 
         let total = rawFile.length;
         let start = parseInt(pos[0], 10);

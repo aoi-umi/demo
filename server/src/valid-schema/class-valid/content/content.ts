@@ -1,9 +1,9 @@
-import { IsArray, IsDefined, ArrayMinSize, MinLength, IsIn } from "class-validator";
+import { IsArray, IsDefined, ArrayMinSize, MinLength, IsIn } from 'class-validator';
 import { Types } from 'mongoose';
-import { Type, Transform } from "class-transformer";
+import { Type, Transform } from 'class-transformer';
 
-import { ListBase, DelBase, DetailQueryBase } from "../base";
-import { arrayTransform, objectIdTransform } from "../util";
+import { ListBase, DelBase, DetailQueryBase } from '../base';
+import { arrayTransform, objectIdTransform } from '../util';
 
 export class ContentQuery extends ListBase {
     @Transform(objectIdTransform)

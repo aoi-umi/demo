@@ -1,6 +1,6 @@
-import { MyRequestHandler } from "@/middleware";
-import { StatUserMapper } from "@/models/mongo/statistics";
-import { myEnum } from "@/config";
+import { MyRequestHandler } from '@/middleware';
+import { StatUserMapper } from '@/models/mongo/statistics';
+import { myEnum } from '@/config';
 
 export let pvSave: MyRequestHandler = async (opt) => {
     let data = opt.reqData;

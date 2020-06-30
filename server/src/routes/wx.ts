@@ -1,8 +1,8 @@
-import { MyRequestHandler } from "@/middleware";
-import { wxInst } from "@/3rd-party";
-import { paramsValid } from "@/helpers";
+import { MyRequestHandler } from '@/middleware';
+import { wxInst } from '@/3rd-party';
+import { paramsValid } from '@/helpers';
 import * as ValidSchema from '@/valid-schema/class-valid';
-import { mySocket } from "@/main";
+import { mySocket } from '@/main';
 
 export const getCode: MyRequestHandler = async (opt) => {
     let data = opt.reqData;

@@ -1,6 +1,6 @@
-import { dev, env } from "@/config";
-import * as common from "@/_system/common";
-import { cache } from "@/main";
+import { dev, env } from '@/config';
+import * as common from '@/_system/common';
+import { cache } from '@/main';
 
 type WxErrorType = {
     errcode: string;
@@ -38,7 +38,7 @@ export class Wx extends WxBase {
             + [
                 `redirect_uri=${uri}`,
                 `appid=${this.appId}`,
-                `response_type=code&scope=snsapi_userinfo&state=1&connect_redirect=1#wechat_redirect`
+                'response_type=code&scope=snsapi_userinfo&state=1&connect_redirect=1#wechat_redirect'
             ].join('&');
         return url;
     }
@@ -49,7 +49,7 @@ export class Wx extends WxBase {
                 `appid=${this.appId}`,
                 `secret=${this.appSecret}`,
                 `code=${data.code}`,
-                `grant_type=authorization_code`
+                'grant_type=authorization_code'
             ].join('&');
         let rs = await common.requestService({ url, method: 'get' });
         let tokenRs = rs.data as WxErrorType;

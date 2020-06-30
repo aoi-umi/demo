@@ -1,12 +1,12 @@
-import { Context } from "koa";
-import { plainToClass } from "class-transformer";
+import { Context } from 'koa';
+import { plainToClass } from 'class-transformer';
 
 import * as config from '@/config';
-import { AuthType } from "@/_system/auth";
+import { AuthType } from '@/_system/auth';
 import { auth, cache } from '@/main';
 import { logger } from '@/helpers';
-import { UserMapper } from "@/models/mongo/user";
-import { LoginUser } from "@/models/login-user";
+import { UserMapper } from '@/models/mongo/user';
+import { LoginUser } from '@/models/login-user';
 
 export class UserAuthMid {
     static async  getUser(token, opt?: {

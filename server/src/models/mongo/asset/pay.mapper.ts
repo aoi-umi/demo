@@ -11,10 +11,10 @@ import { ThirdPartyPayMapper } from '@/3rd-party';
 import { SendQueue } from '@/task';
 
 import { LoginUser } from '../../login-user';
-import { BaseMapper } from "../_base";
+import { BaseMapper } from '../_base';
 import { UserMapper } from '../user';
 import { AssetLogMapper } from './asset-log.mapper';
-import { PayModel, PayInstanceType } from "./pay";
+import { PayModel, PayInstanceType } from './pay';
 import { AssetLogModel } from './asset-log';
 import { RefundModel } from './refund';
 import { GoodsSkuModel } from '../goods';

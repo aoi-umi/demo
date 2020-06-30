@@ -1,7 +1,7 @@
-import { IsArray, IsDefined, ArrayMinSize, MinLength } from "class-validator";
-import { Type } from "class-transformer";
+import { IsArray, IsDefined, ArrayMinSize, MinLength } from 'class-validator';
+import { Type } from 'class-transformer';
 
-import { ListBase, DelBase } from "../base";
+import { ListBase, DelBase } from '../base';
 
 export class RoleQuery extends ListBase {
     _id?: string;

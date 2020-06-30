@@ -1,10 +1,10 @@
-import { myEnum } from "@/config";
+import { myEnum } from '@/config';
 import * as ValidSchema from '@/valid-schema/class-valid';
-import { escapeRegExp } from "@/_system/common";
+import { escapeRegExp } from '@/_system/common';
 
-import { BaseMapper } from "../_base";
-import { AssetLogModel } from "../asset";
-import { NotifyModel } from "./notify";
+import { BaseMapper } from '../_base';
+import { AssetLogModel } from '../asset';
+import { NotifyModel } from './notify';
 
 export class NotifyMapper {
     static async create(data: {
@@ -34,14 +34,14 @@ export class NotifyMapper {
             orderNo: '',
         };
         switch (data.type) {
-            case myEnum.notifyType.微信:
-                obj.outOrderNo = data.value.out_trade_no;
-                obj.orderNo = data.value.transaction_id;
-                break;
-            case myEnum.notifyType.支付宝:
-                obj.outOrderNo = data.value.out_trade_no;
-                obj.orderNo = data.value.trade_no;
-                break;
+        case myEnum.notifyType.微信:
+            obj.outOrderNo = data.value.out_trade_no;
+            obj.orderNo = data.value.transaction_id;
+            break;
+        case myEnum.notifyType.支付宝:
+            obj.outOrderNo = data.value.out_trade_no;
+            obj.orderNo = data.value.trade_no;
+            break;
         }
         return obj;
     }

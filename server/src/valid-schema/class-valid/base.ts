@@ -1,5 +1,5 @@
 import { Type, Transform } from 'class-transformer';
-import { IsIn, IsArray, IsDefined, ArrayMinSize, IsInt } from "class-validator";
+import { IsIn, IsArray, IsDefined, ArrayMinSize, IsInt } from 'class-validator';
 import { Types } from 'mongoose';
 import { arrayTransform, objectIdTransform } from './util';
 

@@ -2,7 +2,7 @@ import { escapeRegExp } from '@/_system/common';
 import * as ValidSchema from '@/valid-schema/class-valid';
 
 import { BaseMapper } from '../_base';
-import { AssetLogModel } from "./asset-log";
+import { AssetLogModel } from './asset-log';
 
 export class AssetLogMapper {
     static lookupPipeline(opt?: {

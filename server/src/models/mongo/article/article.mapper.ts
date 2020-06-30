@@ -12,7 +12,7 @@ import {
     ContentLogModel,
     ContentQueryOption, ContentResetOption, ContentMapper, ContentUpdateStatusOutOption
 } from '../content';
-import { ArticleModel, ArticleDocType } from "./article";
+import { ArticleModel, ArticleDocType } from './article';
 import { BaseMapper } from '../_base';
 
 

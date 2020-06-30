@@ -42,7 +42,7 @@ export let myRequestHandler = async function (fn: (opt?: MyRequestHandlerOpt) =>
         if (opt.sendAsFile) {
             let filename = result.filename || '未命名';
             let userAgent = (ctx.headers['user-agent'] || '').toLowerCase();
-            ctx.setHeader('Content-Type', "application/octet-stream");
+            ctx.setHeader('Content-Type', 'application/octet-stream');
             let encodeName = encodeURIComponent(filename);
             let disposition = 'attachment; filename=' + encodeName;
             if (userAgent.indexOf('firefox') >= 0) {

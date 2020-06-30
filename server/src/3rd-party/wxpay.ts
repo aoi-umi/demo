@@ -4,7 +4,7 @@ import * as config from '@/config';
 
 let wxConfig = config.env.wx;
 wxpay.WxPayStatic.config({
-    sandbox: false,//wxConfig.sandbox,
+    sandbox: false, //wxConfig.sandbox,
     requestLog: (log) => {
         // console.log('wx', log);
     }

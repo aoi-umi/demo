@@ -1,4 +1,4 @@
-import { ListBase, DetailQueryBase } from "./base";
+import { ListBase, DetailQueryBase } from './base';
 
 export class AssetNotifyQuery extends ListBase {
     orderNo: string;

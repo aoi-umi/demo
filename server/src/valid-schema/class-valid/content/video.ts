@@ -1,14 +1,14 @@
-import { IsArray, IsDefined, ArrayMinSize, MinLength, IsIn } from "class-validator";
+import { IsArray, IsDefined, ArrayMinSize, MinLength, IsIn } from 'class-validator';
 import { Types } from 'mongoose';
-import { Type, Transform } from "class-transformer";
+import { Type, Transform } from 'class-transformer';
 
-import { myEnum } from "@/config";
+import { myEnum } from '@/config';
 
-import { arrayTransform } from "../util";
+import { arrayTransform } from '../util';
 import {
     ContentQuery, ContentDetailQuery,
     ContentSave, ContentDel, ContentMgtAudit
-} from "./content";
+} from './content';
 
 export class VideoQuery extends ContentQuery {
 }

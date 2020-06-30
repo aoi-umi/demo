@@ -10,7 +10,7 @@ import { transaction } from '@/_system/dbMongo';
 import { LoginUser } from '../../login-user';
 import { UserModel, UserMapper } from '../user';
 import { ContentMapper, ContentResetOption, ContentQueryOption, ContentUpdateStatusOutOption, ContentLogModel } from '../content';
-import { VideoInstanceType, VideoModel, VideoDocType } from "./video";
+import { VideoInstanceType, VideoModel, VideoDocType } from './video';
 import { BaseMapper } from '../_base';
 import { FileMapper, FileModel } from '../file';
 

@@ -1,4 +1,4 @@
-import { escapeRegExp } from "@/_system/common";
+import { escapeRegExp } from '@/_system/common';
 
 export class BaseMapper {
     static getListOptions(data) {

@@ -1,5 +1,5 @@
-import { IsArray, IsDefined, ArrayMinSize, MinLength } from "class-validator";
-import { ListBase, DelBase } from "../base";
+import { IsArray, IsDefined, ArrayMinSize, MinLength } from 'class-validator';
+import { ListBase, DelBase } from '../base';
 
 export class AuthorityQuery extends ListBase {
     code: string;

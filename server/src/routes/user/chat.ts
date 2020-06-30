@@ -1,14 +1,14 @@
-import { RequestHandler } from "express";
+import { RequestHandler } from 'express';
 
-import { paramsValid } from "@/helpers";
-import { error } from "@/_system/common";
-import { mySocket } from "@/main";
+import { paramsValid } from '@/helpers';
+import { error } from '@/_system/common';
+import { mySocket } from '@/main';
 import * as ValidSchema from '@/valid-schema/class-valid';
 import { MyRequestHandler } from '@/middleware';
 
-import { ChatModel, ChatMapper } from "@/models/mongo/chat";
-import { BaseMapper } from "@/models/mongo/_base";
-import { UserMapper } from "@/models/mongo/user";
+import { ChatModel, ChatMapper } from '@/models/mongo/chat';
+import { BaseMapper } from '@/models/mongo/_base';
+import { UserMapper } from '@/models/mongo/user';
 
 export let submit: MyRequestHandler = async (opt) => {
     let user = opt.myData.user;
@@ -40,7 +40,7 @@ export let list: MyRequestHandler = async (opt) => {
     let rs = await ChatModel.aggregatePaginate([
         {
             $match: {
-                $or: [{ "destUserId": userId }, { "userId": userId }]
+                $or: [{ 'destUserId': userId }, { 'userId': userId }]
             }
         },
         {

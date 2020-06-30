@@ -1,5 +1,5 @@
-import { IsArray } from "class-validator";
-import { ListBase, DelBase } from "./base";
+import { IsArray } from 'class-validator';
+import { ListBase, DelBase } from './base';
 
 export class BookmarkQuery extends ListBase {
     name: string;

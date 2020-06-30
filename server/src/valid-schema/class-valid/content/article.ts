@@ -1,10 +1,10 @@
-import { IsDefined, MinLength, IsIn } from "class-validator";
+import { IsDefined, MinLength, IsIn } from 'class-validator';
 
-import { myEnum } from "@/config";
+import { myEnum } from '@/config';
 import {
     ContentQuery, ContentDetailQuery,
     ContentSave, ContentDel, ContentMgtAudit
-} from "./content";
+} from './content';
 
 export class ArticleQuery extends ContentQuery {
 }

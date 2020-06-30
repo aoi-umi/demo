@@ -1,9 +1,9 @@
-import { Transform, Type } from "class-transformer";
-import { IsDefined, IsIn, IsArray, ArrayMinSize, ValidateNested, IsInt, Min } from "class-validator";
+import { Transform, Type } from 'class-transformer';
+import { IsDefined, IsIn, IsArray, ArrayMinSize, ValidateNested, IsInt, Min } from 'class-validator';
 import { Types } from 'mongoose';
-import { myEnum } from "@/config";
-import { objectIdTransform } from "./util";
-import { DetailQueryBase, ListBase, DelBase } from "./base";
+import { myEnum } from '@/config';
+import { objectIdTransform } from './util';
+import { DetailQueryBase, ListBase, DelBase } from './base';
 
 class Spu {
     @Transform(objectIdTransform)

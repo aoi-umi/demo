@@ -1,14 +1,14 @@
-import { Types } from "mongoose";
+import { Types } from 'mongoose';
 
-import { myEnum } from "@/config";
+import { myEnum } from '@/config';
 import * as ValidSchema from '@/valid-schema/class-valid';
-import { escapeRegExp } from "@/_system/common";
+import { escapeRegExp } from '@/_system/common';
 
-import { LoginUser } from "../../login-user";
-import { UserMapper } from "../user";
-import { BaseMapper } from "../_base";
-import { FileMapper } from "../file";
-import { FollowModel } from "./follow";
+import { LoginUser } from '../../login-user';
+import { UserMapper } from '../user';
+import { BaseMapper } from '../_base';
+import { FileMapper } from '../file';
+import { FollowModel } from './follow';
 
 export class FollowMapper {
     static async create(opt: {
