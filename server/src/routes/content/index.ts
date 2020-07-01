@@ -54,3 +54,8 @@ import * as favourite from './favourite';
 router.post('/favourite/submit', UserAuthMid.normal([auth.login]), MyRequestHandlerMid.convert(favourite.submit));
 router.get('/favourite/query', UserAuthMid.normal([auth.login]), MyRequestHandlerMid.convert(favourite.query));
 //#endregion
+
+//#region view-history 
+import * as viewHistory from './view-history';
+router.get('/view-history/query', UserAuthMid.normal([auth.login]), MyRequestHandlerMid.convert(viewHistory.query));
+//#endregion

@@ -10,9 +10,6 @@ import { ArticleModel } from '../article';
 import { VideoModel } from '../video';
 import { ContentBaseInstanceType, ContentResetOption, ContentMapper } from '../content';
 import { FavouriteModel } from './favourite';
-import { BaseMapper } from '../_base';
-import { UserMapper } from '../user';
-import { VoteMapper } from '../vote';
 
 export class FavouriteMapper {
     static async create(opt: {
@@ -76,96 +73,15 @@ export class FavouriteMapper {
     }
 
     static async query(data: ValidSchema.FavouriteQuery, opt: ContentResetOption) {
-        //
-        let match2: any = {};
-        let and = [];
-        let anyKeyAnd = BaseMapper.multiKeyLike(data.anyKey, (anykey) => {
-            return {
-                $or: [
-                    { title: anykey },
-                    { content: anykey },
-                    { profile: anykey },
-                    { 'user.nickname': anykey },
-                    { 'user.account': anykey },
-                ]
-            };
-        });
-        if (anyKeyAnd.length) {
-            and.push({
-                $and: anyKeyAnd
-            });
-        }
-        if (and.length)
-            match2.$and = and;
-        let rs = await FavouriteModel.aggregatePaginate<{
-            favouriteValue: boolean
-        }>([
-            {
-                $match: {
-                    userId: opt.user._id,
-                }
-            },
-            {
-                $lookup: {
-                    from: ArticleModel.collection.collectionName,
-                    let: { ownerId: '$ownerId' },
-                    pipeline: [{
-                        $match: {
-                            $expr: { $eq: ['$$ownerId', '$_id'] }
-                        }
-                    }],
-                    as: 'article'
-                }
-            },
-            {
-                $lookup: {
-                    from: VideoModel.collection.collectionName,
-                    let: { ownerId: '$ownerId' },
-                    pipeline: [{
-                        $match: {
-                            $expr: { $eq: ['$$ownerId', '$_id'] }
-                        }
-                    }],
-                    as: 'video'
-                }
-            },
-            {
-                $addFields: {
-                    'article.contentType': myEnum.contentType.文章,
-                    'video.contentType': myEnum.contentType.视频,
-                }
-            },
-            {
-                $project: {
-                    favourAt: 1,
-                    items: {
-                        $concatArrays: ['$article', '$video']
-                    }
-                }
-            },
-            {
-                $unwind: '$items'
-            },
-            {
-                $replaceRoot: {
-                    newRoot: { $mergeObjects: ['$items', { favourAt: '$favourAt' }] }
-                }
-            },
-            ...UserMapper.lookupPipeline(),
-            ...VoteMapper.lookupPipeline({
-                userId: opt.user._id
-            }),
-            {
-                $match: match2
-            },
-        ], {
-            ...BaseMapper.getListOptions(data),
-            orderBy: 'favourAt',
+        let rs = await ContentMapper.mixQuery(data, {
+            resetOpt: opt,
+            ContentContactModel: FavouriteModel,
+            merge: { favourAt: '$root.favourAt' }
         });
         rs.rows = rs.rows.map(ele => {
-            ContentMapper.resetDetail(ele, opt);
-            ele.favouriteValue = true;
-            return ele;
+            let obj = ele as typeof ele & { favouriteValue: boolean };
+            obj.favouriteValue = true;
+            return obj;
         });
         return rs;
     }

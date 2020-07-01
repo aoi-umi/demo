@@ -4,6 +4,7 @@ import { Types } from 'mongoose';
 import { myEnum } from '@/config';
 import { objectIdTransform } from '../util';
 import { ListBase } from '../base';
+import { ContentQuery } from './content';
 
 export class FavouriteSubmit {
     @IsDefined()
@@ -21,6 +22,5 @@ export class FavouriteSubmit {
     favourite: boolean;
 }
 
-export class FavouriteQuery extends ListBase {
-    anyKey: string;
+export class FavouriteQuery extends ContentQuery {
 }

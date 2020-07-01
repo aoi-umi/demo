@@ -17,6 +17,11 @@ import { VoteMapper } from '../vote';
 import { UserMapper, UserModel, UserInstanceType } from '../user';
 import { ContentLogModel } from './content-log';
 import { FavouriteMapper } from '../favourite';
+import { ContentBase, ContentBaseDocType } from '.';
+import { ViewHistoryMapper } from '../view-history/view-history.mapper';
+import { ArticleModel } from '../article';
+import { VideoModel } from '../video';
+import { ContentContactBaseModelType } from './content-contact';
 
 export type ContentResetOption = {
     user?: LoginUser,
@@ -94,9 +99,6 @@ export class ContentMapper {
                 ...FavouriteMapper.lookupPipeline({
                     userId: resetOpt.user._id
                 }),
-                ...FollowMapper.lookupPipeline({
-                    userId: resetOpt.user._id,
-                })
             ];
         }
 
@@ -148,9 +150,7 @@ export class ContentMapper {
         detail.coverUrl = FileMapper.getImgUrl(detail.cover, opt.imgHost);
         if (detail.user) {
             detail.user.avatarUrl = FileMapper.getImgUrl(detail.user.avatar, opt.imgHost);
-            detail.user.followStatus = detail.follow ? detail.follow.status : myEnum.followStatus.未关注;
         }
-        delete detail.follow;
         detail.voteValue = detail.vote ? detail.vote.value : myEnum.voteValue.无;
         detail.favouriteValue = detail.favouriteDetail ? detail.favouriteDetail.favourite : false;
         delete detail.vote;
@@ -271,5 +271,105 @@ export class ContentMapper {
             });
         }
         return detail;
+    }
+
+    static async mixQuery(data: ValidSchema.ContentQuery, opt: {
+        resetOpt: ContentResetOption,
+        ContentContactModel: ContentContactBaseModelType,
+        merge?: object
+    }) {
+        let { ContentContactModel, resetOpt } = opt;
+        let match2: any = {};
+        let and = [];
+        let anyKeyAnd = BaseMapper.multiKeyLike(data.anyKey, (anykey) => {
+            return {
+                $or: [
+                    { title: anykey },
+                    { content: anykey },
+                    { profile: anykey },
+                    { 'user.nickname': anykey },
+                    { 'user.account': anykey },
+                ]
+            };
+        });
+        if (anyKeyAnd.length) {
+            and.push({
+                $and: anyKeyAnd
+            });
+        }
+        if (and.length)
+            match2.$and = and;
+        let rs = await ContentContactModel.aggregatePaginate([
+            {
+                $match: {
+                    userId: resetOpt.user._id,
+                }
+            },
+            ...[ArticleModel, VideoModel].map(model => {
+                return {
+                    $lookup: {
+                        from: model.collection.collectionName,
+                        let: { ownerId: '$ownerId' },
+                        pipeline: [{
+                            $match: {
+                                $expr: { $eq: ['$$ownerId', '$_id'] }
+                            }
+                        }],
+                        as: model.collection.collectionName
+                    }
+                };
+            }),
+            {
+                $addFields: {
+                    'article.contentType': myEnum.contentType.文章,
+                    'video.contentType': myEnum.contentType.视频,
+                }
+            },
+            {
+                $project: {
+                    root: '$$ROOT',
+                    items: {
+                        $concatArrays: ['$article', '$video']
+                    }
+                }
+            },
+            {
+                $unwind: '$items'
+            },
+            {
+                $replaceRoot: {
+                    newRoot: { $mergeObjects: ['$items', opt.merge] }
+                }
+            },
+            ...UserMapper.lookupPipeline(),
+            ...VoteMapper.lookupPipeline({
+                userId: resetOpt.user._id
+            }),
+            ...FavouriteMapper.lookupPipeline({
+                userId: resetOpt.user._id
+            }),
+            {
+                $match: match2
+            },
+        ], {
+            ...BaseMapper.getListOptions(data),
+        });
+        rs.rows = rs.rows.map(ele => {
+            ContentMapper.resetDetail(ele, resetOpt);
+            return ele;
+        });
+        return rs;
+    }
+
+    static async contentView(opt: {
+        detail: ContentBase | ContentBaseDocType,
+        type: number,
+        user?: LoginUser, model: ContentBaseModelType
+    }) {
+        let { user, model, detail, type } = opt;
+        model.update({ _id: detail._id }, { readTimes: detail.readTimes + 1 }).exec();
+        if (user?.isLogin) {
+            ViewHistoryMapper.save({ ownerId: detail._id, type }, user);
+        }
     }
 }

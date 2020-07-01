@@ -126,6 +126,9 @@ class UserPoptip extends Vue<UserPoptipProp & Base> {
                             <p class="ivu-select-item" on-click={() => {
                                 this.$router.push(routerConfig.userInfo.path);
                             }}>主页</p>
+                            <p class="ivu-select-item" on-click={() => {
+                                this.$router.push(routerConfig.viewHistory.path);
+                            }}>{routerConfig.viewHistory.text}</p>
                             <p class="ivu-select-item" on-click={this.signOut}>退出</p>
                         </div> :
                         <div slot="content" class={this.getStyleName('content')}>

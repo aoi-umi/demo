@@ -135,6 +135,14 @@ const cfg = {
         },
         component: () => import('../views/content/video-mgt-detail')
     },
+    viewHistory: {
+        path: '/my/view-history',
+        text: '浏览记录',
+        meta: {
+            authority: [authority.login],
+        },
+        component: () => import('../views/content/view-history')
+    },
 
     payMgt: {
         path: '/payMgt',

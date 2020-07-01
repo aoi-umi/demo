@@ -226,12 +226,6 @@ export class Comment extends Vue<CommentProp & Base> {
     }
 
     renderResult(rs: ResultType) {
-        if (!rs.success || !rs.data.length) {
-            let msg = !rs.success ? rs.msg : '暂无评论';
-            return (
-                <div class={[...this.getStyleName('msg'), "center"]}>{msg}</div>
-            );
-        }
         return rs.data.map((ele) => {
             return this.renderComment(ele);
         });

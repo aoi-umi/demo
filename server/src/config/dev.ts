@@ -48,5 +48,6 @@ export default {
             ...MQ.createQueueKey('payAutoCancel'),
             delay: 1000 * 60 * 16,
         },
-    }
+    },
+    maxViewHistoryCount: 100
 };

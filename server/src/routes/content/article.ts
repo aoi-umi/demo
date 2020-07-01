@@ -7,6 +7,7 @@ import * as ValidSchema from '@/valid-schema/class-valid';
 import { MyRequestHandler } from '@/middleware';
 
 import { ArticleModel, ArticleMapper } from '@/models/mongo/article';
+import { ContentMapper } from '@/models/mongo/content';
 
 /**
  * @api {get} /article/mgt/query mgt query
@@ -116,6 +117,6 @@ export let detailQuery: MyRequestHandler = async (opt, ctx) => {
         }
     });
     let detail = rs.detail;
-    ArticleModel.update({ _id: detail._id }, { readTimes: detail.readTimes + 1 }).exec();
+    ContentMapper.contentView({ detail, model: ArticleModel, user, type: myEnum.contentType.文章 });
     return rs;
 };

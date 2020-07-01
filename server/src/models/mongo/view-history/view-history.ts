@@ -7,41 +7,27 @@ import {
     prop,
     arrayProp,
     getSchema,
+    setPlugin,
 } from 'mongoose-ts-ua';
 import { Types, SchemaTypes } from 'mongoose';
 
 import { myEnum } from '@/config/enum';
 
-import { Base } from '../_base';
+import { ContentContactBase } from '../content/content-contact';
+import { IPagination, pagination } from '../_plugins/pagination';
 
+type viewHistory = typeof ViewHistory & IPagination<ViewHistory>;
 export type ViewHistoryInstanceType = InstanceType<ViewHistory>;
-export type ViewHistoryModelType = ModelType<ViewHistory, typeof ViewHistory>;
+export type ViewHistoryModelType = ModelType<ViewHistory, viewHistory>;
 export type ViewHistoryDocType = DocType<ViewHistoryInstanceType>;
+
 @setSchema()
-export class ViewHistory extends Base {
-    @prop({
-        required: true,
-        type: SchemaTypes.ObjectId,
-    })
-    userId: Types.ObjectId;
-
-    @prop({
-        required: true,
-        type: SchemaTypes.ObjectId,
-    })
-    ownerId: Types.ObjectId;
-
-    @prop({
-        required: true,
-        enum: myEnum.contentType.getAllValue(),
-    })
-    type: number;
-
+export class ViewHistory extends ContentContactBase {
     @prop()
-    at: Date;
+    viewAt: Date;
 }
 
 let schema = getSchema(ViewHistory);
 schema.index({ ownerId: 1, userId: 1 }, { unique: true });
 
-export const ViewHistoryModel = getModelForClass<ViewHistory, typeof ViewHistory>(ViewHistory);
+export const ViewHistoryModel = getModelForClass<ViewHistory, viewHistory>(ViewHistory);

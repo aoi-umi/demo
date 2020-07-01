@@ -83,12 +83,6 @@ export default class Goods extends Base {
     }
 
     private renderResult(rs: ResultType) {
-        if (!rs.success || !rs.data.length) {
-            let msg = !rs.success ? rs.msg : '暂无数据';
-            return (
-                <Card style={{ marginTop: '5px', textAlign: 'center' }}>{msg}</Card>
-            );
-        }
         return (
             <Row gutter={10}>
                 {rs.data.map((ele) => {

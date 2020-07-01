@@ -2,16 +2,12 @@ import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
 import * as iview from 'iview';
 import moment from 'dayjs';
 
-import * as helpers from '@/helpers';
 import { dev, myEnum } from '@/config';
-import { routerConfig } from '@/router';
-import { testApi, testSocket } from '@/api';
+import { testApi } from '@/api';
 import { convClass, getCompOpts } from '@/components/utils';
-import { Modal, Input, Form, FormItem, Button, Card, TabPane, Tabs, Time } from '@/components/iview';
+import { Modal, Input, Form, FormItem, Button, TabPane, Tabs } from '@/components/iview';
 import { MyUpload, IMyUpload, FileDataType } from '@/components/my-upload';
-import { MyList, IMyList, ResultType } from '@/components/my-list';
 import { MyLoad, IMyLoad } from '@/components/my-load';
-import { Utils } from '@/components/utils';
 import { LoginUser } from '@/model/user';
 
 import { UserAvatarView } from '../comps/user-avatar';
@@ -20,11 +16,13 @@ import { AuthorityTagView } from '../comps/authority-tag';
 import { RoleTagView } from '../comps/role-tag';
 
 import { Base } from '../base';
-import Article, { ArticleListItemView, ArticleView } from '../content/article';
-import Video, { VideoListItemView, VideoView } from '../content/video';
+import Article, { ArticleView } from '../content/article';
+import Video, { VideoView } from '../content/video';
 import { DetailDataType as UserDetailDataType } from './user-mgt';
 import { ChatList, ChatListView } from './user-chat';
 import { ThirdPartyLoginView } from './user-sign';
+import { FavouriteList, FavouriteListView } from './favourite';
+import { FollowList, FollowListView } from './follow';
 
 import './user.less';
 
@@ -221,7 +219,7 @@ export default class UserInfo extends Base {
         });
     }
 
-    private handleSearch(firstLoad?: boolean) {
+    private handleSearch() {
         if (!(this.tab in this.tabLoaded))
             return;
         let loaded = this.tabLoaded[this.tab];
@@ -493,167 +491,3 @@ export class UserUnbind extends Vue<UserUnbindProp & Base> {
 
 
 export const UserUnbindView = convClass<UserUnbindProp>(UserUnbind);
-
-/**
- * 粉丝/关注
- */
-class FollowListProp {
-    @Prop({
-        required: true
-    })
-    userId: string;
-
-    @Prop({
-        required: true
-    })
-    followType: number;
-}
-@Component({
-    extends: Base,
-    mixins: [getCompOpts(FollowListProp)]
-})
-class FollowList extends Vue<FollowListProp & Base> {
-    stylePrefix = 'user-follow-';
-
-    $refs: {
-        list: IMyList<any>,
-    };
-    anyKey = '';
-
-    query() {
-        this.$refs.list.handleQuery({ resetPage: true });
-    }
-
-    private async followQuery() {
-        let opt = {
-            anyKey: this.anyKey,
-            userId: this.userId,
-            type: this.followType,
-        };
-
-        await this.$refs.list.query(opt);
-    }
-
-    private renderFn(rs: ResultType) {
-        if (!rs.success || !rs.data.length) {
-            let msg = !rs.success ? rs.msg : '空空的';
-            return (
-                <Card class="center" style={{ marginTop: '5px' }}>{msg}</Card>
-            );
-        }
-        return rs.data.map(ele => {
-            let user = this.followType == myEnum.followQueryType.粉丝 ? ele.followerUser : ele.followingUser;
-            return (
-                <Card class={[...this.getStyleName('main'), 'pointer']} nativeOn-click={() => {
-                    this.$router.push({
-                        path: routerConfig.userInfo.path,
-                        query: { _id: user._id }
-                    });
-                }}>
-                    <div class={this.getStyleName('content')}>
-                        <UserAvatarView user={user} />
-                        <span class={this.getStyleName('profile')}>{user.profile || dev.defaultProfile}</span>
-                        <div class="flex-stretch" />
-                        <FollowButtonView user={user} />
-                    </div>
-                </Card>
-            );
-        });
-    }
-
-    render() {
-        return (
-            <div>
-                <Input v-model={this.anyKey} search on-on-search={() => {
-                    this.query();
-                }} />
-                <MyList
-                    ref="list"
-                    type="custom"
-                    hideSearchBox
-                    on-query={(t) => {
-                        this.followQuery();
-                    }}
-
-                    queryFn={async (data) => {
-                        let rs = await testApi.followQuery(data);
-                        return rs;
-                    }}
-
-                    customRenderFn={(rs) => {
-                        return this.renderFn(rs);
-                    }}
-                />
-            </div>
-        );
-    }
-}
-
-const FollowListView = convClass<FollowListProp>(FollowList);
-
-/**
- * 收藏
- */
-@Component
-
-class FavouriteList extends Base {
-    $refs: {
-        list: IMyList<any>,
-    };
-    anyKey = '';
-    query() {
-        this.$refs.list.handleQuery({ resetPage: true });
-    }
-
-    private async favouriteQuery() {
-        let opt = {
-            anyKey: this.anyKey,
-        };
-        await this.$refs.list.query(opt);
-    }
-
-    render() {
-        return (
-            <div>
-                <Input v-model={this.anyKey} search on-on-search={() => {
-                    this.query();
-                }} />
-                <MyList
-                    ref="list"
-                    type="custom"
-                    hideSearchBox
-                    on-query={(t) => {
-                        this.favouriteQuery();
-                    }}
-
-                    queryFn={async (data) => {
-                        let rs = await testApi.favouriteQuery(data);
-                        return rs;
-                    }}
-
-                    customRenderFn={(rs) => {
-                        return this.renderFn(rs);
-                    }}
-                />
-            </div>
-        );
-    }
-
-    private renderFn(rs: ResultType) {
-        if (!rs.success || !rs.data.length) {
-            let msg = !rs.success ? rs.msg : '空空的';
-            return (
-                <Card class="center" style={{ marginTop: '5px' }}>{msg}</Card>
-            );
-        }
-        return rs.data.map(ele => {
-            if (ele.contentType === myEnum.contentType.文章)
-                return <ArticleListItemView value={ele} />;
-            if (ele.contentType === myEnum.contentType.视频)
-                return <VideoListItemView value={ele} />;
-            return <Card>错误的类型</Card>;
-        });
-    }
-}
-
-const FavouriteListView = convClass(FavouriteList);

@@ -234,12 +234,6 @@ export class ChatList extends Base {
     }
 
     private renderChat(rs: ResultType) {
-        if (!rs.success || !rs.data.length) {
-            let msg = !rs.success ? rs.msg : '空空的';
-            return (
-                <Card class={[...this.getStyleName('msg'), "center"]}>{msg}</Card>
-            );
-        }
         return rs.data.map(ele => {
             let user = ele.user;
             return (

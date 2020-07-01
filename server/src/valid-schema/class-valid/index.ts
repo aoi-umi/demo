@@ -5,6 +5,7 @@ export * from './content/vote';
 export * from './content/video';
 export * from './content/danmaku';
 export * from './content/favourite';
+export * from './content/view-history';
 
 export * from './user/authority';
 export * from './user/chat';

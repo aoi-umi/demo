@@ -17,5 +17,10 @@ module.exports = {
         'space-before-blocks': [1, 'always'],
         "semi": [1, "always"],
         "quotes": [1, "single"],
+        "keyword-spacing": [1, {
+            "before": true,
+            "after": true,
+            "overrides": {}
+        }],
     }
 };

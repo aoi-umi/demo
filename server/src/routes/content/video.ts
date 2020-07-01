@@ -7,6 +7,7 @@ import * as ValidSchema from '@/valid-schema/class-valid';
 import { MyRequestHandler } from '@/middleware';
 
 import { VideoMapper, VideoModel } from '@/models/mongo/video';
+import { ContentMapper } from '@/models/mongo/content';
 
 export let mgtQuery: MyRequestHandler = async (opt) => {
     let myData = opt.myData;
@@ -112,6 +113,6 @@ export let detailQuery: MyRequestHandler = async (opt) => {
         }
     });
     let detail = rs.detail;
-    VideoModel.update({ _id: detail._id }, { readTimes: detail.readTimes + 1 }).exec();
+    ContentMapper.contentView({ detail, model: VideoModel, user, type: myEnum.contentType.视频 });
     return rs;
 };

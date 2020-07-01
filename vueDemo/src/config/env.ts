@@ -218,6 +218,10 @@ const config = {
                     url: '/favourite/query',
                     method: 'get',
                 },
+                viewHistoryQuery: {
+                    url: '/view-history/query',
+                    method: 'get',
+                },
                 myImgQuery: {
                     url: '/my/img/query',
                     method: 'get',

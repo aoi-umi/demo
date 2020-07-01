@@ -82,6 +82,16 @@ class MyListProp<QueryArgs = any> {
     @Prop()
     customRenderFn?: (result: ResultType) => any;
 
+    @Prop({
+        default: true
+    })
+    defaultCustomFail?: boolean;
+
+    @Prop({
+        default: '空空的'
+    })
+    defaultCustomNoDataMsg?: string;
+
     @Prop()
     data?: any[];
 
@@ -297,6 +307,22 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue<MyListProp<QueryArgs> 
 
     $refs: { page: iView.Page & { currentPage: number } };
 
+    private _customRenderFn(rs: ResultType) {
+        let defaultFail;
+        if (!rs.success || !rs.data.length) {
+            let msg = !rs.success ? rs.msg : this.defaultCustomNoDataMsg;
+            defaultFail = (
+                <Card style={{ marginTop: '5px', textAlign: 'center' }}>{msg}</Card>
+            );
+        }
+        return (
+            <div>
+                {this.defaultCustomFail && defaultFail}
+                {this.customRenderFn(rs)}
+            </div>
+        );
+    }
+
     private renderPage(position: string) {
         if (!this.infiniteScroll && !this.hidePage && this.result.total !== 0 && (['both', position].includes(this.pagePosition))) {
             return (
@@ -385,34 +411,36 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue<MyListProp<QueryArgs> 
                     {this.$slots.default}
                     {this.renderPage('top')}
                     {this.type == 'table' ?
-                        <Table class={this.getStyleName('table')} columns={this.cols.filter(ele => {
-                            let sort = this.model.sort;
-                            ele.sortType = '' as any;
-                            if (sort.orderBy && sort.sortOrder) {
-                                if (ele.key == sort.orderBy) {
-                                    ele.sortType = sort.sortOrder as any;
+                        <Table
+                            class={this.getStyleName('table')} columns={this.cols.filter(ele => {
+                                let sort = this.model.sort;
+                                ele.sortType = '' as any;
+                                if (sort.orderBy && sort.sortOrder) {
+                                    if (ele.key == sort.orderBy) {
+                                        ele.sortType = sort.sortOrder as any;
+                                    }
                                 }
-                            }
-                            return !ele.hide;
-                        })}
-                        data={this.result.data} no-data-text={this.result.msg}
-                        on-on-selection-change={this.setSelectedRows}
-                        on-on-sort-change={(opt: OnSortChangeOptions) => {
-                            let sortMap = {
-                                asc: 1,
-                                desc: -1
-                            };
-                            let orderBy, sortOrder = sortMap[opt.order];
-                            if (sortOrder)
-                                orderBy = opt.key;
-                            this.model.setSort({
-                                orderBy,
-                                sortOrder,
-                            });
-                            this.handleQuery({ resetPage: true });
-                        }}>
+                                return !ele.hide;
+                            })}
+
+                            data={this.result.data} no-data-text={this.result.msg}
+                            on-on-selection-change={this.setSelectedRows}
+                            on-on-sort-change={(opt: OnSortChangeOptions) => {
+                                let sortMap = {
+                                    asc: 1,
+                                    desc: -1
+                                };
+                                let orderBy, sortOrder = sortMap[opt.order];
+                                if (sortOrder)
+                                    orderBy = opt.key;
+                                this.model.setSort({
+                                    orderBy,
+                                    sortOrder,
+                                });
+                                this.handleQuery({ resetPage: true });
+                            }}>
                         </Table> :
-                        this.customRenderFn(this.result)
+                        this._customRenderFn(this.result)
                     }
                     {this.renderPage('bottom')}
                     {!this.infiniteScroll ?

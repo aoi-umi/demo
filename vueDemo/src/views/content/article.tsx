@@ -51,12 +51,6 @@ export default class Article extends ListBase {
 
                     type="custom"
                     customRenderFn={(rs) => {
-                        if (!rs.success || !rs.data.length) {
-                            let msg = !rs.success ? rs.msg : '暂无数据';
-                            return (
-                                <Card style={{ marginTop: '5px', textAlign: 'center' }}>{msg}</Card>
-                            );
-                        }
                         return rs.data.map(ele => {
                             return (
                                 <ArticleListItemView value={ele} />
