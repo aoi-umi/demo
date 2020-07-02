@@ -107,7 +107,7 @@ export default class WxAuth extends Base {
     }
 
     getCodeUrl(data: { type: string, token?: string }) {
-        let uri = encodeURIComponent(`${env.ipHost}/wx/auth?type=${data.type}&getUserInfo=1&token=${data.token || ''}`);
+        let uri = encodeURIComponent(`${location.origin}/wx/auth?type=${data.type}&getUserInfo=1&token=${data.token || ''}`);
         let url = 'https://open.weixin.qq.com/connect/oauth2/authorize?'
             + [
                 `redirect_uri=${uri}`,
@@ -203,7 +203,7 @@ export default class WxAuth extends Base {
                         <div>
                             {
                                 isScan ?
-                                    <div>
+                                    <div class={this.getStyleName('auth')}>
                                         {!this.account ? '无关联账号,请先绑定或注册' :
                                             <div>
                                                 {this.authMsg || <Button loading={this.authSending} on-click={() => {

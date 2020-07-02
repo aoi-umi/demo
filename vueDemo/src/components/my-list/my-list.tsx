@@ -312,7 +312,7 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue<MyListProp<QueryArgs> 
         if (!rs.success || !rs.data.length) {
             let msg = !rs.success ? rs.msg : this.defaultCustomNoDataMsg;
             defaultFail = (
-                <Card style={{ marginTop: '5px', textAlign: 'center' }}>{msg}</Card>
+                <Card class="not-important" style={{ marginTop: '5px', textAlign: 'center' }}>{msg}</Card>
             );
         }
         return (
