@@ -61,14 +61,12 @@ export class Cache {
 
     //expire seconds
     set(key: string, value, expire?) {
-        return common.promise(() => {
-            if (typeof value == 'object')
-                value = JSON.stringify(value);
-            let args = [this.getKey([this.cachePrefix, key]), value];
-            if (expire)
-                args = [...args, 'EX', expire];
-            return (this.client.set as any)(...args);
-        });
+        if (typeof value == 'object')
+            value = JSON.stringify(value);
+        let args = [this.getKey([this.cachePrefix, key]), value];
+        if (expire)
+            args = [...args, 'EX', expire];
+        return (this.client.set as any)(...args);
     }
 
     del(key: string) {
