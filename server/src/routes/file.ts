@@ -10,7 +10,7 @@ import { FileMapper, FileModel } from '@/models/mongo/file';
 import { logger } from '@/helpers';
 import { MyRequestHandler } from '@/middleware';
 
-const uplaod: MyRequestHandler = async (opt) => {
+const upload: MyRequestHandler = async (opt) => {
     let option = <{ fileType: string, file: multer.File }>opt.reqOption;
     let { myData } = opt;
     let { file } = option;
@@ -92,7 +92,7 @@ const download: MyRequestHandler = async (opt, ctx) => {
 
 export const imgUpload: MyRequestHandler = (opt, ctx) => {
     opt.reqOption = { fileType: myEnum.fileType.图片, file: ctx.file };
-    return uplaod(opt);
+    return upload(opt);
 };
 
 export const imgGet: MyRequestHandler = (opt, ctx) => {
@@ -102,7 +102,7 @@ export const imgGet: MyRequestHandler = (opt, ctx) => {
 
 export const videoUpload: MyRequestHandler = (opt, ctx) => {
     opt.reqOption = { fileType: myEnum.fileType.视频, file: ctx.file };
-    return uplaod(opt);
+    return upload(opt);
 };
 
 export const vedioGet: MyRequestHandler = (opt, ctx) => {

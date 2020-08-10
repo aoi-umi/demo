@@ -1,16 +1,16 @@
 import { Context, Next } from 'koa';
-import * as Q from 'q';
 import * as moment from 'dayjs';
 import { MongooseDocument, Error } from 'mongoose';
 import { ClassType } from 'class-transformer/ClassTransformer';
 import { plainToClass } from 'class-transformer';
 import { configure, getLogger } from 'log4js';
 
-import * as common from '../_system/common';
-import * as config from '../config';
-import * as ValidSchema from '../valid-schema/class-valid';
-import { valid } from './class-valid';
 import { MyRequestHandlerOpt } from '@/middleware';
+import * as common from '@/_system/common';
+import * as config from '@/config';
+import * as ValidSchema from '@/valid-schema/class-valid';
+
+import { valid } from './class-valid';
 
 export const logger = getLogger();
 
