@@ -48,6 +48,7 @@ const config: Configuration = {
   */
   plugins: [{
     src: '~/plugins/ElementUI',
+    // ssr: false
     // mode: 'server',
   }],
   /*
@@ -86,7 +87,12 @@ const config: Configuration = {
     /*
     ** You can extend webpack config here
     */
-    extend(config, ctx) {
+    extend(config, { isDev, isClient }) {
+      // if (isClient) {
+      //   config.externals = {
+      //     'element-ui': 'ELEMENT',
+      //   }
+      // }
     },
     // vendor: ['element-ui']
   } as any,
