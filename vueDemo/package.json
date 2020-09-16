@@ -23,7 +23,7 @@
     "iview": "3.5.2",
     "marked": "^0.8.0",
     "mathjs": "^6.2.3",
-    "node-forge": "0.8.4",
+    "node-forge": "0.10.0",
     "qrcode": "1.4.2",
     "socket.io-client": "2.2.0",
     "video.js": "^6.13.0",
