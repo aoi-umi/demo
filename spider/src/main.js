@@ -71,7 +71,7 @@ class Download {
                     try {
                         console.log(`下载[${ele.url}]`);
                         let filename = path.join(dir, ele.filename);
-                        let res = await axios.get(ele.url, { responseType: 'arraybuffer', });
+                        let res = await axios.get(ele.url, { responseType: 'arraybuffer', timeout: 1000 * 15 });
                         fs.writeFileSync(filename, res.data);
                         rs.success++;
                         break;

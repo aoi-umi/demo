@@ -14,6 +14,9 @@ async function nyahentai(html) {
             }, {
                 search: 't.nyahentai.net',
                 replace: 'i.nyahentai.net',
+            }, {
+                search: 't1.nyacdn.com',
+                replace: 'i0.nyacdn.com',
             }].forEach(ele => {
                 src = src.replace(ele.search, ele.replace);
             });
