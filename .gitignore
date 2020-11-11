@@ -32,6 +32,7 @@ yarn.lock
 Template/Output
 MyService/**/routes/dal/models/_auto
 MyService/file
-pm2.json
+pm2.*
 .dev
 env
+logs

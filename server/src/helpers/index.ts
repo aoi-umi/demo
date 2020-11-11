@@ -26,6 +26,8 @@ configure({
         }
     }
 });
+console.log = logger.info.bind(logger);
+console.error = logger.error.bind(logger);
 
 
 export let myRequestHandler = async function (fn: (opt?: MyRequestHandlerOpt) => any, ctx: Context) {

@@ -2,18 +2,24 @@
 import * as path from 'path';
 import { MongoOpt } from '@/_system/dbMongo';
 
-let processEnv: {
+let processEnv = process.env as {
+    NODE_ENV: string;
     Port?: string;
     RedisUri?: string;
     MongoUri?: string;
     Host?: string;
     MQUri?: string;
-} = process.env;
+    //pm2
+    pm_out_log_path?: string;
+};
 const urlPrefix = '/devMgt';
 const envDir = path.resolve(__dirname, '../../env');
 let host = processEnv.Host || 'http://localhost';
 let hostWithPrefix = host + urlPrefix;
 let name = 'devMgt';
+let isDev = !processEnv.NODE_ENV || processEnv.NODE_ENV === 'development';
+// console.log(processEnv);
+let logPath = processEnv.pm_out_log_path || path.resolve(__dirname, '../../logs/out.log');
 export default {
     name,
     port: processEnv.Port || 8000,
@@ -42,7 +48,9 @@ export default {
     urlPrefix,
     logger: {
         name,
-        appenders: { type: 'stdout' }
+        appenders: !isDev ?
+            { type: 'stdout' } :
+            { type: 'dateFile', filename: logPath + `.${processEnv.NODE_ENV}` }
     },
     imgPrefix: `${urlPrefix}/img`,
     videoPrefix: `${urlPrefix}/video`,
