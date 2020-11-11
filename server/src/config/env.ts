@@ -48,7 +48,7 @@ export default {
     urlPrefix,
     logger: {
         name,
-        appenders: !isDev ?
+        appenders: isDev ?
             { type: 'stdout' } :
             { type: 'dateFile', filename: logPath + `.${processEnv.NODE_ENV}` }
     },
