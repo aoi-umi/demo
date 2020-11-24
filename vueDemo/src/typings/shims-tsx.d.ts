@@ -1,4 +1,4 @@
-import Vue, { VNode } from 'vue';
+import Vue, { VNode } from 'vue'
 
 declare global {
   namespace JSX {
@@ -12,7 +12,7 @@ declare global {
   }
 }
 
-declare module "vue/types/options" {
+declare module 'vue/types/options' {
 
   interface ComponentOptions<V extends Vue> extends VueComponentOptions {
     [propName: string]: any;

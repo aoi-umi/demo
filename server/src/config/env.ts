@@ -50,7 +50,7 @@ export default {
         name,
         appenders: isDev ?
             { type: 'stdout' } :
-            { type: 'dateFile', filename: logPath + `.${processEnv.NODE_ENV}` }
+            { type: 'dateFile', filename: logPath + `.${processEnv.NODE_ENV}`, daysToKeep: 90 }
     },
     imgPrefix: `${urlPrefix}/img`,
     videoPrefix: `${urlPrefix}/video`,

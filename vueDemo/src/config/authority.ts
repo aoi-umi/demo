@@ -1,27 +1,27 @@
 export default {
-    login: 'login',
+  login: 'login',
 
-    userMgtQuery: 'userMgtQuery',
-    userMgtEdit: 'userMgtEdit',
-    userMgtDisable: 'userMgtDisable',
+  userMgtQuery: 'userMgtQuery',
+  userMgtEdit: 'userMgtEdit',
+  userMgtDisable: 'userMgtDisable',
 
-    authorityQuery: 'authorityQuery',
-    authorityDel: 'authorityDel',
-    authoritySave: 'authoritySave',
+  authorityQuery: 'authorityQuery',
+  authorityDel: 'authorityDel',
+  authoritySave: 'authoritySave',
 
-    roleQuery: 'roleQuery',
-    roleDel: 'roleDel',
-    roleSave: 'roleSave',
+  roleQuery: 'roleQuery',
+  roleDel: 'roleDel',
+  roleSave: 'roleSave',
 
-    settingQuery: 'settingQuery',
-    settingSave: 'settingSave',
+  settingQuery: 'settingQuery',
+  settingSave: 'settingSave',
 
-    articleMgtDel: 'articleMgtDel',
-    articleMgtAudit: 'articleMgtAudit',
-    videoMgtDel: 'videoMgtDel',
-    videoMgtAudit: 'videoMgtAudit',
+  articleMgtDel: 'articleMgtDel',
+  articleMgtAudit: 'articleMgtAudit',
+  videoMgtDel: 'videoMgtDel',
+  videoMgtAudit: 'videoMgtAudit',
 
-    goodsMgtAudit: 'goodsMgtAudit',
-    payMgtQuery: 'payMgtQuery',
-    payMgtOperate: 'payMgtOperate',
-};
+  goodsMgtAudit: 'goodsMgtAudit',
+  payMgtQuery: 'payMgtQuery',
+  payMgtOperate: 'payMgtOperate'
+}

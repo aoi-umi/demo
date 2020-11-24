@@ -1,2 +1,2 @@
-export { default as MyVideo } from './my-video';
-export * from './my-video';
+export { default as MyVideo } from './my-video'
+export * from './my-video'

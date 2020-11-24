@@ -1,8 +1,8 @@
-import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
+import { Component, Vue, Watch, Prop } from 'vue-property-decorator'
 
-import { convClass, getCompOpts } from '@/components/utils';
-import { MyTagBase, MyTagBaseProp } from '@/components/my-tag/my-tag';
-import { myEnum } from '@/config';
+import { convClass, getCompOpts } from '@/components/utils'
+import { MyTagBase, MyTagBaseProp } from '@/components/my-tag/my-tag'
+import { myEnum } from '@/config'
 
 export type AuthorityDetail = {
     isDel?: boolean;
@@ -16,30 +16,29 @@ class AuthorityTagProp extends MyTagBaseProp {
     hideCode?: boolean
 }
 @Component({
-    extends: MyTagBase,
-    mixins: [getCompOpts(AuthorityTagProp)]
+  extends: MyTagBase,
+  mixins: [getCompOpts(AuthorityTagProp)]
 })
 class AuthorityTag extends Vue<AuthorityTagProp & MyTagBase<AuthorityDetail>> {
-    private convert(ele: AuthorityDetail) {
-        let color = '';
-        let tag = ele.code;
-        if (ele.isDel || ele.status !== myEnum.authorityStatus.启用) {
-            color = 'default';
-        } else {
-            tag = `${ele.name}` + (this.hideCode ? '' : `(${ele.code})`);
-        }
-        return {
-            tag,
-            color,
-            isDel: ele.isDel,
-        };
+  private convert (ele: AuthorityDetail) {
+    let color = ''
+    let tag = ele.code
+    if (ele.isDel || ele.status !== myEnum.authorityStatus.启用) {
+      color = 'default'
+    } else {
+      tag = `${ele.name}` + (this.hideCode ? '' : `(${ele.code})`)
     }
+    return {
+      tag,
+      color,
+      isDel: ele.isDel
+    }
+  }
 
-    render() {
-        return this.renderTag(this.tagList.map(ele => this.convert(ele)));
-    }
+  render () {
+    return this.renderTag(this.tagList.map(ele => this.convert(ele)))
+  }
 }
 
-
-export const AuthorityTagView = convClass<AuthorityTagProp>(AuthorityTag);
+export const AuthorityTagView = convClass<AuthorityTagProp>(AuthorityTag)
 export interface IAuthorityTagView extends AuthorityTag { };

@@ -1,37 +1,37 @@
-import { Component, Vue, Watch } from 'vue-property-decorator';
-import { Card, Row, Col } from '@/components/iview';
-import { routerConfig } from '@/router';
+import { Component, Vue, Watch } from 'vue-property-decorator'
+import { Card, Row, Col } from '@/components/iview'
+import { routerConfig } from '@/router'
 
-import { Base } from '../base';
-import './apps.less';
+import { Base } from '../base'
+import './apps.less'
 
 @Component
 export default class Apps extends Base {
     stylePrefix = 'apps-';
     apps = [{
-        routerConfig: routerConfig.xiaobianBot,
-        cover: ''
+      routerConfig: routerConfig.xiaobianBot,
+      cover: ''
     }].map(ele => {
-        let { routerConfig, ...rest } = ele;
-        return {
-            url: routerConfig.path,
-            text: routerConfig.text,
-            ...rest
-        };
+      const { routerConfig, ...rest } = ele
+      return {
+        url: routerConfig.path,
+        text: routerConfig.text,
+        ...rest
+      }
     });
-    render() {
-        return (
-            <div>
-                {this.apps.map(ele => {
-                    return (
-                        <Card class={this.getStyleName('item')} nativeOn-click={() => {
-                            this.$router.push(ele.url);
-                        }}>
-                            <span>{ele.text}</span>
-                        </Card>
-                    );
-                })}
-            </div>
-        );
+    render () {
+      return (
+        <div>
+          {this.apps.map(ele => {
+            return (
+              <Card class={this.getStyleName('item')} nativeOn-click={() => {
+                this.$router.push(ele.url)
+              }}>
+                <span>{ele.text}</span>
+              </Card>
+            )
+          })}
+        </div>
+      )
     }
 }

@@ -1,4 +1,4 @@
-import { env } from '../config';
+import { env } from '../config'
 
 export type ApiListQueryArgs = {
     page?: number,
@@ -11,13 +11,12 @@ export type ApiMethod<U, T> = {
     [P in keyof T]: U
 }
 
-import { TestApi } from './test';
-export * from './test';
+import { TestApi } from './test'
+export * from './test'
 
-export const testApi = new TestApi(env.api.test);
+export const testApi = new TestApi(env.api.test)
 
-
-import { TestSocket } from './test-socket';
+import { TestSocket } from './test-socket'
 export const testSocket = new TestSocket(env.socket.test.host, {
-    path: env.socket.test.path,
-});
+  path: env.socket.test.path
+})

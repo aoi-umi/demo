@@ -1,2 +1,2 @@
-export { default as MyNumber } from './my-number';
-export * from './my-number';
+export { default as MyNumber } from './my-number'
+export * from './my-number'

@@ -1,13 +1,13 @@
-import { Component, Vue, Watch, Prop } from 'vue-property-decorator';
-import VueDND from 'awe-dnd';
+import { Component, Vue, Watch, Prop } from 'vue-property-decorator'
+import VueDND from 'awe-dnd'
 
-import { Utils } from './utils';
+import { Utils } from './utils'
 
-Vue.use(VueDND);
+Vue.use(VueDND)
 @Component
 export class MyBase extends Vue {
     protected stylePrefix = 'base-';
-    protected getStyleName(...args: string[]) {
-        return Utils.getStyleName(this.stylePrefix, ...args);
+    protected getStyleName (...args: string[]) {
+      return Utils.getStyleName(this.stylePrefix, ...args)
     }
 }

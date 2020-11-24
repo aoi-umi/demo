@@ -1,16 +1,16 @@
-import Vue from 'vue';
-import Vuex, { Store } from 'vuex';
+import Vue from 'vue'
+import Vuex, { Store } from 'vuex'
 
-import LoginUserStore from './login-user';
-import SettingStore from './setting';
+import LoginUserStore from './login-user'
+import SettingStore from './setting'
 
-Vue.use(Vuex);
+Vue.use(Vuex)
 
 export default new Vuex.Store({
-    modules: {
-        user: LoginUserStore,
-        setting: SettingStore
-    },
-});
+  modules: {
+    user: LoginUserStore,
+    setting: SettingStore
+  }
+})
 
-export * from './local-store';
+export * from './local-store'

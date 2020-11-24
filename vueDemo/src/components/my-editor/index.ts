@@ -1,2 +1,2 @@
-export { default as MyEditor } from './my-editor';
-export * from './my-editor';
+export { default as MyEditor } from './my-editor'
+export * from './my-editor'

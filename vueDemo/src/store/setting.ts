@@ -1,9 +1,9 @@
 
 import {
-    Module,
-    VuexModule,
-    Mutation,
-} from 'vuex-module-decorators';
+  Module,
+  VuexModule,
+  Mutation
+} from 'vuex-module-decorators'
 
 type SettingType = {
     signInShow: boolean;
@@ -14,10 +14,10 @@ export default class SettingStore extends VuexModule {
     setting: SettingType = { signInShow: false };
 
     @Mutation
-    setSetting(setting: Partial<SettingType>) {
-        this.setting = {
-            ...this.setting,
-            ...setting,
-        };
+    setSetting (setting: Partial<SettingType>) {
+      this.setting = {
+        ...this.setting,
+        ...setting
+      }
     }
 }
