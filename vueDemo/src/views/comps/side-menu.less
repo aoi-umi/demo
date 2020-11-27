@@ -1,7 +1,6 @@
 @prefix: comp-side-menu-;
 
 .@{prefix} {
-
   &blank {
     flex: 0 0 78px;
     position: relative;
@@ -34,7 +33,6 @@
     }
   }
 
-
   &root.open {
     .@{prefix}menu {
       span {
@@ -53,14 +51,14 @@
       justify-content: stretch;
       flex-grow: 1;
 
-      >* {
+      > * {
         flex-grow: 1;
       }
     }
   }
 
   &item,
-  &sub-menu>.ivu-menu-submenu-title {
+  &sub-menu > .ivu-menu-submenu-title {
     padding: 14px !important;
     padding-left: 20px !important;
   }
@@ -70,13 +68,12 @@
     display: flex;
   }
 
-  &sub-menu-title>i {
+  &sub-menu-title > i {
     margin-right: 6px;
   }
 }
 
 .ivu-layout-sider-collapsed {
-
   .ivu-menu-submenu-title-icon,
   .ivu-menu-submenu .@{prefix}text {
     display: none;

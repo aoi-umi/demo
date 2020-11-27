@@ -191,6 +191,7 @@ export default class App extends Base {
               size='24'
             />
             <span>{this.title}</span>
+            <div class='layout-header-wrap'></div>
             <div class='layout-header-right'>
               {this.storeUser.user.isLogin
                 ? <UserAvatarView user={this.storeUser.user} self tipsPlacement='bottom' />
