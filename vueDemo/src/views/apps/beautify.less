@@ -1,7 +1,8 @@
+@minHeight: 300px;
 .beautify- {
   &input {
     textarea {
-      min-height: 300px;
+      height: @minHeight;
     }
   }
   &op {
@@ -10,5 +11,7 @@
   &output {
     white-space: pre-wrap;
     word-wrap: break-word;
+    overflow: auto;
+    height: @minHeight;
   }
 }
