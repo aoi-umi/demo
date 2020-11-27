@@ -12,6 +12,12 @@ export default {
     text: '小编bot',
     component: () => import('../views/apps/xiaobian-bot')
   },
+
+  beautify: {
+    path: appsPath + '/beautify',
+    text: 'json校验',
+    component: () => import('../views/apps/beautify')
+  },
   stat: {
     path: '/stat',
     text: '统计',
