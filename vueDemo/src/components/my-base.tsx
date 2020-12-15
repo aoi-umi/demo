@@ -1,4 +1,4 @@
-import { Component, Vue, Watch, Prop } from 'vue-property-decorator'
+import { Component, Vue, Watch } from 'vue-property-decorator'
 import VueDND from 'awe-dnd'
 
 import { Utils } from './utils'

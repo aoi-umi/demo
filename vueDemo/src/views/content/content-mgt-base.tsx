@@ -1,8 +1,9 @@
-import { Component, Vue, Watch, Prop } from 'vue-property-decorator'
+import { Component, Vue, Watch } from 'vue-property-decorator'
 import moment from 'dayjs'
 import * as iview from 'iview'
-import { testApi } from '@/api'
 
+import { Prop } from '@/components/property-decorator'
+import { testApi } from '@/api'
 import { myEnum, dev } from '@/config'
 import { routerConfig } from '@/router'
 import { convClass, getCompOpts } from '@/components/utils'

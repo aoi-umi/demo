@@ -1,8 +1,9 @@
-import { Component, Vue, Watch, Prop } from 'vue-property-decorator'
+import { Component, Vue, Watch } from 'vue-property-decorator'
 import moment from 'dayjs'
 
+import { Prop } from '@/components/property-decorator'
+
 import { convert } from '@/helpers'
-import * as helpers from '@/helpers'
 import { dev, myEnum, authority } from '@/config'
 import { routerConfig } from '@/router'
 import { testApi, testSocket } from '@/api'

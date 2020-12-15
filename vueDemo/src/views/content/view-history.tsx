@@ -1,4 +1,5 @@
-import { Component, Vue, Watch, Prop } from 'vue-property-decorator'
+import { Component, Vue, Watch } from 'vue-property-decorator'
+
 import { testApi } from '@/api'
 import { convert } from '@/helpers'
 import { MyList, IMyList } from '@/components/my-list'

@@ -1,8 +1,9 @@
-import { Component, Vue, Watch, Prop } from 'vue-property-decorator'
+import { Component, Vue, Watch } from 'vue-property-decorator'
 import * as echarts from 'echarts'
 import * as QRCode from 'qrcode'
 import { VideoJsPlayer } from 'video.js'
 
+import { Prop } from '@/components/property-decorator'
 import { testSocket, testApi } from '@/api'
 import { Input, Card, Button, Checkbox } from '@/components/iview'
 import { MyList, IMyList } from '@/components/my-list'

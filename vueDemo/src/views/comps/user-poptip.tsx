@@ -1,6 +1,7 @@
-import { Component, Vue, Watch, Prop } from 'vue-property-decorator'
+import { Component, Vue, Watch } from 'vue-property-decorator'
 import * as iviewTypes from 'iview'
 
+import { Prop } from '@/components/property-decorator'
 import { testApi, testSocket } from '@/api'
 import { dev, myEnum, authority } from '@/config'
 import { routerConfig } from '@/router'

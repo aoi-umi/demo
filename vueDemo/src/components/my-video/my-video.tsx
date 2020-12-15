@@ -1,8 +1,10 @@
-import { Component, Vue, Watch, Prop } from 'vue-property-decorator'
+import { Component, Vue, Watch } from 'vue-property-decorator'
 import { VideoJsPlayer } from 'video.js'
 import Swatches from 'vue-swatches'
 import moment from 'dayjs'
 import 'vue-swatches/dist/vue-swatches.min.css'
+
+import { Prop } from '@/components/property-decorator'
 
 import { MyBase } from '../my-base'
 import { convClass, Utils, getCompOpts } from '../utils'

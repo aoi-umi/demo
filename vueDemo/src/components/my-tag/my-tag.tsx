@@ -1,4 +1,7 @@
-import { Vue, Prop, Watch, Component } from 'vue-property-decorator'
+import { Vue, Watch, Component } from 'vue-property-decorator'
+
+import { Prop } from '@/components/property-decorator'
+
 import { convClass, getCompOpts } from '../utils'
 import { Tag, Tooltip } from '../iview'
 import { TagType } from './model'

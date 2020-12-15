@@ -1,5 +1,7 @@
-import { Component, Vue, Watch, Prop } from 'vue-property-decorator'
+import { Component, Vue, Watch } from 'vue-property-decorator'
 import Hammer from 'hammerjs'
+
+import { Prop } from '@/components/property-decorator'
 
 import { convClass, getCompOpts } from '../utils'
 import { Carousel, CarouselItem, Icon, Button } from '../iview'

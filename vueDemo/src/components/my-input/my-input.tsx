@@ -1,4 +1,6 @@
-import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
+import { Component, Vue, Watch } from 'vue-property-decorator'
+
+import { Prop } from '@/components/property-decorator'
 
 import { convClass, getCompOpts } from '../utils'
 import { Option, Select, Input } from '../iview'

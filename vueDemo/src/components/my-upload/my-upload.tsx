@@ -1,7 +1,9 @@
-import { Component, Vue, Watch, Prop } from 'vue-property-decorator'
+import { Component, Vue, Watch } from 'vue-property-decorator'
 import * as iview from 'iview'
 import axios, { AxiosRequestConfig } from 'axios'
 import { VueCropper } from 'vue-cropper'
+
+import { Prop } from '@/components/property-decorator'
 
 import { Upload, Modal, Icon, Progress, Button } from '../iview'
 import { Utils, convClass, getCompOpts } from '../utils'

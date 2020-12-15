@@ -1,4 +1,4 @@
-import { Component, Vue, Watch, Prop } from 'vue-property-decorator'
+import { Component, Vue, Watch } from 'vue-property-decorator'
 import { quillEditor } from 'vue-quill-editor'
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
@@ -6,6 +6,7 @@ import 'quill/dist/quill.bubble.css'
 
 import marked from 'marked'
 
+import { Prop } from '@/components/property-decorator'
 import { Input, RadioGroup, Radio, Row, Col } from '../iview'
 import { convClass, getCompOpts } from '../utils'
 import { MyInputBase, MyInputBaseProp } from '../my-input/my-input'

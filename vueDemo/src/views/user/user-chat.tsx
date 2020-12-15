@@ -1,4 +1,5 @@
-import { Component, Vue, Watch, Prop } from 'vue-property-decorator'
+import { Component, Vue, Watch } from 'vue-property-decorator'
+
 import { convClass } from '@/components/utils'
 import { Card, Split, Input, Button, Time, Icon } from '@/components/iview'
 import { IMyLoad, MyLoad } from '@/components/my-load'
