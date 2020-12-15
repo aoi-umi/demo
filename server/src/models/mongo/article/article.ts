@@ -42,7 +42,7 @@ export class Article extends ContentBase {
 
     @prop()
     get canUpdate() {
-        return [myEnum.articleStatus.草稿, myEnum.articleStatus.审核不通过].includes(this.status);
+        return [myEnum.articleStatus.草稿, myEnum.articleStatus.审核不通过, myEnum.articleStatus.审核通过].includes(this.status);
     }
 
     @prop()
