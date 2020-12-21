@@ -4,8 +4,11 @@ export function convClass<prop, partial extends boolean = false> (t) {
   type P = (partial extends false ? prop : Partial<prop>);
   return t as {
     new(props: P & VueComponentOptions<Partial<prop>>): any
-    // new(props: Partial<prop> & VueComponentOptions): any
   }
+}
+
+export type convType<prop, partial extends boolean = false> = {
+  new(props: (partial extends false ? prop : Partial<prop>) & VueComponentOptions<Partial<prop>>): any
 }
 
 export function getCompOpts (target) {

@@ -140,17 +140,7 @@ export default class ArticleMgt extends Vue<ArticleMgtProp & ArticleMgtBase> imp
                       ele._checked = val
                       this.$refs.list.selectedRows = rs.data.filter(ele => ele._checked)
                     }}>
-                    <div class={this.getStyleName('item-op-box')}>
-                      {
-                        this.getOperate(ele).map(ele => {
-                          return (
-                            <Button type={ele.type as any} on-click={ele.fn}>
-                              {ele.text}
-                            </Button>
-                          )
-                        })
-                      }
-                    </div>
+                    {this.renderOpBox(ele)}
                   </ArticleListItemView>
                 )
               })

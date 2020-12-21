@@ -185,6 +185,22 @@ export class ContentMgtBase extends Vue<IContentMgtBase & Base> {
       return operate
     }
 
+    protected renderOpBox (detail: ContentDataType, opt?: { noPreview?: boolean; isDetail?: boolean; }) {
+      return (
+        <div class={['content-mgt-item-op-box', 'button-group-normal']}>
+          {
+            this.getOperate(detail, opt).map(ele => {
+              return (
+                <Button type={ele.type as any} on-click={ele.fn}>
+                  {ele.text}
+                </Button>
+              )
+            })
+          }
+        </div>
+      )
+    }
+
     protected renderNotPassConfirm () {
       return (
         <Modal v-model={this.notPassShow} footer-hide>

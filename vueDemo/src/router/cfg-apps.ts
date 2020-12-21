@@ -14,9 +14,9 @@ export default {
   },
 
   beautify: {
-    path: appsPath + '/beautify',
-    text: 'json校验',
-    component: () => import('../views/apps/beautify')
+    path: appsPath + '/json',
+    text: 'json',
+    component: () => import('../views/apps/json')
   },
   stat: {
     path: '/stat',

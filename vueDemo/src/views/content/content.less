@@ -1,5 +1,6 @@
+@prefix: content-;
 @mLeft: 40px;
-.content- {
+.@{prefix} {
   &top-col {
     margin-left: @mLeft;
     display: flex;
@@ -51,5 +52,13 @@
     &item {
       min-width: 60px;
     }
+  }
+}
+
+.@{prefix}mgt- {
+  &item-op-box {
+    display: flex;
+    justify-content: flex-end;
+    flex-grow: 1;
   }
 }

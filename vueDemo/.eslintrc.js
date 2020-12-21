@@ -19,6 +19,7 @@ module.exports = {
     "eqeqeq": 0,
     "no-undef": 0,
     "prefer-const": 0,
+    "new-cap": 0
     // "consistent-return": 2,
     // indent: [1, 2],
     // // "no-else-return": 1,

@@ -136,17 +136,7 @@ export default class VideoMgt extends Vue<VideoMgtProp & VideoMgtBase> implement
                       ele._checked = val
                       this.$refs.list.selectedRows = rs.data.filter(ele => ele._checked)
                     }}>
-                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                      {
-                        this.getOperate(ele).map(ele => {
-                          return (
-                            <Button type={ele.type as any} on-click={ele.fn}>
-                              {ele.text}
-                            </Button>
-                          )
-                        })
-                      }
-                    </div>
+                    {this.renderOpBox(ele)}
                   </VideoListItemView>
                 )
               })

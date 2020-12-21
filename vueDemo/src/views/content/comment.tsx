@@ -229,7 +229,7 @@ export class Comment extends Vue<CommentProp & Base> {
       const send = this.reply.floor === 0
       return (
         <div>
-          <div class={this.getStyleName('send-op-box')}>
+          <div class={this.getStyleName('send-op-box').concat(['button-group-normal'])}>
             <Button on-click={() => {
               this.query(convert.Test.listModelToQuery(this.$refs.list.model))
             }} loading={this.refreshLoading}>刷新评论</Button>

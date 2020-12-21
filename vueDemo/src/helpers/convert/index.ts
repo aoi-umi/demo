@@ -2,6 +2,8 @@ import { EnumInstance } from 'enum-ts'
 
 import { MyListModel } from '@/components/my-list'
 
+export * from './xml'
+
 export class Test {
   // query参数与列表model之间的转换
   static queryToListModel (query: any, model: MyListModel) {
