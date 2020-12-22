@@ -77,26 +77,10 @@ export default class ArticleMgtDetail extends ArticleMgtBase {
 
   private renderPreview () {
     const { detail } = this.innerDetail
-    const operate = this.getOperate(detail, { noPreview: true, isDetail: true })
     return (
       <div>
         <ArticleDetailMainView data={detail} />
-        {operate.length > 0 &&
-          <div>
-            <Divider />
-            <Affix offset-bottom={40}>
-              <Card>
-                {operate.map(ele => {
-                  return (
-                    <Button type={ele.type as any} on-click={ele.fn}>
-                      {ele.text}
-                    </Button>
-                  )
-                })}
-              </Card>
-            </Affix>
-          </div>
-        }
+        {this.renderDetailOpBox(detail)}
         {this.renderLog()}
         {this.renderDelConfirm()}
         {this.renderNotPassConfirm()}

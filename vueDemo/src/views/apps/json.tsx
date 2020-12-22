@@ -15,6 +15,7 @@ export default class Apps extends Base {
   output = '';
   mounted () {
   }
+
   render () {
     return (
       <Row gutter={10}>

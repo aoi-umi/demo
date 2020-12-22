@@ -136,7 +136,7 @@ export default class VideoMgt extends Vue<VideoMgtProp & VideoMgtBase> implement
                       ele._checked = val
                       this.$refs.list.selectedRows = rs.data.filter(ele => ele._checked)
                     }}>
-                    {this.renderOpBox(ele)}
+                    {this.renderListOpBox(ele)}
                   </VideoListItemView>
                 )
               })

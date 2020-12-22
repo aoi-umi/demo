@@ -140,7 +140,7 @@ export default class ArticleMgt extends Vue<ArticleMgtProp & ArticleMgtBase> imp
                       ele._checked = val
                       this.$refs.list.selectedRows = rs.data.filter(ele => ele._checked)
                     }}>
-                    {this.renderOpBox(ele)}
+                    {this.renderListOpBox(ele)}
                   </ArticleListItemView>
                 )
               })
