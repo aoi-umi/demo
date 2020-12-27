@@ -177,6 +177,11 @@ const cfg = {
     path: '/waterfall',
     text: '瀑布流',
     component: () => import('../views/waterfall')
+  },
+  print: {
+    path: '/print',
+    text: '打印',
+    component: () => import('../views/print')
   }
 }
 export default {
