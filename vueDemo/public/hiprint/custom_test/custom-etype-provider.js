@@ -22,20 +22,15 @@ let customElementTypeProvider = (function () {
               columnAlignEditable: true, // 列对齐是否调整
               columns: [
                 [{
-                  'title': '姓名',
-                  'field': 'name'
+                  'title': '标题',
+                  'field': 'title'
                 }]
               ]
             },
             {
               tid: 'testModule.tableCustom',
               title: '表格',
-              type: 'tableCustom',
-              columnDisplayEditable: true, // 列显示是否能编辑
-              columnDisplayIndexEditable: true, // 列顺序显示是否能编辑
-              columnTitleEditable: true, // 列标题是否能编辑
-              columnResizable: true, // 列宽是否能调整
-              columnAlignEditable: true // 列对齐是否调整
+              type: 'tableCustom'
             },
             {
               tid: 'testModule.html', title: 'html',

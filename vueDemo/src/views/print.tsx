@@ -5,13 +5,79 @@ import { Button } from '@/components/iview'
 
 import { Base } from './base'
 
+type ItemGroup = {
+  title: string
+  items: Item[]
+}
+
+type Item = {
+  tid: string;
+  text: string;
+  icon: string;
+}
 @Component
 export default class Print extends Base {
   hiprintTemplate: any
-  mounted () {
-    this.init()
+  itemGroups: ItemGroup[] = []
+  created () {
+    this.createdInit()
   }
-  async init () {
+  mounted () {
+    this.mountedInit()
+  }
+  createdInit () {
+    this.itemGroups = [{
+      title: '拖拽列表',
+      items: [{
+        tid: 'testModule.text',
+        text: '文本',
+        icon: 'glyphicon-text-width'
+      }, {
+        tid: 'testModule.image',
+        text: '图片',
+        icon: 'glyphicon-picture'
+      }, {
+        tid: 'testModule.longText',
+        text: '长文',
+        icon: 'glyphicon-subscript'
+      },
+      // {
+      //   tid: 'testModule.table',
+      //   text: '表格',
+      //   icon: 'glyphicon-th'
+      // },
+      {
+        tid: 'testModule.tableCustom',
+        text: '表格',
+        icon: 'glyphicon-th'
+      },
+      {
+        tid: 'testModule.html',
+        text: 'html',
+        icon: 'glyphicon-header'
+      }]
+    }, {
+      title: '辅助',
+      items: [{
+        tid: 'testModule.hline',
+        text: '横线',
+        icon: 'glyphicon-resize-horizontal'
+      }, {
+        tid: 'testModule.vline',
+        text: '竖线',
+        icon: 'glyphicon-resize-vertical'
+      }, {
+        tid: 'testModule.rect',
+        text: '矩形',
+        icon: 'glyphicon-unchecked'
+      }, {
+        tid: 'testModule.oval',
+        text: '椭圆',
+        icon: 'glyphicon-record'
+      }]
+    }]
+  }
+  async mountedInit () {
     await this.getScript()
     hiprint.init({
       providers: [new customElementTypeProvider()]
@@ -27,7 +93,7 @@ export default class Print extends Base {
     hiprintTemplate.design('#hiprint-printTemplate')
 
     $('#A4_directPrint').click(function () {
-      hiprintTemplate.print([{}, {}])
+      hiprintTemplate.print([{ table: [{ a: 1, b: 2, c: 3 }] }, {}])
     })
   }
   async getScript () {
@@ -66,80 +132,27 @@ export default class Print extends Base {
             <div class='col-sm-3 col-md-2' style='padding-right:0px;'>
 
               <div class='rect-printElement-types hiprintEpContainer'>
+
                 <ul class='hiprint-printElement-type'>
-
-                  <li>
-                    <span class='title'><code>拖拽列表</code></span>
-                    <ul>
+                  {this.itemGroups.map(ele => {
+                    return (
                       <li>
-                        <a class='ep-draggable-item' tid='testModule.text' style=''>
-
-                          <span class='glyphicon glyphicon-text-width' aria-hidden='true'></span>
-                          <span class='glyphicon-class'>文本</span>
-                        </a>
+                        <span class='title'><code>{ele.title}</code></span>
+                        <ul>
+                          {ele.items.map(item => {
+                            return (
+                              <li>
+                                <a class='ep-draggable-item' tid={item.tid} style=''>
+                                  <span class={['glyphicon', item.icon]} aria-hidden='true'></span>
+                                  <span class='glyphicon-class'>{item.text}</span>
+                                </a>
+                              </li>
+                            )
+                          })}
+                        </ul>
                       </li>
-
-                      <li>
-                        <a class='ep-draggable-item' tid='testModule.image' style=''>
-                          <span class='glyphicon glyphicon-picture' aria-hidden='true'></span>
-                          <span class='glyphicon-class'>图片</span>
-                        </a>
-                      </li>
-                      <li>
-                        <a class='ep-draggable-item' tid='testModule.longText'>
-                          <span class='glyphicon glyphicon-subscript' aria-hidden='true'></span>
-                          <span class='glyphicon-class'>长文</span>
-
-                        </a>
-                      </li>
-
-                      <li>
-                        <a class='ep-draggable-item' tid='testModule.table' style=''>
-                          <span class='glyphicon glyphicon-th' aria-hidden='true'></span>
-                          <span class='glyphicon-class'>表格</span>
-                        </a>
-                      </li>
-
-                      <li>
-                        <a class='ep-draggable-item' tid='testModule.html'>
-                          <span class='glyphicon glyphicon-header' aria-hidden='true'></span>
-                          <span class='glyphicon-class'>html</span>
-                        </a>
-                      </li>
-
-                    </ul>
-                  </li>
-                  <li>
-                    <span class='title'>辅助</span>
-                    <ul>
-                      <li>
-                        <a class='ep-draggable-item' tid='testModule.hline' style=''>
-
-                          <span class='glyphicon glyphicon-resize-horizontal' aria-hidden='true'></span>
-                          <span class='glyphicon-class'>横线</span>
-                        </a>
-                      </li>
-
-                      <li>
-                        <a class='ep-draggable-item' tid='testModule.vline' style=''>
-                          <span class='glyphicon glyphicon-resize-vertical' aria-hidden='true'></span>
-                          <span class='glyphicon-class'>竖线</span>
-                        </a>
-                      </li>
-                      <li>
-                        <a class='ep-draggable-item' tid='testModule.rect'>
-                          <span class='glyphicon glyphicon-unchecked' aria-hidden='true'></span>
-                          <span class='glyphicon-class'>矩形</span>
-                        </a>
-                      </li>
-                      <li>
-                        <a class='ep-draggable-item' tid='testModule.oval'>
-                          <span class='glyphicon glyphicon-record' aria-hidden='true'></span>
-                          <span class='glyphicon-class'>椭圆</span>
-                        </a>
-                      </li>
-                    </ul>
-                  </li>
+                    )
+                  })}
                 </ul>
               </div>
 
