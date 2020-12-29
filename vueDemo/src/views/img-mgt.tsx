@@ -3,9 +3,9 @@ import { Component, Vue, Watch } from 'vue-property-decorator'
 import { Button, Divider, Modal } from '@/components/iview'
 import { MyWaterfall, IMyWaterfallView } from '@/components/my-waterfall'
 import { MyConfirm } from '@/components/my-confirm'
+import { testApi } from '@/api'
 
 import { Base } from './base'
-import { testApi } from '@/api'
 @Component
 export default class ImgMgt extends Base {
     $refs: { root: HTMLDivElement; waterFall: IMyWaterfallView };
@@ -46,7 +46,7 @@ export default class ImgMgt extends Base {
     }
     render () {
       return (
-        <div>
+        <div class='button-group-normal'>
           <Button type='error' disabled={this.selectable && !this.deletable} on-click={() => {
             if (!this.selectable) {
               this.selectable = true

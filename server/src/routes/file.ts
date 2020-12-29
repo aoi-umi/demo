@@ -55,10 +55,11 @@ const download: MyRequestHandler = async (opt, ctx) => {
         let end = pos[1] ? parseInt(pos[1], 10) : total - 1;
         let chunksize = (end - start) + 1;
 
-        ctx.writeHead(206, {
+        ctx.status = 206;
+        ctx.set({
             'Content-Range': `bytes ${start}-${end}/${total}`,
             'Accept-Ranges': 'bytes',
-            'Content-Length': chunksize,
+            'Content-Length': chunksize.toString(),
             'Content-Type': rawFile.contentType,
         });
         downloadOpt.streamOpt = {
@@ -67,12 +68,7 @@ const download: MyRequestHandler = async (opt, ctx) => {
             //不加1会提示 ERR_CONTENT_LENGTH_MISMATCH
         };
         let rs = await new FileModel({ fileId: rawFile._id }).download(downloadOpt);
-        rs.stream
-            .pipe(ctx.res, { end: true })
-            .on('error', function (err) {
-                logger.log('file stream error:', err.message);
-                ctx.sendStatus(500);
-            });
+        ctx.body = rs.stream;
     } else {
         let ifModifiedSince = ctx.request.get('if-modified-since');
         downloadOpt.ifModifiedSince = ifModifiedSince;
@@ -81,11 +77,12 @@ const download: MyRequestHandler = async (opt, ctx) => {
             ctx.status = 304;
             return;
         }
-        ctx.set('Content-Type', rs.raw.contentType);
-        ctx.set('Content-Length', rs.raw.length.toString());
-        ctx.set('Content-Disposition', 'inline');
-        ctx.set('Last-Modified', (rs.raw.uploadDate || new Date()).toUTCString());
-        // rs.stream.pipe(ctx.res);
+        ctx.set({
+            'Content-Type': rs.raw.contentType,
+            'Content-Length': rs.raw.length.toString(),
+            'Content-Disposition': 'inline',
+            'Last-Modified': (rs.raw.uploadDate || new Date()).toUTCString()
+        });
         ctx.body = rs.stream;
     }
 };
