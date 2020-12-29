@@ -19,6 +19,7 @@ type Item = {
 export default class Print extends Base {
   hiprintTemplate: any
   itemGroups: ItemGroup[] = []
+  testData: any = ''
   created () {
     this.createdInit()
   }
@@ -76,6 +77,14 @@ export default class Print extends Base {
         icon: 'glyphicon-record'
       }]
     }]
+    this.testData = JSON.stringify({
+      name: 'vue',
+      table: [{
+        col1: '1',
+        col2: '2',
+        col3: '3'
+      }]
+    })
   }
   async mountedInit () {
     await this.getScript()
@@ -84,16 +93,23 @@ export default class Print extends Base {
     })
     let hiprintTemplate
     // 设置左侧拖拽事件
+    let template = { 'panels': [{ 'index': 0, 'paperType': 'A4', 'height': 297, 'width': 210, 'paperHeader': 0, 'paperFooter': 841.8897637795277, 'printElements': [{ 'options': { 'left': 27, 'top': 30, 'height': 9.75, 'width': 33, 'title': 'hello,' }, 'printElementType': { 'type': 'text' }}, { 'options': { 'left': 57, 'top': 30, 'height': 12, 'width': 121.5, 'field': 'name', 'testData': 'world' }, 'printElementType': { 'type': 'text' }}, { 'options': { 'left': 12, 'top': 103.5, 'height': 36, 'width': 550, 'field': 'table', 'columns': [[{ 'title': '列1', 'field': 'col1', 'width': 232.69230769230768, 'colspan': 1, 'rowspan': 1, 'checked': true }, { 'title': '列2', 'field': 'col2', 'width': 162.6925576923077, 'colspan': 1, 'rowspan': 1, 'checked': true }, { 'title': '列3', 'field': 'col3', 'width': 154.6151346153846, 'colspan': 1, 'rowspan': 1, 'checked': true }]] }, 'printElementType': { 'title': '表格', 'type': 'tableCustom' }}] }] }
     hiprint.PrintElementTypeManager.buildByHtml($('.ep-draggable-item'))
     this.hiprintTemplate = hiprintTemplate = new hiprint.PrintTemplate({
+      template,
       settingContainer: '#PrintElementOptionSetting',
       paginationContainer: '.hiprint-printPagination'
     })
     // 打印设计
     hiprintTemplate.design('#hiprint-printTemplate')
 
-    $('#A4_directPrint').click(function () {
-      hiprintTemplate.print([{ table: [{ a: 1, b: 2, c: 3 }] }, {}])
+    $('#A4_directPrint').click(() => {
+      try {
+        let testData = JSON.parse(this.testData)
+        hiprintTemplate.print(testData)
+      } catch (e) {
+        this.$Message.error(e.message)
+      }
     })
   }
   async getScript () {
@@ -183,9 +199,9 @@ export default class Print extends Base {
                   <li><a class='hiprint-toolbar-item' on-click={this.rotatePaper}>旋转</a></li>
                   <li><a class='hiprint-toolbar-item' on-click={this.clearTemplate}>清空</a></li>
 
-                  <li>
+                  {/* <li>
                     <a id='A4_preview' class='btn hiprint-toolbar-item ' style='color: #fff;background-color: #d9534f;border-color: #d43f3a;' >快速预览</a>
-                  </li>
+                  </li> */}
                   <li>
                     <a id='A4_directPrint' class='btn hiprint-toolbar-item ' style='color: #fff;background-color: #d9534f; border-color: #d43f3a;'>打印</a>
                   </li>
@@ -205,6 +221,9 @@ export default class Print extends Base {
           </div>
 
           <div style='width:250px'>
+            <div>测试数据</div>
+            <textarea v-model={this.testData}>
+            </textarea>
             <div id='PrintElementOptionSetting' style='margin-top:10px;'></div>
           </div>
         </div>
