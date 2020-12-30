@@ -89,7 +89,8 @@ export default class Print extends Base {
   async mountedInit () {
     await this.getScript()
     hiprint.init({
-      providers: [new customElementTypeProvider()]
+      providers: [new customElementTypeProvider()],
+      paginationContainer: '.hiprint-printPagination'
     })
     let hiprintTemplate
     // 设置左侧拖拽事件
@@ -121,8 +122,8 @@ export default class Print extends Base {
       'hiprint/hiprint.bundle.js',
       'hiprint/custom_test/config-etype-provider.js',
       'hiprint/custom_test/custom-etype-provider.js',
-      'hiprint/plugins/jquery.hiwprint.js',
-      'https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js'
+      'hiprint/plugins/jquery.hiwprint.js'
+      // 'https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js'
     ]
     await this.loadScript(scripts)
   }
@@ -139,6 +140,23 @@ export default class Print extends Base {
       return promise
     }))
   }
+
+  // 调整纸张
+  setPaper (paperTypeOrWidth, height?) {
+    let { hiprintTemplate } = this
+    hiprintTemplate.setPaper(paperTypeOrWidth, height)
+  }
+
+  // 旋转
+  rotatePaper () {
+    let { hiprintTemplate } = this
+    hiprintTemplate.rotatePaper()
+  }
+  clearTemplate () {
+    let { hiprintTemplate } = this
+    hiprintTemplate.clear()
+  }
+
   render () {
     return (
       <div>
@@ -212,6 +230,7 @@ export default class Print extends Base {
                 </ul>
                 <div style='clear:both;'></div>
               </div>
+              <div class='hiprint-printPagination'></div>
               <div style='width:820px;overflow-x:auto;overflow-y:hidden;'>
                 <div id='hiprint-printTemplate' class='hiprint-printTemplate' style='margin-top:20px;'>
                 </div>
@@ -247,21 +266,5 @@ export default class Print extends Base {
         {/* <script src='https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js'></script> */}
       </div>
     )
-  }
-
-  // 调整纸张
-  setPaper (paperTypeOrWidth, height?) {
-    let { hiprintTemplate } = this
-    hiprintTemplate.setPaper(paperTypeOrWidth, height)
-  }
-
-  // 旋转
-  rotatePaper () {
-    let { hiprintTemplate } = this
-    hiprintTemplate.rotatePaper()
-  }
-  clearTemplate () {
-    let { hiprintTemplate } = this
-    hiprintTemplate.clear()
   }
 }

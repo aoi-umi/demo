@@ -92,3 +92,9 @@ import * as stat from './stat';
 router.post('/stat/pv/save', MyRequestHandlerMid.convert(stat.pvSave));
 router.get('/stat/query', MyRequestHandlerMid.convert(stat.query));
 //#endregion
+
+//#region print 
+import * as print from './print';
+router.get('/print/mgt/query', UserAuthMid.normal(), MyRequestHandlerMid.convert(print.mgtQuery));
+router.post('/print/mgt/save', UserAuthMid.normal(), MyRequestHandlerMid.convert(print.mgtSave));
+//#endregion

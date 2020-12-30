@@ -314,6 +314,17 @@ export default {
       statQuery: {
         url: '/stat/query',
         method: 'get'
+      },
+      printMgtQuery: {
+        url: '/print/mgt/query',
+        method: 'get'
+      },
+      printMgtDetailQuery: {
+        url: '/print/mgt/detailQuery',
+        method: 'get'
+      },
+      printMgtSave: {
+        url: '/print/mgt/save'
       }
     }
   } as TestApiConfigType

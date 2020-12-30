@@ -178,6 +178,11 @@ const cfg = {
     text: '瀑布流',
     component: () => import('../views/waterfall')
   },
+  printMgt: {
+    path: '/printMgt',
+    text: '打印管理',
+    component: () => import('../views/print-mgt')
+  },
   print: {
     path: '/print',
     text: '打印',
