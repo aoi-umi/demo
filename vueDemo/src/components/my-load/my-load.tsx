@@ -10,75 +10,80 @@ import { cls } from '../style'
 import './style.less'
 
 class MyLoadProp {
-    @Prop()
-    loadFn: () => Promise<any>;
+  @Prop()
+  loadFn: () => Promise<any>;
 
-    @Prop()
-    renderFn: (data: any) => any;
+  @Prop()
+  afterLoad?: () => Promise<any>;
 
-    @Prop()
-    width?: number;
+  @Prop()
+  renderFn: (data: any) => any;
 
-    @Prop({
-      default: 200
-    })
-    height?: number;
+  @Prop()
+  width?: number;
 
-    @Prop()
-    notLoadOnMounted?: boolean;
+  @Prop({
+    default: 200
+  })
+  height?: number;
 
-    @Prop()
-    errMsgFn?: (e) => string;
+  @Prop()
+  notLoadOnMounted?: boolean;
+
+  @Prop()
+  errMsgFn?: (e) => string;
 }
 @Component({
   extends: MyBase,
   mixins: [getCompOpts(MyLoadProp)]
 })
 class MyLoad extends Vue<MyLoadProp & MyBase> {
-    stylePrefix = 'my-load-';
+  stylePrefix = 'my-load-';
 
-    loading = false;
-    result = {
-      success: false,
-      msg: '准备加载',
-      data: null
-    };
+  loading = false;
+  result = {
+    success: false,
+    msg: '准备加载',
+    data: null
+  };
 
-    protected mounted () {
-      if (!this.notLoadOnMounted) { this.loadData() }
+  protected mounted () {
+    if (!this.notLoadOnMounted) { this.loadData() }
+  }
+
+  async loadData () {
+    this.loading = true
+    try {
+      this.result.data = await this.loadFn()
+      this.result.success = true
+      await this.$utils.wait()
+      this.afterLoad && await this.afterLoad()
+    } catch (e) {
+      this.result.success = false
+      this.result.msg = (this.errMsgFn && this.errMsgFn(e)) || e.message
+    } finally {
+      this.loading = false
+    }
+  }
+
+  protected render () {
+    if (!this.result.success) {
+      return (
+        <div class={this.getStyleName('root')}>
+          <Card class={cls.center} style={{ height: this.height ? this.height + 'px' : null, width: this.width ? this.width + 'px' : null }}>
+            {this.loading ? <Spin size='large' fix />
+              : <div class={this.getStyleName('content').concat(cls.center)}>
+                {this.result.msg}
+                <Button class={this.getStyleName('retry-btn')} on-click={this.loadData}>重试</Button>
+              </div>
+            }
+          </Card>
+        </div>
+      )
     }
 
-    async loadData () {
-      this.loading = true
-      try {
-        this.result.data = await this.loadFn()
-        this.result.success = true
-      } catch (e) {
-        this.result.success = false
-        this.result.msg = (this.errMsgFn && this.errMsgFn(e)) || e.message
-      } finally {
-        this.loading = false
-      }
-    }
-
-    protected render () {
-      if (!this.result.success) {
-        return (
-          <div class={this.getStyleName('root')}>
-            <Card class={cls.center} style={{ height: this.height ? this.height + 'px' : null, width: this.width ? this.width + 'px' : null }}>
-              {this.loading ? <Spin size='large' fix />
-                : <div class={this.getStyleName('content').concat(cls.center)}>
-                  {this.result.msg}
-                  <Button class={this.getStyleName('retry-btn')} on-click={this.loadData}>重试</Button>
-                </div>
-              }
-            </Card>
-          </div>
-        )
-      }
-
-      return this.renderFn(this.result.data)
-    }
+    return this.renderFn(this.result.data)
+  }
 }
 
 const MyLoadView = convClass<MyLoadProp>(MyLoad)

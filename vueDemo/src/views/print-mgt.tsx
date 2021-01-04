@@ -11,16 +11,10 @@ import { MyList, IMyList, Const as MyListConst, OnSortChangeOptions, MyListModel
 import { MyTagModel, MyTag } from '@/components/my-tag'
 import { MyConfirm } from '@/components/my-confirm'
 import { Base } from './base'
-
-type DetailDataType = {
-  _id?: string;
-  name?: string;
-};
+import { routerConfig } from '@/router'
 
 @Component
-export default class Bookmark extends Base {
-  detailShow = false;
-  detail: any;
+export default class PrintMgt extends Base {
   $refs: { list: IMyList<any> };
 
   mounted () {
@@ -38,6 +32,27 @@ export default class Bookmark extends Base {
     list.setQueryByKey(query, ['name'])
     convert.Test.queryToListModel(query, list.model)
     this.$refs.list.query(query)
+  }
+
+  async delHandler (delIds: any[]) {
+    this.$utils.confirm((
+      <div>
+        将要删除{delIds.length}项
+      </div>
+    ), {
+      title: '确认删除?',
+      confirm: async () => {
+        await testApi.printMgtDel({ idList: delIds })
+        this.query()
+      }
+    })
+  }
+
+  toDetail (query?) {
+    this.$router.push({
+      path: routerConfig.printMgtDetail.path,
+      query
+    })
   }
 
   protected render () {
@@ -69,12 +84,12 @@ export default class Bookmark extends Base {
               return (
                 <div class={MyListConst.clsActBox}>
                   <a on-click={() => {
-                    this.detail = params.row
-                    this.detailShow = true
+                    let row = params.row
+                    this.toDetail({ _id: row._id })
                   }}>编辑</a>
-                  {/* <a on-click={() => {
+                  <a on-click={() => {
                     this.delHandler([params.row._id])
-                  }}>删除</a> */}
+                  }}>删除</a>
                 </div>
               )
             }
@@ -96,16 +111,15 @@ export default class Bookmark extends Base {
           }}
 
           on-add-click={() => {
-            this.detail = null
-            this.detailShow = true
+            this.toDetail()
           }}
 
-        // multiOperateBtnList={[{
-        //   text: '批量删除',
-        //   onClick: (selection) => {
-        //     this.delHandler(selection.map(ele => ele._id))
-        //   }
-        // }]}
+          multiOperateBtnList={[{
+            text: '批量删除',
+            onClick: (selection) => {
+              this.delHandler(selection.map(ele => ele._id))
+            }
+          }]}
         ></MyList>
       </div>
     )

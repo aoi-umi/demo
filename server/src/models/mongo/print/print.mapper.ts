@@ -1,10 +1,27 @@
 import { LoginUser } from '@/models/login-user';
+import * as ValidSchema from '@/valid-schema/class-valid';
+import { escapeRegExp } from '@/_system/common';
+
 import { PrintInstanceType, PrintModel, } from './print';
 export class PrintMapper {
-    static async query() {
+    static async query(data: ValidSchema.PrintQuery, opt: {
+        user: LoginUser
+    }) {
+        let query: any = {};
+
+        if (data.name)
+            query.name = new RegExp(escapeRegExp(data.name), 'i');
         let rs = await PrintModel.findAndCountAll({
+            conditions: query,
             projection: { data: 0 },
         });
+        return rs;
+    }
+
+    static async detailQuery(data: ValidSchema.PrintDetailQuery, opt: {
+        user: LoginUser
+    }) {
+        let rs = await PrintModel.findById(data._id);
         return rs;
     }
 
@@ -12,12 +29,19 @@ export class PrintMapper {
         user: LoginUser
     }) {
         let detail: PrintInstanceType;
-        if (data._id) {
-            detail = await PrintModel.findOne({ _id: data._id });
-        } else {
+        if (!data._id) {
+            delete data._id;
             detail = new PrintModel(data);
+            await detail.save();
+        } else {
+            detail = await PrintModel.findOne({ _id: data._id });
+            let update: any = {};
+            ['name', 'data'].forEach(key => {
+                console.log(key);
+                update[key] = data[key];
+            });
+            await detail.update(update);
         }
-        await detail.save();
         return detail;
     }
 }

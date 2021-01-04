@@ -36,7 +36,7 @@ export class Base extends MyBase {
     async operateHandler (operate: string, fn: () => any, opt?: {
         beforeValid?: () => any;
         onSuccessClose?: () => any;
-        validate?: (callback?: (valid?: boolean) => void) => void,
+        validate?: (callback?: (valid?: boolean) => void) => Promise<boolean>,
         noDefaultHandler?: boolean;
         noSuccessHandler?: boolean;
         noErrorHandler?: boolean;
@@ -49,23 +49,14 @@ export class Base extends MyBase {
       try {
         opt = { ...opt }
         opt.beforeValid && await opt.beforeValid()
-        const valid = await new Promise((reso, rej) => {
-          if (opt.validate) {
-            opt.validate((valid) => {
-              if (!valid) {
-                this.$Message.error('参数有误')
-                reso(false)
-              } else {
-                reso(true)
-              }
-            })
-          } else {
-            reso(true)
-          }
-        })
+        let valid = true
+        if (opt.validate) {
+          valid = await opt.validate()
+        }
         if (!valid) {
           result.success = false
           result.msg = '参数有误'
+          this.$Message.error('参数有误')
           return result
         }
         await fn()

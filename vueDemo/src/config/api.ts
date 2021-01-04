@@ -325,6 +325,9 @@ export default {
       },
       printMgtSave: {
         url: '/print/mgt/save'
+      },
+      printMgtDel: {
+        url: '/print/mgt/del'
       }
     }
   } as TestApiConfigType

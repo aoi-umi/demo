@@ -115,6 +115,7 @@ type TestApiMethod = ApiMethod<ApiMethodConfigType, {
   printMgtQuery,
   printMgtSave,
   printMgtDetailQuery,
+  printMgtDel,
 }>;
 export type TestApiConfigType = ApiConfigModel<TestApiMethod>;
 
@@ -501,6 +502,18 @@ export class TestApi extends ApiModel<TestApiMethod> {
   // #region print
   async printMgtQuery (data) {
     return this.requestByConfig(this.apiConfig.method.printMgtQuery, { data })
+  }
+
+  async printMgtDetailQuery (data) {
+    return this.requestByConfig(this.apiConfig.method.printMgtDetailQuery, { data })
+  }
+
+  async printMgtSave (data) {
+    return this.requestByConfig(this.apiConfig.method.printMgtSave, { data })
+  }
+
+  async printMgtDel (data) {
+    return this.requestByConfig(this.apiConfig.method.printMgtDel, { data })
   }
 
   // #endregion

@@ -152,7 +152,7 @@ export default class App extends Base {
         icon: 'md-pie'
       }, {
         routerConfig: routerConfig.printMgt,
-        icon: 'md-pie'
+        icon: 'md-print'
       }].map(ele => this.convMenu(ele))
     }
 

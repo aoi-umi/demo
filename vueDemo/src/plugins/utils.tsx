@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import 'jquery'
 import { MyConfirmModalView, MyConfirmModal, MyConfirmModalProp } from '@/components/my-confirm'
 const vm = Vue.prototype as Vue
 class Utils {
@@ -47,6 +48,29 @@ class Utils {
       }, ms)
     })
     return promise
+  }
+
+  private scripts: { [key: string]: { url: string, promise: Promise<any> } } = {};
+  async loadScript (list: string[]) {
+    return Promise.all(list.map(ele => {
+      let resolve, reject
+      let promise = new Promise((reso, rej) => {
+        resolve = reso
+        reject = rej
+      })
+      let script = this.scripts[ele]
+      if (script) {
+        script.promise.then(() => {
+          resolve()
+        })
+      } else {
+        this.scripts[ele] = { url: ele, promise }
+        $.getScript(ele, (response, status) => {
+          resolve()
+        })
+      }
+      return promise
+    }))
   }
 }
 declare module 'vue/types/vue' {

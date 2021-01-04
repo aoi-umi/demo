@@ -1,9 +1,11 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
-import 'jquery'
 
-import { Button } from '@/components/iview'
+import { Button, Input } from '@/components/iview'
+import { IMyLoad, MyLoad } from '@/components/my-load'
+import { testApi } from '@/api'
 
 import { Base } from './base'
+import './print.less'
 
 type ItemGroup = {
   title: string
@@ -15,18 +17,45 @@ type Item = {
   text: string;
   icon: string;
 }
+
+type DetailDataType = {
+  _id?: string;
+  name?: string;
+  data?: any
+};
 @Component
 export default class Print extends Base {
+  stylePrefix = 'print-'
+  $refs: { loadView: IMyLoad };
   hiprintTemplate: any
   itemGroups: ItemGroup[] = []
   testData: any = ''
+  detail: DetailDataType = this.getDetailData()
+  initPromise: Promise<void>;
   created () {
     this.createdInit()
   }
   mounted () {
-    this.mountedInit()
   }
-  createdInit () {
+
+  @Watch('$route')
+  route (to, from) {
+    this.$refs.loadView.loadData()
+  }
+
+  private getDetailData () {
+    return {
+      _id: null,
+      name: '',
+      data: null
+    }
+  }
+  async createdInit () {
+    this.initPromise = new Promise(async (resolve, reject) => {
+      await this.getScript()
+      resolve()
+    })
+
     this.itemGroups = [{
       title: '拖拽列表',
       items: [{
@@ -77,42 +106,60 @@ export default class Print extends Base {
         icon: 'glyphicon-record'
       }]
     }]
-    this.testData = JSON.stringify({
+  }
+
+  setTestData (obj?) {
+    this.testData = JSON.stringify(obj || {})
+  }
+
+  getTestData () {
+    return JSON.parse(this.testData)
+  }
+
+  async afterLoad () {
+    await this.initPromise
+    hiprint.init({
+      providers: [new customElementTypeProvider()],
+      paginationContainer: '.hiprint-printPagination'
+    })
+
+    // 设置左侧拖拽事件
+    hiprint.PrintElementTypeManager.buildByHtml($('.ep-draggable-item'))
+
+    $('#A4_directPrint').click(() => {
+      try {
+        let testData = this.getTestData()
+        this.hiprintTemplate.print(testData)
+      } catch (e) {
+        this.$Message.error(e.message)
+      }
+    })
+
+    let testData = {
       name: 'vue',
       table: [{
         col1: '1',
         col2: '2',
         col3: '3'
       }]
-    })
+    }
+    if (this.detail._id) { testData = null }
+    this.setTestData(testData)
+    this.setTemplate(this.detail.data)
   }
-  async mountedInit () {
-    await this.getScript()
-    hiprint.init({
-      providers: [new customElementTypeProvider()],
-      paginationContainer: '.hiprint-printPagination'
-    })
-    let hiprintTemplate
-    // 设置左侧拖拽事件
-    let template = { 'panels': [{ 'index': 0, 'paperType': 'A4', 'height': 297, 'width': 210, 'paperHeader': 0, 'paperFooter': 841.8897637795277, 'printElements': [{ 'options': { 'left': 27, 'top': 30, 'height': 9.75, 'width': 33, 'title': 'hello,' }, 'printElementType': { 'type': 'text' }}, { 'options': { 'left': 57, 'top': 30, 'height': 12, 'width': 121.5, 'field': 'name', 'testData': 'world' }, 'printElementType': { 'type': 'text' }}, { 'options': { 'left': 12, 'top': 103.5, 'height': 36, 'width': 550, 'field': 'table', 'columns': [[{ 'title': '列1', 'field': 'col1', 'width': 232.69230769230768, 'colspan': 1, 'rowspan': 1, 'checked': true }, { 'title': '列2', 'field': 'col2', 'width': 162.6925576923077, 'colspan': 1, 'rowspan': 1, 'checked': true }, { 'title': '列3', 'field': 'col3', 'width': 154.6151346153846, 'colspan': 1, 'rowspan': 1, 'checked': true }]] }, 'printElementType': { 'title': '表格', 'type': 'tableCustom' }}] }] }
-    hiprint.PrintElementTypeManager.buildByHtml($('.ep-draggable-item'))
-    this.hiprintTemplate = hiprintTemplate = new hiprint.PrintTemplate({
+
+  async setTemplate (template) {
+    await this.initPromise
+    let hiprintTemplate = this.hiprintTemplate = new hiprint.PrintTemplate({
       template,
       settingContainer: '#PrintElementOptionSetting',
       paginationContainer: '.hiprint-printPagination'
     })
     // 打印设计
+    $('#hiprint-printTemplate').html('')
     hiprintTemplate.design('#hiprint-printTemplate')
-
-    $('#A4_directPrint').click(() => {
-      try {
-        let testData = JSON.parse(this.testData)
-        hiprintTemplate.print(testData)
-      } catch (e) {
-        this.$Message.error(e.message)
-      }
-    })
   }
+
   async getScript () {
     let scripts = [
       'hiprint/polyfill.min.js',
@@ -125,20 +172,7 @@ export default class Print extends Base {
       'hiprint/plugins/jquery.hiwprint.js'
       // 'https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js'
     ]
-    await this.loadScript(scripts)
-  }
-  loadScript (list: string[]) {
-    return Promise.all(list.map(ele => {
-      let resolve, reject
-      let promise = new Promise((reso, rej) => {
-        resolve = reso
-        reject = rej
-      })
-      $.getScript(ele, (response, status) => {
-        resolve()
-      })
-      return promise
-    }))
+    await this.$utils.loadScript(scripts)
   }
 
   // 调整纸张
@@ -157,7 +191,50 @@ export default class Print extends Base {
     hiprintTemplate.clear()
   }
 
+  async loadDetail () {
+    const query = this.$route.query
+    let detail: DetailDataType
+    if (query._id) {
+      detail = await testApi.printMgtDetailQuery({ _id: query._id })
+    } else {
+      detail = this.getDetailData() as any
+      detail.data = { 'panels': [{ 'index': 0, 'paperType': 'A4', 'height': 297, 'width': 210, 'paperHeader': 0, 'paperFooter': 841.8897637795277, 'printElements': [{ 'options': { 'left': 27, 'top': 30, 'height': 9.75, 'width': 33, 'title': 'hello,' }, 'printElementType': { 'type': 'text' }}, { 'options': { 'left': 57, 'top': 30, 'height': 12, 'width': 121.5, 'field': 'name', 'testData': 'world' }, 'printElementType': { 'type': 'text' }}, { 'options': { 'left': 12, 'top': 103.5, 'height': 36, 'width': 550, 'field': 'table', 'columns': [[{ 'title': '列1', 'field': 'col1', 'width': 232.69230769230768, 'colspan': 1, 'rowspan': 1, 'checked': true }, { 'title': '列2', 'field': 'col2', 'width': 162.6925576923077, 'colspan': 1, 'rowspan': 1, 'checked': true }, { 'title': '列3', 'field': 'col3', 'width': 154.6151346153846, 'colspan': 1, 'rowspan': 1, 'checked': true }]] }, 'printElementType': { 'title': '表格', 'type': 'tableCustom' }}] }] }
+    }
+
+    this.detail = detail
+    return detail
+  }
+
+  saving = false
+  save () {
+    this.operateHandler('保存', async () => {
+      this.saving = true
+      let saveData = {
+        ...this.detail,
+        data: this.hiprintTemplate.getJson()
+      }
+      let rs = await testApi.printMgtSave(saveData)
+      if (!this.detail._id) { this.detail._id = rs._id }
+    }).finally(() => {
+      this.saving = false
+    })
+  }
+
   render () {
+    return (
+      <MyLoad
+        ref='loadView'
+        loadFn={this.loadDetail}
+        renderFn={() => {
+          return this.renderMain()
+        }}
+        afterLoad={this.afterLoad}
+        v-loading={this.saving}
+      />
+    )
+  }
+
+  renderMain () {
     return (
       <div>
         {this.renderImport()}
@@ -217,15 +294,12 @@ export default class Print extends Base {
                   <li><a class='hiprint-toolbar-item' on-click={this.rotatePaper}>旋转</a></li>
                   <li><a class='hiprint-toolbar-item' on-click={this.clearTemplate}>清空</a></li>
 
-                  {/* <li>
-                    <a id='A4_preview' class='btn hiprint-toolbar-item ' style='color: #fff;background-color: #d9534f;border-color: #d43f3a;' >快速预览</a>
-                  </li> */}
                   <li>
-                    <a id='A4_directPrint' class='btn hiprint-toolbar-item ' style='color: #fff;background-color: #d9534f; border-color: #d43f3a;'>打印</a>
+                    <a id='A4_directPrint' class={['btn hiprint-toolbar-item ', ...this.getStyleName('important-btn')]} >打印</a>
                   </li>
-                  <li><a class='hiprint-toolbar-item' on-click={() => {
-                    console.log(this.hiprintTemplate.getJson())
-                  }}>json</a></li>
+                  <li><a class={['btn hiprint-toolbar-item ', ...this.getStyleName('important-btn')]} on-click={() => {
+                    this.save()
+                  }}>保存</a></li>
 
                 </ul>
                 <div style='clear:both;'></div>
@@ -240,9 +314,15 @@ export default class Print extends Base {
           </div>
 
           <div style='width:250px'>
-            <div>测试数据</div>
-            <textarea v-model={this.testData}>
-            </textarea>
+            <div>
+              <div>模板名称</div>
+              <Input v-model={this.detail.name} />
+            </div>
+            <div>
+              <div>测试数据</div>
+              <textarea v-model={this.testData}>
+              </textarea>
+            </div>
             <div id='PrintElementOptionSetting' style='margin-top:10px;'></div>
           </div>
         </div>
