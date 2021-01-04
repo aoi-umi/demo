@@ -162,14 +162,14 @@ export default class Print extends Base {
 
   async getScript () {
     let scripts = [
-      'hiprint/polyfill.min.js',
-      'hiprint/plugins/jquery.minicolors.min.js',
-      'hiprint/plugins/JsBarcode.all.min.js',
-      'hiprint/plugins/qrcode.js',
-      'hiprint/hiprint.bundle.js',
-      'hiprint/custom_test/config-etype-provider.js',
-      'hiprint/custom_test/custom-etype-provider.js',
-      'hiprint/plugins/jquery.hiwprint.js'
+      '/hiprint/polyfill.min.js',
+      '/hiprint/plugins/jquery.minicolors.min.js',
+      '/hiprint/plugins/JsBarcode.all.min.js',
+      '/hiprint/plugins/qrcode.js',
+      '/hiprint/hiprint.bundle.js',
+      '/hiprint/custom_test/config-etype-provider.js',
+      '/hiprint/custom_test/custom-etype-provider.js',
+      '/hiprint/plugins/jquery.hiwprint.js'
       // 'https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js'
     ]
     await this.$utils.loadScript(scripts)
@@ -332,8 +332,8 @@ export default class Print extends Base {
   renderImport () {
     return (
       <div>
-        <link href='hiprint/css/hiprint.css' rel='stylesheet' />
-        <link href='hiprint/css/print-lock.css' rel='stylesheet' />
+        <link href='/hiprint/css/hiprint.css' rel='stylesheet' />
+        <link href='/hiprint/css/print-lock.css' rel='stylesheet' />
 
         <link href='https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css' rel='stylesheet' />
 

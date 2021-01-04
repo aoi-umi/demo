@@ -1,6 +1,7 @@
 import { LoginUser } from '@/models/login-user';
 import * as ValidSchema from '@/valid-schema/class-valid';
 import { escapeRegExp } from '@/_system/common';
+import { BaseMapper } from '../_base';
 
 import { PrintInstanceType, PrintModel, } from './print';
 export class PrintMapper {
@@ -12,6 +13,7 @@ export class PrintMapper {
         if (data.name)
             query.name = new RegExp(escapeRegExp(data.name), 'i');
         let rs = await PrintModel.findAndCountAll({
+            ...BaseMapper.getListOptions(data),
             conditions: query,
             projection: { data: 0 },
         });

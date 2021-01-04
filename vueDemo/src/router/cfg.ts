@@ -184,7 +184,7 @@ const cfg = {
     component: () => import('../views/print-mgt')
   },
   printMgtDetail: {
-    path: '/printMgtDetail',
+    path: '/printMgt/detail',
     text: '打印',
     component: () => import('../views/print')
   }
