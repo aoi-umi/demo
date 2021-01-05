@@ -23,6 +23,7 @@
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
         "strictPropertyInitialization": false,
-        "moduleResolution": "node"
+        "moduleResolution": "node",
+        "skipLibCheck": true
     }
 }

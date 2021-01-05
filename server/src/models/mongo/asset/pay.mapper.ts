@@ -66,7 +66,7 @@ export class PayMapper {
         ], {
             ...BaseMapper.getListOptions(data)
         });
-        rs.rows = rs.rows.map(ele => {
+        let rows = rs.rows.map(ele => {
             let obj = new PayModel(ele).toJSON();
             UserMapper.resetDetail(ele.user, { imgHost: opt.imgHost });
             obj.user = ele.user;
@@ -75,7 +75,10 @@ export class PayMapper {
             PayMapper.resetDetail(obj, { user: opt.user });
             return obj;
         });
-        return rs;
+        return {
+            ...rs,
+            rows
+        };
     }
 
     static resetDetail(detail, opt: { user: LoginUser }) {

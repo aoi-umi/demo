@@ -40,7 +40,11 @@ export class AuthorityMapper {
             getAll: data.getAll,
             ...BaseMapper.getListOptions(data),
         });
-        rs.rows = rs.rows.map(ele => new AuthorityModel(ele).toJSON());
-        return rs;
+
+        let rows = rs.rows.map(ele => new AuthorityModel(ele).toJSON());
+        return {
+            ...rs,
+            rows
+        };
     }
 }

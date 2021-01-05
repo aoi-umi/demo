@@ -66,11 +66,11 @@ export class FileMapper {
         contentType: string,
         filename: string,
         buffer: Buffer,
-        user: {
+        user: Partial<{
             _id: Types.ObjectId;
             nickname: string;
             account: string;
-        },
+        }>,
         imgHost?: string,
     }) {
         let { user } = opt;

@@ -192,7 +192,7 @@ export class UserMapper {
         });
         let rows = rs.rows.map((ele) => {
             let model = new UserModel(ele);
-            let obj = model.toJSON();
+            let obj = model.toJSON() as any;
             delete obj.wxOpenId;
             //可用权限
             let auth = {};

@@ -99,7 +99,7 @@ export class RoleMapper {
             noTotal,
             ...BaseMapper.getListOptions(data),
         });
-        rs.rows = rs.rows.map(ele => {
+        let rows = rs.rows.map(ele => {
             let obj = new RoleModel(ele).toJSON();
             let authorityList = ele.newAuthorityList;
             if (data.includeDelAuth) {
@@ -108,6 +108,6 @@ export class RoleMapper {
             obj.authorityList = authorityList;
             return obj;
         });
-        return rs;
+        return {...rs, rows};
     }
 }

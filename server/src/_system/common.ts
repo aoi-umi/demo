@@ -329,7 +329,7 @@ export let requestServiceByConfig = function (option: RequestServiceByConfigOpti
         let opt: AxiosRequestConfig = {
             url: url,
             data: option.data,
-            method: method
+            method: method as any
         };
         if (option.beforeRequest) {
             //发送的参数 当前所用参数

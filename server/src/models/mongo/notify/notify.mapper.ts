@@ -68,7 +68,7 @@ export class NotifyMapper {
         ], {
             ...BaseMapper.getListOptions(data)
         });
-        rs.rows = rs.rows.map(ele => {
+        let rows = rs.rows.map(ele => {
             let obj = new NotifyModel(ele).toJSON();
             if (ele.assetLog) {
                 obj.assetLog = {
@@ -78,6 +78,9 @@ export class NotifyMapper {
             }
             return obj;
         });
-        return rs;
+        return {
+            ...rs,
+            rows
+        };
     }
 }

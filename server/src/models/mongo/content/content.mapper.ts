@@ -48,7 +48,8 @@ export type ContentUpdateStatusOutOption = {
 
 export class ContentMapper {
     static async query(data: ValidSchema.ContentQuery, opt: {
-        model: ContentBaseModelType,
+        // model: ContentBaseModelType,
+        model: any,
         setMatch?: (match) => void;
         resetDetail?: (data: any) => any;
     } & ContentQueryOption) {
@@ -102,7 +103,7 @@ export class ContentMapper {
             ];
         }
 
-        let model = opt.model;
+        let model = opt.model as ContentBaseModelType;
         if (!data.orderBy && opt.normal)
             data.orderBy = 'publishAt';
         let rs = await model.aggregatePaginate(pipeline, {
@@ -110,14 +111,17 @@ export class ContentMapper {
             ...opt,
             extraPipeline,
         });
-        rs.rows = rs.rows.map(ele => {
+        let rows = rs.rows.map(ele => {
             let e = {
                 ...ele,
                 ...new model(ele).toJSON()
             };
             return opt.resetDetail ? opt.resetDetail(e) : e;
         });
-        return rs;
+        return {
+            ...rs,
+            rows,
+        };
     }
 
     static async detailQuery(opt: ContentQueryOption & { query: () => Promise<any> }) {
@@ -137,7 +141,7 @@ export class ContentMapper {
                 { $sort: { _id: -1 } }
             ]);
             rs.log = logRs.rows.map(ele => {
-                let obj = new ContentLogModel(ele).toJSON();
+                let obj = new ContentLogModel(ele).toJSON() as any;
                 UserMapper.resetDetail(ele.user, { imgHost: opt.resetOpt.imgHost });
                 obj.user = ele.user;
                 return obj;
@@ -159,7 +163,7 @@ export class ContentMapper {
     }
 
     static async updateStatus(opt: {
-        model: ContentBaseModelType,
+        model: any,
         contentType: number,
         passCond: (detail) => boolean,
         delCond: (detail) => boolean,
@@ -173,7 +177,7 @@ export class ContentMapper {
             cond.status = status;
         if (includeUserId)
             cond.userId = Types.ObjectId(includeUserId as any);
-        let model = opt.model;
+        let model = opt.model as ContentBaseModelType;
         let list = await model.find(cond);
         if (!list.length)
             throw error('', config.error.NO_MATCH_DATA);
@@ -223,9 +227,9 @@ export class ContentMapper {
         user: LoginUser,
         contentType: number,
         saveKey: string[],
-        model: ContentBaseModelType,
+        model: any,
         status: number,
-        getDetail: () => Promise<ContentBaseInstanceType>,
+        getDetail: () => Promise<any>,
     }) {
         let { user } = opt;
         let detail: ContentBaseInstanceType;
@@ -236,7 +240,8 @@ export class ContentMapper {
             saveData[key] = data[key];
         });
         if (!data._id) {
-            detail = new opt.model({
+            let model = opt.model as ContentBaseModelType;
+            detail = new model({
                 ...saveData,
                 status,
                 userId: user._id,
@@ -275,10 +280,12 @@ export class ContentMapper {
 
     static async mixQuery(data: ValidSchema.ContentQuery, opt: {
         resetOpt: ContentResetOption,
-        ContentContactModel: ContentContactBaseModelType,
+        // ContentContactModel: ContentContactBaseModelType,
+        ContentContactModel: any,
         merge?: object
     }) {
-        let { ContentContactModel, resetOpt } = opt;
+        let { resetOpt } = opt;
+        let ContentContactModel = opt.ContentContactModel as ContentContactBaseModelType;
         let match2: any = {};
         let and = [];
         let anyKeyAnd = BaseMapper.multiKeyLike(data.anyKey, (anykey) => {
@@ -299,13 +306,14 @@ export class ContentMapper {
         }
         if (and.length)
             match2.$and = and;
+            
         let rs = await ContentContactModel.aggregatePaginate([
             {
                 $match: {
                     userId: resetOpt.user._id,
                 }
             },
-            ...[ArticleModel, VideoModel].map(model => {
+            ...[ArticleModel, VideoModel].map<any>(model => {
                 return {
                     $lookup: {
                         from: model.collection.collectionName,

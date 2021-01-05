@@ -78,11 +78,14 @@ export class FavouriteMapper {
             ContentContactModel: FavouriteModel,
             merge: { favourAt: '$root.favourAt' }
         });
-        rs.rows = rs.rows.map(ele => {
+        let rows = rs.rows.map(ele => {
             let obj = ele as typeof ele & { favouriteValue: boolean };
             obj.favouriteValue = true;
             return obj;
         });
-        return rs;
+        return {
+            ...rs,
+            rows
+        };
     }
 }

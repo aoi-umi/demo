@@ -116,14 +116,17 @@ export class CommentMapper {
             voteList,
         };
         replyList = replyList.map(ele => CommentMapper.resetDetail(ele.toJSON(), commentResetOpt));
-        rs.rows = commentList.map(detail => {
+        let rows = commentList.map(detail => {
             let obj = CommentMapper.resetDetail(detail.toJSON(), commentResetOpt);
             if (getReply) {
                 obj.replyList = replyList.filter(reply => reply.topId.equals(detail._id));
             }
             return obj;
         });
-        return rs;
+        return {
+            ...rs,
+            rows,
+        };
     }
 
     //获取子级评论

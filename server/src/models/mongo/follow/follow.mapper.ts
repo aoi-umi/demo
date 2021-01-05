@@ -131,7 +131,7 @@ export class FollowMapper {
         }>(pipeline, {
             ...BaseMapper.getListOptions(data),
         });
-        rs.rows = rs.rows.map(detail => {
+        let rows = rs.rows.map(detail => {
             detail.user.avatarUrl = FileMapper.getImgUrl(detail.user.avatar, opt.imgHost);
             detail[asName] = detail.user;
             let eachFollowStatus = detail.follow ? detail.follow.status : myEnum.followStatus.未关注;
@@ -148,6 +148,9 @@ export class FollowMapper {
             delete detail.follow;
             return detail;
         });
-        return rs;
+        return {
+            ...rs,
+            rows
+        };
     }
 }

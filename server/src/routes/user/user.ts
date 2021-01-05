@@ -40,14 +40,14 @@ export let detailQuery: MyRequestHandler = async (opt) => {
     let detail = await UserModel.findById(data._id, { password: 0, roleList: 0, authorityList: 0 });
     if (!detail)
         throw common.error('', config.error.USER_NOT_FOUND);
-    let obj = detail.toJSON({ virtuals: false });
+    let obj = detail.toJSON({ virtuals: false }) as any;
     UserMapper.resetDetail(obj, { imgHost: opt.myData.imgHost });
     await UserMapper.resetStat(detail, obj);
     let follow: FollowInstanceType;
     obj.followEachOther = false;
     obj.followStatus = myEnum.followStatus.未关注;
     if (user.isLogin) {
-        follow = await FollowModel.findOne({ userId: user._id, followUserId: detail._id });
+        follow = await FollowModel.findOne({ userId: user._id, followUserId: detail._id } as any);
         if (follow) {
             let { followEachOther } = await FollowMapper.isFollowEach({
                 srcStatus: follow.status,

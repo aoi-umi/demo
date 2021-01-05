@@ -9,7 +9,7 @@ import { ContentBase } from '../content/content-base';
 import { IPagination } from '../_plugins/pagination';
 
 export type VideoInstanceType = InstanceType<Video>;
-export type VideoModelType = ModelType<Video, typeof Video>;
+// export type VideoModelType = ModelType<Video, typeof Video>;
 export type VideoDocType = DocType<VideoInstanceType>;
 @setSchema({
     schemaOptions: {
@@ -47,4 +47,5 @@ export class Video extends ContentBase {
 }
 
 export const VideoModel = getModelForClass<Video, typeof Video & IPagination<Video>>(Video);
+export type VideoModelType = typeof VideoModel
 
