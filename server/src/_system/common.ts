@@ -372,12 +372,12 @@ export let requestService = function (option: RequestServiceOption) {
         let data = response.data;
         let encoding = response.headers['content-encoding'];
         switch (encoding) {
-        case 'gzip':
-            data = await promisify(zlib.unzip)(data);
-            break;
-        default:
-            if (encoding)
-                throw error(`Not Accept Encoding:${encoding}`);
+            case 'gzip':
+                data = await promisify(zlib.unzip)(data);
+                break;
+            default:
+                if (encoding)
+                    throw error(`Not Accept Encoding:${encoding}`);
         }
 
         if (!opt.raw && Buffer.isBuffer(data)) {

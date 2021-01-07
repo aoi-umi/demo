@@ -8,10 +8,17 @@ export class PrintMapper {
     static async query(data: ValidSchema.PrintQuery, opt: {
         user: LoginUser
     }) {
-        let query: any = {};
+        let query: any = {}, $and = [];
 
         if (data.name)
             query.name = new RegExp(escapeRegExp(data.name), 'i');
+        if (opt.user.isLogin) {
+            $and.push({
+                $or: [{ userId: null }, { userId: opt.user._id }]
+            });
+        }
+        if ($and.length)
+            query.$and = $and;
         let rs = await PrintModel.findAndCountAll({
             ...BaseMapper.getListOptions(data),
             conditions: query,
@@ -33,6 +40,8 @@ export class PrintMapper {
         let detail: PrintInstanceType;
         if (!data._id) {
             delete data._id;
+            if (opt.user.isLogin)
+                data.userId = opt.user._id;
             detail = new PrintModel(data);
             await detail.save();
         } else {

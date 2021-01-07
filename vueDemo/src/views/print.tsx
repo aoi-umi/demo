@@ -1,6 +1,6 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
 
-import { Button, Input } from '@/components/iview'
+import { Button, Input, Row, Col } from '@/components/iview'
 import { IMyLoad, MyLoad } from '@/components/my-load'
 import { testApi } from '@/api'
 
@@ -198,7 +198,7 @@ export default class Print extends Base {
       detail = await testApi.printMgtDetailQuery({ _id: query._id })
     } else {
       detail = this.getDetailData() as any
-      detail.data = { 'panels': [{ 'index': 0, 'paperType': 'A4', 'height': 297, 'width': 210, 'paperHeader': 0, 'paperFooter': 841.8897637795277, 'printElements': [{ 'options': { 'left': 27, 'top': 30, 'height': 9.75, 'width': 33, 'title': 'hello,' }, 'printElementType': { 'type': 'text' }}, { 'options': { 'left': 57, 'top': 30, 'height': 12, 'width': 121.5, 'field': 'name', 'testData': 'world' }, 'printElementType': { 'type': 'text' }}, { 'options': { 'left': 12, 'top': 103.5, 'height': 36, 'width': 550, 'field': 'table', 'columns': [[{ 'title': '列1', 'field': 'col1', 'width': 232.69230769230768, 'colspan': 1, 'rowspan': 1, 'checked': true }, { 'title': '列2', 'field': 'col2', 'width': 162.6925576923077, 'colspan': 1, 'rowspan': 1, 'checked': true }, { 'title': '列3', 'field': 'col3', 'width': 154.6151346153846, 'colspan': 1, 'rowspan': 1, 'checked': true }]] }, 'printElementType': { 'title': '表格', 'type': 'tableCustom' }}] }] }
+      detail.data = { 'panels': [{ 'index': 0, 'paperType': 'A4', 'height': 297, 'width': 210, 'paperHeader': 0, 'paperFooter': 841.8897637795277, 'printElements': [{ 'options': { 'left': 27, 'top': 30, 'height': 9.75, 'width': 33, 'title': 'hello,' }, 'printElementType': { 'type': 'text' }}, { 'options': { 'left': 57, 'top': 30, 'height': 12, 'width': 121.5, 'field': 'name', 'testData': 'world' }, 'printElementType': { 'type': 'text' }}, { 'options': { 'left': 12, 'top': 103.5, 'height': 36, 'width': 550, 'field': 'table', 'columns': [[{ 'title': '列1', 'field': 'col1', 'width': 232.69230769230768, 'colspan': 1, 'rowspan': 1, 'checked': true, 'columnId': 'col1' }, { 'title': '列2', 'field': 'col2', 'width': 162.6925576923077, 'colspan': 1, 'rowspan': 1, 'checked': true, 'columnId': 'col2' }, { 'title': '列3', 'field': 'col3', 'width': 154.6151346153846, 'colspan': 1, 'rowspan': 1, 'checked': true, 'columnId': 'col3' }]] }, 'printElementType': { 'title': '表格', 'type': 'tableCustom' }}], 'paperNumberLeft': 565.5, 'paperNumberTop': 819, 'paperNumberDisabled': true }] }
     }
 
     this.detail = detail
@@ -236,82 +236,17 @@ export default class Print extends Base {
 
   renderMain () {
     return (
-      <div>
+      <div class={this.getStyleName('root')}>
         {this.renderImport()}
         <div style='display:flex'>
-          <div class='row'>
-            <div class='col-sm-3 col-md-2' style='padding-right:0px;'>
-
-              <div class='rect-printElement-types hiprintEpContainer'>
-
-                <ul class='hiprint-printElement-type'>
-                  {this.itemGroups.map(ele => {
-                    return (
-                      <li>
-                        <span class='title'><code>{ele.title}</code></span>
-                        <ul>
-                          {ele.items.map(item => {
-                            return (
-                              <li>
-                                <a class='ep-draggable-item' tid={item.tid} style=''>
-                                  <span class={['glyphicon', item.icon]} aria-hidden='true'></span>
-                                  <span class='glyphicon-class'>{item.text}</span>
-                                </a>
-                              </li>
-                            )
-                          })}
-                        </ul>
-                      </li>
-                    )
-                  })}
-                </ul>
-              </div>
-
-            </div>
-            <div class='col-sm-9 col-md-10'>
-              <div class='hiprint-toolbar' style='margin-top:15px;'>
-                <ul>
-                  {[
-                    'A3', 'A4', 'A5',
-                    'B3', 'B4', 'B5'
-                  ].map(ele => {
-                    return (
-                      <li><a class='hiprint-toolbar-item' on-click={() => {
-                        this.setPaper(ele)
-                      }}>{ele}</a></li>
-                    )
-                  })}
-
-                  <li><a class='hiprint-toolbar-item'><input type='text' id='customWidth' style='width: 50px;height: 19px;border: 0px;' placeholder='宽/mm' /></a></li>
-                  <li><a class='hiprint-toolbar-item'><input type='text' id='customHeight' style='width: 50px;height: 19px;border: 0px;' placeholder='高/mm' /></a></li>
-
-                  <li><a class='hiprint-toolbar-item' on-click={() => {
-                    let width = $('#customWidth').val()
-                    let height = $('#customHeight').val()
-                    if (!width || isNaN(width) || !height || isNaN(height)) { return this.$Message.warning('请输入正确的宽高') }
-                    this.setPaper(width, height)
-                  }}>自定义</a></li>
-                  <li><a class='hiprint-toolbar-item' on-click={this.rotatePaper}>旋转</a></li>
-                  <li><a class='hiprint-toolbar-item' on-click={this.clearTemplate}>清空</a></li>
-
-                  <li>
-                    <a id='A4_directPrint' class={['btn hiprint-toolbar-item ', ...this.getStyleName('important-btn')]} >打印</a>
-                  </li>
-                  <li><a class={['btn hiprint-toolbar-item ', ...this.getStyleName('important-btn')]} on-click={() => {
-                    this.save()
-                  }}>保存</a></li>
-
-                </ul>
-                <div style='clear:both;'></div>
-              </div>
-              <div class='hiprint-printPagination'></div>
-              <div style='width:820px;overflow-x:auto;overflow-y:hidden;'>
-                <div id='hiprint-printTemplate' class='hiprint-printTemplate' style='margin-top:20px;'>
-                </div>
-
-              </div>
-            </div>
-          </div>
+          <Row>
+            <Col sm={6} md={4}>
+              {this.renderSideBar()}
+            </Col>
+            <Col sm={18} md={20}>
+              {this.renderMainPage()}
+            </Col>
+          </Row>
 
           <div style='width:250px'>
             <div>
@@ -320,8 +255,7 @@ export default class Print extends Base {
             </div>
             <div>
               <div>测试数据</div>
-              <textarea v-model={this.testData}>
-              </textarea>
+              <Input type='textarea' v-model={this.testData} />
             </div>
             <div id='PrintElementOptionSetting' style='margin-top:10px;'></div>
           </div>
@@ -334,16 +268,81 @@ export default class Print extends Base {
       <div>
         <link href='/hiprint/css/hiprint.css' rel='stylesheet' />
         <link href='/hiprint/css/print-lock.css' rel='stylesheet' />
+      </div>
+    )
+  }
 
-        <link href='https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css' rel='stylesheet' />
+  renderSideBar () {
+    return (
+      <div class='rect-printElement-types hiprintEpContainer'>
+        <ul class='hiprint-printElement-type'>
+          {this.itemGroups.map(ele => {
+            return (
+              <li>
+                <span class='title'><code>{ele.title}</code></span>
+                <ul>
+                  {ele.items.map(item => {
+                    return (
+                      <li>
+                        <a class='ep-draggable-item' tid={item.tid} style=''>
+                          <span class={['glyphicon', item.icon]} aria-hidden='true'></span>
+                          <span class='glyphicon-class'>{item.text}</span>
+                        </a>
+                      </li>
+                    )
+                  })}
+                </ul>
+              </li>
+            )
+          })}
+        </ul>
+      </div>
+    )
+  }
 
-        {/* <script src='hiprint/polyfill.min.js'></script> */}
-        {/* <script src='hiprint/plugins/jquery.minicolors.min.js'></script> */}
-        {/* <script src='hiprint/plugins/JsBarcode.all.min.js'></script> */}
-        {/* <script src='hiprint/plugins/qrcode.js'></script> */}
-        {/* <script src='hiprint/hiprint.bundle.js'></script> */}
-        {/* <script src='hiprint/plugins/jquery.hiwprint.js'></script> */}
-        {/* <script src='https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js'></script> */}
+  renderMainPage () {
+    return (
+      <div>
+        <div class='hiprint-toolbar' style='margin-top:15px;'>
+          <ul>
+            {[
+              'A3', 'A4', 'A5',
+              'B3', 'B4', 'B5'
+            ].map(ele => {
+              return (
+                <li><a class='hiprint-toolbar-item' on-click={() => {
+                  this.setPaper(ele)
+                }}>{ele}</a></li>
+              )
+            })}
+
+            <li><a class='hiprint-toolbar-item'><input type='text' id='customWidth' style='width: 50px;height: 19px;border: 0px;' placeholder='宽/mm' /></a></li>
+            <li><a class='hiprint-toolbar-item'><input type='text' id='customHeight' style='width: 50px;height: 19px;border: 0px;' placeholder='高/mm' /></a></li>
+
+            <li><a class='hiprint-toolbar-item' on-click={() => {
+              let width = $('#customWidth').val()
+              let height = $('#customHeight').val()
+              if (!width || isNaN(width) || !height || isNaN(height)) { return this.$Message.warning('请输入正确的宽高') }
+              this.setPaper(width, height)
+            }}>自定义</a></li>
+            <li><a class='hiprint-toolbar-item' on-click={this.rotatePaper}>旋转</a></li>
+            <li><a class='hiprint-toolbar-item' on-click={this.clearTemplate}>清空</a></li>
+
+            <li>
+              <a id='A4_directPrint' class={['btn hiprint-toolbar-item ', ...this.getStyleName('important-btn')]} >打印</a>
+            </li>
+            <li><a class={['btn hiprint-toolbar-item ', ...this.getStyleName('important-btn')]} on-click={() => {
+              this.save()
+            }}>保存</a></li>
+
+          </ul>
+          <div style='clear:both;'></div>
+        </div>
+        <div class='hiprint-printPagination'></div>
+        <div style='width:820px;overflow-x:auto;overflow-y:hidden;'>
+          <div id='hiprint-printTemplate' class='hiprint-printTemplate' style='margin-top:20px;'>
+          </div>
+        </div>
       </div>
     )
   }

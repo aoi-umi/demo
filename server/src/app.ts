@@ -28,7 +28,8 @@ app.use(bodyParser());
 // app.use(express.static(path.join(__dirname, 'public')));
 //app.use(express.static(config.fileDir));
 app.use(cors({
-    credentials: true
+    credentials: true,
+    // origin: '*',
 }));
 (async () => {
     await db.init(config.env.mongoose);

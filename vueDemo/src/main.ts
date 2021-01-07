@@ -18,7 +18,7 @@ import router from './router'
 import store from './store'
 import { env } from './config'
 
-import './global.less'
+import './assets/style/index.less'
 
 Vue.config.productionTip = false
 document.title = env.title
