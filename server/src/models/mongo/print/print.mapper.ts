@@ -16,6 +16,10 @@ export class PrintMapper {
             $and.push({
                 $or: [{ userId: null }, { userId: opt.user._id }]
             });
+        } else {
+            $and.push({
+                $or: [{ userId: null }, ]
+            });
         }
         if ($and.length)
             query.$and = $and;
@@ -46,6 +50,8 @@ export class PrintMapper {
             await detail.save();
         } else {
             detail = await PrintModel.findOne({ _id: data._id });
+            if (detail.userId && !opt.user.equalsId(detail.userId))
+                throw new Error('无权限修改');
             let update: any = {};
             ['name', 'data'].forEach(key => {
                 console.log(key);
