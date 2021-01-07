@@ -1,10 +1,17 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
+import * as iview from 'iview'
 
-import { Button, Input, Row, Col } from '@/components/iview'
+import {
+  Button, Input, Row, Col, Collapse, Panel, Divider,
+  Form, FormItem, Spin
+} from '@/components/iview'
 import { IMyLoad, MyLoad } from '@/components/my-load'
 import { testApi } from '@/api'
 
 import { Base } from './base'
+
+import '@public/hiprint/css/hiprint.css'
+import '@public/hiprint/css/print-lock.css'
 import './print.less'
 
 type ItemGroup = {
@@ -26,12 +33,19 @@ type DetailDataType = {
 @Component
 export default class Print extends Base {
   stylePrefix = 'print-'
-  $refs: { loadView: IMyLoad };
+  $refs: { loadView: IMyLoad, formVaild: iview.Form };
   hiprintTemplate: any
   itemGroups: ItemGroup[] = []
   testData: any = ''
   detail: DetailDataType = this.getDetailData()
   initPromise: Promise<void>;
+
+  private rules = {
+    name: [
+      { required: true, trigger: 'blur' }
+    ]
+  };
+
   created () {
     this.createdInit()
   }
@@ -126,15 +140,6 @@ export default class Print extends Base {
     // 设置左侧拖拽事件
     hiprint.PrintElementTypeManager.buildByHtml($('.ep-draggable-item'))
 
-    $('#A4_directPrint').click(() => {
-      try {
-        let testData = this.getTestData()
-        this.hiprintTemplate.print(testData)
-      } catch (e) {
-        this.$Message.error(e.message)
-      }
-    })
-
     let testData = {
       name: 'vue',
       table: [{
@@ -205,6 +210,13 @@ export default class Print extends Base {
     return detail
   }
 
+  print () {
+    this.operateHandler('打印', () => {
+      let testData = this.getTestData()
+      this.hiprintTemplate.print(testData)
+    })
+  }
+
   saving = false
   save () {
     this.operateHandler('保存', async () => {
@@ -215,12 +227,14 @@ export default class Print extends Base {
       }
       let rs = await testApi.printMgtSave(saveData)
       if (!this.detail._id) { this.detail._id = rs._id }
+    }, {
+      validate: this.$refs.formVaild.validate
     }).finally(() => {
       this.saving = false
     })
   }
 
-  render () {
+  protected render () {
     return (
       <MyLoad
         ref='loadView'
@@ -229,50 +243,52 @@ export default class Print extends Base {
           return this.renderMain()
         }}
         afterLoad={this.afterLoad}
-        v-loading={this.saving}
       />
     )
   }
 
-  renderMain () {
+  protected renderMain () {
+    let { detail } = this
     return (
       <div class={this.getStyleName('root')}>
-        {this.renderImport()}
-        <div style='display:flex'>
-          <Row>
-            <Col sm={6} md={4}>
-              {this.renderSideBar()}
+        <div>
+          <Row gutter={10}>
+            <Col sm={24} lg={6}>
+              <Collapse value='0'>
+                <Panel>
+                  属性
+                  <div slot='content'>
+                    <Form ref='formVaild' label-position='top' props={{ model: detail }} rules={this.rules}>
+                      <FormItem label='模板名称' prop='name'>
+                        <Input v-model={detail.name} />
+                      </FormItem>
+                      <FormItem label='测试数据' prop='testData'>
+                        <Input type='textarea' v-model={this.testData} />
+                      </FormItem>
+                    </Form>
+
+                    <Divider />
+                    <div id='PrintElementOptionSetting' style='margin-top:10px;'></div>
+                  </div>
+                </Panel>
+                <Panel>
+                  组件
+                  <div slot='content'>
+                    {this.renderSideBar()}
+                  </div>
+                </Panel>
+              </Collapse>
             </Col>
-            <Col sm={18} md={20}>
+            <Col sm={24} lg={18}>
               {this.renderMainPage()}
             </Col>
           </Row>
-
-          <div style='width:250px'>
-            <div>
-              <div>模板名称</div>
-              <Input v-model={this.detail.name} />
-            </div>
-            <div>
-              <div>测试数据</div>
-              <Input type='textarea' v-model={this.testData} />
-            </div>
-            <div id='PrintElementOptionSetting' style='margin-top:10px;'></div>
-          </div>
         </div>
       </div>
     )
   }
-  renderImport () {
-    return (
-      <div>
-        <link href='/hiprint/css/hiprint.css' rel='stylesheet' />
-        <link href='/hiprint/css/print-lock.css' rel='stylesheet' />
-      </div>
-    )
-  }
 
-  renderSideBar () {
+  protected renderSideBar () {
     return (
       <div class='rect-printElement-types hiprintEpContainer'>
         <ul class='hiprint-printElement-type'>
@@ -300,7 +316,7 @@ export default class Print extends Base {
     )
   }
 
-  renderMainPage () {
+  protected renderMainPage () {
     return (
       <div>
         <div class='hiprint-toolbar' style='margin-top:15px;'>
@@ -329,11 +345,18 @@ export default class Print extends Base {
             <li><a class='hiprint-toolbar-item' on-click={this.clearTemplate}>清空</a></li>
 
             <li>
-              <a id='A4_directPrint' class={['btn hiprint-toolbar-item ', ...this.getStyleName('important-btn')]} >打印</a>
+              <a class={['btn hiprint-toolbar-item ', ...this.getStyleName('important-btn')]} on-click={() => {
+                this.print()
+              }}>打印</a>
             </li>
-            <li><a class={['btn hiprint-toolbar-item ', ...this.getStyleName('important-btn')]} on-click={() => {
-              this.save()
-            }}>保存</a></li>
+            <li>
+              <a class={['btn hiprint-toolbar-item ', ...this.getStyleName('important-btn')]} on-click={() => {
+                this.save()
+              }}>
+                保存
+                {this.saving && <Spin fix/>}
+              </a>
+            </li>
 
           </ul>
           <div style='clear:both;'></div>

@@ -23,7 +23,11 @@ let cdnOpt = {
       'quill/dist/quill.snow.css': 'quill.snow.css',
       'quill/dist/quill.bubble.css': 'quill.bubble.css'
     }),
-    'highlight.js/styles/github.css': 'https://unpkg.com/highlight.js/styles/github.css'
+    'highlight.js/styles/github.css': 'https://unpkg.com/highlight.js/styles/github.css',
+    ...getCdn('/', {
+      'hiprint/css/hiprint.css': 'hiprint/css/hiprint.css',
+      'hiprint/css/print-lock.css': 'hiprint/css/print-lock.css'
+    })
   },
   js: {
     vue: {

@@ -51,14 +51,14 @@ export const Submenu = convClass<{ name: string }>(iview.Submenu)
 
 export const Select = convClass<iviewTypes.Select, true>(iview.Select)
 export const Sider = convClass<{
-    breakpoint?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
-    value?: boolean;
-    width?: number;
-    collapsible?: boolean;
-    'collapsed-width'?: number;
-    'hide-trigger'?: boolean;
-    'default-collapsed'?: boolean;
-    'reverse-arrow'?: boolean;
+  breakpoint?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
+  value?: boolean;
+  width?: number;
+  collapsible?: boolean;
+  'collapsed-width'?: number;
+  'hide-trigger'?: boolean;
+  'default-collapsed'?: boolean;
+  'reverse-arrow'?: boolean;
 }>(iview.Sider)
 export const Spin = convClass<iviewTypes.Spin, true>(iview.Spin)
 export const Split = convClass<iviewTypes.Split, true>(iview.Split)
@@ -71,4 +71,10 @@ export const Time = convClass<iviewTypes.Time, true>(iview.Time)
 export const Tooltip = convClass<iviewTypes.Tooltip, true>(iview.Tooltip)
 export const Transfer = convClass<iviewTypes.Transfer, true>(iview.Transfer)
 export const Upload = convClass<iviewTypes.Upload, true>(iview.Upload)
+
+export const Collapse = convClass<iviewTypes.Collapse, true>(iview.Collapse)
+export const Panel = convClass<{
+  name?: String;
+  'hide-arrow'?: boolean
+}, true>(iview.Panel)
 
