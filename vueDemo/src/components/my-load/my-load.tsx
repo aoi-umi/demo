@@ -11,10 +11,10 @@ import './style.less'
 
 class MyLoadProp {
   @Prop()
-  loadFn: () => Promise<any>;
+  loadFn: () => Promise<any> | any;
 
   @Prop()
-  afterLoad?: () => Promise<any>;
+  afterLoad?: () => Promise<any> | any;
 
   @Prop()
   renderFn: (data: any) => any;

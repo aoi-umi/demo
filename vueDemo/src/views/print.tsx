@@ -123,7 +123,7 @@ export default class Print extends Base {
   }
 
   setTestData (obj?) {
-    this.testData = JSON.stringify(obj || {})
+    this.testData = JSON.stringify(obj || {}, null, '\t')
   }
 
   getTestData () {
@@ -140,17 +140,49 @@ export default class Print extends Base {
     // 设置左侧拖拽事件
     hiprint.PrintElementTypeManager.buildByHtml($('.ep-draggable-item'))
 
-    let testData = {
-      name: 'vue',
-      table: [{
-        col1: '1',
-        col2: '2',
-        col3: '3'
-      }]
+    await this.setTemplate(this.detail.data)
+    this.updateTestData()
+  }
+
+  createTestData (temp) {
+    let data
+    if (temp && temp.panels) {
+      data = {}
+      for (let panel of temp.panels) {
+        for (let ele of panel.printElements) {
+          let field = ele.options.field
+          let type = ele.printElementType.type
+          let val = data[field]
+          switch (type) {
+            case 'tableCustom':
+              if (!val) { val = [] }
+              let obj = val[0]
+              if (!obj) {
+                obj = {}
+                val.push(obj)
+              }
+              let columns = ele.options.columns[0]
+              columns.forEach(col => {
+                obj[col.field] = col.field
+              })
+              break
+            case 'image':
+              val = ele.options.src || ''
+              break
+            default:
+              val = field
+              break
+          }
+          if (field) { data[field] = val }
+        }
+      }
     }
-    if (this.detail._id) { testData = null }
+    return data
+  }
+
+  updateTestData () {
+    let testData = this.createTestData(this.hiprintTemplate.getJson())
     this.setTestData(testData)
-    this.setTemplate(this.detail.data)
   }
 
   async setTemplate (template) {
@@ -160,6 +192,7 @@ export default class Print extends Base {
       settingContainer: '#PrintElementOptionSetting',
       paginationContainer: '.hiprint-printPagination'
     })
+    hiprintTemplate.setFields([{}])
     // 打印设计
     $('#hiprint-printTemplate').html('')
     hiprintTemplate.design('#hiprint-printTemplate')
@@ -203,7 +236,7 @@ export default class Print extends Base {
       detail = await testApi.printMgtDetailQuery({ _id: query._id })
     } else {
       detail = this.getDetailData() as any
-      detail.data = { 'panels': [{ 'index': 0, 'paperType': 'A4', 'height': 297, 'width': 210, 'paperHeader': 0, 'paperFooter': 841.8897637795277, 'printElements': [{ 'options': { 'left': 27, 'top': 30, 'height': 9.75, 'width': 33, 'title': 'hello,' }, 'printElementType': { 'type': 'text' }}, { 'options': { 'left': 57, 'top': 30, 'height': 12, 'width': 121.5, 'field': 'name', 'testData': 'world' }, 'printElementType': { 'type': 'text' }}, { 'options': { 'left': 12, 'top': 103.5, 'height': 36, 'width': 550, 'field': 'table', 'columns': [[{ 'title': '列1', 'field': 'col1', 'width': 232.69230769230768, 'colspan': 1, 'rowspan': 1, 'checked': true, 'columnId': 'col1' }, { 'title': '列2', 'field': 'col2', 'width': 162.6925576923077, 'colspan': 1, 'rowspan': 1, 'checked': true, 'columnId': 'col2' }, { 'title': '列3', 'field': 'col3', 'width': 154.6151346153846, 'colspan': 1, 'rowspan': 1, 'checked': true, 'columnId': 'col3' }]] }, 'printElementType': { 'title': '表格', 'type': 'tableCustom' }}], 'paperNumberLeft': 565.5, 'paperNumberTop': 819, 'paperNumberDisabled': true }] }
+      detail.data = { 'panels': [{ 'index': 0, 'paperType': 'A4', 'height': 297, 'width': 210, 'paperHeader': 0, 'paperFooter': 841.8897637795277, 'printElements': [{ 'options': { 'left': 27, 'top': 30, 'height': 9.75, 'width': 33, 'title': 'hello,' }, 'printElementType': { 'type': 'text' }}, { 'options': { 'left': 57, 'top': 30, 'height': 12, 'width': 121.5, 'field': 'name', 'testData': 'world' }, 'printElementType': { 'type': 'text' }}, { 'options': { 'left': 12, 'top': 103.5, 'height': 36, 'width': 550, 'field': 'table', 'columns': [[{ 'title': '列1', 'field': 'col1', 'width': 232.69230769230768, 'colspan': 1, 'rowspan': 1, 'checked': true, 'columnId': 'col1' }, { 'title': '列2', 'field': 'col2', 'width': 162.6925576923077, 'colspan': 1, 'rowspan': 1, 'checked': true, 'columnId': 'col2' }, { 'title': '列3', 'field': 'col3', 'width': 154.6151346153846, 'colspan': 1, 'rowspan': 1, 'checked': true, 'columnId': 'col3' }]] }, 'printElementType': { 'title': '表格', 'type': 'tableCustom' }}, { 'options': { 'left': 25.5, 'top': 177, 'height': 90, 'width': 90, 'formatter': 'function(value, options, data) {\n data = data || {} \n return `<a href="#">${data.name} html test</a>`\n}' }, 'printElementType': { 'title': 'html', 'type': 'html' }}, { 'options': { 'left': 12, 'top': 223.5, 'height': 124.5, 'width': 126, 'field': 'img', 'src': 'https://cn.vuejs.org/images/logo.png' }, 'printElementType': { 'type': 'image' }}], 'paperNumberLeft': 565.5, 'paperNumberTop': 819, 'paperNumberDisabled': true }] }
     }
 
     this.detail = detail
@@ -214,6 +247,8 @@ export default class Print extends Base {
     this.operateHandler('打印', () => {
       let testData = this.getTestData()
       this.hiprintTemplate.print(testData)
+    }, {
+      noSuccessHandler: true
     })
   }
 
@@ -221,6 +256,7 @@ export default class Print extends Base {
   save () {
     this.operateHandler('保存', async () => {
       this.saving = true
+      await this.$utils.wait(2000)
       let saveData = {
         ...this.detail,
         data: this.hiprintTemplate.getJson()
@@ -263,7 +299,7 @@ export default class Print extends Base {
                         <Input v-model={detail.name} />
                       </FormItem>
                       <FormItem label='测试数据' prop='testData'>
-                        <Input type='textarea' v-model={this.testData} />
+                        <Input type='textarea' v-model={this.testData} rows={4}/>
                       </FormItem>
                     </Form>
 
@@ -354,10 +390,14 @@ export default class Print extends Base {
                 this.save()
               }}>
                 保存
-                {this.saving && <Spin fix/>}
+                {this.saving && <Spin fix />}
               </a>
             </li>
-
+            <li>
+              <a class={['btn hiprint-toolbar-item ', ...this.getStyleName('important-btn')]} on-click={() => {
+                this.updateTestData()
+              }}>更新测试数据</a>
+            </li>
           </ul>
           <div style='clear:both;'></div>
         </div>
