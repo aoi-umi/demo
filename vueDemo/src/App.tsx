@@ -19,15 +19,19 @@ import './App.less'
 export default class App extends Base {
   theme = 'light' as any;
   title = '';
-  activeName = '';
   $refs: { sideMenu: SideMenu };
 
   async logPV () {
     testApi.statPVSave({ path: this.$route.path })
   }
 
+  activeName = '';
   getActiveNameByPath (path: string) {
-    return this.$refs.sideMenu.getActiveNameByPath(path)
+    return this.$refs.sideMenu?.getActiveNameByPath(path)
+  }
+
+  setActiveNameByPath () {
+    this.activeName = this.getActiveNameByPath(location.pathname)
   }
 
   protected created () {
@@ -42,7 +46,7 @@ export default class App extends Base {
   }
 
   private initAfterRender () {
-    this.activeName = this.getActiveNameByPath(location.pathname)
+    this.setActiveNameByPath()
   }
 
   setRouteTitle () {
@@ -84,7 +88,7 @@ export default class App extends Base {
   @Watch('$route')
   route (to, from) {
     this.setRouteTitle()
-    this.activeName = this.getActiveNameByPath(location.pathname)
+    this.setActiveNameByPath()
     this.logPV()
   }
 

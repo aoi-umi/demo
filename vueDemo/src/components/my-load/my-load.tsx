@@ -59,6 +59,7 @@ class MyLoad extends Vue<MyLoadProp & MyBase> {
       await this.$utils.wait()
       this.afterLoad && await this.afterLoad()
     } catch (e) {
+      console.error(e)
       this.result.success = false
       this.result.msg = (this.errMsgFn && this.errMsgFn(e)) || e.message
     } finally {

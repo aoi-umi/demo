@@ -13,6 +13,7 @@ import { Base } from './base'
 import '@public/hiprint/css/hiprint.css'
 import '@public/hiprint/css/print-lock.css'
 import './print.less'
+import { OperateModel } from '@/helpers'
 
 type ItemGroup = {
   title: string
@@ -64,6 +65,8 @@ export default class Print extends Base {
       data: null
     }
   }
+
+  saveOpModel: OperateModel = null
   async createdInit () {
     this.initPromise = new Promise(async (resolve, reject) => {
       await this.getScript()
@@ -120,6 +123,22 @@ export default class Print extends Base {
         icon: 'glyphicon-record'
       }]
     }]
+
+    this.saveOpModel = this.getOpModel({
+      prefix: '保存',
+      validate: () => {
+        return this.$refs.formVaild.validate()
+      },
+      fn: async () => {
+        await this.$utils.wait(2000)
+        let saveData = {
+          ...this.detail,
+          data: this.hiprintTemplate.getJson()
+        }
+        let rs = await testApi.printMgtSave(saveData)
+        if (!this.detail._id) { this.detail._id = rs._id }
+      }
+    })
   }
 
   setTestData (obj?) {
@@ -192,7 +211,6 @@ export default class Print extends Base {
       settingContainer: '#PrintElementOptionSetting',
       paginationContainer: '.hiprint-printPagination'
     })
-    hiprintTemplate.setFields([{}])
     // 打印设计
     $('#hiprint-printTemplate').html('')
     hiprintTemplate.design('#hiprint-printTemplate')
@@ -252,22 +270,8 @@ export default class Print extends Base {
     })
   }
 
-  saving = false
   save () {
-    this.operateHandler('保存', async () => {
-      this.saving = true
-      await this.$utils.wait(2000)
-      let saveData = {
-        ...this.detail,
-        data: this.hiprintTemplate.getJson()
-      }
-      let rs = await testApi.printMgtSave(saveData)
-      if (!this.detail._id) { this.detail._id = rs._id }
-    }, {
-      validate: this.$refs.formVaild.validate
-    }).finally(() => {
-      this.saving = false
-    })
+    this.saveOpModel.run()
   }
 
   protected render () {
@@ -390,7 +394,7 @@ export default class Print extends Base {
                 this.save()
               }}>
                 保存
-                {this.saving && <Spin fix />}
+                {this.saveOpModel.loading && <Spin fix />}
               </a>
             </li>
             <li>

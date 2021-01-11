@@ -64,6 +64,6 @@
     "typescript-eslint-parser": "^22.0.0",
     "vue-template-compiler": "^2.5.21",
     "webpack-bundle-analyzer": "^3.6.0",
-    "webpack-dynamic-import-cdn-plugin": "0.0.1"
+    "webpack-dynamic-import-cdn-plugin": "^0.1.0"
   }
 }

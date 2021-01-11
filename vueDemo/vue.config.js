@@ -7,69 +7,74 @@ function resolve (dir) {
 
 let env = process.env
 let isProd = env.NODE_ENV === 'production'
-function getCdn (host, cfg) {
+function getCdn (host, cfg, opt) {
   let rs = {}
+  opt = { ...opt }
   for (let key in cfg) {
-    rs[key] = host + cfg[key]
+    rs[key] = {
+      ...opt,
+      url: host + cfg[key]
+    }
   }
   return rs
 }
 let cdnOpt = {
+  urlPrefix: 'https://cdn.jsdelivr.net/npm',
   css: {
-    'iview/dist/styles/iview.css': 'https://unpkg.com/iview@3.5.4/dist/styles/iview.css',
-    'video.js/dist/video-js.min.css': 'https://unpkg.com/video.js@7.6.6/dist/video-js.min.css',
-    ...getCdn('https://unpkg.com/quill@1.3.7/dist/', {
+    'iview/dist/styles/iview.css': `/iview@3.5.4/dist/styles/iview.css`,
+    'video.js/dist/video-js.min.css': `/video.js@7.6.6/dist/video-js.min.css`,
+    ...getCdn(`/quill@1.3.7/dist/`, {
       'quill/dist/quill.core.css': 'quill.core.css',
       'quill/dist/quill.snow.css': 'quill.snow.css',
       'quill/dist/quill.bubble.css': 'quill.bubble.css'
     }),
-    'highlight.js/styles/github.css': 'https://unpkg.com/highlight.js/styles/github.css',
+    'highlight.js/styles/github.css': `/highlight.js/styles/github.css`,
     ...getCdn('/', {
       'hiprint/css/hiprint.css': 'hiprint/css/hiprint.css',
       'hiprint/css/print-lock.css': 'hiprint/css/print-lock.css'
-    })
+    }, { noUrlPrefix: true })
   },
   js: {
     vue: {
       moduleName: 'Vue',
-      url: 'https://unpkg.com/vue@2.6.10/dist/vue.min.js'
+      url: `/vue@2.6.10/dist/vue.min.js`
     },
     'vue-router': {
       moduleName: 'VueRouter',
-      url: 'https://unpkg.com/vue-router@3.0.2/dist/vue-router.min.js'
+      url: `/vue-router@3.0.2/dist/vue-router.min.js`
     },
     vuex: {
       moduleName: 'Vuex',
-      url: 'https://unpkg.com/vuex@3.1.0/dist/vuex.min.js'
+      url: `/vuex@3.1.0/dist/vuex.min.js`
     },
     'vue-lazyload': {
       moduleName: 'VueLazyload',
-      url: 'https://unpkg.com/vue-lazyload@1.3.3/vue-lazyload.js'
+      url: `/vue-lazyload@1.3.3/vue-lazyload.js`
     },
     axios: {
       moduleName: 'axios',
-      url: 'https://unpkg.com/axios@0.19.0/dist/axios.min.js'
+      url: `/axios@0.19.0/dist/axios.min.js`
     },
     iview: {
       moduleName: 'iview',
-      url: 'https://unpkg.com/iview@3.5.4/dist/iview.min.js'
+      url: `/iview@3.5.4/dist/iview.min.js`
     },
 
     'video.js': {
       moduleName: 'videojs',
-      url: 'https://unpkg.com/video.js@7.6.6/dist/video.min.js'
+      url: `/video.js@7.6.6/dist/video.min.js`
     },
     quill: {
       moduleName: 'Quill',
-      url: 'https://unpkg.com/quill@1.3.7/dist/quill.min.js'
+      url: `/quill@1.3.7/dist/quill.min.js`
     },
     echarts: {
       moduleName: 'echarts',
-      url: 'https://unpkg.com/echarts@4.5.0/dist/echarts.min.js'
+      url: `/echarts@4.5.0/dist/echarts.min.js`
     },
     jquery: {
       moduleName: 'jQuery',
-      url: 'https://unpkg.com/jquery@3.5.1/dist/jquery.min.js'
+      url: `/jquery@3.5.1/dist/jquery.min.js`
     }
   }
 }
