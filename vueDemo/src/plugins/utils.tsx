@@ -72,6 +72,10 @@ class Utils {
       return promise
     }))
   }
+
+  isPressEnter (e: KeyboardEvent) {
+    return e && (e.charCode || e.keyCode) === 13
+  }
 }
 declare module 'vue/types/vue' {
   interface Vue {

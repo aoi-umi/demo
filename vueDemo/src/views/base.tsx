@@ -102,10 +102,6 @@ export class Base extends MyBase {
     }
   }
 
-  protected isPressEnter (e: KeyboardEvent) {
-    return e && (e.charCode || e.keyCode) === 13
-  }
-
   protected toError (query: { code?: string; msg?: string }) {
     this.$router.push({
       path: routerConfig.error.path,

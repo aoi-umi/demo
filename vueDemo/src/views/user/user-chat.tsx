@@ -181,7 +181,7 @@ class ChatDetail extends Base {
                         v-model={this.chatContent}
                         class={this.getStyleName('send-input')}
                         on-keydown={(e: KeyboardEvent) => {
-                          if (this.isPressEnter(e)) {
+                          if (this.$utils.isPressEnter(e)) {
                             if (!e.altKey) {
                               this.chatSubmit()
                               e.preventDefault()

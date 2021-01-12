@@ -130,7 +130,7 @@ export default class Print extends Base {
         return this.$refs.formVaild.validate()
       },
       fn: async () => {
-        await this.$utils.wait(2000)
+        // await this.$utils.wait(2000)
         let saveData = {
           ...this.detail,
           data: this.hiprintTemplate.getJson()

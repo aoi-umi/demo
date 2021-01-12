@@ -93,7 +93,7 @@ class SignIn extends Vue<Base & SignInProp> {
     }
 
     private handlePress (e) {
-      if (this.isPressEnter(e)) {
+      if (this.$utils.isPressEnter(e)) {
         this.handleSignIn()
       }
     }
@@ -319,7 +319,7 @@ class SignUp extends Vue<SignUpProp & Base> {
     }
 
     private handlePress (e) {
-      if (this.isPressEnter(e)) {
+      if (this.$utils.isPressEnter(e)) {
         this.handleSignUp()
       }
     }

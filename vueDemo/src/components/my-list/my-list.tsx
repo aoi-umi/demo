@@ -360,7 +360,7 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue<MyListProp<QueryArgs> 
                   return (
                     <Col class={this.getStyleName('query-args-item')} xs={24} sm={8} md={6}>
                       {ele.label || key}
-                      {ele.comp ? ele.comp(this.model.query, ele) : <Input placeholder={ele.placeholder} v-model={this.model.query[key]} />}
+                      {ele.comp ? ele.comp(this.model.query, ele) : <Input placeholder={ele.placeholder} v-model={this.model.query[key]} clearable />}
                     </Col>
                   )
                 })}
@@ -368,28 +368,38 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue<MyListProp<QueryArgs> 
               {this.customQueryNode}
               <Divider size='small' />
               <Row gutter={5} type='flex' justify='end'>
-                {(!hideQueryBtn.all && !hideQueryBtn.reset) &&
-                  <Col>
-                    <Button on-click={() => {
-                      this.resetQueryArgs()
-                      this.$emit(event.resetClick)
-                    }}>重置</Button>
-                  </Col>
-                }
-                {(!hideQueryBtn.all && !hideQueryBtn.query) &&
-                  <Col>
-                    <Button type='primary' loading={this.loading} on-click={() => {
-                      this.handleQuery({ resetPage: true })
-                    }}>查询</Button>
-                  </Col>
-                }
-                {(!hideQueryBtn.all && !hideQueryBtn.add) &&
-                  <Col>
-                    <Button on-click={() => {
-                      this.$emit(event.addClick)
-                    }}>新增</Button>
-                  </Col>
-                }
+                {[{
+                  name: 'reset',
+                  text: '重置',
+                  click: () => {
+                    this.resetQueryArgs()
+                    this.$emit(event.resetClick)
+                  }
+                }, {
+                  name: 'query',
+                  text: '查询',
+                  type: 'primary',
+                  click: () => {
+                    this.handleQuery({ resetPage: true })
+                  },
+                  loading: () => {
+                    return this.loading
+                  }
+                }, {
+                  name: 'add',
+                  text: '新增',
+                  click: () => {
+                    this.$emit(event.addClick)
+                  }
+                }].filter(ele => !hideQueryBtn.all && !hideQueryBtn[ele.name]).map(ele => {
+                  return (
+                    <Col>
+                      <Button type={ele.type as any} loading={ele.loading && ele.loading()} on-click={() => {
+                        ele.click()
+                      }}>{ele.text}</Button>
+                    </Col>
+                  )
+                })}
                 {this.customOperateView}
               </Row>
             </div>

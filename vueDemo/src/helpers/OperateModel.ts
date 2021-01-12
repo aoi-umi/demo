@@ -30,6 +30,7 @@ export class OperateModel {
         let valid = await opt.validate()
         if (!valid) {
           vm.$Message.error('参数有误')
+          return
         }
       }
       await opt.fn()

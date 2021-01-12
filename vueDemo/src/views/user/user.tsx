@@ -202,7 +202,7 @@ export default class UserInfo extends Base {
     }
 
     private handlePress (e) {
-      if (this.isPressEnter(e)) {
+      if (this.$utils.isPressEnter(e)) {
         this.handleUpdate()
       }
     }
@@ -434,7 +434,7 @@ export class UserUnbind extends Vue<UserUnbindProp & Base> {
     };
 
     handlePress (e) {
-      if (this.isPressEnter(e)) {
+      if (this.$utils.isPressEnter(e)) {
         this.unbind()
       }
     }
