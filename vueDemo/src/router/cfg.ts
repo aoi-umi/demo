@@ -179,12 +179,17 @@ const cfg = {
     component: () => import('../views/waterfall')
   },
   printMgt: {
-    path: '/printMgt',
-    text: '打印管理',
-    component: () => import('../views/print-mgt')
+    path: '/printTempMgt',
+    text: '模板管理',
+    component: () => import('../views/print-temp-mgt')
   },
   printMgtDetail: {
-    path: '/printMgt/detail',
+    path: '/printTempMgt/detail',
+    text: '模板设置',
+    component: () => import('../views/print')
+  },
+  printPreview: {
+    path: '/print/preview',
     text: '打印',
     component: () => import('../views/print')
   }

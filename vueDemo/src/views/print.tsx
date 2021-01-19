@@ -7,13 +7,14 @@ import {
 } from '@/components/iview'
 import { IMyLoad, MyLoad } from '@/components/my-load'
 import { testApi } from '@/api'
+import { OperateModel } from '@/helpers'
+import { routerConfig } from '@/router'
 
 import { Base } from './base'
 
 import '@public/hiprint/css/hiprint.css'
 import '@public/hiprint/css/print-lock.css'
 import './print.less'
-import { OperateModel } from '@/helpers'
 
 type ItemGroup = {
   title: string
@@ -64,6 +65,10 @@ export default class Print extends Base {
       name: '',
       data: null
     }
+  }
+
+  get preview () {
+    return location.pathname === routerConfig.printPreview.path
   }
 
   saveOpModel: OperateModel = null
@@ -130,7 +135,6 @@ export default class Print extends Base {
         return this.$refs.formVaild.validate()
       },
       fn: async () => {
-        // await this.$utils.wait(2000)
         let saveData = {
           ...this.detail,
           data: this.hiprintTemplate.getJson()
@@ -151,6 +155,10 @@ export default class Print extends Base {
 
   async afterLoad () {
     await this.initPromise
+    if (!this.preview) { await this.initEdit() } else { await this.initPreview() }
+  }
+
+  async initEdit () {
     hiprint.init({
       providers: [new customElementTypeProvider()],
       paginationContainer: '.hiprint-printPagination'
@@ -161,6 +169,14 @@ export default class Print extends Base {
 
     await this.setTemplate(this.detail.data)
     this.updateTestData()
+  }
+
+  async initPreview () {
+    let template = this.detail.data
+    this.hiprintTemplate = new hiprint.PrintTemplate({ template })
+    this.updateTestData()
+    let data = this.getTestData()
+    $('#printPreview').html(this.hiprintTemplate.getHtml(data))
   }
 
   createTestData (temp) {
@@ -261,10 +277,10 @@ export default class Print extends Base {
     return detail
   }
 
-  print () {
+  print (data?) {
     this.operateHandler('打印', () => {
-      let testData = this.getTestData()
-      this.hiprintTemplate.print(testData)
+      data = data || this.getTestData()
+      this.hiprintTemplate.print(data)
     }, {
       noSuccessHandler: true
     })
@@ -288,43 +304,50 @@ export default class Print extends Base {
   }
 
   protected renderMain () {
-    let { detail } = this
     return (
       <div class={this.getStyleName('root')}>
-        <div>
-          <Row gutter={10}>
-            <Col sm={24} lg={6}>
-              <Collapse value='0'>
-                <Panel>
-                  属性
-                  <div slot='content'>
-                    <Form ref='formVaild' label-position='top' props={{ model: detail }} rules={this.rules}>
-                      <FormItem label='模板名称' prop='name'>
-                        <Input v-model={detail.name} />
-                      </FormItem>
-                      <FormItem label='测试数据' prop='testData'>
-                        <Input type='textarea' v-model={this.testData} rows={4}/>
-                      </FormItem>
-                    </Form>
-
-                    <Divider />
-                    <div id='PrintElementOptionSetting' style='margin-top:10px;'></div>
-                  </div>
-                </Panel>
-                <Panel>
-                  组件
-                  <div slot='content'>
-                    {this.renderSideBar()}
-                  </div>
-                </Panel>
-              </Collapse>
-            </Col>
-            <Col sm={24} lg={18}>
-              {this.renderMainPage()}
-            </Col>
-          </Row>
-        </div>
+        {this.preview
+          ? this.renderPreview()
+          : this.renderEdit()
+        }
       </div>
+    )
+  }
+
+  protected renderEdit () {
+    let { detail } = this
+    return (
+      <Row gutter={10}>
+        <Col sm={24} lg={6}>
+          <Collapse value='0'>
+            <Panel>
+                  属性
+              <div slot='content'>
+                <Form ref='formVaild' label-position='top' props={{ model: detail }} rules={this.rules}>
+                  <FormItem label='模板名称' prop='name'>
+                    <Input v-model={detail.name} />
+                  </FormItem>
+                  <FormItem label='测试数据' prop='testData'>
+                    <Input type='textarea' v-model={this.testData} rows={4}/>
+                  </FormItem>
+                </Form>
+
+                <Divider />
+                <div id='PrintElementOptionSetting' style='margin-top:10px;'></div>
+              </div>
+            </Panel>
+            <Panel>
+                  组件
+              <div slot='content'>
+                {this.renderSideBar()}
+              </div>
+            </Panel>
+          </Collapse>
+        </Col>
+        <Col sm={24} lg={18}>
+          {this.renderMainPage()}
+        </Col>
+      </Row>
     )
   }
 
@@ -410,6 +433,15 @@ export default class Print extends Base {
           <div id='hiprint-printTemplate' class='hiprint-printTemplate' style='margin-top:20px;'>
           </div>
         </div>
+      </div>
+    )
+  }
+
+  protected renderPreview () {
+    return (
+      <div>
+        <Button on-click={() => { this.print() }}>打印</Button>
+        <div id='printPreview'></div>
       </div>
     )
   }
