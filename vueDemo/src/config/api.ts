@@ -328,6 +328,10 @@ export default {
       },
       printMgtDel: {
         url: '/print/mgt/del'
+      },
+      printGetData: {
+        url: '/print/getData',
+        method: 'get'
       }
     }
   } as TestApiConfigType

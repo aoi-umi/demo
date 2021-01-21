@@ -32,6 +32,12 @@ type DetailDataType = {
   name?: string;
   data?: any
 };
+
+type PrintDataType = {
+  label?: string;
+  template: any;
+  data: any[];
+}
 @Component
 export default class Print extends Base {
   stylePrefix = 'print-'
@@ -41,6 +47,8 @@ export default class Print extends Base {
   testData: any = ''
   detail: DetailDataType = this.getDetailData()
   initPromise: Promise<void>;
+  printData: PrintDataType[] = []
+  currPrintData: PrintDataType
 
   private rules = {
     name: [
@@ -153,9 +161,26 @@ export default class Print extends Base {
     return JSON.parse(this.testData)
   }
 
+  async loadDetail () {
+    const query = this.$route.query
+    if (!this.preview) {
+      let detail: DetailDataType
+      if (query._id) {
+        detail = await testApi.printMgtDetailQuery({ _id: query._id })
+      } else {
+        detail = this.getDetailData() as any
+        detail.data = { 'panels': [{ 'index': 0, 'paperType': 'A4', 'height': 297, 'width': 210, 'paperHeader': 0, 'paperFooter': 841.8897637795277, 'printElements': [{ 'options': { 'left': 27, 'top': 30, 'height': 9.75, 'width': 33, 'title': 'hello,' }, 'printElementType': { 'type': 'text' }}, { 'options': { 'left': 57, 'top': 30, 'height': 12, 'width': 121.5, 'field': 'name', 'testData': 'world' }, 'printElementType': { 'type': 'text' }}, { 'options': { 'left': 12, 'top': 103.5, 'height': 36, 'width': 550, 'field': 'table', 'columns': [[{ 'title': '列1', 'field': 'col1', 'width': 232.69230769230768, 'colspan': 1, 'rowspan': 1, 'checked': true, 'columnId': 'col1' }, { 'title': '列2', 'field': 'col2', 'width': 162.6925576923077, 'colspan': 1, 'rowspan': 1, 'checked': true, 'columnId': 'col2' }, { 'title': '列3', 'field': 'col3', 'width': 154.6151346153846, 'colspan': 1, 'rowspan': 1, 'checked': true, 'columnId': 'col3' }]] }, 'printElementType': { 'title': '表格', 'type': 'tableCustom' }}, { 'options': { 'left': 25.5, 'top': 177, 'height': 90, 'width': 90, 'formatter': 'function(value, options, data) {\n data = data || {} \n return `<a href="#">${data.name} html test</a>`\n}' }, 'printElementType': { 'title': 'html', 'type': 'html' }}, { 'options': { 'left': 12, 'top': 223.5, 'height': 124.5, 'width': 126, 'field': 'img', 'src': 'https://cn.vuejs.org/images/logo.png' }, 'printElementType': { 'type': 'image' }}], 'paperNumberLeft': 565.5, 'paperNumberTop': 819, 'paperNumberDisabled': true }] }
+      }
+
+      this.detail = detail
+    } else {
+      this.printData = await testApi.printGetData({ type: 'test' })
+    }
+  }
+
   async afterLoad () {
     await this.initPromise
-    if (!this.preview) { await this.initEdit() } else { await this.initPreview() }
+    if (!this.preview) { await this.initEdit() } else { await this.updatePreview(this.printData[0]) }
   }
 
   async initEdit () {
@@ -169,14 +194,6 @@ export default class Print extends Base {
 
     await this.setTemplate(this.detail.data)
     this.updateTestData()
-  }
-
-  async initPreview () {
-    let template = this.detail.data
-    this.hiprintTemplate = new hiprint.PrintTemplate({ template })
-    this.updateTestData()
-    let data = this.getTestData()
-    $('#printPreview').html(this.hiprintTemplate.getHtml(data))
   }
 
   createTestData (temp) {
@@ -263,23 +280,9 @@ export default class Print extends Base {
     hiprintTemplate.clear()
   }
 
-  async loadDetail () {
-    const query = this.$route.query
-    let detail: DetailDataType
-    if (query._id) {
-      detail = await testApi.printMgtDetailQuery({ _id: query._id })
-    } else {
-      detail = this.getDetailData() as any
-      detail.data = { 'panels': [{ 'index': 0, 'paperType': 'A4', 'height': 297, 'width': 210, 'paperHeader': 0, 'paperFooter': 841.8897637795277, 'printElements': [{ 'options': { 'left': 27, 'top': 30, 'height': 9.75, 'width': 33, 'title': 'hello,' }, 'printElementType': { 'type': 'text' }}, { 'options': { 'left': 57, 'top': 30, 'height': 12, 'width': 121.5, 'field': 'name', 'testData': 'world' }, 'printElementType': { 'type': 'text' }}, { 'options': { 'left': 12, 'top': 103.5, 'height': 36, 'width': 550, 'field': 'table', 'columns': [[{ 'title': '列1', 'field': 'col1', 'width': 232.69230769230768, 'colspan': 1, 'rowspan': 1, 'checked': true, 'columnId': 'col1' }, { 'title': '列2', 'field': 'col2', 'width': 162.6925576923077, 'colspan': 1, 'rowspan': 1, 'checked': true, 'columnId': 'col2' }, { 'title': '列3', 'field': 'col3', 'width': 154.6151346153846, 'colspan': 1, 'rowspan': 1, 'checked': true, 'columnId': 'col3' }]] }, 'printElementType': { 'title': '表格', 'type': 'tableCustom' }}, { 'options': { 'left': 25.5, 'top': 177, 'height': 90, 'width': 90, 'formatter': 'function(value, options, data) {\n data = data || {} \n return `<a href="#">${data.name} html test</a>`\n}' }, 'printElementType': { 'title': 'html', 'type': 'html' }}, { 'options': { 'left': 12, 'top': 223.5, 'height': 124.5, 'width': 126, 'field': 'img', 'src': 'https://cn.vuejs.org/images/logo.png' }, 'printElementType': { 'type': 'image' }}], 'paperNumberLeft': 565.5, 'paperNumberTop': 819, 'paperNumberDisabled': true }] }
-    }
-
-    this.detail = detail
-    return detail
-  }
-
-  print (data?) {
+  print () {
     this.operateHandler('打印', () => {
-      data = data || this.getTestData()
+      let data = this.preview ? this.currPrintData.data : this.getTestData()
       this.hiprintTemplate.print(data)
     }, {
       noSuccessHandler: true
@@ -321,14 +324,14 @@ export default class Print extends Base {
         <Col sm={24} lg={6}>
           <Collapse value='0'>
             <Panel>
-                  属性
+              属性
               <div slot='content'>
                 <Form ref='formVaild' label-position='top' props={{ model: detail }} rules={this.rules}>
                   <FormItem label='模板名称' prop='name'>
                     <Input v-model={detail.name} />
                   </FormItem>
                   <FormItem label='测试数据' prop='testData'>
-                    <Input type='textarea' v-model={this.testData} rows={4}/>
+                    <Input type='textarea' v-model={this.testData} rows={4} />
                   </FormItem>
                 </Form>
 
@@ -337,7 +340,7 @@ export default class Print extends Base {
               </div>
             </Panel>
             <Panel>
-                  组件
+              组件
               <div slot='content'>
                 {this.renderSideBar()}
               </div>
@@ -437,10 +440,35 @@ export default class Print extends Base {
     )
   }
 
+  async updatePreview (printData: PrintDataType) {
+    let html = '没有数据'
+    if (printData) {
+      this.currPrintData = printData
+      try {
+        let template = printData.template
+        this.hiprintTemplate = new hiprint.PrintTemplate({ template })
+        let data = printData.data
+        html = this.hiprintTemplate.getHtml(data)
+      } catch (e) {
+        html = e.message
+      }
+    }
+    $('#printPreview').html(html)
+  }
+
   protected renderPreview () {
     return (
       <div>
-        <Button on-click={() => { this.print() }}>打印</Button>
+        <Button type='primary' on-click={() => { this.print() }}>打印</Button>
+        <div class={this.getStyleName('preview-label')}>
+          {this.printData.length > 1 && this.printData.map(ele => {
+            return (
+              <Button on-click={() => {
+                this.updatePreview(ele)
+              }}>{ele.label || '未命名'}</Button>
+            )
+          })}
+        </div>
         <div id='printPreview'></div>
       </div>
     )

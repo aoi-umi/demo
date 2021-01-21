@@ -94,9 +94,12 @@ router.get('/stat/query', MyRequestHandlerMid.convert(stat.query));
 //#endregion
 
 //#region print 
+import * as printTemp from './printTemp';
+router.get('/print/mgt/query', UserAuthMid.normal(), MyRequestHandlerMid.convert(printTemp.mgtQuery));
+router.get('/print/mgt/detailQuery', UserAuthMid.normal(), MyRequestHandlerMid.convert(printTemp.mgtDetailQuery));
+router.post('/print/mgt/save', UserAuthMid.normal(), MyRequestHandlerMid.convert(printTemp.mgtSave));
+router.post('/print/mgt/del', UserAuthMid.normal(), MyRequestHandlerMid.convert(printTemp.mgtDel));
+
 import * as print from './print';
-router.get('/print/mgt/query', UserAuthMid.normal(), MyRequestHandlerMid.convert(print.mgtQuery));
-router.get('/print/mgt/detailQuery', UserAuthMid.normal(), MyRequestHandlerMid.convert(print.mgtDetailQuery));
-router.post('/print/mgt/save', UserAuthMid.normal(), MyRequestHandlerMid.convert(print.mgtSave));
-router.post('/print/mgt/del', UserAuthMid.normal(), MyRequestHandlerMid.convert(print.mgtDel));
+router.get('/print/getData', UserAuthMid.normal(), MyRequestHandlerMid.convert(print.getData));
 //#endregion
