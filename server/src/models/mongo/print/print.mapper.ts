@@ -1,6 +1,7 @@
 import { LoginUser } from '@/models/login-user';
 import * as ValidSchema from '@/valid-schema/class-valid';
 import { escapeRegExp } from '@/_system/common';
+import { error } from '@/_system/common';
 import { BaseMapper } from '../_base';
 
 import { PrintInstanceType, PrintModel, } from './print';
@@ -61,4 +62,32 @@ export class PrintMapper {
         }
         return detail;
     }
+
+    static getPrintLogic(type) {
+        let logic = printLogic[type];
+        if (!logic)
+            throw error(`错误的打印类型[${type}]`);
+        return logic;
+    }
+
+    static async execPrintLogic(opt: { type: string, data: any }) {
+        let logic = this.getPrintLogic(opt.type);
+        return logic(opt.data);
+    }
+
+    static setPrintLogic(type, fn: GetPrintDataType) {
+        if (printLogic[type])
+            throw error(`打印类型[${type}]已存在`);
+        printLogic[type] = fn;
+    }
 }
+
+type ArrayOrSelf<T> = Array<T> | T
+type PromiseOrSelf<T> = Promise<T> | T
+type PrintDataType = {
+    label?: string;
+    template: any;
+    data: any[];
+};
+type GetPrintDataType = (data) => PromiseOrSelf<ArrayOrSelf<PrintDataType>>
+const printLogic: { [key: string]: GetPrintDataType } = {};
