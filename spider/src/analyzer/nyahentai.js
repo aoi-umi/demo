@@ -17,6 +17,9 @@ async function nyahentai(html) {
             }, {
                 search: 't1.nyacdn.com',
                 replace: 'i0.nyacdn.com',
+            }, {
+                search: 't1.mspcdn.xyz',
+                replace: 'i0.mspcdn3.xyz',
             }].forEach(ele => {
                 src = src.replace(ele.search, ele.replace);
             });

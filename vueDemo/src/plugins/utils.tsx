@@ -76,6 +76,15 @@ class Utils {
   isPressEnter (e: KeyboardEvent) {
     return e && (e.charCode || e.keyCode) === 13
   }
+
+  obj2arr (o: Object) {
+    return Object.entries(o).map(ele => {
+      return {
+        key: ele[0],
+        value: ele[1]
+      }
+    })
+  }
 }
 declare module 'vue/types/vue' {
   interface Vue {

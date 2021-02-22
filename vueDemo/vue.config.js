@@ -2,18 +2,18 @@
 const { DynamicImportCdnPlugin } = require('webpack-dynamic-import-cdn-plugin')
 const path = require('path')
 function resolve (dir) {
-  return path.join(__dirname, dir)
+  return path.resolve(path.join(__dirname, dir))
 }
 
 let env = process.env
 let isProd = env.NODE_ENV === 'production'
-function getCdn (host, cfg, opt) {
+function getCdn (prefix, cfg, opt) {
   let rs = {}
   opt = { ...opt }
   for (let key in cfg) {
     rs[key] = {
       ...opt,
-      url: host + cfg[key]
+      url: prefix + cfg[key]
     }
   }
   return rs
