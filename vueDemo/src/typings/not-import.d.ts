@@ -2,7 +2,7 @@ interface VueComponentOptions<Props = any> {
   key?: string;
   ref?: any;
   class?: any;
-  style?: { [key: string]: any };
+  style?: { [key: string]: any } | string;
   props?: Props;
   slot?: string;
   name?: string;

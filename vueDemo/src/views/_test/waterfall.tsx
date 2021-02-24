@@ -3,7 +3,7 @@ import { Component, Vue, Watch } from 'vue-property-decorator'
 import { Button } from '@/components/iview'
 import { MyWaterfall } from '@/components/my-waterfall'
 
-import { Base } from './base'
+import { Base } from '../base'
 import './demo.less'
 @Component
 export default class Waterfall extends Base {

@@ -23,6 +23,10 @@ export function getCompOpts (target) {
   return options
 }
 
+export function getInstCompName (inst) {
+  if (inst.componentOptions) { return inst.componentOptions.Ctor.options.name }
+}
+
 export class Utils {
   static base64ToFile = (dataUrl: string, filename: string) => {
     const arr = dataUrl.split(',')

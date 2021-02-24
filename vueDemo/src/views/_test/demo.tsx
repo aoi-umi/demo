@@ -12,8 +12,8 @@ import { MyVideo, IMyVideo } from '@/components/my-video'
 import { MyEditor } from '@/components/my-editor'
 import { convClass, getCompOpts } from '@/components/utils'
 
-import { DynamicCompView, DynamicCompType } from './comps/dynamic-comp'
-import { Base } from './base'
+import { DynamicCompView, DynamicCompType } from '../comps/dynamic-comp'
+import { Base } from '../base'
 import './demo.less'
 
 @Component({})

@@ -171,12 +171,17 @@ const cfg = {
   test: {
     path: '/test',
     text: '测试',
-    component: () => import('../views/demo')
+    component: () => import('../views/_test/demo')
+  },
+  testDockPanel: {
+    path: '/test/dockpanel',
+    text: '测试',
+    component: () => import('../views/_test/dock-panel')
   },
   waterfall: {
     path: '/waterfall',
     text: '瀑布流',
-    component: () => import('../views/waterfall')
+    component: () => import('../views/_test/waterfall')
   },
   printMgt: {
     path: '/printTempMgt',
