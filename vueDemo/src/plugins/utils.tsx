@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import 'jquery'
 import { MyConfirmModalView, MyConfirmModal, MyConfirmModalProp } from '@/components/my-confirm'
+import * as assist from 'iview/src/utils/assist'
+
 const vm = Vue.prototype as Vue
 class Utils {
   getComp<T> (name: any, compOpt?): T {
@@ -84,6 +86,14 @@ class Utils {
         value: ele[1]
       }
     })
+  }
+
+  findComponentUpward (context, componentName, componentNames?) {
+    return assist.findComponentUpward(context, componentName, componentNames)
+  }
+
+  findComponentDownward (context, componentName) {
+    return assist.findComponentDownward(context, componentName)
   }
 }
 declare module 'vue/types/vue' {

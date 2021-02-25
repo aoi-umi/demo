@@ -1,4 +1,5 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
+import { VNode } from 'vue'
 
 import { Prop } from '@/components/property-decorator'
 import { Button, Row, Col, Modal } from '../iview'
@@ -10,6 +11,7 @@ import './style.less'
 class MyDockPanelProp {
 }
 @Component({
+  name: 'MyDockPanel',
   extends: MyBase,
   mixins: [getCompOpts(MyDockPanelProp)]
 })
@@ -22,27 +24,33 @@ class MyDockPanelModel extends Vue<MyDockPanelProp & MyBase> {
     let direction = ['left', 'right'].includes(dock) ? 'row' : 'column'
     return {
       dock,
-      direction
+      direction,
+      propsData
     }
   }
 
-  render () {
-    let items = this.$slots.default.filter(ele => {
+  get items () {
+    return this.$slots.default.filter(ele => {
       return getInstCompName(ele) === 'MyDockPanelItem'
     })
-    console.log(items)
+  }
+
+  render () {
     let newItem
-    items.reverse().forEach((ele, idx) => {
+    let items = this.items
+    for (let idx = items.length - 1; idx >= 0; idx--) {
+      let ele = items[idx]
+      let lIdx = items.length - 1 - idx
       let { direction, dock } = this.getDock(ele)
       let style = ''
-      if (idx === items.length - 1) { style = 'width:100%;height:100%' }
+      if (idx === 0) { style = 'width:100%;height:100%' }
       newItem = (
         <div class={this.getStyleName('wrap', 'stretch', direction)} style={style}>
           {['bottom', 'right'].includes(dock) && newItem}
-          <div class={this.getStyleName('child', idx == 0 && 'stretch')}>{ele}</div>
+          {ele}
           {['left', 'top'].includes(dock) && newItem}
         </div>)
-    })
+    }
     return (
       <div>
         {newItem}
@@ -62,6 +70,12 @@ class MyDockPanelItemProp {
 
   @Prop()
   height?: string;
+
+  @Prop()
+  minWidth?: string;
+
+  @Prop()
+  minHeight?: string;
 }
 @Component({
   name: 'MyDockPanelItem',
@@ -70,15 +84,23 @@ class MyDockPanelItemProp {
 })
 class MyDockPanelItemModel extends Vue<MyDockPanelItemProp & MyBase> {
   stylePrefix = 'my-dock-panel-item-';
-
   render () {
+    let dockPanel: MyDockPanelModel = this.$utils.findComponentUpward(this, 'MyDockPanel')
+    let { direction, dock } = dockPanel.getDock(this.$vnode)
+    let { width, height, minWidth, minHeight } = this
+
+    let lIdx = dockPanel.items.length - 1 - dockPanel.items.indexOf(this.$vnode)
+    height = lIdx == 0 || direction === 'row' ? 'auto' : height
+    width = lIdx == 0 || direction === 'column' ? 'auto' : width
+
+    let style = `width: ${width}; height: ${height}; min-width: ${minWidth}; min-height: ${minHeight};`
+    console.log(lIdx, style)
     return (
-      <div class={this.getStyleName('root')}>
-        {this.$slots.default}
+      <div class={[...this.getStyleName('root'), ...dockPanel.getStyleName(lIdx == 0 && 'stretch')]} style={style}>
+        <div>{this.$slots.default}</div>
       </div>
     )
   }
 }
 
 export const MyDockPanelItem = convClass<MyDockPanelItemProp>(MyDockPanelItemModel)
-
