@@ -1,18 +1,12 @@
 .my-dock-panel- {
-  &wrap {
+  &container {
     display: flex;
-    flex-wrap: wrap;
+    overflow: auto;
+    flex-shrink: 0;
   }
   &stretch {
     align-self: stretch;
     flex: 1 1 auto;
-  }
-  &child {
-    display: flex;
-    justify-content: stretch;
-    > * {
-      flex: 1 1 auto;
-    }
   }
   &row {
     flex-direction: row;
@@ -26,7 +20,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      overflow: hidden;
+      transition: all .2s ease-in-out;
     }
   }
 }

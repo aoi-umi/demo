@@ -45,7 +45,7 @@ class MyDockPanelModel extends Vue<MyDockPanelProp & MyBase> {
       let style = ''
       if (idx === 0) { style = 'width:100%;height:100%' }
       newItem = (
-        <div class={this.getStyleName('wrap', 'stretch', direction)} style={style}>
+        <div class={this.getStyleName('container', 'stretch', direction)} style={style}>
           {['bottom', 'right'].includes(dock) && newItem}
           {ele}
           {['left', 'top'].includes(dock) && newItem}
@@ -94,7 +94,6 @@ class MyDockPanelItemModel extends Vue<MyDockPanelItemProp & MyBase> {
     width = lIdx == 0 || direction === 'column' ? 'auto' : width
 
     let style = `width: ${width}; height: ${height}; min-width: ${minWidth}; min-height: ${minHeight};`
-    console.log(lIdx, style)
     return (
       <div class={[...this.getStyleName('root'), ...dockPanel.getStyleName(lIdx == 0 && 'stretch')]} style={style}>
         <div>{this.$slots.default}</div>

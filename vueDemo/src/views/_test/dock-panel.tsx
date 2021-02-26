@@ -21,7 +21,7 @@ export default class App extends Base {
           <div>bottom</div>
           <div>bottom</div>
         </MyDockPanelItem>
-        <MyDockPanelItem width='10px' height='10px' style='background-color: #96cac3'>rest</MyDockPanelItem>
+        <MyDockPanelItem width='10px' height='10px' minHeight='10px' minWidth='10px' style='background-color: #96cac3;'>rest</MyDockPanelItem>
       </MyDockPanel>
     )
   }
