@@ -38,7 +38,7 @@ const router = new Router({
 router.beforeEach((to, from, next) => {
   ViewUI.LoadingBar.start()
   if (to.path == routeCfg.index.path) {
-    return next(routeCfg.article.path)
+    return next(routeCfg.home.path)
   }
   const auth = to.meta && to.meta.authority
   const userMod = getModule(LoginUserStore, store)

@@ -5,14 +5,13 @@ import { VideoJsPlayer } from 'video.js'
 
 import { Prop } from '@/components/property-decorator'
 import { testSocket, testApi } from '@/api'
-import { Input, Card, Button, Checkbox, Row, Col, Select, Option, Form, FormItem } from '@/components/iview'
+import { Input, Card, Button, Checkbox } from '@/components/iview'
 import { MyList, IMyList } from '@/components/my-list'
 import { MyUpload, IMyUpload } from '@/components/my-upload'
 import { MyVideo, IMyVideo } from '@/components/my-video'
 import { MyEditor } from '@/components/my-editor'
 import { convClass, getCompOpts } from '@/components/utils'
 
-import { DynamicCompView, DynamicCompType } from '../comps/dynamic-comp'
 import { Base } from '../base'
 import './demo.less'
 
@@ -114,7 +113,6 @@ export default class App extends Base {
       <div>
         <TsxView />
         <TsxView2 test='传参属性1' />
-        {this.renderDynamicComp()}
         <div class={this.getStyleName('box1')}>
           {this.renderVideo()}
           {this.renderEditor()}
@@ -222,59 +220,6 @@ export default class App extends Base {
             this.chartAddData = ''
           }
         }} />
-      </div>
-    )
-  }
-
-  dynamic = {
-    config: {
-      name: 'test',
-      text: '测试',
-      type: 'input'
-    },
-    data: {
-      test: null
-    }
-  }
-
-  renderDynamicComp () {
-    return (
-      <div>
-        <span>动态组件</span>
-        <Row>
-          <Col xs={12}>
-            <Form label-width={40} show-message={false}>
-              <FormItem label='name'>
-                <Input v-model={this.dynamic.config.name}>
-                </Input>
-              </FormItem>
-              <FormItem label='text'>
-                <Input v-model={this.dynamic.config.text}>
-                </Input>
-              </FormItem>
-              <FormItem label='type'>
-                <Select v-model={this.dynamic.config.type}>
-                  {this.$utils.obj2arr(DynamicCompType).map(ele => {
-                    const opt = (
-                      <Option key={ele.key} value={ele.value}>
-                        {ele.key}
-                      </Option>
-                    )
-                    opt.componentOptions.tag = 'Option'
-                    return opt
-                  })}
-                </Select>
-              </FormItem>
-              <FormItem label='value'>
-                <Input v-model={this.dynamic.data.test}>
-                </Input>
-              </FormItem>
-            </Form>
-          </Col>
-          <Col xs={12}>
-            <DynamicCompView config={this.dynamic.config} data={this.dynamic.data} />
-          </Col>
-        </Row>
       </div>
     )
   }

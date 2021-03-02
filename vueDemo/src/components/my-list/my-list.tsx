@@ -140,6 +140,9 @@ class MyListProp<QueryArgs = any> {
     default: 'bottom'
   })
   pagePosition?: 'top' | 'bottom' | 'both';
+
+  @Prop()
+  tableHeight?: string | number
 }
 @Component({
   extends: MyBase,
@@ -239,7 +242,12 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue<MyListProp<QueryArgs> 
     }
   }
 
-  selectedRows = [];
+  get selectedRows () {
+    return this.model.selection
+  }
+  set selectedRows (val) {
+    this.model.selection = val
+  }
   private setSelectedRows (selection) {
     this.selectedRows = selection
   }
@@ -435,7 +443,9 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue<MyListProp<QueryArgs> 
                   sortOrder
                 })
                 this.handleQuery({ resetPage: true })
-              }}>
+              }}
+              height={this.tableHeight}
+            >
             </Table>
             : this._customRenderFn(this.result)
           }

@@ -1,6 +1,7 @@
 import { authority, error, dev } from '../config'
 import cfgAdmin from './cfg-admin'
 import cfgApps from './cfg-apps'
+import cfgTest from './cfg-test'
 
 const errPath = '/error'
 
@@ -168,21 +169,6 @@ const cfg = {
     component: () => import('../views/wx-auth')
   },
 
-  test: {
-    path: '/test',
-    text: '测试',
-    component: () => import('../views/_test/demo')
-  },
-  testDockPanel: {
-    path: '/test/dockpanel',
-    text: '测试',
-    component: () => import('../views/_test/dock-panel')
-  },
-  waterfall: {
-    path: '/waterfall',
-    text: '瀑布流',
-    component: () => import('../views/_test/waterfall')
-  },
   printMgt: {
     path: '/printTempMgt',
     text: '模板管理',
@@ -199,10 +185,18 @@ const cfg = {
     component: () => import('../views/print')
   }
 }
-export default {
+
+const mergeCfg = {
   ...cfg,
   ...cfgAdmin,
   ...cfgApps,
+  ...cfgTest
+}
+export default {
+  ...mergeCfg,
+
+  // 首页
+  home: mergeCfg.article,
 
   error: {
     path: errPath,
