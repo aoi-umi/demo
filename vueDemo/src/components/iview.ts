@@ -16,6 +16,7 @@ export const CarouselItem = convClass<iviewTypes.CarouselItem, true>(iview.Carou
 export const Checkbox = convClass<iviewTypes.Checkbox, true>(iview.Checkbox)
 export const Content = convClass<iviewTypes.Content, true>(iview.Content)
 export const DatePicker = convClass<iviewTypes.DatePicker, true>(iview.DatePicker)
+export const TimePicker = convClass<iviewTypes.TimePicker, true>(iview.TimePicker)
 export const Drawer = convClass<iviewTypes.Drawer, true>(iview.Drawer)
 export const Divider = convClass<iviewTypes.Divider, true>(iview.Divider)
 export const Form = convClass<iviewTypes.Form, true>(iview.Form)

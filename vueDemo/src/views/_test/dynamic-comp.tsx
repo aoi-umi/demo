@@ -3,7 +3,7 @@ import { Component, Vue, Watch } from 'vue-property-decorator'
 
 import { Input, Card, Button, Checkbox, Row, Col, Select, Option, Form, FormItem } from '@/components/iview'
 
-import { DynamicCompView, DynamicCompType, DynamicCompConfigType } from '../comps/dynamic-comp'
+import { DynamicComp, DynamicCompType, DynamicCompConfigType } from '../comps/dynamic-comp'
 import { Base } from '../base'
 import { MyList } from '@/components/my-list'
 
@@ -21,7 +21,14 @@ export default class App extends Base {
         name,
         text,
         type: name,
-        isRange: false
+        isRange: false,
+        options: async (query) => {
+          await this.$utils.wait(2000)
+          return [{
+            label: '选项1',
+            value: 'option1'
+          }].filter(ele => !query || ele.label.includes(query))
+        }
       }
     })
   }
@@ -74,7 +81,7 @@ export default class App extends Base {
             {this.configList.map(ele => {
               return (
                 <Col xs={6}>
-                  <DynamicCompView style='margin: 0 5px 5px 0'
+                  <DynamicComp style='margin: 0 5px 5px 0'
                     config={ele}
                     data={this.data}
                     showText
