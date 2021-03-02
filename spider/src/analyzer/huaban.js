@@ -1,7 +1,7 @@
 const cheerio = require('cheerio');
 
 //花瓣
-exports.default = async function (html, save) {
+exports.default = async function ({ html }) {
     let $ = cheerio.load(html);
     let out, matchCfg;
     let cfg = [{

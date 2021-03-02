@@ -1,28 +1,24 @@
 const cheerio = require('cheerio');
+const utils = require('../utils')
 
-async function nyahentai(html) {
+async function nyahentai({ html, origin }) {
     let $ = cheerio.load(html);
     let list = [];
+    let href = $(`#cover a`).attr('href')
+    let firstPage = origin + href
+    let fpRs = await utils.loadUrl(firstPage);
+    let fp$ = cheerio.load(fpRs.html);
+    let fpSrc = fp$(fp$('#image-container img')[0]).attr('src')
+    
+    let hostReg = /^(http|https):\/\/(\w+(\.)?)+/;
+    let regRs = hostReg.exec(fpSrc)
+    let host = regRs[0];
     $(`#thumbnail-container img`).each(function (idx, ele) {
         let dom = $(this);
         let src = dom.attr('data-src');
         let reg = /(\d+)t\.([\w]+)$/;
         if (src) {
-            [{
-                search: 'mt.404cdn.com',
-                replace: 'mi.404cdn.com',
-            }, {
-                search: 't.nyahentai.net',
-                replace: 'i.nyahentai.net',
-            }, {
-                search: 't1.nyacdn.com',
-                replace: 'i0.nyacdn.com',
-            }, {
-                search: 't1.mspcdn.xyz',
-                replace: 'i0.mspcdn3.xyz',
-            }].forEach(ele => {
-                src = src.replace(ele.search, ele.replace);
-            });
+            src = src.replace(hostReg, host);
             let exec = reg.exec(src);
             if (exec) {
                 list.push([{

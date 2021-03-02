@@ -4,35 +4,21 @@ const path = require('path');
 
 const huaban = require('./analyzer/huaban').default;
 const nyahentai = require('./analyzer/nyahentai').default;
+const utils = require('./utils')
 
 const analyzerEnum = {
     花瓣: 'huaban',
     nyahentai: 'nyahentai'
 };
 exports.analyzerEnum = analyzerEnum;
-function mkdir(dir) {
-    if (!fs.existsSync(dir)) {
-        console.log('创建文件夹', dir);
-        fs.mkdirSync(dir, { recursive: true });
-    }
-}
 class Download {
-    static async load(url) {
-        console.log(`url: ${url}`);
-        console.log('load url start');
-        let rs = await axios.get(url);
-        let html = rs.data;
-        console.log('load url end');
-        return html;
-    }
-
     static async run(url, analyzerType) {
         let dir = 'out';
         let dirName = url.replace(/http(s)?:\/\//, '').replace(/\//g, '_');
         // let exec = /^http(s)?:\/\/[^\/]+/.exec(url);
-        let html = await this.load(url);
+        let urlRs = await utils.loadUrl(url);
         let analyzer = this.getAnalyzer(analyzerType, url);
-        let rs = await analyzer(html);
+        let rs = await analyzer(urlRs);
 
         if (!rs.list.length)
             console.log('无下载内容');
@@ -43,7 +29,7 @@ class Download {
             //替换特殊符号
             dirName = dirName.replace(/[\\\/\<\>\?\*\|"\:]/g, '');
             dir = path.join(dir, dirName);
-            mkdir(dir);
+            utils.mkdir(dir);
             await this.save(dir, rs.list);
         }
     }
