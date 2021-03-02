@@ -417,7 +417,7 @@ export default class GoodsMgtDetail extends Base {
           return (
             <Select v-model={this.sku[params.index].status} clearable placeholder='不设置'>
               {myEnum.goodsSkuStatus.toArray().map(ele => {
-                return <ioption value={ele.value} key={ele.value}>{ele.key}</ioption>
+                return <i-option value={ele.value} key={ele.value}>{ele.key}</i-option>
               })}
             </Select>
           )

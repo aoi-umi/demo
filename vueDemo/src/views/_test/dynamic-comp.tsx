@@ -110,9 +110,9 @@ export default class App extends Base {
           <Select v-model={this.selectRow.type}>
             {this.$utils.obj2arr(DynamicCompType).map(ele => {
               return (
-                <ioption key={ele.key} value={ele.value}>
+                <i-option key={ele.key} value={ele.value}>
                   {ele.key}
-                </ioption>
+                </i-option>
               )
             })}
           </Select>

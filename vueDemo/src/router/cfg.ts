@@ -31,7 +31,7 @@ const cfg = {
   userSignIn: {
     path: '/user/signIn',
     text: '登录',
-    component: () => import('../views/user/user-sign').then(t => t.SignInView)
+    component: () => import('../views/user/user-sign').then(t => t.SignIn)
   },
   userSignUp: {
     path: '/user/signUp',

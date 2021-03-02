@@ -9,7 +9,7 @@ import { LocalStore } from '@/store'
 
 import { testApi, testSocket } from './api'
 import { dev, env } from './config'
-import { SignInView } from './views/user/user-sign'
+import { SignIn, SignInModel } from './views/user/user-sign'
 import { Base } from './views/base'
 import { UserAvatarView } from './views/comps/user-avatar'
 import { SideMenuView, SideMenu, MenuConfig } from './views/comps/side-menu'
@@ -19,7 +19,7 @@ import './App.less'
 export default class App extends Base {
   theme = 'light' as any;
   title = '';
-  $refs: { sideMenu: SideMenu };
+  $refs: { sideMenu: SideMenu, signIn: SignInModel };
 
   async logPV () {
     testApi.statPVSave({ path: this.$route.path })
@@ -190,16 +190,21 @@ export default class App extends Base {
   protected renderMain () {
     return (
       <Layout class='layout no-bg'>
-        <Modal v-model={this.storeSetting.setting.signInShow} footer-hide>
-          <SignInView on-success={() => {
-            this.storeSetting.setSetting({
-              signInShow: false
-            })
-          }} on-3rd-party-login-click={() => {
-            this.storeSetting.setSetting({
-              signInShow: false
-            })
-          }} />
+        <Modal v-model={this.storeSetting.setting.signInShow} footer-hide on-on-visible-change={(val) => {
+          if (val && this.$refs.signIn) { this.$refs.signIn.setUserList() }
+        }}>
+          <SignIn
+            ref='signIn'
+            on-success={() => {
+              this.storeSetting.setSetting({
+                signInShow: false
+              })
+            }}
+            on-3rd-party-login-click={() => {
+              this.storeSetting.setSetting({
+                signInShow: false
+              })
+            }} />
         </Modal>
         <Header class='layout-header-bar'>
           <Icon

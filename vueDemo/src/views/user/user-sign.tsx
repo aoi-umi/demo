@@ -41,7 +41,7 @@ class SignInProp extends SignProp {
   extends: Base,
   mixins: [getCompOpts(SignInProp)]
 })
-class SignIn extends Vue<Base & SignInProp> {
+export class SignInModel extends Vue<Base & SignInProp> {
     stylePrefix = 'user-sign-in-';
     private innerDetail: SignInDataType = this.getDetailData();
     private getDetailData () {
@@ -108,7 +108,7 @@ class SignIn extends Vue<Base & SignInProp> {
         this.to = (to as string) || routerConfig.index.path
         this.toQuery = query
       }
-      const list = this.signInUsers = LocalStoreUser.getList()
+      const list = this.setUserList()
       const detail = this.innerDetail
       if (list && list.length) {
         const rs = list[0]
@@ -119,6 +119,12 @@ class SignIn extends Vue<Base & SignInProp> {
         }
       }
     }
+
+    setUserList () {
+      this.signInUsers = LocalStoreUser.getList()
+      return this.signInUsers
+    }
+
     render () {
       const detail = this.innerDetail
       return (
@@ -134,12 +140,13 @@ class SignIn extends Vue<Base & SignInProp> {
               <AutoComplete v-model={detail.account} clearable on-on-select={(value) => {
                 const match = this.signInUsers.find(ele => ele.account === value)
                 detail.password = match?.password || ''
+                this.remberPwd = !!detail.password
               }}>
                 {this.signInUsers.filter(ele => !detail.account || ele.account.includes(detail.account)).map(ele => {
                   const opt = (
-                    <ioption key={ele.account} value={ele.account}>
+                    <i-option key={ele.account} value={ele.account}>
                       <span>{ele.account}</span>
-                    </ioption>
+                    </i-option>
                   )
                   const icon = <Icon type='md-close' class={this.getStyleName('account-item-del')} nativeOn-click={() => {
                     LocalStoreUser.delAccount(ele.account, this.signInUsers)
@@ -172,7 +179,7 @@ class SignIn extends Vue<Base & SignInProp> {
     }
 }
 
-export const SignInView = convClass<SignInProp>(SignIn)
+export const SignIn = convClass<SignInProp>(SignInModel)
 
 class ThirdPartyLoginProp {
     @Prop()
