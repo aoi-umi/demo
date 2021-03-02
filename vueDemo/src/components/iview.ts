@@ -1,5 +1,5 @@
-import * as iviewTypes from 'iview'
-const iview = require('iview')
+import * as iviewTypes from 'view-design'
+const iview = require('view-design')
 
 import { convClass } from './utils'
 
@@ -45,7 +45,7 @@ export const RadioGroup = convClass<iviewTypes.RadioGroup, true>(iview.RadioGrou
 export const Menu = convClass<iviewTypes.Menu, true>(iview.Menu)
 export const MenuGroup = convClass<iviewTypes.MenuGroup, true>(iview.MenuGroup)
 export const MenuItem = convClass<iviewTypes.MenuItem, true>(iview.MenuItem)
-export const MenuSub = convClass<iviewTypes.MenuSub, true>(iview.MenuSub)
+// export const MenuSub = convClass<iviewTypes.MenuSub, true>(iview.MenuSub)
 export const Option = convClass<iviewTypes.Option, true>(iview.Option)
 export const Submenu = convClass<{ name: string }>(iview.Submenu)
 
