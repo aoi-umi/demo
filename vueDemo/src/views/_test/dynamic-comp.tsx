@@ -109,13 +109,11 @@ export default class App extends Base {
         <FormItem label='type'>
           <Select v-model={this.selectRow.type}>
             {this.$utils.obj2arr(DynamicCompType).map(ele => {
-              const opt = (
-                <Option key={ele.key} value={ele.value}>
+              return (
+                <ioption key={ele.key} value={ele.value}>
                   {ele.key}
-                </Option>
+                </ioption>
               )
-              opt.componentOptions.tag = 'Option'
-              return opt
             })}
           </Select>
         </FormItem>

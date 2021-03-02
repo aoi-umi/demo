@@ -137,11 +137,10 @@ class SignIn extends Vue<Base & SignInProp> {
               }}>
                 {this.signInUsers.filter(ele => !detail.account || ele.account.includes(detail.account)).map(ele => {
                   const opt = (
-                    <Option key={ele.account} value={ele.account}>
+                    <ioption key={ele.account} value={ele.account}>
                       <span>{ele.account}</span>
-                    </Option>
+                    </ioption>
                   )
-                  opt.componentOptions.tag = 'Option'
                   const icon = <Icon type='md-close' class={this.getStyleName('account-item-del')} nativeOn-click={() => {
                     LocalStoreUser.delAccount(ele.account, this.signInUsers)
                   }} />

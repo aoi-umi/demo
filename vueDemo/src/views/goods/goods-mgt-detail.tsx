@@ -1,5 +1,4 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
-import moment from 'dayjs'
 import * as iview from 'iview'
 
 import { dev, myEnum, authority } from '@/config'
@@ -418,9 +417,7 @@ export default class GoodsMgtDetail extends Base {
           return (
             <Select v-model={this.sku[params.index].status} clearable placeholder='不设置'>
               {myEnum.goodsSkuStatus.toArray().map(ele => {
-                const opt = <Option value={ele.value} key={ele.value}>{ele.key}</Option>
-                opt.componentOptions.tag = 'Option'
-                return opt
+                return <ioption value={ele.value} key={ele.value}>{ele.key}</ioption>
               })}
             </Select>
           )
