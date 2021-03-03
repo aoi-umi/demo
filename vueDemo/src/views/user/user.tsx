@@ -1,6 +1,5 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import * as iview from 'iview'
-import moment from 'dayjs'
 
 import { dev, myEnum } from '@/config'
 import { testApi } from '@/api'
@@ -381,7 +380,7 @@ export default class UserInfo extends Base {
               <AuthorityTagView value={Object.values(detail.auth)} hideCode />
             </FormItem>
             <FormItem label='注册时间'>
-              {detail.createdAt && moment(detail.createdAt).format(dev.dateFormat)}
+              {detail.createdAt && this.$utils.dateFormat(detail.createdAt)}
             </FormItem>
             <FormItem label='绑定'>
               <ThirdPartyLoginView bind user={detail} />
@@ -393,7 +392,7 @@ export default class UserInfo extends Base {
             {detail.profile || dev.defaultProfile}
           </FormItem>
           <FormItem label='注册时间'>
-            {detail.createdAt && moment(detail.createdAt).format(dev.dateFormat)}
+            {detail.createdAt && this.$utils.dateFormat(detail.createdAt)}
           </FormItem>
         </Form>
       )

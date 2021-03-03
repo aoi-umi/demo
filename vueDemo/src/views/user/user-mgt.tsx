@@ -1,6 +1,5 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import * as iview from 'iview'
-import moment from 'dayjs'
 
 import { Prop } from '@/components/property-decorator'
 import { testApi } from '@/api'
@@ -214,7 +213,7 @@ export default class UserMgt extends Base {
         key: 'createdAt',
         sortable: 'custom' as any,
         render: (h, params) => {
-          return <label>{moment(params.row.createdAt).format(dev.dateFormat)}</label>
+          return <label>{this.$utils.dateFormat(params.row.createdAt)}</label>
         }
       }, {
         title: '状态',

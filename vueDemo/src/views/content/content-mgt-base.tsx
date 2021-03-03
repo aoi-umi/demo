@@ -1,5 +1,4 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
-import moment from 'dayjs'
 import * as iview from 'iview'
 
 import { Prop } from '@/components/property-decorator'
@@ -404,8 +403,8 @@ export class ContentMgtDetail extends Vue<ContentMgtDetailProp & Base> {
         <UserAvatarView user={detail.user} />
         {[
           '状态: ' + detail.statusText,
-          '创建于: ' + moment(detail.createdAt).format(dev.dateFormat),
-          detail.publishAt && ('发布于:' + moment(detail.publishAt).format(dev.dateFormat))
+          '创建于: ' + this.$utils.dateFormat(detail.createdAt),
+          detail.publishAt && ('发布于:' + this.$utils.dateFormat(detail.publishAt))
         ].map(ele => {
           return (<span class='not-important' style={{ marginLeft: '5px' }}>{ele}</span>)
         })}
@@ -458,8 +457,8 @@ export class ContentMgtDetail extends Vue<ContentMgtDetailProp & Base> {
             </label>
             <DatePicker v-model={detail.setPublishAt} type='datetime' options={{
               disabledDate: (date?: Date) => {
-                const start = moment().startOf('day')
-                const end = moment(start).add(3, 'd')
+                const start = this.$moment().startOf('day')
+                const end = this.$moment(start).add(3, 'd')
                 return date && (date.valueOf() < start.valueOf() || date.valueOf() >= end.valueOf())
               }
             }} />
@@ -528,7 +527,7 @@ export class ContentLogList extends Vue<ContentLogListProp & Base> {
                 title: '操作时间',
                 key: 'createdAt',
                 render: (h, params) => {
-                  return <span>{moment(params.row.createdAt).format(dev.dateFormat)}</span>
+                  return <span>{this.$utils.dateFormat(params.row.createdAt)}</span>
                 }
               }]}
               data={log}>

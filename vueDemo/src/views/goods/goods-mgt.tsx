@@ -1,5 +1,4 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
-import moment from 'dayjs'
 
 import { convert } from '@/helpers'
 import * as helpers from '@/helpers'
@@ -116,7 +115,7 @@ export default class GoodsMgt extends Base {
               sortable: 'custom' as any,
               render: (h, params) => {
                 return (
-                  <span>{moment(params.row.putOnAt).format(dev.dateFormat)}</span>
+                  <span>{this.$utils.dateFormat(params.row.putOnAt)}</span>
                 )
               }
             }, {

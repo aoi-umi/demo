@@ -1,7 +1,7 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { VideoJsPlayer } from 'video.js'
 import Swatches from 'vue-swatches'
-import moment from 'dayjs'
+
 import 'vue-swatches/dist/vue-swatches.min.css'
 
 import { Prop } from '@/components/property-decorator'
@@ -160,7 +160,7 @@ class MyVideo extends Vue<MyVideoProp & MyBase> {
               minWidth: 90,
               sortable: true,
               render: (h, params) => {
-                return <span>{moment(params.row.createdAt).format(dev.dateFormat)}</span>
+                return <span>{this.$utils.dateFormat(params.row.createdAt)}</span>
               }
             }, {
               title: '操作',

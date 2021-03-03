@@ -1,5 +1,4 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
-import moment from 'dayjs'
 
 import { Prop } from '@/components/property-decorator'
 import { testApi, testSocket } from '@/api'
@@ -111,7 +110,7 @@ class VideoDetailMain extends Vue<VideoDetailMainProp & Base> {
         <div>
           <UserAvatarView user={detail.user} />
           {[
-            '发布于: ' + moment(detail.publishAt).format(dev.dateFormat)
+            '发布于: ' + this.$utils.dateFormat(detail.publishAt)
           ].map(ele => {
             return (<span class='not-important' style={{ marginLeft: '5px' }}>{ele}</span>)
           })}

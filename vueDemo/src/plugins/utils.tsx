@@ -1,7 +1,11 @@
 import Vue from 'vue'
 import 'jquery'
-import { MyConfirmModalView, MyConfirmModal, MyConfirmModalProp } from '@/components/my-confirm'
+import moment, { Dayjs } from 'dayjs'
 import * as assist from 'iview/src/utils/assist'
+
+import { MyConfirmModalView, MyConfirmModal, MyConfirmModalProp } from '@/components/my-confirm'
+
+import { dev } from '@/config'
 
 const vm = Vue.prototype as Vue
 class Utils {
@@ -95,14 +99,24 @@ class Utils {
   findComponentDownward (context, componentName) {
     return assist.findComponentDownward(context, componentName)
   }
+
+  dateFormat (date, fmt = dev.dateFormat) {
+    let format = {
+      date: 'YYYY-MM-DD',
+      datetime: 'YYYY-MM-DD HH:mm:ss'
+    }[fmt] || fmt
+    return !date ? '' : moment(date).format(format)
+  }
 }
 declare module 'vue/types/vue' {
   interface Vue {
     $utils: Utils;
+    $moment: typeof moment
   }
 }
 export default {
   install: function (Vue, options) {
     Vue.prototype.$utils = new Utils()
+    Vue.prototype.$moment = moment
   }
 }

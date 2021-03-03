@@ -1,5 +1,4 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
-import moment from 'dayjs'
 
 import { Prop } from '@/components/property-decorator'
 
@@ -110,7 +109,7 @@ export class AssetMgtLog extends Base {
             title: '创建时间',
             key: 'createdAt',
             render: (h, params) => {
-              return <span>{moment(params.row.createdAt).format(dev.dateFormat)}</span>
+              return <span>{this.$utils.dateFormat(params.row.createdAt)}</span>
             }
           }]}
 
@@ -234,7 +233,7 @@ export class AssetMgtNotify extends Base {
             title: '创建时间',
             key: 'createdAt',
             render: (h, params) => {
-              return <span>{moment(params.row.createdAt).format(dev.dateFormat)}</span>
+              return <span>{this.$utils.dateFormat(params.row.createdAt)}</span>
             }
           }]}
 

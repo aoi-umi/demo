@@ -1,6 +1,5 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import * as iview from 'iview'
-import moment from 'dayjs'
 
 import { Prop } from '@/components/property-decorator'
 import { testApi } from '@/api'
@@ -244,7 +243,7 @@ export default class Pay extends Base {
         render: (h, params) => {
           const detail = params.row
           return (
-            <span>{moment(detail.createdAt).format(dev.dateFormat)}</span>
+            <span>{this.$utils.dateFormat(detail.createdAt)}</span>
           )
         }
       }, {

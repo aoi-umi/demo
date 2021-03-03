@@ -1,5 +1,4 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
-import moment from 'dayjs'
 
 import { Prop } from '@/components/property-decorator'
 import { testApi } from '@/api'

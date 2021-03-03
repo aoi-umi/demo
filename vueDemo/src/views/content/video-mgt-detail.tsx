@@ -1,5 +1,4 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
-import moment from 'dayjs'
 
 import { testApi } from '@/api'
 import { myEnum, dev } from '@/config'

@@ -1,5 +1,4 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
-import moment from 'dayjs'
 import marked from 'marked'
 import hljs from 'highlight.js'
 import 'highlight.js/styles/github.css'
@@ -96,7 +95,7 @@ class ArticleDetailMain extends Vue<ArticleDetailMainProp & Base> {
         <div>
           <UserAvatarView user={detail.user} />
           {[
-            '发布于: ' + moment(detail.publishAt).format(dev.dateFormat)
+            '发布于: ' + this.$utils.dateFormat(detail.publishAt)
           ].map(ele => {
             return (<span class='not-important' style={{ marginLeft: '5px' }}>{ele}</span>)
           })}
