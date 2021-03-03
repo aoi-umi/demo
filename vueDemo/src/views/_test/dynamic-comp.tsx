@@ -3,9 +3,9 @@ import { Component, Vue, Watch } from 'vue-property-decorator'
 
 import { Input, Card, Button, Checkbox, Row, Col, Select, Option, Form, FormItem } from '@/components/iview'
 
-import { DynamicComp, DynamicCompType, DynamicCompConfigType } from '../comps/dynamic-comp'
-import { Base } from '../base'
 import { MyList } from '@/components/my-list'
+import { DynamicComp, DynamicCompType, DynamicCompConfigType } from '@/components/my-dynamic-comp'
+import { Base } from '../base'
 
 @Component({})
 export default class App extends Base {
@@ -21,20 +21,49 @@ export default class App extends Base {
     }]
   }
   created () {
-    this.configList = Object.entries(DynamicCompType).map(ele => {
-      let name = ele[1]
+    this.configList = Object.entries({
+      ...DynamicCompType,
+      不可编辑输入框: {
+        name: 'input',
+        editable: false
+      },
+      动态组件: {
+        name: 'dyn-input'
+      }
+    }).map(ele => {
+      let val = ele[1]
       let text = ele[0]
-      return {
+      let name = ''
+      if (typeof val === 'string') { name = val } else name = val.name
+      let obj = {
         name,
         text,
         type: name,
         isRange: false,
-        options: 'options'
+        options: 'options',
+        remark: `${text}_${name}`,
+        editable: true
       }
+      if (!(typeof val === 'string')) {
+        obj = {
+          ...obj,
+          ...val
+        }
+      }
+      return obj
     })
     this.setData()
   }
-  test () {
+
+  dynamicConfig ({ config, name, value, data }) {
+    if (name === 'dyn-input') {
+      if (data.input === 'disabled') return { editable: false }
+      if (data.input === 'checkbox') return { type: data.input }
+    }
+    return
+  }
+
+  changeOption () {
     this.extraValue.options = [{
       label: '选项2',
       value: 'option2'
@@ -44,13 +73,17 @@ export default class App extends Base {
     }]
   }
 
-  setData () {
+  getData () {
     let data = {}
     this.configList.forEach(ele => {
       data[ele.name] = null
     })
+    data['input'] = 'disabled'
     data['select'] = 'option1'
-    this.data = data
+    return data
+  }
+  setData () {
+    this.data = this.getData()
   }
 
   render () {
@@ -97,9 +130,8 @@ export default class App extends Base {
               <Checkbox v-model={this.editable}>可编辑</Checkbox>
 
               <Button on-click={() => {
-                this.test()
-                console.log(this.data)
-              }}>test</Button>
+                this.changeOption()
+              }}>修改选项</Button>
             </div>
             {this.renderSetting()}
           </Col>
@@ -116,12 +148,21 @@ export default class App extends Base {
                     editable={this.editable}
                     readonlyType='disabled'
                     extraValue={this.extraValue}
+                    dynamicConfig={this.dynamicConfig}
                   />
                 </Col>
               )
             })}
           </Row>
         </div>
+        <MyList colConfigs={this.configList} dynamicCompOptions={
+          {
+            extraValue: this.extraValue,
+            editable: this.editable,
+            dynamicConfig: this.dynamicConfig
+          }
+        }
+        data={[this.getData(), this.getData()]}></MyList>
       </div>
     )
   }

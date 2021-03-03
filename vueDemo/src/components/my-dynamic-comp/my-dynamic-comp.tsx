@@ -2,6 +2,7 @@ import { Component, Vue, Watch } from 'vue-property-decorator'
 
 import { convClass, getCompOpts } from '@/components/utils'
 import { Prop } from '@/components/property-decorator'
+
 import {
   Input,
   Select,
@@ -9,10 +10,9 @@ import {
   InputNumber,
   DatePicker,
   TimePicker
-} from '@/components/iview'
-
-import { Base } from '../base'
-import './dynamic-comp.less'
+} from '../iview'
+import { MyBase } from '../my-base'
+import './my-dynamic-comp.less'
 
 export const DynamicCompType = {
   输入框: 'input',
@@ -45,6 +45,8 @@ type SelectOptionType = { label: string; value: any };
 export type DynamicCompConfigType = {
   name: string;
   text: string;
+  editable?: boolean
+  remark?: string;
   // 组件类型
   type?: string;
   // 是否区间
@@ -78,14 +80,22 @@ class DynamicCompProp {
 
   @Prop()
   extraValue?: Object
+
+  @Prop()
+  dynamicConfig?: (opt: {
+    config: DynamicCompConfigType,
+    name: string,
+    value: any,
+    data: any,
+  }) => any
 }
 
 @Component({
-  extends: Base,
+  extends: MyBase,
   mixins: [getCompOpts(DynamicCompProp)]
 })
-class DynamicCompModel extends Vue<DynamicCompProp & Base> {
-  stylePrefix = 'comp-dynamic-comp-';
+class DynamicCompModel extends Vue<DynamicCompProp & MyBase> {
+  stylePrefix = 'my-dynamic-comp-';
   created () {
   }
   render () {
@@ -110,14 +120,40 @@ class DynamicCompModel extends Vue<DynamicCompProp & Base> {
   private remoteSelectOptions: SelectOptionType[] = []
 
   private get actuallyEditable () {
-    return this.editable
+    return this.getActualOption().editable
   }
+
   private get isDate () {
-    let { config } = this
+    let { config } = this.getActualOption()
     return [DynamicCompType.日期, DynamicCompType.日期时间].includes(config.type)
   }
+
+  // 获取实际的参数
+  private getActualOption () {
+    let { config, data } = this
+    let cfg
+    if (this.dynamicConfig) {
+      cfg = this.dynamicConfig({
+        config, name: config.name,
+        value: data[config.name],
+        data
+      })
+    }
+    let actConfig = config
+    if (cfg) {
+      actConfig = {
+        ...actConfig,
+        ...cfg
+      }
+    }
+    return {
+      data,
+      config: actConfig,
+      editable: this.editable && actConfig.editable
+    }
+  }
   renderText ({ rangeSeparator }) {
-    let { data, config } = this
+    let { data, config } = this.getActualOption()
 
     let val = data[config.name]
     let showValue = val
@@ -140,8 +176,12 @@ class DynamicCompModel extends Vue<DynamicCompProp & Base> {
     return showValue
   }
   renderComp () {
-    let { data, config } = this
+    let { data, config } = this.getActualOption()
     let rangeSeparator = config.rangeSeparator || '-'
+
+    if (config.type === DynamicCompType.多选框) {
+      return <Checkbox v-model={data[config.name]} disabled={!this.actuallyEditable} />
+    }
 
     if (this.readonlyType === 'text' && !this.actuallyEditable) {
       return this.renderText({
@@ -157,16 +197,16 @@ class DynamicCompModel extends Vue<DynamicCompProp & Base> {
         })
       }
       return (
-        <Select v-model={data[config.name]} filterable loading={this.loading} remote-method={method} disabled={!this.actuallyEditable}>
+        <Select
+          v-model={data[config.name]} filterable placeholder={config.remark}
+          loading={this.loading} remote-method={method} disabled={!this.actuallyEditable}
+          clearable
+        >
           {this.selectOptions?.map((ele) => {
             return <i-option value={ele.value} key={ele.label}>{ele.label}</i-option>
           })}
         </Select>
       )
-    }
-
-    if (config.type === DynamicCompType.多选框) {
-      return <Checkbox v-model={data[config.name]} disabled={!this.actuallyEditable}/>
     }
 
     if (this.isDate) {
@@ -175,7 +215,8 @@ class DynamicCompModel extends Vue<DynamicCompProp & Base> {
         [DynamicCompType.日期时间]: 'datetime'
       }[config.type] as any
       if (config.isRange) type += 'range'
-      return <DatePicker type={type} v-model={data[config.name]} disabled={!this.actuallyEditable}/>
+      return <DatePicker type={type} v-model={data[config.name]} disabled={!this.actuallyEditable}
+        placeholder={config.remark} clearable />
     }
 
     if (config.type === DynamicCompType.时间) {
@@ -187,6 +228,7 @@ class DynamicCompModel extends Vue<DynamicCompProp & Base> {
           v-model={data[config.name]}
           type={type}
           range-separator={rangeSeparator}
+          placeholder={config.remark}
         />
       )
     }
@@ -196,19 +238,23 @@ class DynamicCompModel extends Vue<DynamicCompProp & Base> {
         <InputNumber
           v-model={data[config.name]}
           disabled={!this.actuallyEditable}
-          controls-position='right' />
+          controls-position='right'
+          placeholder={config.remark}
+        />
       )
     }
 
     return <Input
       v-model={data[config.name]}
       disabled={!this.actuallyEditable}
+      placeholder={config.remark}
+      clearable
     ></Input>
   }
 
   setSelectOption (opt: { query?}) {
     let { query } = opt
-    let { config, data } = this
+    let { config, data } = this.getActualOption()
     let rs = (config.options as any)(query)
     this.loading = true
     let value

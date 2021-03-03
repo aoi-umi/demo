@@ -380,7 +380,7 @@ export default class UserInfo extends Base {
               <AuthorityTagView value={Object.values(detail.auth)} hideCode />
             </FormItem>
             <FormItem label='注册时间'>
-              {detail.createdAt && this.$utils.dateFormat(detail.createdAt)}
+              {this.$utils.dateFormat(detail.createdAt)}
             </FormItem>
             <FormItem label='绑定'>
               <ThirdPartyLoginView bind user={detail} />
@@ -392,7 +392,7 @@ export default class UserInfo extends Base {
             {detail.profile || dev.defaultProfile}
           </FormItem>
           <FormItem label='注册时间'>
-            {detail.createdAt && this.$utils.dateFormat(detail.createdAt)}
+            {this.$utils.dateFormat(detail.createdAt)}
           </FormItem>
         </Form>
       )

@@ -1,6 +1,7 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
 
 import { Prop } from '@/components/property-decorator'
+import { DynamicCompConfigType, DynamicComp } from '../my-dynamic-comp'
 
 import {
   Table, Page, Row, Col,
@@ -79,6 +80,12 @@ class MyListProp<QueryArgs = any> {
   columns?: ColType[];
 
   @Prop()
+  colConfigs?: DynamicCompConfigType[];
+
+  @Prop()
+  dynamicCompOptions?: Object
+
+  @Prop()
   defaultColumn?: ColType;
 
   @Prop()
@@ -154,8 +161,22 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue<MyListProp<QueryArgs> 
   private cols?: ColType[];
   protected created () {
     if (this.type == 'table') {
-      if (!this.columns) { throw new Error(`type 'table' require 'columns'!`) }
-      this.cols = this.columns
+      if (!this.columns && !this.colConfigs) { throw new Error(`type 'table' require 'columns' or 'colConfigs'!`) }
+      this.cols = []
+      if (this.colConfigs) {
+        this.cols.push(...this.colConfigs.map(ele => {
+          return {
+            key: ele.name,
+            title: ele.text || ele.name,
+            align: 'center',
+            render: (h, params) => {
+              return (<DynamicComp props={this.dynamicCompOptions} config={ele} data={params.row}
+              ></DynamicComp>)
+            }
+          }
+        }))
+      }
+      if (this.columns) { this.cols.push(...this.columns) }
       if (this.defaultColumn) {
         this.cols.forEach(ele => {
           for (const key in this.defaultColumn) {
