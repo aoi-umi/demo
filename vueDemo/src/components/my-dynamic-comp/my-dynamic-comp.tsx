@@ -107,7 +107,9 @@ class DynamicCompModel extends Vue<DynamicCompProp & MyBase> {
     return (
       <Tooltip class={this.getStyleName('root')} disabled={!this.toolTips}>
         {this.showText &&
-          <span class={[this.actuallyRequired && 'required']}>{this.actualOption.config.text}</span>
+          <span class={this.getStyleName('text').concat([this.actuallyRequired && 'required'])}>
+            {this.actualOption.config.text}
+          </span>
         }
         <div class={this.getStyleName('container').concat([
           !this.showText && this.actuallyRequired && 'required'

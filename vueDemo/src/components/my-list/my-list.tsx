@@ -270,8 +270,22 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue<MyListProp<QueryArgs> 
   set selectedRows (val) {
     this.model.selection = val
   }
-  private setSelectedRows (selection) {
+  private selectionChangeHandler (selection) {
     this.selectedRows = selection
+  }
+
+  private currentChangeHandler (_currentRow, _oldCurrentRow) {
+    let currentRow = this.findOriginData(_currentRow)
+    let oldCurrentRow = this.findOriginData(_oldCurrentRow)
+
+    this.$emit('current-change', {
+      currentRow,
+      oldCurrentRow
+    })
+  }
+
+  private findOriginData (row) {
+    if (this.data && row) { return this.data.find(ele => ele._index === row._index) }
   }
 
   private showQuery = true;
@@ -281,6 +295,15 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue<MyListProp<QueryArgs> 
   @Watch('value')
   private watchValue (newVal) {
     this.model = newVal
+  }
+
+  @Watch('data')
+  private watchData (newVal) {
+    if (newVal) {
+      newVal.forEach((ele, idx) => {
+        ele._index = idx
+      })
+    }
   }
 
   setQueryByKey (data, keyList: string[]) {
@@ -452,7 +475,7 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue<MyListProp<QueryArgs> 
               })}
 
               data={this.result.data} no-data-text={this.result.msg}
-              on-on-selection-change={this.setSelectedRows}
+              on-on-selection-change={this.selectionChangeHandler}
               on-on-sort-change={(opt: OnSortChangeOptions) => {
                 const sortMap = {
                   asc: 1,
@@ -467,6 +490,8 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue<MyListProp<QueryArgs> 
                 this.handleQuery({ resetPage: true })
               }}
               height={this.tableHeight}
+              highlight-row
+              on-on-current-change={this.currentChangeHandler}
             >
             </Table>
             : this._customRenderFn(this.result)

@@ -34,7 +34,7 @@ export default class App extends Base {
       动态组件: {
         name: 'dyn-input'
       }
-    }).map(ele => {
+    }).map((ele, index) => {
       let val = ele[1]
       let text = ele[0]
       let name = ''
@@ -102,12 +102,13 @@ export default class App extends Base {
           <Col xs={12}>
             <MyList
               tableHeight={200}
+              on-current-change={(obj) => {
+                this.selectRow = obj.currentRow
+              }}
               columns={[{
                 key: 'name',
                 render: (h, params) => {
-                  return (<div on-click={() => {
-                    this.selectRow = this.configList[params['index']]
-                  }}>{params.row.name}</div>)
+                  return (<div>{params.row.name}</div>)
                 }
               }, {
                 key: 'op',
