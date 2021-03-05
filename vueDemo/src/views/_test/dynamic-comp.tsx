@@ -18,7 +18,11 @@ export default class App extends Base {
     options: [{
       label: '选项1',
       value: 'option1'
-    }]
+    }] as any
+  }
+
+  getDefaultConfig () {
+    return { editable: true }
   }
   created () {
     this.configList = Object.entries({
@@ -36,13 +40,13 @@ export default class App extends Base {
       let name = ''
       if (typeof val === 'string') { name = val } else name = val.name
       let obj = {
+        ...this.getDefaultConfig(),
         name,
         text,
         type: name,
         isRange: false,
         options: 'options',
-        remark: `${text}_${name}`,
-        editable: true
+        remark: `${text}_${name}`
       }
       if (!(typeof val === 'string')) {
         obj = {
@@ -58,28 +62,32 @@ export default class App extends Base {
   dynamicConfig ({ config, name, value, data }) {
     if (name === 'dyn-input') {
       if (data.input === 'disabled') return { editable: false }
-      if (data.input === 'checkbox') return { type: data.input }
+      if (data.input === 'required') return { required: true }
+      if (DynamicCompType[data.input]) return { type: DynamicCompType[data.input] }
     }
     return
   }
 
   changeOption () {
-    this.extraValue.options = [{
-      label: '选项2',
-      value: 'option2'
-    }, {
-      label: '选项1',
-      value: 'option1'
-    }]
+    this.extraValue.options = {
+      选项2: 'option2',
+      选项1: 'option1'
+    }
   }
 
-  getData () {
+  getData (d?) {
     let data = {}
     this.configList.forEach(ele => {
       data[ele.name] = null
     })
     data['input'] = 'disabled'
     data['select'] = 'option1'
+    if (d) {
+      data = {
+        ...data,
+        ...d
+      }
+    }
     return data
   }
   setData () {
@@ -118,6 +126,7 @@ export default class App extends Base {
             >
               <Button on-click={() => {
                 this.configList.push({
+                  ...this.getDefaultConfig(),
                   name: 'unknow',
                   text: '未命名',
                   type: 'input'
@@ -155,14 +164,14 @@ export default class App extends Base {
             })}
           </Row>
         </div>
-        <MyList colConfigs={this.configList} dynamicCompOptions={
+        <MyList hideSearchBox colConfigs={this.configList} dynamicCompOptions={
           {
             extraValue: this.extraValue,
             editable: this.editable,
             dynamicConfig: this.dynamicConfig
           }
         }
-        data={[this.getData(), this.getData()]}></MyList>
+        data={[this.getData(), this.getData({ input: 'required' })]}></MyList>
       </div>
     )
   }
@@ -195,6 +204,10 @@ export default class App extends Base {
 
         <FormItem label='isRange'>
           <Checkbox v-model={this.selectRow.isRange} />
+        </FormItem>
+
+        <FormItem label='required'>
+          <Checkbox v-model={this.selectRow.required} />
         </FormItem>
       </Form>
     )

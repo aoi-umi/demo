@@ -1,4 +1,11 @@
 .my-dynamic-comp- {
+  &root {
+    display: flex;
+    align-items: center;
+    > * {
+      flex-grow: 1;
+    }
+  }
   &container {
     height: 32px;
     display: flex;

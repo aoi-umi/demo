@@ -9,8 +9,10 @@ import {
   Checkbox,
   InputNumber,
   DatePicker,
-  TimePicker
+  TimePicker,
+  Tooltip
 } from '../iview'
+import '../style'
 import { MyBase } from '../my-base'
 import './my-dynamic-comp.less'
 
@@ -52,9 +54,12 @@ export type DynamicCompConfigType = {
   // 是否区间
   isRange?: boolean;
   rangeSeparator?: string;
-  options?: string | SelectOptionType[] | ((query: string) => Promise<SelectOptionType[]>);
+  options?: string | { [key: string]: number | string }
+  | SelectOptionType[] | ((query: string) => Promise<SelectOptionType[]>);
+  append?: any
+  required?: boolean
 };
-class DynamicCompProp {
+export class DynamicCompProp {
   @Prop({
     required: true
   })
@@ -100,27 +105,49 @@ class DynamicCompModel extends Vue<DynamicCompProp & MyBase> {
   }
   render () {
     return (
-      <div>
-        {this.showText && this.config.text}
-        <div class={this.getStyleName('container')}>{this.renderComp()}</div>
-      </div>
+      <Tooltip class={this.getStyleName('root')} disabled={!this.toolTips}>
+        {this.showText &&
+          <span class={[this.actuallyRequired && 'required']}>{this.actualOption.config.text}</span>
+        }
+        <div class={this.getStyleName('container').concat([
+          !this.showText && this.actuallyRequired && 'required'
+        ])}>{this.renderComp()}</div>
+        <div slot='content' style='white-space: normal;word-break: break-all;'>
+          {this.toolTips}
+        </div>
+      </Tooltip>
     )
   }
 
   private loading = false
 
   private get selectOptions () {
-    let { config, data } = this
+    let { config, data } = this.getActualOption()
+    let val
     if (typeof config.options === 'function') {
-      return this.remoteSelectOptions
+      val = this.remoteSelectOptions
     } else if (typeof config.options === 'string') {
-      return this.extraValue[config.options]
-    } else { return config.options }
+      val = this.extraValue[config.options]
+    } else { val = config.options }
+
+    if (val && !(val instanceof Array)) {
+      val = Object.entries(val).map(ele => {
+        return {
+          label: ele[0],
+          value: ele[1]
+        }
+      })
+    }
+    return val as SelectOptionType[]
   }
+
   private remoteSelectOptions: SelectOptionType[] = []
 
   private get actuallyEditable () {
-    return this.getActualOption().editable
+    return this.actualOption.editable
+  }
+  private get actuallyRequired () {
+    return this.actualOption.config.required
   }
 
   private get isDate () {
@@ -128,6 +155,9 @@ class DynamicCompModel extends Vue<DynamicCompProp & MyBase> {
     return [DynamicCompType.日期, DynamicCompType.日期时间].includes(config.type)
   }
 
+  private get actualOption () {
+    return this.getActualOption()
+  }
   // 获取实际的参数
   private getActualOption () {
     let { config, data } = this
@@ -146,14 +176,21 @@ class DynamicCompModel extends Vue<DynamicCompProp & MyBase> {
         ...cfg
       }
     }
+
+    let rangeSeparator = config.rangeSeparator || '-'
     return {
       data,
       config: actConfig,
-      editable: this.editable && actConfig.editable
+      editable: this.editable && actConfig.editable,
+      rangeSeparator
     }
   }
-  renderText ({ rangeSeparator }) {
-    let { data, config } = this.getActualOption()
+
+  private get toolTips () {
+    return this.getReadonlyValue()
+  }
+  private getReadonlyValue () {
+    let { data, config, rangeSeparator } = this.getActualOption()
 
     let val = data[config.name]
     let showValue = val
@@ -175,18 +212,19 @@ class DynamicCompModel extends Vue<DynamicCompProp & MyBase> {
     if (showValue instanceof Array) { showValue = showValue.join(` ${rangeSeparator} `) }
     return showValue
   }
+
+  renderText () {
+    return this.getReadonlyValue()
+  }
   renderComp () {
-    let { data, config } = this.getActualOption()
-    let rangeSeparator = config.rangeSeparator || '-'
+    let { data, config, rangeSeparator } = this.getActualOption()
 
     if (config.type === DynamicCompType.多选框) {
       return <Checkbox v-model={data[config.name]} disabled={!this.actuallyEditable} />
     }
 
     if (this.readonlyType === 'text' && !this.actuallyEditable) {
-      return this.renderText({
-        rangeSeparator
-      })
+      return this.renderText()
     }
 
     if (config.type === DynamicCompType.选择器) {
@@ -198,9 +236,9 @@ class DynamicCompModel extends Vue<DynamicCompProp & MyBase> {
       }
       return (
         <Select
-          v-model={data[config.name]} filterable placeholder={config.remark}
+          clearable transfer filterable
+          v-model={data[config.name]} placeholder={config.remark}
           loading={this.loading} remote-method={method} disabled={!this.actuallyEditable}
-          clearable
         >
           {this.selectOptions?.map((ele) => {
             return <i-option value={ele.value} key={ele.label}>{ele.label}</i-option>
@@ -215,8 +253,10 @@ class DynamicCompModel extends Vue<DynamicCompProp & MyBase> {
         [DynamicCompType.日期时间]: 'datetime'
       }[config.type] as any
       if (config.isRange) type += 'range'
-      return <DatePicker type={type} v-model={data[config.name]} disabled={!this.actuallyEditable}
-        placeholder={config.remark} clearable />
+      return <DatePicker
+        clearable transfer
+        type={type} v-model={data[config.name]} disabled={!this.actuallyEditable}
+        placeholder={config.remark} />
     }
 
     if (config.type === DynamicCompType.时间) {
@@ -224,6 +264,7 @@ class DynamicCompModel extends Vue<DynamicCompProp & MyBase> {
       if (config.isRange) type += 'range'
       return (
         <TimePicker
+          transfer
           disabled={!this.actuallyEditable}
           v-model={data[config.name]}
           type={type}
@@ -249,7 +290,9 @@ class DynamicCompModel extends Vue<DynamicCompProp & MyBase> {
       disabled={!this.actuallyEditable}
       placeholder={config.remark}
       clearable
-    ></Input>
+    >
+      {config.append && <span slot='append'>{config.append}</span>}
+    </Input>
   }
 
   setSelectOption (opt: { query?}) {

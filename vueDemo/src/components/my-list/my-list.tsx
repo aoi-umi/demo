@@ -1,7 +1,7 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
 
 import { Prop } from '@/components/property-decorator'
-import { DynamicCompConfigType, DynamicComp } from '../my-dynamic-comp'
+import { DynamicCompConfigType, DynamicComp, DynamicCompProp } from '../my-dynamic-comp'
 
 import {
   Table, Page, Row, Col,
@@ -83,7 +83,7 @@ class MyListProp<QueryArgs = any> {
   colConfigs?: DynamicCompConfigType[];
 
   @Prop()
-  dynamicCompOptions?: Object
+  dynamicCompOptions?: Partial<DynamicCompProp>
 
   @Prop()
   defaultColumn?: ColType;
@@ -177,13 +177,14 @@ class MyList<QueryArgs extends QueryArgsType> extends Vue<MyListProp<QueryArgs> 
         }))
       }
       if (this.columns) { this.cols.push(...this.columns) }
-      if (this.defaultColumn) {
-        this.cols.forEach(ele => {
-          for (const key in this.defaultColumn) {
-            if (!(key in ele)) { ele[key] = this.defaultColumn[key] }
-          }
-        })
+      let defaultColumn = {
+        ...this.defaultColumn
       }
+      this.cols.forEach(ele => {
+        for (const key in defaultColumn) {
+          if (!(key in ele)) { ele[key] = defaultColumn[key] }
+        }
+      })
     } else if (this.type == 'custom' && !this.customRenderFn) {
       throw new Error(`type 'custom' require 'customRenderFn'!`)
     }
