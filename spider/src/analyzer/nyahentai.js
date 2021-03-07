@@ -8,17 +8,16 @@ async function nyahentai({ html, origin }) {
     let firstPage = origin + href
     let fpRs = await utils.loadUrl(firstPage);
     let fp$ = cheerio.load(fpRs.html);
+    // console.log(fp$)
     let fpSrc = fp$(fp$('#image-container img')[0]).attr('src')
     
-    let hostReg = /^(http|https):\/\/(\w+(\.)?)+/;
-    let regRs = hostReg.exec(fpSrc)
-    let host = regRs[0];
+    let host = utils.getUrlHost(fpSrc)
     $(`#thumbnail-container img`).each(function (idx, ele) {
         let dom = $(this);
         let src = dom.attr('data-src');
         let reg = /(\d+)t\.([\w]+)$/;
         if (src) {
-            src = src.replace(hostReg, host);
+            src = utils.replaceHost(src, host);
             let exec = reg.exec(src);
             if (exec) {
                 list.push([{

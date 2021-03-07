@@ -9,11 +9,22 @@ const mkdir = exports.mkdir = (dir) => {
     }
 }
 
+let hostReg = /^(http|https):\/\/(\w+(\.)?)+/;
+const getUrlHost = exports.getUrlHost = (url) => {
+    let regRs = hostReg.exec(url)
+    let host = regRs[0];
+    return host
+}
+
+exports.replaceHost = (url, newHost) => {
+    return url.replace(hostReg, newHost);
+}
+
 const loadUrl = exports.loadUrl = async (url) => {
     console.log(`url: ${url}`);
     console.log('load url start');
     let rs = await axios.get(url);
-    let origin = `${rs.request.protocol}//${rs.request.host}`
+    let origin = getUrlHost(url);
     let html = rs.data;
     console.log('load url end');
     return { html, origin };
