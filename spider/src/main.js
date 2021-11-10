@@ -75,7 +75,7 @@ class Download {
         if (!analyzerType) {
             if (/huaban.com/.test(url))
                 analyzerType = analyzerEnum.花瓣;
-            else if (/nyahentai.pro|nyahentai[\d]*.com|eehentai.com/.test(url))
+            else if (/nyahentai|qqhentai/.test(url))
                 analyzerType = analyzerEnum.nyahentai;
 
         }
