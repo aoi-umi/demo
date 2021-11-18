@@ -12,25 +12,27 @@ const analyzerEnum = {
 };
 exports.analyzerEnum = analyzerEnum;
 class Download {
-    static async run(url, analyzerType) {
-        let dir = 'out';
+    static async run({ url, type, dir } = opt) {
+        let outDir = 'out';
         let dirName = url.replace(/http(s)?:\/\//, '').replace(/\//g, '_');
         // let exec = /^http(s)?:\/\/[^\/]+/.exec(url);
         let urlRs = await utils.loadUrl(url);
-        let analyzer = this.getAnalyzer(analyzerType, url);
+        let analyzer = this.getAnalyzer(type, url);
         let rs = await analyzer(urlRs);
 
         if (!rs.list.length)
             console.log('无下载内容');
         else {
-            if (rs.title)
+            if (dir)
+                dirname = dir
+            else if (rs.title)
                 dirName = rs.title;
 
             //替换特殊符号
             dirName = dirName.replace(/[\\\/\<\>\?\*\|"\:]/g, '');
-            dir = path.join(dir, dirName);
-            utils.mkdir(dir);
-            await this.save(dir, rs.list);
+            outDir = path.join(outDir, dirName);
+            utils.mkdir(outDir);
+            await this.save(outDir, rs.list);
         }
     }
 
