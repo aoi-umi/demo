@@ -12,7 +12,7 @@ const analyzerEnum = {
 };
 exports.analyzerEnum = analyzerEnum;
 class Download {
-    static async run({ url, type, dir } = opt) {
+    static async run({ url, type, dir, retry } = opt) {
         let outDir = 'out';
         let dirName = url.replace(/http(s)?:\/\//, '').replace(/\//g, '_');
         // let exec = /^http(s)?:\/\/[^\/]+/.exec(url);
@@ -32,7 +32,19 @@ class Download {
             dirName = dirName.replace(/[\\\/\<\>\?\*\|"\:]/g, '');
             outDir = path.join(outDir, dirName);
             utils.mkdir(outDir);
-            await this.save(outDir, rs.list);
+            let retryTimes = parseInt(retry);
+            if (isNaN(retryTimes) || retryTimes <= 0)
+                retryTimes = 0;
+
+            while (true) {
+                let saveRs = await this.save(outDir, rs.list);
+                if (saveRs.finished) break;
+                if (retry === true);
+                else if (retryTimes === 0)
+                    break;
+                else
+                    retryTimes--;
+            }
         }
     }
 
@@ -41,6 +53,7 @@ class Download {
             total: 0,
             success: 0,
             exists: 0,
+            finished: false
         };
         rs.total = list.length;
         for (let o of list) {
@@ -70,6 +83,8 @@ class Download {
             }
         }
         console.log(`下载结果: 成功:${rs.success}/已存在:${rs.exists}/总数:${rs.total}`);
+        rs.finished = rs.total === rs.success + rs.exists;
+        return rs;
     }
 
     static getAnalyzer(analyzerType, url) {
