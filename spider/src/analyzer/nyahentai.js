@@ -1,8 +1,12 @@
 const cheerio = require('cheerio');
 const utils = require('../utils')
 
-async function nyahentai({ html, origin }) {
+exports.default = async function nyahentai({ html, origin }) {
     let $ = cheerio.load(html);
+    let title = $('#info h1').text();
+    if (title)
+        title = title.trim();
+        
     let list = [];
     let href = $(`#cover a`).attr('href')
     let firstPage = origin + href
@@ -30,10 +34,5 @@ async function nyahentai({ html, origin }) {
             }
         }
     });
-    let title = $('#info h1').text();
-    if (title)
-        title = title.trim();
     return { list, title };
 }
-
-exports.default = nyahentai;

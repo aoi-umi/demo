@@ -2,13 +2,12 @@ const axios = require('axios').default;
 const fs = require('fs');
 const path = require('path');
 
-const huaban = require('./analyzer/huaban').default;
-const nyahentai = require('./analyzer/nyahentai').default;
 const utils = require('./utils')
 
 const analyzerEnum = {
     花瓣: 'huaban',
-    nyahentai: 'nyahentai'
+    nyahentai: 'nyahentai',
+    '3hentai': '3hentai'
 };
 exports.analyzerEnum = analyzerEnum;
 class Download {
@@ -24,7 +23,7 @@ class Download {
             console.log('无下载内容');
         else {
             if (dir)
-                dirname = dir
+                dirName = dir
             else if (rs.title)
                 dirName = rs.title;
 
@@ -92,18 +91,18 @@ class Download {
         if (!analyzerType) {
             if (/huaban.com/.test(url))
                 analyzerType = analyzerEnum.花瓣;
-            else if (/nyahentai|qqhentai/.test(url))
+            else if (/nyahentai|qqhentai|bughentai/.test(url))
                 analyzerType = analyzerEnum.nyahentai;
+            else if (/3hentai.net/.test(url))
+                analyzerType = analyzerEnum['3hentai'];
 
         }
-        switch (analyzerType) {
-            case analyzerEnum.花瓣:
-                analyzer = huaban;
-                break;
-            case analyzerEnum.nyahentai:
-                analyzer = nyahentai;
-                break;
+        if (analyzerType) {
+            let analyzerPath = path.resolve(__dirname, 'analyzer', `${analyzerType}.js`);
+            if (fs.existsSync(analyzerPath))
+                analyzer = require(analyzerPath).default;
         }
+
         if (!analyzer)
             throw new Error('无对应解析器');
         return analyzer;
