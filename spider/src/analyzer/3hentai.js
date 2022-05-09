@@ -4,7 +4,7 @@ const utils = require('../utils')
 exports.default = async function fn({ html, origin }) {
   let $ = cheerio.load(html);
 
-  let title = $('#main-info h1').text();
+  let title = $('#main-info h2').text() || $('#main-info h1').text();
   if (title)
     title = title.trim();
   let list = [];

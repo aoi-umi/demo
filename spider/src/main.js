@@ -81,8 +81,9 @@ class Download {
                 }
             }
         }
-        console.log(`下载结果: 成功:${rs.success}/已存在:${rs.exists}/总数:${rs.total}`);
-        rs.finished = rs.total === rs.success + rs.exists;
+        let rest = rs.total - (rs.success + rs.exists);
+        console.log(`下载结果: 成功:${rs.success}/已存在:${rs.exists}/总数:${rs.total}/剩余:${rest}`);
+        rs.finished = rest === 0;
         return rs;
     }
 
