@@ -10,8 +10,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.19.1",
+    "axios": "^1.5.0",
     "cheerio": "^1.0.0-rc.3",
-    "commander": "^5.1.0"
+    "commander": "^5.1.0",
+    "config": "^3.3.9",
+    "data-uri-to-buffer": "^6.0.1",
+    "https-proxy-agent": "^7.0.2",
+    "puppeteer": "^21.3.4"
   }
 }
