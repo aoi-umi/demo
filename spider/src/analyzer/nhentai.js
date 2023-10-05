@@ -19,22 +19,20 @@ exports.default = async function nyahentai({ html, origin, requestOpt }) {
     let dom = $(this);
     let src = dom.attr("data-src");
     let reg = /(\d+)t\.([\w]+)$/;
-    if (src) {
-      src = utils.replaceHost(src, host);
-      let exec = reg.exec(src);
-      if (exec) {
-        let exts = ["jpg", "png"];
-        if (exec[2] == "png") exts = ["png", "jpg"];
-        list.push(
-          exts.map((ext) => {
-            return {
-              url: src.replace(reg, "$1." + ext),
-              filename: exec[1] + "." + ext,
-            };
-          })
-        );
-      }
-    }
+    if (!src) return true;
+    src = utils.replaceHost(src, host);
+    let exec = reg.exec(src);
+    if (!exec) return true;
+    let exts = ["jpg", "png"];
+    if (exec[2] == "png") exts = ["png", "jpg"];
+    list.push(
+      exts.map((ext) => {
+        return {
+          url: src.replace(reg, "$1." + ext),
+          filename: exec[1] + "." + ext,
+        };
+      })
+    );
   });
   return { list, title };
 };
