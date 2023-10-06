@@ -8,10 +8,10 @@ exports.default = async function fn({ html, origin }) {
   if (title) title = title.trim();
   let list = [];
 
+  let reg = /(?<name>\d+)t\.(?<ext>[\w]+)$/;
   $(`#thumbnail-gallery img`).each(function (idx, ele) {
     let dom = $(this);
     let src = dom.attr("data-src");
-    let reg = /(?<name>\d+)t\.(?<ext>[\w]+)$/;
     if (!src) return true;
     let exec = reg.exec(src);
     if (!exec) return true;

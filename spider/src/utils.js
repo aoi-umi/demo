@@ -28,11 +28,19 @@ const loadUrl = (exports.loadUrl = async (url, opt) => {
   console.log(`url: ${url}`);
   console.log("load url start");
   let origin = getUrlHost(url);
-  let html = await request(url, opt);
+  let result = await request(url, opt);
   console.log("load url end");
-  return { html, origin };
+  return { html: result.data, origin, result };
 });
 
+/**
+ * opt
+ * opt.proxy {string}
+ * opt.file {boolean}
+ * opt.usePuppeter {boolean}
+ * opt.pageNotClose {boolean}
+ * opt.page
+ */
 const request = (exports.request = async (url, opt) => {
   opt = { ...opt };
   if (opt.usePuppeter) return byPuppeteer(url, opt);
@@ -64,7 +72,7 @@ const byAxios = async (url, opt) => {
   }
   let rs = await axios.get(url, options);
   let data = rs.data;
-  return data;
+  return { data };
 };
 
 let browser;
@@ -75,19 +83,25 @@ async function byPuppeteer(url, opt) {
       userDataDir: config.puppeteer.userDataDir,
     });
   }
-  const page = await browser.newPage();
-  await page.goto(url, { waitUntil: "domcontentloaded" });
-  let cont;
+  let page = opt.page;
+  let newPage;
+  if (!page) page = newPage = await browser.newPage();
+  if (!opt.page) await page.goto(url, { waitUntil: "domcontentloaded" });
+  let data;
   if (opt.file) {
     const dataUrl = await page.evaluate(getDataUrlThroughFetch, url);
-    cont = Buffer.from(dataUriToBuffer(dataUrl).buffer);
+    data = Buffer.from(dataUriToBuffer(dataUrl).buffer);
   } else {
-    cont = await page.content();
+    data = await page.content();
   }
-  await page.close();
+  if (!opt.pageNotClose && newPage) await newPage.close();
 
-  return cont;
+  return { data, page };
 }
+
+exports.closePuppeteer = async () => {
+  if (browser) await browser.close();
+};
 
 const getDataUrlThroughFetch = async (url) => {
   const response = await fetch(url);
@@ -101,53 +115,3 @@ const getDataUrlThroughFetch = async (url) => {
     reader.readAsDataURL(data);
   });
 };
-
-const parseDataURL = (dataUrl) => {
-  let arr = dataUrl.split(","),
-    mime = arr[0].match(/:(.*?);/)[1],
-    bstr = atob(arr[1]),
-    n = bstr.length,
-    u8arr = new Uint8Array(n);
-  while (n--) {
-    u8arr[n] = bstr.charCodeAt(n);
-  }
-  return {
-    buffer: u8arr,
-    mime,
-  };
-};
-
-// const getImageContent = async (page) => {
-//   const client = await page.target().createCDPSession();
-//   let filePath = path.resolve(__dirname, "../.dev");
-//   await client.send("Page.setDownloadBehavior", {
-//     behavior: "allow",
-//     downloadPath: filePath,
-//   });
-
-//   let f = path.resolve(filePath, "1.png");
-//   console.log(f);
-//   await waitForFile(f);
-//   await client.detach();
-// };
-
-exports.closePuppeteer = async () => {
-  if (browser) await browser.close();
-};
-
-function waitForFile(path) {
-  return new Promise(function (resolve, reject) {
-    let times = 10;
-    let id = setInterval(() => {
-      let exists = fs.existsSync(path);
-      if (exists) {
-        resolve();
-        clearInterval(id);
-      }
-      times--;
-      if (!times) {
-        reject("time out");
-      }
-    }, 1 * 1000);
-  });
-}

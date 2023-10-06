@@ -54,11 +54,12 @@ class Download {
       finished: false,
     };
     rs.total = list.length;
-    for (let o of list) {
-      if (!(o instanceof Array)) {
-        o = [o];
+    let puppeteerPage;
+    for (let links of list) {
+      if (!(links instanceof Array)) {
+        links = [links];
       }
-      let exists = o.find((ele) => {
+      let exists = links.find((ele) => {
         let filename = path.join(dir, ele.filename);
         return fs.existsSync(filename);
       });
@@ -66,14 +67,17 @@ class Download {
         rs.exists++;
         continue;
       }
-      for (let ele of o) {
+      for (let ele of links) {
         try {
           console.log(`下载[${ele.url}]`);
           let filename = path.join(dir, ele.filename);
-          let data = await utils.request(ele.url, {
+          let { data, page } = await utils.request(ele.url, {
             ...requestOpt,
+            pageNotClose: true,
             file: true,
+            page: puppeteerPage,
           });
+          puppeteerPage = page;
           fs.writeFileSync(filename, data);
           rs.success++;
           break;
@@ -81,6 +85,9 @@ class Download {
           console.log(e.message);
         }
       }
+    }
+    if (puppeteerPage) {
+      await puppeteerPage.close();
     }
     let rest = rs.total - (rs.success + rs.exists);
     console.log(

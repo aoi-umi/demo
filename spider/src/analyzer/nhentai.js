@@ -15,10 +15,10 @@ exports.default = async function nyahentai({ html, origin, requestOpt }) {
   let fpSrc = fp$(fp$("#image-container img")[0]).attr("src");
 
   let host = utils.getUrlHost(fpSrc);
+  let reg = /(\d+)t\.([\w]+)$/;
   $(`#thumbnail-container img`).each(function (idx, ele) {
     let dom = $(this);
     let src = dom.attr("data-src");
-    let reg = /(\d+)t\.([\w]+)$/;
     if (!src) return true;
     src = utils.replaceHost(src, host);
     let exec = reg.exec(src);
