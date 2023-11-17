@@ -21,7 +21,7 @@ class Download {
     let urlRs = await utils.loadUrl(url, requestOpt);
     let rs = await analyzer({ ...urlRs, requestOpt });
 
-    if (!rs.list.length) {
+    if (!rs || !rs.list.length) {
       console.log("无下载内容");
       return;
     }

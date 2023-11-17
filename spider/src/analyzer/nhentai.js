@@ -3,11 +3,12 @@ const utils = require("../utils");
 
 exports.default = async function nyahentai({ html, origin, requestOpt }) {
   let $ = cheerio.load(html);
-  let title = $("#info h1").text();
+  let title = $("#info h2").text();
   if (title) title = title.trim();
 
   let list = [];
   let href = $(`#thumbnail-container a:first`).attr("href");
+  if (!href) return;
   let firstPage = origin + href;
   let fpRs = await utils.loadUrl(firstPage, requestOpt);
   let fp$ = cheerio.load(fpRs.html);
