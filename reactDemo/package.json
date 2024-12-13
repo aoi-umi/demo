@@ -16,7 +16,7 @@
     "material-ui-pickers": "2.2.4",
     "mobx": "4.9.4",
     "mobx-react": "5.2.8",
-    "moment": "2.24.0",
+    "moment": "2.29.4",
     "node-forge": "0.8.1",
     "notistack": "^0.8.1",
     "q": "1.5.1",
