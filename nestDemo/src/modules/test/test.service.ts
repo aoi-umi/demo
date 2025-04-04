@@ -35,7 +35,7 @@ const QueueMap: {
   [key: string]: {
     key: Settings;
     queue: Queue.Queue;
-    jobs: { [key: Queue.JobId]: JobObject };
+    jobs: { [key in Queue.JobId]: JobObject };
     addJob: (jobData) => Promise<JobObject>;
   };
 } = {};

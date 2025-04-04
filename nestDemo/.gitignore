@@ -40,3 +40,5 @@ config/*
 !config/default.d.ts
 
 *.spec.ts
+
+pnpm-lock.yaml

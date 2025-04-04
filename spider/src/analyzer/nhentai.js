@@ -3,7 +3,7 @@ const utils = require("../utils");
 
 exports.default = async function nyahentai({ html, origin, requestOpt }) {
   let $ = cheerio.load(html);
-  let title = $("#info h2").text();
+  let title = $("#info .title:last").text();
   if (title) title = title.trim();
 
   let list = [];
@@ -24,8 +24,12 @@ exports.default = async function nyahentai({ html, origin, requestOpt }) {
     src = utils.replaceHost(src, host);
     let exec = reg.exec(src);
     if (!exec) return true;
+    let ext = exec[2];
     let exts = ["jpg", "png"];
-    if (exec[2] == "png") exts = ["png", "jpg"];
+    if (ext == "png") exts = ["png", "jpg"];
+    if (!exts.includes(ext))
+      exts.unshift(ext);
+
     list.push(
       exts.map((ext) => {
         return {
