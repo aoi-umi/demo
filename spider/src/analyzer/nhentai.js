@@ -14,9 +14,11 @@ exports.default = async function nyahentai({ html, origin, requestOpt }) {
   let fp$ = cheerio.load(fpRs.html);
   // console.log(fp$)
   let fpSrc = fp$(fp$("#image-container img")[0]).attr("src");
+  let protacol = origin.split(":")[0];
 
   let host = utils.getUrlHost(fpSrc);
-  let reg = /(\d+)t\.([\w]+)$/;
+  if (!host.startsWith(protacol)) host = protacol + ":" + host;
+  let reg = /(\d+)t(\.(?<ext>[\w]+)){1,}$/;
   $(`#thumbnail-container img`).each(function (idx, ele) {
     let dom = $(this);
     let src = dom.attr("data-src");
@@ -24,7 +26,7 @@ exports.default = async function nyahentai({ html, origin, requestOpt }) {
     src = utils.replaceHost(src, host);
     let exec = reg.exec(src);
     if (!exec) return true;
-    let ext = exec[2];
+    let ext = exec.groups.ext;
     let exts = ["jpg", "png"];
     if (ext == "png") exts = ["png", "jpg"];
     if (!exts.includes(ext))

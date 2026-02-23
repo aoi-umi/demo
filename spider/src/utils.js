@@ -13,7 +13,7 @@ const mkdir = (exports.mkdir = (dir) => {
   }
 });
 
-let hostReg = /^(http|https):\/\/(\w+(\.)?)+/;
+let hostReg = /^((http|https):)?\/\/(\w+(\.)?)+/;
 const getUrlHost = (exports.getUrlHost = (url) => {
   let regRs = hostReg.exec(url);
   let host = regRs[0];
