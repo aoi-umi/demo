@@ -21,7 +21,7 @@ exports.default = async function nyahentai({ html, origin, requestOpt }) {
   let reg = /(\d+)t(\.(?<ext>[\w]+)){1,}$/;
   $(`#thumbnail-container img`).each(function (idx, ele) {
     let dom = $(this);
-    let src = dom.attr("data-src");
+    let src = dom.attr("data-src") || dom.attr("src");
     if (!src) return true;
     src = utils.replaceHost(src, host);
     let exec = reg.exec(src);

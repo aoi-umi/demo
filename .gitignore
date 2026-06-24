@@ -23,6 +23,7 @@ yarn-error.log*
 .nuxt
 **/config/local.*
 
+nul
 obj
 bin
 out
